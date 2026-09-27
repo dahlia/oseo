@@ -878,6 +878,123 @@ observations. API timestamps have second resolution; nested log timestamps
 and durations have finer resolution, but normalized rates remain derived
 allocations with the startup limitation stated above.
 
+### Native case runtime profile (U11 Phase A)
+
+U11 profiles the ordinary policy at `8e8b6766` without changing runtime or
+compiler sources. Diagnostic wrappers and compact outputs are preserved in
+[*evidence/u11/README.md*](./evidence/u11/README.md). Every sanitized run
+requests the same `-fsanitize=address,undefined` flags as the Zig gate and uses
+only `ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-native-case-runtime-cost`.
+Runtime objects retain `-O2`; generated C retains the gate's flags. Dependency
+installation and `mise run build` are outside native execution measurements.
+
+The ordinary allocator does not trigger collection after an allocation count
+or live-heap threshold. *runtime\_core.c* sets `collect_every_safepoint` only
+when `OSEO_GC_EVERY_SAFEPOINT` is present; *runtime\_memory.c* and other
+safepoints collect conditionally on that field. Without the override,
+`oseo_context_destroy` collects at teardown. The profiles below count every
+collection directly, without enabling specialization observation.
+
+The case is upstream
+*test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached.js*,
+with its original 10,000-element array, non-strict mode, and specialization
+enabled. The reviewed TypedArray harness exercises several constructor-argument
+factories, including ordinary arrays and array-like objects. It repeatedly
+fills and copies those large property vectors before reaching the detachment
+assertion. The same source passes in the profiled and ordinary executions.
+
+`oseo_internal_own_property_index` scans every property's key until it finds
+a match or exhausts the vector. A growing dense vector therefore makes
+repeated insertion and iteration quadratic in its element count. Inclusive
+lookup CPU and key-comparison counts distinguish that work from collector
+tracing. This is category (b), a per-element property slow path, rather than
+category (a), an allocation-trigger policy. The array size is required security
+evidence; quadratic key lookup is an implementation cost.
+
+Measured native process CPU seconds and counts from the named profile runs in
+*evidence/u11/measurements.json.txt* follow. CPU uses `clock()` inside the
+executable; the collector column includes teardown collection. Lookup CPU
+includes profiler overhead. Each accepted profile is measured once.
+
+| Run        | Workload                                                  | Native CPU s | Collector CPU s | Lookup CPU s | Collections | Allocation attempts |
+| ---------- | --------------------------------------------------------- | -----------: | --------------: | -----------: | ----------: | ------------------: |
+| `profile3` | Original security case, one variant, gate flags           |   107.299830 |        0.275869 |    95.770142 |           1 |          12,983,881 |
+| `nosan1`   | Same case and profile, sanitizer flags removed as control |    54.145868 |        0.211097 |    43.263758 |           1 |          12,983,881 |
+| `shard2`   | Reviewed shard 3/200, all variants, gate flags            |     2.784129 |        0.068596 |     0.606263 |         370 |           2,903,620 |
+
+Derived from `profile3`: collection is 0.2571 percent of process CPU,
+lookup is 89.2547 percent, and non-collector CPU is 107.023961 s.
+The measured lookup splits into 47.160606 s for hits and 48.609536 s for
+misses. The observed 12,880,590 lookups perform 14,447,751,233 key comparisons;
+14,329,854,054 are on objects with at least 1,000 properties, a derived
+99.184 percent. The unsanitized control has identical counts and is a derived
+1.982 times faster in process CPU. It explains instrumentation cost and proposes
+no sanitizer change. Removing collection entirely could save at most the
+measured 0.276 s from this profile, and would violate the runtime contract.
+
+The accepted fine shard contains a measured 107 paths, with 93 passes,
+8 expected negatives, 6 unsupported results, and no failure or retry. All
+370 native executions have a captured profile; canonical serialized records
+match the checked-in manifest exactly. The runner uses one execution slot to
+keep attribution serial. The three security cases are absent from this sample.
+Measured summed native elapsed intervals are 4.370522 s; summed process CPU is
+2.784129 s. The two quantities include different startup/completion costs and
+are not interchangeable. Derived collector and lookup shares of native CPU
+are 2.4638 and 21.7757 percent. No comparison in this sample involves an object
+with at least 1,000 properties.
+
+This sample estimates collector share in ordinary reviewed work; it does not
+measure a whole-corpus total or the unreviewed remainder. Its zero large-vector
+comparisons give no basis for multiplying the exceptional three-path cost by
+41,091. The same linear lookup exists throughout the runtime, but its quadratic
+large-vector cost is workload-dependent. The known three paths remain the
+measured concentration from U10; neither U10 nor this fine sample establishes
+a corpus-wide saving from a property-lookup optimization.
+
+Measured execution and command times from the same artifact follow. Native
+elapsed is the process launch/completion interval; command wall/user/system
+include compile/link and wrapper work. Runtime compilation requests the gate
+flags in every sanitized row. All rows use the shared, already populated Zig
+lane. The cold/warm column describes only the relevant Oseo cache entries.
+
+| Run         | Oseo cache                           | Native elapsed s | Command wall s | User s | System s |
+| ----------- | ------------------------------------ | ---------------: | -------------: | -----: | -------: |
+| `profile3`  | Cold revised profile archive/harness |          107.716 |         126.20 | 115.77 |    10.77 |
+| `shard2`    | Warm profile archive/harness         |            4.371 |          65.71 |  56.56 |    38.06 |
+| `nosan1`    | Cold explanatory-control namespace   |           54.409 |          65.19 |  56.02 |     9.64 |
+| `baseline1` | Cold ordinary namespace              |           90.136 |         108.86 | 105.49 |     3.43 |
+| `baseline2` | Warm ordinary namespace              |           90.121 |          91.33 |  90.65 |     1.00 |
+
+Both ordinary case runs pass with empty output. Their native intervals agree
+within a derived 0.016 s; the command-time reduction is cache preparation, not
+a runtime improvement. The profile interval exceeds their mean by a derived
+19.5 percent. Counts and timers add work, so the profile's inclusive lookup
+share and hit-time ceiling are diagnostic quantities, not measured potential
+savings in an uninstrumented gate. The fine shard's CPU percentages likewise
+estimate attribution under profiling; timing overhead affects its denominator.
+No cold Zig measurement or before/after runtime comparison is claimed.
+
+Phase B was stopped at the required coordinator decision. The coordinator
+authorized a Phase A-only commit and deferred the guarded-slot proposal
+because it would add hot-path semantic risk while M5c is about to own the
+runtime. The measured successful-lookup CPU gives a derived 43.952-percent
+ceiling on that proposal for this one variant; its estimated practical saving
+was 25–40 percent, not an observed improvement. No runtime experiment or CI
+configuration change was approved or made.
+
+A proper indexed element representation is the lossless runtime lever: it
+would preserve the large security arrays while avoiding repeated linear key
+searches. Its CI value grows if further large-array cases enter the corpus;
+this sample supplies no count or cost for those future cases. Collector
+trigger changes do not address the measured bottleneck. This unit claims zero
+recovered CI capacity and leaves runtime design to its owning work.
+
+macOS was not measured, as the coordinator explicitly allowed after Phase A.
+All timings here are local Linux observations on the shared host described in
+*evidence/u11/host.log*. They are not macOS estimates. Reviewed paths, variants,
+manifests, revision pins, classifications, sanitizer flags, targets, and
+property budgets remain unchanged.
+
 ### Historical per-path test262 investigation
 
 The measurement sources, exact per-run values, and table-to-artifact map

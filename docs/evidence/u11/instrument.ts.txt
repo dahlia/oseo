@@ -1,0 +1,108 @@
+import { writeFileSync as u11Save } from "node:fs";
+const originalHost = createNodeHost();
+const metrics = [];
+const instrument = process.env.U11_MODE !== "baseline";
+const runnerHost = {
+  ...originalHost,
+  async readTextFile(path) {
+    let source = await originalHost.readTextFile(path);
+    if (!instrument) return source;
+    const name = String(path).split("/").at(-1);
+    if (name === "runtime_internal.h") {
+      source += `\n#include <time.h>
+extern unsigned long long u11_collections, u11_lookups;
+extern unsigned long long u11_comparisons, u11_large_comparisons;
+extern clock_t u11_gc_ticks, u11_lookup_ticks, u11_hit_ticks, u11_miss_ticks;
+`;
+    }
+    if (name === "runtime_memory.c") {
+      source += `\nunsigned long long u11_collections, u11_lookups;
+unsigned long long u11_comparisons, u11_large_comparisons;
+clock_t u11_gc_ticks, u11_lookup_ticks, u11_hit_ticks, u11_miss_ticks;
+`;
+      source = source.replace(
+        "void oseo_collect(OseoContext *context) {",
+        `void oseo_collect(OseoContext *context) {
+    clock_t u11_start = clock();
+    u11_collections += 1u;`,
+      ).replace(
+        "\n}\n\nvoid *oseo_internal_allocate_heap_bytes",
+        "\n    u11_gc_ticks += clock() - u11_start;\n}\n\n" +
+          "void *oseo_internal_allocate_heap_bytes",
+      );
+    }
+    if (name === "runtime_object.c") {
+      const start = source.indexOf("size_t oseo_internal_own_property_index(");
+      const end = source.indexOf("\nbool oseo_internal_remove_property", start);
+      let body = source.slice(start, end);
+      body = body.replace(
+        ") {\n    for",
+        ") {\n    clock_t u11_start = clock();\n" +
+          "    u11_lookups += 1u;\n    for",
+      ).replace(
+        "        if (oseo_internal_property_key_equal(",
+        "        u11_comparisons += 1u;\n" +
+          "        if (object->property_count >= 1000u)\n" +
+          "            u11_large_comparisons += 1u;\n" +
+          "        if (oseo_internal_property_key_equal(",
+      ).replace(
+        "            return index;",
+        "            clock_t u11_elapsed = clock() - u11_start;\n" +
+          "            u11_lookup_ticks += u11_elapsed;\n" +
+          "            u11_hit_ticks += u11_elapsed;\n" +
+          "            return index;",
+      ).replace(
+        "    return SIZE_MAX;",
+        "    clock_t u11_elapsed = clock() - u11_start;\n" +
+          "    u11_lookup_ticks += u11_elapsed;\n" +
+          "    u11_miss_ticks += u11_elapsed;\n" +
+          "    return SIZE_MAX;",
+      );
+      source = source.slice(0, start) + body + source.slice(end);
+    }
+    if (name === "runtime_core.c") {
+      source = source.replace(
+        "    oseo_internal_clock_destroy(context);",
+        `    oseo_internal_clock_destroy(context);
+    fprintf(stderr, "U11 cpu=%.6f gc=%.6f lookup=%.6f "
+        "hit=%.6f miss=%.6f collections=%llu lookups=%llu comparisons=%llu "
+        "large_comparisons=%llu allocations=%zu forced=%d\\n",
+        (double)clock() / CLOCKS_PER_SEC,
+        (double)u11_gc_ticks / CLOCKS_PER_SEC,
+        (double)u11_lookup_ticks / CLOCKS_PER_SEC,
+        (double)u11_hit_ticks / CLOCKS_PER_SEC,
+        (double)u11_miss_ticks / CLOCKS_PER_SEC,
+        u11_collections, u11_lookups, u11_comparisons,
+        u11_large_comparisons, context->allocation_attempts,
+        context->collect_every_safepoint);`,
+      );
+    }
+    return source;
+  },
+  async run(request) {
+    if (process.env.U11_MODE === "nosan") {
+      request = {
+        ...request,
+        args: request.args.filter((arg) => !arg.startsWith("-fsanitize=")),
+      };
+    }
+    const start = performance.now();
+    const result = await originalHost.run(request);
+    if (request.command.includes("oseo") &&
+        !request.args.includes("cc") && !request.args.includes("ar")) {
+      metrics.push({
+        command: request.command,
+        milliseconds: performance.now() - start,
+        status: result.exitStatus,
+        profile: result.stderr.match(/U11 .*/g) ?? [],
+      });
+    }
+    return {
+      ...result,
+      stderr: result.stderr.replace(/^U11 .*\n/gmu, ""),
+    };
+  },
+};
+process.on("exit", () => {
+  u11Save(process.env.U11_RESULT + ".metrics", JSON.stringify(metrics));
+});

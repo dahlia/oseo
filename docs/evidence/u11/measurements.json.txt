@@ -1,0 +1,3803 @@
+{
+  "profile3": {
+    "start": "2026-09-27T23:18:02+09:00",
+    "commandTime": "wall=126.20 user=115.77 system=10.77",
+    "result": {
+      "path": "test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached.js",
+      "strictness": "non-strict",
+      "specialization": "enabled",
+      "milliseconds": 125265.639984,
+      "result": {
+        "exitStatus": 0,
+        "stderr": "U11 cpu=107.299830 gc=0.275869 lookup=95.770142 hit=47.160606 miss=48.609536 collections=1 lookups=12880590 comparisons=14447751233 large_comparisons=14329854054 allocations=12983881 forced=0\n",
+        "stdout": ""
+      }
+    },
+    "native": [
+      {
+        "command": "/tmp/oseo-cli-OhVUiZ/fixture-linux-x86_64-gnu",
+        "milliseconds": 107715.546845,
+        "status": 0,
+        "profile": [
+          "U11 cpu=107.299830 gc=0.275869 lookup=95.770142 hit=47.160606 miss=48.609536 collections=1 lookups=12880590 comparisons=14447751233 large_comparisons=14329854054 allocations=12983881 forced=0"
+        ]
+      }
+    ],
+    "derivedTotals": {
+      "cpu": 107.29983,
+      "gc": 0.275869,
+      "lookup": 95.770142,
+      "hit": 47.160606,
+      "miss": 48.609536,
+      "collections": 1,
+      "lookups": 12880590,
+      "comparisons": 14447751233,
+      "large_comparisons": 14329854054,
+      "allocations": 12983881,
+      "gcPercent": 0.2571010597127693,
+      "lookupPercent": 89.25470058992639
+    }
+  },
+  "shard2": {
+    "start": "2026-09-27T23:22:03+09:00 (observed launch checkpoint)",
+    "commandTime": "wall=65.71 user=56.56 system=38.06",
+    "result": {
+      "metadata": {
+        "durationMilliseconds": 59419.98,
+        "poolLimit": 1,
+        "retries": 0
+      },
+      "summary": {
+        "expectedNegatives": 8,
+        "harnessFailures": 0,
+        "infrastructureFailures": 0,
+        "passes": 93,
+        "semanticFailures": 0,
+        "unsupportedProfileFeatures": 6,
+        "dependencies": [
+          {
+            "dependency": "abrupt-completion",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "array-buffer",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 3,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "async-functions",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "async-iteration",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 8,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "atomics-single-agent",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 1
+          },
+          {
+            "dependency": "bigint-primitive",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "classes",
+            "expectedNegatives": 4,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 5,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "control-flow",
+            "expectedNegatives": 2,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "data-view",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "date",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 3,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "destructuring-bindings",
+            "expectedNegatives": 1,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 5,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "error-intrinsics",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "functions",
+            "expectedNegatives": 1,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 16,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 3
+          },
+          {
+            "dependency": "generators",
+            "expectedNegatives": 2,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 3,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "iterator-protocol",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 7,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 2
+          },
+          {
+            "dependency": "lexical-bindings",
+            "expectedNegatives": 1,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "module-linking",
+            "expectedNegatives": 1,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 0,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "object-literals",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 3,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "object-own-keys",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "object-properties",
+            "expectedNegatives": 2,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 47,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 1
+          },
+          {
+            "dependency": "promise-settlement",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 5,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "property-enumeration",
+            "expectedNegatives": 1,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 0,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "reflect-namespace",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "regular-expressions",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 4,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "set-intrinsic",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "symbols",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "typed-array-iterative",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 3,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "typed-array-mutation",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "typed-array-search-and-join",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "var-bindings",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "dependency": "weak-collections",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          }
+        ],
+        "groups": [
+          {
+            "group": "built-ins/AggregateError",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Array",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 13,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 1
+          },
+          {
+            "group": "built-ins/ArrayBuffer",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/AsyncFromSyncIteratorPrototype",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Atomics",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 1
+          },
+          {
+            "group": "built-ins/Boolean",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/DataView",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Date",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 3,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/FinalizationRegistry",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Function",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/GeneratorPrototype",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Iterator",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 0,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 2
+          },
+          {
+            "group": "built-ins/Map",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Math",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Number",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Object",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 16,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Promise",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 3,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Reflect",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/RegExp",
+            "expectedNegatives": 1,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 7,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 2
+          },
+          {
+            "group": "built-ins/Set",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 2,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/String",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 6,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/Symbol",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/TypedArray",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 7,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/WeakMap",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/decodeURI",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "built-ins/isFinite",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "language/arguments-object",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "language/computed-property-names",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "language/expressions",
+            "expectedNegatives": 2,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 8,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "language/literals",
+            "expectedNegatives": 0,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 1,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "language/module-code",
+            "expectedNegatives": 1,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 0,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          },
+          {
+            "group": "language/statements",
+            "expectedNegatives": 4,
+            "harnessFailures": 0,
+            "infrastructureFailures": 0,
+            "passes": 5,
+            "semanticFailures": 0,
+            "unsupportedProfileFeatures": 0
+          }
+        ]
+      },
+      "paths": [
+        "test/built-ins/AggregateError/errors-iterabletolist.js",
+        "test/built-ins/Array/prototype/at/returns-item.js",
+        "test/built-ins/Array/prototype/every/15.4.4.16-5-12.js",
+        "test/built-ins/Array/prototype/filter/15.4.4.20-3-11.js",
+        "test/built-ins/Array/prototype/filter/resizable-buffer.js",
+        "test/built-ins/Array/prototype/forEach/15.4.4.18-4-12.js",
+        "test/built-ins/Array/prototype/indexOf/15.4.4.14-3-18.js",
+        "test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-1-2.js",
+        "test/built-ins/Array/prototype/map/15.4.4.19-1-3.js",
+        "test/built-ins/Array/prototype/map/not-a-constructor.js",
+        "test/built-ins/Array/prototype/reduce/15.4.4.21-8-c-6.js",
+        "test/built-ins/Array/prototype/reduceRight/15.4.4.22-5-2.js",
+        "test/built-ins/Array/prototype/shift/S15.4.4.9_A2_T4.js",
+        "test/built-ins/Array/prototype/some/15.4.4.17-7-b-4.js",
+        "test/built-ins/Array/prototype/splice/S15.4.4.12_A6.1_T2.js",
+        "test/built-ins/ArrayBuffer/isView/name.js",
+        "test/built-ins/AsyncFromSyncIteratorPrototype/next/for-await-next-rejected-promise-close.js",
+        "test/built-ins/Atomics/load/name.js",
+        "test/built-ins/Atomics/waitAsync/bigint/non-bigint64-typedarray-throws.js",
+        "test/built-ins/Boolean/prototype/S15.6.3.1_A2.js",
+        "test/built-ins/DataView/prototype/getFloat64/index-is-out-of-range.js",
+        "test/built-ins/DataView/prototype/setFloat32/set-values-return-undefined.js",
+        "test/built-ins/Date/S15.9.3.1_A3_T5.2.js",
+        "test/built-ins/Date/prototype/getTime/prop-desc.js",
+        "test/built-ins/Date/prototype/setSeconds/this-value-valid-date-ms.js",
+        "test/built-ins/FinalizationRegistry/prototype/register/prop-desc.js",
+        "test/built-ins/Function/prototype/bind/instance-construct-newtarget-boundtarget-bound.js",
+        "test/built-ins/GeneratorPrototype/return/try-catch-before-try.js",
+        "test/built-ins/Iterator/prototype/find/predicate-args.js",
+        "test/built-ins/Iterator/prototype/take/next-method-returns-throwing-done.js",
+        "test/built-ins/Map/groupBy/toPropertyKey.js",
+        "test/built-ins/Math/acosh/prop-desc.js",
+        "test/built-ins/Math/pow/applying-the-exp-operator_A9.js",
+        "test/built-ins/Number/S9.3_A5_T1.js",
+        "test/built-ins/Number/prototype/valueOf/S15.7.4.4_A1_T01.js",
+        "test/built-ins/Object/create/15.2.3.5-4-144.js",
+        "test/built-ins/Object/create/15.2.3.5-4-48.js",
+        "test/built-ins/Object/defineProperties/15.2.3.7-5-b-183.js",
+        "test/built-ins/Object/defineProperties/15.2.3.7-6-a-134.js",
+        "test/built-ins/Object/defineProperties/15.2.3.7-6-a-33.js",
+        "test/built-ins/Object/defineProperty/15.2.3.6-3-143-1.js",
+        "test/built-ins/Object/defineProperty/15.2.3.6-3-49.js",
+        "test/built-ins/Object/defineProperty/15.2.3.6-4-222.js",
+        "test/built-ins/Object/defineProperty/15.2.3.6-4-354-16.js",
+        "test/built-ins/Object/defineProperty/15.2.3.6-4-529.js",
+        "test/built-ins/Object/defineProperty/8.12.9-9-b-i_1.js",
+        "test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-110.js",
+        "test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-80.js",
+        "test/built-ins/Object/hasOwn/symbol_own_property.js",
+        "test/built-ins/Object/keys/15.2.3.14-5-6.js",
+        "test/built-ins/Object/prototype/toString/length.js",
+        "test/built-ins/Promise/all/ctx-ctor.js",
+        "test/built-ins/Promise/any/invoke-then-get-error-reject.js",
+        "test/built-ins/Promise/prototype/then/rxn-handler-rejected-return-abrupt.js",
+        "test/built-ins/Reflect/apply/target-is-not-callable-throws.js",
+        "test/built-ins/RegExp/S15.10.2.13_A1_T10.js",
+        "test/built-ins/RegExp/S15.10.2.7_A6_T4.js",
+        "test/built-ins/RegExp/lookBehind/misc.js",
+        "test/built-ins/RegExp/property-escapes/generated/Script_-_Egyptian_Hieroglyphs.js",
+        "test/built-ins/RegExp/property-escapes/generated/Script_Extensions_-_Javanese.js",
+        "test/built-ins/RegExp/property-escapes/loose-matching-11.js",
+        "test/built-ins/RegExp/prototype/Symbol.replace/replace-without-trailing.js",
+        "test/built-ins/RegExp/prototype/flags/rethrow.js",
+        "test/built-ins/RegExp/regexp-modifiers/nesting-multiline-does-not-affect-alternatives-outside.js",
+        "test/built-ins/RegExp/unicodeSets/generated/string-literal-union-character-class-escape.js",
+        "test/built-ins/Set/prototype/has/returns-false-when-value-not-present-number.js",
+        "test/built-ins/Set/set-does-not-throw-when-add-is-not-callable.js",
+        "test/built-ins/String/S9.8.1_A10.js",
+        "test/built-ins/String/prototype/includes/return-abrupt-from-position.js",
+        "test/built-ins/String/prototype/padEnd/exception-symbol.js",
+        "test/built-ins/String/prototype/slice/S15.5.4.13_A2_T2.js",
+        "test/built-ins/String/prototype/substring/S15.5.4.15_A7.js",
+        "test/built-ins/String/prototype/trim/15.5.4.20-3-2.js",
+        "test/built-ins/Symbol/prototype/Symbol.toPrimitive/this-val-obj-symbol-wrapper.js",
+        "test/built-ins/TypedArray/prototype/copyWithin/BigInt/return-abrupt-from-start.js",
+        "test/built-ins/TypedArray/prototype/filter/callbackfn-called-before-species.js",
+        "test/built-ins/TypedArray/prototype/forEach/BigInt/callbackfn-is-not-callable.js",
+        "test/built-ins/TypedArray/prototype/lastIndexOf/invoked-as-method.js",
+        "test/built-ins/TypedArray/prototype/reduceRight/callbackfn-this.js",
+        "test/built-ins/TypedArray/prototype/slice/detached-buffer.js",
+        "test/built-ins/TypedArray/prototype/toLocaleString/BigInt/return-abrupt-from-nextelement-valueof.js",
+        "test/built-ins/WeakMap/prototype/delete/delete-entry-with-object-key-initial-iterable.js",
+        "test/built-ins/decodeURI/S15.1.3.1_A1.15_T5.js",
+        "test/built-ins/isFinite/toprimitive-valid-result.js",
+        "test/language/arguments-object/cls-decl-gen-meth-args-trailing-comma-spread-operator.js",
+        "test/language/computed-property-names/class/accessor/setter.js",
+        "test/language/expressions/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-fn.js",
+        "test/language/expressions/async-generator/dstr/named-dflt-obj-ptrn-id-init-fn-name-class.js",
+        "test/language/expressions/async-generator/named-yield-star-getiter-sync-returns-symbol-throw.js",
+        "test/language/expressions/class/class-name-ident-static.js",
+        "test/language/expressions/class/elements/syntax/early-errors/delete/field-delete-covered-err-delete-call-expression-private-method-accessor-get.js",
+        "test/language/expressions/class/ident-name-method-def-default-escaped-ext.js",
+        "test/language/expressions/generators/has-instance.js",
+        "test/language/expressions/object/covered-ident-name-prop-name-literal-export-escaped.js",
+        "test/language/expressions/object/ident-name-prop-name-literal-interface-escaped.js",
+        "test/language/expressions/super/prop-dot-obj-ref-strict.js",
+        "test/language/literals/bigint/numeric-separators/numeric-separator-literal-oil-ods-nsl-od.js",
+        "test/language/module-code/parse-err-invoke-anon-fun-decl.js",
+        "test/language/statements/async-generator/dstr/dflt-ary-ptrn-elem-id-init-fn-name-class.js",
+        "test/language/statements/async-generator/yield-star-sync-throw.js",
+        "test/language/statements/class/elements/private-accessor-name/inst-private-name-dollar.js",
+        "test/language/statements/class/elements/syntax/early-errors/delete/method-delete-covered-err-delete-member-expression-private-method-gen.js",
+        "test/language/statements/class/static-init-invalid-return.js",
+        "test/language/statements/for-await-of/async-func-decl-dstr-obj-prop-elem-init-fn-name-class.js",
+        "test/language/statements/for-await-of/async-func-dstr-var-ary-ptrn-elem-id-init-fn-name-cover.js",
+        "test/language/statements/for-in/dstr/array-rest-yield-ident-invalid.js",
+        "test/language/statements/generators/rest-params-trailing-comma-early-error.js"
+      ]
+    },
+    "native": [
+      {
+        "command": "/tmp/oseo-cli-O4E5Ke/fixture-linux-x86_64-gnu",
+        "milliseconds": 7.8361699999995835,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004953 gc=0.000118 lookup=0.001045 hit=0.000024 miss=0.001021 collections=1 lookups=2256 comparisons=10836 large_comparisons=0 allocations=6013 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-QLZCX5/fixture-linux-x86_64-gnu",
+        "milliseconds": 7.572091,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004657 gc=0.000118 lookup=0.001084 hit=0.000030 miss=0.001054 collections=1 lookups=2268 comparisons=11057 large_comparisons=0 allocations=6013 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-TnXXjz/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.816647999999986,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005366 gc=0.000123 lookup=0.000957 hit=0.000025 miss=0.000932 collections=1 lookups=2256 comparisons=10836 large_comparisons=0 allocations=6013 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ltOWJD/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.020647000000281,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005704 gc=0.000127 lookup=0.001102 hit=0.000028 miss=0.001074 collections=1 lookups=2268 comparisons=11057 large_comparisons=0 allocations=6013 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-jh2cm5/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.060709999999744,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004850 gc=0.000115 lookup=0.001029 hit=0.000018 miss=0.001011 collections=1 lookups=2237 comparisons=9871 large_comparisons=0 allocations=5954 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-TbcaS1/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.31930900000043,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004932 gc=0.000113 lookup=0.001046 hit=0.000013 miss=0.001033 collections=1 lookups=2240 comparisons=9898 large_comparisons=0 allocations=5954 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-h5vEab/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.540568999999778,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005184 gc=0.000115 lookup=0.001203 hit=0.000016 miss=0.001187 collections=1 lookups=2237 comparisons=9871 large_comparisons=0 allocations=5954 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ZeEn7E/fixture-linux-x86_64-gnu",
+        "milliseconds": 7.95919000000049,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004865 gc=0.000115 lookup=0.001013 hit=0.000013 miss=0.001000 collections=1 lookups=2240 comparisons=9898 large_comparisons=0 allocations=5954 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6v3ztZ/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.847858000000087,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005350 gc=0.000142 lookup=0.001171 hit=0.000008 miss=0.001163 collections=1 lookups=2159 comparisons=9971 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-f9HmWS/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.595868999999766,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004702 gc=0.000114 lookup=0.000982 hit=0.000005 miss=0.000977 collections=1 lookups=2160 comparisons=9973 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-i1SzbK/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.969348000000537,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005570 gc=0.000144 lookup=0.001184 hit=0.000009 miss=0.001175 collections=1 lookups=2159 comparisons=9971 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-5J8A09/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.398465999999644,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005249 gc=0.000112 lookup=0.001070 hit=0.000010 miss=0.001060 collections=1 lookups=2160 comparisons=9973 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-9U4U6Z/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.713908000000629,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004885 gc=0.000112 lookup=0.001025 hit=0.000012 miss=0.001013 collections=1 lookups=2181 comparisons=10039 large_comparisons=0 allocations=5842 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-fox34q/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.094786999999997,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005487 gc=0.000122 lookup=0.001224 hit=0.000013 miss=0.001211 collections=1 lookups=2185 comparisons=10054 large_comparisons=0 allocations=5842 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-7goi4q/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.124047999999675,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005441 gc=0.000111 lookup=0.001200 hit=0.000012 miss=0.001188 collections=1 lookups=2181 comparisons=10039 large_comparisons=0 allocations=5842 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-LfXZb1/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.516579000001002,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005254 gc=0.000111 lookup=0.001104 hit=0.000010 miss=0.001094 collections=1 lookups=2185 comparisons=10054 large_comparisons=0 allocations=5842 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-E4q0gB/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.185074999999415,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005118 gc=0.000118 lookup=0.001029 hit=0.000006 miss=0.001023 collections=1 lookups=2157 comparisons=9792 large_comparisons=0 allocations=5799 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-XvT3Dp/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.47555900000043,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005000 gc=0.000128 lookup=0.000986 hit=0.000006 miss=0.000980 collections=1 lookups=2157 comparisons=9792 large_comparisons=0 allocations=5799 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-RXqFeA/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.42320700000164,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005025 gc=0.000113 lookup=0.000944 hit=0.000007 miss=0.000937 collections=1 lookups=2157 comparisons=9792 large_comparisons=0 allocations=5799 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-wBhbgu/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.391545999998925,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005464 gc=0.000115 lookup=0.001052 hit=0.000010 miss=0.001042 collections=1 lookups=2157 comparisons=9792 large_comparisons=0 allocations=5799 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-oAcexS/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.17906000000039,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004696 gc=0.000113 lookup=0.001036 hit=0.000010 miss=0.001026 collections=1 lookups=2148 comparisons=9629 large_comparisons=0 allocations=5779 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-PDEoUE/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.325388999999632,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004981 gc=0.000114 lookup=0.000976 hit=0.000011 miss=0.000965 collections=1 lookups=2151 comparisons=9658 large_comparisons=0 allocations=5779 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-tSuTuX/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.067576999999801,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005358 gc=0.000116 lookup=0.001165 hit=0.000008 miss=0.001157 collections=1 lookups=2148 comparisons=9629 large_comparisons=0 allocations=5779 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SEEvWP/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.084936999999627,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005195 gc=0.000113 lookup=0.001083 hit=0.000006 miss=0.001077 collections=1 lookups=2151 comparisons=9658 large_comparisons=0 allocations=5779 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-F6ODw6/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.14065699999992,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005440 gc=0.000112 lookup=0.001046 hit=0.000011 miss=0.001035 collections=1 lookups=2147 comparisons=9588 large_comparisons=0 allocations=5785 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-MqUiku/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.916078000000198,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005378 gc=0.000141 lookup=0.001118 hit=0.000015 miss=0.001103 collections=1 lookups=2152 comparisons=9669 large_comparisons=0 allocations=5785 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-t3roze/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.581648999999743,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004994 gc=0.000115 lookup=0.000994 hit=0.000010 miss=0.000984 collections=1 lookups=2147 comparisons=9588 large_comparisons=0 allocations=5785 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-O0wjNz/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.189930000000459,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004861 gc=0.000129 lookup=0.001025 hit=0.000015 miss=0.001010 collections=1 lookups=2152 comparisons=9669 large_comparisons=0 allocations=5785 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-0sNsOg/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.713268000001335,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005223 gc=0.000113 lookup=0.001084 hit=0.000012 miss=0.001072 collections=1 lookups=2179 comparisons=9873 large_comparisons=0 allocations=5815 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-81khrr/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.636427999999796,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005096 gc=0.000167 lookup=0.001097 hit=0.000018 miss=0.001079 collections=1 lookups=2187 comparisons=9898 large_comparisons=0 allocations=5815 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-bJmb7T/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.401409000000058,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005021 gc=0.000111 lookup=0.001127 hit=0.000024 miss=0.001103 collections=1 lookups=2179 comparisons=9873 large_comparisons=0 allocations=5815 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nS7TXi/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.366519000001063,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004967 gc=0.000112 lookup=0.001024 hit=0.000011 miss=0.001013 collections=1 lookups=2187 comparisons=9898 large_comparisons=0 allocations=5815 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ho1fBV/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.752958000000945,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005236 gc=0.000115 lookup=0.001114 hit=0.000011 miss=0.001103 collections=1 lookups=2179 comparisons=9909 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-2ULe3g/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.842717999999877,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005184 gc=0.000119 lookup=0.001048 hit=0.000013 miss=0.001035 collections=1 lookups=2188 comparisons=10028 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-UhgYZ7/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.412556999999651,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005789 gc=0.000114 lookup=0.001201 hit=0.000018 miss=0.001183 collections=1 lookups=2179 comparisons=9909 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-tEoaCV/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.47209599999951,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005364 gc=0.000119 lookup=0.001007 hit=0.000018 miss=0.000989 collections=1 lookups=2188 comparisons=10028 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-AAXwyI/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.82908800000041,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005252 gc=0.000113 lookup=0.001096 hit=0.000019 miss=0.001077 collections=1 lookups=2204 comparisons=10055 large_comparisons=0 allocations=5870 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-20iRRS/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.799238000001424,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005192 gc=0.000116 lookup=0.001048 hit=0.000020 miss=0.001028 collections=1 lookups=2210 comparisons=10132 large_comparisons=0 allocations=5870 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-4stuh8/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.43811900000037,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004870 gc=0.000111 lookup=0.001019 hit=0.000017 miss=0.001002 collections=1 lookups=2204 comparisons=10055 large_comparisons=0 allocations=5870 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-FJcays/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.291207000000213,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005713 gc=0.000112 lookup=0.001146 hit=0.000021 miss=0.001125 collections=1 lookups=2210 comparisons=10132 large_comparisons=0 allocations=5870 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-2Qk5sl/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.469458999999915,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004827 gc=0.000113 lookup=0.000984 hit=0.000008 miss=0.000976 collections=1 lookups=2168 comparisons=10136 large_comparisons=0 allocations=5831 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ogGeK6/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.965847999999824,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005164 gc=0.000114 lookup=0.001099 hit=0.000012 miss=0.001087 collections=1 lookups=2171 comparisons=10190 large_comparisons=0 allocations=5831 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-BykMK2/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.511705999999322,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005868 gc=0.000125 lookup=0.001050 hit=0.000013 miss=0.001037 collections=1 lookups=2168 comparisons=10136 large_comparisons=0 allocations=5831 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Q8gkpf/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.52314699999988,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005976 gc=0.000114 lookup=0.001161 hit=0.000012 miss=0.001149 collections=1 lookups=2171 comparisons=10190 large_comparisons=0 allocations=5831 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-R0qsuF/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.382698999999775,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004963 gc=0.000113 lookup=0.000996 hit=0.000022 miss=0.000974 collections=1 lookups=2183 comparisons=9937 large_comparisons=0 allocations=5783 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-2McMyO/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.67203900000095,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005111 gc=0.000110 lookup=0.000986 hit=0.000028 miss=0.000958 collections=1 lookups=2189 comparisons=9978 large_comparisons=0 allocations=5783 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Knnlxu/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.562103999998726,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005979 gc=0.000112 lookup=0.001048 hit=0.000025 miss=0.001023 collections=1 lookups=2183 comparisons=9937 large_comparisons=0 allocations=5783 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-srAudN/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.508418999999776,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005067 gc=0.000113 lookup=0.000958 hit=0.000017 miss=0.000941 collections=1 lookups=2189 comparisons=9978 large_comparisons=0 allocations=5783 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-g2XCr7/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.275077000000238,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005584 gc=0.000140 lookup=0.001281 hit=0.000022 miss=0.001259 collections=1 lookups=2213 comparisons=9938 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-1wXkG2/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.022267000000284,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005413 gc=0.000115 lookup=0.001024 hit=0.000012 miss=0.001012 collections=1 lookups=2218 comparisons=9953 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-THCcDL/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.698035999999775,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005964 gc=0.000117 lookup=0.001045 hit=0.000013 miss=0.001032 collections=1 lookups=2213 comparisons=9938 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-kGCHO7/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.291473999999653,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006618 gc=0.000145 lookup=0.001197 hit=0.000017 miss=0.001180 collections=1 lookups=2218 comparisons=9953 large_comparisons=0 allocations=5862 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SxIxbg/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.159436999998434,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005363 gc=0.000144 lookup=0.000974 hit=0.000025 miss=0.000949 collections=1 lookups=2178 comparisons=9844 large_comparisons=0 allocations=5816 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-TGdbpy/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.535109000000375,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005207 gc=0.000115 lookup=0.001132 hit=0.000018 miss=0.001114 collections=1 lookups=2181 comparisons=9896 large_comparisons=0 allocations=5816 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OIFl3L/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.405128999998851,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004959 gc=0.000114 lookup=0.001021 hit=0.000010 miss=0.001011 collections=1 lookups=2178 comparisons=9844 large_comparisons=0 allocations=5816 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-78e1lG/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.852695999999924,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005461 gc=0.000112 lookup=0.001045 hit=0.000016 miss=0.001029 collections=1 lookups=2181 comparisons=9896 large_comparisons=0 allocations=5816 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6T0P14/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.590806000000157,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006036 gc=0.000124 lookup=0.001352 hit=0.000040 miss=0.001312 collections=1 lookups=2404 comparisons=13210 large_comparisons=0 allocations=6289 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-vnv1p3/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.598336999999447,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005906 gc=0.000138 lookup=0.001279 hit=0.000052 miss=0.001227 collections=1 lookups=2434 comparisons=13348 large_comparisons=0 allocations=6289 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-EhwRCP/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.71960400000171,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006418 gc=0.000125 lookup=0.001116 hit=0.000044 miss=0.001072 collections=1 lookups=2405 comparisons=13210 large_comparisons=0 allocations=6294 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-C4DXlR/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.35235400000056,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006293 gc=0.000157 lookup=0.001247 hit=0.000062 miss=0.001185 collections=1 lookups=2435 comparisons=13348 large_comparisons=0 allocations=6294 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-2mBE87/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.397296000001006,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005375 gc=0.000119 lookup=0.000989 hit=0.000014 miss=0.000975 collections=1 lookups=2259 comparisons=10549 large_comparisons=0 allocations=6049 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-rqsgqD/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.042696000000433,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006144 gc=0.000145 lookup=0.001223 hit=0.000022 miss=0.001201 collections=1 lookups=2263 comparisons=10668 large_comparisons=0 allocations=6049 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ie5buR/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.254306999999244,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005363 gc=0.000119 lookup=0.001066 hit=0.000014 miss=0.001052 collections=1 lookups=2259 comparisons=10549 large_comparisons=0 allocations=6049 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-hErGUo/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.758575000001656,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005850 gc=0.000120 lookup=0.001180 hit=0.000018 miss=0.001162 collections=1 lookups=2263 comparisons=10668 large_comparisons=0 allocations=6049 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-NQ0GPz/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.085756999998921,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005491 gc=0.000124 lookup=0.001165 hit=0.000039 miss=0.001126 collections=1 lookups=2404 comparisons=13318 large_comparisons=0 allocations=6289 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nQLzfu/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.600436999999147,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005669 gc=0.000129 lookup=0.001115 hit=0.000057 miss=0.001058 collections=1 lookups=2434 comparisons=13494 large_comparisons=0 allocations=6289 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-svLxyQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.423273999998855,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006356 gc=0.000164 lookup=0.001316 hit=0.000045 miss=0.001271 collections=1 lookups=2405 comparisons=13318 large_comparisons=0 allocations=6294 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-UQvw8u/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.413817000000563,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005674 gc=0.000126 lookup=0.001170 hit=0.000052 miss=0.001118 collections=1 lookups=2435 comparisons=13494 large_comparisons=0 allocations=6294 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-PRdCcw/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.37374699999964,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005640 gc=0.000120 lookup=0.001189 hit=0.000018 miss=0.001171 collections=1 lookups=2305 comparisons=13164 large_comparisons=0 allocations=6103 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-fUHYR4/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.026726000000053,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006085 gc=0.000125 lookup=0.001050 hit=0.000027 miss=0.001023 collections=1 lookups=2321 comparisons=13257 large_comparisons=0 allocations=6103 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-dj8RrB/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.68812600000092,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005756 gc=0.000118 lookup=0.001093 hit=0.000022 miss=0.001071 collections=1 lookups=2312 comparisons=13328 large_comparisons=0 allocations=6110 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6BuJuc/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.51492700000017,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005865 gc=0.000119 lookup=0.001294 hit=0.000025 miss=0.001269 collections=1 lookups=2329 comparisons=13471 large_comparisons=0 allocations=6110 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-vTSImu/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.292571999998472,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006836 gc=0.000163 lookup=0.001350 hit=0.000092 miss=0.001258 collections=1 lookups=2489 comparisons=13234 large_comparisons=0 allocations=6484 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-PzlZqK/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.08597699999882,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005475 gc=0.000138 lookup=0.001178 hit=0.000079 miss=0.001099 collections=1 lookups=2529 comparisons=14191 large_comparisons=0 allocations=6484 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-8VDZwu/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.038335000001098,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006205 gc=0.000138 lookup=0.001466 hit=0.000082 miss=0.001384 collections=1 lookups=2489 comparisons=13234 large_comparisons=0 allocations=6484 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OTSlXi/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.472066000002087,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005846 gc=0.000127 lookup=0.001175 hit=0.000082 miss=0.001093 collections=1 lookups=2529 comparisons=14191 large_comparisons=0 allocations=6484 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-EoidKg/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.65503600000011,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.009701 gc=0.000276 lookup=0.002551 hit=0.000241 miss=0.002310 collections=1 lookups=4852 comparisons=38293 large_comparisons=0 allocations=10624 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-U0bhTT/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.99581500000204,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.010069 gc=0.000254 lookup=0.002309 hit=0.000229 miss=0.002080 collections=1 lookups=4857 comparisons=38338 large_comparisons=0 allocations=10624 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Is4J21/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.451547000000573,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.009473 gc=0.000244 lookup=0.002557 hit=0.000236 miss=0.002321 collections=1 lookups=4852 comparisons=38293 large_comparisons=0 allocations=10624 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-V8aOc8/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.231038000001718,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.008989 gc=0.000228 lookup=0.002283 hit=0.000226 miss=0.002057 collections=1 lookups=4857 comparisons=38338 large_comparisons=0 allocations=10624 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-vqI96y/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.520434000001842,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006669 gc=0.000124 lookup=0.001264 hit=0.000045 miss=0.001219 collections=1 lookups=2408 comparisons=14275 large_comparisons=0 allocations=6179 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-4M0f9s/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.386226999999053,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005629 gc=0.000122 lookup=0.001087 hit=0.000050 miss=0.001037 collections=1 lookups=2425 comparisons=14663 large_comparisons=0 allocations=6179 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-65dX9D/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.920665999998164,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005567 gc=0.000119 lookup=0.001151 hit=0.000047 miss=0.001104 collections=1 lookups=2408 comparisons=14275 large_comparisons=0 allocations=6179 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-qn1BnH/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.780485000002955,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005808 gc=0.000120 lookup=0.001222 hit=0.000047 miss=0.001175 collections=1 lookups=2425 comparisons=14663 large_comparisons=0 allocations=6179 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-GGHlfQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.349491000000853,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006482 gc=0.000123 lookup=0.001141 hit=0.000065 miss=0.001076 collections=1 lookups=2420 comparisons=14378 large_comparisons=0 allocations=6231 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-edRNEQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.617834000000585,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006604 gc=0.000124 lookup=0.001136 hit=0.000058 miss=0.001078 collections=1 lookups=2446 comparisons=14521 large_comparisons=0 allocations=6231 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-GFe5HW/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.935691999999108,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006788 gc=0.000154 lookup=0.001220 hit=0.000076 miss=0.001144 collections=1 lookups=2420 comparisons=14378 large_comparisons=0 allocations=6231 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Qr7Ab9/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.815006000000722,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005974 gc=0.000121 lookup=0.001114 hit=0.000055 miss=0.001059 collections=1 lookups=2446 comparisons=14521 large_comparisons=0 allocations=6231 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-jGnHlQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.119965000001685,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006191 gc=0.000152 lookup=0.001133 hit=0.000025 miss=0.001108 collections=1 lookups=2234 comparisons=10554 large_comparisons=0 allocations=5930 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-NqzOPF/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.222967000001518,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005236 gc=0.000114 lookup=0.001010 hit=0.000024 miss=0.000986 collections=1 lookups=2238 comparisons=10662 large_comparisons=0 allocations=5930 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Ib66Dw/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.135447000000568,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005254 gc=0.000116 lookup=0.000976 hit=0.000020 miss=0.000956 collections=1 lookups=2234 comparisons=10554 large_comparisons=0 allocations=5930 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-EkGGsT/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.17933500000072,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005750 gc=0.000114 lookup=0.001026 hit=0.000023 miss=0.001003 collections=1 lookups=2238 comparisons=10662 large_comparisons=0 allocations=5930 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-mDL6vO/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.336107000002812,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005336 gc=0.000124 lookup=0.001092 hit=0.000033 miss=0.001059 collections=1 lookups=2394 comparisons=13303 large_comparisons=0 allocations=6260 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-tclTdN/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.978586000001087,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006092 gc=0.000124 lookup=0.001307 hit=0.000053 miss=0.001254 collections=1 lookups=2423 comparisons=13468 large_comparisons=0 allocations=6260 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-DQVWLq/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.342776999998023,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005379 gc=0.000124 lookup=0.001086 hit=0.000039 miss=0.001047 collections=1 lookups=2394 comparisons=13303 large_comparisons=0 allocations=6260 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-bdHpfP/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.764220999997633,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006566 gc=0.000124 lookup=0.001336 hit=0.000050 miss=0.001286 collections=1 lookups=2423 comparisons=13468 large_comparisons=0 allocations=6260 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-faNawe/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.956294999999955,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005973 gc=0.000148 lookup=0.001192 hit=0.000016 miss=0.001176 collections=1 lookups=2192 comparisons=10502 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-FPWBi7/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.692990999999893,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007545 gc=0.000115 lookup=0.001108 hit=0.000018 miss=0.001090 collections=1 lookups=2195 comparisons=10543 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-W3CjUr/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.206367999999202,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005141 gc=0.000125 lookup=0.001017 hit=0.000009 miss=0.001008 collections=1 lookups=2192 comparisons=10502 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-0wCFCj/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.635855999997148,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005749 gc=0.000112 lookup=0.001051 hit=0.000019 miss=0.001032 collections=1 lookups=2195 comparisons=10543 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-CiIWb7/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.262885000000097,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006346 gc=0.000131 lookup=0.001126 hit=0.000014 miss=0.001112 collections=1 lookups=2263 comparisons=10344 large_comparisons=0 allocations=6020 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-gFzrRS/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.87425599999915,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005845 gc=0.000118 lookup=0.001100 hit=0.000015 miss=0.001085 collections=1 lookups=2267 comparisons=10350 large_comparisons=0 allocations=6020 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Qn32G5/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.070057000000816,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005227 gc=0.000121 lookup=0.001045 hit=0.000013 miss=0.001032 collections=1 lookups=2263 comparisons=10344 large_comparisons=0 allocations=6020 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-DYzMtu/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.147633000000496,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006896 gc=0.000148 lookup=0.001022 hit=0.000011 miss=0.001011 collections=1 lookups=2267 comparisons=10350 large_comparisons=0 allocations=6020 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-LeAo4P/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.410235999999713,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005351 gc=0.000118 lookup=0.000993 hit=0.000027 miss=0.000966 collections=1 lookups=2306 comparisons=9998 large_comparisons=0 allocations=6101 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Cj9lAN/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.682835999999952,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005794 gc=0.000124 lookup=0.001111 hit=0.000029 miss=0.001082 collections=1 lookups=2327 comparisons=10056 large_comparisons=0 allocations=6101 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-PmCMET/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.185427000000345,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005305 gc=0.000120 lookup=0.001125 hit=0.000024 miss=0.001101 collections=1 lookups=2306 comparisons=9998 large_comparisons=0 allocations=6101 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-CgzCpI/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.439766999999847,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005584 gc=0.000121 lookup=0.001130 hit=0.000028 miss=0.001102 collections=1 lookups=2327 comparisons=10056 large_comparisons=0 allocations=6101 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-VcFM3l/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.115164999999251,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006099 gc=0.000126 lookup=0.001241 hit=0.000079 miss=0.001162 collections=1 lookups=2420 comparisons=14391 large_comparisons=0 allocations=6230 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-I3mEk2/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.641505999999936,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005694 gc=0.000123 lookup=0.001136 hit=0.000086 miss=0.001050 collections=1 lookups=2445 comparisons=14531 large_comparisons=0 allocations=6230 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-03JEm5/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.716082999999344,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006632 gc=0.000129 lookup=0.001306 hit=0.000069 miss=0.001237 collections=1 lookups=2420 comparisons=14391 large_comparisons=0 allocations=6230 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-QMlPE0/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.36712400000033,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005897 gc=0.000125 lookup=0.001219 hit=0.000064 miss=0.001155 collections=1 lookups=2445 comparisons=14531 large_comparisons=0 allocations=6230 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-IBmnw6/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.634165999999823,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005806 gc=0.000119 lookup=0.001035 hit=0.000026 miss=0.001009 collections=1 lookups=2258 comparisons=11344 large_comparisons=0 allocations=5933 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-d0SfjY/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.233305000001565,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006101 gc=0.000116 lookup=0.001073 hit=0.000024 miss=0.001049 collections=1 lookups=2255 comparisons=11231 large_comparisons=0 allocations=5933 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-yKLvOg/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.608502999999473,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006532 gc=0.000127 lookup=0.001231 hit=0.000036 miss=0.001195 collections=1 lookups=2258 comparisons=11344 large_comparisons=0 allocations=5933 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-o6CbrD/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.606126999999105,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005327 gc=0.000123 lookup=0.001063 hit=0.000027 miss=0.001036 collections=1 lookups=2255 comparisons=11231 large_comparisons=0 allocations=5933 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-15TLEX/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.697316000001592,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005685 gc=0.000127 lookup=0.001182 hit=0.000050 miss=0.001132 collections=1 lookups=2535 comparisons=11440 large_comparisons=0 allocations=6401 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-xEeRFF/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.685173000001669,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006764 gc=0.000130 lookup=0.001518 hit=0.000062 miss=0.001456 collections=1 lookups=2560 comparisons=11535 large_comparisons=0 allocations=6401 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-oD9DdB/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.1183549999987,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006078 gc=0.000131 lookup=0.001131 hit=0.000063 miss=0.001068 collections=1 lookups=2535 comparisons=11440 large_comparisons=0 allocations=6401 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-iboT89/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.646043999997346,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006279 gc=0.000132 lookup=0.001166 hit=0.000074 miss=0.001092 collections=1 lookups=2560 comparisons=11535 large_comparisons=0 allocations=6401 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-YUJT6t/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.146884999998292,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005394 gc=0.000115 lookup=0.001053 hit=0.000038 miss=0.001015 collections=1 lookups=2274 comparisons=9821 large_comparisons=0 allocations=5993 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-WxLZXD/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.619063999998616,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006153 gc=0.000117 lookup=0.001065 hit=0.000037 miss=0.001028 collections=1 lookups=2291 comparisons=9947 large_comparisons=0 allocations=5993 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-QREkIt/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.253394999999728,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006342 gc=0.000116 lookup=0.001046 hit=0.000026 miss=0.001020 collections=1 lookups=2274 comparisons=9821 large_comparisons=0 allocations=5993 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-YQRsSa/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.776698000001488,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005006 gc=0.000116 lookup=0.001066 hit=0.000047 miss=0.001019 collections=1 lookups=2291 comparisons=9947 large_comparisons=0 allocations=5993 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-mqloAG/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.390407000002597,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005318 gc=0.000113 lookup=0.001000 hit=0.000013 miss=0.000987 collections=1 lookups=2191 comparisons=10125 large_comparisons=0 allocations=5836 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-oqh8DW/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.30416200000036,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006137 gc=0.000114 lookup=0.001064 hit=0.000012 miss=0.001052 collections=1 lookups=2193 comparisons=10154 large_comparisons=0 allocations=5836 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6RDZnL/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.68628600000011,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005492 gc=0.000112 lookup=0.000991 hit=0.000013 miss=0.000978 collections=1 lookups=2191 comparisons=10125 large_comparisons=0 allocations=5836 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-IcWcnK/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.561193000001367,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005744 gc=0.000114 lookup=0.000977 hit=0.000017 miss=0.000960 collections=1 lookups=2193 comparisons=10154 large_comparisons=0 allocations=5836 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OdGceD/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.949667999997473,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005157 gc=0.000112 lookup=0.000999 hit=0.000013 miss=0.000986 collections=1 lookups=2168 comparisons=10018 large_comparisons=0 allocations=5800 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-a9b7WB/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.610488999998779,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004941 gc=0.000112 lookup=0.001020 hit=0.000021 miss=0.000999 collections=1 lookups=2169 comparisons=10019 large_comparisons=0 allocations=5800 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ZmpGBI/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.475923999998486,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006140 gc=0.000109 lookup=0.001205 hit=0.000016 miss=0.001189 collections=1 lookups=2168 comparisons=10018 large_comparisons=0 allocations=5800 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ahOm9c/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.045647999999346,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005215 gc=0.000111 lookup=0.001003 hit=0.000019 miss=0.000984 collections=1 lookups=2169 comparisons=10019 large_comparisons=0 allocations=5800 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-KrZ8Jz/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.864348000002792,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005008 gc=0.000112 lookup=0.001062 hit=0.000008 miss=0.001054 collections=1 lookups=2167 comparisons=9726 large_comparisons=0 allocations=5801 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-uk2NYc/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.795755999999528,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005813 gc=0.000115 lookup=0.001102 hit=0.000014 miss=0.001088 collections=1 lookups=2170 comparisons=9756 large_comparisons=0 allocations=5801 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-E6exJE/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.192317000000912,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005072 gc=0.000112 lookup=0.000953 hit=0.000011 miss=0.000942 collections=1 lookups=2167 comparisons=9726 large_comparisons=0 allocations=5801 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Nu9SzF/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.340087000000494,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005305 gc=0.000110 lookup=0.001042 hit=0.000013 miss=0.001029 collections=1 lookups=2170 comparisons=9756 large_comparisons=0 allocations=5801 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-xuKhsl/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.050457000001188,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005165 gc=0.000116 lookup=0.000950 hit=0.000012 miss=0.000938 collections=1 lookups=2176 comparisons=9803 large_comparisons=0 allocations=5827 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-DoRBUB/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.273326999998972,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005301 gc=0.000114 lookup=0.001002 hit=0.000013 miss=0.000989 collections=1 lookups=2180 comparisons=9852 large_comparisons=0 allocations=5827 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-zmunhp/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.858435999998619,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005708 gc=0.000111 lookup=0.001085 hit=0.000008 miss=0.001077 collections=1 lookups=2176 comparisons=9803 large_comparisons=0 allocations=5827 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-1V1mKz/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.011735000000044,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006042 gc=0.000142 lookup=0.001250 hit=0.000017 miss=0.001233 collections=1 lookups=2180 comparisons=9852 large_comparisons=0 allocations=5827 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-bcsH9n/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.817494999999326,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005848 gc=0.000124 lookup=0.001229 hit=0.000042 miss=0.001187 collections=1 lookups=2418 comparisons=13636 large_comparisons=0 allocations=6281 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OjLJEN/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.886155000000144,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005889 gc=0.000125 lookup=0.001235 hit=0.000045 miss=0.001190 collections=1 lookups=2441 comparisons=13744 large_comparisons=0 allocations=6281 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-LUOnqS/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.051054999999906,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006126 gc=0.000123 lookup=0.001271 hit=0.000032 miss=0.001239 collections=1 lookups=2418 comparisons=13636 large_comparisons=0 allocations=6281 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-fGMfTO/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.765673000001698,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006426 gc=0.000152 lookup=0.001307 hit=0.000053 miss=0.001254 collections=1 lookups=2441 comparisons=13744 large_comparisons=0 allocations=6281 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-FrhRMW/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.164547000000312,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005182 gc=0.000114 lookup=0.001038 hit=0.000011 miss=0.001027 collections=1 lookups=2175 comparisons=9909 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-QTQxSp/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.00539800000115,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.004988 gc=0.000113 lookup=0.000998 hit=0.000010 miss=0.000988 collections=1 lookups=2180 comparisons=9935 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-HlIJc0/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.925515999999334,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005976 gc=0.000112 lookup=0.001169 hit=0.000010 miss=0.001159 collections=1 lookups=2175 comparisons=9909 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-fAjDLl/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.901434999999765,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005915 gc=0.000114 lookup=0.001094 hit=0.000016 miss=0.001078 collections=1 lookups=2180 comparisons=9935 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-QoQCIS/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.522756999998819,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005545 gc=0.000140 lookup=0.001184 hit=0.000014 miss=0.001170 collections=1 lookups=2171 comparisons=10035 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Y73rCy/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.437914999998611,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006399 gc=0.000114 lookup=0.001018 hit=0.000006 miss=0.001012 collections=1 lookups=2172 comparisons=10036 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-rYBf9e/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.505896999999095,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005637 gc=0.000110 lookup=0.001131 hit=0.000015 miss=0.001116 collections=1 lookups=2171 comparisons=10035 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-FCHZyl/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.498096000002988,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005470 gc=0.000111 lookup=0.001085 hit=0.000017 miss=0.001068 collections=1 lookups=2172 comparisons=10036 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-mbMw2V/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.69779600000038,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005653 gc=0.000125 lookup=0.001201 hit=0.000040 miss=0.001161 collections=1 lookups=2430 comparisons=13464 large_comparisons=0 allocations=6319 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OreiFy/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.061805000001186,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006130 gc=0.000150 lookup=0.001179 hit=0.000054 miss=0.001125 collections=1 lookups=2460 comparisons=13594 large_comparisons=0 allocations=6319 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-JI9KVg/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.307154000001901,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006219 gc=0.000127 lookup=0.001131 hit=0.000037 miss=0.001094 collections=1 lookups=2432 comparisons=13464 large_comparisons=0 allocations=6329 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OWofwK/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.93610500000068,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005907 gc=0.000124 lookup=0.001222 hit=0.000054 miss=0.001168 collections=1 lookups=2462 comparisons=13594 large_comparisons=0 allocations=6329 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-488C5N/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.482717000002594,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005420 gc=0.000126 lookup=0.001125 hit=0.000025 miss=0.001100 collections=1 lookups=2361 comparisons=13313 large_comparisons=0 allocations=6184 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-gK5iUE/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.5984669999998,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005445 gc=0.000122 lookup=0.001031 hit=0.000034 miss=0.000997 collections=1 lookups=2381 comparisons=13407 large_comparisons=0 allocations=6184 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-vQL1eg/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.020224999996572,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005768 gc=0.000125 lookup=0.001030 hit=0.000029 miss=0.001001 collections=1 lookups=2362 comparisons=13313 large_comparisons=0 allocations=6189 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-T2Nnxu/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.171435000000201,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006084 gc=0.000150 lookup=0.001214 hit=0.000042 miss=0.001172 collections=1 lookups=2382 comparisons=13407 large_comparisons=0 allocations=6189 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-4TWDpN/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.060095000000729,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005774 gc=0.000118 lookup=0.001096 hit=0.000019 miss=0.001077 collections=1 lookups=2238 comparisons=10502 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nX9ayu/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.316634000002523,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005783 gc=0.000114 lookup=0.001102 hit=0.000017 miss=0.001085 collections=1 lookups=2244 comparisons=10557 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-zukM6w/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.406014000000141,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006001 gc=0.000114 lookup=0.000957 hit=0.000022 miss=0.000935 collections=1 lookups=2238 comparisons=10502 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-woGOBC/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.612076000001252,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005609 gc=0.000114 lookup=0.001102 hit=0.000022 miss=0.001080 collections=1 lookups=2244 comparisons=10557 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-g5w2kc/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.389526999999362,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005360 gc=0.000117 lookup=0.001029 hit=0.000027 miss=0.001002 collections=1 lookups=2273 comparisons=10114 large_comparisons=0 allocations=5975 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-RUaBwm/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.400707000000693,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005420 gc=0.000117 lookup=0.001033 hit=0.000027 miss=0.001006 collections=1 lookups=2284 comparisons=10137 large_comparisons=0 allocations=5975 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-92EYpe/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.548526000002312,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005617 gc=0.000120 lookup=0.001089 hit=0.000014 miss=0.001075 collections=1 lookups=2273 comparisons=10114 large_comparisons=0 allocations=5975 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-p08u9w/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.263447000001179,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005345 gc=0.000119 lookup=0.001034 hit=0.000018 miss=0.001016 collections=1 lookups=2284 comparisons=10137 large_comparisons=0 allocations=5975 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-8ZMZga/fixture-linux-x86_64-gnu",
+        "milliseconds": 8.938517999999021,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005099 gc=0.000116 lookup=0.000959 hit=0.000016 miss=0.000943 collections=1 lookups=2194 comparisons=9948 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SaiQV4/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.905194999999367,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005805 gc=0.000117 lookup=0.001211 hit=0.000023 miss=0.001188 collections=1 lookups=2202 comparisons=10054 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-eYGuVV/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.665916000001744,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005714 gc=0.000114 lookup=0.001008 hit=0.000016 miss=0.000992 collections=1 lookups=2194 comparisons=9948 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-D2luUF/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.460006000001158,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005519 gc=0.000113 lookup=0.000994 hit=0.000019 miss=0.000975 collections=1 lookups=2202 comparisons=10054 large_comparisons=0 allocations=5863 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-48ocVc/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.897544999999809,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005974 gc=0.000114 lookup=0.001056 hit=0.000019 miss=0.001037 collections=1 lookups=2194 comparisons=9778 large_comparisons=0 allocations=5865 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-BzKmbx/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.98447500000475,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005886 gc=0.000113 lookup=0.001044 hit=0.000019 miss=0.001025 collections=1 lookups=2204 comparisons=9833 large_comparisons=0 allocations=5865 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6O5Dba/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.266727000001993,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005241 gc=0.000115 lookup=0.000965 hit=0.000013 miss=0.000952 collections=1 lookups=2194 comparisons=9778 large_comparisons=0 allocations=5865 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-KLBZV6/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.895072999999684,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006126 gc=0.000142 lookup=0.001041 hit=0.000023 miss=0.001018 collections=1 lookups=2204 comparisons=9833 large_comparisons=0 allocations=5865 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-vMfoGb/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.974794999994629,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005808 gc=0.000114 lookup=0.000959 hit=0.000009 miss=0.000950 collections=1 lookups=2168 comparisons=9977 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-9ystDn/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.064424999996845,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005984 gc=0.000113 lookup=0.000961 hit=0.000013 miss=0.000948 collections=1 lookups=2171 comparisons=10023 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-RuF0jw/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.104414999994333,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005868 gc=0.000114 lookup=0.001127 hit=0.000013 miss=0.001114 collections=1 lookups=2168 comparisons=9977 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ylBb6W/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.799302999999782,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006763 gc=0.000115 lookup=0.001179 hit=0.000012 miss=0.001167 collections=1 lookups=2171 comparisons=10023 large_comparisons=0 allocations=5806 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-FOhi80/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.003935000000638,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005935 gc=0.000115 lookup=0.001212 hit=0.000052 miss=0.001160 collections=1 lookups=2258 comparisons=11286 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-y5BEif/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.411504000003333,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006178 gc=0.000115 lookup=0.001076 hit=0.000040 miss=0.001036 collections=1 lookups=2261 comparisons=11289 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-eliAUa/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.734676000000036,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005568 gc=0.000143 lookup=0.001121 hit=0.000052 miss=0.001069 collections=1 lookups=2258 comparisons=11286 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-slSrsQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.16784799999732,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005240 gc=0.000115 lookup=0.001008 hit=0.000045 miss=0.000963 collections=1 lookups=2261 comparisons=11289 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-kcvZtr/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.899826000000758,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005790 gc=0.000130 lookup=0.001122 hit=0.000047 miss=0.001075 collections=1 lookups=2404 comparisons=13190 large_comparisons=0 allocations=6288 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-VMCXyt/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.790274999999383,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005850 gc=0.000127 lookup=0.001093 hit=0.000049 miss=0.001044 collections=1 lookups=2435 comparisons=13350 large_comparisons=0 allocations=6288 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-2ZJ0hG/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.40955500000564,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006309 gc=0.000126 lookup=0.001304 hit=0.000041 miss=0.001263 collections=1 lookups=2405 comparisons=13190 large_comparisons=0 allocations=6293 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-EXNVv7/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.168574999996054,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005723 gc=0.000128 lookup=0.001232 hit=0.000049 miss=0.001183 collections=1 lookups=2436 comparisons=13350 large_comparisons=0 allocations=6293 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-u3TaUC/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.84778599999845,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005782 gc=0.000118 lookup=0.000937 hit=0.000012 miss=0.000925 collections=1 lookups=2220 comparisons=10321 large_comparisons=0 allocations=5927 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-kLs2fM/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.742025999999896,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005577 gc=0.000117 lookup=0.000975 hit=0.000015 miss=0.000960 collections=1 lookups=2225 comparisons=10399 large_comparisons=0 allocations=5927 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ZJhM6D/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.561644000001252,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006433 gc=0.000132 lookup=0.001137 hit=0.000018 miss=0.001119 collections=1 lookups=2220 comparisons=10321 large_comparisons=0 allocations=5927 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-hYdXF6/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.708396000001812,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005498 gc=0.000117 lookup=0.001006 hit=0.000017 miss=0.000989 collections=1 lookups=2225 comparisons=10399 large_comparisons=0 allocations=5927 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-9AT0d1/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.583375999995042,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005587 gc=0.000200 lookup=0.001030 hit=0.000016 miss=0.001014 collections=1 lookups=2225 comparisons=9938 large_comparisons=0 allocations=5911 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-sDUgpA/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.898934999997437,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005835 gc=0.000146 lookup=0.001234 hit=0.000026 miss=0.001208 collections=1 lookups=2228 comparisons=9951 large_comparisons=0 allocations=5911 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Bj14k8/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.258797000002232,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005198 gc=0.000116 lookup=0.001030 hit=0.000030 miss=0.001000 collections=1 lookups=2225 comparisons=9938 large_comparisons=0 allocations=5911 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-hPHLl4/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.473583999999391,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006395 gc=0.000145 lookup=0.001121 hit=0.000022 miss=0.001099 collections=1 lookups=2228 comparisons=9951 large_comparisons=0 allocations=5911 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-X0uS0p/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.362134000002698,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006208 gc=0.000116 lookup=0.000998 hit=0.000011 miss=0.000987 collections=1 lookups=2188 comparisons=10194 large_comparisons=0 allocations=5883 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-bBLc6R/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.051214999999502,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005986 gc=0.000115 lookup=0.001193 hit=0.000008 miss=0.001185 collections=1 lookups=2189 comparisons=10200 large_comparisons=0 allocations=5883 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ecgrq8/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.69216299999971,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006266 gc=0.000114 lookup=0.000993 hit=0.000003 miss=0.000990 collections=1 lookups=2188 comparisons=10194 large_comparisons=0 allocations=5883 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ydT4yT/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.220005000002857,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006059 gc=0.000119 lookup=0.000994 hit=0.000004 miss=0.000990 collections=1 lookups=2189 comparisons=10200 large_comparisons=0 allocations=5883 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-1aDpXg/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.773116000003938,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005642 gc=0.000208 lookup=0.001000 hit=0.000017 miss=0.000983 collections=1 lookups=2189 comparisons=10239 large_comparisons=0 allocations=5873 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-K1cOnS/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.210325000000012,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006046 gc=0.000116 lookup=0.001040 hit=0.000024 miss=0.001016 collections=1 lookups=2198 comparisons=10506 large_comparisons=0 allocations=5873 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-eLaAml/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.710956000002625,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005649 gc=0.000113 lookup=0.001091 hit=0.000024 miss=0.001067 collections=1 lookups=2189 comparisons=10239 large_comparisons=0 allocations=5873 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ix7U1W/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.58018599999923,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006845 gc=0.000118 lookup=0.001019 hit=0.000024 miss=0.000995 collections=1 lookups=2198 comparisons=10506 large_comparisons=0 allocations=5873 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-NLMFiD/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.95072600000276,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005840 gc=0.000113 lookup=0.001124 hit=0.000010 miss=0.001114 collections=1 lookups=2200 comparisons=10157 large_comparisons=0 allocations=5892 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-sfYUGG/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.780194999999367,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005429 gc=0.000117 lookup=0.000995 hit=0.000011 miss=0.000984 collections=1 lookups=2208 comparisons=10180 large_comparisons=0 allocations=5892 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-2kM3I0/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.505233999996562,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006141 gc=0.000116 lookup=0.001034 hit=0.000014 miss=0.001020 collections=1 lookups=2200 comparisons=10157 large_comparisons=0 allocations=5892 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-qjNdgn/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.409444999997504,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006192 gc=0.000121 lookup=0.001060 hit=0.000015 miss=0.001045 collections=1 lookups=2208 comparisons=10180 large_comparisons=0 allocations=5892 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-k55Uh0/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.809884000002057,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006298 gc=0.000118 lookup=0.001004 hit=0.000018 miss=0.000986 collections=1 lookups=2215 comparisons=10199 large_comparisons=0 allocations=5926 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-p27EDe/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.598605999999563,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005347 gc=0.000120 lookup=0.000967 hit=0.000014 miss=0.000953 collections=1 lookups=2224 comparisons=10234 large_comparisons=0 allocations=5926 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-LZO9NN/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.17299500000081,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005796 gc=0.000113 lookup=0.001130 hit=0.000011 miss=0.001119 collections=1 lookups=2215 comparisons=10199 large_comparisons=0 allocations=5926 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nBKVlZ/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.113424999995914,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005893 gc=0.000116 lookup=0.001159 hit=0.000013 miss=0.001146 collections=1 lookups=2224 comparisons=10234 large_comparisons=0 allocations=5926 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-n7Ih2e/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.173453000003065,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006748 gc=0.000132 lookup=0.001235 hit=0.000092 miss=0.001143 collections=1 lookups=2661 comparisons=11228 large_comparisons=0 allocations=6720 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-O8wpQV/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.899550999994972,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006869 gc=0.000164 lookup=0.001260 hit=0.000084 miss=0.001176 collections=1 lookups=2702 comparisons=11387 large_comparisons=0 allocations=6720 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-eGL9tM/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.722043000001577,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006084 gc=0.000127 lookup=0.001280 hit=0.000073 miss=0.001207 collections=1 lookups=2661 comparisons=11228 large_comparisons=0 allocations=6720 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-JyQQDJ/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.010943000001134,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006653 gc=0.000134 lookup=0.001273 hit=0.000080 miss=0.001193 collections=1 lookups=2702 comparisons=11387 large_comparisons=0 allocations=6720 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ajsGzj/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.821453000004112,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006543 gc=0.000122 lookup=0.001092 hit=0.000040 miss=0.001052 collections=1 lookups=2307 comparisons=10567 large_comparisons=0 allocations=6012 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6D5KaV/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.267551999997522,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006844 gc=0.000124 lookup=0.001252 hit=0.000074 miss=0.001178 collections=1 lookups=2315 comparisons=10779 large_comparisons=0 allocations=6012 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OTiKYI/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.259154999999737,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006121 gc=0.000117 lookup=0.001069 hit=0.000042 miss=0.001027 collections=1 lookups=2307 comparisons=10567 large_comparisons=0 allocations=6012 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-gbOnyP/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.926694999994652,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005798 gc=0.000111 lookup=0.001117 hit=0.000059 miss=0.001058 collections=1 lookups=2315 comparisons=10779 large_comparisons=0 allocations=6012 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Q5Twe5/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.3859719999964,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007159 gc=0.000127 lookup=0.001212 hit=0.000023 miss=0.001189 collections=1 lookups=2400 comparisons=10208 large_comparisons=0 allocations=6267 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-0nogAX/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.982845999998972,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005605 gc=0.000123 lookup=0.001079 hit=0.000021 miss=0.001058 collections=1 lookups=2411 comparisons=10249 large_comparisons=0 allocations=6267 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-mG3J4h/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.496923999999126,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006258 gc=0.000157 lookup=0.001054 hit=0.000020 miss=0.001034 collections=1 lookups=2400 comparisons=10208 large_comparisons=0 allocations=6267 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-VzI1DD/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.439292000002752,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006469 gc=0.000122 lookup=0.001067 hit=0.000022 miss=0.001045 collections=1 lookups=2411 comparisons=10249 large_comparisons=0 allocations=6267 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-pMymYi/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.90254499999719,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005678 gc=0.000116 lookup=0.001049 hit=0.000030 miss=0.001019 collections=1 lookups=2338 comparisons=10117 large_comparisons=0 allocations=6233 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-LjBE5f/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.18495200000325,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006750 gc=0.000117 lookup=0.001423 hit=0.000027 miss=0.001396 collections=1 lookups=2338 comparisons=10117 large_comparisons=0 allocations=6233 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SD0DwD/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.355725000001257,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006099 gc=0.000116 lookup=0.001190 hit=0.000017 miss=0.001173 collections=1 lookups=2338 comparisons=10117 large_comparisons=0 allocations=6233 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Q42eFa/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.374049999998533,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007254 gc=0.000168 lookup=0.001118 hit=0.000031 miss=0.001087 collections=1 lookups=2338 comparisons=10117 large_comparisons=0 allocations=6233 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-TYhz4K/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.533574000000954,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006185 gc=0.000150 lookup=0.001136 hit=0.000017 miss=0.001119 collections=1 lookups=2198 comparisons=10024 large_comparisons=0 allocations=5887 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-XzwRzs/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.034834999998566,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005625 gc=0.000115 lookup=0.000942 hit=0.000018 miss=0.000924 collections=1 lookups=2202 comparisons=10034 large_comparisons=0 allocations=5887 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-zdlHWT/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.405434000000241,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006173 gc=0.000116 lookup=0.001207 hit=0.000017 miss=0.001190 collections=1 lookups=2198 comparisons=10024 large_comparisons=0 allocations=5887 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-85gY2I/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.750596000005316,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005574 gc=0.000115 lookup=0.001030 hit=0.000024 miss=0.001006 collections=1 lookups=2202 comparisons=10034 large_comparisons=0 allocations=5887 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-UOFsX8/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.58857700000226,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005367 gc=0.000112 lookup=0.000970 hit=0.000006 miss=0.000964 collections=1 lookups=2143 comparisons=9651 large_comparisons=0 allocations=5773 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-tnEuDT/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.476655999998911,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005193 gc=0.000110 lookup=0.000953 hit=0.000005 miss=0.000948 collections=1 lookups=2144 comparisons=9671 large_comparisons=0 allocations=5773 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-VP23Lu/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.730536000002758,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005421 gc=0.000134 lookup=0.001015 hit=0.000006 miss=0.001009 collections=1 lookups=2143 comparisons=9651 large_comparisons=0 allocations=5773 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-RVlRi9/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.591315999998187,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005454 gc=0.000112 lookup=0.000957 hit=0.000007 miss=0.000950 collections=1 lookups=2144 comparisons=9671 large_comparisons=0 allocations=5773 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-T5q8c7/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.664097000000766,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005512 gc=0.000139 lookup=0.001036 hit=0.000008 miss=0.001028 collections=1 lookups=2148 comparisons=9723 large_comparisons=0 allocations=5776 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-VHaEvT/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.463304000004428,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005875 gc=0.000112 lookup=0.000904 hit=0.000007 miss=0.000897 collections=1 lookups=2152 comparisons=9766 large_comparisons=0 allocations=5776 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-h0pP4P/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.864935999998124,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005633 gc=0.000109 lookup=0.001009 hit=0.000005 miss=0.001004 collections=1 lookups=2148 comparisons=9723 large_comparisons=0 allocations=5776 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-t6uTg8/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.437065999998595,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005335 gc=0.000113 lookup=0.000953 hit=0.000010 miss=0.000943 collections=1 lookups=2152 comparisons=9766 large_comparisons=0 allocations=5776 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-gS5ez6/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.802576000001864,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005563 gc=0.000109 lookup=0.000943 hit=0.000019 miss=0.000924 collections=1 lookups=2150 comparisons=9510 large_comparisons=0 allocations=5766 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-lay5HK/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.49632500000007,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006259 gc=0.000109 lookup=0.001006 hit=0.000019 miss=0.000987 collections=1 lookups=2159 comparisons=9555 large_comparisons=0 allocations=5766 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-f5FzKC/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.644288999996206,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006575 gc=0.000115 lookup=0.000980 hit=0.000019 miss=0.000961 collections=1 lookups=2150 comparisons=9510 large_comparisons=0 allocations=5766 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-4qT3B6/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.679125999995449,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005303 gc=0.000138 lookup=0.001065 hit=0.000029 miss=0.001036 collections=1 lookups=2159 comparisons=9555 large_comparisons=0 allocations=5766 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-lTZspb/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.597304000002623,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006252 gc=0.000114 lookup=0.001123 hit=0.000007 miss=0.001116 collections=1 lookups=2158 comparisons=9612 large_comparisons=0 allocations=5810 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-tWQLrW/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.58062400000199,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006056 gc=0.000141 lookup=0.001128 hit=0.000012 miss=0.001116 collections=1 lookups=2159 comparisons=9613 large_comparisons=0 allocations=5810 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-EkwyXe/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.038942999999563,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006131 gc=0.000113 lookup=0.001118 hit=0.000009 miss=0.001109 collections=1 lookups=2158 comparisons=9612 large_comparisons=0 allocations=5810 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OfEHHL/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.343257000000449,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005153 gc=0.000114 lookup=0.000997 hit=0.000002 miss=0.000995 collections=1 lookups=2159 comparisons=9613 large_comparisons=0 allocations=5810 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Iv2MxP/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.676711000000068,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005390 gc=0.000112 lookup=0.000989 hit=0.000009 miss=0.000980 collections=1 lookups=2150 comparisons=9738 large_comparisons=0 allocations=5788 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-5xCr2Y/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.472852000006242,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006340 gc=0.000116 lookup=0.000997 hit=0.000013 miss=0.000984 collections=1 lookups=2156 comparisons=9876 large_comparisons=0 allocations=5788 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-8WFGh8/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.07744200000161,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006223 gc=0.000150 lookup=0.000892 hit=0.000009 miss=0.000883 collections=1 lookups=2150 comparisons=9738 large_comparisons=0 allocations=5788 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-e3xlZC/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.669684000000416,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006420 gc=0.000112 lookup=0.001047 hit=0.000018 miss=0.001029 collections=1 lookups=2156 comparisons=9876 large_comparisons=0 allocations=5788 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-FUBKB8/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.13852400000178,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005824 gc=0.000140 lookup=0.001117 hit=0.000005 miss=0.001112 collections=1 lookups=2136 comparisons=9703 large_comparisons=0 allocations=5802 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-QrDIyW/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.8950760000007,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005732 gc=0.000113 lookup=0.001116 hit=0.000008 miss=0.001108 collections=1 lookups=2137 comparisons=9708 large_comparisons=0 allocations=5802 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-v67kKI/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.59142399999837,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006275 gc=0.000115 lookup=0.000984 hit=0.000009 miss=0.000975 collections=1 lookups=2136 comparisons=9703 large_comparisons=0 allocations=5802 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-NzMiCm/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.660573000001023,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006341 gc=0.000155 lookup=0.001100 hit=0.000010 miss=0.001090 collections=1 lookups=2137 comparisons=9708 large_comparisons=0 allocations=5802 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-vaSu3M/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.826145999999426,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005511 gc=0.000113 lookup=0.000947 hit=0.000007 miss=0.000940 collections=1 lookups=2140 comparisons=9933 large_comparisons=0 allocations=5757 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-HxwKdF/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.714702999997826,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005996 gc=0.000118 lookup=0.001124 hit=0.000013 miss=0.001111 collections=1 lookups=2144 comparisons=10008 large_comparisons=0 allocations=5757 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-KUXFJ6/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.63412299999618,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006406 gc=0.000120 lookup=0.001021 hit=0.000008 miss=0.001013 collections=1 lookups=2140 comparisons=9933 large_comparisons=0 allocations=5757 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-DjSTYA/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.845743000005314,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005555 gc=0.000110 lookup=0.000937 hit=0.000011 miss=0.000926 collections=1 lookups=2144 comparisons=10008 large_comparisons=0 allocations=5757 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-RbWKJh/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.433385999996972,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005249 gc=0.000112 lookup=0.000980 hit=0.000005 miss=0.000975 collections=1 lookups=2140 comparisons=9611 large_comparisons=0 allocations=5771 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-lk9SZf/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.515961999997671,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006615 gc=0.000110 lookup=0.001050 hit=0.000008 miss=0.001042 collections=1 lookups=2140 comparisons=9611 large_comparisons=0 allocations=5771 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ywhjS3/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.051393000001553,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006124 gc=0.000114 lookup=0.001042 hit=0.000007 miss=0.001035 collections=1 lookups=2140 comparisons=9611 large_comparisons=0 allocations=5771 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-k4EkfH/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.586985999994795,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005316 gc=0.000130 lookup=0.001042 hit=0.000008 miss=0.001034 collections=1 lookups=2140 comparisons=9611 large_comparisons=0 allocations=5771 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-dpXdqO/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.833896000003733,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005575 gc=0.000111 lookup=0.000953 hit=0.000016 miss=0.000937 collections=1 lookups=2151 comparisons=9842 large_comparisons=0 allocations=5772 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-xqOU59/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.164785000000848,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005993 gc=0.000135 lookup=0.001175 hit=0.000023 miss=0.001152 collections=1 lookups=2158 comparisons=10014 large_comparisons=0 allocations=5772 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-DrxblN/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.193325000000186,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005989 gc=0.000117 lookup=0.001044 hit=0.000015 miss=0.001029 collections=1 lookups=2151 comparisons=9842 large_comparisons=0 allocations=5772 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-KHnfgs/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.510001999995438,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006366 gc=0.000114 lookup=0.000989 hit=0.000026 miss=0.000963 collections=1 lookups=2158 comparisons=10014 large_comparisons=0 allocations=5772 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6WoHtv/fixture-linux-x86_64-gnu",
+        "milliseconds": 14.228334999999788,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.009569 gc=0.000275 lookup=0.002001 hit=0.000346 miss=0.001655 collections=1 lookups=4083 comparisons=23491 large_comparisons=0 allocations=9247 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-COQJE1/fixture-linux-x86_64-gnu",
+        "milliseconds": 15.396562000001722,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.010396 gc=0.000231 lookup=0.001878 hit=0.000315 miss=0.001563 collections=1 lookups=4177 comparisons=23937 large_comparisons=0 allocations=9245 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-VWpSWQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.238016999996034,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.008759 gc=0.000223 lookup=0.001881 hit=0.000296 miss=0.001585 collections=1 lookups=4083 comparisons=23491 large_comparisons=0 allocations=9247 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-TAaPkY/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.560879000004206,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.008523 gc=0.000221 lookup=0.001889 hit=0.000291 miss=0.001598 collections=1 lookups=4177 comparisons=23937 large_comparisons=0 allocations=9245 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-w9u71C/fixture-linux-x86_64-gnu",
+        "milliseconds": 104.71264099999826,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.098221 gc=0.003149 lookup=0.031973 hit=0.006148 miss=0.025825 collections=1 lookups=66022 comparisons=280857 large_comparisons=0 allocations=102101 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ZSCq0H/fixture-linux-x86_64-gnu",
+        "milliseconds": 101.2588390000019,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.095376 gc=0.002868 lookup=0.031668 hit=0.005950 miss=0.025718 collections=1 lookups=68519 comparisons=276897 large_comparisons=0 allocations=102014 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Q3KKEZ/fixture-linux-x86_64-gnu",
+        "milliseconds": 97.53199800000584,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.091645 gc=0.002733 lookup=0.029890 hit=0.005761 miss=0.024129 collections=1 lookups=66022 comparisons=280857 large_comparisons=0 allocations=102101 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-w1xMa3/fixture-linux-x86_64-gnu",
+        "milliseconds": 109.3931190000003,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.102802 gc=0.004610 lookup=0.032844 hit=0.006162 miss=0.026682 collections=1 lookups=68519 comparisons=276897 large_comparisons=0 allocations=102014 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-gG2YYb/fixture-linux-x86_64-gnu",
+        "milliseconds": 16.15969999999652,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.011791 gc=0.000360 lookup=0.003267 hit=0.000739 miss=0.002528 collections=1 lookups=6624 comparisons=44670 large_comparisons=0 allocations=14057 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-bBzsdS/fixture-linux-x86_64-gnu",
+        "milliseconds": 16.11641999999847,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.011874 gc=0.000362 lookup=0.003144 hit=0.000697 miss=0.002447 collections=1 lookups=6801 comparisons=40300 large_comparisons=0 allocations=14055 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-veRTcn/fixture-linux-x86_64-gnu",
+        "milliseconds": 22.983682999998564,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.015115 gc=0.000441 lookup=0.003522 hit=0.000818 miss=0.002704 collections=1 lookups=6624 comparisons=44670 large_comparisons=0 allocations=14057 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-0OsAgo/fixture-linux-x86_64-gnu",
+        "milliseconds": 17.37779700000101,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.012721 gc=0.000382 lookup=0.003229 hit=0.000684 miss=0.002545 collections=1 lookups=6801 comparisons=40300 large_comparisons=0 allocations=14055 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-JWZHpl/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.729298999998719,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007682 gc=0.000154 lookup=0.001365 hit=0.000123 miss=0.001242 collections=1 lookups=2548 comparisons=18369 large_comparisons=0 allocations=6297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-F1TauB/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.262924999995448,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006106 gc=0.000125 lookup=0.001205 hit=0.000090 miss=0.001115 collections=1 lookups=2577 comparisons=18783 large_comparisons=0 allocations=6297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-wgkAEN/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.240640000003623,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007775 gc=0.000129 lookup=0.001335 hit=0.000084 miss=0.001251 collections=1 lookups=2548 comparisons=18369 large_comparisons=0 allocations=6297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-LQgojv/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.67266400000517,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006449 gc=0.000126 lookup=0.001264 hit=0.000098 miss=0.001166 collections=1 lookups=2577 comparisons=18783 large_comparisons=0 allocations=6297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-rtERk6/fixture-linux-x86_64-gnu",
+        "milliseconds": 31.405331999994814,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.026450 gc=0.000868 lookup=0.007880 hit=0.001614 miss=0.006266 collections=1 lookups=16207 comparisons=72849 large_comparisons=0 allocations=30630 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-bfUQ6t/fixture-linux-x86_64-gnu",
+        "milliseconds": 30.09674599999562,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.025331 gc=0.000817 lookup=0.007586 hit=0.001487 miss=0.006099 collections=1 lookups=16457 comparisons=72251 large_comparisons=0 allocations=30614 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-2DI4CE/fixture-linux-x86_64-gnu",
+        "milliseconds": 32.96697899999708,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.027615 gc=0.000890 lookup=0.007853 hit=0.001610 miss=0.006243 collections=1 lookups=16207 comparisons=72849 large_comparisons=0 allocations=30630 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Tqm041/fixture-linux-x86_64-gnu",
+        "milliseconds": 31.87807099999918,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.027193 gc=0.001722 lookup=0.007759 hit=0.001508 miss=0.006251 collections=1 lookups=16457 comparisons=72251 large_comparisons=0 allocations=30614 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nDUlyB/fixture-linux-x86_64-gnu",
+        "milliseconds": 20.543660000003,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.016099 gc=0.000539 lookup=0.004511 hit=0.001280 miss=0.003231 collections=1 lookups=10180 comparisons=52877 large_comparisons=0 allocations=20394 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SaxZWF/fixture-linux-x86_64-gnu",
+        "milliseconds": 21.59806699999899,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.017015 gc=0.000549 lookup=0.004936 hit=0.001242 miss=0.003694 collections=1 lookups=10395 comparisons=48623 large_comparisons=0 allocations=20378 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-hdp6U0/fixture-linux-x86_64-gnu",
+        "milliseconds": 21.734285999998974,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.017263 gc=0.000542 lookup=0.004995 hit=0.001394 miss=0.003601 collections=1 lookups=10180 comparisons=52877 large_comparisons=0 allocations=20394 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-AYLmsU/fixture-linux-x86_64-gnu",
+        "milliseconds": 21.50221700000111,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.016757 gc=0.000544 lookup=0.004593 hit=0.001169 miss=0.003424 collections=1 lookups=10395 comparisons=48623 large_comparisons=0 allocations=20378 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-zmTdKT/fixture-linux-x86_64-gnu",
+        "milliseconds": 16.508098999998765,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.011586 gc=0.000281 lookup=0.002463 hit=0.000428 miss=0.002035 collections=1 lookups=5371 comparisons=25725 large_comparisons=0 allocations=11471 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-wHRgEq/fixture-linux-x86_64-gnu",
+        "milliseconds": 16.833928000000014,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.011311 gc=0.000360 lookup=0.002497 hit=0.000444 miss=0.002053 collections=1 lookups=5554 comparisons=26164 large_comparisons=0 allocations=11469 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-S6IVif/fixture-linux-x86_64-gnu",
+        "milliseconds": 16.21747900000628,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.011596 gc=0.000330 lookup=0.002506 hit=0.000464 miss=0.002042 collections=1 lookups=5371 comparisons=25725 large_comparisons=0 allocations=11471 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-fNSKU6/fixture-linux-x86_64-gnu",
+        "milliseconds": 17.35154699999839,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.011813 gc=0.000290 lookup=0.002698 hit=0.000460 miss=0.002238 collections=1 lookups=5554 comparisons=26164 large_comparisons=0 allocations=11469 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SG4GqK/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.298302000002877,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006619 gc=0.000117 lookup=0.001057 hit=0.000012 miss=0.001045 collections=1 lookups=2181 comparisons=10103 large_comparisons=0 allocations=5833 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-wcJXkJ/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.370614999999816,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005636 gc=0.000115 lookup=0.001094 hit=0.000017 miss=0.001077 collections=1 lookups=2182 comparisons=10124 large_comparisons=0 allocations=5833 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-f2J3mX/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.16860999999335,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007432 gc=0.000135 lookup=0.001195 hit=0.000012 miss=0.001183 collections=1 lookups=2181 comparisons=10103 large_comparisons=0 allocations=5833 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-VmCzwY/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.859449999996286,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006993 gc=0.000125 lookup=0.001034 hit=0.000009 miss=0.001025 collections=1 lookups=2182 comparisons=10124 large_comparisons=0 allocations=5833 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-YCD6eK/fixture-linux-x86_64-gnu",
+        "milliseconds": 22.261493999998493,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.017112 gc=0.000572 lookup=0.005030 hit=0.002434 miss=0.002596 collections=1 lookups=9368 comparisons=146590 large_comparisons=0 allocations=21297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-uKTShF/fixture-linux-x86_64-gnu",
+        "milliseconds": 19.909310999995796,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.015000 gc=0.000447 lookup=0.004517 hit=0.001699 miss=0.002818 collections=1 lookups=8348 comparisons=105280 large_comparisons=0 allocations=21297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nM2WYb/fixture-linux-x86_64-gnu",
+        "milliseconds": 23.483852000004845,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.018279 gc=0.000916 lookup=0.004870 hit=0.002273 miss=0.002597 collections=1 lookups=9368 comparisons=146590 large_comparisons=0 allocations=21297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-foAwvH/fixture-linux-x86_64-gnu",
+        "milliseconds": 20.524538999998185,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.015405 gc=0.000458 lookup=0.004306 hit=0.001675 miss=0.002631 collections=1 lookups=8348 comparisons=105280 large_comparisons=0 allocations=21297 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-q5l4WJ/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.566082999997889,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006008 gc=0.000119 lookup=0.001108 hit=0.000047 miss=0.001061 collections=1 lookups=2383 comparisons=11659 large_comparisons=0 allocations=6209 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-IOeCEs/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.661403999998583,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006104 gc=0.000123 lookup=0.001228 hit=0.000062 miss=0.001166 collections=1 lookups=2401 comparisons=12205 large_comparisons=0 allocations=6209 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-wnUO7L/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.77909300000465,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006012 gc=0.000123 lookup=0.001064 hit=0.000043 miss=0.001021 collections=1 lookups=2383 comparisons=11659 large_comparisons=0 allocations=6209 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Hwzama/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.346535000004224,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005820 gc=0.000123 lookup=0.001090 hit=0.000064 miss=0.001026 collections=1 lookups=2401 comparisons=12205 large_comparisons=0 allocations=6209 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-11Z01K/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.675632999998925,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005834 gc=0.000120 lookup=0.001081 hit=0.000019 miss=0.001062 collections=1 lookups=2277 comparisons=10295 large_comparisons=0 allocations=6038 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-JWa4Iq/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.702241000006325,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005884 gc=0.000123 lookup=0.001026 hit=0.000019 miss=0.001007 collections=1 lookups=2281 comparisons=10306 large_comparisons=0 allocations=6038 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-mMfETF/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.559832999999344,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006053 gc=0.000147 lookup=0.001090 hit=0.000020 miss=0.001070 collections=1 lookups=2277 comparisons=10295 large_comparisons=0 allocations=6038 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-XPsug8/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.611450999997032,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006853 gc=0.000119 lookup=0.001173 hit=0.000021 miss=0.001152 collections=1 lookups=2281 comparisons=10306 large_comparisons=0 allocations=6038 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-n9xL4s/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.714413000001514,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006039 gc=0.000126 lookup=0.000999 hit=0.000005 miss=0.000994 collections=1 lookups=2155 comparisons=9655 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-jGitaQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.55209399999876,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006002 gc=0.000118 lookup=0.001033 hit=0.000005 miss=0.001028 collections=1 lookups=2155 comparisons=9655 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Dr89OS/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.543173999998544,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006139 gc=0.000114 lookup=0.000968 hit=0.000006 miss=0.000962 collections=1 lookups=2155 comparisons=9655 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Y6hVsY/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.13263200000074,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006640 gc=0.000114 lookup=0.000948 hit=0.000007 miss=0.000941 collections=1 lookups=2155 comparisons=9655 large_comparisons=0 allocations=5808 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-CCMBZV/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.969786000001477,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005593 gc=0.000121 lookup=0.001007 hit=0.000012 miss=0.000995 collections=1 lookups=2237 comparisons=10123 large_comparisons=0 allocations=5986 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-dRcdbK/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.216734999994515,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005779 gc=0.000117 lookup=0.000964 hit=0.000013 miss=0.000951 collections=1 lookups=2239 comparisons=10127 large_comparisons=0 allocations=5986 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-yS2tbQ/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.307652000003145,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006820 gc=0.000147 lookup=0.001093 hit=0.000014 miss=0.001079 collections=1 lookups=2237 comparisons=10123 large_comparisons=0 allocations=5986 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nw7sXw/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.171657000006235,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006999 gc=0.000126 lookup=0.001231 hit=0.000018 miss=0.001213 collections=1 lookups=2239 comparisons=10127 large_comparisons=0 allocations=5986 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Xej1O0/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.962980999996944,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007028 gc=0.000119 lookup=0.001225 hit=0.000014 miss=0.001211 collections=1 lookups=2255 comparisons=10130 large_comparisons=0 allocations=6032 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-U6Zbcq/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.211343999995734,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005785 gc=0.000117 lookup=0.001129 hit=0.000014 miss=0.001115 collections=1 lookups=2258 comparisons=10136 large_comparisons=0 allocations=6032 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Yoy2vp/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.804271000000881,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006399 gc=0.000120 lookup=0.001046 hit=0.000016 miss=0.001030 collections=1 lookups=2255 comparisons=10130 large_comparisons=0 allocations=6032 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-dyxy3W/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.51461399999971,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006129 gc=0.000122 lookup=0.001014 hit=0.000015 miss=0.000999 collections=1 lookups=2258 comparisons=10136 large_comparisons=0 allocations=6032 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-sxdYc5/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.384343999998237,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005920 gc=0.000119 lookup=0.001088 hit=0.000025 miss=0.001063 collections=1 lookups=2288 comparisons=10965 large_comparisons=0 allocations=6058 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-EZLuxy/fixture-linux-x86_64-gnu",
+        "milliseconds": 14.90961299999617,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006348 gc=0.000120 lookup=0.001205 hit=0.000023 miss=0.001182 collections=1 lookups=2294 comparisons=11116 large_comparisons=0 allocations=6058 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-gJPqeL/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.596623999997973,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005681 gc=0.000122 lookup=0.001024 hit=0.000026 miss=0.000998 collections=1 lookups=2288 comparisons=10965 large_comparisons=0 allocations=6058 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-nsRhBG/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.618383000000904,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006182 gc=0.000121 lookup=0.001193 hit=0.000028 miss=0.001165 collections=1 lookups=2294 comparisons=11116 large_comparisons=0 allocations=6058 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-U37hpe/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.619594000003417,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006100 gc=0.000113 lookup=0.001163 hit=0.000007 miss=0.001156 collections=1 lookups=2156 comparisons=9778 large_comparisons=0 allocations=5804 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-5pMERG/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.061184999998659,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005602 gc=0.000116 lookup=0.000930 hit=0.000003 miss=0.000927 collections=1 lookups=2156 comparisons=9778 large_comparisons=0 allocations=5804 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-jJkghq/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.830652999997255,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006302 gc=0.000147 lookup=0.001140 hit=0.000008 miss=0.001132 collections=1 lookups=2156 comparisons=9778 large_comparisons=0 allocations=5804 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-cK8pyi/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.976120999999694,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006254 gc=0.000115 lookup=0.000978 hit=0.000006 miss=0.000972 collections=1 lookups=2156 comparisons=9778 large_comparisons=0 allocations=5804 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-rpM8X5/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.52530200000183,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006804 gc=0.000113 lookup=0.000944 hit=0.000004 miss=0.000940 collections=1 lookups=2159 comparisons=9602 large_comparisons=0 allocations=5821 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SBfLiS/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.945433000000776,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006283 gc=0.000120 lookup=0.001263 hit=0.000006 miss=0.001257 collections=1 lookups=2159 comparisons=9602 large_comparisons=0 allocations=5821 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-wxYXMv/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.115061999997124,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006639 gc=0.000111 lookup=0.001021 hit=0.000003 miss=0.001018 collections=1 lookups=2159 comparisons=9602 large_comparisons=0 allocations=5821 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-e9Zibg/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.323974999999336,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005761 gc=0.000114 lookup=0.001125 hit=0.000007 miss=0.001118 collections=1 lookups=2159 comparisons=9602 large_comparisons=0 allocations=5821 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-WDjcZx/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.002645000000484,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005536 gc=0.000135 lookup=0.000976 hit=0.000006 miss=0.000970 collections=1 lookups=2140 comparisons=9585 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-D2bx4I/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.059504999997444,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005676 gc=0.000112 lookup=0.000947 hit=0.000007 miss=0.000940 collections=1 lookups=2141 comparisons=9586 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-hP2jJ4/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.914624999997613,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005354 gc=0.000114 lookup=0.000966 hit=0.000008 miss=0.000958 collections=1 lookups=2140 comparisons=9585 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-lUw3z8/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.54195400000026,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005933 gc=0.000117 lookup=0.000960 hit=0.000006 miss=0.000954 collections=1 lookups=2141 comparisons=9586 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-UxgQwX/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.65942399999767,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005934 gc=0.000119 lookup=0.000981 hit=0.000005 miss=0.000976 collections=1 lookups=2140 comparisons=9585 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-OL6Idp/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.525422999999137,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005920 gc=0.000115 lookup=0.001082 hit=0.000006 miss=0.001076 collections=1 lookups=2141 comparisons=9586 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-YIzJVI/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.51628399999754,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005752 gc=0.000112 lookup=0.000908 hit=0.000007 miss=0.000901 collections=1 lookups=2140 comparisons=9585 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-dySY8C/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.434134000002814,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005977 gc=0.000113 lookup=0.001090 hit=0.000009 miss=0.001081 collections=1 lookups=2141 comparisons=9586 large_comparisons=0 allocations=5770 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-uXZqRZ/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.090152999997372,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006553 gc=0.000114 lookup=0.001004 hit=0.000015 miss=0.000989 collections=1 lookups=2178 comparisons=10044 large_comparisons=0 allocations=5829 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Q5TfUe/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.627924000000348,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006055 gc=0.000121 lookup=0.000937 hit=0.000015 miss=0.000922 collections=1 lookups=2182 comparisons=10159 large_comparisons=0 allocations=5829 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-bz1Wxv/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.966854999998759,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005604 gc=0.000111 lookup=0.000991 hit=0.000008 miss=0.000983 collections=1 lookups=2145 comparisons=9421 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-GltfAy/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.62430399999721,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005774 gc=0.000113 lookup=0.001124 hit=0.000010 miss=0.001114 collections=1 lookups=2145 comparisons=9421 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-y3FjLV/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.03261499999644,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005498 gc=0.000111 lookup=0.000982 hit=0.000008 miss=0.000974 collections=1 lookups=2145 comparisons=9421 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-EyyOEG/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.086265000005369,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005316 gc=0.000112 lookup=0.000917 hit=0.000007 miss=0.000910 collections=1 lookups=2145 comparisons=9421 large_comparisons=0 allocations=5793 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-RzRlos/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.196044999996957,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005597 gc=0.000123 lookup=0.001118 hit=0.000011 miss=0.001107 collections=1 lookups=2256 comparisons=10153 large_comparisons=0 allocations=6035 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-7DZ5vY/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.20982499999809,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005775 gc=0.000118 lookup=0.001001 hit=0.000009 miss=0.000992 collections=1 lookups=2259 comparisons=10159 large_comparisons=0 allocations=6035 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-kT8VpM/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.273439999997208,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006354 gc=0.000121 lookup=0.001241 hit=0.000018 miss=0.001223 collections=1 lookups=2256 comparisons=10153 large_comparisons=0 allocations=6035 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-RjpUmw/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.340841999997792,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006894 gc=0.000116 lookup=0.001057 hit=0.000013 miss=0.001044 collections=1 lookups=2259 comparisons=10159 large_comparisons=0 allocations=6035 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-PhPvdN/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.46799099999771,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006973 gc=0.000159 lookup=0.001403 hit=0.000085 miss=0.001318 collections=1 lookups=2966 comparisons=13136 large_comparisons=0 allocations=7451 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-ab0ZSM/fixture-linux-x86_64-gnu",
+        "milliseconds": 13.057517999994161,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.008369 gc=0.000195 lookup=0.001586 hit=0.000142 miss=0.001444 collections=1 lookups=3012 comparisons=13265 large_comparisons=0 allocations=7451 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-TXlaqh/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.036560000000463,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007607 gc=0.000155 lookup=0.001584 hit=0.000091 miss=0.001493 collections=1 lookups=2966 comparisons=13136 large_comparisons=0 allocations=7451 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-0R6cK5/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.731219000001147,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007648 gc=0.000156 lookup=0.001506 hit=0.000099 miss=0.001407 collections=1 lookups=3012 comparisons=13265 large_comparisons=0 allocations=7451 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-6iquSc/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.481693999994604,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005889 gc=0.000114 lookup=0.000965 hit=0.000008 miss=0.000957 collections=1 lookups=2190 comparisons=9876 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-iVJFrE/fixture-linux-x86_64-gnu",
+        "milliseconds": 9.872726000001421,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005464 gc=0.000118 lookup=0.000909 hit=0.000007 miss=0.000902 collections=1 lookups=2190 comparisons=9876 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-5bdtVR/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.356873999997333,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005875 gc=0.000150 lookup=0.001171 hit=0.000003 miss=0.001168 collections=1 lookups=2190 comparisons=9876 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-yTsmVi/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.800543999997899,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006161 gc=0.000130 lookup=0.001084 hit=0.000008 miss=0.001076 collections=1 lookups=2190 comparisons=9876 large_comparisons=0 allocations=5893 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-Lz8tQG/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.987003000002005,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006386 gc=0.000135 lookup=0.001170 hit=0.000050 miss=0.001120 collections=1 lookups=2552 comparisons=14196 large_comparisons=0 allocations=6617 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-SyJ1Xy/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.672999000002164,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007946 gc=0.000136 lookup=0.001258 hit=0.000057 miss=0.001201 collections=1 lookups=2582 comparisons=14328 large_comparisons=0 allocations=6617 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-0ycP7C/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.79785300000367,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006354 gc=0.000153 lookup=0.001236 hit=0.000056 miss=0.001180 collections=1 lookups=2553 comparisons=14196 large_comparisons=0 allocations=6622 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-5DqpRo/fixture-linux-x86_64-gnu",
+        "milliseconds": 12.358878999999433,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.007314 gc=0.000131 lookup=0.001173 hit=0.000049 miss=0.001124 collections=1 lookups=2583 comparisons=14328 large_comparisons=0 allocations=6622 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-7DbbIy/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.858204000003752,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006313 gc=0.000132 lookup=0.001162 hit=0.000013 miss=0.001149 collections=1 lookups=2268 comparisons=10283 large_comparisons=0 allocations=6046 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-lsSPuW/fixture-linux-x86_64-gnu",
+        "milliseconds": 10.41003500000079,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.005764 gc=0.000118 lookup=0.001018 hit=0.000028 miss=0.000990 collections=1 lookups=2270 comparisons=10287 large_comparisons=0 allocations=6046 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-jM7z4f/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.711420999999973,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006724 gc=0.000122 lookup=0.001044 hit=0.000018 miss=0.001026 collections=1 lookups=2268 comparisons=10283 large_comparisons=0 allocations=6046 forced=0"
+        ]
+      },
+      {
+        "command": "/tmp/oseo-cli-w9PHRK/fixture-linux-x86_64-gnu",
+        "milliseconds": 11.355291999992914,
+        "status": 0,
+        "profile": [
+          "U11 cpu=0.006333 gc=0.000121 lookup=0.001146 hit=0.000016 miss=0.001130 collections=1 lookups=2270 comparisons=10287 large_comparisons=0 allocations=6046 forced=0"
+        ]
+      }
+    ],
+    "derivedTotals": {
+      "cpu": 2.784129,
+      "gc": 0.068596,
+      "lookup": 0.606263,
+      "hit": 0.058831,
+      "miss": 0.547432,
+      "collections": 370,
+      "lookups": 1261181,
+      "comparisons": 6291015,
+      "large_comparisons": 0,
+      "allocations": 2903620,
+      "gcPercent": 2.4638226174146385,
+      "lookupPercent": 21.775679216013337
+    }
+  },
+  "nosan1": {
+    "start": "2026-09-27T23:23:26+09:00",
+    "commandTime": "wall=65.19 user=56.02 system=9.64",
+    "result": {
+      "path": "test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached.js",
+      "strictness": "non-strict",
+      "specialization": "enabled",
+      "milliseconds": 64232.060621,
+      "result": {
+        "exitStatus": 0,
+        "stderr": "",
+        "stdout": ""
+      }
+    },
+    "native": [
+      {
+        "command": "/tmp/oseo-cli-GFlsuA/fixture-linux-x86_64-gnu",
+        "milliseconds": 54409.116978,
+        "status": 0,
+        "profile": [
+          "U11 cpu=54.145868 gc=0.211097 lookup=43.263758 hit=20.925357 miss=22.338401 collections=1 lookups=12880590 comparisons=14447751233 large_comparisons=14329854054 allocations=12983881 forced=0"
+        ]
+      }
+    ],
+    "derivedTotals": {
+      "cpu": 54.145868,
+      "gc": 0.211097,
+      "lookup": 43.263758,
+      "hit": 20.925357,
+      "miss": 22.338401,
+      "collections": 1,
+      "lookups": 12880590,
+      "comparisons": 14447751233,
+      "large_comparisons": 14329854054,
+      "allocations": 12983881,
+      "gcPercent": 0.38986723788415395,
+      "lookupPercent": 79.90223372169416
+    }
+  },
+  "baseline1": {
+    "start": "2026-09-27T23:24:31+09:00",
+    "commandTime": "wall=108.86 user=105.49 system=3.43",
+    "result": {
+      "path": "test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached.js",
+      "strictness": "non-strict",
+      "specialization": "enabled",
+      "milliseconds": 107925.91323,
+      "result": {
+        "exitStatus": 0,
+        "stderr": "",
+        "stdout": ""
+      }
+    },
+    "native": [
+      {
+        "command": "/tmp/oseo-cli-0eSv2d/fixture-linux-x86_64-gnu",
+        "milliseconds": 90136.469036,
+        "status": 0,
+        "profile": []
+      }
+    ],
+    "derivedTotals": null
+  },
+  "baseline2": {
+    "start": "2026-09-27T23:26:20+09:00",
+    "commandTime": "wall=91.33 user=90.65 system=1.00",
+    "result": {
+      "path": "test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached.js",
+      "strictness": "non-strict",
+      "specialization": "enabled",
+      "milliseconds": 90363.29726600001,
+      "result": {
+        "exitStatus": 0,
+        "stderr": "",
+        "stdout": ""
+      }
+    },
+    "native": [
+      {
+        "command": "/tmp/oseo-cli-BEJA8O/fixture-linux-x86_64-gnu",
+        "milliseconds": 90120.660712,
+        "status": 0,
+        "profile": []
+      }
+    ],
+    "derivedTotals": null
+  }
+}
