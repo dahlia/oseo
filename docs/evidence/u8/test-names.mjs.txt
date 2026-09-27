@@ -1,0 +1,43 @@
+// Historical registration patterns; no test source is executed.
+import { execFileSync } from 'node:child_process';
+import { parse } from '@babel/parser';
+
+const revision = process.argv[2];
+const paths = execFileSync('git', ['ls-tree', '-r', '--name-only', revision],
+  { encoding: 'utf8' }).trim().split('\n').filter(path =>
+  /^(packages|tests)\/.*\.test\.ts$/.test(path));
+const escape = text => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function pattern(node) {
+  if (node?.type === 'StringLiteral') return escape(node.value);
+  if (node?.type === 'TemplateLiteral')
+    return node.quasis.map(part => escape(part.value.cooked)).join('.*');
+  if (node?.type === 'BinaryExpression' && node.operator === '+') {
+    const left = pattern(node.left), right = pattern(node.right);
+    return left == null || right == null ? undefined : left + right;
+  }
+}
+const output = [];
+for (const path of paths) {
+  const source = execFileSync('git', ['show', `${revision}:${path}`],
+    { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
+  const ast = parse(source, { sourceType: 'module', plugins: ['typescript'] });
+  const patterns = [];
+  const literals = [];
+  function visit(node) {
+    if (node == null || typeof node !== 'object') return;
+    const literal = pattern(node);
+    if (literal != null && !literal.includes('.*')) literals.push(literal);
+    if (node.type === 'CallExpression' && node.callee.type === 'Identifier'
+      && node.callee.name === 'test') {
+      const value = pattern(node.arguments[0]);
+      if (value != null) patterns.push(value);
+    }
+    for (const value of Object.values(node)) {
+      if (Array.isArray(value)) value.forEach(visit);
+      else if (value != null && typeof value === 'object') visit(value);
+    }
+  }
+  visit(ast);
+  output.push({ path, patterns, literals });
+}
+process.stdout.write(JSON.stringify(output, null, 2) + '\n');

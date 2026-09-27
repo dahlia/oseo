@@ -275,6 +275,151 @@ These two different-commit samples describe observed costs, not an
 implementation improvement. There is no before/after branch comparison and
 no claimed macOS minute reduction from this documentation-only audit.
 
+### U8 macOS host split audit
+
+U8 inspected the workflow and mise tasks at `875506fe` (including U7),
+then compared the historical sources and logs for runs 36243816479,
+36261458909 and [36312192623] at `af9bb68c`. The first two runs used
+Node 24.18.0 and Deno 2.9.2; the third and current checkout use Node 24.21.0
+and Deno 2.9.7. Within each run, Linux and macOS use the same pinned runtime,
+source revision, task command and ordinary property inputs. These samples are
+not three repetitions of one unchanged configuration or workload.
+
+The coordinator explicitly requested an audit-only result after the initial
+source inspection: do not introduce a Node discovery runner for a small share
+of the job, and do not spend a CI cycle on a narrow Deno exclusion. U8 therefore
+moves no component. Provably movable evidence exists, but its attributable
+Node case time is a derived 0.14/0.14/0.21 min, far below the coordinator's
+specified 10-minute follow-up threshold. This does not mean every remaining
+file proves a macOS-specific contract. Uncertain host and timing evidence is
+listed below and retained. No recovered runner minutes are claimed.
+
+#### Classification and complete inventories
+
+The categories are macOS-only evidence, host-independent with equivalent Linux
+coverage, host-independent without equivalent Linux coverage, and unclear.
+`timing-verdict` is an unclear movement decision for semantically independent
+files whose pass verdict includes elapsed time or property interruption.
+`independent-linux`, `macos-only` and `unclear` are local audit identifiers
+in the [per-file inventory](./evidence/u8/file-costs.md), not changes to any
+reviewed conformance vocabulary. The inventory lists every historical Node
+test file, including files introduced between samples, its classification and
+its derived measured-case cost. The [step inventory](./evidence/u8/job-steps.md)
+names every macOS job instance and non-skipped step in all source runs.
+
+No inspected component is established as host-independent *and* missing the
+matching Linux runtime configuration. That is narrower than treating any
+Linux native result as equivalent to macOS native execution. Node coverage
+never substitutes for Deno, nor Node 24.18.0 for Node 24.21.0. Extended seeds,
+size and case budgets never substitute for ordinary ones (U7).
+
+Every family has these shared steps; this classification applies to each
+named instance in the step inventory:
+
+| Step/component                                                                    | Classification                                            | Source evidence and disposition                                                                                                                                                                                                                                     |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Checkout, job initialization, mise installation/dependencies, post-action cleanup | Unclear as standalone coverage; operational prerequisites | The workflow installs the pinned macOS tool binaries and workspace dependencies. These steps establish no independent language verdict and stay with each macOS gate.                                                                                               |
+| Cache-action `mise run build` and each task's `build` dependency                  | Host-independent, equivalent Linux configuration          | *mise.toml* runs `aube exec -- tsdown --workspace`; package configs validate ESM/declarations/publint/attw, not generated native programs. Linux runs the same build, but each macOS consumer needs its artifacts. Reuse is U3's scope, not a removable macOS test. |
+| Cache-key computation                                                             | macOS-specific preparation, retained                      | *tests/ci-runtime-archive-cache.ts* selects the actual execution host/target and compiler identity; Zig and host-cc keys differ. It prepares the archive for that native target, not a Linux-equivalent assertion.                                                  |
+| Cache restore, exact-hit rejection/removal, post-cache save                       | Unclear as standalone coverage; retained infrastructure   | The composite action restores the complete key's archive and removes prefix matches. A hit is an archive observation, not a measurement of Zig cold/warm state.                                                                                                     |
+| Conditional failure/cancellation artifact upload                                  | macOS-specific diagnostic preservation, retained          | Native, support, test262 and sanitizer jobs upload that runner's native temporary artifacts. Removing this loses failure evidence from the actual native host.                                                                                                      |
+
+Job-specific steps/components follow. Setup costs are not attributed to pure
+case durations, and target-dependent work is never moved by file-name alone.
+
+| Job family and step/component                                                  | Classification                                                                  | Source evidence and disposition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `test` Node: compiler/backend/parser semantic unit files                       | Host-independent, equivalent Linux Node configuration                           | The invoked compiler functions build/print owned HIR/MIR, link supplied module graphs, parse/match supplied regex data, or hash supplied harness inputs with Web Crypto. The C backend emits strings. Test imports use assertions, `node:test` and these pure APIs; compiler/backend source has no process/FS/host adapter invocation. Parser files use Babel and owned conversion APIs. Explicit target descriptions are supplied data, not host detection. Keep *statements.test.ts* separate below.                                                                                                             |
+| `test` Node: CLI/testkit unit files                                            | Host-independent, equivalent Linux Node configuration                           | *packages/cli/tests/index.test.ts* supplies fake `CompilerHost`/`NativeToolchain` objects to native-named orchestration APIs; their `run` methods return observations, never spawn. *packages/testkit/tests/index.test.ts* uses Map-backed files and fake process results. Native-looking API names do not establish native execution here.                                                                                                                                                                                                                                                                        |
+| `test` Node: runtime input/symbol/registry/graph unit files and Unicode tables | Host-independent, equivalent Linux Node configuration                           | Runtime *index.test.ts*/*symbols.test.ts* inspect provider metadata and capabilities. *builtin-code-registry.test.ts*/*intrinsic-graph.test.ts* read the checked-in C assets and compare text/registry entries without compiling them. *packages/unicode/tests/tables.test.ts* checks pinned lookup/encoding data. Native clone/assembly files are excluded from this group.                                                                                                                                                                                                                                       |
+| `test` Node: pure integration and inventory files                              | Host-independent, equivalent Linux Node configuration                           | *harness-fragments.test.ts* reads fixed harness text then compiles/prints fragments without a toolchain; *regexp-literal-aot.test.ts* only lowers/emits data; *regexp-matcher.test.ts* compares the TS matcher to the JS RegExp oracle. *shard.test.ts*/*structured-data.test.ts* operate on supplied values. *test262-inventory.test.ts* parses supplied frontmatter and policy values. Unicode oracle/generator tests read pinned inputs and compare deterministic sets/digests/text, without native execution or OS branches.                                                                                   |
+| `test` Node: evidence-lanes and M5b/M5c graph unit files                       | Host-independent, equivalent Linux Node configuration                           | Evidence-lane tests pass in-memory source strings/path sets and explicit reader callbacks. Graph tests validate synthetic records plus the checked-in graph/manifest through deterministic readers in *tools/m5b-graph.ts*/*tools/m5c-graph.ts*. No native execution, host API oracle or elapsed-time verdict is used. Reading repository bytes is input acquisition, not testing filesystem locks/permissions.                                                                                                                                                                                                    |
+| `test` Node: parser *statements.test.ts*                                       | Unclear for movement; semantics independent, timing verdict retained            | Semantic parse/conversion assertions share the pure frontend, but `performance.now()` bounds large-file conversion and structured-hint scaling ratios. Linux runs the same Node version, but that does not prove a macOS timing regression. Retain the complete file.                                                                                                                                                                                                                                                                                                                                              |
+| `test` Node: ordinary native properties and runtime/harness integration        | macOS-only evidence                                                             | Native property helpers, *harness-native.test.ts*, *harness-resource.test.ts*, *native-runtime-archive-cache.test.ts*, *test262-fragments.test.ts*, *runtime-*.test.ts\* except the mocked *runtime-archive-cache.test.ts*, and native clock tests build/execute through the selected native toolchain and actual host. Linux's target is different. The five pure property files below are excluded from this category.                                                                                                                                                                                           |
+| `test` Node: pure RegExp/Unicode properties                                    | Unclear for movement; semantics independent, interruption verdict retained      | *m5-regexp-pattern*, *m5-regexp-matcher*, *m5-regexp-pattern-extensions*, *m5-regexp-unicode-property-escapes* and *unicode-tables* property files use generated TS data and the pinned matcher/Unicode tables or JS RegExp oracle, with no native build/execute. `assertProperty` sets `interruptAfterTimeLimit` and `markInterruptAsFailure`; the macOS timing verdict is retained.                                                                                                                                                                                                                              |
+| `test` Node: host/tooling/mixed files                                          | Unclear; retained                                                               | Host tests use real temp paths, locks, environment or processes; Zig unit tests actually compile archives and sanitizer probes; host-cc plan tests select their target from `process.platform`. Guard/toolchain/lint/commit/boundary/version tests invoke external tools or real filesystem/process behavior. *regexp-probes.test.ts* exercises process/resource measurements, and *test262-runner.test.ts* mixes manifest validation with temp-file, VM/harness, retry and scheduling checks. See the per-file inventory; pure subcases inside these mixed files are not presumed to make the whole file movable. |
+| `test` Deno: `deno test -A packages`                                           | Mixed; same pure package components have equivalent Linux Deno coverage         | Linux runs the same command and Deno pin. Compiler/backend/parser/CLI/testkit pure contracts above run unchanged under Deno too. Package properties retain interruption verdicts; parser statements retain timing verdicts. Host adapters exercise Deno/Node compatibility and real host behavior. Runtime TypedArray clone and Zig activity tests compile/execute on the host; date floating-point tests inspect host-compiler assembly. The whole job cannot move.                                                                                                                                               |
+| `native`: `test:native --shard N/3` native outputs and scenarios               | macOS-only evidence                                                             | *tests/native.ts* selects `targetForExecutionHost`, executes admitted native fixtures with specialization/GC policies, compares outputs and runs *tests/native/scenarios/shard-{0,1,2}.ts*. Native reference Node/Deno comparisons belong to that output check; Linux native outputs are not equivalent.                                                                                                                                                                                                                                                                                                           |
+| `native`: cross-link and assembly checks inside the same step                  | Unclear for movement; retained                                                  | The cross target is `linux-aarch64-musl` on both hosts, but *tests/native.ts* invokes the actual host Zig adapter to compile/link it and inspects configured assembly paths. This proves that host toolchain's cross-build capability, not a pure TS contract. Parse/emission assertions inside the native step are not isolated wall-time measurements.                                                                                                                                                                                                                                                           |
+| `native support`: shard 1 extended package step                                | Unclear for movement; semantics independent, interruption verdict retained      | Exactly the two *packages/testkit/tests/*.property.test.ts\* files run under both Node and Deno for seeds 1592590337/1592590338, scale 10 and size `large`; Linux shard 1 has the same runtime pins and inputs. Graph/list generators, explicit replay parameter checks and Promise microtasks perform no native or host API execution. Their helper retains time-limit failure, so the macOS verdict stays conservatively.                                                                                                                                                                                        |
+| `native support`: extended native shard step                                   | macOS-only evidence for native files; unclear for the five pure timing files    | Scale 10, seed 1592590339 and size `large` select *tests/property/*.property.test.ts\* through *tools/run-native-tests.ts*. The wrapper derives concurrency from `availableParallelism` and CI status. Most files build/execute the macOS target. The five pure files above remain for interruption evidence, not because all files in this directory are native. Linux uses four shards versus macOS twelve; identical filenames do not imply identical scheduling.                                                                                                                                               |
+| `test262`: `test:test262 --shard N/10`                                         | macOS-only evidence for execution; unclear for separating parse-only components | *tools/test262.ts* selects the native execution target and calls `runNativeCli` or fragment execution for reviewed paths. Structural/parse rejection, frontmatter/manifest handling and harness construction also run within the step. Some are semantically independent, but no isolated per-path timing or proof of target-independent complete verdicts is established here. Preserve every reviewed path and shard.                                                                                                                                                                                            |
+| Host C sanitizers: self preflight in each native/property job                  | macOS-only evidence                                                             | *tests/native-toolchain.ts* probes the actual Apple Clang ASan runtime; *host-cc-sanitizer.test.ts* compiles intentionally invalid runtime/generated C and requires sanitizer reports. The selection file also contains mocked compiler-selection subprocess cases; their host/process behavior is unclear, and preflight stays in each job. Linux Clang/GCC is not Apple Clang.                                                                                                                                                                                                                                   |
+| Host C sanitizers: runtime/native or property step                             | macOS-only evidence; pure timing property subfiles retained                     | `OSEO_NATIVE_TOOLCHAIN=host-cc`, `OSEO_HOST_CC=clang` select Apple Clang on macOS. The native job runs runtime fixtures and native scenarios; the property job runs all ordinary property files with concurrency four and macOS time scale six. Linux's compiler and time scale three differ. The workflow does not invoke `test:sanitizer:test262`.                                                                                                                                                                                                                                                               |
+
+#### Measured costs and attribution limits
+
+The following wall times are **measured** from GitHub step/job timestamps.
+The source jobs are `test (macos-latest, node)`,
+`test (macos-latest, deno)` and
+`native support (macos-aarch64, 1/12)` in the named run.
+The last row is only the package step on that shard, not its native execution.
+All other job instances/steps are preserved in the step inventory.
+
+| Measured component s                            | 36243816479 | 36261458909 | 36312192623 |
+| ----------------------------------------------- | ----------: | ----------: | ----------: |
+| Node whole job                                  |        2421 |        2589 |        2986 |
+| Node test step, including repeated build        |        2368 |        2537 |        2943 |
+| Deno whole job                                  |          90 |         182 |         151 |
+| Deno test step                                  |          38 |          47 |          62 |
+| Extended package step, including repeated build |          11 |          10 |          10 |
+
+The next table contains **derived sums of measured Node case durations**, not
+wall-time allocations. Node's spec output exposes each case's `ms`, but no
+file subprocess start/end or per-file duration summary. The extraction starts
+at the Node task launch and stops before its final summary; it does not count
+build-tool checkmarks or repeated failure details. It maps names against the
+run's historical source, preserves ambiguous cases separately, and never
+assigns them from apparent output order. The per-file inventory and compact
+JSON retain the inputs. No proportional allocation of the Node wall time is
+valid: file subprocesses overlap, and their setup/import/scheduling cost is
+not measured by case callbacks.
+
+| Derived case seconds in macOS Node job                 | 36243816479 | 36261458909 | 36312192623 |
+| ------------------------------------------------------ | ----------: | ----------: | ----------: |
+| Provably independent, matching Linux Node coverage     |       8.132 |       8.372 |      12.740 |
+| Native/host compiler evidence retained                 |    4471.151 |    4816.922 |    5640.646 |
+| Semantically independent timing-verdict files retained |       1.163 |       1.095 |       1.175 |
+| Unclear mixed/host/tooling files retained              |     117.161 |      97.742 |      88.366 |
+| Ambiguous source-file attribution                      |      21.751 |      25.106 |      22.163 |
+
+Native case sums exceed job wall time because cases from separate files
+execute concurrently. The independent row is attributable case work, not a
+measured saving or a complete per-file cost. All independent files have
+uniquely attributable cases in their matching Linux Node job in each run.
+The largest independent file in run 36312192623 is the M5c graph check at a
+derived 7.405 s; its checked-in manifest validation accounts for most of the
+increase from the earlier samples. Configuration/workload changes and runner
+variance remain confounded, so this is not a speedup comparison.
+
+Pure components nested in mixed native/standards steps have no isolated
+measured cost. Their enclosing step costs are preserved, but cannot be credited
+as movable. Initial npm builds, repeated build intervals, dependency install,
+cache and checkout costs are fixed/setup costs, already decomposed by U7/U3;
+none is added to the independent case row. No Zig cache-cold/warm comparison
+is made and no archive-cache hit is credited as optimization.
+
+Run [36300567111] independently observed a macOS Node failure at
+*packages/parser-babel/tests/statements.test.ts:1330*: the object hint scaling
+ratio assertion reported 7.52. That is an observation of a host-sensitive
+timing verdict, not evidence that removing the macOS test preserves coverage.
+Parse-only semantics, hint-scaling ratios and property interruption are assessed
+separately; all timing-verdict files remain.
+
+A future Node host split would need a reviewed discovery runner that excludes
+only explicit audited files on macOS, retains default discovery coverage for
+new files, and leaves full Linux Node coverage and macOS native tests intact.
+Node 24 has no test-file exclusion flag; a name-based skip would be too broad.
+The attributable movable share here is below 10 min in every observed run and
+does not justify that runner change. Exact recovery would require a controlled
+CI experiment measuring process/import cost and overlap, not extrapolation
+from summed case `ms`. U8 introduces no runner, changes no workflow/mise task,
+and requests no CI run. The projection's entire `test` family remains an upper
+ceiling, not an evidenced host-split saving.
+
+[36300567111]: https://github.com/dahlia/oseo/actions/runs/36300567111
+[36312192623]: https://github.com/dahlia/oseo/actions/runs/36312192623
+
 ### macOS test262 execution series
 
 The measured series below covers every main workflow run from `32ece7f4`
@@ -350,7 +495,6 @@ implementation change or a measured isolated speedup.
 [36134286493]: https://github.com/dahlia/oseo/actions/runs/36134286493
 [36199093039]: https://github.com/dahlia/oseo/actions/runs/36199093039
 [36226406621]: https://github.com/dahlia/oseo/actions/runs/36226406621
-[36300567111]: https://github.com/dahlia/oseo/actions/runs/36300567111
 
 ### Fixed cost and cache evidence
 
