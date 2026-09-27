@@ -617,6 +617,10 @@ improvement.
 Projected cost at the M5c edition denominator
 ---------------------------------------------
 
+The tables below preserve the measured ten-shard baseline. U6 raises current
+CI test262 totals to twelve; its tail, fixed-cost, and combined-workload
+comparison is in [U6 evidence](./docs/evidence/u6/README.md).
+
 This projection extends the measured CI baseline in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) from its measured
 21,383 reviewed paths to the measured 41,091-path edition denominator that
@@ -666,7 +670,8 @@ summed over a run's ten macOS test262 jobs, a derived 0.68 min for run
 
 The per-family scaling below is derived from the job definitions in
 *.github/workflows/main.yaml*, the task bodies in *mise.toml*, and the source
-sets those tasks name. Job counts are measured from the workflow matrices.
+sets those tasks name. Job counts are measured from the baseline workflow
+matrices.
 
 | Family            | macOS jobs | What one job executes                                                                                                            | Scales with reviewed paths       |
 | ----------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
@@ -676,21 +681,24 @@ sets those tasks name. Job counts are measured from the workflow matrices.
 | test              | 2          | `test:node`, which is `node --test` at the root, and `test:deno`                                                                 | Only in parse-bound components   |
 | native            | 3          | `mise run test:native --shard N/3`, which is `node tests/native.ts`                                                              | No                               |
 
-Only `test262` selects its work from the reviewed path set. *tools/shard.ts*
+In this baseline model, only `test262` selects its work from the reviewed
+path set. *tools/shard.ts*
 takes zero-based positions modulo the shard total from the reviewed order the
 manifest reader reconstructs, so each of the ten macOS shards receives one
 tenth of whatever the reviewed set holds.
 
 The `native support` family runs the observed 128 files matched by
-_tests/property/\*.property.test.ts_ under Node's `--test-shard`, plus the
-package property suites on shard 1. Its unit is a property file, and the
-baseline's derived rates for it are seconds per selected property file, not per
-reviewed path. Nothing in the task reads the reviewed manifest: the three
+_tests/property/\*.property.test.ts_ under the wrapper's cost-based `--shard`,
+plus the package property suites on shard 1. Its unit is a property file, and
+the baseline's derived rates for it are seconds per selected property file, not
+per reviewed path. Nothing in the task reads the reviewed manifest: the three
 property files whose sources mention test262 cover the harness promise helper,
 the shared-memory agent harness, and the native function matcher, none of which
-enumerates reviewed paths. The family therefore grows when property files,
-domains, or case budgets are added, which is the separately measured
-bottleneck the baseline records, and not when the corpus grows.
+enumerates reviewed paths. The deterministic partition and its measured-weight
+model are documented in [*CONTRIBUTING.md*](./CONTRIBUTING.md) and
+[U6 evidence](./docs/evidence/u6/README.md). The family therefore grows when
+property files, domains, or case budgets are added, which is the separately
+measured bottleneck the baseline records, and not when the corpus grows.
 
 The `host C sanitizers` family runs `test:sanitizer:self`,
 `test:sanitizer:runtime`, `test:sanitizer:native`, and
@@ -872,22 +880,26 @@ the local 48.4 percent reduction by path count would instead assume that each
 added path pays the cold-cache penalty again, so this projection does not do
 that.
 
-The unmeasured input is k, the number of distinct harness objects one macOS
-test262 shard builds. At the derived 0.78 s for each object, ten shards recover
-an estimated 0.13k min: 4.67 min at k equal to the locally observed 36, 12.98
-min at 100, 64.88 min at 500, and 190.11 min at 1,465. That last value is what
-extrapolating the local sample's observed ratio of 36 objects over 101 paths to
-4,110 paths would give, and it exceeds the k of about 1,154 that would close the
-residual in the most favorable stack below. Whether k grows with path count that
-way or saturates once a shard has covered the harness corpus is exactly what is
-unmeasured, so this projection draws no conclusion about U4's magnitude in
-either direction. Three further assumptions also remain: the ratio was measured
-on Linux with Zig while macOS runner execution is unmeasured, the local wall
-time includes task setup and manifest checks rather than only harness work, and
-a cross-job cache adds restore and publication transfer that the local
-comparison does not contain. U4's contribution stays unestablished until the
-distinct-object count for a macOS shard and that shard's harness preparation
-cost are measured.
+The projection input is k, the number of distinct harness objects one macOS
+test262 shard builds. U6 later measures 96 to 128 built objects per shard at
+21,383 paths, a derived sum of 1,117 per target in each of its three source
+runs; [U6 evidence](./docs/evidence/u6/README.md) preserves the counters.
+Its macOS preparation cost and growth at 41,091 paths remain unmeasured,
+so this projection still leaves k variable. At the derived 0.78 s for each
+object, ten shards recover an estimated 0.13k min: 4.67 min at k equal to the
+locally observed 36, 12.98 min at 100, 64.88 min at 500, and 190.11 min at
+1,465. That last value is what extrapolating the local sample's observed ratio
+of 36 objects over 101 paths to 4,110 paths would give, and it exceeds the k of
+about 1,154 that would close the residual in the most favorable stack below.
+Whether k grows with path count that way or saturates once a shard has covered
+the harness corpus is exactly what is unmeasured, so this projection draws no
+conclusion about U4's magnitude in either direction. Three further assumptions
+also remain: the ratio was measured on Linux with Zig while macOS runner
+execution is unmeasured, the local wall time includes task setup and manifest
+checks rather than only harness work, and a cross-job cache adds restore and
+publication transfer that the local comparison does not contain. U4's
+contribution stays unestablished until the distinct-object count for a macOS
+shard and that shard's harness preparation cost are measured.
 
 The harness split landed at `f131a798` and `30c9f690` on 2026-09-17, before
 `32ece7f4`, so the derived 0.629 s/path rate already includes the split path

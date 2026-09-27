@@ -1,0 +1,103 @@
+All figures below are derived/estimated minutes from named run logs.
+
+Run 36243816479
+macos-aarch64 native support job/runner/outside-runner sum: 310.2 298.76 11.44
+macos-aarch64 test262 job/runner/outside-runner sum: 326.08 312.64 13.44
+macos-aarch64 file sum distribution s: min/median/p90/max 0.15 307.99 669.71 3565.12
+positional model max/sum: 67.13 298.45
+LPT 12 max/sum/delta: 59.42 321.86 23.42
+batch 12 max/sum/delta: 59.42 293.19 -5.26
+shard 1 observed job / old model / new model: 21.68 20.45 59.42
+shard 2 observed job / old model / new model: 24.15 22.99 19.17
+shard 3 observed job / old model / new model: 27.27 26.57 20.45
+shard 4 observed job / old model / new model: 32.17 31.12 21.15
+shard 5 observed job / old model / new model: 68.13 67.13 21.2
+shard 6 observed job / old model / new model: 25.8 24.73 20.31
+shard 7 observed job / old model / new model: 20.27 19.5 21.63
+shard 8 observed job / old model / new model: 19.0 18.02 21.41
+shard 9 observed job / old model / new model: 17.2 16.12 22.72
+shard 10 observed job / old model / new model: 20.75 19.8 21.31
+shard 11 observed job / old model / new model: 15.27 14.48 22.13
+shard 12 observed job / old model / new model: 18.52 17.56 22.28
+batch 13 max/sum/delta: 59.42 295.98 -2.47
+batch 14 max/sum/delta: 59.42 296.49 -1.96
+linux-x86_64-gnu native support job/runner/outside-runner sum: 235.75 233.7 2.05
+linux-x86_64-gnu test262 job/runner/outside-runner sum: 192.4 186.16 6.24
+linux-x86_64-gnu file sum distribution s: min/median/p90/max 0.2 349.97 711.21 3286.29
+positional model max/sum: 85.52 233.37
+LPT 4 max/sum/delta: 56.36 219.33 -14.04
+batch 4 max/sum/delta: 55.44 219.88 -13.48
+shard 1 observed job / old model / new model: 86.23 85.52 54.77
+shard 2 observed job / old model / new model: 49.68 49.13 54.63
+shard 3 observed job / old model / new model: 38.85 38.37 55.44
+shard 4 observed job / old model / new model: 60.98 60.36 55.04
+batch 5 max/sum/delta: 54.77 239.61 6.25
+batch 6 max/sum/delta: 54.77 240.91 7.54
+
+Run 36261458909
+macos-aarch64 native support job/runner/outside-runner sum: 284.85 274.18 10.67
+macos-aarch64 test262 job/runner/outside-runner sum: 320.4 308.79 11.61
+macos-aarch64 file sum distribution s: min/median/p90/max 0.1 274.57 681.93 2578.7
+positional model max/sum: 50.73 273.89
+LPT 12 max/sum/delta: 42.98 284.07 10.19
+batch 12 max/sum/delta: 42.98 264.69 -9.2
+shard 1 observed job / old model / new model: 20.7 19.72 42.98
+shard 2 observed job / old model / new model: 21.98 21.03 19.8
+shard 3 observed job / old model / new model: 39.02 38.06 21.57
+shard 4 observed job / old model / new model: 28.72 27.72 21.11
+shard 5 observed job / old model / new model: 51.58 50.73 20.3
+shard 6 observed job / old model / new model: 18.83 18.01 19.16
+shard 7 observed job / old model / new model: 21.38 20.43 20.92
+shard 8 observed job / old model / new model: 15.97 15.06 19.32
+shard 9 observed job / old model / new model: 12.73 12.02 20.18
+shard 10 observed job / old model / new model: 23.3 22.17 20.92
+shard 11 observed job / old model / new model: 12.03 11.17 19.47
+shard 12 observed job / old model / new model: 18.6 17.75 18.97
+batch 13 max/sum/delta: 42.98 266.01 -7.88
+batch 14 max/sum/delta: 42.98 269.45 -4.43
+linux-x86_64-gnu native support job/runner/outside-runner sum: 247.68 245.75 1.93
+linux-x86_64-gnu test262 job/runner/outside-runner sum: 192.28 185.88 6.4
+linux-x86_64-gnu file sum distribution s: min/median/p90/max 0.28 349.12 722.84 3326.07
+positional model max/sum: 86.3 245.45
+LPT 4 max/sum/delta: 58.23 229.39 -16.06
+batch 4 max/sum/delta: 58.37 230.06 -15.39
+shard 1 observed job / old model / new model: 87.02 86.3 57.81
+shard 2 observed job / old model / new model: 63.25 62.76 56.94
+shard 3 observed job / old model / new model: 42.38 41.92 56.95
+shard 4 observed job / old model / new model: 55.03 54.47 58.37
+batch 5 max/sum/delta: 55.43 250.77 5.32
+batch 6 max/sum/delta: 55.43 251.58 6.13
+
+Run 36312192623
+macos-aarch64 native support job/runner/outside-runner sum: 306.93 295.97 10.96
+macos-aarch64 test262 job/runner/outside-runner sum: 296.68 285.21 11.47
+macos-aarch64 file sum distribution s: min/median/p90/max 0.2 291.08 684.43 2658.35
+positional model max/sum: 50.81 295.62
+LPT 12 max/sum/delta: 44.31 306.1 10.48
+batch 12 max/sum/delta: 44.31 286.23 -9.39
+shard 1 observed job / old model / new model: 19.6 18.62 44.31
+shard 2 observed job / old model / new model: 23.0 22.05 19.63
+shard 3 observed job / old model / new model: 33.6 32.75 21.18
+shard 4 observed job / old model / new model: 31.1 30.12 24.88
+shard 5 observed job / old model / new model: 51.43 50.81 23.19
+shard 6 observed job / old model / new model: 22.85 21.89 19.7
+shard 7 observed job / old model / new model: 20.43 19.7 27.63
+shard 8 observed job / old model / new model: 20.77 19.76 22.09
+shard 9 observed job / old model / new model: 12.95 12.18 22.31
+shard 10 observed job / old model / new model: 24.35 23.29 21.23
+shard 11 observed job / old model / new model: 17.75 16.68 20.06
+shard 12 observed job / old model / new model: 29.1 27.77 20.03
+batch 13 max/sum/delta: 44.31 287.96 -7.66
+batch 14 max/sum/delta: 44.31 290.59 -5.03
+linux-x86_64-gnu native support job/runner/outside-runner sum: 229.38 227.24 2.14
+linux-x86_64-gnu test262 job/runner/outside-runner sum: 187.02 174.71 12.31
+linux-x86_64-gnu file sum distribution s: min/median/p90/max 0.19 323.35 766.51 2023.05
+positional model max/sum: 64.17 226.97
+LPT 4 max/sum/delta: 60.43 216.08 -10.89
+batch 4 max/sum/delta: 58.58 215.37 -11.6
+shard 1 observed job / old model / new model: 52.95 52.19 50.49
+shard 2 observed job / old model / new model: 64.83 64.17 52.48
+shard 3 observed job / old model / new model: 62.33 61.94 53.82
+shard 4 observed job / old model / new model: 49.27 48.67 58.58
+batch 5 max/sum/delta: 51.08 224.49 -2.48
+batch 6 max/sum/delta: 39.08 224.37 -2.6

@@ -106,6 +106,20 @@ Run 36261458909, derived minutes from its measured job timestamps:
 
 Derived platform totals: macOS 764.12 min, Linux 578.80 min.
 
+### U6 shard assignment experiment
+
+U6's [cost distribution and option analysis](./evidence/u6/README.md) retains
+native case costs and test262 shard durations from runs 36243816479 and
+36261458909. It selects a deterministic cost-based native file partition at
+unchanged totals, with estimated tail reduction and no estimated macOS
+workload increase. The estimates replay concurrent case durations and do not
+establish an improvement: branch CI validation is pending. Test262 keeps its
+round-robin assignment and raises the total from ten to twelve. Using run
+36261458909's derived slowest residual rate, the estimate leaves 47.53 minutes
+against the 120-minute timeout, up from 33.22, at a derived 1.89 minutes of
+added macOS fixed cost. Extra harness preparation is unmeasured; branch CI must
+check the combined workload limit.
+
 ### U3 fixed-cost cache audit
 
 U3 leaves the workflow unchanged. Mise already caches the installed tools;

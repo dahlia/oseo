@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { spawn, spawnSync } from "node:child_process";
 import { once } from "node:events";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,77 +52,83 @@ for (const exitCode of [0, 1]) {
   });
 }
 
-for (const signal of ["SIGINT", "SIGTERM"] as const) {
-  test(
-    `forwards ${signal} and reaps the test process`,
-    {
-      skip: process.platform === "win32" ? "requires POSIX signals" : false,
-      timeout: 10_000,
-    },
-    async () => {
-      const directory = await mkdtemp(join(tmpdir(), "oseo-test-launcher-"));
-      const ready = join(directory, "ready");
-      const fixture = join(directory, "wait.test.mjs");
-      await writeFile(
-        fixture,
-        [
-          'import { writeFileSync } from "node:fs";',
-          'writeFileSync(process.env.READY, "");',
-          "setTimeout(() => {",
-          "  writeFileSync(process.env.READY, String(process.pid));",
-          "}, 25);",
-          "setInterval(() => {}, 1000);",
-          "",
-        ].join("\n"),
-      );
-      const child = spawn(
-        process.execPath,
-        [
-          fileURLToPath(
-            new URL("../tools/run-native-tests.ts", import.meta.url),
-          ),
-          "--test-isolation=none",
+for (const sharded of [false, true]) {
+  for (const signal of ["SIGINT", "SIGTERM"] as const) {
+    test(
+      `forwards ${signal} and reaps the test process (sharded=${sharded})`,
+      {
+        skip: process.platform === "win32" ? "requires POSIX signals" : false,
+        timeout: 10_000,
+      },
+      async () => {
+        const directory = await mkdtemp(join(tmpdir(), "oseo-test-launcher-"));
+        const ready = join(directory, "ready");
+        const relativeFile = "tests/property/wait.property.test.ts";
+        const fixture = join(directory, relativeFile);
+        await mkdir(join(directory, "tests/property"), { recursive: true });
+        await writeFile(
           fixture,
-        ],
-        {
-          env: { ...process.env, READY: ready },
-          stdio: "ignore",
-        },
-      );
-      const exited = once(child, "exit");
-      let testPid: number | undefined;
-      try {
-        const deadline = Date.now() + 5000;
-        while (testPid == null && Date.now() < deadline) {
-          try {
-            // eslint-disable-next-line no-await-in-loop -- Await readiness.
-            const pid = Number(await readFile(ready, "utf8"));
-            if (Number.isSafeInteger(pid) && pid > 0) testPid = pid;
-          } catch {
-            /* The marker has not been created yet. */
+          [
+            'import { writeFileSync } from "node:fs";',
+            'writeFileSync(process.env.READY, "");',
+            "setTimeout(() => {",
+            "  writeFileSync(process.env.READY, String(process.pid));",
+            "}, 25);",
+            "setInterval(() => {}, 1000);",
+            "",
+          ].join("\n"),
+        );
+        const child = spawn(
+          process.execPath,
+          [
+            fileURLToPath(
+              new URL("../tools/run-native-tests.ts", import.meta.url),
+            ),
+            ...(sharded
+              ? ["--shard", "1/12", relativeFile]
+              : ["--test-isolation=none", fixture]),
+          ],
+          {
+            cwd: directory,
+            env: { ...process.env, READY: ready, NODE_TEST_CONTEXT: undefined },
+            stdio: "ignore",
+          },
+        );
+        const exited = once(child, "exit");
+        let testPid: number | undefined;
+        try {
+          const deadline = Date.now() + 5000;
+          while (testPid == null && Date.now() < deadline) {
+            try {
+              // eslint-disable-next-line no-await-in-loop -- Await readiness.
+              const pid = Number(await readFile(ready, "utf8"));
+              if (Number.isSafeInteger(pid) && pid > 0) testPid = pid;
+            } catch {
+              /* The marker has not been created yet. */
+            }
+            if (testPid == null) {
+              // eslint-disable-next-line no-await-in-loop -- Bound polling.
+              await new Promise((resolve) => setTimeout(resolve, 10));
+            }
           }
-          if (testPid == null) {
-            // eslint-disable-next-line no-await-in-loop -- Bound polling.
-            await new Promise((resolve) => setTimeout(resolve, 10));
+          assert.ok(testPid != null);
+          const reapedPid = testPid;
+          child.kill(signal);
+          await exited;
+          assert.throws(() => process.kill(reapedPid, 0), { code: "ESRCH" });
+          testPid = undefined;
+        } finally {
+          child.kill("SIGKILL");
+          if (testPid != null) {
+            try {
+              process.kill(testPid, "SIGKILL");
+            } catch {
+              /* Already reaped. */
+            }
           }
+          await rm(directory, { recursive: true, force: true });
         }
-        assert.ok(testPid != null);
-        const reapedPid = testPid;
-        child.kill(signal);
-        await exited;
-        assert.throws(() => process.kill(reapedPid, 0), { code: "ESRCH" });
-        testPid = undefined;
-      } finally {
-        child.kill("SIGKILL");
-        if (testPid != null) {
-          try {
-            process.kill(testPid, "SIGKILL");
-          } catch {
-            /* Already reaped. */
-          }
-        }
-        await rm(directory, { recursive: true, force: true });
-      }
-    },
-  );
+      },
+    );
+  }
 }

@@ -200,83 +200,99 @@ jobs:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 1
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 2
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 3
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 4
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 5
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 6
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 7
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 8
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 9
-            total: 10
+            total: 12
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 10
-            total: 10
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 11
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 12
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 1
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 2
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 3
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 4
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 5
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 6
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 7
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 8
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 9
-            total: 10
+            total: 12
           - os: macos-15
             target: macos-aarch64
             shard: 10
-            total: 10
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 11
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 12
+            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -384,7 +400,7 @@ jobs:
         run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --test-shard=${{ matrix.shard }}/${{ matrix.total }}
+          --shard ${{ matrix.shard }}/${{ matrix.total }}
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
