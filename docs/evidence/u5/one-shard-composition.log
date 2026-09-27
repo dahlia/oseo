@@ -1,0 +1,71 @@
+U5 complete cache composition of one test262 shard
+==================================================
+
+One cold mise run test:test262 --shard 1/10 against an emptied
+ZIG_GLOBAL_CACHE_DIR, then every o/ entry of the cache it left classified
+by the object the entry holds. Its cache bytes and entry count reproduce
+the series' cold arms exactly.
+
+== one cold test262 shard 1/10, then its complete cache composition
+== 2026-09-28T04:49:08+09:00 load=2.28 4.61 5.11
+Finished in 392.43s
+TIME 392.47 wall 1138.67 user 770.35 sys
+cache-bytes-kib 2529612
+8	/data/zig-cache/m5ci-zig-cache-share/b
+117148	/data/zig-cache/m5ci-zig-cache-share/h
+2370616	/data/zig-cache/m5ci-zig-cache-share/o
+0	/data/zig-cache/m5ci-zig-cache-share/tmp
+41840	/data/zig-cache/m5ci-zig-cache-share/z
+-- grouped classification with exact byte totals, same cache --
+   python3 docs/evidence/u5/compose.py $ZIG_GLOBAL_CACHE_DIR
+class                           entries          bytes       MiB
+per-case launcher.o                7195      347167712     331.1
+per-case case.o                    7195     1611645568    1537.0
+per-case harness.o                   96      251047640     239.4
+per-case generated.o                 64      150883120     143.9
+agent objects                        56       22621936      21.6
+C startup and libc objects           29        1329435       1.3
+zig target-constant libraries         2       12751764      12.2
+TOTAL o/                          14637     2397447175    2286.4
+
+   The two stable classes, whose inputs carry no staging path, are
+   2 + 29 = 31 entries and 12,751,764 + 1,329,435 = 14,081,199 bytes,
+   a derived 0.587 percent of the 2,397,447,175 bytes in o/.
+
+-- per-object-name breakdown of the same cache, as first taken --
+    7195 entries      331.1 MiB  per-case (launcher.o)
+    7195 entries     1537.0 MiB  per-case (case.o)
+      96 entries      239.4 MiB  per-case (harness.o)
+      64 entries      143.9 MiB  per-case (generated.o)
+      52 entries       20.8 MiB  other: agent-0.o
+       4 entries        0.8 MiB  other: agent-1.o
+       3 entries       13.1 MiB  zig target-constant library
+       1 entries        0.0 MiB  other: at_quick_exit.o
+       1 entries        0.0 MiB  other: atexit.o
+       1 entries        0.0 MiB  other: abi-note.o
+       1 entries        0.0 MiB  other: start-2.33.o
+       1 entries        0.1 MiB  other: m.o
+       1 entries        0.0 MiB  other: init.o
+       1 entries        0.0 MiB  other: crt1.o
+       1 entries        0.0 MiB  other: pthread_atfork.o
+       1 entries        0.1 MiB  other: c.o
+       1 entries        0.0 MiB  other: stack_chk_fail_local.o
+       1 entries        0.0 MiB  other: stat-2.32.o
+       1 entries        0.0 MiB  other: ld.o
+       1 entries        0.0 MiB  other: fstat-2.32.o
+       1 entries        0.0 MiB  other: resolv.o
+       1 entries        0.0 MiB  other: pthread.o
+       1 entries        0.0 MiB  other: lstat-2.32.o
+       1 entries        0.0 MiB  other: stat64-2.32.o
+       1 entries        0.0 MiB  other: dl.o
+       1 entries        0.0 MiB  other: fstat64-2.32.o
+       1 entries        0.0 MiB  other: lstat64-2.32.o
+       1 entries        0.0 MiB  other: rt.o
+       1 entries        0.0 MiB  other: fstatat64-2.32.o
+       1 entries        0.0 MiB  other: mknodat-2.32.o
+       1 entries        0.0 MiB  other: fstatat-2.32.o
+       1 entries        0.0 MiB  other: util.o
+       1 entries        0.0 MiB  other: mknod-2.32.o
+       1 entries        0.0 MiB  other: elf-init-2.33.o
+       1 entries        0.1 MiB  other: libc_nonshared.a
+   14637 entries     2286.4 MiB  TOTAL o/

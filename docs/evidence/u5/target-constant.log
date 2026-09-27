@@ -1,0 +1,79 @@
+U5 Zig target-constant build cost and payload
+=============================================
+
+Each block empties the cache directory, links a trivial C program with the
+exact flags packages/toolchain-zig/src/index.ts builds for that target,
+then repeats the compile and link against the now warm cache. Two trials
+for each target on each host. The compressed figures are of the whole
+cache directory; the macOS host has no zstd, so it reports gzip -6.
+
+--- macOS host: ssh macbook-air, Apple Silicon, macOS 27.0, zig 0.16.0 ---
+ZIG_GLOBAL_CACHE_DIR was a probe directory under ~/Desktop/u5-zig-const.
+Nothing was committed or pushed in the macOS project checkout.
+
+zig 0.16.0, host arm64 macOS 27.0
+== trial 1 target macos-aarch64 flags: -target aarch64-macos -fsanitize=address,undefined -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.07s
+  cold link:       4.20s
+    cache 49MiB 823f
+  warm compile:    0.04s
+  warm link:       0.06s
+    tar|gzip -6 bytes: 19982810
+== trial 1 target linux-aarch64-musl flags: -target aarch64-linux-musl -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.09s
+  cold link:       14.01s
+    cache 78MiB 2999f
+  warm compile:    0.07s
+  warm link:       0.10s
+    tar|gzip -6 bytes: 25381720
+== trial 2 target macos-aarch64 flags: -target aarch64-macos -fsanitize=address,undefined -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.08s
+  cold link:       4.66s
+    cache 49MiB 823f
+  warm compile:    0.04s
+  warm link:       0.06s
+    tar|gzip -6 bytes: 19982948
+== trial 2 target linux-aarch64-musl flags: -target aarch64-linux-musl -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.10s
+  cold link:       14.77s
+    cache 78MiB 2999f
+  warm compile:    0.08s
+  warm link:       0.11s
+    tar|gzip -6 bytes: 25383363
+MACOS CONST DONE
+
+--- Linux host: zig 0.16.0, ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-zig-cache-share ---
+
+== trial 1 target linux-x86_64-gnu flags: -target x86_64-linux-gnu -fsanitize=address,undefined -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.02s
+  cold link:       8.66s
+    cache 55MiB 898f
+  warm compile:    0.01s
+  warm link:       0.02s
+    tar|zstd -3 bytes: 19301421
+    tar|gzip -6 bytes: 20780654
+== trial 1 target linux-aarch64-musl flags: -target aarch64-linux-musl -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.05s
+  cold link:       23.15s
+    cache 77MiB 2999f
+  warm compile:    0.00s
+  warm link:       0.02s
+    tar|zstd -3 bytes: 22786170
+    tar|gzip -6 bytes: 24770126
+== trial 2 target linux-x86_64-gnu flags: -target x86_64-linux-gnu -fsanitize=address,undefined -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.03s
+  cold link:       8.96s
+    cache 55MiB 898f
+  warm compile:    0.01s
+  warm link:       0.02s
+    tar|zstd -3 bytes: 19271521
+    tar|gzip -6 bytes: 20753982
+== trial 2 target linux-aarch64-musl flags: -target aarch64-linux-musl -std=c11 -Wall -Wextra -Werror -pedantic
+  cold compile -c: 0.02s
+  cold link:       22.01s
+    cache 77MiB 2999f
+  warm compile:    0.00s
+  warm link:       0.02s
+    tar|zstd -3 bytes: 22885445
+    tar|gzip -6 bytes: 24761174
+LINUX CONST DONE

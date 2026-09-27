@@ -925,13 +925,29 @@ therefore act on different costs. That chronology does not prove independence:
 the cause of the later per-path rise is unidentified and could itself lie in
 harness preparation, so U10's investigation still owns that question.
 
-Zig compilation cache, U5. The baseline infers a cold Zig compilation cache on
-fresh runners and states that it did not inspect the cache contents, so there
-is no measured hit rate to project from. The runtime archive is already cached
-by *.github/actions/runtime-archive-cache*, and generated program translation
-units differ for each case, so the remaining reusable surface is small. This
-projection assigns U5 no derived recovery, and the plan's own note that doing
-nothing is a valid result stands.
+Zig compilation cache, U5. The cache contents are now measured rather than
+inferred, and the unit is closed as do nothing. A byte-identical repeat of one
+test262 shard reuses a derived 31 of 14,637 cache entries, a derived 0.21
+percent, because Oseo stages every build in a fresh temporary directory whose
+path reaches the compile and link command lines. The `native support` family
+behaves the same way at a derived 31 of 3,211. Only the three-job `native`
+family reuses, at a derived 1,155 of 1,500, and two options are estimated to
+save slightly more than they cost: caching Zig's target-constant libraries is a
+derived 0.83 to 1.49 min for a whole run, and caching the `native` family is a
+derived 1.41 to 1.54 min net, or a derived 0.91 to 0.99 min once U4's 64.6
+percent input-stability proportion is applied. Both are small beside the
+derived 0.35 to 16.53 min same-job spread for one macOS test262 shard, and both
+rest on a transfer band measured from a different cache, so these measurements
+do not establish a runner-level improvement large enough to justify
+implementing either. Sharing the whole
+cache loses outright and does not fit the repository cache limit: one shard is
+a measured 292.8 MB compressed, so the 27 macOS keys alone are a derived 7.91
+GB against a derived 5.94 GB of headroom. This projection therefore assigns U5
+no derived recovery, and the plan's own note that doing nothing is a valid
+result stands. The condition for revisiting is path-independent staging in the
+compiler, not a new cache. The measurements are in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and their sources
+in [*docs/evidence/u5/*](./docs/evidence/u5/README.md).
 
 Shard sizing, U6. Raising the test262 or native support shard total leaves the
 executed work unchanged, so it recovers no runner minutes and adds a derived

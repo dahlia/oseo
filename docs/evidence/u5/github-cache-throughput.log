@@ -1,0 +1,102 @@
+U5 GitHub Actions cache transfer observations
+=============================================
+
+Source: run 36312192623 on main at af9bb68c, read 2026-09-28 with
+  gh api --allow-escape-sequences repos/dahlia/oseo/actions/jobs/JOB/logs
+All lines are measured runner log lines, trimmed to 190 columns.
+
+Jobs 108600171379/403/460 run on the macos15 image and 108600171356/522
+on macos26, so the mise cache they move has two sizes: 306,078,528 B and
+306,192,714 B. Job 108600171356 saves the macos26 entry and its log does
+not state that entry's size; job 108600171522 restores the same key and
+does, which is where the save rate's payload size comes from.
+
+--- job 108600171379 ---
+2026-09-27T10:22:56.5139860Z Complete job name: test262 (macos-aarch64, 9/10)
+2026-09-27T10:23:00.7091570Z ##[group]Restoring mise cache
+2026-09-27T10:23:01.4334590Z Cache hit for: mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T10:23:02.5848310Z Received 67108864 of 306078528 (21.9%), 63.9 MBs/sec
+2026-09-27T10:23:03.5914120Z Received 134217728 of 306078528 (43.9%), 63.8 MBs/sec
+2026-09-27T10:23:04.5918830Z Received 247463936 of 306078528 (80.8%), 78.5 MBs/sec
+2026-09-27T10:23:05.4203190Z Received 306078528 of 306078528 (100.0%), 76.1 MBs/sec
+2026-09-27T10:23:05.4215590Z Cache Size: ~292 MB (306078528 B)
+2026-09-27T10:23:05.4312900Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/119ab7fb-0f47-4c02-a229-4280609921f0/cache.tzst -P -C /Users/runner/work/oseo/oseo --delay-directory
+2026-09-27T10:23:11.3184480Z Cache restored successfully
+2026-09-27T10:23:11.4979370Z mise cache restored from key: mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T10:23:29.6061700Z Cache not found for input keys: oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323
+2026-09-27T10:49:55.4150060Z [command]/opt/homebrew/bin/gtar --posix -cf cache.tzst --exclude cache.tzst -P -C /Users/runner/work/oseo/oseo --files-from manifest.txt --delay-directory-restor
+2026-09-27T10:49:55.6821200Z Failed to save: Unable to reserve cache with key oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323, another job may be creating th
+
+--- job 108600171403 ---
+2026-09-27T10:54:54.3696570Z Complete job name: test262 (macos-aarch64, 3/10)
+2026-09-27T10:54:58.7729770Z ##[group]Restoring mise cache
+2026-09-27T10:54:59.5364460Z Cache hit for: mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T10:55:00.6851190Z Received 33554432 of 306078528 (11.0%), 32.0 MBs/sec
+2026-09-27T10:55:01.6978430Z Received 134217728 of 306078528 (43.9%), 63.6 MBs/sec
+2026-09-27T10:55:02.7548820Z Received 268435456 of 306078528 (87.7%), 83.3 MBs/sec
+2026-09-27T10:55:03.2181880Z Received 306078528 of 306078528 (100.0%), 82.6 MBs/sec
+2026-09-27T10:55:03.2200390Z Cache Size: ~292 MB (306078528 B)
+2026-09-27T10:55:03.2310610Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/ab522115-0064-4c19-9328-93bd421c1d7e/cache.tzst -P -C /Users/runner/work/oseo/oseo --delay-directory
+2026-09-27T10:55:10.6214670Z Cache restored successfully
+2026-09-27T10:55:10.6400100Z mise cache restored from key: mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T10:55:39.7567890Z Cache hit for: oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323
+2026-09-27T10:55:40.6357560Z Received 3257528 of 3257528 (100.0%), 4.2 MBs/sec
+2026-09-27T10:55:40.6370790Z Cache Size: ~3 MB (3257528 B)
+2026-09-27T10:55:40.6395840Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/1855bb20-90fd-4c51-96d8-58ce138e17ac/cache.tzst -P -C /Users/runner/work/oseo/oseo --delay-directory
+2026-09-27T10:55:40.6793750Z Cache restored successfully
+2026-09-27T10:55:40.7087020Z Cache restored from key: oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323
+
+--- job 108600171460 ---
+2026-09-27T12:00:53.0645910Z Complete job name: test262 (macos-aarch64, 1/10)
+2026-09-27T12:00:56.3534860Z ##[group]Restoring mise cache
+2026-09-27T12:00:57.2937610Z Cache hit for: mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T12:00:58.5785470Z Received 0 of 306078528 (0.0%), 0.0 MBs/sec
+2026-09-27T12:00:59.6099710Z Received 100663296 of 306078528 (32.9%), 47.5 MBs/sec
+2026-09-27T12:01:00.6055130Z Received 167772160 of 306078528 (54.8%), 52.8 MBs/sec
+2026-09-27T12:01:01.7080800Z Received 268435456 of 306078528 (87.7%), 61.9 MBs/sec
+2026-09-27T12:01:02.3876900Z Received 306078528 of 306078528 (100.0%), 60.8 MBs/sec
+2026-09-27T12:01:02.3912070Z Cache Size: ~292 MB (306078528 B)
+2026-09-27T12:01:02.3956280Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/c698a2a8-e01a-4f91-8091-ee0fdd0bdc08/cache.tzst -P -C /Users/runner/work/oseo/oseo --delay-directory
+2026-09-27T12:01:09.2766760Z Cache restored successfully
+2026-09-27T12:01:09.2876590Z mise cache restored from key: mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T12:01:36.3083640Z Cache hit for: oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323
+2026-09-27T12:01:37.6174740Z Received 0 of 3257528 (0.0%), 0.0 MBs/sec
+2026-09-27T12:01:37.8014460Z Received 3257528 of 3257528 (100.0%), 2.6 MBs/sec
+2026-09-27T12:01:37.8069890Z Cache Size: ~3 MB (3257528 B)
+2026-09-27T12:01:37.8101930Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/f00f1ec8-c145-4eed-823c-fe754f80c0c0/cache.tzst -P -C /Users/runner/work/oseo/oseo --delay-directory
+2026-09-27T12:01:37.8644950Z Cache restored successfully
+2026-09-27T12:01:37.8921670Z Cache restored from key: oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323
+
+--- job 108600171356 ---
+2026-09-27T10:20:18.4249230Z Complete job name: test (macos-latest, deno)
+2026-09-27T10:20:21.9431850Z ##[group]Restoring mise cache
+2026-09-27T10:21:07.7018630Z ##[group]Saving mise cache
+2026-09-27T10:21:07.7528920Z [command]/opt/homebrew/bin/gtar --posix -cf cache.tzst --exclude cache.tzst -P -C /Users/runner/work/oseo/oseo --files-from manifest.txt --delay-directory-restor
+2026-09-27T10:21:30.4650920Z Cache saved from /Users/runner/.local/share/mise with key: mise-v1-macos-arm64-macos26-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T10:21:38.9059970Z Cache not found for input keys: oseo-runtime-v1-79e390afc493ff87217a75503e0bce2249feda0a9ea5908e8a096559941fa1d9
+
+--- job 108600171522 ---
+2026-09-27T10:50:05.1151160Z Complete job name: test (macos-latest, node)
+2026-09-27T10:50:08.5357110Z ##[group]Restoring mise cache
+2026-09-27T10:50:09.1369820Z Cache hit for: mise-v1-macos-arm64-macos26-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T10:50:10.1906930Z Received 150994944 of 306192714 (49.3%), 143.9 MBs/sec
+2026-09-27T10:50:11.0798980Z Received 306192714 of 306192714 (100.0%), 154.4 MBs/sec
+2026-09-27T10:50:11.0802360Z Cache Size: ~292 MB (306192714 B)
+2026-09-27T10:50:11.0896480Z [command]/opt/homebrew/bin/gtar -xf /Users/runner/work/_temp/c0d1be78-d2b1-4485-9b85-242d98fa381d/cache.tzst -P -C /Users/runner/work/oseo/oseo --delay-directory
+2026-09-27T10:50:15.3476690Z Cache restored successfully
+2026-09-27T10:50:15.3557380Z mise cache restored from key: mise-v1-macos-arm64-macos26-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554
+2026-09-27T10:50:42.9418930Z Cache not found for input keys: oseo-runtime-v1-79e390afc493ff87217a75503e0bce2249feda0a9ea5908e8a096559941fa1d9
+2026-09-27T11:39:46.5248420Z [command]/opt/homebrew/bin/gtar --posix -cf cache.tzst --exclude cache.tzst -P -C /Users/runner/work/oseo/oseo --files-from manifest.txt --delay-directory-restor
+
+--- the other two macOS jobs that lost the runtime archive save race ---
+[job 108600171389]
+2026-09-27T10:20:18.5808580Z Complete job name: test262 (macos-aarch64, 6/10)
+2026-09-27T10:21:19.6908380Z Failed to save: Unable to reserve cache with key mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554, another job may be
+2026-09-27T10:54:41.1990410Z Failed to save: Unable to reserve cache with key oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323, another job may be creating th
+[job 108600171391]
+2026-09-27T10:20:14.6826750Z Complete job name: test262 (macos-aarch64, 5/10)
+2026-09-27T10:21:07.9232520Z Failed to save: Unable to reserve cache with key mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554, another job may be
+2026-09-27T10:46:28.9742450Z Failed to save: Unable to reserve cache with key oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323, another job may be creating th
+
+--- repository cache occupancy, gh api repos/dahlia/oseo/actions/cache/usage ---
+{"full_name":"dahlia/oseo","active_caches_size_in_bytes":4058176690,"active_caches_count":69}

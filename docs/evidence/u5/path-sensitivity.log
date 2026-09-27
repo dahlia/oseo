@@ -1,0 +1,12 @@
+U5 staging-path sensitivity of the Zig cache key
+================================================
+
+One harness translation unit, identical bytes and identical flags apart
+from the staging directory the toolchain embeds through
+-ffile-prefix-map=<working-directory>=/oseo/harness. Emptied cache first.
+
+oseo-harness-aaa111: o/ entries 0 -> 1; harness.o sha256 1a69ae150469038e87d7ffdad915ba86f5bd77fbc3041cda022830efa7631cb5
+oseo-harness-bbb222: o/ entries 1 -> 2; harness.o sha256 26bc03f2654298dd43f8ce956042c8cd5d20ec0f745e9944d93af03ea772c376
+--- control: identical staging path, repeated invocation ---
+repeat in same path: o/ entries 2 -> 2
+PATH SENSITIVITY DONE
