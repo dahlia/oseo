@@ -9,6 +9,7 @@ import {
   defaultComponents,
   prepareNativeRuntime,
   runNativeUnits,
+  verifyPreparedNativeRuntime,
 } from "../packages/cli/src/index.ts";
 import type {
   CliResult,
@@ -326,13 +327,27 @@ export function createTest262FragmentExecutor(
             observeSpecialization: false,
             generatedSource: emitted.harness.source,
           };
-          const built = await prepareHarnessObject(host, toolchain, keyInput);
+          // The harness object is keyed by the prepared identity too, so it
+          // builds through the pinned compiler and rechecks the pin at the
+          // same points one native execution does.
+          const pin = {
+            compilerPath: initialization.prepared.compilerPath,
+            verify: async () =>
+              await verifyPreparedNativeRuntime(initialization.prepared),
+          };
+          const built = await prepareHarnessObject(
+            host,
+            toolchain,
+            keyInput,
+            pin,
+          );
           if (process.env.OSEO_TEST262_VERIFY_HARNESS_OBJECTS === "1") {
             const { cache: _cache, ...uncached } = host;
             const rebuilt = await prepareHarnessObject(
               uncached,
               toolchain,
               keyInput,
+              pin,
             );
             try {
               const [first, second] = await Promise.all([

@@ -4,6 +4,7 @@ import type {
   CompilerHost,
   Diagnostic,
   ExecutionHostDescription,
+  FileFingerprint,
   ModuleLoader,
   ModuleResolver,
   ProcessObservation,
@@ -96,8 +97,12 @@ interface DenoRuntime {
     options?: { readonly recursive: boolean },
   ): Promise<void>;
   rename(oldPath: string, newPath: string): Promise<void>;
+  realPath(path: string): Promise<string>;
   stat(path: string): Promise<{
+    readonly dev?: number | null;
+    readonly ino?: number | null;
     readonly isFile: boolean;
+    readonly mtime?: Date | null;
     readonly size: number;
   }>;
   writeTextFile(
@@ -1033,6 +1038,26 @@ export function createNodeHost(): CompilerHost {
       ]);
       return canonicalizeFileModuleUrl(pathToFileURL(resolve(path)));
     },
+    async describeFile(path: string): Promise<FileFingerprint | undefined> {
+      const { realpath, stat } = await import("node:fs/promises");
+      try {
+        // stat resolves symbolic links, so a relinked path reports the new
+        // target's identity and a replaced file reports new size and time.
+        const [resolved, status] = await Promise.all([
+          realpath(path),
+          stat(path),
+        ]);
+        return {
+          device: Number(status.dev),
+          inode: Number(status.ino),
+          modifiedAtMilliseconds: status.mtimeMs,
+          realPath: resolved,
+          size: Number(status.size),
+        };
+      } catch {
+        return undefined;
+      }
+    },
     async makeTemporaryDirectory(prefix: string): Promise<string> {
       const [{ mkdtemp }, { tmpdir }, { join }] = await Promise.all([
         import("node:fs/promises"),
@@ -1118,6 +1143,23 @@ export function createDenoHost(): CompilerHost {
       const url = new URL("file:///");
       url.pathname = basePath.replaceAll("%", "%25");
       return Promise.resolve(canonicalizeFileModuleUrl(url));
+    },
+    async describeFile(path: string): Promise<FileFingerprint | undefined> {
+      try {
+        const [resolved, status] = await Promise.all([
+          runtime.realPath(path),
+          runtime.stat(path),
+        ]);
+        return {
+          device: status.dev ?? 0,
+          inode: status.ino ?? 0,
+          modifiedAtMilliseconds: status.mtime?.getTime() ?? 0,
+          realPath: resolved,
+          size: status.size,
+        };
+      } catch {
+        return undefined;
+      }
     },
     async makeTemporaryDirectory(prefix: string): Promise<string> {
       return await runtime.makeTempDir({ prefix });

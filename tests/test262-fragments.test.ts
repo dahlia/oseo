@@ -295,7 +295,16 @@ test(
             async run() {
               attempts += 1;
               if (phase === "object" && attempts === 1) {
-                return { exitStatus: 0, stdout: "injected cc", stderr: "" };
+                // A prepared runtime pins the executable its identity
+                // names, so the injected identity has to name a real file;
+                // this one is never invoked, because the next call throws.
+                return {
+                  exitStatus: 0,
+                  stdout: `.{\n    .zig_exe = ${JSON.stringify(
+                    process.execPath,
+                  )},\n}\n`,
+                  stderr: "",
+                };
               }
               throw new Error("injected build failure");
             },

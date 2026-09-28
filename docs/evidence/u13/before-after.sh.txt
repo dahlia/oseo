@@ -6,30 +6,42 @@
 # run, and measures an uninstrumented tree: the only inputs are the runner's
 # report and `/usr/bin/time`.
 #
-# Run it from the repository root with the Phase B commit at HEAD. It checks
-# the three sources this unit changes out of HEAD~1 for the before arm and out
-# of HEAD for the after arm, and restores HEAD when it finishes.
+# Run it from the repository root with the unit's commits at HEAD. It checks
+# every source file the unit changes under packages/ and tools/ out of BASE
+# for the before arm and out of HEAD for the after arm, rebuilds between
+# arms because the runner loads several of those packages from their built
+# output, and restores HEAD when it finishes.
 #
-#   OUT=/tmp/u13/ba REPS=2 SHARD=1/100 ./before-after.sh
+#   BASE=<merge base> OUT=/tmp/u13/ba REPS=2 SHARD=1/100 ./before-after.sh
 #
 # The Oseo object and archive cache is redirected per arm and CPU count, so a
 # cold run starts from an empty one. ZIG_GLOBAL_CACHE_DIR stays on the lane
 # directory in every run and is never emptied.
 set -euo pipefail
 
+BASE=${BASE:?set BASE to the revision the change is measured against}
 OUT=${OUT:?set OUT to an output directory}
 REPS=${REPS:-2}
 SHARD=${SHARD:-1/100}
 CPU_COUNTS=${CPU_COUNTS:-"3 4"}
 : "${ZIG_GLOBAL_CACHE_DIR:?set ZIG_GLOBAL_CACHE_DIR to the lane cache}"
 
-FILES=(
-  packages/cli/src/index.ts
-  packages/cli/tests/index.test.ts
-  tools/test262-fragments.ts
-)
+mapfile -t FILES < <(git diff --name-only "$BASE" HEAD -- packages tools)
+if [ "${#FILES[@]}" -eq 0 ]; then
+  echo "no changed sources between $BASE and HEAD" >&2
+  exit 1
+fi
 
 mkdir -p "$OUT"
+
+select_arm() { # arm
+  if [ "$1" = before ]; then
+    git checkout "$BASE" -- "${FILES[@]}"
+  else
+    git checkout HEAD -- "${FILES[@]}"
+  fi
+  mise run build > "$OUT/build-$1.log" 2>&1
+}
 
 run() { # arm cpus cache-state rep
   local arm=$1 cpus=$2 state=$3 rep=$4
@@ -47,11 +59,7 @@ run() { # arm cpus cache-state rep
 
 for rep in $(seq 1 "$REPS"); do
   for arm in before after; do
-    if [ "$arm" = before ]; then
-      git checkout HEAD~1 -- "${FILES[@]}"
-    else
-      git checkout HEAD -- "${FILES[@]}"
-    fi
+    select_arm "$arm"
     for cpus in $CPU_COUNTS; do
       run "$arm" "$cpus" cold "$rep"
       run "$arm" "$cpus" warm "a$rep"
@@ -59,4 +67,4 @@ for rep in $(seq 1 "$REPS"); do
     done
   done
 done
-git checkout HEAD -- "${FILES[@]}"
+select_arm after

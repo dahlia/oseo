@@ -39,14 +39,19 @@ path rather than through `RECORDER`.
  -  *cpu-profile-top.txt*: the main-thread self-time attribution for one pool 8
     run.
  -  *before-after.sh.txt*: the Phase B measurement driver. Each repetition
-    runs one arm's six runs and then the other's, checking the three changed
-    sources out of `HEAD~1` and `HEAD` in turn, so the two runs of a pair are
-    minutes apart rather than adjacent.
+    runs one arm's six runs and then the other's, checking every changed
+    source under *packages/* and *tools/* out of `BASE` and `HEAD` in turn and
+    rebuilding between arms, so the two runs of a pair are minutes apart
+    rather than adjacent.
+ -  *pin-recheck-cost.mjs.txt* and *pin-recheck-cost.txt*: the cost of the
+    per-execution pinned-toolchain recheck, and the script that measures it.
  -  *before-after.txt*: the Phase B before-and-after table, on an
     uninstrumented tree.
  -  *property-lane.txt*: the commands and counts showing that the property and
     native-support lane repeats the same per-execution work through
     *packages/testkit*, which this unit leaves unchanged.
+ -  *ci-compare.py*: compares two CI runs' test262 job and execution-step
+    seconds, and their per-family job minutes.
 
 
 Reproducing
@@ -90,7 +95,7 @@ from the repository root with the Phase B commit at `HEAD`.
 ~~~~ sh
 cp docs/evidence/u13/before-after.sh.txt /tmp/u13/before-after.sh
 chmod +x /tmp/u13/before-after.sh
-OUT=/tmp/u13/ba REPS=2 /tmp/u13/before-after.sh
+BASE=98e66719 OUT=/tmp/u13/ba REPS=2 /tmp/u13/before-after.sh
 ~~~~
 
 A cold Oseo object and archive cache is selected with a fresh
@@ -109,3 +114,11 @@ per-path cost is not identical to a whole-corpus average. No measurement in
 this directory was taken on macOS or on a GitHub runner; the macOS and Linux
 CI figures in the baseline section are derived from these Linux observations
 and the previously recorded CI step times, and are labelled as estimates.
+
+The one branch CI run of this unit so far, 36451319573 on `f483a129`, was
+cancelled by the coordinator about three minutes in, after a review of that
+commit found the two cache-safety defects the pinned compiler and the
+snapshot-only runtime bytes now close. Every test262 job was stopped during
+setup, so the run holds no execution-step time. *ci-compare.py* is the script
+that will compare a completed branch run against main run 36369711059; it is
+kept here unused rather than rewritten later.

@@ -1855,85 +1855,121 @@ ever producing a different answer: rereading and rehashing the C runtime into a
 runtime-archive key, and starting one `zig env` process to identify the
 toolchain. Phase B derives both once per process and reuses them.
 
-The contract change is explicit rather than ambient. `prepareNativeRuntime` is
-a new public entry point in `@oseo/cli` that reads the runtime assets,
-identifies the toolchain, and derives the archive key for one host, toolchain,
-target, and runtime provider. `runNativeUnits` takes the result as a new
-optional argument and then performs no per-execution runtime read, identity
-probe, or key derivation. A caller that passes nothing behaves exactly as
-before, so `runNativeCli`, the published CLI, the testkit native workflow, the
-native fixtures, and the property suites are unchanged. Only the reviewed
-test262 fragment executor passes a prepared runtime, and it derives it from the
-same initialization that already builds the harness object key.
+The contract change is explicit rather than ambient. `prepareNativeRuntime`
+is a new public entry point in `@oseo/cli` that reads the runtime assets,
+identifies the toolchain, pins the executable that identity describes, and
+derives the archive key, once for one host, toolchain, target, and runtime
+provider. `runNativeUnits` takes the result as a new optional argument and
+then performs no per-execution runtime read, identity probe, or key
+derivation. A caller that passes nothing behaves exactly as before, so
+`runNativeCli`, the published CLI, the testkit native workflow, the native
+fixtures, and the property suites are unchanged. Only the reviewed test262
+fragment executor passes a prepared runtime, and it derives it from the same
+initialization that already builds the harness object key.
 
-A prepared runtime records every input it came from: the compiler host, the
-toolchain, the target, the captured environment snapshot, the runtime ABI
-version, the ordered asset set, and a digest of the asset contents the key was
-derived from. `runNativeUnits` compares the first six against the execution's
-own inputs and raises `PreparedNativeRuntimeMismatchError` on any difference,
-after removing the temporary directory and before any build plan is created.
-Hosts and toolchains are compared by identity, so a host that would read
-different runtime bytes and a toolchain with different flags are both refused
-rather than reused. Package tests cover a rejected host, toolchain, target,
-environment snapshot, and runtime provider, and assert that no build plan was
-created in any of them. Two further tests run the same units with and without a
-prepared runtime, against both a missing and a published archive, and assert
-that the result, the archive key, the cache lookups, the build plan, and every
-written artifact are identical, that the prepared execution reads no runtime
-asset and starts no identity probe, and that preparing reads exactly the assets
-one per-execution workflow reads. The existing Zig identity-probe retry test is
-unchanged and still passes: it uses `runNativeCli`, which never takes a
-prepared runtime.
+Two properties make the reuse safe, and both are enforced rather than
+documented. First, the prepared snapshot is the only source of runtime bytes:
+every build that uses a prepared runtime stages the snapshotted contents, so
+the bytes compiled and archived are always the bytes hashed into the key, and
+a runtime file edited after preparation is neither read nor compiled. A test
+edits a runtime file after preparation and asserts that the staged bytes and
+the archive key are still the snapshot's, and that preparing again derives a
+different key. Second, the compiler is pinned. `prepareNativeRuntime` asks the
+toolchain which executable its identity output describes, resolves that path to
+its real location, fingerprints every watched path, repeats the identity probe
+through the resolved executable, and fingerprints again, accepting the
+preparation only when the repeat agrees and nothing moved around it; a single
+probe would otherwise leave a window in which a replacement pairs a new
+compiler with an old identity. Every build of that preparation then invokes the
+resolved path rather than a search-path name, and the fingerprints are
+rechecked after validation, after the archive cache lock is acquired,
+immediately before the compiler runs, and once the build has finished, before
+any artifact it produced is executed or published. The harness object build
+uses the same pinned path and the same checkpoints. A mismatch raises and is
+propagated rather than falling back to a build without archive reuse, so a
+compiler replaced in place, or a reported path repointed at a different file,
+cannot build, run, or publish under the previous compiler's key. Tests cover a
+replaced, a relinked, and a removed compiler, one swapped inside the confirming
+probe, one swapped during the lock wait, and one swapped during the build with
+an archive published, with an archive already cached, and with archive reuse
+disabled, plus an uncached harness object whose pin fails at each of its three
+checkpoints. A toolchain that cannot name its
+executable, or a host that cannot fingerprint files, refuses to prepare rather
+than reusing an unpinned identity.
 
-The one behavior a prepared runtime gives up is stated in its API
-documentation. A change written to the runtime source files after preparation
-is not observed by later executions of that process, where the per-execution
-path would have reread them. The reviewed runner reads the runtime package it
-was started with, and the published CLI performs one execution per process, so
-neither observes the difference.
+Each recheck is one `realpath` and one `stat` per watched path, with no
+process start. Measured on the same host, four rechecks of the two paths the
+Zig identity reports cost 61.6 to 65.4 ms for a whole 730-execution shard, a
+measured 0.084 to 0.090 ms per execution, against the per-execution saving
+below. Its cost is a derived 0.5 percent of that saving. The figures are in
+[*evidence/u13/pin-recheck-cost.txt*](./evidence/u13/pin-recheck-cost.txt).
+
+A prepared runtime also records the host, toolchain, target, environment
+snapshot, ABI version, ordered asset set, and a digest of the asset contents
+it came from, taking immutable copies of the target, its sanitizer list, the
+environment variables, the ABI version, and each asset's location before any
+await. `runNativeUnits` compares those against the execution's own inputs and
+raises `PreparedNativeRuntimeMismatchError` on any difference, after removing
+the temporary directory and before any build plan is created. Hosts and
+toolchains are compared by identity, so a host that would read different
+runtime bytes and a toolchain with different flags are both refused. Package
+tests cover a rejected host, toolchain, target, sanitizer list, asset
+location, environment snapshot, and runtime provider, and assert that no build
+plan was created in any of them. Two further tests run the same units with and
+without a prepared runtime, against both a missing and a published archive,
+and assert that the result, the archive key, the cache lookups, the written
+artifacts, and the build plan are identical apart from the pinned compiler
+path, that the prepared execution reads no runtime asset and starts no
+identity probe, and that preparing reads exactly the assets one per-execution
+workflow reads. The existing Zig identity-probe retry test is unchanged and
+still passes: it uses `runNativeCli`, which never takes a prepared runtime.
 
 Before and after were measured on the same 214-path reviewed shard on one
 Linux host, with the whole process tree restricted by `taskset` to the CI
-runners' core counts, on an uninstrumented tree. Both arms run inside one
-session, which checks the three changed sources out of the parent revision and
-back, and alternates the arms once per repetition rather than run by run: a
-repetition runs all six of one arm's runs and then all six of the other's.
-Each arm has four warm and two cold runs per core count. Cold empties the Oseo
-object and archive cache; the lane Zig cache stays populated throughout, so
-this separates only the Oseo caches. Per-run values are in
+runners' core counts, on an uninstrumented tree. Before is `98e66719`; every
+source this unit changes under *packages/* and *tools/* is checked out and
+rebuilt between arms, because the runner loads several of those packages from
+their built output. Both arms run inside one session, which alternates them
+once per repetition rather than run by run: a repetition runs all six of one
+arm's runs and then all six of the other's. Each arm has four warm and two
+cold runs per core count. Cold empties the Oseo object and archive cache; the
+lane Zig cache stays populated throughout, so this separates only the Oseo
+caches. Per-run values are in
 [*evidence/u13/before-after.txt*](./evidence/u13/before-after.txt).
 
 | CPUs | Cache | Measured before s | Measured after s | Derived change | Derived tree CPU change |
 | ---- | ----- | ----------------- | ---------------- | -------------- | ----------------------- |
-| 3    | warm  | 66.83             | 49.46            | -26.0%         | -19.1%                  |
-| 3    | cold  | 74.44             | 60.59            | -18.6%         | -12.5%                  |
-| 4    | warm  | 53.55             | 38.60            | -27.9%         | -17.3%                  |
-| 4    | cold  | 62.85             | 51.75            | -17.7%         | -7.0%                   |
+| 3    | warm  | 57.06             | 44.36            | -22.2%         | -16.0%                  |
+| 3    | cold  | 68.71             | 55.78            | -18.8%         | -13.2%                  |
+| 4    | warm  | 47.55             | 35.04            | -26.3%         | -15.4%                  |
+| 4    | cold  | 56.64             | 44.67            | -21.1%         | -12.7%                  |
 
-The host was shared and its one-minute load moved from 1.3 to 7.0 across the
-session, so the widest spread inside an arm reaches a derived 11.59 s, which is
-comparable to the effect. Host drift is therefore reduced but not controlled:
-the two runs of a pair are about six minutes apart, not adjacent. Pairing each
-run against the run of the other arm at the same core count, cache state, and
-repetition nevertheless holds for every pair. All twelve are reductions, from a
-derived 16.2 to 32.7 percent, with derived means of 18.7 and 17.8 percent cold
-and 25.9 and 27.7 percent warm at three and four cores. The direction and
-approximate size do not depend on which comparison is used, and no single run
-of either arm reverses the sign.
+The host's one-minute load stayed between 1.7 and 5.1 across the session, and
+the widest spread inside any arm is a derived 0.94 s, far under the effect.
+Pairing each run against the run of the other arm at the same core count,
+cache state, and repetition gives derived means of 18.8 and 21.1 percent cold
+and 22.2 and 26.3 percent warm at three and four cores, and all twelve pairs
+are reductions, from a derived 17.9 to 27.1 percent. Host drift is reduced but
+not controlled, because the two runs of a pair are minutes apart rather than
+adjacent.
 
-The saving is a derived 15.2 to 23.8 ms of wall time per native execution
+The saving is a derived 16.4 to 17.7 ms of wall time per native execution
 across the four arms, each arm's measured difference divided by its 730
 executions, against the Phase A measurement of 26.60 ms of removable elapsed
 work per execution. It exceeds the Phase A estimate of 12.4 to 12.8 percent
 because that estimate assumed only the CPU floor moved, while the runner
 process's single thread was also releasing the pool earlier.
 
-Applying the measured 17.7 to 27.9 percent band to the measured macOS
-execution-step sums of 16,159 to 18,935 s at 21,383 paths estimates 2,860 to
-5,283 s, a derived 47.7 to 88.1 min per run. At 41,091 paths the same per-path
-rate estimates a derived 91.6 to 169.2 min. Those are estimates: the band was
+Applying the measured 18.8 to 26.3 percent band to the measured macOS
+execution-step sums of 16,159 to 18,935 s at 21,383 paths estimates 3,038 to
+4,980 s, a derived 50.6 to 83.0 min per run. At 41,091 paths the same per-path
+rate estimates a derived 97.3 to 159.5 min. Those are estimates: the band was
 measured on a Linux host restricted to three and four cores, not on a GitHub
-macOS runner, and no CI run has yet been measured with this change.
+macOS runner. The one branch CI run so far, 36451319573 on `f483a129`, was
+cancelled by the coordinator about three minutes in, after a review of that
+commit found the two cache-safety defects this section's pinning and
+snapshot-bytes rules now close; every test262 job was stopped during setup, so
+it produced no step time and no CI measurement has been obtained yet.
 
 Native support and property native executions do go through the same shape of
 per-execution work, through `packages/testkit`'s own native workflow rather

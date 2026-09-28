@@ -1,0 +1,35 @@
+// Cost of a prepared runtime's pin rechecks: each recheck is one describeFile
+// call per watched path, a realpath plus a stat. One native execution
+// rechecks up to four times, so this measures four rechecks for each of the
+// 730 native executions of one reviewed shard 1/100 run.
+import { realpath, stat } from "node:fs/promises";
+import { performance } from "node:perf_hooks";
+import process from "node:process";
+
+const paths = process.argv.slice(2);
+const executions = 730;
+const rechecksPerExecution = 4;
+
+async function describe(path) {
+  const [resolved, status] = await Promise.all([realpath(path), stat(path)]);
+  return {
+    device: Number(status.dev),
+    inode: Number(status.ino),
+    modifiedAtMilliseconds: status.mtimeMs,
+    realPath: resolved,
+    size: Number(status.size),
+  };
+}
+
+for (const round of [1, 2, 3]) {
+  const started = performance.now();
+  for (let index = 0; index < executions * rechecksPerExecution; index += 1) {
+    await Promise.all(paths.map(describe));
+  }
+  const elapsed = performance.now() - started;
+  console.log(
+    `round ${round}: ${executions} executions x ${rechecksPerExecution} ` +
+      `rechecks of ${paths.length} paths in ${elapsed.toFixed(1)} ms, ` +
+      `${(elapsed / executions).toFixed(3)} ms per execution`,
+  );
+}

@@ -569,3 +569,74 @@ test("links fragment units and compiles a normalized standalone object", () => {
     request.args.includes("-ffile-prefix-map=/different/build=/oseo/harness"),
   );
 });
+
+test("reports the executable and library its identity names", () => {
+  const reuse = zigToolchain.runtimeArchiveReuse!;
+  const identity = [
+    ".{",
+    '    .zig_exe = "/opt/zig/zig",',
+    '    .lib_dir = "/opt/zig/lib",',
+    '    .version = "0.16.0",',
+    "}",
+  ].join("\n");
+  assert.deepEqual(reuse.pinToolchain!(identity), {
+    compilerPath: "/opt/zig/zig",
+    watchedPaths: ["/opt/zig/zig", "/opt/zig/lib"],
+  });
+  // Zig writes a path's bytes, so a non-ASCII path arrives as one escape per
+  // UTF-8 byte and must be decoded as a sequence, not character by character.
+  const escaped = [
+    ".{",
+    '    .zig_exe = "/opt/\\xc3\\xa9/a\\"b\\\\c/zig",',
+    '    .lib_dir = "/opt/\\u{e9}/lib",',
+    "}",
+  ].join("\n");
+  assert.deepEqual(reuse.pinToolchain!(escaped), {
+    compilerPath: '/opt/é/a"b\\c/zig',
+    watchedPaths: ['/opt/é/a"b\\c/zig', "/opt/é/lib"],
+  });
+  // Without a library directory only the executable is watched, and without
+  // an executable the adapter reports that it cannot be pinned.
+  assert.deepEqual(reuse.pinToolchain!('.{ .zig_exe = "/opt/zig/zig" }'), {
+    compilerPath: "/opt/zig/zig",
+    watchedPaths: ["/opt/zig/zig"],
+  });
+  assert.equal(reuse.pinToolchain!('.{ .version = "0.16.0" }'), undefined);
+  assert.equal(reuse.pinToolchain!(""), undefined);
+});
+
+test("probes and builds through a pinned executable", () => {
+  const reuse = zigToolchain.runtimeArchiveReuse!;
+  const environment = { variables: { PATH: "/opt/zig/bin" } };
+  assert.equal(
+    reuse.createIdentityRequest("/work", environment).command,
+    "zig",
+  );
+  assert.equal(
+    reuse.createIdentityRequest("/work", environment, "/opt/zig/zig").command,
+    "/opt/zig/zig",
+  );
+  const target = describeTarget("linux-x86_64-gnu");
+  const plan = zigToolchain.createBuildPlan({
+    compilerPath: "/opt/zig/zig",
+    environment,
+    generatedSourcePath: "/work/case.c",
+    prebuiltRuntimeArchivePath: "/cache/runtime.a",
+    runtimeSourcePaths: [],
+    runtimeDirectory: "/runtime",
+    workingDirectory: "/work",
+    target,
+  });
+  for (const request of plan.requests) {
+    assert.equal(request.command, "/opt/zig/zig");
+  }
+  assert.equal(
+    zigToolchain.harnessObjectReuse!.createBuildRequest({
+      compilerPath: "/opt/zig/zig",
+      workingDirectory: "/work",
+      target,
+      environment,
+    }).command,
+    "/opt/zig/zig",
+  );
+});

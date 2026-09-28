@@ -11,6 +11,7 @@ import type {
   ProcessEnvironment,
   ProcessObservation,
   ProcessRequest,
+  FileFingerprint,
   RegExpPatternExtensions,
   RuntimeAsset,
   RuntimeInput,
@@ -651,12 +652,22 @@ export interface PreparedNativeRuntime {
   readonly archiveKey: string;
   readonly assetDigest: string;
   readonly assets: readonly PreparedRuntimeAsset[];
+  /** The executable every build of this preparation invokes. */
+  readonly compilerPath: string;
   readonly host: CompilerHost;
+  /** Fingerprints rechecked before each build that uses this preparation. */
+  readonly pinnedFiles: readonly PinnedFile[];
   readonly runtimeAbiVersion: string;
   readonly target: TargetDescription;
   readonly toolchain: NativeToolchain;
   readonly toolchainEnvironment: ProcessEnvironment;
   readonly toolchainIdentity: string;
+}
+
+/** One path the toolchain identity described and the facts it then had. */
+export interface PinnedFile {
+  readonly fingerprint: FileFingerprint;
+  readonly path: string;
 }
 
 /**
@@ -855,26 +866,91 @@ export async function prepareNativeRuntime(
       name: descriptor.name,
     })),
   );
-  const directory = await host.makeTemporaryDirectory("oseo-prepare-");
-  let identity: ProcessObservation;
-  try {
-    // The probe runs through the host directly, without the per-execution
-    // path's start-failure conversion, so a host that refuses to run reaches
-    // the composing caller as its own error rather than as a missing
-    // identity. A composer prepares once and needs to see why.
-    identity = await host.run(
-      reuse.createIdentityRequest(directory, toolchainEnvironment),
+  if (host.describeFile == null) {
+    throw new Error(
+      "The compiler host cannot fingerprint files, so a pinned toolchain " +
+        "cannot be rechecked.",
     );
-  } finally {
-    try {
-      await host.remove(directory);
-    } catch {
-      // A retained probe directory cannot fail an otherwise usable identity.
-    }
   }
-  const toolchainIdentity = identity.stdout.trim();
-  if (identity.exitStatus !== 0 || toolchainIdentity === "") {
-    throw new Error("The native toolchain identity is unavailable.");
+  const describeFile = host.describeFile.bind(host);
+  const probe = async (compilerPath?: string): Promise<string> => {
+    const directory = await host.makeTemporaryDirectory("oseo-prepare-");
+    let identity: ProcessObservation;
+    try {
+      // The probe runs through the host directly, without the per-execution
+      // path's start-failure conversion, so a host that refuses to run
+      // reaches the composing caller as its own error rather than as a
+      // missing identity. A composer prepares once and needs to see why.
+      identity = await host.run(
+        reuse.createIdentityRequest(
+          directory,
+          toolchainEnvironment,
+          compilerPath,
+        ),
+      );
+    } finally {
+      try {
+        await host.remove(directory);
+      } catch {
+        // A retained directory cannot fail an otherwise usable identity.
+      }
+    }
+    const observed = identity.stdout.trim();
+    if (identity.exitStatus !== 0 || observed === "") {
+      throw new Error("The native toolchain identity is unavailable.");
+    }
+    return observed;
+  };
+  const fingerprintPaths = async (
+    paths: readonly string[],
+  ): Promise<readonly PinnedFile[]> =>
+    await Promise.all(
+      paths.map(async (path) => {
+        const fingerprint = await describeFile(path);
+        if (fingerprint == null) {
+          throw new Error(`The pinned toolchain path is missing: ${path}.`);
+        }
+        return { fingerprint, path };
+      }),
+    );
+  /*
+   * The first probe only says which executable to pin. Recording its output
+   * would leave a window in which the compiler is replaced between that probe
+   * and the fingerprints, pairing a new compiler with an old identity. So the
+   * probe is repeated through the resolved executable and bracketed by
+   * fingerprints, and the preparation is accepted only when the repeat agrees
+   * with the first and nothing moved around it.
+   */
+  const searched = reuse.pinToolchain?.(await probe());
+  if (searched == null) {
+    throw new Error(
+      "The native toolchain does not report the executable its identity " +
+        "describes, so it cannot be pinned for a prepared runtime.",
+    );
+  }
+  const before = await fingerprintPaths(searched.watchedPaths);
+  const compilerPin = before.find(
+    (entry) => entry.path === searched.compilerPath,
+  );
+  if (compilerPin == null) {
+    throw new Error(
+      "The native toolchain did not include its compiler among the paths " +
+        "it pins.",
+    );
+  }
+  const compilerPath = compilerPin.fingerprint.realPath;
+  const toolchainIdentity = await probe(compilerPath);
+  const pinned = reuse.pinToolchain?.(toolchainIdentity);
+  const pinnedFiles = await fingerprintPaths(searched.watchedPaths);
+  if (
+    pinned == null ||
+    pinned.compilerPath !== searched.compilerPath ||
+    !samePinnedFiles(before, pinnedFiles)
+  ) {
+    throw new Error(
+      "The native toolchain changed while it was being pinned; prepare " +
+        "again once it is stable.",
+    );
   }
   const archiveKey = await reuse.createKey({
     runtimeAbiVersion,
@@ -895,13 +971,84 @@ export async function prepareNativeRuntime(
       ),
     ),
     assets,
+    // Builds run the resolved file, so repointing the reported path later
+    // cannot substitute a different compiler behind the recorded key.
+    compilerPath,
     host,
+    pinnedFiles,
     runtimeAbiVersion,
     target: preparedTarget,
     toolchain,
     toolchainEnvironment,
     toolchainIdentity,
   };
+}
+
+function samePinnedFiles(
+  left: readonly PinnedFile[],
+  right: readonly PinnedFile[],
+): boolean {
+  return (
+    left.length === right.length &&
+    left.every((entry, index) => {
+      const other = right[index];
+      return (
+        other != null &&
+        other.path === entry.path &&
+        other.fingerprint.device === entry.fingerprint.device &&
+        other.fingerprint.inode === entry.fingerprint.inode &&
+        other.fingerprint.modifiedAtMilliseconds ===
+          entry.fingerprint.modifiedAtMilliseconds &&
+        other.fingerprint.realPath === entry.fingerprint.realPath &&
+        other.fingerprint.size === entry.fingerprint.size
+      );
+    })
+  );
+}
+
+/**
+ * Recheck a prepared runtime's pinned toolchain. `runNativeUnits` calls this
+ * before every build it performs with a prepared runtime; a composer that
+ * builds something else from the same preparation, such as a reusable
+ * harness object, calls it first as well.
+ */
+export async function verifyPreparedNativeRuntime(
+  prepared: PreparedNativeRuntime,
+): Promise<void> {
+  await requirePinnedToolchain(prepared, prepared.host);
+}
+
+/**
+ * Recheck the pinned toolchain before a build. This is one stat per watched
+ * path, so it runs per native execution rather than once per process: an
+ * executable replaced in place, or a path repointed at a different file,
+ * must not build under the key the previous one produced.
+ */
+async function requirePinnedToolchain(
+  prepared: PreparedNativeRuntime,
+  host: CompilerHost,
+): Promise<void> {
+  const describeFile = host.describeFile;
+  if (describeFile == null) {
+    throw new PreparedNativeRuntimeMismatchError("compiler host");
+  }
+  const observed = await Promise.all(
+    prepared.pinnedFiles.map(async (entry) => {
+      const fingerprint = await describeFile(entry.path);
+      return fingerprint == null
+        ? undefined
+        : { fingerprint, path: entry.path };
+    }),
+  );
+  if (
+    observed.some((entry) => entry == null) ||
+    !samePinnedFiles(
+      prepared.pinnedFiles,
+      observed.filter((e) => e != null),
+    )
+  ) {
+    throw new PreparedNativeRuntimeMismatchError("pinned native toolchain");
+  }
 }
 
 async function executeNativeWorkflow(
@@ -991,6 +1138,7 @@ async function executeNativeWorkflow(
       toolchain,
       toolchainEnvironment,
     });
+    await requirePinnedToolchain(prepared, host);
   }
   const cache =
     archiveReuse === "enabled" && reuse != null && toolchainEnvironment != null
@@ -1053,6 +1201,10 @@ async function executeNativeWorkflow(
       const cacheDirectory = await cache.getDirectory("runtime-archives");
       const candidate = join(cacheDirectory, `liboseo-runtime-${key}.a`);
       cacheLock = await cache.acquireFileLock(candidate);
+      // Acquiring the lock can wait, so the pin is rechecked after it: this
+      // decision either consumes an archive or claims the right to publish
+      // one under the prepared key.
+      if (prepared != null) await requirePinnedToolchain(prepared, host);
       if (await cache.hasFile(candidate)) {
         cachedArchivePath = candidate;
         await releaseCacheLock(cacheLock);
@@ -1060,9 +1212,12 @@ async function executeNativeWorkflow(
       } else {
         publishArchivePath = candidate;
       }
-    } catch {
+    } catch (error) {
       await releaseCacheLock(cacheLock);
       cacheLock = undefined;
+      // Falling back to a build without archive reuse is right for a cache
+      // that is merely unavailable, and wrong for a toolchain that moved.
+      if (error instanceof PreparedNativeRuntimeMismatchError) throw error;
     }
   }
   try {
@@ -1108,6 +1263,10 @@ async function executeNativeWorkflow(
   try {
     const plan = toolchain.createBuildPlan({
       ...includePropertiesWhen(() => {
+        if (prepared == null) return undefined;
+        return { compilerPath: prepared.compilerPath };
+      }),
+      ...includePropertiesWhen(() => {
         if (toolchainEnvironment == null) return undefined;
         return {
           environment: toolchainEnvironment,
@@ -1135,6 +1294,9 @@ async function executeNativeWorkflow(
       workingDirectory: directory,
     });
     executablePath = plan.executablePath;
+    // Staging ran between the last recheck and here, so the pin is confirmed
+    // once more immediately before the compiler is invoked.
+    if (prepared != null) await requirePinnedToolchain(prepared, host);
     for (const processRequest of plan.requests) {
       // eslint-disable-next-line no-await-in-loop -- Native steps are ordered.
       const attempt = await observeProcess(host, processRequest);
@@ -1156,6 +1318,11 @@ async function executeNativeWorkflow(
         );
       }
     }
+    // Every artifact this build produced, whether it is published under the
+    // prepared key or only executed here, has to come from the pinned
+    // compiler, so the last recheck covers the whole build rather than only
+    // the publication branch below.
+    if (prepared != null) await requirePinnedToolchain(prepared, host);
     if (
       publishArchivePath != null &&
       plan.runtimeArchivePath != null &&

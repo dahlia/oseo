@@ -1,46 +1,49 @@
 U13 Phase B before/after: reviewed test262 shard 1/100 (214 paths,
 730 native executions), target linux-x86_64-gnu, uninstrumented tree,
-whole process tree restricted with taskset. Both arms run inside one
+whole process tree restricted with taskset. Before is 98e66719, after
+is this unit's commits, with every changed source under packages/ and
+tools/ checked out and rebuilt between arms. Both arms run inside one
 session, which alternates them once per repetition: a repetition runs
 one arm's six runs and then the other's, so the two runs of a pair are
 minutes apart rather than adjacent and host drift is reduced but not
-controlled. The session spans 20:38 to 21:03 on a shared host whose
-one-minute load moved from 1.3 to 7.0 over that time. runner_s is the
-runner's own reported duration, wall_s adds Node startup and manifest
-comparison,
-treeCPU_s is user+system for the whole tree. Cold empties the Oseo
-object and archive cache; the lane Zig cache stays populated in every
-run. load1 is the one-minute load average taken before each run.
+controlled. The session spans 02:32 to 02:55 on a shared host whose
+one-minute load stayed between 1.7 and 5.1 over that time. runner_s is
+the runner's own reported duration, wall_s adds Node startup and
+manifest comparison, treeCPU_s is user+system
+for the whole tree. Cold empties the Oseo object and archive cache;
+the lane Zig cache stays populated in every run. load1 is the
+one-minute load average taken before each run.
 
  cpus cache     arm  n  runner_s   wall_s  treeCPU_s  load1
- 3cpu  cold   after  2     60.59    67.28     175.59   5.61
- 3cpu  cold  before  2     74.44    81.24     200.70   3.56
- 3cpu  warm   after  4     49.46    56.38     142.29   4.65
- 3cpu  warm  before  4     66.83    74.30     175.94   4.27
- 4cpu  cold   after  2     51.75    59.69     195.00   4.96
- 4cpu  cold  before  2     62.85    69.76     209.69   5.27
- 4cpu  warm   after  4     38.60    45.39     142.76   5.95
- 4cpu  warm  before  4     53.55    60.56     172.54   5.51
+ 3cpu  cold   after  2     55.78    62.12     161.13   4.28
+ 3cpu  cold  before  2     68.71    75.07     185.63   3.42
+ 3cpu  warm   after  4     44.36    50.72     126.97   3.90
+ 3cpu  warm  before  4     57.06    63.42     151.19   3.02
+ 4cpu  cold   after  2     44.67    51.06     167.60   3.97
+ 4cpu  cold  before  2     56.64    62.92     192.01   2.83
+ 4cpu  warm   after  4     35.04    41.31     130.71   4.74
+ 4cpu  warm  before  4     47.55    53.85     154.54   4.13
 
 Per-run runner seconds, in the order the session ran them:
-  3cpu cold  after   r1=57.58 r2=63.59
-  3cpu cold  before  r1=73.01 r2=75.87
-  3cpu warm  after   ra1=45.81 ra2=51.64 rb1=45.96 rb2=54.42
-  3cpu warm  before  ra1=61.20 ra2=72.79 rb1=62.09 rb2=71.23
-  4cpu cold  after   r1=46.93 r2=56.57
-  4cpu cold  before  r1=58.21 r2=67.49
-  4cpu warm  after   ra1=37.56 ra2=41.49 rb1=38.00 rb2=37.34
-  4cpu warm  before  ra1=48.64 ra2=58.32 rb1=51.76 rb2=55.47
+  3cpu cold  after   r1=56.26 r2=55.31
+  3cpu cold  before  r1=68.53 r2=68.89
+  3cpu warm  after   ra1=44.28 ra2=44.34 rb1=44.50 rb2=44.33
+  3cpu warm  before  ra1=57.15 ra2=56.87 rb1=57.21 rb2=57.01
+  4cpu cold  after   r1=44.68 r2=44.66
+  4cpu cold  before  r1=56.60 r2=56.69
+  4cpu warm  after   ra1=34.64 ra2=34.97 rb1=35.45 rb2=35.09
+  4cpu warm  before  ra1=47.52 ra2=47.67 rb1=47.41 rb2=47.58
 
-3cpu cold : runner  74.44 ->  60.59 s (-18.6%), tree CPU  200.7 ->  175.6 s (-12.5%), 19.0 ms per execution; widest within-arm spread 6.01 s
-3cpu warm : runner  66.83 ->  49.46 s (-26.0%), tree CPU  175.9 ->  142.3 s (-19.1%), 23.8 ms per execution; widest within-arm spread 11.59 s
-4cpu cold : runner  62.85 ->  51.75 s (-17.7%), tree CPU  209.7 ->  195.0 s (-7.0%), 15.2 ms per execution; widest within-arm spread 9.64 s
-4cpu warm : runner  53.55 ->  38.60 s (-27.9%), tree CPU  172.5 ->  142.8 s (-17.3%), 20.5 ms per execution; widest within-arm spread 9.69 s
+3cpu cold : runner  68.71 ->  55.78 s (-18.8%), tree CPU  185.6 ->  161.1 s (-13.2%), 17.7 ms per execution; widest within-arm spread 0.94 s
+3cpu warm : runner  57.06 ->  44.36 s (-22.2%), tree CPU  151.2 ->  127.0 s (-16.0%), 17.4 ms per execution; widest within-arm spread 0.33 s
+4cpu cold : runner  56.64 ->  44.67 s (-21.1%), tree CPU  192.0 ->  167.6 s (-12.7%), 16.4 ms per execution; widest within-arm spread 0.09 s
+4cpu warm : runner  47.55 ->  35.04 s (-26.3%), tree CPU  154.5 ->  130.7 s (-15.4%), 17.1 ms per execution; widest within-arm spread 0.81 s
 
 Paired by position: every run of the after arm against the run of the
-before arm at the same CPU count, cache state, and repetition. Those two
-runs are minutes apart, so this reduces host drift without removing it.
-  3cpu cold : -21.1% -16.2%  mean -18.7%
-  3cpu warm : -25.1% -29.1% -26.0% -23.6%  mean -25.9%
-  4cpu cold : -19.4% -16.2%  mean -17.8%
-  4cpu warm : -22.8% -28.9% -26.6% -32.7%  mean -27.7%
+before arm at the same CPU count, cache state, and repetition. Those
+two runs are minutes apart, so this reduces host drift without
+removing it.
+  3cpu cold : -17.9% -19.7%  mean -18.8%
+  3cpu warm : -22.5% -22.0% -22.2% -22.2%  mean -22.2%
+  4cpu cold : -21.1% -21.2%  mean -21.1%
+  4cpu warm : -27.1% -26.6% -25.2% -26.3%  mean -26.3%

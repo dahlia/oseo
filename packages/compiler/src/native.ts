@@ -111,13 +111,55 @@ export interface RuntimeArchiveKeyInput {
   readonly toolchainIdentity: string;
 }
 
+/**
+ * The executable a toolchain identity describes, and the paths whose
+ * fingerprints decide whether that identity is still current. A composer
+ * that reuses one identity across many builds pins the compiler by this
+ * absolute path and rechecks the fingerprints before every build, so an
+ * executable replaced or relinked mid-process cannot run under a key
+ * derived from the previous one.
+ */
+export interface PinnedToolchain {
+  readonly compilerPath: string;
+  readonly watchedPaths: readonly string[];
+}
+
+/**
+ * Facts a host reports about one path without reading it. The identity
+ * fields describe the file the path resolves to, so replacing a file in
+ * place and repointing a symbolic link both change them. `realPath` is that
+ * resolved location, which a caller pins so later work runs the same file
+ * the fingerprint describes.
+ */
+export interface FileFingerprint {
+  readonly device: number;
+  readonly inode: number;
+  readonly modifiedAtMilliseconds: number;
+  readonly realPath: string;
+  readonly size: number;
+}
+
 /** Optional archive-reuse capability implemented by a native toolchain. */
 export interface RuntimeArchiveReuse {
   createKey(input: RuntimeArchiveKeyInput): Promise<string>;
+  /**
+   * Ask the toolchain to report its identity. `compilerPath` repeats the
+   * probe through an already resolved executable, which lets a composer
+   * confirm that the identity it is about to record describes the file it
+   * pinned rather than whatever the search path resolved a moment earlier.
+   */
   createIdentityRequest(
     workingDirectory: string,
     environment: ProcessEnvironment,
+    compilerPath?: string,
   ): ProcessRequest;
+  /**
+   * Read the adapter's own identity output and report which executable it
+   * describes. An adapter that cannot name one returns undefined, and a
+   * composer must then refuse to prepare rather than reuse an unpinned
+   * identity.
+   */
+  pinToolchain?(identity: string): PinnedToolchain | undefined;
 }
 
 /**
@@ -127,6 +169,13 @@ export interface RuntimeArchiveReuse {
  * filesystem enumeration never selects sources or archive layout.
  */
 export interface NativeBuildInput {
+  /**
+   * Absolute path the toolchain must invoke instead of resolving its
+   * compiler through the host's search path. A composer that pinned the
+   * compiler for a prepared runtime supplies it so that every build of that
+   * preparation runs the executable the recorded identity describes.
+   */
+  readonly compilerPath?: string;
   readonly environment?: ProcessEnvironment;
   readonly generatedSourcePath: string;
   /** Opt-in additional units and already compiled objects, in link order. */
@@ -166,6 +215,12 @@ export interface CompilerCache {
 export interface CompilerHost {
   readonly cache?: CompilerCache;
   canonicalizeFile?(path: string): Promise<string>;
+  /**
+   * Report one path's fingerprint without reading it, or undefined when the
+   * path does not exist. It is a stat, so a caller may repeat it per native
+   * execution.
+   */
+  describeFile?(path: string): Promise<FileFingerprint | undefined>;
   captureEnvironment?(
     policy: ProcessEnvironmentPolicy,
   ): Promise<ProcessEnvironment | undefined>;
@@ -237,6 +292,8 @@ export function targetForExecutionHost(
 
 /** Normalized object staging contains harness.c and runtime headers. */
 export interface HarnessObjectBuildInput {
+  /** Pinned compiler, with the same meaning as on `NativeBuildInput`. */
+  readonly compilerPath?: string;
   readonly workingDirectory: string;
   readonly target: TargetDescription;
   readonly environment: ProcessEnvironment;

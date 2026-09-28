@@ -98,6 +98,8 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
         join(input.workingDirectory, `runtime-${index}.o`),
       );
       const common = [...flags, "-I", input.runtimeDirectory];
+      // A composer that pinned this toolchain supplies the resolved path.
+      const compiler = input.compilerPath ?? options.compiler;
       return {
         executablePath,
         target: input.target,
@@ -107,7 +109,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
         }),
         requests: [
           ...input.runtimeSourcePaths.map((source, index) => ({
-            command: options.compiler,
+            command: compiler,
             args: [...common, "-O2", "-c", source, "-o", objects[index]!],
             cwd: input.workingDirectory,
             environment,
@@ -123,7 +125,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
               ]
             : []),
           {
-            command: options.compiler,
+            command: compiler,
             args: [
               ...common,
               ...((input.prebuiltObjectPaths?.length ?? 0) > 0 ||
@@ -184,7 +186,7 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
           }
         }
         return {
-          command: options.compiler,
+          command: input.compilerPath ?? options.compiler,
           args: [
             ...flags,
             "-I",
@@ -202,12 +204,20 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
       },
     },
     runtimeArchiveReuse: {
-      createIdentityRequest(cwd, environment) {
+      createIdentityRequest(cwd, environment, compilerPath) {
         return {
-          command: options.compiler,
+          command: compilerPath ?? options.compiler,
           args: ["--version"],
           cwd,
           environment,
+        };
+      },
+      pinToolchain() {
+        // This adapter is composed with an already resolved compiler path,
+        // so the identity text names nothing the composer does not have.
+        return {
+          compilerPath: options.compiler,
+          watchedPaths: [options.compiler],
         };
       },
       async createKey(input) {

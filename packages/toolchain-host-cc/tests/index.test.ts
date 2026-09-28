@@ -142,3 +142,60 @@ test(
     assert.equal(request.cwd, "/different/build");
   },
 );
+
+test(
+  "pins and builds through a supplied compiler path",
+  { skip: !supported },
+  () => {
+    const toolchain = createHostCcToolchain(options);
+    const reuse = toolchain.runtimeArchiveReuse!;
+    // The adapter is composed with a resolved path, so it pins that one.
+    assert.deepEqual(reuse.pinToolchain!("/usr/bin/clang\nclang 22"), {
+      compilerPath: "/usr/bin/clang",
+      watchedPaths: ["/usr/bin/clang"],
+    });
+    const environment = { variables: {} };
+    assert.equal(
+      reuse.createIdentityRequest("/work", environment).command,
+      "/usr/bin/clang",
+    );
+    assert.equal(
+      reuse.createIdentityRequest("/work", environment, "/pinned/cc").command,
+      "/pinned/cc",
+    );
+    // Every compiler request of a pinned build runs the supplied path; the
+    // archiver is a separate tool and keeps its configured one.
+    const plan = toolchain.createBuildPlan({
+      compilerPath: "/pinned/cc",
+      environment,
+      generatedSourcePath: "/work/case.c",
+      runtimeSourcePaths: ["/runtime/runtime_core.c"],
+      runtimeDirectory: "/runtime",
+      workingDirectory: "/work",
+      target,
+    });
+    const commands = plan.requests.map((request) => request.command);
+    assert.deepEqual(commands.toSorted(), [
+      "/pinned/cc",
+      "/pinned/cc",
+      "/usr/bin/ar",
+    ]);
+    assert.equal(
+      toolchain.harnessObjectReuse!.createBuildRequest({
+        compilerPath: "/pinned/cc",
+        workingDirectory: "/work",
+        target,
+        environment,
+      }).command,
+      "/pinned/cc",
+    );
+    assert.equal(
+      toolchain.harnessObjectReuse!.createBuildRequest({
+        workingDirectory: "/work",
+        target,
+        environment,
+      }).command,
+      "/usr/bin/clang",
+    );
+  },
+);
