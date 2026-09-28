@@ -2411,8 +2411,8 @@ test("round-trips and shards the checked-in reviewed manifest", async () => {
   assert.equal(serializeTest262Manifest(reparsed).indexText, canonicalIndex);
   assert.deepEqual(serializeTest262Manifest(reparsed).partitions, partitions);
 
-  const shards = [1, 2, 3].map((index) =>
-    selectManifestShard(reparsed, { index, total: 3 }),
+  const shards = Array.from({ length: 12 }, (_, index) =>
+    selectManifestShard(reparsed, { index: index + 1, total: 12 }),
   );
   assert.deepEqual(
     shards
@@ -2420,6 +2420,14 @@ test("round-trips and shards the checked-in reviewed manifest", async () => {
       .map((result) => result.case.path)
       .toSorted(),
     reparsed.results.map((result) => result.case.path).toSorted(),
+  );
+  assert.equal(
+    new Set(
+      shards.flatMap((shard) =>
+        shard.results.map((result) => result.case.path),
+      ),
+    ).size,
+    reparsed.results.length,
   );
   assert.equal(
     shards.reduce((total, shard) => total + shard.summary.passes, 0),

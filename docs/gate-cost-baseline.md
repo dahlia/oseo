@@ -106,6 +106,41 @@ Run 36261458909, derived minutes from its measured job timestamps:
 
 Derived platform totals: macOS 764.12 min, Linux 578.80 min.
 
+### U6 shard assignment experiment
+
+U6's [cost distribution and option analysis](./evidence/u6/README.md) retains
+native case costs and test262 shard durations from runs 36243816479 and
+36261458909. It selects a deterministic cost-based native file partition at
+unchanged macOS totals, with estimated tail reduction and no estimated macOS
+workload increase. The estimates replay concurrent case durations and do not
+establish an improvement. Branch run 36343919872 failed Linux own-key at the
+unchanged 3,600-second property deadline after a reported 149 examples;
+its generated budget is incomplete. The
+[failed-run analysis](./evidence/u6/failed-branch-run.md) records measured
+costs and scheduling assumptions. Its
+[full per-shard comparison](./evidence/u6/first-branch-comparison.md) records
+a one-run measured macOS native job maximum of 46.10 minutes versus 51.43
+in run 36312192623, and test262 maximum of 35.23 versus 34.50 minutes.
+Their derived combined job sum differs by -20.70 macOS minutes; runner
+variance is not separated, and runtime-archive conditions differ. The
+correction isolates Linux own-key in its first shard and raises Linux native
+support from four to five, retaining four shards for all remaining files; its
+corrected branch run 36358067906 passed all 58 jobs. Its
+[full comparison](./evidence/u6/second-branch-comparison.md) retains derived
+macOS native/test262 job maxima from observed timestamps of 34.35/31.67 minutes
+versus 51.43/34.50 before, and derived total macOS workload of 731.40 versus
+778.12 minutes. Five-slot wall lower bounds are derived as 146.28 versus 155.62
+minutes. This is one corrected observation; variance and cache effects are not
+separated. The same macOS own-key cohort varies by a derived 11.80 case-minutes
+between branch runs. Linux singleton own-key passes in 41.36 measured
+case-minutes, with a derived 18.64-minute margin against its unchanged property
+deadline. Test262 keeps its round-robin assignment and raises the total from
+ten to twelve. Using run 36261458909's derived slowest residual rate, the
+estimate leaves 47.53 minutes against the 120-minute timeout, up from 33.22, at
+a derived 1.89 minutes of added macOS fixed cost. Extra harness preparation has
+no separate timing measurement; the corrected combined-workload observation
+meets the limit without establishing repeatable savings.
+
 ### U3 fixed-cost cache audit
 
 U3 leaves the workflow unchanged. Mise already caches the installed tools;

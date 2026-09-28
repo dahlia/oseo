@@ -439,18 +439,19 @@ standards tasks inside the ordinary gate execute the matching host target and
 retain the AArch64 Linux cross-link; do not replace a required execution with a
 blanket skip.
 
-CI partitions the native and test262 suites with `--shard INDEX/TOTAL`, for
+CI partitions the `test:native` fixture and test262 suites with
+`--shard INDEX/TOTAL`, for
 example `mise run test:native --shard 1/3` or
 `mise run test:test262 --shard 1/3`. Each shard selects a deterministic
 round-robin partition of the reviewed input order.
 
 The focused `test:property:extended:native` and
 `test:property:extended:package` tasks compose the local extended property
-gate. CI partitions the native component by file through Node.js:
+gate. CI partitions the native component by file through the wrapper:
 
 ~~~~ sh
 mise run test:property:extended:native:shard \
-  --test-shard=1/6 tests/property/*.property.test.ts
+  --shard 1/12 tests/property/*.property.test.ts
 ~~~~
 
 Indices are one-based. Run every index for the same total and exact property
@@ -458,14 +459,28 @@ file set on each matching host. The unsharded tasks remain the local gates, and
 `mise run test262:update` always regenerates the complete manifest without
 sharding.
 
-Node.js assigns files to shards by position, not by cost, so which files a
-shard receives changes whenever the property file set does, and how evenly the
-cost lands is accidental rather than chosen. The total is therefore sized so
-that an unlucky partition still finishes well inside the job timeout: measure
-the per-file cost of an unsharded `mise run test:property:extended:native` run,
-and raise the total whenever the slowest host's slowest shard stops leaving
-room for the corpus to keep growing. Raising it costs almost nothing, because
-the shards share one fixed amount of work.
+The wrapper's `--shard INDEX/TOTAL` uses the checked-in measured weights in
+*tools/native-shard-costs.ts*. It sorts files by descending weight, breaking
+ties by path, and groups them in batches of three on macOS and four on Linux.
+Each batch goes to the shard with the shortest modeled completion time, with
+ties going to the lowest index. Each shard starts its expensive files first.
+On Linux, totals greater than one reserve index one exclusively for
+*tests/property/m5-object-own-keys.property.test.ts* when it is present; the
+other indices partition the remaining files by the same cost rule. CI uses
+five Linux shards so four still carry the remaining files. The singleton
+executes with one file worker to preserve the property's deadline margin.
+These model widths are fixed independently of local CPU availability, so every
+index of a total selects disjoint files from the same complete input set.
+Unknown files use the measured table's upper median weight. Empty shards execute
+nothing. Node.js's own `--test-shard` still assigns files by position; CI uses
+the wrapper flag instead.
+
+Weights are derived sums of concurrent test-case durations, not isolated file
+latencies or processor time. Refresh them from CI logs when the file set or
+relative costs change; *docs/evidence/u6/README.md* records their source and
+model limits. Raising totals adds approximately one derived macOS minute of
+fixed job cost per extra job in the current measured baseline. Keep every
+shard of every total and the complete input set when changing the partition.
 
 
 Package manifests and versions

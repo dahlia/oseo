@@ -1,0 +1,167 @@
+{
+  "sourceRun": "36343919872",
+  "headSha": "e98edd15ddd0e74187200990ba7d8038c8b33688",
+  "jobs": [
+    {
+      "name": "native support (linux-x86_64-gnu, 1/4)",
+      "id": 108689202335,
+      "conclusion": "failure",
+      "jobSeconds": 3912.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-09-27T19:19:59.0271733Z",
+      "packageBeforeNativeSeconds": 12.457801,
+      "workers": 4,
+      "shardReportedAt": "2026-09-27T19:19:59.1028311Z",
+      "files": {
+        "tests/property/m5-object-own-keys.property.test.ts": [
+          3600008.22068
+        ],
+        "tests/property/m5-reflect-namespace.property.test.ts": [
+          1290533.099529,
+          699190.376936,
+          434521.961614
+        ],
+        "tests/property/m5-proxy-exotic-object.property.test.ts": [
+          1587596.530618,
+          172266.709197
+        ],
+        "tests/property/m5-object-constructor.property.test.ts": [
+          1284624.729665
+        ],
+        "tests/property/m5-async-await.property.test.ts": [
+          285445.325178
+        ],
+        "tests/property/m5-typed-array-search-and-join.property.test.ts": [
+          314280.224262,
+          15831.387896
+        ],
+        "tests/property/m5-string-iterator.property.test.ts": [
+          400786.141786
+        ],
+        "tests/property/m5-array-prototype-sort.property.test.ts": [
+          347845.352422
+        ],
+        "tests/property/m5-aggregate-error.property.test.ts": [
+          1.318592,
+          227799.407433
+        ],
+        "tests/property/m5-runtime-error-observation.property.test.ts": [
+          1.353307,
+          379448.88904
+        ],
+        "tests/property/m5-iterator-intrinsic.property.test.ts": [
+          362919.391436
+        ],
+        "tests/property/m5-string-prototype-pad.property.test.ts": [
+          358359.913285
+        ],
+        "tests/property/m5-array-spread.property.test.ts": [
+          250154.586695
+        ],
+        "tests/property/m5-optional-private.property.test.ts": [
+          1.8643,
+          246692.828898
+        ],
+        "tests/property/m5-array-binding.property.test.ts": [
+          2.221146,
+          195929.978832
+        ],
+        "tests/property/m5-call-spread.property.test.ts": [
+          238265.43521
+        ],
+        "tests/property/m5-for-of-assignment.property.test.ts": [
+          2.039192,
+          230567.333708
+        ],
+        "tests/property/m5-module-continuation.property.test.ts": [
+          228316.098875
+        ],
+        "tests/property/m5-for-binding.property.test.ts": [
+          2.004131,
+          215078.081724
+        ],
+        "tests/property/m5-for-of-binding.property.test.ts": [
+          2.056491,
+          209947.410227
+        ],
+        "tests/property/m5-super-without-extends.property.test.ts": [
+          308465.766471
+        ],
+        "tests/property/m5-optional-chaining.property.test.ts": [
+          2.218673,
+          200059.682137
+        ],
+        "tests/property/m5-destructuring-assignment.property.test.ts": [
+          1.866174,
+          183347.167366
+        ],
+        "tests/property/m5-tagged-template.property.test.ts": [
+          1.263459,
+          176148.504686
+        ],
+        "tests/property/m5-catch-binding.property.test.ts": [
+          1.891452,
+          160342.69345
+        ],
+        "tests/property/m5-parameter-var.property.test.ts": [
+          149987.71763
+        ],
+        "tests/property/m5-generator-parameter.property.test.ts": [
+          2.03532,
+          204501.879741
+        ],
+        "tests/property/m5-for-of.property.test.ts": [
+          171298.982576
+        ],
+        "tests/property/m5-generator-throw.property.test.ts": [
+          47060.188947
+        ],
+        "tests/property/m5-export-default-class.property.test.ts": [
+          46728.803925
+        ],
+        "tests/property/m5-ephemeron-tracing.property.test.ts": [
+          39865.750593
+        ],
+        "tests/property/m5-regexp-matcher.property.test.ts": [
+          3291.95046,
+          3582.63521
+        ],
+        "tests/property/m5-regexp-pattern.property.test.ts": [
+          900.393247,
+          519.666799
+        ],
+        "tests/property/m5-regexp-unicode-property-escapes.property.test.ts": [
+          251.964606,
+          717.070732,
+          58.416488
+        ],
+        "tests/property/m5-regexp-pattern-extensions.property.test.ts": [
+          266.767094
+        ],
+        "tests/property/unicode-tables.property.test.ts": [
+          101.409508,
+          124.822124,
+          77.924148
+        ]
+      },
+      "caseFailures": [
+        {
+          "path": "tests/property/m5-object-own-keys.property.test.ts",
+          "title": "generated Object own-key statics match the M5 model",
+          "reportedAt": "2026-09-27T20:19:59.9200414Z"
+        }
+      ],
+      "nativeCounts": {
+        "tests": 58,
+        "pass": 57,
+        "fail": 1,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 3871938.705649,
+      "interruptedExampleCounts": [
+        149
+      ]
+    }
+  ]
+}

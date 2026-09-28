@@ -1,15 +1,33 @@
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { availableParallelism } from "node:os";
+
+import { nativeTestArguments } from "./native-shard.ts";
 
 import { nativeTestWorkers } from "./native-test-workers.ts";
 
-const workers = nativeTestWorkers(
+const workerLimit = nativeTestWorkers(
   availableParallelism(),
   process.env.GITHUB_ACTIONS === "true",
 );
+const input = process.argv.slice(2);
+const sharded = input.some(
+  (arg) => arg === "--shard" || arg.startsWith("--shard="),
+);
+const args = nativeTestArguments(input, process.platform);
+const workers = sharded ? Math.min(workerLimit, args.length) : workerLimit;
+if (sharded)
+  console.log(`native-shard ${JSON.stringify({ workers, files: args })}`);
+if (args.length === 0 && process.argv.length > 2) process.exit(0);
 const child = spawn(
   process.execPath,
-  ["--test", `--test-concurrency=${workers}`, ...process.argv.slice(2)],
+  sharded
+    ? [
+        fileURLToPath(new URL("run-native-shard.ts", import.meta.url)),
+        String(workers),
+        ...args,
+      ]
+    : ["--test", `--test-concurrency=${workers}`, ...args],
   { stdio: "inherit" },
 );
 const forwarders = {

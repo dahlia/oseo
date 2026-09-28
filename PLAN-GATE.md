@@ -625,6 +625,13 @@ improvement.
 Projected cost at the M5c edition denominator
 ---------------------------------------------
 
+The tables below preserve the measured ten-shard baseline. U6 raises current
+CI test262 totals to twelve; its tail, fixed-cost, and combined-workload
+comparison is in [U6 evidence](./docs/evidence/u6/README.md).
+The corrected Linux native-support total is five, including a singleton
+own-key shard; the historical rates and tables below retain their source
+run totals.
+
 This projection extends the measured CI baseline in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) from its measured
 21,383 reviewed paths to the measured 41,091-path edition denominator that
@@ -654,7 +661,7 @@ The projection model is:
     baseline's derived mean F, which is 59.82 s for run 36243816479 and 56.81 s
     for run 36261458909, while a held family keeps whatever fixed cost is
     already inside its measured minutes; and
- -  the shard totals stay at their measured current values, test262 10 and
+ -  the shard totals stay at their measured baseline values, test262 10 and
     native support 12.
 
 Two limits apply to every derived number below. A constant second-per-path
@@ -674,7 +681,8 @@ summed over a run's ten macOS test262 jobs, a derived 0.68 min for run
 
 The per-family scaling below is derived from the job definitions in
 *.github/workflows/main.yaml*, the task bodies in *mise.toml*, and the source
-sets those tasks name. Job counts are measured from the workflow matrices.
+sets those tasks name. Job counts are measured from the baseline workflow
+matrices.
 
 | Family            | macOS jobs | What one job executes                                                                                                            | Scales with reviewed paths       |
 | ----------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
@@ -684,21 +692,24 @@ sets those tasks name. Job counts are measured from the workflow matrices.
 | test              | 2          | `test:node`, which is `node --test` at the root, and `test:deno`                                                                 | Only in parse-bound components   |
 | native            | 3          | `mise run test:native --shard N/3`, which is `node tests/native.ts`                                                              | No                               |
 
-Only `test262` selects its work from the reviewed path set. *tools/shard.ts*
+In this baseline model, only `test262` selects its work from the reviewed
+path set. *tools/shard.ts*
 takes zero-based positions modulo the shard total from the reviewed order the
 manifest reader reconstructs, so each of the ten macOS shards receives one
 tenth of whatever the reviewed set holds.
 
 The `native support` family runs the observed 128 files matched by
-_tests/property/\*.property.test.ts_ under Node's `--test-shard`, plus the
-package property suites on shard 1. Its unit is a property file, and the
-baseline's derived rates for it are seconds per selected property file, not per
-reviewed path. Nothing in the task reads the reviewed manifest: the three
+_tests/property/\*.property.test.ts_ under the wrapper's cost-based `--shard`,
+plus the package property suites on shard 1. Its unit is a property file, and
+the baseline's derived rates for it are seconds per selected property file, not
+per reviewed path. Nothing in the task reads the reviewed manifest: the three
 property files whose sources mention test262 cover the harness promise helper,
 the shared-memory agent harness, and the native function matcher, none of which
-enumerates reviewed paths. The family therefore grows when property files,
-domains, or case budgets are added, which is the separately measured
-bottleneck the baseline records, and not when the corpus grows.
+enumerates reviewed paths. The deterministic partition and its measured-weight
+model are documented in [*CONTRIBUTING.md*](./CONTRIBUTING.md) and
+[U6 evidence](./docs/evidence/u6/README.md). The family therefore grows when
+property files, domains, or case budgets are added, which is the separately
+measured bottleneck the baseline records, and not when the corpus grows.
 
 The `host C sanitizers` family runs `test:sanitizer:self`,
 `test:sanitizer:runtime`, `test:sanitizer:native`, and
@@ -802,7 +813,7 @@ min. Substituting the slowest derived per-shard rate, which projects a derived
 82.72 to 86.78 min for the longest test262 shard, does not change that: the
 workload term remains at least 1.9 times the longest job.
 
-The projected longest test262 shard at the current total of 10 holds a derived
+The projected longest test262 shard at the baseline total of 10 holds a derived
 4,110 paths, since 41,091 is 10 times 4,109 plus 1. At the family-level rates
 that shard is a derived 44.03 to 44.08 min at 0.629 s/path, depending on which
 run's mean F is used, and 61.69 min at 0.886 with run 36243816479's F. The
@@ -811,8 +822,8 @@ The slowest macOS shards are 1.193 s/path in run 36243816479 and 1.253 s/path in
 run 36261458909, which with each run's own mean F project a derived 82.72 min
 and 86.78 min for the slowest shard. Against the workflow's 120-minute
 `test_test262` timeout that leaves a derived 33.22 min of headroom in the least
-favorable case, so the current shard total does not itself breach the timeout at
-41,091 paths.
+favorable case, so the baseline shard total does not itself breach the timeout
+at 41,091 paths.
 
 The derived `native support` maximum is 68.13 min in run 36243816479 and 51.58
 min in run 36261458909, with a derived max/mean of 2.64 and 2.17. The observed
@@ -872,12 +883,14 @@ U4 shares the test262 harness object cache across jobs. Its unmeasured input,
 k, is now measured, and the measurement removes the case for the unit. Every
 reviewed test262 job prints its own object count, and the ten macOS shards of
 both baseline runs built 96, 96, 116, 128, 128, 108, 109, 112, 116, and 108
-objects, a sum of 1,117 and a mean of 111.7. The same ten values appear on
-`linux-x86_64-gnu`, so k belongs to the shard's reviewed path set rather than
-to the host. The reported reuse count is zero in every one of those jobs
-because the persistent object directory starts empty on a fresh runner; later
-cases in the same job still share each prepared object through the runner's
-promise map.
+objects, a derived sum of 1,117 and a derived mean of 111.7. The same ten
+values appear on `linux-x86_64-gnu`, so k belongs to the shard's reviewed path
+set rather than to the host. The reported reuse count is zero in every one of
+those jobs because the persistent object directory starts empty on a fresh
+runner; later cases in the same job still share each prepared object through
+the runner's promise map. U6 independently preserves these measured counters in
+three source runs at 21,383 measured paths in
+[U6 evidence](./docs/evidence/u6/README.md).
 
 k saturates, and its ceiling is the harness include vocabulary rather than the
 path count. The reviewed corpus of 21,383 paths uses 53 distinct combinations
@@ -957,6 +970,20 @@ set by the workload term at 169 to 217 min, while the longest job is a derived
 44 to 87 min, so rebalancing does not move the projected lower bound either. U6
 is timeout insurance and tail control here, not workload recovery.
 
+U6 implements twelve test262 shards with the same round-robin selection,
+cost-based native file batching at the unchanged macOS totals, and five
+Linux native-support shards instead of four. Linux shard one isolates
+own-key with one file worker; the other four retain the remaining files.
+Branch run 36343919872 failed own-key at the unchanged configured 3,600-second
+property deadline after 149 reported examples. The corrected branch run
+36358067906 passed all 58 observed jobs and was measured once. Its derived
+macOS family total is 731.40 min versus 778.12 min in source run 36312192623,
+and its derived five-slot wall lower bound is 146.28 min versus 155.62 min.
+Those lower totals are not separable from runner variance and cache effects;
+they do not establish runner-minute recovery or change this projection's
+reachability conclusion. The measured timestamps, derived comparisons, and
+failed-run analysis remain in [U6 evidence](./docs/evidence/u6/README.md).
+
 Duplicate work and host split, U7 and U8. The macOS `test` family is a derived
 41.85 min in run 36243816479 and 46.18 min in run 36261458909, of which the Node
 job is a derived 40.35 min and 43.15 min from its measured elapsed seconds.
@@ -1001,7 +1028,8 @@ The least favorable scenario is 1086.12 derived min at 0.886 s/path with run
 910.11 min, the 28.06 min U3 could reach leaves 882.05 min, and U7 with U8 net
 of the 1.77 min of derived F U3 already took from those two jobs leave an
 estimated 841.97 min, or +213.97 min against the ceiling. U5 and U6 recover no
-runner minutes at all.
+derived runner minutes in these stacks. U6's once-measured green run does
+not justify subtracting its lower observed total from either projection.
 
 So U3, U7, U8, and U10 taken at their estimated ceilings close a derived 30.7
 percent of the excess in the most favorable scenario and 53.3 percent in the
