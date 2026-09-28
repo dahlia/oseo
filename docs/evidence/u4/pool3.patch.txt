@@ -1,0 +1,29 @@
+# The pool-size patch applied to tools/test262.ts in the throwaway macOS clone
+# at ~/Desktop/oseo-m5ci, and only there. It adds an OSEO_TEST262_POOL
+# override so the Mac mini could run reviewed shard 1/10 at the macos-15
+# runner's pool of 3. Nothing in the repository sets an explicit pool.
+#
+# The macOS pool=3 runs used exactly this patch: applying it to e76e235b's
+# tools/test262.ts reproduces the clone's file byte for byte. environment.log
+# records both SHA-256 digests.
+#
+# The original patch was applied by the inline Python replacement preserved in
+# macos-scripts.sh.txt; this unified diff is the same edit in patch form.
+#
+#   mkdir -p /tmp/u4-patch/tools
+#   git show e76e235b:tools/test262.ts > /tmp/u4-patch/tools/test262.ts
+#   git -C /tmp/u4-patch apply -p1 \
+#     "$PWD/docs/evidence/u4/pool3.patch.txt"
+--- a/tools/test262.ts
++++ b/tools/test262.ts
+@@ -195,7 +195,9 @@
+ const measuredExecutionPoolLimit = 8;
+ const reviewedExecutionPoolLimit = Math.min(
+   measuredExecutionPoolLimit,
+-  availableParallelism(),
++  process.env.OSEO_TEST262_POOL == null
++    ? availableParallelism()
++    : Number(process.env.OSEO_TEST262_POOL),
+ );
+ const reviewedExecutionRetryLimit = 1;
+ const unavailableHarnessIncludes = new Set([

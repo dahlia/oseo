@@ -608,9 +608,17 @@ CI jobs use their own existing host cache directories. The workflow does not
 restore or publish harness objects between shards; workers within one process
 share preparation promises. Separate processes using the same cache directory
 coordinate through the host's exclusive publication lock. Linux Zig and host
-Clang execution were measured locally. macOS runner execution and CI
-before/after wall time remain unmeasured in this change. The earlier macOS work
-projection is an estimate and must not be presented as an observed CI
+Clang execution were measured locally. Sharing those objects between CI jobs
+was investigated and rejected. The distinct-object count for each shard is
+measured in CI; the cold and warm shard wall times are measured on two hosts
+outside CI, at each host's own pool and again at the macOS runner's pool of 3,
+with the Linux runner's pool of 4 not reproduced; the key-input stability of
+main's history is derived from measured commit counts rather than observed as a
+cache hit rate; and the transfer cost is estimated from other caches. All of it
+is in [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md), where the
+derived recovery is 12.2 macOS min for a complete run at the current workload
+on the most favorable of the four configurations. The earlier macOS work
+projection was an estimate and must not be presented as an observed CI
 improvement.
 
 
@@ -653,7 +661,7 @@ The projection model is:
     baseline's derived mean F, which is 59.82 s for run 36243816479 and 56.81 s
     for run 36261458909, while a held family keeps whatever fixed cost is
     already inside its measured minutes; and
- -  the shard totals stay at their measured current values, test262 10 and
+ -  the shard totals stay at their measured baseline values, test262 10 and
     native support 12.
 
 Two limits apply to every derived number below. A constant second-per-path
@@ -805,7 +813,7 @@ min. Substituting the slowest derived per-shard rate, which projects a derived
 82.72 to 86.78 min for the longest test262 shard, does not change that: the
 workload term remains at least 1.9 times the longest job.
 
-The projected longest test262 shard at the current total of 10 holds a derived
+The projected longest test262 shard at the baseline total of 10 holds a derived
 4,110 paths, since 41,091 is 10 times 4,109 plus 1. At the family-level rates
 that shard is a derived 44.03 to 44.08 min at 0.629 s/path, depending on which
 run's mean F is used, and 61.69 min at 0.886 with run 36243816479's F. The
@@ -814,8 +822,8 @@ The slowest macOS shards are 1.193 s/path in run 36243816479 and 1.253 s/path in
 run 36261458909, which with each run's own mean F project a derived 82.72 min
 and 86.78 min for the slowest shard. Against the workflow's 120-minute
 `test_test262` timeout that leaves a derived 33.22 min of headroom in the least
-favorable case, so the current shard total does not itself breach the timeout at
-41,091 paths.
+favorable case, so the baseline shard total does not itself breach the timeout
+at 41,091 paths.
 
 The derived `native support` maximum is 68.13 min in run 36243816479 and 51.58
 min in run 36261458909, with a derived max/mean of 2.64 and 2.17. The observed
@@ -855,9 +863,9 @@ close this gap; its value is that it is cheap, measurable, and does not touch
 coverage. Raising a shard total under U6 adds a derived 1 min or so of fixed
 cost for each added macOS job, which works against this same budget.
 
-test262 per-path execution, U4 and U10. U10 is the only lever whose estimated
-magnitude can be put against the gap from the evidence available. U4 acts on the
-same family, but its size depends on a count no measurement supplies.
+test262 per-path execution, U4 and U10. Both act on the same family. U10 is
+several times the larger, and U4 is now measured and bounded well below the
+gap.
 
 U10 recovers the observed rise from 0.629 s/path to the 0.741 to 0.886 band.
 Returning to 0.629 is a derived saving of 76.70 min from 0.741, 167.79 min from
@@ -871,54 +879,88 @@ investigation, not an attribution: the baseline records the same runs as a
 run-to-run spread with no established cause, and runner variance and cache
 warmth are not improvements.
 
-U4 shares the test262 harness object cache across jobs. The relevant local
-evidence is already in this plan: on one Linux host and reviewed shard 3/200,
-the Zig split path took a measured 57.94 s with a cold harness cache and 29.91 s
-warm, while building 36 harness objects over 101 reviewed paths. The derived
-difference is 28.03 s for 36 objects, or 0.78 s for each object. That is the
-shape of the saving. A cross-job cache removes the cost of building one job's
-distinct harness objects, not a cost that each reviewed path pays, because
-within a job the runner already reuses an object after its first build. Scaling
-the local 48.4 percent reduction by path count would instead assume that each
-added path pays the cold-cache penalty again, so this projection does not do
-that.
+U4 shares the test262 harness object cache across jobs. Its unmeasured input,
+k, is now measured, and the measurement removes the case for the unit. Every
+reviewed test262 job prints its own object count, and the ten macOS shards of
+both baseline runs built 96, 96, 116, 128, 128, 108, 109, 112, 116, and 108
+objects, a derived sum of 1,117 and a derived mean of 111.7. The same ten
+values appear on `linux-x86_64-gnu`, so k belongs to the shard's reviewed path
+set rather than to the host. The reported reuse count is zero in every one of
+those jobs because the persistent object directory starts empty on a fresh
+runner; later cases in the same job still share each prepared object through
+the runner's promise map. U6 independently preserves these measured counters in
+three source runs at 21,383 measured paths in
+[U6 evidence](./docs/evidence/u6/README.md).
 
-The projection input is k, the number of distinct harness objects one macOS
-test262 shard builds. U6 later measures 96 to 128 built objects per shard at
-21,383 paths, a derived sum of 1,117 per target in each of its three source
-runs; [U6 evidence](./docs/evidence/u6/README.md) preserves the counters.
-Its macOS preparation cost and growth at 41,091 paths remain unmeasured,
-so this projection still leaves k variable. At the derived 0.78 s for each
-object, ten shards recover an estimated 0.13k min: 4.67 min at k equal to the
-locally observed 36, 12.98 min at 100, 64.88 min at 500, and 190.11 min at
-1,465. That last value is what extrapolating the local sample's observed ratio
-of 36 objects over 101 paths to 4,110 paths would give, and it exceeds the k of
-about 1,154 that would close the residual in the most favorable stack below.
-Whether k grows with path count that way or saturates once a shard has covered
-the harness corpus is exactly what is unmeasured, so this projection draws no
-conclusion about U4's magnitude in either direction. Three further assumptions
-also remain: the ratio was measured on Linux with Zig while macOS runner
-execution is unmeasured, the local wall time includes task setup and manifest
-checks rather than only harness work, and a cross-job cache adds restore and
-publication transfer that the local comparison does not contain. U4's
-contribution stays unestablished until the distinct-object count for a macOS
-shard and that shard's harness preparation cost are measured.
+k saturates, and its ceiling is the harness include vocabulary rather than the
+path count. The reviewed corpus of 21,383 paths uses 53 distinct combinations
+of the asynchronous flag and the ordered include list, bounding it at 212 keys
+across both strictness modes and both specialization policies; the whole
+pinned upstream suite uses 75, bounding it at 300. A 101-path shard built 36
+objects and a 2,139-path shard of the same corpus builds 96, so 21 times the
+paths gave 2.7 times the objects. Doubling a shard's paths at 41,091 cannot
+take k past that ceiling, and the earlier estimate of 0.13k min was therefore
+being applied to a k that cannot reach the values it projected.
+
+The wall-clock saving is also smaller than the per-object build cost suggests.
+The likely reason, which the measurement does not establish, is that the
+worker pool overlaps harness preparation with case execution: shard 1/10
+performs 7,195 split attempts against 96 harness objects, so preparation is
+1.3 percent of the compile and link units it starts. Derived cold-minus-warm
+differences for that shard, computed before rounding, are -0.16 s on a Linux
+host at pool 8, 12.86 s on the same host at pool 3, 63 s on an Apple M4 host
+at pool 8, and -96 s on that host at pool 3. In two of the four
+configurations, including the one matching the macOS runner's own pool size,
+the warm runs were the slower ones, so none of them separates the cache from
+its sample's spread. Taking the largest per-object wall saving anyway, 0.656
+s, applied to the measured 1,117 objects of the ten macOS shards, gives a
+derived 12.2 min for one complete run at the current workload, and a derived
+7.9 min if the derived 64.6 percent of main steps that leave the key inputs
+unchanged is taken as a hit rate, less a derived 0.6 to 1.4 min of restore and
+publication that every run pays whether it hits or misses. The two baseline
+runs establish no improvement of this size either way: each job was measured
+once per commit and the derived same-job spread for a macOS test262 shard
+ranges from 0.35 to 16.53 min, so showing a change this small would need
+matched repeated measurements. At 41,091 paths the same rate gives a larger
+derived bound, 32.8 min, because a shard's 300-key ceiling times ten shards
+bounds it at 3,000 objects; that bound, not the current-workload figure, is
+what would justify revisiting the unit. The measurement, its hosts, and the
+cache-key and storage costs are recorded in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md), and their
+preserved sources in
+[*docs/evidence/u4/*](./docs/evidence/u4/README.md). U4 was therefore
+not implemented, and this projection subtracts nothing for it.
 
 The harness split landed at `f131a798` and `30c9f690` on 2026-09-17, before
 `32ece7f4`, so the derived 0.629 s/path rate already includes the split path
 with a per-job cold harness cache. On the evidence available the two levers
 therefore act on different costs. That chronology does not prove independence:
 the cause of the later per-path rise is unidentified and could itself lie in
-harness preparation, so treating U4 and U10 as additive is an assumption U10's
-investigation has to confirm.
+harness preparation, so U10's investigation still owns that question.
 
-Zig compilation cache, U5. The baseline infers a cold Zig compilation cache on
-fresh runners and states that it did not inspect the cache contents, so there
-is no measured hit rate to project from. The runtime archive is already cached
-by *.github/actions/runtime-archive-cache*, and generated program translation
-units differ for each case, so the remaining reusable surface is small. This
-projection assigns U5 no derived recovery, and the plan's own note that doing
-nothing is a valid result stands.
+Zig compilation cache, U5. The cache contents are now measured rather than
+inferred, and the unit is closed as do nothing. A byte-identical repeat of one
+test262 shard reuses a derived 31 of 14,637 cache entries, a derived 0.21
+percent, because Oseo stages every build in a fresh temporary directory whose
+path reaches the compile and link command lines. The `native support` family
+behaves the same way at a derived 31 of 3,211. Only the three-job `native`
+family reuses, at a derived 1,155 of 1,500, and two options are estimated to
+save slightly more than they cost: caching Zig's target-constant libraries is a
+derived 0.83 to 1.49 min for a whole run, and caching the `native` family is a
+derived 1.41 to 1.54 min net, or a derived 0.91 to 0.99 min once U4's 64.6
+percent input-stability proportion is applied. Both are small beside the
+derived 0.35 to 16.53 min same-job spread for one macOS test262 shard, and both
+rest on a transfer band measured from a different cache, so these measurements
+do not establish a runner-level improvement large enough to justify
+implementing either. Sharing the whole
+cache loses outright and does not fit the repository cache limit: one shard is
+a measured 292.8 MB compressed, so the 27 macOS keys alone are a derived 7.91
+GB against a derived 5.94 GB of headroom. This projection therefore assigns U5
+no derived recovery, and the plan's own note that doing nothing is a valid
+result stands. The condition for revisiting is path-independent staging in the
+compiler, not a new cache. The measurements are in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and their sources
+in [*docs/evidence/u5/*](./docs/evidence/u5/README.md).
 
 Shard sizing, U6. Raising the test262 or native support shard total leaves the
 executed work unchanged, so it recovers no runner minutes and adds a derived
@@ -927,6 +969,20 @@ and the timeout margin. At 41,091 paths the projected wall-clock lower bound is
 set by the workload term at 169 to 217 min, while the longest job is a derived
 44 to 87 min, so rebalancing does not move the projected lower bound either. U6
 is timeout insurance and tail control here, not workload recovery.
+
+U6 implements twelve test262 shards with the same round-robin selection,
+cost-based native file batching at the unchanged macOS totals, and five
+Linux native-support shards instead of four. Linux shard one isolates
+own-key with one file worker; the other four retain the remaining files.
+Branch run 36343919872 failed own-key at the unchanged configured 3,600-second
+property deadline after 149 reported examples. The corrected branch run
+36358067906 passed all 58 observed jobs and was measured once. Its derived
+macOS family total is 731.40 min versus 778.12 min in source run 36312192623,
+and its derived five-slot wall lower bound is 146.28 min versus 155.62 min.
+Those lower totals are not separable from runner variance and cache effects;
+they do not establish runner-minute recovery or change this projection's
+reachability conclusion. The measured timestamps, derived comparisons, and
+failed-run analysis remain in [U6 evidence](./docs/evidence/u6/README.md).
 
 Duplicate work and host split, U7 and U8. The macOS `test` family is a derived
 41.85 min in run 36243816479 and 46.18 min in run 36261458909, of which the Node
@@ -957,8 +1013,8 @@ to these two.
 No projection built on measured evidence reaches 628 min. The two stacks below
 compare U10 recovered against U10 unrecovered inside one scenario each, so the
 held families stay fixed rather than moving with the scenario. Neither stack
-subtracts U4, whose magnitude is unmeasured, so the residual each leaves is the
-residual before U4.
+subtracts U4, whose derived 12.2 min at the current workload would leave both
+scenarios above the 628-minute ceiling.
 
 The most favorable scenario is 843.99 derived min at 0.629 s/path with run
 35456667007's held families, in which U10 is already recovered. Removing the
@@ -972,17 +1028,20 @@ The least favorable scenario is 1086.12 derived min at 0.886 s/path with run
 910.11 min, the 28.06 min U3 could reach leaves 882.05 min, and U7 with U8 net
 of the 1.77 min of derived F U3 already took from those two jobs leave an
 estimated 841.97 min, or +213.97 min against the ceiling. U5 and U6 recover no
-runner minutes at all.
+derived runner minutes in these stacks. U6's once-measured green run does
+not justify subtracting its lower observed total from either projection.
 
 So U3, U7, U8, and U10 taken at their estimated ceilings close a derived 30.7
 percent of the excess in the most favorable scenario and 53.3 percent in the
-least favorable one, roughly a third to a half, and leave 150 to 214 min before
-U4. Closing the most favorable scenario's residual through U4 alone would need k
-of about 1,154 distinct harness objects for each shard. That figure is a lower
-objects-per-path ratio than the local sample observed, so it is not excluded by
-the local evidence; it is also not supported by it, because no measurement
-establishes how k grows with shard size on macOS. Reachability therefore turns
-on a quantity this plan has not measured.
+least favorable one, roughly a third to a half, and leave 150 to 214 min that
+U4 cannot close. Closing the most favorable scenario's residual through U4
+alone would need k of about 1,154 distinct harness objects for each shard under
+the earlier 0.78 s per object model, or a derived 1,369 under the 0.656 s the
+measurement gives. The measurement excludes both: k is 96 to 128 for each shard
+at the current corpus, and the whole pinned upstream suite is bounded at 300
+distinct keys, so no corpus size puts k near either figure. Reachability no
+longer turns on this quantity; it turns on a lever this plan has not
+identified.
 
 Those subtractions are already generous in three ways. U3's ceiling is the whole
 of F, including the cleanup and reporting tails no cache can remove. U7 and U8
@@ -1001,10 +1060,11 @@ in a different category: running all shards of a smaller partition still
 executes the complete corpus, so its cost is longer jobs and timeout risk
 rather than omitted evidence.
 
-The explicit statement this projection owes its plan is therefore narrower than
-a verdict. No coverage-lossless projection here reaches 628 min on measured
-evidence, and the only lever that could close the remaining 150 to 214 min is
-U4 at an object count nothing has measured. Until that measurement exists, the
+The explicit statement this projection owes its plan is therefore narrower
+than a verdict. No coverage-lossless projection here reaches 628 min on
+measured evidence. The lever that was supposed to close the remaining 150 to
+214 min, U4, has now been measured and recovers a derived 12.2 min at the
+current workload on its most favorable assumptions, so the remaining
 alternatives are a lever this plan has not yet identified or a maintainer
 decision that the ceiling itself moves. This projection makes neither and does
 not claim the ceiling is reachable.

@@ -270,6 +270,17 @@ passes its unchanged budget in 41.36 measured case-minutes, leaving a derived
 *ci-36358067906.json.txt*; *macos-job-times.json.txt* retains the other macOS
 job timestamps and complete workload denominator.
 
+The macOS own-key assignment retains a deadline risk. Run 36243816479
+measured that case at 3,565,117 ms, leaving a derived 34.88-second margin
+against its configured 3,600-second extended deadline. The new macOS cohort
+places it with reflect-namespace and proxy-exotic-object at three file workers.
+Both branch observations passed, at measured case durations of 45.07 and
+33.27 minutes, but their derived 11.80-minute spread exceeds that historical
+margin. Those observations do not establish that this cohort preserves the
+margin under runner variance. This documentation-only integration retains the
+reviewed partition; a macOS singleton reservation remains a possible follow-up
+if the coordinator authorizes changing the implementation and validating it.
+
 The final evidence-only `mise run check` also passed in 64.98 observed seconds
 with the assigned Zig cache and `MISE_JOBS=1`; this is gate context, not a
 performance measurement.

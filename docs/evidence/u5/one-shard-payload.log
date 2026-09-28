@@ -1,0 +1,18 @@
+U5 one-shard Zig cache transfer payload
+=======================================
+
+A further cold run of mise run test:test262 --shard 1/10 against an
+emptied cache, taken only to size the payload a cross-job cache would
+move. Its wall time and entry count reproduce the series' cold arms.
+
+===== cold-3, whole-cache payload measurement (2026-09-28T03:56:36+09:00) load=12.46 16.29 17.02
+Finished in 627.64s
+TIME 627.68 wall 1563.55 user 1018.51 sys
+cache-bytes-kib 2529612
+8	/data/zig-cache/m5ci-zig-cache-share/b
+117148	/data/zig-cache/m5ci-zig-cache-share/h
+2370616	/data/zig-cache/m5ci-zig-cache-share/o
+0	/data/zig-cache/m5ci-zig-cache-share/tmp
+41840	/data/zig-cache/m5ci-zig-cache-share/z
+cache-o-entries 14637
+whole-cache tar | zstd -3 -T0 bytes: 292789226

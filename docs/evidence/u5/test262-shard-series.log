@@ -1,0 +1,48 @@
+U5 test262 shard cold/warm series
+=================================
+
+Host: Linux workstation, 16 CPUs, 61 GiB. Target linux-x86_64-gnu.
+Command per arm: mise run test:test262 --shard 1/10
+ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-zig-cache-share throughout.
+XDG_CACHE_HOME pointed at a probe directory so the runtime archive stayed
+warm (as the CI cache action leaves it) while the harness object directory
+was removed before every arm (as CI never restores one).
+A cold arm emptied the Zig cache directory first; a warm arm kept it.
+A competing gate ran on the host throughout; load averages are recorded.
+
+new-o-entries counts directories present after the arm but not before.
+cache-bytes-kib is du -sk of the whole cache directory.
+
+===== cold-1 (2026-09-28T03:12:51+09:00) load=12.97 11.27 8.49
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=618499.5ms pool=8 retries=0
+Finished in 628.85s
+TIME 628.91 wall 1562.29 user 1018.62 sys
+new-o-entries 14637
+cache-bytes-kib 2529612
+cache-o-entries 14637
+load-after=17.27 16.68 13.00
+===== warm-1 (2026-09-28T03:23:20+09:00) load=17.27 16.68 13.00
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=596771.78ms pool=8 retries=0
+Finished in 607.06s
+TIME 607.12 wall 1558.33 user 1009.19 sys
+new-o-entries 14606
+cache-bytes-kib 5003220
+cache-o-entries 29243
+load-after=15.86 17.58 15.62
+===== cold-2 (2026-09-28T03:33:31+09:00) load=15.55 17.49 15.60
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=617579.85ms pool=8 retries=0
+Finished in 628.41s
+TIME 628.46 wall 1585.13 user 1021.58 sys
+new-o-entries 14637
+cache-bytes-kib 2529612
+cache-o-entries 14637
+load-after=18.59 18.28 16.97
+===== warm-2 (2026-09-28T03:44:00+09:00) load=18.59 18.28 16.97
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2139/21383 pass=1831 expected-negative=162 unsupported=146 duration=607273.55ms pool=8 retries=0
+Finished in 618.02s
+TIME 618.08 wall 1573.17 user 1023.22 sys
+new-o-entries 14606
+cache-bytes-kib 5003220
+cache-o-entries 29243
+load-after=19.59 18.67 17.79
+SERIES DONE 2026-09-28T03:54:18+09:00

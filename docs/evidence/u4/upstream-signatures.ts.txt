@@ -1,0 +1,42 @@
+// Upstream signature scan. Counts the distinct (async, ordered includes)
+// signatures of the pinned upstream test262 suite, excluding intl402/,
+// staging/, fixture files, and the raw and module flags the runner cannot
+// split. Preserved verbatim from the U4 session. Run it from the repository
+// root, through standard input so that the workspace's test262 package
+// resolves; saturation.log gives the exact command. It writes nothing.
+import { readFile, readdir } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import { join, dirname } from "node:path";
+
+const pkg = fileURLToPath(import.meta.resolve("test262/package.json"));
+const root = join(dirname(pkg), "test");
+const entries = await readdir(root, { recursive: true });
+const sigs = new Map<string, number>();
+let files = 0, raw = 0, module_ = 0;
+for (const entry of entries) {
+  if (!entry.endsWith(".js")) continue;
+  if (entry.includes("_FIXTURE")) continue;
+  if (entry.startsWith("intl402/") || entry.startsWith("staging/")) continue;
+  const text = await readFile(join(root, entry), "utf8");
+  const meta = /\/\*---(?<body>[\s\S]*?)---\*\//u.exec(text)?.groups?.body ?? "";
+  files += 1;
+  const flags = /^flags:\s*\[(?<list>[^\]]*)\]/mu.exec(meta)?.groups?.list ?? "";
+  const flagSet = flags.split(",").map((f) => f.trim()).filter((f) => f !== "");
+  if (flagSet.includes("raw")) { raw += 1; continue; }
+  if (flagSet.includes("module")) { module_ += 1; continue; }
+  const inlineIncludes = /^includes:\s*\[(?<list>[^\]]*)\]/mu.exec(meta)?.groups?.list;
+  let includes: string[];
+  if (inlineIncludes != null) {
+    includes = inlineIncludes.split(",").map((f) => f.trim()).filter((f) => f !== "");
+  } else {
+    const block = /^includes:\s*\n(?<body>(?:\s*-\s*\S+\n)+)/mu.exec(meta)?.groups?.body;
+    includes = block == null ? [] : [...block.matchAll(/-\s*(\S+)/gu)].map((m) => m[1]!);
+  }
+  const async = flagSet.includes("async");
+  const sig = JSON.stringify([async, includes]);
+  sigs.set(sig, (sigs.get(sig) ?? 0) + 1);
+}
+console.log(`files=${files} raw=${raw} module=${module_} distinctSourceSignatures=${sigs.size}`);
+console.log(`variantCeiling(x4)=${sigs.size * 4}`);
+const top = [...sigs.entries()].toSorted((a, b) => b[1] - a[1]).slice(0, 5);
+for (const [sig, n] of top) console.log(`  ${n}\t${sig.slice(0, 90)}`);

@@ -1,0 +1,30 @@
+# Key-input churn over main's first-parent history. Counts how many steps
+# leave every input of the harness object key unchanged. Preserved verbatim
+# from the U4 session; it was run as 'keychurn2.sh 80' from a checkout whose
+# HEAD was e76e235b, which gives the 79 steps the baseline cites. The cd
+# target is the U4 worktree path.
+#!/bin/bash
+set -u
+cd /home/dahlia/orca/workspaces/oseo/m5ci-harness-object-cache
+PATHS=(
+  aube-lock.yaml
+  packages/compiler/src packages/compiler/package.json
+  packages/backend-c/src packages/backend-c/package.json
+  packages/parser-babel/src packages/parser-babel/package.json
+  packages/cli/src packages/cli/package.json
+  packages/unicode/src packages/unicode/package.json
+  packages/runtime-c
+  tests/test262/harness
+)
+zigpin() { git show "$1:mise.toml" 2>/dev/null | grep -E '^zig *=' || echo none; }
+mapfile -t COMMITS < <(git rev-list --first-parent -n "${1:-80}" HEAD)
+same=0; diff=0
+for ((i=0; i<${#COMMITS[@]}-1; i++)); do
+  a=${COMMITS[$((i+1))]}; b=${COMMITS[$i]}
+  if git diff --quiet "$a" "$b" -- "${PATHS[@]}" && [ "$(zigpin "$a")" = "$(zigpin "$b")" ]; then
+    same=$((same+1))
+  else
+    diff=$((diff+1))
+  fi
+done
+echo "steps=$((same+diff)) unchanged=$same changed=$diff"

@@ -1,0 +1,118 @@
+# GitHub Actions cache occupancy for dahlia/oseo.
+
+== 2026-09-27T21:49:32+09:00  the U4 session's original observation
+$ gh api "repos/dahlia/oseo/actions/cache/usage" 2>&1 | head -10
+$ echo "--- entries:"
+$ gh api "repos/dahlia/oseo/actions/caches?per_page=100" \
+    --jq '[.actions_caches[] | {key,size_in_bytes,ref}] | length as $n | "entries=\($n)"' 2>&1 | head -3
+$ gh api "repos/dahlia/oseo/actions/caches?per_page=10" \
+    --jq '.actions_caches[] | [.key, .size_in_bytes, .ref] | @tsv' 2>&1 | head -8
+{"full_name":"dahlia/oseo","active_caches_size_in_bytes":4058176690,"active_caches_count":69}
+--- entries:
+entries=69
+oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323	3257528	refs/heads/main
+mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554	306078528	refs/heads/main
+oseo-runtime-v1-af2ac21b0bc6ba10a2c3773124ccd7e4cff4dc0ab0c391a60a889ad0e8304030	3030367	refs/heads/main
+oseo-runtime-v1-79e390afc493ff87217a75503e0bce2249feda0a9ea5908e8a096559941fa1d9	3257536	refs/heads/main
+oseo-runtime-v1-3ae6151e49cf14b55f6995e57142a9406a9875247763d5cf04c5a8241f465178	3015731	refs/heads/main
+mise-v1-macos-arm64-macos26-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554	306192714	refs/heads/main
+oseo-runtime-v1-09fba11142eea12212931153b91caabd1fba970602e2bb8081dfa52048e47b43	3015347	refs/heads/main
+mise-v1-windows-x64-win25-vs2026-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554	425040719	refs/heads/main
+
+# The timestamp is that tool call's own, converted to +09:00. The usage totals,
+# 4,058,176,690 active bytes in 69 entries, are fully preserved here. The entry
+# listing is the first 8 rows of the unordered 69, which is why the baseline
+# first described only three visible mise tool caches and stated a count of
+# four from that truncated view. The complete listing below replaces it.
+
+== 2026-09-28T02:01+09:00  complete listing, same usage totals
+$ gh api repos/dahlia/oseo/actions/cache/usage
+{"full_name":"dahlia/oseo","active_caches_size_in_bytes":4058176690,"active_caches_count":69}
+
+# Byte-for-byte the same usage as the observation above, so the composition
+# below describes the same cache state rather than a later one.
+
+$ gh api "repos/dahlia/oseo/actions/caches?per_page=100" \
+    --jq '.actions_caches[] | [.key, .size_in_bytes, .ref] | @tsv' > caches.tsv
+$ awk -F'\t' '{n=$1; sub(/-v1-.*/,"",n); c[n]++; s[n]+=$2;
+    if ($2>mx[n]) mx[n]=$2; if (mn[n]==0 || $2<mn[n]) mn[n]=$2}
+  END {for (k in c) printf "%-16s count=%d totalBytes=%d minBytes=%d maxBytes=%d\n",
+    k, c[k], s[k], mn[k], mx[k]}' caches.tsv
+oseo-runtime     count=57 totalBytes=173389648 minBytes=2857730 maxBytes=3257537
+mise             count=12 totalBytes=3884787042 minBytes=296738356 maxBytes=425040719
+
+# Twelve mise tool caches hold 3,884,787,042 of the 4,058,176,690 active bytes,
+# 296.7 to 425.0 MB each; the other 57 entries are oseo-runtime archives of
+# 2.86 to 3.26 MB. Every entry's ref is refs/heads/main. The complete listing
+# follows, sorted by descending size.
+
+$ sort -t'\t' -k2,2nr caches.tsv
+mise-v1-windows-x64-win25-vs2026-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554	425040719	refs/heads/main
+mise-v1-windows-x64-win25-vs2026-4e8ddf04d4f4dc31585e49d07c1044acdb309352a7ce9964729b2d0aa8961634	346161303	refs/heads/main
+mise-v1-linux-x64-ubuntu24-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554	330841862	refs/heads/main
+mise-v1-linux-x64-ubuntu24-4e8ddf04d4f4dc31585e49d07c1044acdb309352a7ce9964729b2d0aa8961634	327799145	refs/heads/main
+mise-v1-windows-x64-win25-vs2026-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433	325643126	refs/heads/main
+mise-v1-linux-x64-ubuntu24-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433	322755746	refs/heads/main
+mise-v1-macos-arm64-macos26-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554	306192714	refs/heads/main
+mise-v1-macos-arm64-macos15-6f4f665e24fdacc56d54ac165ec20132d88530c39ec5d42e5ee32b174ef2b554	306078528	refs/heads/main
+mise-v1-macos-arm64-macos26-4e8ddf04d4f4dc31585e49d07c1044acdb309352a7ce9964729b2d0aa8961634	300391371	refs/heads/main
+mise-v1-macos-arm64-macos15-4e8ddf04d4f4dc31585e49d07c1044acdb309352a7ce9964729b2d0aa8961634	300367891	refs/heads/main
+mise-v1-macos-arm64-macos26-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433	296776281	refs/heads/main
+mise-v1-macos-arm64-macos15-171e7b07c2b4bdcb91e653a7fec65e8f066f986ce8efc672024ff3f8f0258433	296738356	refs/heads/main
+oseo-runtime-v1-649f1c288bed318d59599947a92a924ebc91216005257ea299c08e8e40bf3b37	3257537	refs/heads/main
+oseo-runtime-v1-79e390afc493ff87217a75503e0bce2249feda0a9ea5908e8a096559941fa1d9	3257536	refs/heads/main
+oseo-runtime-v1-e55baecf32a5c3034bdb3176779c29fb5585e693885b0bd109a0c848a16b6168	3257536	refs/heads/main
+oseo-runtime-v1-228c12a8659e22b6c4fcbeeef6fde93e3fd421f888b76eb7133ae53b91209323	3257528	refs/heads/main
+oseo-runtime-v1-ee9ff17b22f2e218acb6f40a612a3f912a417575840b9084aad49fcaade05a2e	3257528	refs/heads/main
+oseo-runtime-v1-323266584e31bb45f63d84190c8db8512ccee9770f473e7d73aecb0c086c1abb	3257524	refs/heads/main
+oseo-runtime-v1-3ca9d9f1984a893c4849dfbefdd83f7b10fd340b4807680f539c2b91e96fe49d	3253768	refs/heads/main
+oseo-runtime-v1-7848f2aeedaa7e36cd7409362ac46332bf983a35259ef174285276dd502357ae	3253765	refs/heads/main
+oseo-runtime-v1-eae38a543a6b73e2f8a2ea967f59581e91ca5930e2f797f3bf965ae43cafca0a	3243802	refs/heads/main
+oseo-runtime-v1-6f1dc785a4be3aac08ea22f55e47b90d1f09398708e16a90a9c0d3917ad3cda5	3243799	refs/heads/main
+oseo-runtime-v1-3b059b4e1ab32f0d32e9bfff765345d6714cb9a20f21fa5ea2e660fa22cb2b55	3135489	refs/heads/main
+oseo-runtime-v1-b39abc8fd27515f0183838421407172d0785a46fa02ebdfe3ae8a055403872a7	3135484	refs/heads/main
+oseo-runtime-v1-950e13bbcdce45e846c7143b190c62bdd70808c94f171f83ff65f98932a94b59	3128861	refs/heads/main
+oseo-runtime-v1-336529469b4dc83aeaa3551ec5f0cf06ad868bb8a01a7dbea6232b919a0c67a7	3128859	refs/heads/main
+oseo-runtime-v1-884b830f5eabe7e5d36d1cba9b910b588b6740fd6bf8966d2b9415cc116b7830	3127192	refs/heads/main
+oseo-runtime-v1-ccfbbed1ead1cc14bb92c3cc43c8ca774025864ea8a1e5f47b3b21c40b4ab25c	3127191	refs/heads/main
+oseo-runtime-v1-5e0504253274deea65b59efe20b5fa965772704c458f69789f855a19a461bd70	3121560	refs/heads/main
+oseo-runtime-v1-364f781d1c72cf19e74bddc574104113f4cd9bac7172b13794cf5cb3d1eec7bc	3121558	refs/heads/main
+oseo-runtime-v1-fd22fe59e6bdd50296fd259d06447c6473eae5fd95c30e33aca6b7d37f6b9be5	3096839	refs/heads/main
+oseo-runtime-v1-aa687f03d60939fd00c8685b2860d9d68f4613f435248f58db5af9f89b40307f	3096831	refs/heads/main
+oseo-runtime-v1-4e0618d8dd41e39c508d0508f17f56b913fa24d17bd4bc8fc7b7312edb91b8c4	3083703	refs/heads/main
+oseo-runtime-v1-23b0ee89a5bcf9b4a916a6e5b18d5b4e1883804b455932a7c830b23cb4c4efce	3083697	refs/heads/main
+oseo-runtime-v1-af2ac21b0bc6ba10a2c3773124ccd7e4cff4dc0ab0c391a60a889ad0e8304030	3030367	refs/heads/main
+oseo-runtime-v1-3fdf51464bf44a6e432478de0abe519242e0d614ab39a3fc3b392a64397b3eb0	3030333	refs/heads/main
+oseo-runtime-v1-4be145a6454282cf52f493cb902e3fdd7c56082ea6c996d66094e67ce8078940	3028310	refs/heads/main
+oseo-runtime-v1-d8a5cf4eff7485bbe98e0f57b89359e5818d327a8e992ffef9b800cc04fba2c1	3025829	refs/heads/main
+oseo-runtime-v1-bd870da847166015792ca191573af26bc2d6bfc5591da618010f80165a6746f5	3022483	refs/heads/main
+oseo-runtime-v1-52bdff6aba90a230be0bb02af0b453f625704821f10fbd76d26e87805b0615c3	3016030	refs/heads/main
+oseo-runtime-v1-2360a7925e358908e83d3efc5323ee37853b1187d669f976858004021ebf40ba	3015743	refs/heads/main
+oseo-runtime-v1-3ae6151e49cf14b55f6995e57142a9406a9875247763d5cf04c5a8241f465178	3015731	refs/heads/main
+oseo-runtime-v1-601783fb6dcd2223cdc894043edeaae7cbaa237b5cb91d6f74809df837167065	3015728	refs/heads/main
+oseo-runtime-v1-05e39241ff3c0b12fab79f70d16d6efd71a8eb8cbc37391d50fd5a9078e6d4bb	3015721	refs/heads/main
+oseo-runtime-v1-1929e4f53b1c9d1579e529a6236fbf255c19f33ed17d66bc02c281ebf1d548c9	3015352	refs/heads/main
+oseo-runtime-v1-de9116aa43d5eb18c9085281e3dba3e1442481ca2bfaa94c5f41967a87ac7b9e	3015349	refs/heads/main
+oseo-runtime-v1-09fba11142eea12212931153b91caabd1fba970602e2bb8081dfa52048e47b43	3015347	refs/heads/main
+oseo-runtime-v1-d08e3df7281f4c84bc8617947b498c5c1037c316c9ad3f79099fa89043d4b303	3015345	refs/heads/main
+oseo-runtime-v1-dc3349f0cc5bf90b311f73d10c94dd4ba15da38f6d2aad531d7f6655b994759b	3015340	refs/heads/main
+oseo-runtime-v1-34c810416be7bd7101004c59d25ba7cd9bca9265d4a06b952430081e0b22f1a6	3014412	refs/heads/main
+oseo-runtime-v1-d2bb379123059417995408c230ad409b3195b129e6eb5f0e3f0ca1c5f397118c	3009890	refs/heads/main
+oseo-runtime-v1-000b22d49c3896633bf692bded1e975fc6b5cc7d9ba7276f856743684c10147e	2930879	refs/heads/main
+oseo-runtime-v1-52ce42471872ba22afc8f566b16f437bf6aa0d942aec55e6541ee0a952e511d4	2928126	refs/heads/main
+oseo-runtime-v1-36375aa6ab954cef3593f921200b25b090150c292dfadeec69154f5bef76c620	2922144	refs/heads/main
+oseo-runtime-v1-8a03abaeb7c799f68051c3522ecc464a8e996843337b51c16681660d043c1769	2913650	refs/heads/main
+oseo-runtime-v1-bea737871514e5fca7f5ddc25ab262a1a8406157ad719a698c6f74aa86d9dfa2	2912884	refs/heads/main
+oseo-runtime-v1-2c229d465b75475957bf597ce412cffd40b8b4d5127f9b404d155cceb70745ee	2912188	refs/heads/main
+oseo-runtime-v1-c38612c1be52396befb1c9c6ba1f42e0f1f0ef2ee299ed971be81714881c83ed	2905876	refs/heads/main
+oseo-runtime-v1-a2cb520b0a31c5dbd362fc2be75902711483819a0d2ebdfdff1b2287cf9eedf6	2904799	refs/heads/main
+oseo-runtime-v1-0a9611b6931b14851eedba83916eba4e46b9ae44baae4d8043214b5f47730b47	2899867	refs/heads/main
+oseo-runtime-v1-783d2c03e2f608464c2fdfc2e0c223d7119bb9562f570f279f2d51900b9807dc	2894963	refs/heads/main
+oseo-runtime-v1-20199824bd87c09eb849692bf279984eb92ed11b3bcfd6de8ce0b002c3fe402b	2894643	refs/heads/main
+oseo-runtime-v1-f62b90ab6541efeaeb38a24450af6ee1b8af74dc8dc0ede35c5278f8bd6136de	2892496	refs/heads/main
+oseo-runtime-v1-c0987c4030c1ec9857f586d999e74e75cbd555fd61c3d7be0743e8726847b3b2	2887903	refs/heads/main
+oseo-runtime-v1-3258950e23d018b553d6c01ef3afbff6eefbec9f920427ecec685bb00cccbc8e	2878918	refs/heads/main
+oseo-runtime-v1-f46d5bc6a6c02261a2206f4866805f3552a87d7ac2857da943f4e247fa18c4be	2874413	refs/heads/main
+oseo-runtime-v1-c3287689ba3352d463f26e97f6b7b09538b195ccf87c16baa7bf13e6d645c884	2868961	refs/heads/main
+oseo-runtime-v1-d4e3d1d6efb8c083e77bfff6ab77a67e11f1606034a45f1e10d178919802a4eb	2864311	refs/heads/main
+oseo-runtime-v1-fda8bed995075f1f480f0b147b85a015e0a135f9280fe364c5320e856f6872e9	2857730	refs/heads/main
