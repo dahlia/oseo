@@ -993,11 +993,23 @@ carry at 41,091 paths. The band is measured on a Linux host restricted to
 three and four cores, not on a GitHub macOS runner. No CI run has been
 measured with the change: the one branch run so far was cancelled by the
 coordinator for review findings, before any test262 job executed. U13 recovers
-runner
-minutes without touching reviewed paths, variants, targets, sanitizer flags,
-budgets, or verdicts. Its measurements and their sources are in
+runner minutes without touching reviewed paths, variants, targets, sanitizer
+flags, budgets, or verdicts. Its measurements and their sources are in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and
 [U13 evidence](./docs/evidence/u13/README.md).
+
+One limitation surfaced while reviewing U13 and is recorded here rather than
+fixed by it, because it predates the unit and belongs to the runtime-archive
+key. The key an adapter derives hashes the toolchain's identity output, which
+for Zig is `zig env`: a version string and a set of paths. It does not hash
+the contents of the library tree that identity points at. An in-place edit to
+a file beneath that directory, a rewritten header or a replaced nested file,
+therefore changes what a build compiles against without changing the key, on
+the per-execution path and the prepared path alike. U13's pinned toolchain
+matches that guarantee and adds an executable fingerprint on top of it; it
+does not close the gap. Closing it means hashing the library tree, or
+recording a stronger toolchain identity, and belongs to whichever unit owns
+the archive key rather than to this one.
 
 Shard sizing, U6. Raising the test262 or native support shard total leaves the
 executed work unchanged, so it recovers no runner minutes and adds a derived

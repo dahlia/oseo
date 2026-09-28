@@ -823,6 +823,30 @@ function requirePreparedNativeRuntime(
  * Preparation raises rather than reporting a diagnostic. A host that refuses
  * to run the probe raises its own error, and a probe that completes without a
  * usable identity raises `The native toolchain identity is unavailable.`
+ *
+ * What is checked, and when. At preparation the identity is taken twice,
+ * through the search path and then through the resolved executable, and the
+ * two must name the same executable and the same watched paths with no
+ * fingerprint change between them. At every later use `runNativeUnits`
+ * compares the execution's compiler host, toolchain, target, captured
+ * environment snapshot, runtime ABI version and runtime asset set against the
+ * recorded ones, and re-fingerprints the watched paths.
+ *
+ * It does not probe the identity again. A search path that later resolves to
+ * a different installation therefore does not change what this value builds
+ * with: the pinned executable keeps being used, which is what pinning is for,
+ * while an unprepared execution would pick up the new one. In the other
+ * direction the fingerprints catch a rewrite of the pinned executable, or of
+ * a watched path, that unchanged identity output alone would miss.
+ *
+ * Runtime bytes come only from the snapshot this value holds, so a runtime
+ * file edited after preparation is neither read nor compiled.
+ *
+ * One limitation is shared with the per-execution path rather than introduced
+ * here. A watched directory is fingerprinted as a directory, and the archive
+ * key an adapter derives hashes the toolchain's identity output rather than
+ * its library tree, so an in-place edit to a file beneath that directory
+ * which leaves the identity output unchanged is observed by neither path.
  */
 export async function prepareNativeRuntime(
   host: CompilerHost,

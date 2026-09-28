@@ -1905,6 +1905,26 @@ each of its three checkpoints. A toolchain that cannot name its executable, or
 a host that cannot fingerprint files, refuses to prepare rather than reusing an
 unpinned identity.
 
+What a prepared runtime checks, and when, is worth separating. At preparation
+the identity is taken twice and bracketed by fingerprints, as above. At every
+later use `runNativeUnits` compares the execution's compiler host, toolchain,
+target, captured environment snapshot, runtime ABI version and runtime asset
+set against the recorded ones, and re-fingerprints the watched paths; it does
+not probe the identity again. A search path that later resolves to a different
+installation therefore does not change what a prepared runtime builds with,
+because the pinned executable keeps being used, while an unprepared execution
+would pick up the new one. In the other direction the fingerprints catch a
+rewrite of the pinned executable that unchanged identity output alone would
+miss.
+
+One limitation is shared with the per-execution path rather than introduced
+here. A watched library directory is fingerprinted as a directory, and the
+archive key hashes the toolchain's identity output rather than its library
+tree, so an in-place edit to a file beneath that directory which leaves
+`zig env` output unchanged is observed by neither path. That belongs to the
+runtime-archive key itself and predates this unit;
+[*PLAN-GATE.md*](../PLAN-GATE.md) records it as a candidate follow-up.
+
 Each recheck is one `realpath` and one `stat` per watched path, with no
 process start. The inode change time the comparison
 includes comes out of that same stat, so it costs no extra call. Measured on
