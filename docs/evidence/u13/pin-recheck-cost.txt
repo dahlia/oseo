@@ -1,18 +1,19 @@
 # U13: cost of a prepared runtime's pinned-toolchain rechecks.
 #
 # A prepared runtime rechecks its pinned paths after validation, after the
-# archive cache lock is acquired, before the compiler runs, and before an
-# archive is published, so one native execution rechecks up to four times.
+# archive cache lock is acquired, before the compiler runs, and once the
+# build has finished, so one native execution rechecks up to four times.
 # Each recheck is one describeFile per watched path: a realpath plus a stat,
-# no process start. This measures the whole recheck load of one reviewed
-# shard 1/100 run, 730 executions against the two paths the Zig identity
-# reports, on the host in host.log.
+# no process start. The inode change time the fingerprint compares comes out
+# of that same stat, so it adds no call. This measures the whole recheck load
+# of one reviewed shard 1/100 run, 730 executions against the two paths the
+# Zig identity reports, on the host in host.log.
 #
 # $ cp docs/evidence/u13/pin-recheck-cost.mjs.txt /tmp/u13/pin-recheck-cost.mjs
 # $ node /tmp/u13/pin-recheck-cost.mjs \
 #     "$(zig env | sed -n 's/.*\.zig_exe = "\(.*\)".*/\1/p')" \
 #     "$(zig env | sed -n 's/.*\.lib_dir = "\(.*\)".*/\1/p')"
 
-round 1: 730 executions x 4 rechecks of 2 paths in 63.4 ms, 0.087 ms per execution
-round 2: 730 executions x 4 rechecks of 2 paths in 65.4 ms, 0.090 ms per execution
-round 3: 730 executions x 4 rechecks of 2 paths in 61.6 ms, 0.084 ms per execution
+round 1: 730 executions x 4 rechecks of 2 paths in 59.8 ms, 0.082 ms per execution
+round 2: 730 executions x 4 rechecks of 2 paths in 63.7 ms, 0.087 ms per execution
+round 3: 730 executions x 4 rechecks of 2 paths in 64.2 ms, 0.088 ms per execution

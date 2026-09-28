@@ -132,6 +132,14 @@ export interface PinnedToolchain {
  * the fingerprint describes.
  */
 export interface FileFingerprint {
+  /**
+   * Inode change time. It moves on an in-place rewrite even when the writer
+   * restores the size and the modification time, which the other fields
+   * would then miss. A host that cannot report it leaves it absent, and a
+   * caller that depends on detecting such a rewrite must refuse that host
+   * rather than compare the remaining fields.
+   */
+  readonly changedAtMilliseconds?: number;
   readonly device: number;
   readonly inode: number;
   readonly modifiedAtMilliseconds: number;

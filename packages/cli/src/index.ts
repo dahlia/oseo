@@ -929,6 +929,12 @@ export async function prepareNativeRuntime(
     );
   }
   const before = await fingerprintPaths(searched.watchedPaths);
+  if (before.some((entry) => entry.fingerprint.changedAtMilliseconds == null)) {
+    throw new Error(
+      "The compiler host does not report inode change times, so an " +
+        "in-place compiler rewrite could not be detected.",
+    );
+  }
   const compilerPin = before.find(
     (entry) => entry.path === searched.compilerPath,
   );
@@ -945,6 +951,10 @@ export async function prepareNativeRuntime(
   if (
     pinned == null ||
     pinned.compilerPath !== searched.compilerPath ||
+    pinned.watchedPaths.length !== searched.watchedPaths.length ||
+    pinned.watchedPaths.some(
+      (path, index) => searched.watchedPaths[index] !== path,
+    ) ||
     !samePinnedFiles(before, pinnedFiles)
   ) {
     throw new Error(
@@ -995,6 +1005,8 @@ function samePinnedFiles(
       return (
         other != null &&
         other.path === entry.path &&
+        other.fingerprint.changedAtMilliseconds ===
+          entry.fingerprint.changedAtMilliseconds &&
         other.fingerprint.device === entry.fingerprint.device &&
         other.fingerprint.inode === entry.fingerprint.inode &&
         other.fingerprint.modifiedAtMilliseconds ===

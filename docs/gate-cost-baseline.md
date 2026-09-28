@@ -1878,30 +1878,40 @@ different key. Second, the compiler is pinned. `prepareNativeRuntime` asks the
 toolchain which executable its identity output describes, resolves that path to
 its real location, fingerprints every watched path, repeats the identity probe
 through the resolved executable, and fingerprints again, accepting the
-preparation only when the repeat agrees and nothing moved around it; a single
-probe would otherwise leave a window in which a replacement pairs a new
-compiler with an old identity. Every build of that preparation then invokes the
-resolved path rather than a search-path name, and the fingerprints are
-rechecked after validation, after the archive cache lock is acquired,
-immediately before the compiler runs, and once the build has finished, before
-any artifact it produced is executed or published. The harness object build
-uses the same pinned path and the same checkpoints. A mismatch raises and is
-propagated rather than falling back to a build without archive reuse, so a
-compiler replaced in place, or a reported path repointed at a different file,
-cannot build, run, or publish under the previous compiler's key. Tests cover a
-replaced, a relinked, and a removed compiler, one swapped inside the confirming
-probe, one swapped during the lock wait, and one swapped during the build with
-an archive published, with an archive already cached, and with archive reuse
-disabled, plus an uncached harness object whose pin fails at each of its three
-checkpoints. A toolchain that cannot name its
-executable, or a host that cannot fingerprint files, refuses to prepare rather
-than reusing an unpinned identity.
+preparation only when the repeat names the same executable and the same
+watched paths and nothing moved around it; a single probe would otherwise
+leave a window in which a replacement pairs a new compiler with an old
+identity, and accepting a repeat that watched different paths would record an
+identity describing a directory nothing rechecks. The fingerprint compares the
+inode change time as well as the device, inode, size, modification time, and
+resolved path, so an in-place rewrite that restores the size and the
+modification time is still caught; a host that cannot report a change time
+refuses to prepare rather than comparing the weaker set. Every build of that
+preparation then invokes the resolved path rather than a search-path name, and
+the fingerprints are rechecked after validation, after the archive cache lock
+is acquired, immediately before the compiler runs, and once the build has
+finished, before any artifact it produced is executed or published. The harness
+object build uses the same pinned path and the same checkpoints. A mismatch
+raises and is propagated rather than falling back to a build without archive
+reuse, so a compiler replaced in place, or a reported path repointed at a
+different file, cannot build, run, or publish under the previous compiler's
+key. Tests cover a replaced, a relinked, and a removed compiler, one rewritten
+in place with its size and modification time preserved, a confirming probe that
+names different watched paths, a host that reports no change time, one swapped
+inside the confirming probe, one swapped during the lock wait, and one swapped
+during the build with an archive published, with an archive already cached, and
+with archive reuse disabled, plus an uncached harness object whose pin fails at
+each of its three checkpoints. A toolchain that cannot name its executable, or
+a host that cannot fingerprint files, refuses to prepare rather than reusing an
+unpinned identity.
 
 Each recheck is one `realpath` and one `stat` per watched path, with no
-process start. Measured on the same host, four rechecks of the two paths the
-Zig identity reports cost 61.6 to 65.4 ms for a whole 730-execution shard, a
-measured 0.084 to 0.090 ms per execution, against the per-execution saving
-below. Its cost is a derived 0.5 percent of that saving. The figures are in
+process start. The inode change time the comparison
+includes comes out of that same stat, so it costs no extra call. Measured on
+the same host, four rechecks of the two paths the Zig identity reports cost
+59.8 to 64.2 ms for a whole 730-execution shard, a measured 0.082 to
+0.088 ms per execution, against the per-execution saving below. Its cost is a
+derived 0.5 to 0.6 percent of that saving. The figures are in
 [*evidence/u13/pin-recheck-cost.txt*](./evidence/u13/pin-recheck-cost.txt).
 
 A prepared runtime also records the host, toolchain, target, environment
@@ -1939,31 +1949,31 @@ caches. Per-run values are in
 
 | CPUs | Cache | Measured before s | Measured after s | Derived change | Derived tree CPU change |
 | ---- | ----- | ----------------- | ---------------- | -------------- | ----------------------- |
-| 3    | warm  | 57.06             | 44.36            | -22.2%         | -16.0%                  |
-| 3    | cold  | 68.71             | 55.78            | -18.8%         | -13.2%                  |
-| 4    | warm  | 47.55             | 35.04            | -26.3%         | -15.4%                  |
-| 4    | cold  | 56.64             | 44.67            | -21.1%         | -12.7%                  |
+| 3    | warm  | 57.13             | 44.40            | -22.3%         | -16.0%                  |
+| 3    | cold  | 68.58             | 56.39            | -17.8%         | -12.1%                  |
+| 4    | warm  | 47.80             | 35.23            | -26.3%         | -15.6%                  |
+| 4    | cold  | 56.33             | 44.77            | -20.5%         | -12.4%                  |
 
-The host's one-minute load stayed between 1.7 and 5.1 across the session, and
-the widest spread inside any arm is a derived 0.94 s, far under the effect.
+The host's one-minute load stayed between 1.3 and 5.6 across the session, and
+the widest spread inside any arm is a derived 1.28 s, far under the effect.
 Pairing each run against the run of the other arm at the same core count,
-cache state, and repetition gives derived means of 18.8 and 21.1 percent cold
-and 22.2 and 26.3 percent warm at three and four cores, and all twelve pairs
-are reductions, from a derived 17.9 to 27.1 percent. Host drift is reduced but
+cache state, and repetition gives derived means of 17.8 and 20.5 percent cold
+and 22.3 and 26.3 percent warm at three and four cores, and all twelve pairs
+are reductions, from a derived 16.9 to 26.9 percent. Host drift is reduced but
 not controlled, because the two runs of a pair are minutes apart rather than
 adjacent.
 
-The saving is a derived 16.4 to 17.7 ms of wall time per native execution
+The saving is a derived 15.8 to 17.4 ms of wall time per native execution
 across the four arms, each arm's measured difference divided by its 730
 executions, against the Phase A measurement of 26.60 ms of removable elapsed
 work per execution. It exceeds the Phase A estimate of 12.4 to 12.8 percent
 because that estimate assumed only the CPU floor moved, while the runner
 process's single thread was also releasing the pool earlier.
 
-Applying the measured 18.8 to 26.3 percent band to the measured macOS
-execution-step sums of 16,159 to 18,935 s at 21,383 paths estimates 3,038 to
-4,980 s, a derived 50.6 to 83.0 min per run. At 41,091 paths the same per-path
-rate estimates a derived 97.3 to 159.5 min. Those are estimates: the band was
+Applying the measured 17.8 to 26.3 percent band to the measured macOS
+execution-step sums of 16,159 to 18,935 s at 21,383 paths estimates 2,876 to
+4,980 s, a derived 47.9 to 83.0 min per run. At 41,091 paths the same per-path
+rate estimates a derived 92.1 to 159.5 min. Those are estimates: the band was
 measured on a Linux host restricted to three and four cores, not on a GitHub
 macOS runner. The one branch CI run so far, 36451319573 on `f483a129`, was
 cancelled by the coordinator about three minutes in, after a review of that

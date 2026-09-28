@@ -99,6 +99,7 @@ interface DenoRuntime {
   rename(oldPath: string, newPath: string): Promise<void>;
   realPath(path: string): Promise<string>;
   stat(path: string): Promise<{
+    readonly ctime?: Date | null;
     readonly dev?: number | null;
     readonly ino?: number | null;
     readonly isFile: boolean;
@@ -1047,13 +1048,15 @@ export function createNodeHost(): CompilerHost {
           realpath(path),
           stat(path),
         ]);
-        return {
+        const fingerprint: FileFingerprint = {
           device: Number(status.dev),
           inode: Number(status.ino),
           modifiedAtMilliseconds: status.mtimeMs,
           realPath: resolved,
           size: Number(status.size),
         };
+        if (status.ctimeMs == null) return fingerprint;
+        return { ...fingerprint, changedAtMilliseconds: status.ctimeMs };
       } catch {
         return undefined;
       }
@@ -1150,13 +1153,16 @@ export function createDenoHost(): CompilerHost {
           runtime.realPath(path),
           runtime.stat(path),
         ]);
-        return {
+        const fingerprint: FileFingerprint = {
           device: status.dev ?? 0,
           inode: status.ino ?? 0,
           modifiedAtMilliseconds: status.mtime?.getTime() ?? 0,
           realPath: resolved,
           size: status.size,
         };
+        const changedAt = status.ctime?.getTime();
+        if (changedAt == null) return fingerprint;
+        return { ...fingerprint, changedAtMilliseconds: changedAt };
       } catch {
         return undefined;
       }

@@ -13,6 +13,7 @@ const rechecksPerExecution = 4;
 async function describe(path) {
   const [resolved, status] = await Promise.all([realpath(path), stat(path)]);
   return {
+    changedAtMilliseconds: status.ctimeMs,
     device: Number(status.dev),
     inode: Number(status.ino),
     modifiedAtMilliseconds: status.mtimeMs,

@@ -977,14 +977,14 @@ when the execution's host, toolchain, target, runtime provider, or environment
 snapshot differs, and which pins the compiler the recorded identity describes
 so that a replaced or repointed executable cannot build under the previous
 one's key. The measured before-and-after on the same shard, with the two arms
-alternating by batch inside one session, is a 22.2 percent warm and 18.8
-percent cold reduction with three cores, and 26.3 and 21.1 percent with four,
-at 12.7 to 16.0 percent less tree CPU; all twelve position-paired comparisons
-are reductions. Applying that 18.8 to 26.3 percent band to the measured macOS
-execution-step sums estimates a derived 50.6 to 83.0 min per run at 21,383
-paths and 97.3 to 159.5 min at 41,091. The 41,091-path figure is the one to
+alternating by batch inside one session, is a 22.3 percent warm and 17.8
+percent cold reduction with three cores, and 26.3 and 20.5 percent with four,
+at 12.1 to 16.0 percent less tree CPU; all twelve position-paired comparisons
+are reductions. Applying that 17.8 to 26.3 percent band to the measured macOS
+execution-step sums estimates a derived 47.9 to 83.0 min per run at 21,383
+paths and 92.1 to 159.5 min at 41,091. The 41,091-path figure is the one to
 set against the derived gaps of +215.99 and +458.12 min, which are themselves
-stated at 41,091 paths: it is a derived 45 to 74 percent of the smallest and 21
+stated at 41,091 paths: it is a derived 43 to 74 percent of the smallest and 20
 to 35 percent of the largest, so U13 narrows the gap materially without
 closing it. That comparison applies the measured
 fraction to a projection of the measured macOS execution-step sums rather than

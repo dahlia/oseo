@@ -1479,6 +1479,7 @@ function preparedRuntimeFixture(assetText: string, cached = false) {
     [
       compilerPath,
       {
+        changedAtMilliseconds: 900,
         device: 2049,
         inode: 101,
         modifiedAtMilliseconds: 1000,
@@ -1489,6 +1490,7 @@ function preparedRuntimeFixture(assetText: string, cached = false) {
     [
       libraryPath,
       {
+        changedAtMilliseconds: 1900,
         device: 2049,
         inode: 102,
         modifiedAtMilliseconds: 2000,
@@ -1504,6 +1506,7 @@ function preparedRuntimeFixture(assetText: string, cached = false) {
   const plans: NativeBuildInput[] = [];
   interface FixtureHooks {
     identityProbes: number;
+    identityStdout?: string;
     publications: number;
     onAcquireLock?: () => void;
     onBuildRequest?: () => void;
@@ -1544,7 +1547,11 @@ function preparedRuntimeFixture(assetText: string, cached = false) {
       }
       hooks.identityProbes += 1;
       hooks.onIdentityProbe?.(hooks.identityProbes);
-      return { exitStatus: 0, stderr: "", stdout: "zig_exe=/opt/zig/zig\n" };
+      return {
+        exitStatus: 0,
+        stderr: "",
+        stdout: hooks.identityStdout ?? "zig_exe=/opt/zig/zig\n",
+      };
     },
     writeTextFile: async (path, source) => {
       writes.set(path, source);
@@ -1559,9 +1566,12 @@ function preparedRuntimeFixture(assetText: string, cached = false) {
         cwd: workingDirectory,
         environment,
       }),
-      pinToolchain: () => ({
+      pinToolchain: (identity) => ({
         compilerPath,
-        watchedPaths: [compilerPath, libraryPath],
+        watchedPaths: [
+          compilerPath,
+          identity.includes("relocated") ? "/opt/zig/other-lib" : libraryPath,
+        ],
       }),
       createKey: async (input) =>
         [
@@ -1610,6 +1620,9 @@ function preparedRuntimeFixture(assetText: string, cached = false) {
     },
     set onIdentityProbe(hook: (probes: number) => void) {
       hooks.onIdentityProbe = hook;
+    },
+    set identityStdout(stdout: string) {
+      hooks.identityStdout = stdout;
     },
     get identityProbes() {
       return hooks.identityProbes;
@@ -2060,5 +2073,85 @@ test(pinMoveTitle, async () => {
       ["zig", "env"],
       ["/opt/zig/zig-0.16.0", "env"],
     ],
+  );
+});
+
+const relocatedTitle =
+  "preparing refuses a confirming probe that watches other paths";
+test(relocatedTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  // The confirming probe names the same executable but a different library
+  // directory. Keeping the first probe's fingerprints would leave the
+  // recorded key describing a directory nothing ever rechecks.
+  fixture.onIdentityProbe = (probes) => {
+    if (probes === 2) fixture.identityStdout = "zig_exe=/opt/zig/zig relocated";
+  };
+  await assert.rejects(
+    async () =>
+      await prepareNativeRuntime(
+        fixture.host,
+        fixture.toolchain,
+        describeTarget("linux-x86_64-gnu"),
+      ),
+    /changed while it was being pinned/u,
+  );
+});
+
+const inPlaceTitle =
+  "a prepared native runtime refuses a rewrite that keeps size and time";
+test(inPlaceTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  const prepared = await prepareNativeRuntime(
+    fixture.host,
+    fixture.toolchain,
+    describeTarget("linux-x86_64-gnu"),
+  );
+  const before = fixture.fingerprints.get("/opt/zig/zig");
+  assert.ok(before != null);
+  // Only the inode change time moves, which is what an in-place rewrite that
+  // restores the size and the modification time leaves behind.
+  fixture.fingerprints.set("/opt/zig/zig", {
+    changedAtMilliseconds: (before.changedAtMilliseconds ?? 0) + 1,
+    device: before.device,
+    inode: before.inode,
+    modifiedAtMilliseconds: before.modifiedAtMilliseconds,
+    realPath: before.realPath,
+    size: before.size,
+  });
+  let mismatch: PreparedNativeRuntimeMismatchError | undefined;
+  try {
+    await runNativeUnits(
+      preparedRuntimeUnits,
+      "original.js",
+      fixture.host,
+      fixture.toolchain,
+      "enabled",
+      prepared,
+    );
+  } catch (error) {
+    if (!(error instanceof PreparedNativeRuntimeMismatchError)) throw error;
+    mismatch = error;
+  }
+  if (mismatch == null) throw new Error("An in-place rewrite was accepted.");
+  assert.match(mismatch.message, /pinned native toolchain/u);
+  assert.equal(fixture.plans.length, 0);
+});
+
+const noChangeTimeTitle =
+  "preparing refuses a host that reports no inode change time";
+test(noChangeTimeTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  for (const [path, fingerprint] of fixture.fingerprints) {
+    const { changedAtMilliseconds: _dropped, ...rest } = fingerprint;
+    fixture.fingerprints.set(path, rest);
+  }
+  await assert.rejects(
+    async () =>
+      await prepareNativeRuntime(
+        fixture.host,
+        fixture.toolchain,
+        describeTarget("linux-x86_64-gnu"),
+      ),
+    /does not report inode change times/u,
   );
 });
