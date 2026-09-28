@@ -13,11 +13,11 @@ command/marker/failure timestamps. Historical inputs *ci-36243816479.json.txt*,
 *ci-36261458909.json.txt*, and *ci-36312192623.json.txt* retain the comparison
 jobs and package intervals.
 
-All durations below are measured from the named CI logs, except the scheduling
-replays explicitly labeled derived. The historical compact inputs retain each
-case duration; the branch job reports a warm runtime archive, whereas the
-historical Linux support jobs report cold archives. Neither cache effects nor
-runner variance have been separated from scheduling.
+Individual case, runner, and job durations below are measured from the named
+CI logs. Per-file case sums and scheduling replays are derived. The historical
+compact inputs retain each case duration; the branch job reports a warm runtime
+archive, whereas the historical Linux support jobs report cold archives.
+Neither cache effects nor runner variance have been separated from scheduling.
 
 | Source run  | Own-key measured min | Native runner measured min | Job elapsed measured min | Verdict          |
 | ----------- | -------------------- | -------------------------- | ------------------------ | ---------------- |
@@ -52,11 +52,12 @@ object binding, and Object.defineProperty. These are estimated overlaps;
 ordered Node reporting does not preserve a complete dispatch timeline.
 
 The branch explicitly logs four file workers and starts own-key, Reflect,
-Proxy, and Object-constructor first. Its measured initial-peer case sums are
-1,290.53, 1,587.60, and 1,284.62 seconds. It continues assigning the remaining
-files to freed slots while own-key runs. Concentrating heavy peers at the
-beginning is a contention risk; the logs establish a deadline interruption,
-but do not establish that scheduling alone caused its duration increase.
+Proxy, and Object-constructor first. The derived per-file sums of its measured
+peer cases are 2,424.25, 1,759.86, and 1,284.62 seconds, respectively. It
+continues assigning the remaining files to freed slots while own-key runs.
+Concentrating heavy peers at the beginning is a contention risk; the logs
+establish a deadline interruption, but do not establish that scheduling alone
+caused its duration increase.
 
 The first-shard-only extended package step is sequential, before native
 execution. Its measured package-command to native-command intervals are
@@ -65,9 +66,9 @@ branch own-key failure event appears about 3,600.82 measured seconds after the
 native-shard marker, so the package step is outside the own-key timer.
 
 All files sharing the historical/branch shard are listed below. Columns are
-measured case-sum minutes; n/a means the file belongs to another shard.
-The failed own-key entry is censored. Co-assignment does not imply continuous
-concurrent execution.
+derived per-file sums of measured case minutes; n/a means the file belongs to
+another shard. The failed own-key entry is censored. Co-assignment does not
+imply continuous concurrent execution.
 
 | Property filename under tests/property/               | 36243816479 | 36261458909 | 36312192623 | 36343919872 |
 | ----------------------------------------------------- | ----------- | ----------- | ----------- | ----------- |
@@ -149,8 +150,10 @@ of twelve on both targets.
 
 The correction changes neither generated budgets nor the interruption verdict.
 It adds one Linux job and zero macOS jobs, so its derived additional macOS fixed
-cost is zero. A second branch CI run is explicitly authorized to validate it;
-no success or complete-coverage claim is made for the failed first run.
+cost is zero. The explicitly authorized second run 36358067906 validated
+completion of the corrected partition; its observations are retained in
+[second-branch-comparison.md](./second-branch-comparison.md). No success or
+complete-coverage claim is made for the failed first run.
 
 The unchanged two-run weight table gives the following derived/estimated Linux
 execution model, replaying measured concurrent case sums. These estimates
@@ -172,4 +175,5 @@ isolation; Linux fixed cost for its added job has not been separately measured.
 The macOS fixed-cost increment is zero because its job count is unchanged.
 The replay command is `python3 docs/evidence/u6/summarize.py`, and its output
 is retained in *model.txt*. Case durations were measured concurrently and can
-change with peers; the next branch run must validate the new partition.
+change with peers; corrected run 36358067906 validates completion of the new
+partition, without isolating scheduling from variance or cache effects.

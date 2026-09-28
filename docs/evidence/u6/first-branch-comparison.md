@@ -36,7 +36,8 @@ inside the runner interval and has not been separately measured. The
 outside-runner differences below include setup, builds, package evidence,
 input loading and reporting, and must not be called pure fixed cost.
 
-Other macOS jobs were unchanged. Their measured elapsed minutes from the same
+Other macOS job definitions and totals were unchanged; Node also executes the
+added partition regression tests. Their measured elapsed minutes from the same
 run API job timestamps are retained here to make full-workload sums auditable:
 
 | Job                        | 36312192623 | 36343919872 |
@@ -53,7 +54,7 @@ Across all macOS jobs, derived workload is 778.12 minutes before (29 jobs)
 and 754.12 after (31 jobs), a difference of -24.00 minutes. Dividing unrounded
 workload by five slots derives wall-clock lower bounds of 155.62 and 150.82
 minutes, respectively. These are lower bounds, not measured run makespans or
-scheduling savings, and include variation in unchanged jobs.
+scheduling savings, and include variation across the other jobs.
 
 Reproduce the following tables from the retained compact inputs:
 

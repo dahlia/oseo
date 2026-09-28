@@ -76,7 +76,7 @@ after deriving weights from only the two older runs. Weights are not tuned to
 this comparison or to the after run.
 
 The observed `objectsBuilt` counter is 96 to 128 per ten-way test262 shard
-in every retained run, with a derived sum of 1,117 per target per run.
+in the three retained main runs, with a derived sum of 1,117 per target per run.
 Every counter is in the compact inputs. This measures current harness-object
 preparation counts, not their macOS wall cost or their growth at 41,091 paths.
 The first branch run retains these counters too: the derived target sum
@@ -199,8 +199,8 @@ The initial combination was batch native assignment at unchanged totals plus
 twelve test262 shards on each target. The Linux correction above supersedes
 that platform's native total; it adds no macOS job. The estimated macOS native
 execution saving offsets the added macOS fixed cost. Extra harness preparation
-and cache effects are unmeasured; the single CI run must compare combined
-native/test262 workload to verify the few-minute limit.
+and cache effects are unmeasured; the corrected CI observation below compares
+combined native/test262 workload against the few-minute limit.
 
 Across all macOS families, the measured baseline's derived sums are
 795.45/764.12 minutes at the current count and the plan projects
@@ -242,10 +242,12 @@ passed; test262 reported 21,383/21,383 paths with the unchanged
 classifications, pool eight, and zero retries. Its local test262 objects were
 reused (172 reused, zero built). These timings and cache observations are
 correctness-gate context, not isolated scheduling improvements. Final
-`mise run check` passed in 65.87 seconds. Review and the explicitly authorized
-second branch CI run remain pending. The first branch experiment 36343919872
-failed its Linux property deadline and has incomplete generated work. Every
-native-support/test262 CI shard and its archive state is retained below.
+`mise run check` passed in 65.87 seconds. Independent Claude Fable 5.1 review
+ended with `No issues found.` before the corrected implementation commit
+`30dab254`. The explicitly authorized second branch run [36358067906] passed
+all 58 jobs. The first branch experiment 36343919872 failed its Linux property
+deadline and has incomplete generated work. Every native-support/test262 CI
+shard and its archive state is retained below.
 
 The completed failed experiment's full retained input is
 *ci-36343919872.json.txt*. *first-branch-comparison.md* retains every native
@@ -254,3 +256,22 @@ other macOS job durations and full-workload lower bound. Reproduce its tables
 with *compare-ci.py* and the two compact inputs; all aggregates are derived
 from measured durations/counters. The first-run Linux interruption prevents a
 complete verdict, despite unchanged selected-file unions and path counts.
+
+The [corrected-run comparison](./second-branch-comparison.md) retains every
+shard from all three comparison runs. Its derived macOS native/test262 job
+maxima from observed timestamps are 34.35/31.67 minutes, versus 51.43/34.50
+before; derived combined macOS workload is 556.68 versus 603.62 minutes. All
+macOS jobs sum to a derived 731.40 versus 778.12 minutes, with five-slot wall
+lower bounds of 146.28 versus 155.62. This is one corrected run; variance and
+cache effects are not separated. The same macOS own-key cohort varies by a
+derived 11.80 case-minutes across branch observations. Linux singleton own-key
+passes its unchanged budget in 41.36 measured case-minutes, leaving a derived
+18.64-minute deadline margin. The full retained input is
+*ci-36358067906.json.txt*; *macos-job-times.json.txt* retains the other macOS
+job timestamps and complete workload denominator.
+
+The final evidence-only `mise run check` also passed in 64.98 observed seconds
+with the assigned Zig cache and `MISE_JOBS=1`; this is gate context, not a
+performance measurement.
+
+[36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

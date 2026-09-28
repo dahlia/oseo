@@ -125,12 +125,21 @@ Their derived combined job sum differs by -20.70 macOS minutes; runner
 variance is not separated, and runtime-archive conditions differ. The
 correction isolates Linux own-key in its first shard and raises Linux native
 support from four to five, retaining four shards for all remaining files; its
-explicitly authorized second branch validation is pending. Test262 keeps its
-round-robin assignment and raises the total from ten to twelve. Using run
-36261458909's derived slowest residual rate, the estimate leaves 47.53 minutes
-against the 120-minute timeout, up from 33.22, at a derived 1.89 minutes of
-added macOS fixed cost. Extra harness preparation is unmeasured; branch CI must
-check the combined workload limit.
+corrected branch run 36358067906 passed all 58 jobs. Its
+[full comparison](./evidence/u6/second-branch-comparison.md) retains derived
+macOS native/test262 job maxima from observed timestamps of 34.35/31.67 minutes
+versus 51.43/34.50 before, and derived total macOS workload of 731.40 versus
+778.12 minutes. Five-slot wall lower bounds are derived as 146.28 versus 155.62
+minutes. This is one corrected observation; variance and cache effects are not
+separated. The same macOS own-key cohort varies by a derived 11.80 case-minutes
+between branch runs. Linux singleton own-key passes in 41.36 measured
+case-minutes, with a derived 18.64-minute margin against its unchanged property
+deadline. Test262 keeps its round-robin assignment and raises the total from
+ten to twelve. Using run 36261458909's derived slowest residual rate, the
+estimate leaves 47.53 minutes against the 120-minute timeout, up from 33.22, at
+a derived 1.89 minutes of added macOS fixed cost. Extra harness preparation has
+no separate timing measurement; the corrected combined-workload observation
+meets the limit without establishing repeatable savings.
 
 ### U3 fixed-cost cache audit
 
