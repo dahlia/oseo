@@ -1,0 +1,50 @@
+# U13 Phase A measurements: reviewed test262 shard 1/100 (214 paths),
+# 730 native executions per run, target linux-x86_64-gnu, on the
+# instrumented tree (docs/evidence/u13/phase-instrumentation.diff).
+# cpus: taskset restriction on the whole process tree; 16cpu is
+# unrestricted and varies the pool through OSEO_U13_POOL instead.
+# node and tree CPU are user+system seconds; tree includes children.
+# Interval columns are summed per-call durations that overlap when
+# executions run concurrently. sync is main-thread-only frontend,
+# lowering, and C emission work. All runs used the same lane Zig
+# cache; 16cpu-cold starts from an empty Oseo object/archive cache.
+
+       cpus       label  pool   wall_s  runner_s  nodeCPU  treeCPU  blocked   sync  assets    key  ident   build   exec  rssMiB  load1
+      16cpu      p16-r1    16     47.9      41.6     50.6    202.4     19.6    2.9   233.6   25.3   36.6   108.9   24.8    1033   6.60
+      16cpu       p8-r1     8     47.1      40.9     48.5    194.7     17.1    2.9    64.2   21.5   24.1   102.1   20.4    1005   9.70
+      16cpu       p3-r1     3     56.9      50.0     46.8    183.1     14.4    2.7     9.0   15.8   11.1    85.0   13.5    1020   8.29
+      16cpu       p1-r1     1    127.1     117.8     49.3    178.8     18.1    2.7     3.2   13.1    7.4    75.8   10.5     998   4.09
+      16cpu      p16-r2    16     50.8      43.7     52.8    209.3     21.0    3.2   260.3   25.0   35.9   112.1   25.0    1076   9.96
+      16cpu       p8-r2     8     44.6      38.2     48.0    190.9     15.9    2.9    57.4   20.9   23.0    95.7   19.1    1043   6.61
+      16cpu       p3-r2     3     53.0      46.9     44.9    175.3     13.3    2.6     7.8   15.5    9.6    80.5   12.5     978   5.08
+      16cpu       p1-r2     1    118.7     112.6     44.5    170.4     14.4    2.5     3.3   12.6    6.9    72.3   10.1    1001   2.29
+       3cpu pdefault-r1     3     64.0      57.7     42.3    151.7     14.1    2.9    12.5   14.7    8.6   108.5   11.4     991   3.80
+       3cpu pdefault-r2     3     64.1      57.8     42.0    151.0     14.1    2.9    12.0   14.6    8.8   108.3   11.7    1013   3.39
+       4cpu pdefault-r1     4     53.7      47.6     42.0    154.4     13.4    2.7    19.9   15.7   10.0   107.3   12.1    1044   3.30
+       4cpu pdefault-r2     4     53.9      47.7     42.8    156.2     13.5    2.7    19.0   15.8   10.9   107.3   12.8     999   4.11
+ 16cpu-cold       p8-r1     8     46.0      39.9     46.4    228.5     14.3    2.8    43.7   19.2   19.6    93.0   16.8    1011   3.23
+ 16cpu-warm       p8-r1     8     42.9      36.8     46.4    184.9     15.4    2.7    49.0   21.0   23.4    92.0   18.9    1008   6.64
+ 16cpu-warm       p8-r2     8     42.7      36.6     46.0    184.5     15.2    2.7    50.7   20.6   21.3    91.8   18.2    1051   5.66
+
+# Per-phase summed intervals from one uncontended run (16cpu, pool 1,
+# rep 2): the least distorted per-execution cost attribution.
+  case.execute               112.50 s  calls=  214   525.72 ms/call
+  cli.build                   72.33 s  calls=  730    99.08 ms/call
+  cli.archiveKey              12.57 s  calls=  730    17.21 ms/call
+  cli.run                     10.08 s  calls=  730    13.81 ms/call
+  cli.toolchainIdentity        6.86 s  calls=  730     9.39 ms/call
+  cli.loadRuntimeAssets        3.26 s  calls=  730     4.46 ms/call
+  frag.emit                    1.75 s  calls=  726     2.41 ms/call
+  frag.awaitObject             1.33 s  calls=  726     1.84 ms/call
+  frag.harnessObject           1.31 s  calls=   60    21.76 ms/call
+  cli.cleanup                  1.31 s  calls=  726     1.80 ms/call
+  cli.stageAssets              0.48 s  calls=  730     0.66 ms/call
+  frag.bodyCompile             0.41 s  calls=  727     0.57 ms/call
+  frag.harnessCompile          0.25 s  calls=   60     4.14 ms/call
+  cli.temporaryDirectory       0.24 s  calls=  726     0.34 ms/call
+  cli.writeSources             0.07 s  calls=  730     0.10 ms/call
+  case.parse                   0.05 s  calls=  214     0.24 ms/call
+  frag.harnessCompare          0.04 s  calls=  726     0.06 ms/call
+  case.read                    0.02 s  calls=  214     0.10 ms/call
+  cli.buildPlan                0.02 s  calls=  730     0.02 ms/call
+  cli.emit                     0.00 s  calls=  730     0.00 ms/call

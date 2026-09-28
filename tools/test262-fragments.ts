@@ -7,9 +7,13 @@ import { parse } from "@babel/parser";
 import { isObject } from "./value-kinds.ts";
 import {
   defaultComponents,
+  prepareNativeRuntime,
   runNativeUnits,
 } from "../packages/cli/src/index.ts";
-import type { CliResult } from "../packages/cli/src/index.ts";
+import type {
+  CliResult,
+  PreparedNativeRuntime,
+} from "../packages/cli/src/index.ts";
 import { emitScriptFragments } from "../packages/backend-c/src/index.ts";
 import {
   compileBodyFragment,
@@ -186,6 +190,14 @@ export function createTest262FragmentExecutor(
     host.executionHost == null
       ? undefined
       : targetForExecutionHost(host.executionHost);
+  /*
+   * One reviewed run drives thousands of native executions through this
+   * process against one host, toolchain, target, and runtime package. The
+   * runtime read, the toolchain identity probe, and the runtime archive key
+   * are therefore derived once here and reused by every execution, which is
+   * what `prepareNativeRuntime` exists for. The harness object key needs the
+   * same facts, so both come from the one prepared value.
+   */
   const initialize = async () => {
     if (
       host.cache == null ||
@@ -195,41 +207,31 @@ export function createTest262FragmentExecutor(
     ) {
       throw new Error("Fragment toolchain metadata is unavailable.");
     }
-    const environment = await host.captureEnvironment?.(toolchain.environment);
-    if (environment == null) throw new Error("Missing toolchain environment.");
-    const runtime = defaultComponents.runtime.getRuntimeInput();
-    const runtimeAssets = await Promise.all(
-      runtime.assets.map(async (asset) => ({
-        name: asset.name,
-        kind: asset.kind,
-        contents: await host.readTextFile(asset.url),
-      })),
-    );
-    const identity = await host.run(
-      toolchain.runtimeArchiveReuse.createIdentityRequest(
-        process.cwd(),
-        environment,
-      ),
-    );
-    if (identity.exitStatus !== 0 || identity.stdout.trim() === "") {
-      throw new Error("The native toolchain identity is unavailable.");
-    }
+    const prepared = await prepareNativeRuntime(host, toolchain, target);
     return {
-      target,
-      toolchainEnvironment: environment,
-      toolchainIdentity: identity.stdout.trim(),
-      runtimeAbiVersion: runtime.abiVersion,
-      runtimeAssets,
-      frontendIdentity: await packageIdentity([
-        "parser-babel",
-        "cli",
-        "unicode",
-      ]),
-      compilerIdentity: await packageIdentity(["compiler"]),
-      backendIdentity: await packageIdentity(["backend-c"]),
+      prepared,
+      common: {
+        target: prepared.target,
+        toolchainEnvironment: prepared.toolchainEnvironment,
+        toolchainIdentity: prepared.toolchainIdentity,
+        runtimeAbiVersion: prepared.runtimeAbiVersion,
+        runtimeAssets: prepared.assets.map(({ name, kind, contents }) => ({
+          name,
+          kind,
+          contents,
+        })),
+        frontendIdentity: await packageIdentity([
+          "parser-babel",
+          "cli",
+          "unicode",
+        ]),
+        compilerIdentity: await packageIdentity(["compiler"]),
+        backendIdentity: await packageIdentity(["backend-c"]),
+      },
     };
   };
   let initialized: ReturnType<typeof initialize> | undefined;
+  let preparedRuntime: PreparedNativeRuntime | undefined;
   async function observe(reason: string, execute: () => Promise<CliResult>) {
     counts.attempts[reason] = (counts.attempts[reason] ?? 0) + 1;
     const result = await execute();
@@ -312,7 +314,9 @@ export function createTest262FragmentExecutor(
               initialized = undefined;
             });
           }
-          const common = await initialized;
+          const initialization = await initialized;
+          preparedRuntime = initialization.prepared;
+          const common = initialization.common;
           const keyInput: HarnessObjectKeyInput = {
             ...common,
             fragmentAbiVersion: harness.abi,
@@ -365,6 +369,7 @@ export function createTest262FragmentExecutor(
           process.env.OSEO_RUNTIME_ARCHIVE_REUSE === "disabled"
             ? "disabled"
             : "enabled",
+          preparedRuntime,
         ),
       );
     },

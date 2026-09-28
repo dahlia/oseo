@@ -8,7 +8,16 @@ import type {
 } from "@oseo/compiler";
 import { cRuntimeProvider } from "@oseo/runtime-c";
 
-import { runCli, runNativeCli, runNativeUnits } from "../src/index.ts";
+import { describeTarget } from "@oseo/compiler";
+
+import {
+  PreparedNativeRuntimeMismatchError,
+  prepareNativeRuntime,
+  runCli,
+  runNativeCli,
+  runNativeUnits,
+} from "../src/index.ts";
+import type { PreparedNativeRuntime } from "../src/index.ts";
 
 test("prints deterministic MIR and C for accepted source", () => {
   const help = runCli({ args: ["--help"], version: "0.0.0" });
@@ -1453,4 +1462,309 @@ test("links each agent unit beside the main unit", async () => {
   );
   assert.equal(moduleGoal.exitStatus, 1);
   assert.match(moduleGoal.stderr, /applies only to Scripts/u);
+});
+
+/**
+ * One recording host and toolchain pair for the prepared-runtime tests. The
+ * runtime asset text is supplied so that two otherwise identical hosts can
+ * read different runtime bytes.
+ */
+function preparedRuntimeFixture(assetText: string, cached = false) {
+  const reads: string[] = [];
+  const runs: string[][] = [];
+  const writes = new Map<string, string>();
+  const cacheLookups: string[] = [];
+  const plans: NativeBuildInput[] = [];
+  const host: CompilerHost = {
+    cache: {
+      acquireFileLock: async () => ({ release: async () => {} }),
+      getDirectory: async () => "/cache/runtime-archives",
+      hasFile: async (path) => {
+        cacheLookups.push(path);
+        return cached;
+      },
+      publishFile: async () => {},
+    },
+    captureEnvironment: async () => ({
+      variables: { PATH: "/opt/zig/bin" },
+    }),
+    executionHost: { architecture: "x86_64", operatingSystem: "linux" },
+    makeTemporaryDirectory: async () => "/work",
+    readTextFile: async (path) => {
+      reads.push(String(path));
+      return assetText;
+    },
+    remove: async () => {},
+    run: async (request) => {
+      runs.push([request.command, ...request.args]);
+      return request.args[0] === "env"
+        ? { exitStatus: 0, stderr: "", stdout: "zig_exe=/opt/zig/zig\n" }
+        : { exitStatus: 0, stderr: "", stdout: "42\n" };
+    },
+    writeTextFile: async (path, source) => {
+      writes.set(path, source);
+    },
+  };
+  const toolchain: NativeToolchain = {
+    environment: { inherit: ["PATH"] },
+    runtimeArchiveReuse: {
+      createIdentityRequest: (workingDirectory, environment) => ({
+        args: ["env"],
+        command: "zig",
+        cwd: workingDirectory,
+        environment,
+      }),
+      createKey: async (input) =>
+        [
+          input.toolchainIdentity,
+          input.target.name,
+          input.runtimeAbiVersion,
+          ...input.runtimeAssets.map(
+            (asset) => `${asset.kind}:${asset.name}:${asset.contents}`,
+          ),
+          ...Object.entries(input.toolchainEnvironment.variables).map(
+            ([name, value]) => `${name}=${value}`,
+          ),
+        ].join("|"),
+    },
+    createBuildPlan(input) {
+      plans.push(input);
+      return {
+        executablePath: "/work/program",
+        requests: [{ args: ["cc"], command: "zig", cwd: "/work" }],
+        runtimeArchivePath: "/work/liboseo-runtime.a",
+        target: input.target,
+      };
+    },
+  };
+  return { cacheLookups, host, plans, reads, runs, toolchain, writes };
+}
+
+const preparedRuntimeUnits = {
+  sources: [{ sourceName: "case.c", source: "body" }],
+  prebuiltObjectPaths: [],
+} as const;
+
+for (const cached of [false, true]) {
+  const state = cached ? "a published" : "no";
+  const name =
+    "a prepared native runtime reproduces the workflow with " +
+    `${state} archive`;
+  test(name, async () => {
+    const direct = preparedRuntimeFixture("runtime asset", cached);
+    const direct2 = preparedRuntimeFixture("runtime asset", cached);
+    const plain = await runNativeUnits(
+      preparedRuntimeUnits,
+      "original.js",
+      direct.host,
+      direct.toolchain,
+    );
+    const prepared = await prepareNativeRuntime(
+      direct2.host,
+      direct2.toolchain,
+      describeTarget("linux-x86_64-gnu"),
+    );
+    const runsAfterPreparation = direct2.runs.length;
+    const readsAfterPreparation = direct2.reads.length;
+    const reused = await runNativeUnits(
+      preparedRuntimeUnits,
+      "original.js",
+      direct2.host,
+      direct2.toolchain,
+      "enabled",
+      prepared,
+    );
+    assert.deepEqual(reused, plain);
+    assert.deepEqual(direct2.cacheLookups, direct.cacheLookups);
+    assert.deepEqual(
+      [...direct2.writes].toSorted(),
+      [...direct.writes].toSorted(),
+    );
+    assert.deepEqual(direct2.plans[0], direct.plans[0]);
+    assert.equal(
+      prepared.archiveKey,
+      direct.cacheLookups[0]
+        ?.replace("/cache/runtime-archives/liboseo-runtime-", "")
+        .replace(/\.a$/u, ""),
+    );
+    // The reused execution reads no runtime asset and starts no identity probe.
+    assert.equal(direct2.reads.length, readsAfterPreparation);
+    assert.deepEqual(direct2.runs.slice(runsAfterPreparation), [
+      ["zig", "cc"],
+      ["/work/program"],
+    ]);
+    assert.ok(direct.runs.some((request) => request[1] === "env"));
+    // Preparing reads exactly the assets one per-execution workflow reads.
+    assert.equal(readsAfterPreparation, direct.reads.length);
+    assert.equal(prepared.assetDigest.length, 64);
+  });
+}
+
+test("a prepared native runtime is refused for different inputs", async () => {
+  const origin = preparedRuntimeFixture("runtime asset");
+  const target = describeTarget("linux-x86_64-gnu");
+  const prepared = await prepareNativeRuntime(
+    origin.host,
+    origin.toolchain,
+    target,
+  );
+  const refused = async (
+    value: PreparedNativeRuntime,
+    fixture: ReturnType<typeof preparedRuntimeFixture>,
+    subject: string,
+  ) => {
+    let mismatch: PreparedNativeRuntimeMismatchError | undefined;
+    try {
+      await runNativeUnits(
+        preparedRuntimeUnits,
+        "original.js",
+        fixture.host,
+        fixture.toolchain,
+        "enabled",
+        value,
+      );
+    } catch (error) {
+      if (!(error instanceof PreparedNativeRuntimeMismatchError)) throw error;
+      mismatch = error;
+    }
+    if (mismatch == null) {
+      throw new Error(`The ${subject} mismatch was accepted.`);
+    }
+    assert.match(mismatch.message, new RegExp(subject, "u"));
+    assert.equal(fixture.plans.length, 0);
+  };
+  // A host that reads different runtime bytes is a different host.
+  const otherContent = preparedRuntimeFixture("other runtime asset");
+  await refused(prepared, otherContent, "compiler host");
+  // A toolchain with different flags is a different toolchain.
+  const otherToolchain = preparedRuntimeFixture("runtime asset");
+  await refused(
+    { ...prepared, host: otherToolchain.host },
+    otherToolchain,
+    "native toolchain",
+  );
+  // A different native target.
+  const sameHost = preparedRuntimeFixture("runtime asset");
+  const crossTarget = await prepareNativeRuntime(
+    sameHost.host,
+    sameHost.toolchain,
+    describeTarget("linux-aarch64-musl"),
+  );
+  await refused(crossTarget, sameHost, "native target");
+  // A different captured environment snapshot.
+  const otherEnvironment = preparedRuntimeFixture("runtime asset");
+  await refused(
+    {
+      ...crossTarget,
+      target,
+      toolchainEnvironment: { variables: { PATH: "/usr/bin" } },
+      host: otherEnvironment.host,
+      toolchain: otherEnvironment.toolchain,
+    },
+    otherEnvironment,
+    "toolchain environment",
+  );
+  // The same target name with different sanitizers derives a different key.
+  const otherSanitizers = preparedRuntimeFixture("runtime asset");
+  await refused(
+    {
+      ...prepared,
+      host: otherSanitizers.host,
+      toolchain: otherSanitizers.toolchain,
+      target: { ...target, sanitizers: [...target.sanitizers, "address"] },
+    },
+    otherSanitizers,
+    "native target",
+  );
+  // Emptying the caller's sanitizer array after preparation cannot make a
+  // prepared runtime derived from an unsanitized target look canonical.
+  const mutated = preparedRuntimeFixture("runtime asset");
+  const mutableSanitizers = [...target.sanitizers];
+  const fromMutable = await prepareNativeRuntime(
+    mutated.host,
+    mutated.toolchain,
+    { ...target, sanitizers: mutableSanitizers },
+  );
+  mutableSanitizers.length = 0;
+  assert.deepEqual(fromMutable.target.sanitizers, target.sanitizers);
+  await refused(
+    {
+      archiveKey: fromMutable.archiveKey,
+      assetDigest: fromMutable.assetDigest,
+      assets: fromMutable.assets,
+      host: mutated.host,
+      runtimeAbiVersion: fromMutable.runtimeAbiVersion,
+      target: { ...target, sanitizers: mutableSanitizers },
+      toolchain: mutated.toolchain,
+      toolchainEnvironment: fromMutable.toolchainEnvironment,
+      toolchainIdentity: fromMutable.toolchainIdentity,
+    },
+    mutated,
+    "native target",
+  );
+  // A recorded asset location that no longer matches the provider's.
+  const otherLocation = preparedRuntimeFixture("runtime asset");
+  await refused(
+    {
+      ...prepared,
+      host: otherLocation.host,
+      toolchain: otherLocation.toolchain,
+      assets: prepared.assets.map((asset, index) =>
+        index === 0
+          ? {
+              contents: asset.contents,
+              kind: asset.kind,
+              location: "file:///elsewhere.c",
+              name: asset.name,
+            }
+          : asset,
+      ),
+    },
+    otherLocation,
+    "runtime asset set",
+  );
+  // The ABI version is read once, before any await, so a provider that
+  // changes it while preparation is pending cannot make the returned record
+  // describe a different runtime from the one the key was derived from.
+  const shifting = preparedRuntimeFixture("runtime asset");
+  let abiReads = 0;
+  const shiftingPrepared = await prepareNativeRuntime(
+    shifting.host,
+    shifting.toolchain,
+    target,
+    {
+      getRuntimeInput: () => ({
+        get abiVersion() {
+          abiReads += 1;
+          return abiReads === 1
+            ? "not-the-reviewed-abi"
+            : cRuntimeProvider.getRuntimeInput().abiVersion;
+        },
+        assets: cRuntimeProvider.getRuntimeInput().assets,
+      }),
+    },
+  );
+  assert.equal(abiReads, 1);
+  assert.equal(shiftingPrepared.runtimeAbiVersion, "not-the-reviewed-abi");
+  await refused(shiftingPrepared, shifting, "runtime ABI version");
+  // A different runtime provider: a different ABI version and asset set.
+  const otherRuntime = preparedRuntimeFixture("runtime asset");
+  const foreign = await prepareNativeRuntime(
+    otherRuntime.host,
+    otherRuntime.toolchain,
+    target,
+    {
+      getRuntimeInput: () => ({
+        abiVersion: "not-the-reviewed-abi",
+        assets: [
+          {
+            kind: "source",
+            name: "foreign.c",
+            url: new URL("file:///foreign.c"),
+          },
+        ],
+      }),
+    },
+  );
+  await refused(foreign, otherRuntime, "runtime ABI version");
 });

@@ -1,0 +1,77 @@
+// U13 Phase A measurement preload. Loaded with `node --import`; it installs
+// the accumulators the phase-instrumentation patch writes to and prints one
+// compact JSON line at exit. It records nothing when the patch is absent.
+import { appendFileSync } from "node:fs";
+import process from "node:process";
+import { performance } from "node:perf_hooks";
+
+const totals = new Map();
+const startedAt = performance.now();
+const startCpu = process.cpuUsage();
+
+globalThis.__u13 = (name, milliseconds) => {
+  const entry = totals.get(name) ?? { calls: 0, milliseconds: 0 };
+  entry.calls += 1;
+  entry.milliseconds += milliseconds;
+  totals.set(name, entry);
+};
+
+const marks = new Map();
+globalThis.__u13mark = (name) => {
+  const at = performance.now() - startedAt;
+  const entry = marks.get(name);
+  if (entry == null) marks.set(name, { first: at, last: at });
+  else entry.last = at;
+};
+
+// Event-loop blocked time: a 20 ms timer whose observed lateness is the
+// main thread's synchronous occupancy between ticks.
+const tick = 20;
+let lastTick = performance.now();
+let blocked = 0;
+let ticks = 0;
+const timer = setInterval(() => {
+  const now = performance.now();
+  const late = now - lastTick - tick;
+  if (late > 0) blocked += late;
+  ticks += 1;
+  lastTick = now;
+}, tick);
+timer.unref();
+
+process.on("exit", () => {
+  const cpu = process.cpuUsage(startCpu);
+  const record = {
+    label: process.env.OSEO_U13_LABEL ?? "unlabelled",
+    poolLimit: process.env.OSEO_U13_POOL ?? "default",
+    wallMilliseconds: Math.round((performance.now() - startedAt) * 100) / 100,
+    nodeUserMilliseconds: Math.round(cpu.user / 10) / 100,
+    nodeSystemMilliseconds: Math.round(cpu.system / 10) / 100,
+    eventLoopBlockedMilliseconds: Math.round(blocked * 100) / 100,
+    eventLoopTicks: ticks,
+    marks: Object.fromEntries(
+      [...marks].map(([name, entry]) => [
+        name,
+        {
+          first: Math.round(entry.first * 100) / 100,
+          last: Math.round(entry.last * 100) / 100,
+        },
+      ]),
+    ),
+    phases: Object.fromEntries(
+      [...totals]
+        .sort((left, right) => right[1].milliseconds - left[1].milliseconds)
+        .map(([name, entry]) => [
+          name,
+          {
+            calls: entry.calls,
+            milliseconds: Math.round(entry.milliseconds * 100) / 100,
+          },
+        ]),
+    ),
+  };
+  const line = JSON.stringify(record);
+  const path = process.env.OSEO_U13_OUT;
+  if (path == null) process.stderr.write(`u13 ${line}\n`);
+  else appendFileSync(path, `${line}\n`);
+});

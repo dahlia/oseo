@@ -1,0 +1,402 @@
+diff --git a/packages/cli/src/index.ts b/packages/cli/src/index.ts
+index b82350c9..b0251b2a 100644
+--- a/packages/cli/src/index.ts
++++ b/packages/cli/src/index.ts
+@@ -611,6 +611,28 @@ function processStartDiagnostic(
+   return diagnosticResult(hostDiagnostic(sourceId, diagnostic));
+ }
+ 
++/* U13 Phase A measurement instrumentation. */
++const u13 = (globalThis as { __u13?: (n: string, ms: number) => void }).__u13;
++function u13Sync<T>(name: string, work: () => T): T {
++  if (u13 == null) return work();
++  const started = performance.now();
++  try {
++    return work();
++  } finally {
++    u13(name, performance.now() - started);
++  }
++}
++async function u13Async<T>(name: string, work: () => Promise<T>): Promise<T> {
++  if (u13 == null) return await work();
++  const started = performance.now();
++  try {
++    return await work();
++  } finally {
++    u13(name, performance.now() - started);
++  }
++}
++
++
+ async function executeNativeWorkflow(
+   host: CompilerHost,
+   sourceId: string,
+@@ -621,10 +643,11 @@ async function executeNativeWorkflow(
+   toolchain: NativeToolchain,
+ ): Promise<CliResult> {
+   const units = "sources" in input ? input : undefined;
+-  const emitted =
++  const emitted = u13Sync("cli.emit", () =>
+     "sources" in input
+       ? input.sources[0]
+-      : defaultComponents.backend.emit(input);
++      : defaultComponents.backend.emit(input),
++  );
+   if (emitted == null) throw new Error("No native source units supplied.");
+   const extra = units?.sources.slice(1) ?? [];
+   const sourceNames = new Set<string>();
+@@ -640,7 +663,10 @@ async function executeNativeWorkflow(
+     await host.writeTextFile(join(directory, unit.sourceName), unit.source);
+   }
+   const generatedSourcePath = join(directory, emitted.sourceName);
+-  await host.writeTextFile(generatedSourcePath, emitted.source);
++  await u13Async(
++    "cli.writeSources",
++    async () => await host.writeTextFile(generatedSourcePath, emitted.source),
++  );
+   const runtime = defaultComponents.runtime.getRuntimeInput();
+   const assetNames = new Set<string>();
+   for (const asset of runtime.assets) {
+@@ -708,22 +734,28 @@ async function executeNativeWorkflow(
+   }[] = [];
+   if (cache != null && reuse != null && toolchainEnvironment != null) {
+     loadedAssets = [];
+-    for (const asset of runtime.assets) {
+-      // eslint-disable-next-line no-await-in-loop -- Reads settle in order.
+-      const contents = await host.readTextFile(asset.url);
+-      loadedAssets.push({ asset, contents });
+-    }
++    await u13Async("cli.loadRuntimeAssets", async () => {
++      for (const asset of runtime.assets) {
++        // eslint-disable-next-line no-await-in-loop -- Reads settle in order.
++        const contents = await host.readTextFile(asset.url);
++        loadedAssets?.push({ asset, contents });
++      }
++    });
+     try {
+-      const identity = await observeToolchainIdentity(
+-        host,
+-        toolchain,
+-        directory,
+-        toolchainEnvironment,
++      const identity = await u13Async(
++        "cli.toolchainIdentity",
++        async () =>
++          await observeToolchainIdentity(
++            host,
++            toolchain,
++            directory,
++            toolchainEnvironment,
++          ),
+       );
+       if (identity == null) {
+         throw new Error("The native toolchain identity is unavailable.");
+       }
+-      const key = await reuse.createKey({
++      const key = await u13Async("cli.archiveKey", async () => await reuse.createKey({
+         runtimeAbiVersion: runtime.abiVersion,
+         runtimeAssets: loadedAssets.map((entry) => ({
+           contents: entry.contents,
+@@ -733,7 +765,7 @@ async function executeNativeWorkflow(
+         target,
+         toolchainEnvironment,
+         toolchainIdentity: identity,
+-      });
++      }));
+       const cacheDirectory = await cache.getDirectory("runtime-archives");
+       const candidate = join(cacheDirectory, `liboseo-runtime-${key}.a`);
+       cacheLock = await cache.acquireFileLock(candidate);
+@@ -750,6 +782,7 @@ async function executeNativeWorkflow(
+     }
+   }
+   try {
++    await u13Async("cli.stageAssets", async () => {
+     if (loadedAssets != null) {
+       for (const entry of loadedAssets) {
+         if (cachedArchivePath != null && entry.asset.kind === "source") {
+@@ -770,6 +803,7 @@ async function executeNativeWorkflow(
+         copiedAssets.push({ asset, destination });
+       }
+     }
++    });
+   } catch (error) {
+     await releaseCacheLock(cacheLock);
+     cacheLock = undefined;
+@@ -787,7 +821,7 @@ async function executeNativeWorkflow(
+   }
+   let executablePath: string | undefined;
+   try {
+-    const plan = toolchain.createBuildPlan({
++    const plan = u13Sync("cli.buildPlan", () => toolchain.createBuildPlan({
+       ...includePropertiesWhen(() => {
+         if (toolchainEnvironment == null) return undefined;
+         return {
+@@ -814,11 +848,14 @@ async function executeNativeWorkflow(
+       runtimeSourcePaths,
+       target,
+       workingDirectory: directory,
+-    });
++    }));
+     executablePath = plan.executablePath;
+     for (const processRequest of plan.requests) {
+       // eslint-disable-next-line no-await-in-loop -- Native steps are ordered.
+-      const attempt = await observeProcess(host, processRequest);
++      const attempt = await u13Async(
++        "cli.build",
++        async () => await observeProcess(host, processRequest),
++      );
+       if ("failure" in attempt) {
+         return processStartDiagnostic(
+           sourceId,
+@@ -856,11 +893,15 @@ async function executeNativeWorkflow(
+       hostDiagnostic(sourceId, "The native executable is unavailable."),
+     );
+   }
+-  const attempt = await observeProcess(host, {
+-    args: [],
+-    command: executablePath,
+-    cwd: directory,
+-  });
++  const attempt = await u13Async(
++    "cli.run",
++    async () =>
++      await observeProcess(host, {
++        args: [],
++        command: executablePath,
++        cwd: directory,
++      }),
++  );
+   if ("failure" in attempt) {
+     return processStartDiagnostic(sourceId, "The native executable", attempt);
+   }
+@@ -1089,7 +1130,10 @@ export async function runNativeUnits(
+   if ("diagnostic" in selected) return diagnosticResult(selected.diagnostic);
+   let directory: string;
+   try {
+-    directory = await host.makeTemporaryDirectory("oseo-cli-");
++    directory = await u13Async(
++      "cli.temporaryDirectory",
++      async () => await host.makeTemporaryDirectory("oseo-cli-"),
++    );
+   } catch {
+     return diagnosticResult(
+       hostDiagnostic(
+@@ -1115,7 +1159,10 @@ export async function runNativeUnits(
+     );
+   }
+   try {
+-    await host.remove(directory);
++    await u13Async(
++      "cli.cleanup",
++      async () => await host.remove(directory),
++    );
+   } catch {
+     return diagnosticResult(
+       hostDiagnostic(
+diff --git a/tools/test262-fragments.ts b/tools/test262-fragments.ts
+index 2daaa3f0..0a83bdd1 100644
+--- a/tools/test262-fragments.ts
++++ b/tools/test262-fragments.ts
+@@ -26,6 +26,28 @@ import type {
+ } from "../packages/compiler/src/index.ts";
+ import type { Test262ExecutionRequest } from "./test262.ts";
+ 
++/* U13 Phase A measurement instrumentation. */
++const u13 = (globalThis as { __u13?: (n: string, ms: number) => void }).__u13;
++function u13Sync<T>(name: string, work: () => T): T {
++  if (u13 == null) return work();
++  const started = performance.now();
++  try {
++    return work();
++  } finally {
++    u13(name, performance.now() - started);
++  }
++}
++async function u13Async<T>(name: string, work: () => Promise<T>): Promise<T> {
++  if (u13 == null) return await work();
++  const started = performance.now();
++  try {
++    return await work();
++  } finally {
++    u13(name, performance.now() - started);
++  }
++}
++
++
+ /** Original source components; the assembled source remains authoritative. */
+ export interface Test262FragmentInput {
+   readonly body: string;
+@@ -268,38 +290,43 @@ export function createTest262FragmentExecutor(
+       ]);
+       let prepared = bundles.get(key);
+       if (prepared == null) {
+-        prepared = compileHarnessFragment(
+-          defaultComponents.frontend,
+-          input.sources,
+-          input.strict,
+-          { specialization: request.specialization },
++        prepared = u13Sync("frag.harnessCompile", () =>
++          compileHarnessFragment(
++            defaultComponents.frontend,
++            input.sources,
++            input.strict,
++            { specialization: request.specialization },
++          ),
+         );
+         bundles.set(key, prepared);
+       }
+       if (prepared.kind !== "compiled") return await fallback("harness");
+       if (prepared.harness.strict !== input.strict)
+         return await fallback("strictness");
+-      const body = compileBodyFragment(
+-        defaultComponents.frontend,
+-        prepared.harness,
+-        {
++      const body = u13Sync("frag.bodyCompile", () =>
++        compileBodyFragment(defaultComponents.frontend, prepared.harness, {
+           sourceId: request.sourceId,
+           source: input.body + "\n",
+-        },
++        }),
+       );
+       if (body.kind !== "compiled") return await fallback(body.reason);
+       const boundary = fragmentBoundaryReason(input, request.source);
+       if (boundary != null) return await fallback(boundary);
+       const prefix = input.sources.map((s) => s.source).join("\n") + "\n";
+-      const emitted = emitScriptFragments(prepared.harness, body.body, {
+-        sourceId: request.sourceId,
+-        harnessLineOffset: 0,
+-        bodyLineOffset: prefix.match(/\r\n|[\n\r\u2028\u2029]/gu)?.length ?? 0,
+-      });
++      const emitted = u13Sync("frag.emit", () =>
++        emitScriptFragments(prepared.harness, body.body, {
++          sourceId: request.sourceId,
++          harnessLineOffset: 0,
++          bodyLineOffset:
++            prefix.match(/\r\n|[\n\r\u2028\u2029]/gu)?.length ?? 0,
++        }),
++      );
+       const prior = emittedHarnesses.get(key);
+-      if (prior != null && prior !== emitted.harness.source) {
+-        throw new Error("Harness C changed across bodies.");
+-      }
++      u13Sync("frag.harnessCompare", () => {
++        if (prior != null && prior !== emitted.harness.source) {
++          throw new Error("Harness C changed across bodies.");
++        }
++      });
+       if (prior != null) counts.harnessComparisons += 1;
+       emittedHarnesses.set(key, emitted.harness.source);
+       const harness = prepared.harness;
+@@ -322,7 +349,10 @@ export function createTest262FragmentExecutor(
+             observeSpecialization: false,
+             generatedSource: emitted.harness.source,
+           };
+-          const built = await prepareHarnessObject(host, toolchain, keyInput);
++          const built = await u13Async(
++            "frag.harnessObject",
++            async () => await prepareHarnessObject(host, toolchain, keyInput),
++          );
+           if (process.env.OSEO_TEST262_VERIFY_HARNESS_OBJECTS === "1") {
+             const { cache: _cache, ...uncached } = host;
+             const rebuilt = await prepareHarnessObject(
+@@ -352,7 +382,10 @@ export function createTest262FragmentExecutor(
+         objects.set(key, object);
+         void object.catch(() => objects.delete(key));
+       }
+-      const objectPath = await object;
++      const objectPath = await u13Async(
++        "frag.awaitObject",
++        async () => await object,
++      );
+       return await observe("split", () =>
+         runNativeUnits(
+           {
+diff --git a/tools/test262.ts b/tools/test262.ts
+index 1481ab3e..1566aaa3 100644
+--- a/tools/test262.ts
++++ b/tools/test262.ts
+@@ -193,6 +193,32 @@ const runtimeArchiveReuse =
+     ? "disabled"
+     : "enabled";
+ const measuredExecutionPoolLimit = 8;
++const u13PoolLimit =
++  process.env.OSEO_U13_POOL == null
++    ? undefined
++    : Number(process.env.OSEO_U13_POOL);
++
++/* U13 Phase A measurement instrumentation. */
++const u13 = (globalThis as { __u13?: (n: string, ms: number) => void }).__u13;
++function u13Sync<T>(name: string, work: () => T): T {
++  if (u13 == null) return work();
++  const started = performance.now();
++  try {
++    return work();
++  } finally {
++    u13(name, performance.now() - started);
++  }
++}
++async function u13Async<T>(name: string, work: () => Promise<T>): Promise<T> {
++  if (u13 == null) return await work();
++  const started = performance.now();
++  try {
++    return await work();
++  } finally {
++    u13(name, performance.now() - started);
++  }
++}
++
+ const reviewedExecutionPoolLimit = Math.min(
+   measuredExecutionPoolLimit,
+   availableParallelism(),
+@@ -2654,7 +2680,7 @@ export async function createReviewedManifest(
+ ): Promise<ReviewedTest262Run> {
+   const startedAt = performance.now();
+   const configuredPoolLimit = positiveInteger(
+-    options.poolLimit ?? reviewedExecutionPoolLimit,
++    options.poolLimit ?? u13PoolLimit ?? reviewedExecutionPoolLimit,
+     "Reviewed test262 pool limit",
+   );
+   const retryLimit = positiveInteger(
+@@ -2724,20 +2750,28 @@ export async function createReviewedManifest(
+       if (entry == null) return;
+       try {
+         const sourcePath = join(root, entry.path);
+-        const source = await readFile(sourcePath, "utf8");
+-        const parsed = parseTest262Case(
+-          source,
+-          entry.path,
+-          subset.suiteRevision,
++        (
++          globalThis as { __u13mark?: (name: string) => void }
++        ).__u13mark?.("case");
++        const source = await u13Async(
++          "case.read",
++          async () => await readFile(sourcePath, "utf8"),
+         );
+-        pendingResults[index] = await executeTest262Case(
+-          source,
+-          parsed,
+-          supportedFeatures,
+-          harnesses,
+-          gatedExecutor,
+-          entry.dependencies,
+-          { rootPath: root, sourcePath },
++        const parsed = u13Sync("case.parse", () =>
++          parseTest262Case(source, entry.path, subset.suiteRevision),
++        );
++        pendingResults[index] = await u13Async(
++          "case.execute",
++          async () =>
++            await executeTest262Case(
++              source,
++              parsed,
++              supportedFeatures,
++              harnesses,
++              gatedExecutor,
++              entry.dependencies,
++              { rootPath: root, sourcePath },
++            ),
+         );
+       } catch (error) {
+         failures[index] = error;

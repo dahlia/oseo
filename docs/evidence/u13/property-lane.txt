@@ -1,0 +1,34 @@
+# U13: does the property and native-support lane repeat the same
+# per-execution runtime read, identity probe, and archive key derivation?
+#
+# It does, through packages/testkit's own native workflow rather than through
+# @oseo/cli. The commands below count the native executions and the identity
+# probes of one ordinary property file and time the same file without strace.
+# Measured on the host in host.log with
+# ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-test262-serial-bottleneck and a
+# populated cache. This unit changes nothing in that lane.
+
+$ strace -f -qq -e trace=execve -o strace-prop.txt \
+    node --test tests/property/m5-array-buffer.property.test.ts
+ℹ pass 1
+ℹ fail 0
+
+# One successful 'zig env' identity probe per native execution, and one
+# 'zig cc' build per native execution.
+$ grep -E 'execve\("[^"]*/zig", \["zig", "env"\]' strace-prop.txt | grep -c '= 0$'
+24
+$ grep -E 'execve\("[^"]*/zig", \["zig", "cc"' strace-prop.txt | grep -c '= 0$'
+24
+
+# Clean wall time for the same file, twice, without strace.
+$ /usr/bin/time -f "wall %e s" node --test \
+    tests/property/m5-array-buffer.property.test.ts
+wall 18.42 s
+wall 19.29 s
+
+# Derived: at the Phase A per-execution elapsed figure of 26.60 ms, that file
+# holds 0.64 s of removable serial work, about 3.4 percent of its wall time.
+# The share is far smaller than in the reviewed test262 runner because each of
+# these executions compiles and links a whole program, while a reviewed
+# test262 execution links against an already built harness object and a cached
+# runtime archive.
