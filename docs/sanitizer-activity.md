@@ -317,15 +317,15 @@ macOS CI configuration (2026-09-17)
 -----------------------------------
 
 The maintainer has chosen to run the complete self-check, runtime, native, and
-ordinary property tasks on every merge. The two `test_sanitizer_macos` matrix
-jobs in *.github/workflows/main.yaml* use `macos-15` and share the Linux lane's
-unfiltered `push`, `pull_request`, and `workflow_dispatch` triggers. Neither
-platform schedules sanitizer test262. Each macOS job runs
+ordinary property tasks on every merge. The two macOS sanitizer jobs in the
+generated *.github/workflows/main.yaml* use `macos-15` and share the Linux
+lane's unfiltered `push`, `pull_request`, and `workflow_dispatch` triggers.
+Neither platform schedules sanitizer test262. Each macOS job runs
 `test:sanitizer:self` immediately after checkout and tool installation, before
 its other tests, so unsupported instrumentation fails at preflight. The native
-job then runs `test:sanitizer:runtime` and `test:sanitizer:native`; the property
-job runs `test:sanitizer:property`. Both require `clang`. There is no separate
-GCC check because the macOS `gcc` command is an Apple Clang alias.
+job then runs `test:sanitizer:runtime` and `test:sanitizer:native`; the
+property job runs `test:sanitizer:property`. Both require `clang`. There is no
+separate GCC check because the macOS `gcc` command is an Apple Clang alias.
 
 The [GitHub runner specification] lists `macos-15` as arm64 with three M1 CPUs
 and 7 GB of RAM. The [macOS 15 arm64 image README], checked on 2026-09-17,

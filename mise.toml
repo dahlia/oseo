@@ -44,6 +44,7 @@ depends = [
   "check:test262-inventory",
   "check:lines",
   "check:lint",
+  "check:macos-lanes",
   "check:m5b-graph",
   "check:m5b-node-scope",
   "check:m5c-graph",
@@ -353,3 +354,14 @@ node tools/check-native-toolchains.ts
 [tasks."ci:runtime-archive-cache"]
 description = "Print the exact native runtime archive cache key and path"
 run = "node tests/ci-runtime-archive-cache.ts"
+
+[tasks."generate:macos-lanes"]
+description = "Generate five measured macOS CI capacity lanes"
+run = "node tools/generate-macos-lanes.ts"
+
+[tasks."check:macos-lanes"]
+description = "Check generated macOS CI lanes and preserved jobs"
+run = """
+node tools/generate-macos-lanes.ts --check
+node --test tests/macos-lanes.test.ts
+"""

@@ -1,0 +1,435 @@
+name: main
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+    inputs:
+      baseline:
+        description: "Commit to use as the compatibility baseline"
+        required: true
+        type: string
+
+concurrency:
+  # A main push gets its own group keyed by commit, because the ratchet reads
+  # the previous push as its baseline. Sharing a group would let GitHub drop a
+  # queued main run, and the next run would then measure against a commit no
+  # run ever checked.
+  group: >-
+    main-${{ github.workflow }}-${{ github.ref }}-${{
+      github.ref == 'refs/heads/main' && github.sha || 'shared' }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Fetch compatibility baseline
+        if: >-
+          github.event_name == 'pull_request' ||
+          (github.event_name == 'push' &&
+          github.ref_type == 'branch' &&
+          github.event.before != '0000000000000000000000000000000000000000')
+        env:
+          BASELINE: >-
+            ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: git fetch --no-tags origin "$BASELINE"
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - name: Check introduced commit messages
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          COMMIT_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # Fetch both endpoints without making the history shallow. A
+          # force-push's previous tip may no longer be on any remote ref.
+          git fetch --no-tags origin "$COMMIT_HEAD"
+          if [ "$BASE" != "0000000000000000000000000000000000000000" ]; then
+            git fetch --no-tags origin "$BASE"
+          fi
+          mise run check:commit-messages "$BASE..$COMMIT_HEAD"
+      - run: mise run check
+
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        runtime:
+          - node
+          - deno
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        if: runner.os != 'Windows'
+      - run: mise run test:${{ matrix.runtime }}
+
+  test_native:
+    name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
+    runs-on: ${{ matrix.platform.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+          - os: macos-15
+            target: macos-aarch64
+        shard:
+          - 1
+          - 2
+          - 3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: mise run test:native --shard ${{ matrix.shard }}/3
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: native-${{ matrix.platform.target }}-${{ matrix.shard }}-of-3
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  test_sanitizer:
+    name: host C sanitizers (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+      - run: mise run test:sanitizer:self
+      - name: Verify GCC sanitizer instrumentation
+        run: mise run test:sanitizer:self
+        env:
+          OSEO_HOST_CC: gcc
+      - run: mise run test:sanitizer:runtime
+      - run: mise run test:sanitizer:native
+      - run: mise run test:sanitizer:property
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-failures
+          path: /tmp/oseo-native-*
+          if-no-files-found: warn
+
+  test_sanitizer_macos:
+    name: host C sanitizers (macOS, ${{ matrix.suite }})
+    runs-on: macos-15
+    # Each suite retains its own instrumentation preflight.
+    # About 36–44 minutes for runtime/native and 29–35 for properties;
+    # 75 minutes leaves room for setup, cold caches, and slower runner images.
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - native
+          - property
+    env:
+      OSEO_HOST_CC: clang
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - run: mise run test:sanitizer:self
+        env:
+          TMPDIR: ${{ runner.temp }}
+      # No GCC verification: macOS gcc is an Apple Clang alias.
+      - if: matrix.suite == 'native'
+        run: mise run test:sanitizer:runtime
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: matrix.suite == 'native'
+        run: mise run test:sanitizer:native
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: matrix.suite == 'property'
+        run: mise run test:sanitizer:property
+        env:
+          # Four workers share three CPUs. Double Linux's interrupt allowance,
+          # retaining every ordinary case and seed; interruptions still fail.
+          OSEO_PROPERTY_TIME_SCALE: "6"
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-macos-${{ matrix.suite }}-failures
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  test_test262:
+    name: >-
+      test262 (${{ matrix.target }},
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 1
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 2
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 3
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 4
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 5
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 6
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 7
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 8
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 9
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 10
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 11
+            total: 12
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 12
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 1
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 2
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 3
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 4
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 5
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 6
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 7
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 8
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 9
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 10
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 11
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 12
+            total: 12
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:test262
+          --shard ${{ matrix.shard }}/${{ matrix.total }}
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format(
+            'test262-{0}-{1}-of-{2}',
+            matrix.target,
+            matrix.shard,
+            matrix.total) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  test_native_support:
+    name: >-
+      native support (${{ matrix.target }},
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 1
+            total: 5
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 2
+            total: 5
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 3
+            total: 5
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 4
+            total: 5
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 5
+            total: 5
+          - os: macos-15
+            target: macos-aarch64
+            shard: 1
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 2
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 3
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 4
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 5
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 6
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 7
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 8
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 9
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 10
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 11
+            total: 12
+          - os: macos-15
+            target: macos-aarch64
+            shard: 12
+            total: 12
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - if: matrix.shard == 1
+        run: mise run test:property:extended:package
+      - run: >-
+          mise run test:property:extended:native:shard
+          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          tests/property/*.property.test.ts
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format(
+            'native-support-diagnostics-{0}-{1}-of-{2}',
+            matrix.target,
+            matrix.shard,
+            matrix.total) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  native:
+    # The generator expands needs and replaces steps with success checks.
+    if: ${{ always() }}
+    needs:
+      - test_native
+      - test_native_support
+      - test_test262
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every native and test262 shard
+        run: |
+          test "${{ needs.test_native.result }}" = success
+          test "${{ needs.test_native_support.result }}" = success
+          test "${{ needs.test_test262.result }}" = success

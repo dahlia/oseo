@@ -1145,3 +1145,19 @@ current workload on its most favorable assumptions, so the remaining
 alternatives are a lever this plan has not yet identified or a maintainer
 decision that the ceiling itself moves. This projection makes neither and does
 not claim the ceiling is reachable.
+
+### macOS static capacity lanes (U16)
+
+The workflow now generates five macOS job chains from measured whole-job
+costs in *tools/macos-job-costs.ts*. All 31 macOS workloads and all 58 check
+names remain present. Each successor uses `!cancelled()` so predecessor
+failure does not skip coverage; the native aggregate requires success from
+every native and test262 shard. *tools/main-workflow.template.yaml* owns the
+commands, and `mise run check:macos-lanes` rejects generated workflow drift.
+
+The derived longest lane is 147.9 minutes using measured durations from main
+run `36516215200`; this assumes five exclusive slots and excludes additional
+queue delays. Workflow concurrency is unchanged, so other runs can still
+compete for those slots. The single branch CI observation is pending.
+[U16 evidence](./docs/evidence/u16/README.md) records the complete lane plan,
+check name inventory, and scheduling limits.
