@@ -1,0 +1,51 @@
+// Does moving the spawn onto a worker thread avoid the fork cost? A worker
+// shares the process address space, so the page-table copy should be
+// unchanged; only the thread charged for it moves.
+import { Worker, isMainThread, parentPort } from "node:worker_threads";
+import { spawn } from "node:child_process";
+
+const command = process.platform === "darwin" ? "/usr/bin/true" : "/bin/true";
+
+if (!isMainThread) {
+  parentPort.on("message", async () => {
+    const started = process.hrtime.bigint();
+    const child = spawn(command, [], { stdio: ["ignore", "pipe", "pipe"] });
+    const blocked = Number(process.hrtime.bigint() - started) / 1e6;
+    child.stdout.resume();
+    child.stderr.resume();
+    await new Promise((resolve) => child.on("close", resolve));
+    parentPort.postMessage(blocked);
+  });
+} else {
+  const megabytes = Number(process.argv[2] ?? "650");
+  const count = Number(process.argv[3] ?? "300");
+  const ballast = [];
+  for (let i = 0; i < megabytes; i++) {
+    const block = Buffer.allocUnsafe(1048576);
+    block.fill(i & 0xff);
+    ballast.push(block);
+  }
+  globalThis.__ballast = ballast;
+  const worker = new Worker(new URL(import.meta.url));
+  const blocked = [];
+  const cpuBefore = process.cpuUsage();
+  const wallBefore = performance.now();
+  for (let i = 0; i < count; i++) {
+    const answer = new Promise((resolve) => worker.once("message", resolve));
+    worker.postMessage(i);
+    blocked.push(await answer);
+  }
+  const wall = performance.now() - wallBefore;
+  const cpu = process.cpuUsage(cpuBefore);
+  const sum = blocked.reduce((a, b) => a + b, 0);
+  console.log(JSON.stringify({
+    mode: "worker",
+    rssMiB: Number((process.memoryUsage().rss / 1048576).toFixed(1)),
+    count,
+    workerBlockedMsMean: Number((sum / count).toFixed(3)),
+    wallMs: Number(wall.toFixed(1)),
+    processUserMs: Number((cpu.user / 1000).toFixed(1)),
+    processSystemMs: Number((cpu.system / 1000).toFixed(1)),
+  }));
+  await worker.terminate();
+}

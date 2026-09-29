@@ -1,0 +1,248 @@
+U14 Phase A measurements
+========================
+
+Every reviewed run below is at 97278fc6 on the Linux host in host.log, on the
+deterministic reviewed shard 1/100 (214 paths, 730 native executions) unless
+a row says shard 1/25 (856 paths, 2,937 native executions). A reviewed run
+without --update serializes the shard it produced and throws when it differs
+from the checked-in partitions, so every run listed here reproduced the
+checked-in manifest shard exactly: pass=183 expected-negative=14
+unsupported=17 at shard 1/100, pass=737 expected-negative=57 unsupported=62
+at shard 1/25.
+
+"load" is the host's one-minute load average taken immediately before the run.
+
+
+1. Synthetic parent: the cost of one process start against the parent's
+   resident set (spawn-rss.mjs, 300 sequential starts of a trivial child)
+---------------------------------------------------------------------------
+
+Linux, /bin/true:
+
+  ballast   rss MiB   mean ms   median ms   p90 ms   parent system ms
+      50       99.6     1.830       1.773    2.025              241.9
+     250      300.7     6.432       6.377    6.829              905.3
+     500      552.0    11.696      11.639   12.293             1636.9
+    1000     1054.2    22.311      22.156   23.334             3147.0
+
+  Derived slope between the first and last row: 0.02146 ms per MiB, that is
+  22.0 ms per GiB. The parent's own system time grows in step with it: it is
+  a derived 44 percent of the summed call time in the first row and 47
+  percent in the last. Kernel time in the parent growing with the parent's
+  own size is the signature of copying its page tables in fork(); this
+  measurement does not attribute the rest of the call.
+
+macOS (Apple M4, /usr/bin/true):
+
+  ballast   rss MiB   mean ms   median ms   p90 ms   parent system ms
+      50       96.1     0.265       0.163    0.526               63.4
+     250      296.1     0.157       0.109    0.209               40.3
+     500      547.0     0.347       0.199    0.693               73.4
+    1000      898.5     0.263       0.177    0.492               60.0
+
+  Flat, and two orders of magnitude cheaper. No growth with the parent's
+  resident set was observed here, which is what libuv starting a process
+  with posix_spawn on macOS and with fork() on Linux would predict. These
+  four rows do not measure a macOS CI run and demonstrate no macOS saving.
+
+
+2. Reviewed runner main-thread attribution, shard 1/100, pool 8
+---------------------------------------------------------------
+
+node --cpu-prof, load 2.85, wall 31.46 s, user 123.40 s, system 66.42 s,
+maximum resident set 996,640 kB. Sampled main-thread self time 31.33 s:
+
+    11.45 s   36.6%  spawn @ node:internal/child_process:356
+     5.46 s   17.4%  (idle)
+     1.10 s    3.5%  next @ node_modules/yaml/dist/parse/parser.js:176
+     0.98 s    3.1%  createHarnessObjectKey @ packages/compiler/dist/...
+     0.94 s    3.0%  (garbage collector)
+
+  For comparison, the U13 Phase A profile of the same shard before U13's
+  change measured 43.34 s sampled, of which spawn was 15.26 s (35.2%) and the
+  runtime-archive key group 11.88 s (27.4%). U13 removed the key group and
+  one of the three starts per execution; starting processes is now the
+  largest main-thread item by a factor of ten over the next one.
+
+
+3. Census of the process starts the reviewed runner performs
+------------------------------------------------------------
+
+spawn-recorder.mjs, no profiler. "blocked" is main-thread time inside
+ChildProcess.prototype.spawn, summed over the run.
+
+  shard 1/100, load 4.75, runner 21,797.84 ms, wall 28.23 s
+    1,466 starts, blocked 9,730.9 ms, mean resident set 589.8 MiB
+      zig                        736   mean 6.691  median 6.451  max 19.608
+      fixture-linux-x86_64-gnu   730   mean 6.584  median 6.412  max 14.387
+
+  shard 1/100, load 3.11, runner 21,216.86 ms
+    1,466 starts, blocked 9,645.8 ms, mean resident set 604.3 MiB
+      zig 736 mean 6.583; fixture-linux-x86_64-gnu 730 mean 6.577
+    memoryUsage at exit, MiB: rss 980, heapTotal 765, heapUsed 489,
+      external 13
+    median blocked time by the resident set at the start:
+      400-500 MiB  n=  227  4.403 ms
+      500-600 MiB  n=  158  5.415 ms
+      600-700 MiB  n=1,079  6.922 ms
+
+  shard 1/25, load 2.63, runner 103,878.55 ms, wall 110.64 s,
+  maximum resident set 1,148,912 kB
+    5,930 starts, blocked 53,376.4 ms, mean resident set 657.0 MiB
+      zig 2,993 mean 8.973; fixture-linux-x86_64-gnu 2,937 mean 9.029
+    median blocked time by the resident set at the start:
+      400-500 MiB  n=  334   6.377 ms
+      500-600 MiB  n=  623   7.164 ms
+      600-700 MiB  n=3,534   8.921 ms
+      700-800 MiB  n=1,260   9.399 ms
+      800-900 MiB  n=  177  10.006 ms
+    live set, taken as the smallest heapUsed sample in each 20 s window, MiB:
+      133, 97, 139, 186, 243, 231; largest heapTotal sample 918 MiB
+
+  There are exactly two starts per native execution: one zig cc compile and
+  link, and the native executable itself. That accounts for the 730
+  fixture-linux-x86_64-gnu starts and 730 of the 736 zig starts; the
+  remaining 6 are unclassified overhead. The recorder groups starts by the
+  executable's basename and keeps no arguments, so it cannot say what they
+  were, and more than one caller reaches the compiler under that name:
+  besides a harness object build, prepareNativeRuntime runs two zig env
+  identity probes while the executor initializes. Blocked time is a derived
+  44.6 and 45.5 percent of the runner's reported duration at shard 1/100 and
+  51.4 percent at shard 1/25; the share grows because the resident set does.
+
+  Within one run the blocked time tracks the resident set. Taking each group
+  at its midpoint, the derived slope is 12.9 ms per GiB across the 450 and
+  650 MiB groups of shard 1/100 and 9.3 ms per GiB across the 450 and 850 MiB
+  groups of shard 1/25. Both are estimates from grouped medians rather than a
+  fit to the individual observations. They are lower than the synthetic
+  parent's 22.0 ms per GiB, which is consistent with a V8 heap not being one
+  contiguous mapping of touched pages, although this measurement does not
+  establish that explanation.
+
+
+4. Where the resident set comes from
+------------------------------------
+
+The recorder samples heapUsed once a second without observing collection
+boundaries, so the smallest sample in a window is a proxy for the live set
+rather than an observation of it. That proxy grows from a measured 97 to 243
+MiB over the 856 paths of shard 1/25, which is an estimated 0.17 MiB retained
+per path, and the largest heapTotal sample is 918 MiB against a 1,083 MiB
+resident set. heapTotal is the whole V8 heap and does not isolate old space.
+The shape is consistent with a resident set dominated by heap reserve for
+per-case allocation churn, over a retained component that grows with the path
+count, and it does not by itself exclude a leak. If the retained component
+does grow with paths, a CI shard of 1,782 paths carries more of it than this
+sample and its starts are at least as expensive.
+
+Capping the heap was measured on a contended host (load 8.4 to 11.1) and is
+inconclusive; it is recorded only to show the direction and the cost.
+
+  configuration            wall s   maximum rss kB   blocked ms   per start ms
+  4 CPUs, default           50.18        1,010,984     12,168.0          8.300
+  --max-old-space-size=256  34.17          548,248     12,419.3          8.472
+  --max-old-space-size=384  30.71          595,616     10,111.3          6.897
+  4 CPUs, 256               61.54          516,820     10,810.2          7.374
+
+The cap halves the resident set and buys back some of the start cost, but
+the two 4-CPU rows disagree on the sign of the wall-time change and a cap
+sized against a 214-path sample risks an out-of-memory failure on a
+1,782-path CI shard. More collector time would explain paying for the
+smaller resident set, but these rows record no collector duration and do not
+test that. This unit does not propose it.
+
+
+5. Starting processes from a small helper, or from a worker thread
+------------------------------------------------------------------
+
+helper-bench.mjs and worker-spawn.mjs, 300 sequential starts. "blocked" is
+time inside the start call, on the main thread for the direct and helper
+rows and on the worker thread for the worker row, which is a different
+thread and not comparable with the others. The comparable columns for the
+worker row are wall time and the whole process's system time.
+
+Linux:
+
+  mode     ballast MiB   rss MiB   blocked ms   wall ms   parent system ms
+  direct            50     112.9        1.875     631.9              233.5
+  direct           650     716.1       18.846    5732.8             2542.6
+  helper            50     103.6        0.009     308.0                2.1
+  helper           650     706.5        0.009     308.2                6.8
+  worker           650     733.8       31.447    9641.5             4442.5
+
+macOS (Apple M4):
+
+  mode     ballast MiB   rss MiB   blocked ms   wall ms
+  direct            50     107.2        0.233     396.3
+  direct           650     612.5        0.159     278.7
+  helper            50      99.3        0.005     262.3
+  helper           650     701.6        0.011     492.4
+
+A helper removes the cost rather than moving it: the parent's system time for
+300 starts falls from 2,542.6 to 6.8 ms. The page tables copied are then the
+helper's rather than the parent's, which is the intended explanation but not
+something these two rows separate from other differences. A worker thread
+shares the parent's address space, so the same page tables are still copied.
+It is measurably worse than starting directly on the two comparable columns,
+at 9,641.5 ms of wall time against 5,732.8 and 4,442.5 ms of process system
+time against 2,542.6; its 31.447 ms figure is worker-thread time and is not
+comparable with the direct row's 18.846 ms of main-thread time. A second heap
+to copy would explain the increase, and this measurement does not test that.
+On macOS the helper also lowers blocked time, from a measured 0.233 to
+0.005 ms and from 0.159 to 0.011 ms, but from figures already under a
+quarter of a millisecond, and wall time moves in opposite directions between
+the two macOS configurations. Those rows demonstrate no macOS saving either
+way.
+
+
+6. Reviewed A/B with the measurement prototype
+----------------------------------------------
+
+ab.sh. The arms differ only by the environment variable that selects the
+helper, so no rebuild happens between them and they alternate run by run.
+Every run reproduced the checked-in manifest shard. Every individual run,
+with its own wall time, runner duration, and host load, is preserved in
+ab-runs.tsv.txt in the order the driver ran them; the means below are
+arithmetic means over the complete pairs of each group, and each per-pair
+percentage compares the two runs of one repetition.
+
+Cache conditions were not controlled. The Oseo compiler cache, which
+XDG_CACHE_HOME locates, and the lane's ZIG_GLOBAL_CACHE_DIR both persisted
+across every run; the driver neither reset nor warmed them and recorded no
+cache state, and it ran base before helper in every repetition rather than
+reversing the order within a pair. Warming that continued across the
+sequence would land on the helper arm, so these changes are the difference
+between the arms as they were run and do not isolate the helper's effect
+from cache state. The evidence against such a trend is weak: base wall time
+does not fall monotonically across the repetitions of three of the four
+groups below.
+
+  configuration            pairs   base wall s   helper wall s   change
+  3 CPUs, shard 1/100          3         53.82           50.11    -6.9%
+  4 CPUs, shard 1/100          3         45.24           40.87    -9.7%
+  16 CPUs pool 8, 1/100        3         32.93           29.57   -10.2%
+  4 CPUs, shard 1/25           3        180.60          157.00   -13.1%
+
+  configuration            pairs   base runner s   helper runner s   change
+  3 CPUs, shard 1/100          3           46.98             43.27    -7.9%
+  4 CPUs, shard 1/100          3           38.36             34.09   -11.1%
+  16 CPUs pool 8, 1/100        3           25.48             22.25   -12.7%
+  4 CPUs, shard 1/25           3          173.63            149.93   -13.6%
+
+  Per-pair wall change, in repetition order:
+    3 CPUs, 1/100:      -7.0%  -6.2%  -7.5%   (load 4.6 to 6.0)
+    4 CPUs, 1/100:      -8.0% -14.6%  -5.9%   (load 2.2 to 6.2)
+    16 CPUs, 1/100:    -13.1%  -7.2% -10.6%   (load 4.9 to 19.3)
+    4 CPUs, 1/25:      -12.8% -18.0%  -7.5%   (load 4.3 to 10.3)
+
+  All twelve pairs are reductions. The saving is larger on the four times
+  larger shard, which is what the resident-set relationship predicts: the
+  mean resident set during shard 1/25 is a measured 657.0 MiB against 589.8
+  and 604.3 MiB during shard 1/100, and a CI shard is 1/12 of the corpus.
+
+  An earlier pair of shard 1/25 repetitions taken while another lane was
+  running, at loads between 9.8 and 12.5, gave -7.4 and +6.7 percent. They
+  are recorded in ab-runs.tsv.txt because they were taken, not because they
+  measure anything: at that load the arms differ by less than the host does.
+  The three repetitions in the table above replace them and were taken at
+  loads between 4.3 and 10.3.

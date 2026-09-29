@@ -1,0 +1,97 @@
+// U14 measurement preload. Wraps child_process.spawn so every process start
+// the reviewed runner performs is counted, classified by command, and timed
+// around the synchronous uv_spawn call, together with the parent's resident
+// set at that moment. Writes one JSON line at exit.
+import childProcess from "node:child_process";
+import { appendFileSync } from "node:fs";
+import { basename } from "node:path";
+
+const out = process.env.OSEO_U14_OUT ?? "/dev/stderr";
+const label = process.env.OSEO_U14_LABEL ?? "run";
+const groups = new Map();
+const pairs = [];
+let rssSum = 0;
+
+// Optional ballast, to measure how the fork cost scales with the parent's
+// resident set inside the real runner rather than in a synthetic parent.
+const ballastMiB = Number(process.env.OSEO_U14_BALLAST_MIB ?? "0");
+const ballast = [];
+for (let index = 0; index < ballastMiB; index++) {
+  const block = Buffer.allocUnsafe(1024 * 1024);
+  block.fill(index & 0xff);
+  ballast.push(block);
+}
+
+// ChildProcess.prototype.spawn is the frame the V8 profile attributes the
+// fork to, and patching it also covers an ESM named import of spawn().
+const original = childProcess.ChildProcess.prototype.spawn;
+childProcess.ChildProcess.prototype.spawn = function spawn(options) {
+  const key = basename(String(options?.file ?? "unknown"));
+  const started = process.hrtime.bigint();
+  const child = original.call(this, options);
+  const elapsed = Number(process.hrtime.bigint() - started) / 1e6;
+  const rss = process.memoryUsage.rss() / (1024 * 1024);
+  let group = groups.get(key);
+  if (group == null) {
+    group = { count: 0, totalMs: 0, maxMs: 0, rssSum: 0, samples: [] };
+    groups.set(key, group);
+  }
+  group.count++;
+  group.totalMs += elapsed;
+  group.rssSum += rss;
+  if (elapsed > group.maxMs) group.maxMs = elapsed;
+  group.samples.push(elapsed);
+  pairs.push([Number(rss.toFixed(1)), Number(elapsed.toFixed(3))]);
+  rssSum += rss;
+  return child;
+};
+
+// Sample the resident set and V8 heap every second so the run's memory
+// growth can be read off afterwards.
+const memorySamples = [];
+const sampler = setInterval(() => {
+  const usage = process.memoryUsage();
+  memorySamples.push([
+    Math.round(performance.now()),
+    Math.round(usage.rss / 1048576),
+    Math.round(usage.heapUsed / 1048576),
+    Math.round(usage.heapTotal / 1048576),
+  ]);
+}, 1000);
+sampler.unref();
+
+process.on("exit", () => {
+  const report = {};
+  let count = 0;
+  let totalMs = 0;
+  for (const [key, group] of groups) {
+    const sorted = [...group.samples].sort((a, b) => a - b);
+    report[key] = {
+      count: group.count,
+      totalMs: Number(group.totalMs.toFixed(1)),
+      meanMs: Number((group.totalMs / group.count).toFixed(3)),
+      medianMs: Number(sorted[Math.floor(sorted.length / 2)].toFixed(3)),
+      maxMs: Number(group.maxMs.toFixed(3)),
+      meanRssMiB: Number((group.rssSum / group.count).toFixed(1)),
+    };
+    count += group.count;
+    totalMs += group.totalMs;
+  }
+  appendFileSync(
+    out,
+    `${JSON.stringify({
+      label,
+      spawns: count,
+      spawnBlockedMs: Number(totalMs.toFixed(1)),
+      meanRssMiB: count === 0 ? 0 : Number((rssSum / count).toFixed(1)),
+      // The resident set at exit, which is not the run's high-water mark;
+      // /usr/bin/time -v reports that.
+      exitRssMiB: Number((process.memoryUsage().rss / (1024 * 1024)).toFixed(1)),
+      ballastMiB,
+      memoryUsage: process.memoryUsage(),
+      byCommand: report,
+      pairs,
+      memorySamples,
+    })}\n`,
+  );
+});

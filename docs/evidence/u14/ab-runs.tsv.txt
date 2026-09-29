@@ -1,0 +1,46 @@
+# U14 Phase A: every A/B run, in the order the driver ran them.
+#
+# Columns: label, arm, wall seconds, runner reported milliseconds,
+# host one-minute load taken immediately before the run, reviewed summary.
+# The tables in measurements.txt are the arithmetic means of the wall and
+# runner columns over the complete pairs of each group, and each per-pair
+# percentage compares the two runs of one repetition.
+#
+# group: shard 1/100, taskset -c 0-2
+base-r1-cpu0-2	base	54.228736141	47379.75	4.61	pass=183 expected-negative=14 unsupported=17
+helper-r1-cpu0-2	helper	50.449436010	43260.78	5.08	pass=183 expected-negative=14 unsupported=17
+base-r2-cpu0-2	base	54.198648607	47340.2	5.97	pass=183 expected-negative=14 unsupported=17
+helper-r2-cpu0-2	helper	50.844663192	44129.51	5.49	pass=183 expected-negative=14 unsupported=17
+base-r3-cpu0-2	base	53.020701441	46234.84	5.70	pass=183 expected-negative=14 unsupported=17
+helper-r3-cpu0-2	helper	49.043788610	42422.93	5.19	pass=183 expected-negative=14 unsupported=17
+#
+# group: shard 1/100, taskset -c 0-3
+base-r1-cpu0-3	base	44.955297708	38298.21	2.23	pass=183 expected-negative=14 unsupported=17
+helper-r1-cpu0-3	helper	41.358051635	34429.56	3.98	pass=183 expected-negative=14 unsupported=17
+base-r2-cpu0-3	base	47.717086298	40201.15	6.06	pass=183 expected-negative=14 unsupported=17
+helper-r2-cpu0-3	helper	40.771560022	34010.57	6.17	pass=183 expected-negative=14 unsupported=17
+base-r3-cpu0-3	base	43.038704853	36593.82	5.83	pass=183 expected-negative=14 unsupported=17
+helper-r3-cpu0-3	helper	40.481376544	33841.68	5.15	pass=183 expected-negative=14 unsupported=17
+#
+# group: shard 1/100, unrestricted, pool 8 on 16 logical CPUs
+base-r1	base	30.329026193	23794.09	4.94	pass=183 expected-negative=14 unsupported=17
+helper-r1	helper	26.344823653	19606.78	9.18	pass=183 expected-negative=14 unsupported=17
+base-r2	base	33.770721710	25259.2	10.95	pass=183 expected-negative=14 unsupported=17
+helper-r2	helper	31.351494670	24297.69	10.73	pass=183 expected-negative=14 unsupported=17
+base-r3	base	34.689784128	27401.48	16.96	pass=183 expected-negative=14 unsupported=17
+helper-r3	helper	31.012555207	22850.92	19.29	pass=183 expected-negative=14 unsupported=17
+#
+# group: shard 1/25, taskset -c 0-3
+base-r1-cpu0-3	base	170.283212147	163580.97	4.26	pass=737 expected-negative=57 unsupported=62
+helper-r1-cpu0-3	helper	148.419017388	141612.67	7.66	pass=737 expected-negative=57 unsupported=62
+base-r2-cpu0-3	base	201.060964383	193746.21	7.28	pass=737 expected-negative=57 unsupported=62
+helper-r2-cpu0-3	helper	164.945252690	158096.3	9.10	pass=737 expected-negative=57 unsupported=62
+base-r3-cpu0-3	base	170.452843267	163560.91	10.29	pass=737 expected-negative=57 unsupported=62
+helper-r3-cpu0-3	helper	157.635115076	150086.23	9.65	pass=737 expected-negative=57 unsupported=62
+#
+# group: shard 1/25, taskset -c 0-3, taken while another lane was running.
+# Not used in any table; recorded because it was taken.
+base-r1-cpu0-3	base	194.017611937	185702.9	12.46	pass=737 expected-negative=57 unsupported=62
+helper-r1-cpu0-3	helper	179.711528811	172406.97	10.37	pass=737 expected-negative=57 unsupported=62
+base-r2-cpu0-3	base	182.438804550	172789.83	10.55	pass=737 expected-negative=57 unsupported=62
+helper-r2-cpu0-3	helper	194.698420638	186669.44	9.77	pass=737 expected-negative=57 unsupported=62

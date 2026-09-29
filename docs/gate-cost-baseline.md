@@ -2054,6 +2054,184 @@ every measured run above.
 [36369711059]: https://github.com/dahlia/oseo/actions/runs/36369711059
 [36496566681]: https://github.com/dahlia/oseo/actions/runs/36496566681
 
+### Reviewed test262 process starts (U14 Phase A)
+
+U14 asks what the reviewed runner now spends on starting processes, and
+whether any of it can be removed without changing what is executed or proven.
+The answer is that it is the largest remaining main-thread cost on Linux,
+that the measurement that finds it on Linux does not find it on macOS, and
+that the one lossless lever measured here therefore has no demonstrated macOS
+saving. This section is a measurement; the unit implements no repository
+change and claims no recovered CI capacity.
+
+Scripts, the throwaway prototype, and the compact outputs are preserved in
+[*evidence/u14/README.md*](./evidence/u14/README.md), with the hosts in
+*evidence/u14/host.log*. Every reviewed run used only
+`ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-native-spawn-cost`. A reviewed run
+without `--update` serializes the shard it produced and throws when it differs
+from the checked-in partitions, so every run recorded here reproduced the
+checked-in manifest shard exactly. No reviewed path, variant, mode, target,
+sanitizer flag, retry policy, budget, or verdict was changed.
+
+The workload is the reviewed shard 1/100, a measured 214 paths and 730 native
+executions, with one four times larger sample at shard 1/25, a measured 856
+paths and 2,937 native executions. The Linux host is the shared developer
+machine in *evidence/u14/host.log*; its one-minute load is recorded for every
+run.
+
+Main-thread CPU was attributed with `--cpu-prof` on one pool 8 run of shard
+1/100, giving a measured 31.33 s of sampled self time.
+
+| Main-thread work                          | Measured self s | Derived share |
+| ----------------------------------------- | --------------- | ------------- |
+| `spawn` in *node:internal/child\_process* | 11.45           | 36.6%         |
+| Idle                                      | 5.46            | 17.4%         |
+| YAML parsing                              | 1.10            | 3.5%          |
+| `createHarnessObjectKey`                  | 0.98            | 3.1%          |
+| Garbage collector                         | 0.94            | 3.0%          |
+
+Starting processes is now the largest item by a factor of ten over the next
+one that is not idle. U13's profile of the same shard before its change
+measured 43.34 s sampled, of which `spawn` was 15.26 s and the
+runtime-archive key group 11.88 s. U13 removed the key group and one of the
+three starts per execution, so the share of what remains rose while its
+absolute value fell.
+
+Without the profiler, a preload that wraps `ChildProcess.prototype.spawn`
+counts every start and records the main-thread time blocked inside the call.
+There are exactly two starts per native execution, one `zig cc` compile and
+link and the native executable itself. That accounts for the 730
+`fixture-linux-x86_64-gnu` starts and for 730 of the 736 `zig` starts, and
+the remaining six are unclassified overhead. The recorder groups starts by the
+executable's basename and retained no arguments, so it cannot say what they
+were, and more than one caller reaches the compiler under that name: besides
+a harness object build, `prepareNativeRuntime` runs two `zig env` identity
+probes while the executor initializes.
+
+| Shard | Measured starts | Measured blocked s | Measured runner s | Derived share |
+| ----- | --------------- | ------------------ | ----------------- | ------------- |
+| 1/100 | 1,466           | 9.73               | 21.80             | 44.6%         |
+| 1/100 | 1,466           | 9.65               | 21.22             | 45.5%         |
+| 1/25  | 5,930           | 53.38              | 103.88            | 51.4%         |
+
+The cost is the parent's size, not the child's. On Linux libuv starts a
+process with `fork`, which copies the parent's page tables, and the reviewed
+runner's measured peak resident set is 996,640 kB at shard 1/100 and
+1,148,912 kB at shard 1/25. A synthetic parent shows the relationship
+directly: 300 sequential starts of a trivial child cost a measured 1.830 ms
+each at a 99.6 MiB resident set and 22.311 ms each at 1,054.2 MiB, a derived
+22.0 ms per GiB. The parent's own system time over those 300 starts grows
+with it, from a measured 241.9 to 3,147.0 ms, a derived 44 and 47 percent of
+the summed call time; kernel time in the parent that grows with the parent's
+own size is what copying its page tables looks like, and this measurement
+does not attribute the remainder of the call. The same relationship holds
+inside the runner at a lower slope: grouping the run's own starts by the
+resident set at the moment of the start gives a measured 4.403 ms median in
+the 400 to 500 MiB group and 6.922 ms in the 600 to 700 MiB group, an
+estimated 12.9 ms per GiB between those groups' midpoints.
+
+The same measurement on macOS does not find this cost. On an Apple M4 a
+start costs a measured 0.265 ms at a 96.1 MiB resident set and 0.263 ms at
+898.5 MiB, flat within its own noise across a tenfold range, which is what
+libuv starting a process with `posix_spawn` there would predict. Scaling
+that rate to the 1,466 starts of a 1/100 shard estimates 0.4 s in total
+against the Linux 9.7 s. Those macOS figures are micro-benchmarks on a
+desktop M4, not GitHub macOS runner measurements and not a reviewed run, and
+no macOS before-and-after was taken. What they support is that there is no
+demonstrated macOS saving here, not a measured macOS runner time.
+
+Why the runner holds about a gigabyte is worth recording, because it is what
+makes each start expensive. The recorder samples `heapUsed` once a second
+without observing collection boundaries, so the smallest sample in a window
+is a proxy for the live set rather than an observation of it. That proxy
+grows from a measured 97 to 243 MiB over the 856 paths of shard 1/25, an
+estimated 0.17 MiB retained per path, while the largest `heapTotal` sample,
+which covers the whole heap rather than old space alone, is 918 MiB against a
+1,083 MiB resident set. The shape is consistent with a resident set dominated
+by heap reserve for per-case allocation churn over a retained component that
+grows with the path count; it does not by itself exclude a leak, and this
+unit did not look further. Reducing the resident set is in any case not
+free. Capping the old space with
+`--max-old-space-size=256` halves the measured peak resident set, from
+1,010,984 to 548,248 kB, but the two four-core measurements disagree on the
+sign of the wall-time change and a cap sized against a 214-path sample risks
+an out-of-memory failure on a CI shard of 1,782 paths. More collector time
+would explain paying for the smaller resident set; these rows record no
+collector duration and do not test it. Those four rows were also taken on a
+contended host, at loads between 8.4 and 11.1, and are recorded as a
+direction rather than a result.
+
+Moving the start onto a `worker_threads` worker was measured and is worse. A
+worker shares the parent's address space, so the same page tables are still
+copied and only the thread charged for the copy moves. At a 650 MiB ballast,
+300 starts through a worker take a measured 9,641.5 ms of wall time against
+5,732.8 ms directly, and the whole process's system time is 4,442.5 ms
+against 2,542.6 ms. The worker's own 31.447 ms per start is time blocked on
+the worker thread and is not comparable with the 18.846 ms blocked on the
+main thread in the direct arm. A second heap for the fork to copy would
+explain the increase; this measurement does not test that.
+
+The lever that does work on Linux is a small long-lived helper process that
+owns the starts, so that the page tables copied are the helper's rather than
+the runner's. In the same synthetic comparison the blocked time per start
+falls from a measured 18.846 to 0.009 ms and the parent's system time over
+300 starts from 2,542.6 to 6.8 ms. It was measured on the reviewed runner
+with a throwaway prototype, preserved as
+*evidence/u14/spawn-helper-prototype.diff*, which adds an environment-gated
+branch to the Node host's `run` that forwards the request to the helper over
+an IPC channel. The two arms of the A/B differ only by that environment
+variable, so they alternate run by run with no rebuild between them. Every
+individual run, with its own wall time, runner duration, and host load, is
+preserved in *evidence/u14/ab-runs.tsv.txt*; the means below are arithmetic
+means over the complete pairs of each group.
+
+Cache conditions were not controlled. Both the Oseo compiler cache, which
+`XDG_CACHE_HOME` locates, and the lane's `ZIG_GLOBAL_CACHE_DIR` persisted
+across every run, the driver neither reset nor warmed them and recorded no
+cache state, and it ran the base arm before the helper arm in every
+repetition rather than reversing the order within a pair. Any warming
+that continued across the sequence would therefore land on the helper arm, so
+these reductions are the difference between the arms as they were run and do
+not isolate the helper's effect from cache state. What the preserved per-run
+data shows against such a trend is weak: base wall time does not fall
+monotonically across the repetitions of three of the four groups.
+
+| Configuration       | Pairs | Measured base wall s | Measured helper wall s | Derived change |
+| ------------------- | ----- | -------------------- | ---------------------- | -------------- |
+| 3 CPUs, shard 1/100 | 3     | 53.82                | 50.11                  | -6.9%          |
+| 4 CPUs, shard 1/100 | 3     | 45.24                | 40.87                  | -9.7%          |
+| 16 CPUs, pool 8     | 3     | 32.93                | 29.57                  | -10.2%         |
+| 4 CPUs, shard 1/25  | 3     | 180.60               | 157.00                 | -13.1%         |
+
+All twelve position-paired comparisons are reductions, from a derived 5.9 to
+18.0 percent, and the runner's own reported duration moves with them, by a
+derived 7.9, 11.1, 12.7, and 13.6 percent. The saving is larger on the four
+times larger shard, which is what the resident-set relationship predicts: the
+mean resident set during shard 1/25 is a measured 657.0 MiB against 589.8 and
+604.3 MiB during shard 1/100, and a CI shard is 1/12 of the corpus rather
+than 1/25. An earlier pair of shard 1/25 repetitions taken while another lane
+was running, at loads between 9.8 and 12.5, gave -7.4 and +6.7 percent; at
+that load the arms differ by less than the host does, and the three
+repetitions in the table replace them.
+
+This is recorded as a measured candidate for local Linux gate speed and is
+deliberately not adopted in M5CI. The milestone's binding host is macOS,
+where the measurement above demonstrates no saving, and the change would
+add a second process-execution layer between the runner and every compiler
+and fixture start, with its own lifetime, its own failure modes, and a new
+place for the byte identity of captured output and the classification of
+`EAGAIN`, `ENOMEM`, and `ENOENT` start failures to drift. Adopting it would
+be a trade of that risk against Linux minutes that are not the constraint.
+The condition for revisiting it is a scenario in which Linux test262 becomes
+the binding family, or a change that makes the runner's resident set grow
+enough that the Linux lane's own tail matters.
+
+One observation belongs to whoever next looks at the runner's memory rather
+than to this unit. The retained component of an estimated 0.17 MiB per path
+comes from 856 paths on one host and from sampled heap sizes rather than
+collection boundaries; this unit did not identify what holds it, and a CI
+shard holds roughly twice as many paths as the largest sample here.
+
 ### Historical per-path test262 investigation
 
 The measurement sources, exact per-run values, and table-to-artifact map

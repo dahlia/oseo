@@ -1,0 +1,31 @@
+// Prototype spawn helper: a small long-lived process that owns the process
+// launches, so a large parent never forks. One newline-delimited JSON request
+// per line, one response per line.
+import { spawn } from "node:child_process";
+import { createInterface } from "node:readline";
+
+const lines = createInterface({ input: process.stdin });
+for await (const line of lines) {
+  if (line === "") continue;
+  const request = JSON.parse(line);
+  const child = spawn(request.command, request.args ?? [], {
+    cwd: request.cwd,
+    env: request.env ?? process.env,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  const out = [];
+  const err = [];
+  child.stdout.on("data", (chunk) => out.push(chunk));
+  child.stderr.on("data", (chunk) => err.push(chunk));
+  const [code] = await new Promise((resolve) => {
+    child.on("close", (...values) => resolve(values));
+  });
+  process.stdout.write(
+    `${JSON.stringify({
+      id: request.id,
+      exitStatus: code ?? 1,
+      stdout: Buffer.concat(out).toString("base64"),
+      stderr: Buffer.concat(err).toString("base64"),
+    })}\n`,
+  );
+}
