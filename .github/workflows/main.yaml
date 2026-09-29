@@ -2,7 +2,7 @@ name: main
 
 on:
   pull_request:
-  push:
+  # U17 experiment only: no full CI on branch push.
   workflow_dispatch:
     inputs:
       baseline:
