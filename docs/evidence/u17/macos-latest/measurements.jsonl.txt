@@ -1,0 +1,599 @@
+{"cache": "/Users/runner/work/_temp/u17-cold-zig-cache", "host": "macOS-26.6.2-arm64-arm-64bit-Mach-O", "image": "20260907.0351.1", "kind": "metadata", "log_start": "2026-09-29 16:03:39", "note": "measured once; build time excluded from launch totals", "run": "36594796547"}
+{"cache": "cold Zig cache", "compiler": "zig", "kind": "warmup-build", "ms": 15987.193}
+{"compiler": "zig", "kind": "warmup-exec", "ms": 27.388167}
+{"compiler": "zig", "index": 0, "kind": "build", "ms": 421.761542, "serial": true, "sha256": "fb8dcc6258032c4b7908dc0d50a911f1fd392294d0b362aba283660e1f1f9173", "workers": 1}
+{"compiler": "zig", "index": 1, "kind": "build", "ms": 274.068542, "serial": true, "sha256": "380099b495b3254a9cc3cacf93166b611643e561a41feff379aba1c93d9799d8", "workers": 1}
+{"compiler": "zig", "index": 2, "kind": "build", "ms": 416.096083, "serial": true, "sha256": "0a8a3444799670de17031d5377b6ec87328a50c74fa5ec0527c95f2c121ae739", "workers": 1}
+{"compiler": "zig", "index": 3, "kind": "build", "ms": 330.970167, "serial": true, "sha256": "72bd344a7c132065cdc2ef98173db04f6d602774774659511267e1cd5d2d362c", "workers": 1}
+{"compiler": "zig", "index": 4, "kind": "build", "ms": 296.532708, "serial": true, "sha256": "9c6a5587b5bf58f45d01b84dee655eebcc23d51bc97dd119a01400a41a963f58", "workers": 1}
+{"compiler": "zig", "index": 5, "kind": "build", "ms": 320.808166, "serial": true, "sha256": "36b3445a35a0186590f31a6695b1ae032068afba6bba553df407f8d3dc3d5227", "workers": 1}
+{"compiler": "zig", "index": 6, "kind": "build", "ms": 230.194833, "serial": true, "sha256": "00eb60387999049f6d3ab4d2606c279f1e3c92b243633258fe09e4d409a34487", "workers": 1}
+{"compiler": "zig", "index": 7, "kind": "build", "ms": 314.161583, "serial": true, "sha256": "fcad261e9b8ccb919277818d8f9e24854b9dadefd013e2e0098aed84d17070d7", "workers": 1}
+{"compiler": "zig", "index": 8, "kind": "build", "ms": 380.500125, "serial": true, "sha256": "cbc026596bd1cd41ea50ad3d15e1a19f115d8df38b49d8b8378b1c70015b2782", "workers": 1}
+{"compiler": "zig", "index": 9, "kind": "build", "ms": 261.089625, "serial": true, "sha256": "824ae0ff6384a6c85b8b1a50d72d22acf2418c10c2062b2d0e8f1d12c69571b8", "workers": 1}
+{"compiler": "zig", "index": 10, "kind": "build", "ms": 225.907958, "serial": true, "sha256": "9d02ed84b27f8a82bfc2da2f978a24e2b4d2fb3db9da0abb86bf74e3cf35e981", "workers": 1}
+{"compiler": "zig", "index": 11, "kind": "build", "ms": 218.002042, "serial": true, "sha256": "98615ccbcdf6d8912597efd89c12b299f2ccd82f94ff86531e94faaeed9ccaa6", "workers": 1}
+{"compiler": "zig", "index": 12, "kind": "build", "ms": 206.557292, "serial": true, "sha256": "7399fb90ffceff0351950d643e6fe63c6ab485cdeeefba2b03bfb6fc209ede4b", "workers": 1}
+{"compiler": "zig", "index": 13, "kind": "build", "ms": 224.66, "serial": true, "sha256": "cad7fc4031f11d394ee0d117c48f67a15b847abaccaef7dd87e279e2fce93053", "workers": 1}
+{"compiler": "zig", "index": 14, "kind": "build", "ms": 261.550709, "serial": true, "sha256": "807b5b0d3de04ef0c30e5566311defeb6f276348a8638ae96a71e9d29e0ce2bb", "workers": 1}
+{"compiler": "zig", "index": 15, "kind": "build", "ms": 240.962708, "serial": true, "sha256": "4853007f0c99124c9ffe65e231d3e3becf67c5b27bdf41142d189332007def1c", "workers": 1}
+{"compiler": "zig", "index": 16, "kind": "build", "ms": 249.859917, "serial": true, "sha256": "064b0937fe8697ea23417b74aa6b9daf5877e2b1959fca9cb3b44778af7adcf5", "workers": 1}
+{"compiler": "zig", "index": 17, "kind": "build", "ms": 315.762041, "serial": true, "sha256": "00c4e6c41d2041b5240796e417b8af380dbe9a5ef0f859e450d16e17b97ce222", "workers": 1}
+{"compiler": "zig", "index": 18, "kind": "build", "ms": 195.014292, "serial": true, "sha256": "8ebd94a9087d0ab99f2142e53316134288d4dd9c4041dd76aa8e1a3c6cfb50fd", "workers": 1}
+{"compiler": "zig", "index": 19, "kind": "build", "ms": 187.758791, "serial": true, "sha256": "6a55679d8250f46d4cdb92ba299b2c102dd64afde2d014ca0c43c30d1201b432", "workers": 1}
+{"compiler": "zig", "index": 20, "kind": "build", "ms": 231.109541, "serial": true, "sha256": "194b2be2c7559e3c8ac9dfd4783d98ff673f33ac409b93ef0aa8b2c2a415b43f", "workers": 1}
+{"compiler": "zig", "index": 21, "kind": "build", "ms": 215.399708, "serial": true, "sha256": "18ac24706c91c8397d2ca4718390745c587e0d3fe5a3b8dab2f1a9cb35ef0762", "workers": 1}
+{"compiler": "zig", "index": 22, "kind": "build", "ms": 282.075375, "serial": true, "sha256": "2b8b0485708380e0e1869d21236719c45d310d30fedc9fee6751cf816d3844b6", "workers": 1}
+{"compiler": "zig", "index": 23, "kind": "build", "ms": 296.111417, "serial": true, "sha256": "e584eea323142b80526156acd6688c176be71742920be14ad00665c8e2fb27e5", "workers": 1}
+{"compiler": "zig", "index": 24, "kind": "build", "ms": 223.771083, "serial": true, "sha256": "443da9aebb7acaf6a1740477913180a4481b7afc006d878d7fdbf7a19bb66b59", "workers": 1}
+{"compiler": "zig", "index": 25, "kind": "build", "ms": 312.191667, "serial": true, "sha256": "65645000a7e46782a99d8b33a856228e6cbdf0155f167dbed155ea243dcb52af", "workers": 1}
+{"compiler": "zig", "index": 26, "kind": "build", "ms": 359.6885, "serial": true, "sha256": "32369184613466981d18aaba7546e70451c31b8746fd4b2355a39588c293f193", "workers": 1}
+{"compiler": "zig", "index": 27, "kind": "build", "ms": 198.313917, "serial": true, "sha256": "717b86173c29e692e772da6c437e98540284767cecf0e29e6f805019a36eafbe", "workers": 1}
+{"compiler": "zig", "index": 28, "kind": "build", "ms": 294.573625, "serial": true, "sha256": "117b86b1b12155b061138da0834f3187ab4cb14ecc80be75f41357d939e94894", "workers": 1}
+{"compiler": "zig", "index": 29, "kind": "build", "ms": 257.865625, "serial": true, "sha256": "a9d09d0297a4db4d1cfc8705a4492c20b3c95a45ecb0b1fafccbd5d9494287e9", "workers": 1}
+{"compiler": "zig", "index": 30, "kind": "build", "ms": 354.827292, "serial": true, "sha256": "2de8402fd8993f663adb3c4e46fde55515fb7b4792a50f0390579b6763e874f0", "workers": 1}
+{"compiler": "zig", "index": 31, "kind": "build", "ms": 328.440084, "serial": true, "sha256": "8582c04ccec82984eb31ac5dc88de5b9c9515602017a2e47bdff9b18206f0899", "workers": 1}
+{"compiler": "zig", "index": 32, "kind": "build", "ms": 268.723833, "serial": true, "sha256": "6f498a860057c37ade4800aa50e9b11c9095401379dd20938f0565f608b0026e", "workers": 1}
+{"compiler": "zig", "index": 33, "kind": "build", "ms": 284.043333, "serial": true, "sha256": "7bc8e75ecf46cb11be62e9ec1031a00d5344b530833eb381e9f253065628dc7d", "workers": 1}
+{"compiler": "zig", "index": 34, "kind": "build", "ms": 271.437917, "serial": true, "sha256": "c7e00f2150902bdc1b8f2172104db7dff18fe7b3190baddc0e159a3da727d494", "workers": 1}
+{"compiler": "zig", "index": 35, "kind": "build", "ms": 255.550125, "serial": true, "sha256": "1bcc8204becc041ad78878cf5f00e0148273328dc2938527fe17037cee9c98bd", "workers": 1}
+{"compiler": "zig", "index": 36, "kind": "build", "ms": 291.538042, "serial": true, "sha256": "555ba62e20db7188bc1c472b9cce8ce2f7afafacc12160e83ee7a09de9d9444d", "workers": 1}
+{"compiler": "zig", "index": 37, "kind": "build", "ms": 301.095125, "serial": true, "sha256": "5557460eb21639189156252b9feca0989cab5561ebd739682ec4361a10f02250", "workers": 1}
+{"compiler": "zig", "index": 38, "kind": "build", "ms": 254.480959, "serial": true, "sha256": "4c8c98322db3a23d1c56f84c39f44278c1a94c34cd70dfa4d15b400d6edbced5", "workers": 1}
+{"compiler": "zig", "index": 39, "kind": "build", "ms": 253.339667, "serial": true, "sha256": "2c42e4a385fed3b96e8c308d21fcb7f9dbdb11fed8d09c59e7a3d177c3dbc6a5", "workers": 1}
+{"compiler": "zig", "index": 40, "kind": "build", "ms": 367.529292, "serial": true, "sha256": "c59e86b202535fe503c9b9a56ebc5103c6b623aa5aee5099d5c8168c369bc534", "workers": 1}
+{"compiler": "zig", "index": 41, "kind": "build", "ms": 313.156625, "serial": true, "sha256": "7f912ed255ed013b0e96c322e1b81445893233af40ead34bea1b0d13d7209306", "workers": 1}
+{"compiler": "zig", "index": 42, "kind": "build", "ms": 305.519875, "serial": true, "sha256": "fac991c2b970e05dcb8d53062cbc5be3b4486b3f2af33f1f6889dc6bfa960f85", "workers": 1}
+{"compiler": "zig", "index": 43, "kind": "build", "ms": 334.268458, "serial": true, "sha256": "694d55fdd370ad91f87b339dafeff6a872249068afdaf56da8fc4f95d3a2149f", "workers": 1}
+{"compiler": "zig", "index": 44, "kind": "build", "ms": 287.184375, "serial": true, "sha256": "47d2cf175dcc3b0484f8cf864d8da0b3abec31f5c2ed432288af0e1066e1c9e8", "workers": 1}
+{"compiler": "zig", "index": 45, "kind": "build", "ms": 247.072584, "serial": true, "sha256": "f5385c28563da14dd9c2fce1e9f1c1f8ab88b6318995529c8bce0a5d4bb8a3ea", "workers": 1}
+{"compiler": "zig", "index": 46, "kind": "build", "ms": 251.427584, "serial": true, "sha256": "51a08a970f838f6872a6080f2ac1134107e7435a61b81f5831ecadfaaac5adb0", "workers": 1}
+{"compiler": "zig", "index": 47, "kind": "build", "ms": 262.87525, "serial": true, "sha256": "4f6aa38aec76fc02c7c16f209b75f3cf45d4382d5a944c249e58968d86883160", "workers": 1}
+{"cache": "warm Zig cache", "compiler": "zig", "kind": "build-total", "ms": 13602.489458, "serial": true, "workers": 1}
+{"compiler": "zig", "index": 0, "iteration": 1, "kind": "exec", "ms": 11.547125, "workers": 1}
+{"compiler": "zig", "index": 1, "iteration": 1, "kind": "exec", "ms": 8.994958, "workers": 1}
+{"compiler": "zig", "index": 2, "iteration": 1, "kind": "exec", "ms": 8.247958, "workers": 1}
+{"compiler": "zig", "index": 3, "iteration": 1, "kind": "exec", "ms": 8.030542, "workers": 1}
+{"compiler": "zig", "index": 4, "iteration": 1, "kind": "exec", "ms": 9.563292, "workers": 1}
+{"compiler": "zig", "index": 5, "iteration": 1, "kind": "exec", "ms": 7.7975, "workers": 1}
+{"compiler": "zig", "index": 6, "iteration": 1, "kind": "exec", "ms": 9.110791, "workers": 1}
+{"compiler": "zig", "index": 7, "iteration": 1, "kind": "exec", "ms": 18.659875, "workers": 1}
+{"compiler": "zig", "index": 8, "iteration": 1, "kind": "exec", "ms": 9.995083, "workers": 1}
+{"compiler": "zig", "index": 9, "iteration": 1, "kind": "exec", "ms": 8.4705, "workers": 1}
+{"compiler": "zig", "index": 10, "iteration": 1, "kind": "exec", "ms": 15.466125, "workers": 1}
+{"compiler": "zig", "index": 11, "iteration": 1, "kind": "exec", "ms": 18.966333, "workers": 1}
+{"compiler": "zig", "index": 12, "iteration": 1, "kind": "exec", "ms": 9.889833, "workers": 1}
+{"compiler": "zig", "index": 13, "iteration": 1, "kind": "exec", "ms": 8.566792, "workers": 1}
+{"compiler": "zig", "index": 14, "iteration": 1, "kind": "exec", "ms": 11.6895, "workers": 1}
+{"compiler": "zig", "index": 15, "iteration": 1, "kind": "exec", "ms": 41.995584, "workers": 1}
+{"compiler": "zig", "index": 16, "iteration": 1, "kind": "exec", "ms": 14.716125, "workers": 1}
+{"compiler": "zig", "index": 17, "iteration": 1, "kind": "exec", "ms": 10.287792, "workers": 1}
+{"compiler": "zig", "index": 18, "iteration": 1, "kind": "exec", "ms": 9.559708, "workers": 1}
+{"compiler": "zig", "index": 19, "iteration": 1, "kind": "exec", "ms": 9.823875, "workers": 1}
+{"compiler": "zig", "index": 20, "iteration": 1, "kind": "exec", "ms": 10.416541, "workers": 1}
+{"compiler": "zig", "index": 21, "iteration": 1, "kind": "exec", "ms": 10.569959, "workers": 1}
+{"compiler": "zig", "index": 22, "iteration": 1, "kind": "exec", "ms": 8.34725, "workers": 1}
+{"compiler": "zig", "index": 23, "iteration": 1, "kind": "exec", "ms": 8.215958, "workers": 1}
+{"compiler": "zig", "index": 24, "iteration": 1, "kind": "exec", "ms": 8.137834, "workers": 1}
+{"compiler": "zig", "index": 25, "iteration": 1, "kind": "exec", "ms": 8.239333, "workers": 1}
+{"compiler": "zig", "index": 26, "iteration": 1, "kind": "exec", "ms": 7.326834, "workers": 1}
+{"compiler": "zig", "index": 27, "iteration": 1, "kind": "exec", "ms": 8.963833, "workers": 1}
+{"compiler": "zig", "index": 28, "iteration": 1, "kind": "exec", "ms": 7.18675, "workers": 1}
+{"compiler": "zig", "index": 29, "iteration": 1, "kind": "exec", "ms": 8.140083, "workers": 1}
+{"compiler": "zig", "index": 30, "iteration": 1, "kind": "exec", "ms": 18.746917, "workers": 1}
+{"compiler": "zig", "index": 31, "iteration": 1, "kind": "exec", "ms": 8.381916, "workers": 1}
+{"compiler": "zig", "index": 32, "iteration": 1, "kind": "exec", "ms": 9.334458, "workers": 1}
+{"compiler": "zig", "index": 33, "iteration": 1, "kind": "exec", "ms": 5.581542, "workers": 1}
+{"compiler": "zig", "index": 34, "iteration": 1, "kind": "exec", "ms": 10.610875, "workers": 1}
+{"compiler": "zig", "index": 35, "iteration": 1, "kind": "exec", "ms": 7.697917, "workers": 1}
+{"compiler": "zig", "index": 36, "iteration": 1, "kind": "exec", "ms": 9.786042, "workers": 1}
+{"compiler": "zig", "index": 37, "iteration": 1, "kind": "exec", "ms": 8.954333, "workers": 1}
+{"compiler": "zig", "index": 38, "iteration": 1, "kind": "exec", "ms": 10.536583, "workers": 1}
+{"compiler": "zig", "index": 39, "iteration": 1, "kind": "exec", "ms": 5.650834, "workers": 1}
+{"compiler": "zig", "index": 40, "iteration": 1, "kind": "exec", "ms": 7.664333, "workers": 1}
+{"compiler": "zig", "index": 41, "iteration": 1, "kind": "exec", "ms": 7.70025, "workers": 1}
+{"compiler": "zig", "index": 42, "iteration": 1, "kind": "exec", "ms": 9.956833, "workers": 1}
+{"compiler": "zig", "index": 43, "iteration": 1, "kind": "exec", "ms": 8.798875, "workers": 1}
+{"compiler": "zig", "index": 44, "iteration": 1, "kind": "exec", "ms": 8.378458, "workers": 1}
+{"compiler": "zig", "index": 45, "iteration": 1, "kind": "exec", "ms": 8.9385, "workers": 1}
+{"compiler": "zig", "index": 46, "iteration": 1, "kind": "exec", "ms": 9.60125, "workers": 1}
+{"compiler": "zig", "index": 47, "iteration": 1, "kind": "exec", "ms": 8.644292, "workers": 1}
+{"compiler": "zig", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 507.555083, "workers": 1}
+{"compiler": "zig", "index": 0, "iteration": 2, "kind": "exec", "ms": 11.618834, "workers": 1}
+{"compiler": "zig", "index": 1, "iteration": 2, "kind": "exec", "ms": 10.338958, "workers": 1}
+{"compiler": "zig", "index": 2, "iteration": 2, "kind": "exec", "ms": 10.545166, "workers": 1}
+{"compiler": "zig", "index": 3, "iteration": 2, "kind": "exec", "ms": 10.564333, "workers": 1}
+{"compiler": "zig", "index": 4, "iteration": 2, "kind": "exec", "ms": 7.260084, "workers": 1}
+{"compiler": "zig", "index": 5, "iteration": 2, "kind": "exec", "ms": 9.461125, "workers": 1}
+{"compiler": "zig", "index": 6, "iteration": 2, "kind": "exec", "ms": 8.682625, "workers": 1}
+{"compiler": "zig", "index": 7, "iteration": 2, "kind": "exec", "ms": 9.7715, "workers": 1}
+{"compiler": "zig", "index": 8, "iteration": 2, "kind": "exec", "ms": 9.3365, "workers": 1}
+{"compiler": "zig", "index": 9, "iteration": 2, "kind": "exec", "ms": 9.313625, "workers": 1}
+{"compiler": "zig", "index": 10, "iteration": 2, "kind": "exec", "ms": 10.009291, "workers": 1}
+{"compiler": "zig", "index": 11, "iteration": 2, "kind": "exec", "ms": 5.515959, "workers": 1}
+{"compiler": "zig", "index": 12, "iteration": 2, "kind": "exec", "ms": 10.692416, "workers": 1}
+{"compiler": "zig", "index": 13, "iteration": 2, "kind": "exec", "ms": 9.211542, "workers": 1}
+{"compiler": "zig", "index": 14, "iteration": 2, "kind": "exec", "ms": 10.864292, "workers": 1}
+{"compiler": "zig", "index": 15, "iteration": 2, "kind": "exec", "ms": 8.694375, "workers": 1}
+{"compiler": "zig", "index": 16, "iteration": 2, "kind": "exec", "ms": 7.062208, "workers": 1}
+{"compiler": "zig", "index": 17, "iteration": 2, "kind": "exec", "ms": 6.709917, "workers": 1}
+{"compiler": "zig", "index": 18, "iteration": 2, "kind": "exec", "ms": 9.700917, "workers": 1}
+{"compiler": "zig", "index": 19, "iteration": 2, "kind": "exec", "ms": 8.181791, "workers": 1}
+{"compiler": "zig", "index": 20, "iteration": 2, "kind": "exec", "ms": 8.1945, "workers": 1}
+{"compiler": "zig", "index": 21, "iteration": 2, "kind": "exec", "ms": 8.874208, "workers": 1}
+{"compiler": "zig", "index": 22, "iteration": 2, "kind": "exec", "ms": 8.110417, "workers": 1}
+{"compiler": "zig", "index": 23, "iteration": 2, "kind": "exec", "ms": 10.47575, "workers": 1}
+{"compiler": "zig", "index": 24, "iteration": 2, "kind": "exec", "ms": 9.585625, "workers": 1}
+{"compiler": "zig", "index": 25, "iteration": 2, "kind": "exec", "ms": 22.588167, "workers": 1}
+{"compiler": "zig", "index": 26, "iteration": 2, "kind": "exec", "ms": 11.417417, "workers": 1}
+{"compiler": "zig", "index": 27, "iteration": 2, "kind": "exec", "ms": 9.06725, "workers": 1}
+{"compiler": "zig", "index": 28, "iteration": 2, "kind": "exec", "ms": 10.499834, "workers": 1}
+{"compiler": "zig", "index": 29, "iteration": 2, "kind": "exec", "ms": 11.101125, "workers": 1}
+{"compiler": "zig", "index": 30, "iteration": 2, "kind": "exec", "ms": 8.5345, "workers": 1}
+{"compiler": "zig", "index": 31, "iteration": 2, "kind": "exec", "ms": 8.680458, "workers": 1}
+{"compiler": "zig", "index": 32, "iteration": 2, "kind": "exec", "ms": 6.361875, "workers": 1}
+{"compiler": "zig", "index": 33, "iteration": 2, "kind": "exec", "ms": 8.151292, "workers": 1}
+{"compiler": "zig", "index": 34, "iteration": 2, "kind": "exec", "ms": 10.083459, "workers": 1}
+{"compiler": "zig", "index": 35, "iteration": 2, "kind": "exec", "ms": 8.335375, "workers": 1}
+{"compiler": "zig", "index": 36, "iteration": 2, "kind": "exec", "ms": 19.675208, "workers": 1}
+{"compiler": "zig", "index": 37, "iteration": 2, "kind": "exec", "ms": 16.29725, "workers": 1}
+{"compiler": "zig", "index": 38, "iteration": 2, "kind": "exec", "ms": 15.0405, "workers": 1}
+{"compiler": "zig", "index": 39, "iteration": 2, "kind": "exec", "ms": 21.6475, "workers": 1}
+{"compiler": "zig", "index": 40, "iteration": 2, "kind": "exec", "ms": 8.152958, "workers": 1}
+{"compiler": "zig", "index": 41, "iteration": 2, "kind": "exec", "ms": 9.766208, "workers": 1}
+{"compiler": "zig", "index": 42, "iteration": 2, "kind": "exec", "ms": 9.325, "workers": 1}
+{"compiler": "zig", "index": 43, "iteration": 2, "kind": "exec", "ms": 10.815, "workers": 1}
+{"compiler": "zig", "index": 44, "iteration": 2, "kind": "exec", "ms": 13.069083, "workers": 1}
+{"compiler": "zig", "index": 45, "iteration": 2, "kind": "exec", "ms": 11.000791, "workers": 1}
+{"compiler": "zig", "index": 46, "iteration": 2, "kind": "exec", "ms": 10.21025, "workers": 1}
+{"compiler": "zig", "index": 47, "iteration": 2, "kind": "exec", "ms": 10.218042, "workers": 1}
+{"compiler": "zig", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 503.678375, "workers": 1}
+{"compiler": "zig", "index": 0, "kind": "build", "ms": 319.990291, "serial": true, "sha256": "1009cf0b395c80058d6c357ddc64bf7232c72717b18cea9921b6cb926dc681ce", "workers": 3}
+{"compiler": "zig", "index": 1, "kind": "build", "ms": 248.218916, "serial": true, "sha256": "b8ed081cf6f6c6176393a8c9c3a6d49dbd02c984619e568de28e895a876b0d9e", "workers": 3}
+{"compiler": "zig", "index": 2, "kind": "build", "ms": 352.822583, "serial": true, "sha256": "e9198ec3eb9129a6a627a4d0a467332da943cae76d2e322e0913b71a62db4a82", "workers": 3}
+{"compiler": "zig", "index": 3, "kind": "build", "ms": 327.118167, "serial": true, "sha256": "23508a05a93768fccc33b80ac5869e27c3ff14b0d6db3164b4d0caad11e610c7", "workers": 3}
+{"compiler": "zig", "index": 4, "kind": "build", "ms": 249.4925, "serial": true, "sha256": "f1f629bc41e0b10f6926bdd4de7c4888d37aefe1614306f6929cdea4a572f0da", "workers": 3}
+{"compiler": "zig", "index": 5, "kind": "build", "ms": 293.767333, "serial": true, "sha256": "3402e011fc039138a230c930100cac9fc9bddd014b80b51f597e47224f9161b5", "workers": 3}
+{"compiler": "zig", "index": 6, "kind": "build", "ms": 252.995084, "serial": true, "sha256": "ade8a8b2b06091e37ee2673f6b45e429571e23736aa371690196efd56b0ec65c", "workers": 3}
+{"compiler": "zig", "index": 7, "kind": "build", "ms": 270.253958, "serial": true, "sha256": "f9e77c144ac5b6387928bb5f068bfe05eb2ed5157b93656107730c3a339f8eaf", "workers": 3}
+{"compiler": "zig", "index": 8, "kind": "build", "ms": 259.714, "serial": true, "sha256": "16ba6f9301c1013e1752958a1f106b8f5e4144b5c5c3f47780a9ea298a3a0c0a", "workers": 3}
+{"compiler": "zig", "index": 9, "kind": "build", "ms": 188.321833, "serial": true, "sha256": "b49e17b705dad21cc3ee06bb5cb5c8fa51f72ca978e50abe6b7cf2899614e04c", "workers": 3}
+{"compiler": "zig", "index": 10, "kind": "build", "ms": 256.038334, "serial": true, "sha256": "189c0e65f2fdbd0f17cc13be11ac9aae7e3f57947cce8cb134867940b6abf74b", "workers": 3}
+{"compiler": "zig", "index": 11, "kind": "build", "ms": 281.701625, "serial": true, "sha256": "364325f175f440eb78a05cdb30371ee7b5279103c77b5445744cb7306a8b7bfa", "workers": 3}
+{"compiler": "zig", "index": 12, "kind": "build", "ms": 210.358875, "serial": true, "sha256": "08eda44c18692f675926dfd23c275f5026238827f515a7095106ed6188873f96", "workers": 3}
+{"compiler": "zig", "index": 13, "kind": "build", "ms": 193.408709, "serial": true, "sha256": "e5249be66d46006ab9a0be5f9af9c1f658a5c3812a5180670ea37b42fd54619d", "workers": 3}
+{"compiler": "zig", "index": 14, "kind": "build", "ms": 263.345125, "serial": true, "sha256": "eefb31ddfb9aa9f866606ddda99cf97700c25f55e8e01c8976f660082e2c42f4", "workers": 3}
+{"compiler": "zig", "index": 15, "kind": "build", "ms": 207.337042, "serial": true, "sha256": "eec1a791ac26f2925f9f7026b045efaa7cccb0f282ae7f9bcb1029d4cb4c750d", "workers": 3}
+{"compiler": "zig", "index": 16, "kind": "build", "ms": 224.176875, "serial": true, "sha256": "b581437b618aefbd8020b55e24c5ceefb6fb4522ad89cd660019bae0e6cef251", "workers": 3}
+{"compiler": "zig", "index": 17, "kind": "build", "ms": 201.553375, "serial": true, "sha256": "d7fa928ee9e0c795a563231f14f6fb7bec86b224732eec3ea9c29d4427d084f8", "workers": 3}
+{"compiler": "zig", "index": 18, "kind": "build", "ms": 262.818167, "serial": true, "sha256": "bcb0a991f146565105c78d0e34d310701fd0e90c254d9b7145ff7ca504f423fc", "workers": 3}
+{"compiler": "zig", "index": 19, "kind": "build", "ms": 267.21325, "serial": true, "sha256": "8743a1f6731b11c27e5d2d2c2cb51798b659d63e3f65f266dfa6c7699d814315", "workers": 3}
+{"compiler": "zig", "index": 20, "kind": "build", "ms": 304.299333, "serial": true, "sha256": "9dd40015a38193e3286c5be1d465d93b60f0d5709dc3ec45d11ef7d59a75b238", "workers": 3}
+{"compiler": "zig", "index": 21, "kind": "build", "ms": 323.604, "serial": true, "sha256": "aae0525122c131870c3508f5f0ec800f2a696f9023db05430956163d57af1460", "workers": 3}
+{"compiler": "zig", "index": 22, "kind": "build", "ms": 228.614709, "serial": true, "sha256": "b64b4141deb1b1b7816b2521c496cc4de8260eff303ba3f5ca43fac2da47bba9", "workers": 3}
+{"compiler": "zig", "index": 23, "kind": "build", "ms": 266.938666, "serial": true, "sha256": "c17b2951d79edb04633fc62a6dd9c2a91fca3b6389f679faddefe40e51ca9e81", "workers": 3}
+{"compiler": "zig", "index": 24, "kind": "build", "ms": 202.666709, "serial": true, "sha256": "36ca7f730081f96bb141565cbdfd7a3c8223fbd839b04583fc29aee8d5a6b696", "workers": 3}
+{"compiler": "zig", "index": 25, "kind": "build", "ms": 239.10375, "serial": true, "sha256": "6c7993887bed74904d8d94dedc345e55f41ef092ff6db5a08db8d9bbcff4d580", "workers": 3}
+{"compiler": "zig", "index": 26, "kind": "build", "ms": 296.389209, "serial": true, "sha256": "bf40f1a8a2a32980f751ee77a211cc2764887dd23440eb66266a44782e29f093", "workers": 3}
+{"compiler": "zig", "index": 27, "kind": "build", "ms": 219.242792, "serial": true, "sha256": "dd8067755f7e6091e5b9fc450e8ac2c57cd49109b83cc3d73db78d56906c2241", "workers": 3}
+{"compiler": "zig", "index": 28, "kind": "build", "ms": 155.998, "serial": true, "sha256": "fb51369a0e3677179b1bd9636492719c6334c63b4499a2abc74f3e0bb7c272e8", "workers": 3}
+{"compiler": "zig", "index": 29, "kind": "build", "ms": 242.096583, "serial": true, "sha256": "2c17fbf99f1a0cf408655fd116f978d22df9befc04888b6d17f27de665046340", "workers": 3}
+{"compiler": "zig", "index": 30, "kind": "build", "ms": 250.010916, "serial": true, "sha256": "6219f6f297e2e850b392fab32170b6d846191f5c0031561caf7e39fbc12cb245", "workers": 3}
+{"compiler": "zig", "index": 31, "kind": "build", "ms": 299.207167, "serial": true, "sha256": "354dbf5dafda8622998d3d23f72581a72d7b5cfd876d1da6622827dd907af75b", "workers": 3}
+{"compiler": "zig", "index": 32, "kind": "build", "ms": 316.310458, "serial": true, "sha256": "94289b79213df7000eba8b719311864edb5b83e6114ab5444fbad1c013a44157", "workers": 3}
+{"compiler": "zig", "index": 33, "kind": "build", "ms": 326.208458, "serial": true, "sha256": "baa0e41384e36e218854ec82131df001b5e33d8b22ae29b9abec7b32097e27ed", "workers": 3}
+{"compiler": "zig", "index": 34, "kind": "build", "ms": 248.593416, "serial": true, "sha256": "8bf5b0f0438a585eab5150f26c61aa0b5b1d5ca82642f71a9dd16aaa279214b7", "workers": 3}
+{"compiler": "zig", "index": 35, "kind": "build", "ms": 288.715625, "serial": true, "sha256": "94144e1d912676ca068ab10b233e0a50452227672fbc07281e06c1160650bc3e", "workers": 3}
+{"compiler": "zig", "index": 36, "kind": "build", "ms": 226.351791, "serial": true, "sha256": "58176be58032bdbdefc6800cce337847eff173beb8793cfda3b4750e6fb406db", "workers": 3}
+{"compiler": "zig", "index": 37, "kind": "build", "ms": 213.093583, "serial": true, "sha256": "3d0a6639e469d0f3d06e96b0302fa3f37286f0f8c054849a166b9f4882be2dc8", "workers": 3}
+{"compiler": "zig", "index": 38, "kind": "build", "ms": 236.872959, "serial": true, "sha256": "7c37d9788edb29608f852b4c8e5cdb5b0dfe772be7334a55c38e4b2efa1af8eb", "workers": 3}
+{"compiler": "zig", "index": 39, "kind": "build", "ms": 244.408583, "serial": true, "sha256": "25fcdcdb252c0df3734470d1a6172e44b223d1923caeade96daffdcdecfaf5ac", "workers": 3}
+{"compiler": "zig", "index": 40, "kind": "build", "ms": 297.999875, "serial": true, "sha256": "bc45cfc725cc809d2c182ce074012e941da29f5b56af919e650c67971f3c2f2a", "workers": 3}
+{"compiler": "zig", "index": 41, "kind": "build", "ms": 255.058, "serial": true, "sha256": "82956a2c43f2f481fb4835ead3a85a33fb1aa966c8fd6a22abefe88b4d545cc8", "workers": 3}
+{"compiler": "zig", "index": 42, "kind": "build", "ms": 235.638584, "serial": true, "sha256": "0f5cceb5fe3cd71d48739365d29bd010ec96f57913a2f0f18110950c84f9adbe", "workers": 3}
+{"compiler": "zig", "index": 43, "kind": "build", "ms": 291.932542, "serial": true, "sha256": "f2051c13ed5d218a0134bc7b12d57517f1315676ef91563bdbe46e558cdb3bf9", "workers": 3}
+{"compiler": "zig", "index": 44, "kind": "build", "ms": 299.311334, "serial": true, "sha256": "fa05114236498914218c56b2f4f42f76c17a9e0a50561dd86c4397d331d486c3", "workers": 3}
+{"compiler": "zig", "index": 45, "kind": "build", "ms": 199.492334, "serial": true, "sha256": "2ae7934e00174a3b71c0a59935ceaa9e98741933a191009882d8f6a05aa7ed15", "workers": 3}
+{"compiler": "zig", "index": 46, "kind": "build", "ms": 203.722375, "serial": true, "sha256": "63b9094d427e5dc26767f67589e9eba188aedf4d4e5996e7deb567ffb306fa6d", "workers": 3}
+{"compiler": "zig", "index": 47, "kind": "build", "ms": 223.17175, "serial": true, "sha256": "675f0fb6864c371a46225e12ec341c1653e484b0ffe67995c871d83640aeffb7", "workers": 3}
+{"cache": "warm Zig cache", "compiler": "zig", "kind": "build-total", "ms": 12411.53525, "serial": true, "workers": 3}
+{"compiler": "zig", "index": 0, "iteration": 1, "kind": "exec", "ms": 13.337917, "workers": 3}
+{"compiler": "zig", "index": 1, "iteration": 1, "kind": "exec", "ms": 12.1785, "workers": 3}
+{"compiler": "zig", "index": 2, "iteration": 1, "kind": "exec", "ms": 11.988375, "workers": 3}
+{"compiler": "zig", "index": 3, "iteration": 1, "kind": "exec", "ms": 7.541208, "workers": 3}
+{"compiler": "zig", "index": 4, "iteration": 1, "kind": "exec", "ms": 5.036292, "workers": 3}
+{"compiler": "zig", "index": 5, "iteration": 1, "kind": "exec", "ms": 7.57425, "workers": 3}
+{"compiler": "zig", "index": 6, "iteration": 1, "kind": "exec", "ms": 9.876375, "workers": 3}
+{"compiler": "zig", "index": 7, "iteration": 1, "kind": "exec", "ms": 10.230125, "workers": 3}
+{"compiler": "zig", "index": 8, "iteration": 1, "kind": "exec", "ms": 10.500458, "workers": 3}
+{"compiler": "zig", "index": 9, "iteration": 1, "kind": "exec", "ms": 7.825625, "workers": 3}
+{"compiler": "zig", "index": 10, "iteration": 1, "kind": "exec", "ms": 15.497208, "workers": 3}
+{"compiler": "zig", "index": 11, "iteration": 1, "kind": "exec", "ms": 7.77725, "workers": 3}
+{"compiler": "zig", "index": 12, "iteration": 1, "kind": "exec", "ms": 8.316125, "workers": 3}
+{"compiler": "zig", "index": 13, "iteration": 1, "kind": "exec", "ms": 9.309042, "workers": 3}
+{"compiler": "zig", "index": 14, "iteration": 1, "kind": "exec", "ms": 9.14575, "workers": 3}
+{"compiler": "zig", "index": 15, "iteration": 1, "kind": "exec", "ms": 11.435875, "workers": 3}
+{"compiler": "zig", "index": 16, "iteration": 1, "kind": "exec", "ms": 8.562875, "workers": 3}
+{"compiler": "zig", "index": 17, "iteration": 1, "kind": "exec", "ms": 16.1435, "workers": 3}
+{"compiler": "zig", "index": 18, "iteration": 1, "kind": "exec", "ms": 10.404791, "workers": 3}
+{"compiler": "zig", "index": 19, "iteration": 1, "kind": "exec", "ms": 9.262542, "workers": 3}
+{"compiler": "zig", "index": 20, "iteration": 1, "kind": "exec", "ms": 12.275167, "workers": 3}
+{"compiler": "zig", "index": 21, "iteration": 1, "kind": "exec", "ms": 9.218209, "workers": 3}
+{"compiler": "zig", "index": 22, "iteration": 1, "kind": "exec", "ms": 9.031167, "workers": 3}
+{"compiler": "zig", "index": 23, "iteration": 1, "kind": "exec", "ms": 7.91725, "workers": 3}
+{"compiler": "zig", "index": 24, "iteration": 1, "kind": "exec", "ms": 7.231083, "workers": 3}
+{"compiler": "zig", "index": 25, "iteration": 1, "kind": "exec", "ms": 9.923625, "workers": 3}
+{"compiler": "zig", "index": 26, "iteration": 1, "kind": "exec", "ms": 13.088833, "workers": 3}
+{"compiler": "zig", "index": 27, "iteration": 1, "kind": "exec", "ms": 10.996083, "workers": 3}
+{"compiler": "zig", "index": 28, "iteration": 1, "kind": "exec", "ms": 5.386666, "workers": 3}
+{"compiler": "zig", "index": 29, "iteration": 1, "kind": "exec", "ms": 10.102792, "workers": 3}
+{"compiler": "zig", "index": 30, "iteration": 1, "kind": "exec", "ms": 10.015083, "workers": 3}
+{"compiler": "zig", "index": 31, "iteration": 1, "kind": "exec", "ms": 12.038708, "workers": 3}
+{"compiler": "zig", "index": 32, "iteration": 1, "kind": "exec", "ms": 7.731292, "workers": 3}
+{"compiler": "zig", "index": 33, "iteration": 1, "kind": "exec", "ms": 7.988625, "workers": 3}
+{"compiler": "zig", "index": 34, "iteration": 1, "kind": "exec", "ms": 8.609959, "workers": 3}
+{"compiler": "zig", "index": 35, "iteration": 1, "kind": "exec", "ms": 4.26175, "workers": 3}
+{"compiler": "zig", "index": 36, "iteration": 1, "kind": "exec", "ms": 16.664625, "workers": 3}
+{"compiler": "zig", "index": 37, "iteration": 1, "kind": "exec", "ms": 16.878625, "workers": 3}
+{"compiler": "zig", "index": 38, "iteration": 1, "kind": "exec", "ms": 9.444792, "workers": 3}
+{"compiler": "zig", "index": 39, "iteration": 1, "kind": "exec", "ms": 10.88425, "workers": 3}
+{"compiler": "zig", "index": 40, "iteration": 1, "kind": "exec", "ms": 6.852291, "workers": 3}
+{"compiler": "zig", "index": 41, "iteration": 1, "kind": "exec", "ms": 13.208125, "workers": 3}
+{"compiler": "zig", "index": 42, "iteration": 1, "kind": "exec", "ms": 6.945375, "workers": 3}
+{"compiler": "zig", "index": 43, "iteration": 1, "kind": "exec", "ms": 9.104292, "workers": 3}
+{"compiler": "zig", "index": 44, "iteration": 1, "kind": "exec", "ms": 8.679667, "workers": 3}
+{"compiler": "zig", "index": 45, "iteration": 1, "kind": "exec", "ms": 9.136292, "workers": 3}
+{"compiler": "zig", "index": 46, "iteration": 1, "kind": "exec", "ms": 7.400791, "workers": 3}
+{"compiler": "zig", "index": 47, "iteration": 1, "kind": "exec", "ms": 16.819708, "workers": 3}
+{"compiler": "zig", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 174.809125, "workers": 3}
+{"compiler": "zig", "index": 0, "iteration": 2, "kind": "exec", "ms": 8.415292, "workers": 3}
+{"compiler": "zig", "index": 1, "iteration": 2, "kind": "exec", "ms": 14.828833, "workers": 3}
+{"compiler": "zig", "index": 2, "iteration": 2, "kind": "exec", "ms": 7.131, "workers": 3}
+{"compiler": "zig", "index": 3, "iteration": 2, "kind": "exec", "ms": 12.8575, "workers": 3}
+{"compiler": "zig", "index": 4, "iteration": 2, "kind": "exec", "ms": 12.696333, "workers": 3}
+{"compiler": "zig", "index": 5, "iteration": 2, "kind": "exec", "ms": 12.8075, "workers": 3}
+{"compiler": "zig", "index": 6, "iteration": 2, "kind": "exec", "ms": 11.4965, "workers": 3}
+{"compiler": "zig", "index": 7, "iteration": 2, "kind": "exec", "ms": 9.379292, "workers": 3}
+{"compiler": "zig", "index": 8, "iteration": 2, "kind": "exec", "ms": 20.422209, "workers": 3}
+{"compiler": "zig", "index": 9, "iteration": 2, "kind": "exec", "ms": 14.33075, "workers": 3}
+{"compiler": "zig", "index": 10, "iteration": 2, "kind": "exec", "ms": 26.028167, "workers": 3}
+{"compiler": "zig", "index": 11, "iteration": 2, "kind": "exec", "ms": 10.519792, "workers": 3}
+{"compiler": "zig", "index": 12, "iteration": 2, "kind": "exec", "ms": 16.103834, "workers": 3}
+{"compiler": "zig", "index": 13, "iteration": 2, "kind": "exec", "ms": 21.573542, "workers": 3}
+{"compiler": "zig", "index": 14, "iteration": 2, "kind": "exec", "ms": 20.809042, "workers": 3}
+{"compiler": "zig", "index": 15, "iteration": 2, "kind": "exec", "ms": 20.609333, "workers": 3}
+{"compiler": "zig", "index": 16, "iteration": 2, "kind": "exec", "ms": 15.199042, "workers": 3}
+{"compiler": "zig", "index": 17, "iteration": 2, "kind": "exec", "ms": 14.441875, "workers": 3}
+{"compiler": "zig", "index": 18, "iteration": 2, "kind": "exec", "ms": 14.721375, "workers": 3}
+{"compiler": "zig", "index": 19, "iteration": 2, "kind": "exec", "ms": 7.928958, "workers": 3}
+{"compiler": "zig", "index": 20, "iteration": 2, "kind": "exec", "ms": 7.822541, "workers": 3}
+{"compiler": "zig", "index": 21, "iteration": 2, "kind": "exec", "ms": 10.249333, "workers": 3}
+{"compiler": "zig", "index": 22, "iteration": 2, "kind": "exec", "ms": 11.040125, "workers": 3}
+{"compiler": "zig", "index": 23, "iteration": 2, "kind": "exec", "ms": 10.118292, "workers": 3}
+{"compiler": "zig", "index": 24, "iteration": 2, "kind": "exec", "ms": 8.173875, "workers": 3}
+{"compiler": "zig", "index": 25, "iteration": 2, "kind": "exec", "ms": 9.14175, "workers": 3}
+{"compiler": "zig", "index": 26, "iteration": 2, "kind": "exec", "ms": 12.015167, "workers": 3}
+{"compiler": "zig", "index": 27, "iteration": 2, "kind": "exec", "ms": 12.68125, "workers": 3}
+{"compiler": "zig", "index": 28, "iteration": 2, "kind": "exec", "ms": 8.449166, "workers": 3}
+{"compiler": "zig", "index": 29, "iteration": 2, "kind": "exec", "ms": 12.03425, "workers": 3}
+{"compiler": "zig", "index": 30, "iteration": 2, "kind": "exec", "ms": 13.369042, "workers": 3}
+{"compiler": "zig", "index": 31, "iteration": 2, "kind": "exec", "ms": 10.325375, "workers": 3}
+{"compiler": "zig", "index": 32, "iteration": 2, "kind": "exec", "ms": 7.40575, "workers": 3}
+{"compiler": "zig", "index": 33, "iteration": 2, "kind": "exec", "ms": 10.464834, "workers": 3}
+{"compiler": "zig", "index": 34, "iteration": 2, "kind": "exec", "ms": 11.281833, "workers": 3}
+{"compiler": "zig", "index": 35, "iteration": 2, "kind": "exec", "ms": 9.04075, "workers": 3}
+{"compiler": "zig", "index": 36, "iteration": 2, "kind": "exec", "ms": 14.652666, "workers": 3}
+{"compiler": "zig", "index": 37, "iteration": 2, "kind": "exec", "ms": 10.7585, "workers": 3}
+{"compiler": "zig", "index": 38, "iteration": 2, "kind": "exec", "ms": 11.947959, "workers": 3}
+{"compiler": "zig", "index": 39, "iteration": 2, "kind": "exec", "ms": 9.726209, "workers": 3}
+{"compiler": "zig", "index": 40, "iteration": 2, "kind": "exec", "ms": 10.094417, "workers": 3}
+{"compiler": "zig", "index": 41, "iteration": 2, "kind": "exec", "ms": 6.561916, "workers": 3}
+{"compiler": "zig", "index": 42, "iteration": 2, "kind": "exec", "ms": 8.573834, "workers": 3}
+{"compiler": "zig", "index": 43, "iteration": 2, "kind": "exec", "ms": 4.128458, "workers": 3}
+{"compiler": "zig", "index": 44, "iteration": 2, "kind": "exec", "ms": 4.883917, "workers": 3}
+{"compiler": "zig", "index": 45, "iteration": 2, "kind": "exec", "ms": 5.686833, "workers": 3}
+{"compiler": "zig", "index": 46, "iteration": 2, "kind": "exec", "ms": 9.486459, "workers": 3}
+{"compiler": "zig", "index": 47, "iteration": 2, "kind": "exec", "ms": 8.194167, "workers": 3}
+{"compiler": "zig", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 197.350833, "workers": 3}
+{"compiler": "zig", "kind": "dylib-build", "ms": 161.722167}
+{"compiler": "zig", "iteration": 1, "kind": "dlopen", "ms": 1.263541, "note": "second load retains first handle"}
+{"compiler": "zig", "iteration": 2, "kind": "dlopen", "ms": 0.1805, "note": "second load retains first handle"}
+{"cache": "uncontrolled", "compiler": "apple-clang", "kind": "warmup-build", "ms": 560.433667}
+{"compiler": "apple-clang", "kind": "warmup-exec", "ms": 10.379666}
+{"compiler": "apple-clang", "index": 0, "kind": "build", "ms": 140.92425, "serial": true, "sha256": "d25ca71fe409139129f313b8c735ae9371535fd5a050f7029aa85e79ce53715e", "workers": 1}
+{"compiler": "apple-clang", "index": 1, "kind": "build", "ms": 71.515708, "serial": true, "sha256": "88ad379af60c61e586528e8cf00d58ae1a88a6376ea4673b8171d20c245ca32c", "workers": 1}
+{"compiler": "apple-clang", "index": 2, "kind": "build", "ms": 87.105666, "serial": true, "sha256": "38cf56fc0121e7933f341830305cf21f5fb829d2cdd7f78999ffb5ee2c6c561c", "workers": 1}
+{"compiler": "apple-clang", "index": 3, "kind": "build", "ms": 107.190459, "serial": true, "sha256": "4117a40079544a43872323fabb7333933c55d63388863603679442c56c81a134", "workers": 1}
+{"compiler": "apple-clang", "index": 4, "kind": "build", "ms": 106.960875, "serial": true, "sha256": "01ee54717718b115c049e111c9d8e5b60ad468370b5fe7b99126da3381183ce0", "workers": 1}
+{"compiler": "apple-clang", "index": 5, "kind": "build", "ms": 145.590833, "serial": true, "sha256": "5cebacb03cf851adee148ff80cc1e52893db09afaa95ddb92b93a3c228f9ea9b", "workers": 1}
+{"compiler": "apple-clang", "index": 6, "kind": "build", "ms": 119.232959, "serial": true, "sha256": "35de4263ec3b4df1d12d9abeea00f4e02cd40a6507a4d629bb66cfb9f8c91dd9", "workers": 1}
+{"compiler": "apple-clang", "index": 7, "kind": "build", "ms": 111.309542, "serial": true, "sha256": "c63ebc4540a5f2f000e0b2a44bd5867221843a58508ee0cbc394b46465245b7f", "workers": 1}
+{"compiler": "apple-clang", "index": 8, "kind": "build", "ms": 119.64625, "serial": true, "sha256": "2d7b7d66822b3e9dc5e537ee584364fceb9d35567367c2b64ef61bd552835c8d", "workers": 1}
+{"compiler": "apple-clang", "index": 9, "kind": "build", "ms": 102.369875, "serial": true, "sha256": "30279930cf5d6849a8eb0b4d234a9b300fef1e3ce8346434ae5b4c17543d7e2f", "workers": 1}
+{"compiler": "apple-clang", "index": 10, "kind": "build", "ms": 98.237125, "serial": true, "sha256": "4cc985fb9abc427b2857cdd14cb48eb5f69b051c5d1c1ca226602820087ed02f", "workers": 1}
+{"compiler": "apple-clang", "index": 11, "kind": "build", "ms": 83.778583, "serial": true, "sha256": "dd1246df66dff0fc403ff042eaa99bee148100ab89991b0270a8bf648fc3e47e", "workers": 1}
+{"compiler": "apple-clang", "index": 12, "kind": "build", "ms": 117.816917, "serial": true, "sha256": "7305a0ff6c860a41e11de7fa929dfe1492ab94584dbd74432b9ebb6af5395421", "workers": 1}
+{"compiler": "apple-clang", "index": 13, "kind": "build", "ms": 89.857417, "serial": true, "sha256": "5a838f760cf7f2da51dca0a86fa208ea8c37640de4faaa20fbbe89d2cf12325c", "workers": 1}
+{"compiler": "apple-clang", "index": 14, "kind": "build", "ms": 212.908917, "serial": true, "sha256": "d64937e5d04d8c44c3f4507e9086ae61b923cf8dd2ded9532c36318fb950d334", "workers": 1}
+{"compiler": "apple-clang", "index": 15, "kind": "build", "ms": 147.766959, "serial": true, "sha256": "92c1423ecbdc8c2c4b44286148c65337b33471ee7414ba2d1b498c951e3ee3f9", "workers": 1}
+{"compiler": "apple-clang", "index": 16, "kind": "build", "ms": 135.765583, "serial": true, "sha256": "0deeb0a6161dec9e2ab336b20c3e453b210c2ad13b905312a4485a0d79744741", "workers": 1}
+{"compiler": "apple-clang", "index": 17, "kind": "build", "ms": 159.53875, "serial": true, "sha256": "fcdb61fd6b0b47ffc964f793dc946b8ba8b6b45cdcf1edb9fa07a1a155f0decf", "workers": 1}
+{"compiler": "apple-clang", "index": 18, "kind": "build", "ms": 140.269125, "serial": true, "sha256": "0ed4501ea077fd4c85a30cb92fc824caee1c0c1c56788910c28891223523448e", "workers": 1}
+{"compiler": "apple-clang", "index": 19, "kind": "build", "ms": 127.149875, "serial": true, "sha256": "a6d1a953d472269920795cc11b8c66beb1650b59f116e52984bde2df5799cb20", "workers": 1}
+{"compiler": "apple-clang", "index": 20, "kind": "build", "ms": 158.228083, "serial": true, "sha256": "57730665dae59a7232c2f9d2bc41abe2ea036b58487778936070248b5edd52d8", "workers": 1}
+{"compiler": "apple-clang", "index": 21, "kind": "build", "ms": 146.358875, "serial": true, "sha256": "71f64c4c8d5af3d1ec32320f27fc30db22c26f8e4336edfac7141438785ca37e", "workers": 1}
+{"compiler": "apple-clang", "index": 22, "kind": "build", "ms": 175.466917, "serial": true, "sha256": "66552fc0e4dc1e4cd47f077c0e0f0c321ec829e62d3fe9f6f22fa72b6dc66498", "workers": 1}
+{"compiler": "apple-clang", "index": 23, "kind": "build", "ms": 84.153833, "serial": true, "sha256": "5a1298a61cb589a8c8754626ba894b172ee725408d9c2dfee76530f6f074b559", "workers": 1}
+{"compiler": "apple-clang", "index": 24, "kind": "build", "ms": 128.620833, "serial": true, "sha256": "c4009da59c3e9589972d3e45ce42e3355a93111d51c5a2b0a3993b249c0ce596", "workers": 1}
+{"compiler": "apple-clang", "index": 25, "kind": "build", "ms": 100.839083, "serial": true, "sha256": "0f4a29abe45369fe4b0a320786956e865e07b2b57dd16a919e31e54c66602805", "workers": 1}
+{"compiler": "apple-clang", "index": 26, "kind": "build", "ms": 128.350334, "serial": true, "sha256": "07d880d6a37d4f0bbb20cd46544c14136160b79c0a093d81163937c84cedaccc", "workers": 1}
+{"compiler": "apple-clang", "index": 27, "kind": "build", "ms": 111.1015, "serial": true, "sha256": "0ad79417e3a04008381d6b78a690310c9612daea69799cc7906780901180828f", "workers": 1}
+{"compiler": "apple-clang", "index": 28, "kind": "build", "ms": 157.974042, "serial": true, "sha256": "25fbecafc41cdaa278ccf253cf45a2c7abbd0a1393d8bfe6780fb8d50e40e1e6", "workers": 1}
+{"compiler": "apple-clang", "index": 29, "kind": "build", "ms": 136.334834, "serial": true, "sha256": "7dfb5607f9d3e1d35f2372f809673d4d4a0c37148f83348f4f81a482b8f0f442", "workers": 1}
+{"compiler": "apple-clang", "index": 30, "kind": "build", "ms": 152.007542, "serial": true, "sha256": "38edbb2c8792edb18ad5df7fcfa43b1a2c88a647cb6aafef4034e95f07840cdf", "workers": 1}
+{"compiler": "apple-clang", "index": 31, "kind": "build", "ms": 151.079667, "serial": true, "sha256": "cd74a6a4bd815e3a2ee1c9cc61e4a7eef2bd78a4fb4581eef5e3cbe1c3511a74", "workers": 1}
+{"compiler": "apple-clang", "index": 32, "kind": "build", "ms": 131.603208, "serial": true, "sha256": "cbb76cd694d06dac638168b0b037e0bec1a07c71fe8deca62acb4d0bd9c7ba6f", "workers": 1}
+{"compiler": "apple-clang", "index": 33, "kind": "build", "ms": 79.043, "serial": true, "sha256": "3e63a056d56a8d82d2c77efc79c9a9d227bf150f1ad70d23e8541ca9698e4ae9", "workers": 1}
+{"compiler": "apple-clang", "index": 34, "kind": "build", "ms": 100.855875, "serial": true, "sha256": "3a1027db75d2cce3a933ce40511bad5affeddd945c6f978621c2babf78a3f9bc", "workers": 1}
+{"compiler": "apple-clang", "index": 35, "kind": "build", "ms": 185.690375, "serial": true, "sha256": "992d2a992439651216de91bfc1590bdc55c09b737d7ced93beb25fce2be17f4b", "workers": 1}
+{"compiler": "apple-clang", "index": 36, "kind": "build", "ms": 98.670708, "serial": true, "sha256": "396aedd1076df76b3696fc6761242d2c2158aa913f2a97482d2a4f7b25df8a7b", "workers": 1}
+{"compiler": "apple-clang", "index": 37, "kind": "build", "ms": 73.645, "serial": true, "sha256": "3ab93f7c93e66b85097dec70c55ad83a4c4cca5cd5f0c8a734796ad3367fc161", "workers": 1}
+{"compiler": "apple-clang", "index": 38, "kind": "build", "ms": 128.289083, "serial": true, "sha256": "f691dbf12f574ab3d1d634c4bad5abd1b861614d0ef81aa644c3e24f3da9218a", "workers": 1}
+{"compiler": "apple-clang", "index": 39, "kind": "build", "ms": 140.06275, "serial": true, "sha256": "69bf6ab459d09acdbb2bcbd24fa151774bae3a21fe2bf032c4ac151699b4ce2d", "workers": 1}
+{"compiler": "apple-clang", "index": 40, "kind": "build", "ms": 101.810541, "serial": true, "sha256": "994a07c8cc87500dfbce85f8f32fb2db53a1f16054b4f3eecc3c2486a483d238", "workers": 1}
+{"compiler": "apple-clang", "index": 41, "kind": "build", "ms": 112.049959, "serial": true, "sha256": "645db46427a48dfca37af1d5e45d933ea0a860bfdc6d1e20d683c5df0f5c4bce", "workers": 1}
+{"compiler": "apple-clang", "index": 42, "kind": "build", "ms": 87.884416, "serial": true, "sha256": "f147749bb0a80d53a11021ab32c0e1eae4c5d0b0a7505cc7ab4780d1db2610b7", "workers": 1}
+{"compiler": "apple-clang", "index": 43, "kind": "build", "ms": 118.585291, "serial": true, "sha256": "62d42a5468683b3b756c3d55011eb7915c69fc2a62a9ede00ea7443028d28070", "workers": 1}
+{"compiler": "apple-clang", "index": 44, "kind": "build", "ms": 73.660292, "serial": true, "sha256": "b611af52ba3c29eaa15f5daed0c6364fc7bc53e798e7a81a6ea1a32d351d7a09", "workers": 1}
+{"compiler": "apple-clang", "index": 45, "kind": "build", "ms": 107.321125, "serial": true, "sha256": "0a40bc08852099ab2d7497af3a04acd463f59bb08113bd26cf5c280c4ca0780e", "workers": 1}
+{"compiler": "apple-clang", "index": 46, "kind": "build", "ms": 131.764917, "serial": true, "sha256": "825e0f9ca191b7da223c0aefe2f09422c4158c6550a064d04a55753bf9a1c2d9", "workers": 1}
+{"compiler": "apple-clang", "index": 47, "kind": "build", "ms": 129.300209, "serial": true, "sha256": "a8f54b658a3676571de5a42ba81b4d6a190f372ec21cdb8a5d106e188c5ef4d9", "workers": 1}
+{"cache": "uncontrolled", "compiler": "apple-clang", "kind": "build-total", "ms": 5909.100334, "serial": true, "workers": 1}
+{"compiler": "apple-clang", "index": 0, "iteration": 1, "kind": "exec", "ms": 17.097666, "workers": 1}
+{"compiler": "apple-clang", "index": 1, "iteration": 1, "kind": "exec", "ms": 10.169375, "workers": 1}
+{"compiler": "apple-clang", "index": 2, "iteration": 1, "kind": "exec", "ms": 10.43725, "workers": 1}
+{"compiler": "apple-clang", "index": 3, "iteration": 1, "kind": "exec", "ms": 17.612084, "workers": 1}
+{"compiler": "apple-clang", "index": 4, "iteration": 1, "kind": "exec", "ms": 8.483041, "workers": 1}
+{"compiler": "apple-clang", "index": 5, "iteration": 1, "kind": "exec", "ms": 5.48325, "workers": 1}
+{"compiler": "apple-clang", "index": 6, "iteration": 1, "kind": "exec", "ms": 9.168167, "workers": 1}
+{"compiler": "apple-clang", "index": 7, "iteration": 1, "kind": "exec", "ms": 8.508458, "workers": 1}
+{"compiler": "apple-clang", "index": 8, "iteration": 1, "kind": "exec", "ms": 8.78275, "workers": 1}
+{"compiler": "apple-clang", "index": 9, "iteration": 1, "kind": "exec", "ms": 9.361208, "workers": 1}
+{"compiler": "apple-clang", "index": 10, "iteration": 1, "kind": "exec", "ms": 9.325875, "workers": 1}
+{"compiler": "apple-clang", "index": 11, "iteration": 1, "kind": "exec", "ms": 8.738583, "workers": 1}
+{"compiler": "apple-clang", "index": 12, "iteration": 1, "kind": "exec", "ms": 9.202792, "workers": 1}
+{"compiler": "apple-clang", "index": 13, "iteration": 1, "kind": "exec", "ms": 9.395833, "workers": 1}
+{"compiler": "apple-clang", "index": 14, "iteration": 1, "kind": "exec", "ms": 8.562625, "workers": 1}
+{"compiler": "apple-clang", "index": 15, "iteration": 1, "kind": "exec", "ms": 8.686, "workers": 1}
+{"compiler": "apple-clang", "index": 16, "iteration": 1, "kind": "exec", "ms": 9.524334, "workers": 1}
+{"compiler": "apple-clang", "index": 17, "iteration": 1, "kind": "exec", "ms": 8.614667, "workers": 1}
+{"compiler": "apple-clang", "index": 18, "iteration": 1, "kind": "exec", "ms": 8.416292, "workers": 1}
+{"compiler": "apple-clang", "index": 19, "iteration": 1, "kind": "exec", "ms": 8.709458, "workers": 1}
+{"compiler": "apple-clang", "index": 20, "iteration": 1, "kind": "exec", "ms": 9.321166, "workers": 1}
+{"compiler": "apple-clang", "index": 21, "iteration": 1, "kind": "exec", "ms": 9.202417, "workers": 1}
+{"compiler": "apple-clang", "index": 22, "iteration": 1, "kind": "exec", "ms": 8.7715, "workers": 1}
+{"compiler": "apple-clang", "index": 23, "iteration": 1, "kind": "exec", "ms": 8.7535, "workers": 1}
+{"compiler": "apple-clang", "index": 24, "iteration": 1, "kind": "exec", "ms": 8.503667, "workers": 1}
+{"compiler": "apple-clang", "index": 25, "iteration": 1, "kind": "exec", "ms": 8.850708, "workers": 1}
+{"compiler": "apple-clang", "index": 26, "iteration": 1, "kind": "exec", "ms": 8.325958, "workers": 1}
+{"compiler": "apple-clang", "index": 27, "iteration": 1, "kind": "exec", "ms": 10.959333, "workers": 1}
+{"compiler": "apple-clang", "index": 28, "iteration": 1, "kind": "exec", "ms": 7.773667, "workers": 1}
+{"compiler": "apple-clang", "index": 29, "iteration": 1, "kind": "exec", "ms": 9.347791, "workers": 1}
+{"compiler": "apple-clang", "index": 30, "iteration": 1, "kind": "exec", "ms": 8.707959, "workers": 1}
+{"compiler": "apple-clang", "index": 31, "iteration": 1, "kind": "exec", "ms": 10.690291, "workers": 1}
+{"compiler": "apple-clang", "index": 32, "iteration": 1, "kind": "exec", "ms": 7.862958, "workers": 1}
+{"compiler": "apple-clang", "index": 33, "iteration": 1, "kind": "exec", "ms": 9.5305, "workers": 1}
+{"compiler": "apple-clang", "index": 34, "iteration": 1, "kind": "exec", "ms": 8.373834, "workers": 1}
+{"compiler": "apple-clang", "index": 35, "iteration": 1, "kind": "exec", "ms": 21.607, "workers": 1}
+{"compiler": "apple-clang", "index": 36, "iteration": 1, "kind": "exec", "ms": 10.691459, "workers": 1}
+{"compiler": "apple-clang", "index": 37, "iteration": 1, "kind": "exec", "ms": 19.498459, "workers": 1}
+{"compiler": "apple-clang", "index": 38, "iteration": 1, "kind": "exec", "ms": 8.797792, "workers": 1}
+{"compiler": "apple-clang", "index": 39, "iteration": 1, "kind": "exec", "ms": 8.808917, "workers": 1}
+{"compiler": "apple-clang", "index": 40, "iteration": 1, "kind": "exec", "ms": 9.233875, "workers": 1}
+{"compiler": "apple-clang", "index": 41, "iteration": 1, "kind": "exec", "ms": 8.698167, "workers": 1}
+{"compiler": "apple-clang", "index": 42, "iteration": 1, "kind": "exec", "ms": 9.581167, "workers": 1}
+{"compiler": "apple-clang", "index": 43, "iteration": 1, "kind": "exec", "ms": 9.363333, "workers": 1}
+{"compiler": "apple-clang", "index": 44, "iteration": 1, "kind": "exec", "ms": 6.372916, "workers": 1}
+{"compiler": "apple-clang", "index": 45, "iteration": 1, "kind": "exec", "ms": 8.254625, "workers": 1}
+{"compiler": "apple-clang", "index": 46, "iteration": 1, "kind": "exec", "ms": 13.703958, "workers": 1}
+{"compiler": "apple-clang", "index": 47, "iteration": 1, "kind": "exec", "ms": 8.647041, "workers": 1}
+{"compiler": "apple-clang", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 476.02275, "workers": 1}
+{"compiler": "apple-clang", "index": 0, "iteration": 2, "kind": "exec", "ms": 8.922708, "workers": 1}
+{"compiler": "apple-clang", "index": 1, "iteration": 2, "kind": "exec", "ms": 12.122, "workers": 1}
+{"compiler": "apple-clang", "index": 2, "iteration": 2, "kind": "exec", "ms": 6.818833, "workers": 1}
+{"compiler": "apple-clang", "index": 3, "iteration": 2, "kind": "exec", "ms": 8.142875, "workers": 1}
+{"compiler": "apple-clang", "index": 4, "iteration": 2, "kind": "exec", "ms": 8.957875, "workers": 1}
+{"compiler": "apple-clang", "index": 5, "iteration": 2, "kind": "exec", "ms": 7.841083, "workers": 1}
+{"compiler": "apple-clang", "index": 6, "iteration": 2, "kind": "exec", "ms": 9.771042, "workers": 1}
+{"compiler": "apple-clang", "index": 7, "iteration": 2, "kind": "exec", "ms": 6.833875, "workers": 1}
+{"compiler": "apple-clang", "index": 8, "iteration": 2, "kind": "exec", "ms": 9.26825, "workers": 1}
+{"compiler": "apple-clang", "index": 9, "iteration": 2, "kind": "exec", "ms": 9.02525, "workers": 1}
+{"compiler": "apple-clang", "index": 10, "iteration": 2, "kind": "exec", "ms": 7.716, "workers": 1}
+{"compiler": "apple-clang", "index": 11, "iteration": 2, "kind": "exec", "ms": 15.451792, "workers": 1}
+{"compiler": "apple-clang", "index": 12, "iteration": 2, "kind": "exec", "ms": 7.861333, "workers": 1}
+{"compiler": "apple-clang", "index": 13, "iteration": 2, "kind": "exec", "ms": 12.940334, "workers": 1}
+{"compiler": "apple-clang", "index": 14, "iteration": 2, "kind": "exec", "ms": 14.214875, "workers": 1}
+{"compiler": "apple-clang", "index": 15, "iteration": 2, "kind": "exec", "ms": 5.640333, "workers": 1}
+{"compiler": "apple-clang", "index": 16, "iteration": 2, "kind": "exec", "ms": 7.783125, "workers": 1}
+{"compiler": "apple-clang", "index": 17, "iteration": 2, "kind": "exec", "ms": 10.159958, "workers": 1}
+{"compiler": "apple-clang", "index": 18, "iteration": 2, "kind": "exec", "ms": 10.060333, "workers": 1}
+{"compiler": "apple-clang", "index": 19, "iteration": 2, "kind": "exec", "ms": 8.616875, "workers": 1}
+{"compiler": "apple-clang", "index": 20, "iteration": 2, "kind": "exec", "ms": 8.56825, "workers": 1}
+{"compiler": "apple-clang", "index": 21, "iteration": 2, "kind": "exec", "ms": 6.101042, "workers": 1}
+{"compiler": "apple-clang", "index": 22, "iteration": 2, "kind": "exec", "ms": 14.288042, "workers": 1}
+{"compiler": "apple-clang", "index": 23, "iteration": 2, "kind": "exec", "ms": 9.073083, "workers": 1}
+{"compiler": "apple-clang", "index": 24, "iteration": 2, "kind": "exec", "ms": 8.124667, "workers": 1}
+{"compiler": "apple-clang", "index": 25, "iteration": 2, "kind": "exec", "ms": 8.844542, "workers": 1}
+{"compiler": "apple-clang", "index": 26, "iteration": 2, "kind": "exec", "ms": 18.2055, "workers": 1}
+{"compiler": "apple-clang", "index": 27, "iteration": 2, "kind": "exec", "ms": 7.899959, "workers": 1}
+{"compiler": "apple-clang", "index": 28, "iteration": 2, "kind": "exec", "ms": 8.258584, "workers": 1}
+{"compiler": "apple-clang", "index": 29, "iteration": 2, "kind": "exec", "ms": 4.610375, "workers": 1}
+{"compiler": "apple-clang", "index": 30, "iteration": 2, "kind": "exec", "ms": 15.793917, "workers": 1}
+{"compiler": "apple-clang", "index": 31, "iteration": 2, "kind": "exec", "ms": 7.917, "workers": 1}
+{"compiler": "apple-clang", "index": 32, "iteration": 2, "kind": "exec", "ms": 5.361791, "workers": 1}
+{"compiler": "apple-clang", "index": 33, "iteration": 2, "kind": "exec", "ms": 8.976416, "workers": 1}
+{"compiler": "apple-clang", "index": 34, "iteration": 2, "kind": "exec", "ms": 7.524875, "workers": 1}
+{"compiler": "apple-clang", "index": 35, "iteration": 2, "kind": "exec", "ms": 7.945166, "workers": 1}
+{"compiler": "apple-clang", "index": 36, "iteration": 2, "kind": "exec", "ms": 8.25675, "workers": 1}
+{"compiler": "apple-clang", "index": 37, "iteration": 2, "kind": "exec", "ms": 14.367333, "workers": 1}
+{"compiler": "apple-clang", "index": 38, "iteration": 2, "kind": "exec", "ms": 6.646458, "workers": 1}
+{"compiler": "apple-clang", "index": 39, "iteration": 2, "kind": "exec", "ms": 8.468084, "workers": 1}
+{"compiler": "apple-clang", "index": 40, "iteration": 2, "kind": "exec", "ms": 8.312, "workers": 1}
+{"compiler": "apple-clang", "index": 41, "iteration": 2, "kind": "exec", "ms": 9.755625, "workers": 1}
+{"compiler": "apple-clang", "index": 42, "iteration": 2, "kind": "exec", "ms": 6.42775, "workers": 1}
+{"compiler": "apple-clang", "index": 43, "iteration": 2, "kind": "exec", "ms": 13.794542, "workers": 1}
+{"compiler": "apple-clang", "index": 44, "iteration": 2, "kind": "exec", "ms": 9.367875, "workers": 1}
+{"compiler": "apple-clang", "index": 45, "iteration": 2, "kind": "exec", "ms": 7.056666, "workers": 1}
+{"compiler": "apple-clang", "index": 46, "iteration": 2, "kind": "exec", "ms": 9.367958, "workers": 1}
+{"compiler": "apple-clang", "index": 47, "iteration": 2, "kind": "exec", "ms": 8.483208, "workers": 1}
+{"compiler": "apple-clang", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 449.865209, "workers": 1}
+{"compiler": "apple-clang", "index": 0, "kind": "build", "ms": 208.532667, "serial": true, "sha256": "456de48b1788166c3108d722e14010342a5e5731bc14426c37feb935acd1f14d", "workers": 3}
+{"compiler": "apple-clang", "index": 1, "kind": "build", "ms": 202.53625, "serial": true, "sha256": "1229ec08c569fdf6ef7abd8e9cb0fd138e2d2d736ae39a4eab7a857c7f9a5a2d", "workers": 3}
+{"compiler": "apple-clang", "index": 2, "kind": "build", "ms": 131.721417, "serial": true, "sha256": "f80b570f7e020dd37f26862acde55e00e28a91ad502b3012ad5b76a71187444c", "workers": 3}
+{"compiler": "apple-clang", "index": 3, "kind": "build", "ms": 105.3695, "serial": true, "sha256": "398e618e0ee19d0155d40212db77a884fb79c439727a72fce9e0ee5c88a59352", "workers": 3}
+{"compiler": "apple-clang", "index": 4, "kind": "build", "ms": 79.617208, "serial": true, "sha256": "a79c73b23474c1c6c4a9758780f1f337d996918ca224c6ea4a7413a6dbd5aa88", "workers": 3}
+{"compiler": "apple-clang", "index": 5, "kind": "build", "ms": 72.702333, "serial": true, "sha256": "214dbf35adfd7203d5c804a625fa38827d901e8c91713c0d483e622d0ab4d1bb", "workers": 3}
+{"compiler": "apple-clang", "index": 6, "kind": "build", "ms": 67.326, "serial": true, "sha256": "9d8c0602bf2c567fac81977981ab33dae50a6a219448718013b7446f0f17bb62", "workers": 3}
+{"compiler": "apple-clang", "index": 7, "kind": "build", "ms": 78.103083, "serial": true, "sha256": "a8ccd3bd6fa1c82ef090c68e95618a06287b35f8bf0df7338ca3c4f46a56dda5", "workers": 3}
+{"compiler": "apple-clang", "index": 8, "kind": "build", "ms": 101.669458, "serial": true, "sha256": "f0c1ee4f1b27b5dba61363f198e45fd788d5e33ef42470778cfa458afe75b4cd", "workers": 3}
+{"compiler": "apple-clang", "index": 9, "kind": "build", "ms": 67.797166, "serial": true, "sha256": "23cfa5d6080893511cbe132b3c306fa62013f2f1fcd644f77bef7bb34bcd567b", "workers": 3}
+{"compiler": "apple-clang", "index": 10, "kind": "build", "ms": 69.372583, "serial": true, "sha256": "83941fb6c07a4e52b771b9af7cadca05ff5c0396e6415f77e58ed7a536b3b25f", "workers": 3}
+{"compiler": "apple-clang", "index": 11, "kind": "build", "ms": 127.736125, "serial": true, "sha256": "08e3637395c8db4eac8221cc9e8ada049cc156f6cae4b4b68fcadd196d5a3daf", "workers": 3}
+{"compiler": "apple-clang", "index": 12, "kind": "build", "ms": 110.364959, "serial": true, "sha256": "42d9f1d23f42e6bf9d016983fa277dde542ac149f1e3cb3a76f077c6589e88fd", "workers": 3}
+{"compiler": "apple-clang", "index": 13, "kind": "build", "ms": 120.51725, "serial": true, "sha256": "c7f71fb320767aec63dc0d10adae3777b6108f9ffece12f09e2e4d81355c828a", "workers": 3}
+{"compiler": "apple-clang", "index": 14, "kind": "build", "ms": 129.702667, "serial": true, "sha256": "ee0708efc48536044dd7d709a34ac35626798082f652ebb32402623c41b94d4e", "workers": 3}
+{"compiler": "apple-clang", "index": 15, "kind": "build", "ms": 124.422, "serial": true, "sha256": "dabb0303281029d32bda07642719aec981781d32ebda9d54bc9f99cd39cc195a", "workers": 3}
+{"compiler": "apple-clang", "index": 16, "kind": "build", "ms": 125.039083, "serial": true, "sha256": "6144e76135b2335ca0685a0638621a0799bb271d50d1ead11832e68a2d07cfea", "workers": 3}
+{"compiler": "apple-clang", "index": 17, "kind": "build", "ms": 122.084083, "serial": true, "sha256": "b50dadfff377884dd2bb9d20b9b71ead8de33bdf1e76826760b7788986408912", "workers": 3}
+{"compiler": "apple-clang", "index": 18, "kind": "build", "ms": 127.201042, "serial": true, "sha256": "76bc2132e7deabf46d00d562649eb121f2883c17c17000657b90276e51c1cd56", "workers": 3}
+{"compiler": "apple-clang", "index": 19, "kind": "build", "ms": 102.84825, "serial": true, "sha256": "445e4ae63a764e8e24ccff57373844a28a735dedf3fc1d166f1f6f296d97d69e", "workers": 3}
+{"compiler": "apple-clang", "index": 20, "kind": "build", "ms": 152.774625, "serial": true, "sha256": "ac24d0c29a294eef9057a4018bcc5ad0f6adb9e4c1398849fe3199de1897e4f9", "workers": 3}
+{"compiler": "apple-clang", "index": 21, "kind": "build", "ms": 137.428209, "serial": true, "sha256": "f20c5550ac2feb43e53c36d5263bc8bd96703b89fcc8c60849100985a965901c", "workers": 3}
+{"compiler": "apple-clang", "index": 22, "kind": "build", "ms": 130.581042, "serial": true, "sha256": "60c135a59ef71021739bfcb71403a8d20f0552669278b10bc979d2763722d93c", "workers": 3}
+{"compiler": "apple-clang", "index": 23, "kind": "build", "ms": 94.643125, "serial": true, "sha256": "a41942ca13aa046b51895350528f944a691cb0bf7a4b23cd7193b5d8ea17e919", "workers": 3}
+{"compiler": "apple-clang", "index": 24, "kind": "build", "ms": 127.910791, "serial": true, "sha256": "52c36e2f1e2b9b01508fa599d9aee12b6708f0cd49cf25e579b52f4a4f28f6e7", "workers": 3}
+{"compiler": "apple-clang", "index": 25, "kind": "build", "ms": 111.620583, "serial": true, "sha256": "b9c9f792a84c160bb21c659db6e4fb3266af9d750c52937ca70cb43e4a01164c", "workers": 3}
+{"compiler": "apple-clang", "index": 26, "kind": "build", "ms": 97.95125, "serial": true, "sha256": "e38a6e3faf74cc9003357a608cc90cc20f672da801db52cf02870e21f5aa6f51", "workers": 3}
+{"compiler": "apple-clang", "index": 27, "kind": "build", "ms": 146.444875, "serial": true, "sha256": "3545bcaa7195405d15dce1fdf31008b306f0f856b367478e7f6b5cb049363ca0", "workers": 3}
+{"compiler": "apple-clang", "index": 28, "kind": "build", "ms": 226.997875, "serial": true, "sha256": "7e4a9bffb0350df13d9b291e17eb287b393d8943a803e7273c686732c69a8301", "workers": 3}
+{"compiler": "apple-clang", "index": 29, "kind": "build", "ms": 126.030041, "serial": true, "sha256": "eec86a0d0d2cb8e7cfde1d9a5fef55d7270476881d63a3e3b3c860c572dbf31c", "workers": 3}
+{"compiler": "apple-clang", "index": 30, "kind": "build", "ms": 103.344, "serial": true, "sha256": "dfe3e15e476011f145a74df3ba8007598050ff69f084b7588beef3603aed4eba", "workers": 3}
+{"compiler": "apple-clang", "index": 31, "kind": "build", "ms": 158.576583, "serial": true, "sha256": "7277caec8bc14b8fac178f43de5363962e89b46ff728b51ae18c09b325e48a57", "workers": 3}
+{"compiler": "apple-clang", "index": 32, "kind": "build", "ms": 131.478458, "serial": true, "sha256": "3343876de72d1685c5028a82b3c7de7609b7274608d14880cfc30c3a55e5b7d8", "workers": 3}
+{"compiler": "apple-clang", "index": 33, "kind": "build", "ms": 231.456333, "serial": true, "sha256": "064aa950c6a543855ef20fa441f43b63ec06dd3f0bf90661dd1bb999932d608c", "workers": 3}
+{"compiler": "apple-clang", "index": 34, "kind": "build", "ms": 220.641666, "serial": true, "sha256": "4c03079431cb512971bf5c88e7d4c7b7917eac70e3efc29a927e7408775581bf", "workers": 3}
+{"compiler": "apple-clang", "index": 35, "kind": "build", "ms": 401.975083, "serial": true, "sha256": "0a9e668b1bba581e134f4fe1073b6162f218caf48e87c6380b5bbb55babadbf4", "workers": 3}
+{"compiler": "apple-clang", "index": 36, "kind": "build", "ms": 210.656583, "serial": true, "sha256": "f714230b72da9f2f7fed5de0d8ac1f39c3ab8ed6a60b0941c23bd7af5ea86e85", "workers": 3}
+{"compiler": "apple-clang", "index": 37, "kind": "build", "ms": 211.138, "serial": true, "sha256": "432ec8a6751c6a8c9b527dab2cc1e1f07942998720315c076b1b003c958bd60a", "workers": 3}
+{"compiler": "apple-clang", "index": 38, "kind": "build", "ms": 246.698208, "serial": true, "sha256": "89186776baf1c96324628f70acc4f50bb4c3433949bc0516b9d6054fd5fb49f5", "workers": 3}
+{"compiler": "apple-clang", "index": 39, "kind": "build", "ms": 200.868125, "serial": true, "sha256": "a71b8c7ee7d213dd13a378a72b6737bef4c3275a1cbc9d228b26818de77b247f", "workers": 3}
+{"compiler": "apple-clang", "index": 40, "kind": "build", "ms": 167.629458, "serial": true, "sha256": "ef597da9e579ff006878cedee7af19916faff53b75706db48fcaa4ae444a1f48", "workers": 3}
+{"compiler": "apple-clang", "index": 41, "kind": "build", "ms": 206.88975, "serial": true, "sha256": "c63cba9af985e394c42f4c475c8fe10acf2986875fd23fe3cfcaf9a247e6bf7d", "workers": 3}
+{"compiler": "apple-clang", "index": 42, "kind": "build", "ms": 225.839708, "serial": true, "sha256": "9f3f72ae6d615c0559b0bd8d5f31890d97881ba853f66ee59c4a24fc0835ef1c", "workers": 3}
+{"compiler": "apple-clang", "index": 43, "kind": "build", "ms": 202.601208, "serial": true, "sha256": "6f31f66111b47f0e15161352557d699be6bfdec53cc9f12e383136db8aa0db86", "workers": 3}
+{"compiler": "apple-clang", "index": 44, "kind": "build", "ms": 199.690208, "serial": true, "sha256": "0d7a00eb6d403a11cc1b4006a314e1286a2e884e286b2018234f65a56c2a36fc", "workers": 3}
+{"compiler": "apple-clang", "index": 45, "kind": "build", "ms": 168.190917, "serial": true, "sha256": "56ff86b0f800c74152141e38a0e94658b69ec354394ebf03bf844ac980cac364", "workers": 3}
+{"compiler": "apple-clang", "index": 46, "kind": "build", "ms": 174.552125, "serial": true, "sha256": "869baca1ad6b0c56abdecacf7a2aa96e8ee77b48e95e3b79fefc0c9672283553", "workers": 3}
+{"compiler": "apple-clang", "index": 47, "kind": "build", "ms": 135.179666, "serial": true, "sha256": "23d2d1a973b0c22c1b022e9566db4169ee5a5de27e4b71b70c3492adf4ea9a95", "workers": 3}
+{"cache": "uncontrolled", "compiler": "apple-clang", "kind": "build-total", "ms": 7450.010084, "serial": true, "workers": 3}
+{"compiler": "apple-clang", "index": 0, "iteration": 1, "kind": "exec", "ms": 358.025959, "workers": 3}
+{"compiler": "apple-clang", "index": 1, "iteration": 1, "kind": "exec", "ms": 400.837708, "workers": 3}
+{"compiler": "apple-clang", "index": 2, "iteration": 1, "kind": "exec", "ms": 48.059292, "workers": 3}
+{"compiler": "apple-clang", "index": 3, "iteration": 1, "kind": "exec", "ms": 16.190625, "workers": 3}
+{"compiler": "apple-clang", "index": 4, "iteration": 1, "kind": "exec", "ms": 12.706125, "workers": 3}
+{"compiler": "apple-clang", "index": 5, "iteration": 1, "kind": "exec", "ms": 15.005, "workers": 3}
+{"compiler": "apple-clang", "index": 6, "iteration": 1, "kind": "exec", "ms": 10.1995, "workers": 3}
+{"compiler": "apple-clang", "index": 7, "iteration": 1, "kind": "exec", "ms": 22.438333, "workers": 3}
+{"compiler": "apple-clang", "index": 8, "iteration": 1, "kind": "exec", "ms": 27.815167, "workers": 3}
+{"compiler": "apple-clang", "index": 9, "iteration": 1, "kind": "exec", "ms": 59.490417, "workers": 3}
+{"compiler": "apple-clang", "index": 10, "iteration": 1, "kind": "exec", "ms": 39.070583, "workers": 3}
+{"compiler": "apple-clang", "index": 11, "iteration": 1, "kind": "exec", "ms": 42.421875, "workers": 3}
+{"compiler": "apple-clang", "index": 12, "iteration": 1, "kind": "exec", "ms": 24.844666, "workers": 3}
+{"compiler": "apple-clang", "index": 13, "iteration": 1, "kind": "exec", "ms": 61.520041, "workers": 3}
+{"compiler": "apple-clang", "index": 14, "iteration": 1, "kind": "exec", "ms": 30.363917, "workers": 3}
+{"compiler": "apple-clang", "index": 15, "iteration": 1, "kind": "exec", "ms": 47.1855, "workers": 3}
+{"compiler": "apple-clang", "index": 16, "iteration": 1, "kind": "exec", "ms": 103.604, "workers": 3}
+{"compiler": "apple-clang", "index": 17, "iteration": 1, "kind": "exec", "ms": 84.559125, "workers": 3}
+{"compiler": "apple-clang", "index": 18, "iteration": 1, "kind": "exec", "ms": 88.271458, "workers": 3}
+{"compiler": "apple-clang", "index": 19, "iteration": 1, "kind": "exec", "ms": 16.358042, "workers": 3}
+{"compiler": "apple-clang", "index": 20, "iteration": 1, "kind": "exec", "ms": 15.981959, "workers": 3}
+{"compiler": "apple-clang", "index": 21, "iteration": 1, "kind": "exec", "ms": 10.411625, "workers": 3}
+{"compiler": "apple-clang", "index": 22, "iteration": 1, "kind": "exec", "ms": 10.151083, "workers": 3}
+{"compiler": "apple-clang", "index": 23, "iteration": 1, "kind": "exec", "ms": 7.27975, "workers": 3}
+{"compiler": "apple-clang", "index": 24, "iteration": 1, "kind": "exec", "ms": 14.338209, "workers": 3}
+{"compiler": "apple-clang", "index": 25, "iteration": 1, "kind": "exec", "ms": 27.231875, "workers": 3}
+{"compiler": "apple-clang", "index": 26, "iteration": 1, "kind": "exec", "ms": 19.904084, "workers": 3}
+{"compiler": "apple-clang", "index": 27, "iteration": 1, "kind": "exec", "ms": 12.227125, "workers": 3}
+{"compiler": "apple-clang", "index": 28, "iteration": 1, "kind": "exec", "ms": 14.320041, "workers": 3}
+{"compiler": "apple-clang", "index": 29, "iteration": 1, "kind": "exec", "ms": 17.251833, "workers": 3}
+{"compiler": "apple-clang", "index": 30, "iteration": 1, "kind": "exec", "ms": 15.8175, "workers": 3}
+{"compiler": "apple-clang", "index": 31, "iteration": 1, "kind": "exec", "ms": 14.965916, "workers": 3}
+{"compiler": "apple-clang", "index": 32, "iteration": 1, "kind": "exec", "ms": 6.760167, "workers": 3}
+{"compiler": "apple-clang", "index": 33, "iteration": 1, "kind": "exec", "ms": 16.115375, "workers": 3}
+{"compiler": "apple-clang", "index": 34, "iteration": 1, "kind": "exec", "ms": 8.568792, "workers": 3}
+{"compiler": "apple-clang", "index": 35, "iteration": 1, "kind": "exec", "ms": 12.340084, "workers": 3}
+{"compiler": "apple-clang", "index": 36, "iteration": 1, "kind": "exec", "ms": 18.2325, "workers": 3}
+{"compiler": "apple-clang", "index": 37, "iteration": 1, "kind": "exec", "ms": 19.528542, "workers": 3}
+{"compiler": "apple-clang", "index": 38, "iteration": 1, "kind": "exec", "ms": 11.717708, "workers": 3}
+{"compiler": "apple-clang", "index": 39, "iteration": 1, "kind": "exec", "ms": 8.600667, "workers": 3}
+{"compiler": "apple-clang", "index": 40, "iteration": 1, "kind": "exec", "ms": 14.04125, "workers": 3}
+{"compiler": "apple-clang", "index": 41, "iteration": 1, "kind": "exec", "ms": 8.659875, "workers": 3}
+{"compiler": "apple-clang", "index": 42, "iteration": 1, "kind": "exec", "ms": 13.466792, "workers": 3}
+{"compiler": "apple-clang", "index": 43, "iteration": 1, "kind": "exec", "ms": 18.4085, "workers": 3}
+{"compiler": "apple-clang", "index": 44, "iteration": 1, "kind": "exec", "ms": 24.762667, "workers": 3}
+{"compiler": "apple-clang", "index": 45, "iteration": 1, "kind": "exec", "ms": 23.088417, "workers": 3}
+{"compiler": "apple-clang", "index": 46, "iteration": 1, "kind": "exec", "ms": 15.477708, "workers": 3}
+{"compiler": "apple-clang", "index": 47, "iteration": 1, "kind": "exec", "ms": 9.922167, "workers": 3}
+{"compiler": "apple-clang", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 813.272209, "workers": 3}
+{"compiler": "apple-clang", "index": 0, "iteration": 2, "kind": "exec", "ms": 9.254125, "workers": 3}
+{"compiler": "apple-clang", "index": 1, "iteration": 2, "kind": "exec", "ms": 12.560042, "workers": 3}
+{"compiler": "apple-clang", "index": 2, "iteration": 2, "kind": "exec", "ms": 11.119459, "workers": 3}
+{"compiler": "apple-clang", "index": 3, "iteration": 2, "kind": "exec", "ms": 12.171333, "workers": 3}
+{"compiler": "apple-clang", "index": 4, "iteration": 2, "kind": "exec", "ms": 25.930667, "workers": 3}
+{"compiler": "apple-clang", "index": 5, "iteration": 2, "kind": "exec", "ms": 12.764875, "workers": 3}
+{"compiler": "apple-clang", "index": 6, "iteration": 2, "kind": "exec", "ms": 13.493084, "workers": 3}
+{"compiler": "apple-clang", "index": 7, "iteration": 2, "kind": "exec", "ms": 13.313, "workers": 3}
+{"compiler": "apple-clang", "index": 8, "iteration": 2, "kind": "exec", "ms": 8.107791, "workers": 3}
+{"compiler": "apple-clang", "index": 9, "iteration": 2, "kind": "exec", "ms": 9.497375, "workers": 3}
+{"compiler": "apple-clang", "index": 10, "iteration": 2, "kind": "exec", "ms": 18.69375, "workers": 3}
+{"compiler": "apple-clang", "index": 11, "iteration": 2, "kind": "exec", "ms": 10.162625, "workers": 3}
+{"compiler": "apple-clang", "index": 12, "iteration": 2, "kind": "exec", "ms": 18.70325, "workers": 3}
+{"compiler": "apple-clang", "index": 13, "iteration": 2, "kind": "exec", "ms": 23.691833, "workers": 3}
+{"compiler": "apple-clang", "index": 14, "iteration": 2, "kind": "exec", "ms": 20.482791, "workers": 3}
+{"compiler": "apple-clang", "index": 15, "iteration": 2, "kind": "exec", "ms": 18.683041, "workers": 3}
+{"compiler": "apple-clang", "index": 16, "iteration": 2, "kind": "exec", "ms": 18.6555, "workers": 3}
+{"compiler": "apple-clang", "index": 17, "iteration": 2, "kind": "exec", "ms": 11.243917, "workers": 3}
+{"compiler": "apple-clang", "index": 18, "iteration": 2, "kind": "exec", "ms": 14.549417, "workers": 3}
+{"compiler": "apple-clang", "index": 19, "iteration": 2, "kind": "exec", "ms": 10.289042, "workers": 3}
+{"compiler": "apple-clang", "index": 20, "iteration": 2, "kind": "exec", "ms": 12.895708, "workers": 3}
+{"compiler": "apple-clang", "index": 21, "iteration": 2, "kind": "exec", "ms": 12.994417, "workers": 3}
+{"compiler": "apple-clang", "index": 22, "iteration": 2, "kind": "exec", "ms": 11.886167, "workers": 3}
+{"compiler": "apple-clang", "index": 23, "iteration": 2, "kind": "exec", "ms": 16.2855, "workers": 3}
+{"compiler": "apple-clang", "index": 24, "iteration": 2, "kind": "exec", "ms": 10.078958, "workers": 3}
+{"compiler": "apple-clang", "index": 25, "iteration": 2, "kind": "exec", "ms": 10.722292, "workers": 3}
+{"compiler": "apple-clang", "index": 26, "iteration": 2, "kind": "exec", "ms": 9.958917, "workers": 3}
+{"compiler": "apple-clang", "index": 27, "iteration": 2, "kind": "exec", "ms": 12.259458, "workers": 3}
+{"compiler": "apple-clang", "index": 28, "iteration": 2, "kind": "exec", "ms": 8.271375, "workers": 3}
+{"compiler": "apple-clang", "index": 29, "iteration": 2, "kind": "exec", "ms": 6.913625, "workers": 3}
+{"compiler": "apple-clang", "index": 30, "iteration": 2, "kind": "exec", "ms": 7.023292, "workers": 3}
+{"compiler": "apple-clang", "index": 31, "iteration": 2, "kind": "exec", "ms": 5.82375, "workers": 3}
+{"compiler": "apple-clang", "index": 32, "iteration": 2, "kind": "exec", "ms": 8.705459, "workers": 3}
+{"compiler": "apple-clang", "index": 33, "iteration": 2, "kind": "exec", "ms": 9.975875, "workers": 3}
+{"compiler": "apple-clang", "index": 34, "iteration": 2, "kind": "exec", "ms": 7.272125, "workers": 3}
+{"compiler": "apple-clang", "index": 35, "iteration": 2, "kind": "exec", "ms": 12.818875, "workers": 3}
+{"compiler": "apple-clang", "index": 36, "iteration": 2, "kind": "exec", "ms": 7.502125, "workers": 3}
+{"compiler": "apple-clang", "index": 37, "iteration": 2, "kind": "exec", "ms": 7.836125, "workers": 3}
+{"compiler": "apple-clang", "index": 38, "iteration": 2, "kind": "exec", "ms": 7.291125, "workers": 3}
+{"compiler": "apple-clang", "index": 39, "iteration": 2, "kind": "exec", "ms": 16.3215, "workers": 3}
+{"compiler": "apple-clang", "index": 40, "iteration": 2, "kind": "exec", "ms": 8.570416, "workers": 3}
+{"compiler": "apple-clang", "index": 41, "iteration": 2, "kind": "exec", "ms": 7.14075, "workers": 3}
+{"compiler": "apple-clang", "index": 42, "iteration": 2, "kind": "exec", "ms": 10.705708, "workers": 3}
+{"compiler": "apple-clang", "index": 43, "iteration": 2, "kind": "exec", "ms": 13.647834, "workers": 3}
+{"compiler": "apple-clang", "index": 44, "iteration": 2, "kind": "exec", "ms": 11.665375, "workers": 3}
+{"compiler": "apple-clang", "index": 45, "iteration": 2, "kind": "exec", "ms": 10.998209, "workers": 3}
+{"compiler": "apple-clang", "index": 46, "iteration": 2, "kind": "exec", "ms": 5.689167, "workers": 3}
+{"compiler": "apple-clang", "index": 47, "iteration": 2, "kind": "exec", "ms": 9.143666, "workers": 3}
+{"compiler": "apple-clang", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 202.849708, "workers": 3}
+{"compiler": "apple-clang", "kind": "dylib-build", "ms": 132.46725}
+{"compiler": "apple-clang", "iteration": 1, "kind": "dlopen", "ms": 1.467292, "note": "second load retains first handle"}
+{"compiler": "apple-clang", "iteration": 2, "kind": "dlopen", "ms": 0.325667, "note": "second load retains first handle"}

@@ -141,6 +141,49 @@ a derived 1.89 minutes of added macOS fixed cost. Extra harness preparation has
 no separate timing measurement; the corrected combined-workload observation
 meets the limit without establishing repeatable savings.
 
+### U17 hosted first executable launch probe
+
+Branch run [36594796547]
+at `1b5970ff` measured `macos-15`, `macos-latest`, and `ubuntu-latest`
+once each on 2026-09-29 UTC. All jobs passed. The
+[probe and compact outputs](./evidence/u17/README.md) preserve the exact
+script, environment, per-binary durations, build costs, and policy logs.
+The workflow experiment branch must never be merged; these results come
+from a separate documentation branch based on `main`. The
+[historical Mac mini comparison](./evidence/u17/mac-mini-baseline.txt)
+is preserved with its report provenance.
+
+The tested hosted images did not exhibit the Mac mini's reported
+sustained serialized first-execution cost. For fresh Zig binaries on
+macOS 15.7.9, measured totals for 48 first launches were 428.907 ms at
+concurrency one and 133.483 ms at concurrency three; repeats took
+446.241 and 107.836 ms. On macOS 26.6.2, the corresponding first totals
+were 507.555 and 174.809 ms, versus 503.678 and 197.351 ms on repeat.
+Fresh shared-library loads measured 0.938–2.348 ms across the macOS
+compiler/image cells. Builds and installation are excluded from these
+launch/load measurements; cold and warmed Zig build costs are recorded
+separately in the evidence.
+
+Apple-clang macOS 15 first totals measured 361.789/111.009 ms for
+concurrency one/three. The macOS 26 concurrent first pass had outliers:
+813.272 ms total versus 202.850 ms on repeat, with a derived maximum
+individual launch of 400.838 ms. Its cause was not isolated, and that
+cohort does not establish a concurrency speedup. Both macOS images
+reported assessments enabled and SIP disabled without any policy change
+by the probe. `syspolicyd` was active; these observations do not prove
+that security checks are absent or identify the image setting responsible.
+
+The research report's candidate 3, rented dedicated Mac capacity, still
+needs this probe measured in the actual guest under its default policy.
+Candidate 4, measuring family speed before spending, remains necessary:
+use the same SHA, image, toolchain, shard, seeds, budgets, and cache state
+for test262, extended properties, and Apple-clang sanitizers. This
+single tiny-program measurement replaces the inference about hosted
+first-exec cost; it establishes no repeatable gate speedup or rented-Mac
+throughput ratio. Production workflow coverage is unchanged.
+
+[36594796547]: https://github.com/dahlia/oseo/actions/runs/36594796547
+
 ### U3 fixed-cost cache audit
 
 U3 leaves the workflow unchanged. Mise already caches the installed tools;

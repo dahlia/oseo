@@ -1,0 +1,39 @@
+import json
+import re
+import sys
+from pathlib import Path
+
+root=Path(sys.argv[1])
+root.mkdir(parents=True,exist_ok=True)
+rows=[]
+for line in Path(sys.argv[2]).read_text().splitlines():
+    start=line.find('{')
+    if start<0:
+        continue
+    try:
+        row=json.loads(line[start:])
+    except json.JSONDecodeError:
+        continue
+    if 'kind' in row:
+        rows.append(row)
+(root/'measurements.jsonl.txt').write_text(''.join(
+    json.dumps(r,sort_keys=True)+'\n' for r in rows
+    if r['kind']!='command'))
+commands=[r for r in rows if r['kind']=='command']
+(root/'system.txt').write_text(''.join(
+    '$ '+' '.join(r['args'])+'\nexit='+str(r['code'])+'\n'
+    +r['stdout']+r['stderr']+'\n' for r in commands
+    if r['args'][0]!='log'))
+(root/'syspolicyd.txt').write_text(''.join(
+    '$ '+' '.join(r['args'])+'\nexit='+str(r['code'])+'\n'
+    +r['stdout']+r['stderr']+'\n' for r in commands
+    if r['args'][0]=='log') or 'Not applicable on Linux.\n')
+for r in rows:
+    if r['kind'] in ('exec-total','dlopen','build-total','metadata'):
+        print(json.dumps(r,sort_keys=True))
+assert sum(r['kind']=='exec' for r in rows)==384
+
+# Preserve command output while avoiding an extra separator at EOF.
+for name in ("system.txt", "syspolicyd.txt"):
+    path = root / name
+    path.write_text(path.read_text().rstrip("\n") + "\n")

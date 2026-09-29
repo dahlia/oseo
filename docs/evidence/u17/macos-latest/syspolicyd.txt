@@ -1,0 +1,129 @@
+$ log show --start 2026-09-29 16:03:39 --style compact --info --debug --predicate process == "syspolicyd"
+exit=0
+Timestamp               Ty Process[PID:TID]
+2026-09-29 16:03:50.326 Df syspolicyd[194:1fcc] [com.apple.xpc:connection] [0x7dd760780] activating connection: mach=false listener=false peer=true name=com.apple.xpc.activity.peer[88].0x7dd760780
+2026-09-29 16:03:50.326 Df syspolicyd[194:1fcc] [com.apple.xpc.activity:Client] _xpc_activity_dispatch: beginning dispatch, activity name CloudTelemetry.com.apple.syspolicyd.submit, seqno 2
+2026-09-29 16:03:50.326 Df syspolicyd[194:1fcc] [com.apple.xpc.activity:Client] _xpc_activity_dispatch: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0): found an activity with matching seqno 2
+2026-09-29 16:03:50.329 Df syspolicyd[194:1fcc] [com.apple.xpc:connection] [0x7dd0d4c80] activating connection: mach=true listener=false peer=false name=com.apple.distributed_notifications@1v3
+2026-09-29 16:03:50.342 Df syspolicyd[194:1fcc] [com.apple.xpc.activity:Client] _xpc_activity_begin_running: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0) seqno: 2.
+2026-09-29 16:03:50.342 Df syspolicyd[194:1fcc] [com.apple.xpc.activity:Client] _xpc_activity_dispatch: lower half, activity name CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), seqno from top half was 2
+2026-09-29 16:03:50.342 Df syspolicyd[194:1fcc] [com.apple.xpc:connection] [0x7dd0d4dc0] activating connection: mach=false listener=false peer=false name=(anonymous)
+2026-09-29 16:03:50.342 Df syspolicyd[194:1fcc] [com.apple.xpc.activity:Client] _xpc_activity_dispatch: created connection 0x7dd0d4dc0 for activity name CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), seqno 2
+2026-09-29 16:03:50.342 Df syspolicyd[194:1fcc] [com.apple.xpc.activity:Client] _xpc_activity_set_state: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), 2
+2026-09-29 16:03:50.342 Df syspolicyd[194:1fcc] [com.apple.xpc.activity:Client] _xpc_activity_set_state: send new state to CTS: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), 2
+2026-09-29 16:03:50.343 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] _xpc_activity_set_state_from_cts: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), set activity state to 2
+2026-09-29 16:03:50.343 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] __XPC_ACTIVITY_CALLING_HANDLER__: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), current state 2, pending state 0
+2026-09-29 16:03:50.343 Df syspolicyd[194:2259] [com.apple.CloudTelemetryService:activity] run: <private>
+2026-09-29 16:03:50.343 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] _xpc_activity_set_state: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), 4
+2026-09-29 16:03:50.343 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] __XPC_ACTIVITY_CALLING_HANDLER__ returned from handler: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), current state 2, pending state 4
+2026-09-29 16:03:50.343 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] _xpc_activity_set_state: send new state to CTS: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), 4
+2026-09-29 16:03:50.836 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:50.836 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:50.836 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:03:50.842 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:50.842 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:50.842 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:03:50.853 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:50.853 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:50.853 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:03:50.860 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] _xpc_activity_set_state: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), 5
+2026-09-29 16:03:50.860 Df syspolicyd[194:2259] [com.apple.CloudTelemetryService:activity] done: <private>
+2026-09-29 16:03:50.861 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] _xpc_activity_set_state: send new state to CTS: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), 5
+2026-09-29 16:03:50.898 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] _xpc_activity_set_state_from_cts: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0), set activity state to 1
+2026-09-29 16:03:50.898 Df syspolicyd[194:2259] [com.apple.xpc.activity:Client] _xpc_activity_end_running: CloudTelemetry.com.apple.syspolicyd.submit (0x7dcc61ea0) seqno: 2.
+2026-09-29 16:03:50.958 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:50.958 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:50.958 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:03:50.964 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:50.964 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:50.964 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:03:54.849 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:54.849 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:54.849 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:03:54.852 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:54.852 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:54.853 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:03:54.899 I  syspolicyd[194:2259] pid 192 requested <private>
+2026-09-29 16:03:54.899 I  syspolicyd[194:2259] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:03:54.899 I  syspolicyd[194:2259] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.213 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.213 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.214 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.217 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.217 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.218 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.234 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.234 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.234 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.296 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.296 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.296 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.299 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.299 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.299 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.425 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.425 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.425 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.429 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.429 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.429 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.564 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.564 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.565 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.568 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.568 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.568 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.695 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:22.695 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.695 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.699 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:22.699 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.699 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.823 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:22.823 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.823 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.825 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:22.825 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.825 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.896 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:22.896 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.896 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:22.899 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:22.899 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:22.899 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.025 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.025 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.025 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.027 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.027 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.027 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.182 I  syspolicyd[194:27ee] pid 192 requested <private>
+2026-09-29 16:04:23.182 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.182 I  syspolicyd[194:27ee] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.186 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.186 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.186 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.322 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.322 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.322 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.325 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.325 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.325 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.420 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.420 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.421 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.426 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.427 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.427 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.557 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.557 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.558 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.562 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.562 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.562 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.681 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.681 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.681 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3
+2026-09-29 16:04:23.685 I  syspolicyd[194:2b76] pid 192 requested <private>
+2026-09-29 16:04:23.685 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] looking up ticket: <private>, 2, 0
+2026-09-29 16:04:23.686 I  syspolicyd[194:2b76] [com.apple.syspolicy:default] completing lookup: <private>, 3

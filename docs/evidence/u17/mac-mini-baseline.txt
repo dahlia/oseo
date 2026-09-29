@@ -1,0 +1,42 @@
+Historical Mac mini comparison record
+=====================================
+
+Source: ~/.local/state/oseo-m5ci/research/REPORT.md, section 1.3.
+Source context: main 1edb59b9; research dated 2026-09-29 to 09-30 KST.
+Whole-source SHA-256 at capture:
+95ff6a133ad5c29b2bae12979dd649becb9e55a3cc672bc299140fcb65f58b27
+
+These are measurements reported by the preceding research, not new U17
+measurements. U17 did not rerun the Mac mini probe or independently
+verify that report's attribution of the delay to the assessment queue.
+The comparison is descriptive: OS, host load, and probe harness differ.
+The report does not supply raw per-binary rows for this table here.
+
+The following excerpt preserves the original Korean research record.
+Its [측정] label means measured, and ms/초 mean milliseconds/seconds.
+The first three table rows say: first launch 212–225 ms; repeat launch
+2–8 ms; 48 fresh launches at concurrency 1/2/4/8 took
+10.8/10.2/10.2/10.2 s. All are historical reported measurements.
+
+--- Original excerpt ---
+
+### 1.3 macOS 첫 실행 검사 큐
+
+사용자의 Mac mini(`mac-mini-m4`, M4 10코어, 16GB, macOS 15.2)에서
+측정했다. 이 기계는 OrbStack과 PostgreSQL이 도는 운영 서버라서 측정
+전부터 부하 평균이 5~9였다. 아래는 이 기계 한 대의 관측이다.
+
+| 관측 [측정]                                    | 값                          |
+| ---------------------------------------------- | --------------------------- |
+| 새 바이너리의 첫 실행                          | 212~225ms                   |
+| 같은 바이너리의 두 번째 실행                   | 2~8ms                       |
+| 새 바이너리 48개 첫 실행, 동시 1 / 2 / 4 / 8개 | 10.8 / 10.2 / 10.2 / 10.2초 |
+| 새 dylib을 `dlopen`으로 처음 로드              | 211~218ms                   |
+| 크기 1 / 8 / 32MiB 바이너리의 첫 실행          | 224 / 231 / 269ms           |
+
+동시 실행 수를 늘려도 전체 시간이 같다. 큐가 하나라는 뜻이다. 시스템
+로그에서 확인한 과정은 이렇다. `syspolicyd`가 Gatekeeper 평가를
+시작하고, 실행을 책임지는 프로세스에 "개발자 도구" 권한
+(`kTCCServiceDeveloperTool`)이 있는지 확인한 뒤, 없으면 XProtect 검사와
+공증 티켓 조회(네트워크)를 큐에 넣는다. Rust 쪽에서도 같은 현상이
+알려져 있다 [출처].
