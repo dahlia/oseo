@@ -2100,8 +2100,13 @@ absolute value fell.
 Without the profiler, a preload that wraps `ChildProcess.prototype.spawn`
 counts every start and records the main-thread time blocked inside the call.
 There are exactly two starts per native execution, one `zig cc` compile and
-link and the native executable itself, and the 736 `zig` starts are the 730
-execution builds plus six harness object builds.
+link and the native executable itself. That accounts for the 730
+`fixture-linux-x86_64-gnu` starts and for 730 of the 736 `zig` starts, and
+the remaining six are unclassified overhead. The recorder groups starts by the
+executable's basename and retained no arguments, so it cannot say what they
+were, and more than one caller reaches the compiler under that name: besides
+a harness object build, `prepareNativeRuntime` runs two `zig env` identity
+probes while the executor initializes.
 
 | Shard | Measured starts | Measured blocked s | Measured runner s | Derived share |
 | ----- | --------------- | ------------------ | ----------------- | ------------- |
@@ -2179,6 +2184,17 @@ variable, so they alternate run by run with no rebuild between them. Every
 individual run, with its own wall time, runner duration, and host load, is
 preserved in *evidence/u14/ab-runs.tsv.txt*; the means below are arithmetic
 means over the complete pairs of each group.
+
+Cache conditions were not controlled. Both the Oseo compiler cache, which
+`XDG_CACHE_HOME` locates, and the lane's `ZIG_GLOBAL_CACHE_DIR` persisted
+across every run, the driver neither reset nor warmed them and recorded no
+cache state, and it ran the base arm before the helper arm in every
+repetition rather than reversing the order within a pair. Any warming
+that continued across the sequence would therefore land on the helper arm, so
+these reductions are the difference between the arms as they were run and do
+not isolate the helper's effect from cache state. What the preserved per-run
+data shows against such a trend is weak: base wall time does not fall
+monotonically across the repetitions of three of the four groups.
 
 | Configuration       | Pairs | Measured base wall s | Measured helper wall s | Derived change |
 | ------------------- | ----- | -------------------- | ---------------------- | -------------- |

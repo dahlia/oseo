@@ -100,6 +100,13 @@ they support is that no growth with the parent's resident set was observed
 there and that no macOS saving was demonstrated, not that the platform is
 free of every cost this unit is about.
 
+The A/B was run against persistent caches. The Oseo compiler cache, which
+`XDG_CACHE_HOME` locates, and the lane's `ZIG_GLOBAL_CACHE_DIR` survived
+every run, the driver neither reset nor warmed them and recorded no cache
+state, and it ran the base arm before the helper arm in every repetition. The
+reductions it reports therefore do not separate the helper's effect from
+possible cache warming across the sequence.
+
 The `/usr/bin/time` resource figures for a helper arm are not comparable with
 a direct arm's: the compiler and fixture processes are the helper's children
 rather than the runner's, so the runner's own accounting no longer includes

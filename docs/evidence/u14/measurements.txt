@@ -100,8 +100,13 @@ ChildProcess.prototype.spawn, summed over the run.
       133, 97, 139, 186, 243, 231; largest heapTotal sample 918 MiB
 
   There are exactly two starts per native execution: one zig cc compile and
-  link, and the native executable itself. The 736 zig starts are the 730
-  execution builds plus 6 harness object builds. Blocked time is a derived
+  link, and the native executable itself. That accounts for the 730
+  fixture-linux-x86_64-gnu starts and 730 of the 736 zig starts; the
+  remaining 6 are unclassified overhead. The recorder groups starts by the
+  executable's basename and keeps no arguments, so it cannot say what they
+  were, and more than one caller reaches the compiler under that name:
+  besides a harness object build, prepareNativeRuntime runs two zig env
+  identity probes while the executor initializes. Blocked time is a derived
   44.6 and 45.5 percent of the runner's reported duration at shard 1/100 and
   51.4 percent at shard 1/25; the share grows because the resident set does.
 
@@ -200,6 +205,17 @@ with its own wall time, runner duration, and host load, is preserved in
 ab-runs.tsv.txt in the order the driver ran them; the means below are
 arithmetic means over the complete pairs of each group, and each per-pair
 percentage compares the two runs of one repetition.
+
+Cache conditions were not controlled. The Oseo compiler cache, which
+XDG_CACHE_HOME locates, and the lane's ZIG_GLOBAL_CACHE_DIR both persisted
+across every run; the driver neither reset nor warmed them and recorded no
+cache state, and it ran base before helper in every repetition rather than
+reversing the order within a pair. Warming that continued across the
+sequence would land on the helper arm, so these changes are the difference
+between the arms as they were run and do not isolate the helper's effect
+from cache state. The evidence against such a trend is weak: base wall time
+does not fall monotonically across the repetitions of three of the four
+groups below.
 
   configuration            pairs   base wall s   helper wall s   change
   3 CPUs, shard 1/100          3         53.82           50.11    -6.9%
