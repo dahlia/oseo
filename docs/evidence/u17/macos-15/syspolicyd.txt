@@ -1,0 +1,5 @@
+$ log show --start 2026-09-29 16:03:29 --style compact --info --debug --predicate process == "syspolicyd"
+exit=0
+Timestamp               Ty Process[PID:TID]
+2026-09-29 16:04:02.744 Df syspolicyd[181:23c7] [com.apple.xpc:connection] [0x74012cb40] invalidated because the client process (pid 1425) either cancelled the connection or exited
+2026-09-29 16:04:03.365 Df syspolicyd[181:23c7] [com.apple.xpc:connection] [0x74012ca00] invalidated because the client process (pid 1436) either cancelled the connection or exited

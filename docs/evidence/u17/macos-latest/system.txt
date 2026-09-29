@@ -1,0 +1,35 @@
+$ uname -a
+exit=0
+Darwin iad20-gt1025-4d2122c9-b401-4dd2-9596-48242d3474e4-D6DEE0C01365.local 25.6.0 Darwin Kernel Version 25.6.0: Fri Jul 31 19:16:43 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_VMAPPLE arm64
+
+$ zig version
+exit=0
+0.16.0
+
+$ clang --version
+exit=0
+Apple clang version 21.0.0 (clang-2100.1.1.101)
+Target: arm64-apple-darwin25.6.0
+Thread model: posix
+InstalledDir: /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+
+$ sw_vers
+exit=0
+ProductName:		macOS
+ProductVersion:		26.6.2
+BuildVersion:		25G83
+
+$ sysctl hw.ncpu hw.physicalcpu hw.logicalcpu machdep.cpu.brand_string
+exit=0
+hw.ncpu: 3
+hw.physicalcpu: 3
+hw.logicalcpu: 3
+machdep.cpu.brand_string: Apple M1 (Virtual)
+
+$ spctl --status
+exit=0
+assessments enabled
+
+$ csrutil status
+exit=0
+System Integrity Protection status: disabled.

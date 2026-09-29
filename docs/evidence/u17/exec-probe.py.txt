@@ -1,0 +1,151 @@
+import concurrent.futures
+import ctypes
+from datetime import datetime
+import hashlib
+import json
+import os
+from pathlib import Path
+import platform
+import subprocess
+import tempfile
+import time
+
+
+def emit(**row):
+    print(json.dumps(row, sort_keys=True), flush=True)
+
+
+def command(args):
+    try:
+        result = subprocess.run(args, capture_output=True, text=True)
+    except FileNotFoundError as error:
+        emit(kind="command", args=args, code=None,
+             stdout="", stderr=str(error))
+        return None
+    emit(kind="command", args=args, code=result.returncode,
+         stdout=result.stdout, stderr=result.stderr)
+    return result
+
+
+def launch(path):
+    start = time.perf_counter_ns()
+    subprocess.run([str(path)], check=True, timeout=30)
+    return (time.perf_counter_ns() - start) / 1e6
+
+
+mac = platform.system() == "Darwin"
+log_start = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+expected_arch = "arm64" if mac else "x86_64"
+if platform.machine() != expected_arch:
+    raise RuntimeError(
+        f"unsupported execution host: {platform.machine()}")
+emit(kind="metadata", run=os.environ.get("GITHUB_RUN_ID", "local"),
+     image=os.environ.get("ImageVersion"), host=platform.platform(),
+     cache=os.environ.get("ZIG_GLOBAL_CACHE_DIR"),
+     note="measured once; build time excluded from launch totals",
+     log_start=log_start)
+command(["uname", "-a"])
+command(["zig", "version"])
+command(["clang", "--version"])
+if mac:
+    for args in (["sw_vers"], ["sysctl", "hw.ncpu", "hw.physicalcpu",
+                 "hw.logicalcpu", "machdep.cpu.brand_string"],
+                 ["spctl", "--status"], ["csrutil", "status"]):
+        command(args)
+else:
+    command(["lscpu"])
+
+# Each hosted job starts with an empty Zig cache. Warmup builds
+# pay cold compiler startup; all later cohorts use warmed caches.
+# Each compiler/concurrency cohort has distinct bytes and is never run
+# before its first timing pass. Zero checks the embedded token.
+target = "aarch64-macos" if mac else "x86_64-linux-gnu"
+compilers = [("zig", ["zig", "cc", "-target", target])]
+if mac:
+    compilers.append(("apple-clang", ["clang", "-arch", "arm64"]))
+else:
+    compilers.append(("host-clang", ["clang", "-target", target]))
+
+with tempfile.TemporaryDirectory(prefix="u17-exec-") as directory:
+    root = Path(directory)
+    for compiler_index, (name, compiler) in enumerate(compilers):
+        source = root / f"{name}-warmup.c"
+        source.write_text("int main(void) { return 0; }\n")
+        binary = source.with_suffix("")
+        start = time.perf_counter_ns()
+        subprocess.run(compiler + ["-std=c11", "-O0", str(source),
+                       "-o", str(binary)], check=True, timeout=120)
+        emit(kind="warmup-build", compiler=name,
+             ms=(time.perf_counter_ns() - start) / 1e6,
+             cache=("cold Zig cache" if name == "zig"
+                    else "uncontrolled"))
+        emit(kind="warmup-exec", compiler=name, ms=launch(binary))
+        for workers in (1, 3):
+            paths = []
+            hashes = set()
+            start = time.perf_counter_ns()
+            for index in range(48):
+                token = (10000 * (compiler_index + 1)
+                         + workers * 100 + index)
+                source = root / f"{name}-{workers}-{index}.c"
+                binary = source.with_suffix("")
+                source.write_text(
+                    f"volatile int token = {token};\n"
+                    f"int main(void) {{ return token != {token}; }}\n"
+                )
+                build_start = time.perf_counter_ns()
+                subprocess.run(compiler + ["-std=c11", "-O0",
+                               str(source), "-o", str(binary)],
+                               check=True, timeout=120)
+                build_ms = (
+                    time.perf_counter_ns() - build_start) / 1e6
+                digest = hashlib.sha256(
+                    binary.read_bytes()).hexdigest()
+                hashes.add(digest)
+                emit(kind="build", compiler=name, workers=workers,
+                     serial=True,
+                     index=index, ms=build_ms, sha256=digest)
+                paths.append(binary)
+            assert len(hashes) == 48, "expected distinct binaries"
+            emit(kind="build-total", compiler=name, workers=workers,
+                 serial=True,
+                 ms=(time.perf_counter_ns() - start) / 1e6,
+                 cache=("warm Zig cache" if name == "zig"
+                        else "uncontrolled"))
+            for iteration in (1, 2):
+                with concurrent.futures.ThreadPoolExecutor(
+                        max_workers=workers) as pool:
+                    start = time.perf_counter_ns()
+                    timings = list(pool.map(launch, paths))
+                    total_ms = (time.perf_counter_ns() - start) / 1e6
+                for index, elapsed in enumerate(timings):
+                    emit(kind="exec", compiler=name, workers=workers,
+                         iteration=iteration, index=index, ms=elapsed)
+                emit(kind="exec-total", compiler=name,
+                     workers=workers,
+                     iteration=iteration, ms=total_ms,
+                     count=len(paths))
+        source = root / f"{name}-library.c"
+        source.write_text(
+            f"int probe(void) {{ return {compiler_index}; }}\n")
+        library = source.with_suffix(".dylib" if mac else ".so")
+        flags = ["-dynamiclib"] if mac else ["-shared", "-fPIC"]
+        start = time.perf_counter_ns()
+        subprocess.run(
+            compiler + flags + [str(source), "-o", str(library)],
+                       check=True, timeout=120)
+        emit(kind="dylib-build", compiler=name,
+             ms=(time.perf_counter_ns() - start) / 1e6)
+        handles = []
+        for iteration in (1, 2):
+            start = time.perf_counter_ns()
+            handle = ctypes.CDLL(str(library), mode=os.RTLD_NOW)
+            elapsed = (time.perf_counter_ns() - start) / 1e6
+            handles.append(handle)
+            assert handle.probe() == compiler_index
+            emit(kind="dlopen", compiler=name, iteration=iteration,
+                 ms=elapsed, note="second load retains first handle")
+if mac:
+    command(["log", "show", "--start", log_start,
+             "--style", "compact", "--info", "--debug",
+             "--predicate", 'process == "syspolicyd"'])

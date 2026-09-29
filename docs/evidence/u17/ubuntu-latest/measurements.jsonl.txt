@@ -1,0 +1,599 @@
+{"cache": "/home/runner/work/_temp/u17-cold-zig-cache", "host": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39", "image": "20260920.314.1", "kind": "metadata", "log_start": "2026-09-29 16:02:56", "note": "measured once; build time excluded from launch totals", "run": "36594796547"}
+{"cache": "cold Zig cache", "compiler": "zig", "kind": "warmup-build", "ms": 13998.957224}
+{"compiler": "zig", "kind": "warmup-exec", "ms": 1.461557}
+{"compiler": "zig", "index": 0, "kind": "build", "ms": 31.760776, "serial": true, "sha256": "e87eece9eb949303a598431dbc07939e86d3305707ca202f9e8dea4be72c4ce6", "workers": 1}
+{"compiler": "zig", "index": 1, "kind": "build", "ms": 64.037526, "serial": true, "sha256": "579aac540a8b7a3ce40aca4068d61c204f9daae573cd4d8b656f66982a49a780", "workers": 1}
+{"compiler": "zig", "index": 2, "kind": "build", "ms": 64.079815, "serial": true, "sha256": "a1810c3c8b6dcd824161d84691a28ef79eb83191420eec4271142ef17cc6c956", "workers": 1}
+{"compiler": "zig", "index": 3, "kind": "build", "ms": 31.945191, "serial": true, "sha256": "ef63e40441b092089da5ad5db947b315da3962644855446e73d7d952b9ebe77a", "workers": 1}
+{"compiler": "zig", "index": 4, "kind": "build", "ms": 32.852603, "serial": true, "sha256": "081d1362ccb5ff2bb95b72c5ea8d22336c74045196a825259a452901b8476805", "workers": 1}
+{"compiler": "zig", "index": 5, "kind": "build", "ms": 64.038857, "serial": true, "sha256": "db69f6a449979cded4e0dfdc9ca8746f9af49bf1a7bb3305b5de97c9c3f22000", "workers": 1}
+{"compiler": "zig", "index": 6, "kind": "build", "ms": 31.951125, "serial": true, "sha256": "ce11d4ddc4b3e909676d9052776721646cfbf8376c35494e1659c305d2670fca", "workers": 1}
+{"compiler": "zig", "index": 7, "kind": "build", "ms": 31.906084, "serial": true, "sha256": "4fff8effd474ac7be216b969f3d92bff1e42c4abc28674a432670767676753bc", "workers": 1}
+{"compiler": "zig", "index": 8, "kind": "build", "ms": 31.907553, "serial": true, "sha256": "59f17112dc198f9e9c0648b40bdb3ddb95a3dd74157b224588c5e7a064bcd07e", "workers": 1}
+{"compiler": "zig", "index": 9, "kind": "build", "ms": 31.872912, "serial": true, "sha256": "de6a8b0fa309761407614f134342975f716666d7b583146b7a353c85aab6a043", "workers": 1}
+{"compiler": "zig", "index": 10, "kind": "build", "ms": 64.070663, "serial": true, "sha256": "2aabe4547f59ea872c67546e5667789e005e13f010b4aa409094325ff0e7bddf", "workers": 1}
+{"compiler": "zig", "index": 11, "kind": "build", "ms": 64.103377, "serial": true, "sha256": "c798a5a15aa332cc7c2ac0b51ff2d4a9809b389d8b0729dffcfbee5f55778b2d", "workers": 1}
+{"compiler": "zig", "index": 12, "kind": "build", "ms": 64.121959, "serial": true, "sha256": "8de91222affe5d821f739e2db7578fe2a7801119f7187256b976dcd6ef0af424", "workers": 1}
+{"compiler": "zig", "index": 13, "kind": "build", "ms": 64.174781, "serial": true, "sha256": "c46b3d338d7bb841fad89314d540691640a04eef1833a3952ce7ec1694874461", "workers": 1}
+{"compiler": "zig", "index": 14, "kind": "build", "ms": 31.991861, "serial": true, "sha256": "ab56e68b5cc449db215a10dc93d93440554bcdecc70007a593b35e410e506cc4", "workers": 1}
+{"compiler": "zig", "index": 15, "kind": "build", "ms": 31.913419, "serial": true, "sha256": "055274021e33f329b3615b4726997a495f551be54f57573f5ce6faf4c679110e", "workers": 1}
+{"compiler": "zig", "index": 16, "kind": "build", "ms": 31.854645, "serial": true, "sha256": "9bb475bae6586e3c87d12cf5bace93646ad53bea97ee445e6e4e646aefd7c89d", "workers": 1}
+{"compiler": "zig", "index": 17, "kind": "build", "ms": 31.893965, "serial": true, "sha256": "20d28c1b7d32639d52a522664a40dd1d43690ec9b97adbb1ee2d6cc4946af76c", "workers": 1}
+{"compiler": "zig", "index": 18, "kind": "build", "ms": 31.931786, "serial": true, "sha256": "1600c361c91d442ce6d1dc651f9cb29a60ad6511ce9e6955b55a09d4095945fb", "workers": 1}
+{"compiler": "zig", "index": 19, "kind": "build", "ms": 63.995265, "serial": true, "sha256": "da9d209fb87a4f0065f93709894a6262a60d70776d3efed951f2b938c2e37e0b", "workers": 1}
+{"compiler": "zig", "index": 20, "kind": "build", "ms": 64.105659, "serial": true, "sha256": "8574168743273deccfabfb1944e85462edbfefbd070d2e71d55921fdec667750", "workers": 1}
+{"compiler": "zig", "index": 21, "kind": "build", "ms": 64.195062, "serial": true, "sha256": "1bc442ff13966405a19a15be38cf9dbfcc22bc97a21c86e40e1dbac25a8c68e1", "workers": 1}
+{"compiler": "zig", "index": 22, "kind": "build", "ms": 64.175647, "serial": true, "sha256": "00efda30a7209c57a135cee76f069bfc0c62fada5a3a6428cf8c8b9715ea713f", "workers": 1}
+{"compiler": "zig", "index": 23, "kind": "build", "ms": 64.164444, "serial": true, "sha256": "2b30ee0f186748b7593306e0ba790700cb9706c7ebb38589fac0b6faf5f14945", "workers": 1}
+{"compiler": "zig", "index": 24, "kind": "build", "ms": 32.016472, "serial": true, "sha256": "b86b1cf7ee715b378fd50c20f7476a2a4e3630ad6aa3e956b733f5de172f1708", "workers": 1}
+{"compiler": "zig", "index": 25, "kind": "build", "ms": 31.871783, "serial": true, "sha256": "a3777aa8d292f638bc3c5d1b8f9d1b34cb0113ae0844f2a3667cb0e17ffb50da", "workers": 1}
+{"compiler": "zig", "index": 26, "kind": "build", "ms": 31.900942, "serial": true, "sha256": "05183987f76f1a8c06217d2eee22259e80a4b60d7c50fa923c5f87083ace7045", "workers": 1}
+{"compiler": "zig", "index": 27, "kind": "build", "ms": 31.899716, "serial": true, "sha256": "a09e338d8c52a19056a030de58c54a771438fd94f5acdf5cd88df89035ea36f7", "workers": 1}
+{"compiler": "zig", "index": 28, "kind": "build", "ms": 31.937797, "serial": true, "sha256": "cf30aafd91904ff02fa93954fb95cfddb40cd8da641d2912ff4bc2e3810d5a31", "workers": 1}
+{"compiler": "zig", "index": 29, "kind": "build", "ms": 31.904643, "serial": true, "sha256": "3bcea2115d951b64d8ae4a3df60e376d01be3641cc258b6de958ca31497058e5", "workers": 1}
+{"compiler": "zig", "index": 30, "kind": "build", "ms": 63.999971, "serial": true, "sha256": "a42b7254d56b353d83668e90b39ff414c69d08d81e782df2f1cd90bbd5f286e3", "workers": 1}
+{"compiler": "zig", "index": 31, "kind": "build", "ms": 64.056649, "serial": true, "sha256": "dc5cf944919553625e386aebe7536f0d776b78c7bba6762d52b6caf40cf204a7", "workers": 1}
+{"compiler": "zig", "index": 32, "kind": "build", "ms": 64.145703, "serial": true, "sha256": "2186c10f90f39423754c04598882a1a80c2a242dbf93d7d0339467ed7f2144d8", "workers": 1}
+{"compiler": "zig", "index": 33, "kind": "build", "ms": 64.07084, "serial": true, "sha256": "4adbcc2faccd11f2c2e38645c8b53f99ac18a6faab5dfb6a112f932105f66320", "workers": 1}
+{"compiler": "zig", "index": 34, "kind": "build", "ms": 64.085646, "serial": true, "sha256": "d5b8def32b74fb555f65704d340b16ec186102f49f03e57ffcfd280188dc21a8", "workers": 1}
+{"compiler": "zig", "index": 35, "kind": "build", "ms": 64.168262, "serial": true, "sha256": "ec184a77798218c846e7fed1bb7cd6ac92dec9e26743fa475c685ce1f25e0f35", "workers": 1}
+{"compiler": "zig", "index": 36, "kind": "build", "ms": 64.142257, "serial": true, "sha256": "b5a7a3f90cb4d1b216476ec69f1d3468754b2c54e4dd8a6bb06a8be56fe999c4", "workers": 1}
+{"compiler": "zig", "index": 37, "kind": "build", "ms": 64.173503, "serial": true, "sha256": "3433515e1476ea9086c7bb9f3a8ed801eb7635cc10f89491382dd0c1d1a17bae", "workers": 1}
+{"compiler": "zig", "index": 38, "kind": "build", "ms": 64.09377, "serial": true, "sha256": "4395b64332a8236659f7d220ad580ef21315695de37d6651b97bbca58f56b2b8", "workers": 1}
+{"compiler": "zig", "index": 39, "kind": "build", "ms": 64.139953, "serial": true, "sha256": "859b542b4c07f57f3c979d6a5040c31250d5f87c5e48b76f36c4101801823e4c", "workers": 1}
+{"compiler": "zig", "index": 40, "kind": "build", "ms": 64.128468, "serial": true, "sha256": "84bba5e76e095d4fcb56da2459bcc732346b2784535cd2e8c9f4114ff69470ba", "workers": 1}
+{"compiler": "zig", "index": 41, "kind": "build", "ms": 64.129219, "serial": true, "sha256": "4821afce45fcf6148f0e7afc9a052ee2417f5fae1b4fb0a38ba9d579529a810b", "workers": 1}
+{"compiler": "zig", "index": 42, "kind": "build", "ms": 64.082308, "serial": true, "sha256": "e09d1ae2327d75367ded86fdd641345eaf6b6c80c626abe0097971714e595b27", "workers": 1}
+{"compiler": "zig", "index": 43, "kind": "build", "ms": 32.008469, "serial": true, "sha256": "81370fa8dddb194c9271a238caae6309a45707f9e2eb4595ebbce866b8e04a66", "workers": 1}
+{"compiler": "zig", "index": 44, "kind": "build", "ms": 31.883889, "serial": true, "sha256": "1ca1da88ea31bb4dbcdc86bc1f7effbc163fb8624b3cd85f7642826dfbf190f3", "workers": 1}
+{"compiler": "zig", "index": 45, "kind": "build", "ms": 31.860152, "serial": true, "sha256": "e880344a8049dcb4f78b14338a9af90d259d459b7ea590d6cde2758fb9aed3f0", "workers": 1}
+{"compiler": "zig", "index": 46, "kind": "build", "ms": 64.009472, "serial": true, "sha256": "01e994a1611a5eb7e00c536e7a214c2f8b248d952c8ee53a22154c5a6edc58bd", "workers": 1}
+{"compiler": "zig", "index": 47, "kind": "build", "ms": 64.144802, "serial": true, "sha256": "4a8348d7fd1cb852ce5445d620dee178f011a891a6a75f7816e1b44ff667f582", "workers": 1}
+{"cache": "warm Zig cache", "compiler": "zig", "kind": "build-total", "ms": 2418.268584, "serial": true, "workers": 1}
+{"compiler": "zig", "index": 0, "iteration": 1, "kind": "exec", "ms": 1.806733, "workers": 1}
+{"compiler": "zig", "index": 1, "iteration": 1, "kind": "exec", "ms": 1.364695, "workers": 1}
+{"compiler": "zig", "index": 2, "iteration": 1, "kind": "exec", "ms": 1.335852, "workers": 1}
+{"compiler": "zig", "index": 3, "iteration": 1, "kind": "exec", "ms": 1.283294, "workers": 1}
+{"compiler": "zig", "index": 4, "iteration": 1, "kind": "exec", "ms": 1.310023, "workers": 1}
+{"compiler": "zig", "index": 5, "iteration": 1, "kind": "exec", "ms": 1.294575, "workers": 1}
+{"compiler": "zig", "index": 6, "iteration": 1, "kind": "exec", "ms": 1.301968, "workers": 1}
+{"compiler": "zig", "index": 7, "iteration": 1, "kind": "exec", "ms": 1.28107, "workers": 1}
+{"compiler": "zig", "index": 8, "iteration": 1, "kind": "exec", "ms": 1.270799, "workers": 1}
+{"compiler": "zig", "index": 9, "iteration": 1, "kind": "exec", "ms": 1.287732, "workers": 1}
+{"compiler": "zig", "index": 10, "iteration": 1, "kind": "exec", "ms": 1.338767, "workers": 1}
+{"compiler": "zig", "index": 11, "iteration": 1, "kind": "exec", "ms": 1.327486, "workers": 1}
+{"compiler": "zig", "index": 12, "iteration": 1, "kind": "exec", "ms": 1.305465, "workers": 1}
+{"compiler": "zig", "index": 13, "iteration": 1, "kind": "exec", "ms": 1.297129, "workers": 1}
+{"compiler": "zig", "index": 14, "iteration": 1, "kind": "exec", "ms": 1.325282, "workers": 1}
+{"compiler": "zig", "index": 15, "iteration": 1, "kind": "exec", "ms": 1.311486, "workers": 1}
+{"compiler": "zig", "index": 16, "iteration": 1, "kind": "exec", "ms": 1.272623, "workers": 1}
+{"compiler": "zig", "index": 17, "iteration": 1, "kind": "exec", "ms": 1.300636, "workers": 1}
+{"compiler": "zig", "index": 18, "iteration": 1, "kind": "exec", "ms": 1.312508, "workers": 1}
+{"compiler": "zig", "index": 19, "iteration": 1, "kind": "exec", "ms": 1.272494, "workers": 1}
+{"compiler": "zig", "index": 20, "iteration": 1, "kind": "exec", "ms": 1.299183, "workers": 1}
+{"compiler": "zig", "index": 21, "iteration": 1, "kind": "exec", "ms": 1.286399, "workers": 1}
+{"compiler": "zig", "index": 22, "iteration": 1, "kind": "exec", "ms": 1.302849, "workers": 1}
+{"compiler": "zig", "index": 23, "iteration": 1, "kind": "exec", "ms": 1.275789, "workers": 1}
+{"compiler": "zig", "index": 24, "iteration": 1, "kind": "exec", "ms": 1.369665, "workers": 1}
+{"compiler": "zig", "index": 25, "iteration": 1, "kind": "exec", "ms": 1.273745, "workers": 1}
+{"compiler": "zig", "index": 26, "iteration": 1, "kind": "exec", "ms": 1.296568, "workers": 1}
+{"compiler": "zig", "index": 27, "iteration": 1, "kind": "exec", "ms": 1.277442, "workers": 1}
+{"compiler": "zig", "index": 28, "iteration": 1, "kind": "exec", "ms": 1.80996, "workers": 1}
+{"compiler": "zig", "index": 29, "iteration": 1, "kind": "exec", "ms": 1.386938, "workers": 1}
+{"compiler": "zig", "index": 30, "iteration": 1, "kind": "exec", "ms": 1.339378, "workers": 1}
+{"compiler": "zig", "index": 31, "iteration": 1, "kind": "exec", "ms": 1.339969, "workers": 1}
+{"compiler": "zig", "index": 32, "iteration": 1, "kind": "exec", "ms": 1.351922, "workers": 1}
+{"compiler": "zig", "index": 33, "iteration": 1, "kind": "exec", "ms": 1.27632, "workers": 1}
+{"compiler": "zig", "index": 34, "iteration": 1, "kind": "exec", "ms": 1.309071, "workers": 1}
+{"compiler": "zig", "index": 35, "iteration": 1, "kind": "exec", "ms": 1.292821, "workers": 1}
+{"compiler": "zig", "index": 36, "iteration": 1, "kind": "exec", "ms": 1.3027, "workers": 1}
+{"compiler": "zig", "index": 37, "iteration": 1, "kind": "exec", "ms": 1.279386, "workers": 1}
+{"compiler": "zig", "index": 38, "iteration": 1, "kind": "exec", "ms": 1.319511, "workers": 1}
+{"compiler": "zig", "index": 39, "iteration": 1, "kind": "exec", "ms": 1.27651, "workers": 1}
+{"compiler": "zig", "index": 40, "iteration": 1, "kind": "exec", "ms": 1.309412, "workers": 1}
+{"compiler": "zig", "index": 41, "iteration": 1, "kind": "exec", "ms": 1.329069, "workers": 1}
+{"compiler": "zig", "index": 42, "iteration": 1, "kind": "exec", "ms": 1.274536, "workers": 1}
+{"compiler": "zig", "index": 43, "iteration": 1, "kind": "exec", "ms": 1.295716, "workers": 1}
+{"compiler": "zig", "index": 44, "iteration": 1, "kind": "exec", "ms": 1.276661, "workers": 1}
+{"compiler": "zig", "index": 45, "iteration": 1, "kind": "exec", "ms": 1.341842, "workers": 1}
+{"compiler": "zig", "index": 46, "iteration": 1, "kind": "exec", "ms": 1.277463, "workers": 1}
+{"compiler": "zig", "index": 47, "iteration": 1, "kind": "exec", "ms": 1.310414, "workers": 1}
+{"compiler": "zig", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 64.577345, "workers": 1}
+{"compiler": "zig", "index": 0, "iteration": 2, "kind": "exec", "ms": 1.866275, "workers": 1}
+{"compiler": "zig", "index": 1, "iteration": 2, "kind": "exec", "ms": 1.37075, "workers": 1}
+{"compiler": "zig", "index": 2, "iteration": 2, "kind": "exec", "ms": 1.311266, "workers": 1}
+{"compiler": "zig", "index": 3, "iteration": 2, "kind": "exec", "ms": 1.361149, "workers": 1}
+{"compiler": "zig", "index": 4, "iteration": 2, "kind": "exec", "ms": 1.314201, "workers": 1}
+{"compiler": "zig", "index": 5, "iteration": 2, "kind": "exec", "ms": 1.294153, "workers": 1}
+{"compiler": "zig", "index": 6, "iteration": 2, "kind": "exec", "ms": 1.330902, "workers": 1}
+{"compiler": "zig", "index": 7, "iteration": 2, "kind": "exec", "ms": 1.291628, "workers": 1}
+{"compiler": "zig", "index": 8, "iteration": 2, "kind": "exec", "ms": 1.295917, "workers": 1}
+{"compiler": "zig", "index": 9, "iteration": 2, "kind": "exec", "ms": 1.343646, "workers": 1}
+{"compiler": "zig", "index": 10, "iteration": 2, "kind": "exec", "ms": 1.288693, "workers": 1}
+{"compiler": "zig", "index": 11, "iteration": 2, "kind": "exec", "ms": 1.287511, "workers": 1}
+{"compiler": "zig", "index": 12, "iteration": 2, "kind": "exec", "ms": 1.267323, "workers": 1}
+{"compiler": "zig", "index": 13, "iteration": 2, "kind": "exec", "ms": 1.288974, "workers": 1}
+{"compiler": "zig", "index": 14, "iteration": 2, "kind": "exec", "ms": 1.286129, "workers": 1}
+{"compiler": "zig", "index": 15, "iteration": 2, "kind": "exec", "ms": 1.288874, "workers": 1}
+{"compiler": "zig", "index": 16, "iteration": 2, "kind": "exec", "ms": 1.325922, "workers": 1}
+{"compiler": "zig", "index": 17, "iteration": 2, "kind": "exec", "ms": 1.284005, "workers": 1}
+{"compiler": "zig", "index": 18, "iteration": 2, "kind": "exec", "ms": 1.285977, "workers": 1}
+{"compiler": "zig", "index": 19, "iteration": 2, "kind": "exec", "ms": 1.30271, "workers": 1}
+{"compiler": "zig", "index": 20, "iteration": 2, "kind": "exec", "ms": 1.283183, "workers": 1}
+{"compiler": "zig", "index": 21, "iteration": 2, "kind": "exec", "ms": 1.280939, "workers": 1}
+{"compiler": "zig", "index": 22, "iteration": 2, "kind": "exec", "ms": 1.312818, "workers": 1}
+{"compiler": "zig", "index": 23, "iteration": 2, "kind": "exec", "ms": 1.285858, "workers": 1}
+{"compiler": "zig", "index": 24, "iteration": 2, "kind": "exec", "ms": 1.276891, "workers": 1}
+{"compiler": "zig", "index": 25, "iteration": 2, "kind": "exec", "ms": 1.275519, "workers": 1}
+{"compiler": "zig", "index": 26, "iteration": 2, "kind": "exec", "ms": 1.288563, "workers": 1}
+{"compiler": "zig", "index": 27, "iteration": 2, "kind": "exec", "ms": 1.294114, "workers": 1}
+{"compiler": "zig", "index": 28, "iteration": 2, "kind": "exec", "ms": 1.282171, "workers": 1}
+{"compiler": "zig", "index": 29, "iteration": 2, "kind": "exec", "ms": 1.321735, "workers": 1}
+{"compiler": "zig", "index": 30, "iteration": 2, "kind": "exec", "ms": 1.284285, "workers": 1}
+{"compiler": "zig", "index": 31, "iteration": 2, "kind": "exec", "ms": 1.29255, "workers": 1}
+{"compiler": "zig", "index": 32, "iteration": 2, "kind": "exec", "ms": 1.330421, "workers": 1}
+{"compiler": "zig", "index": 33, "iteration": 2, "kind": "exec", "ms": 1.27666, "workers": 1}
+{"compiler": "zig", "index": 34, "iteration": 2, "kind": "exec", "ms": 1.284595, "workers": 1}
+{"compiler": "zig", "index": 35, "iteration": 2, "kind": "exec", "ms": 1.308571, "workers": 1}
+{"compiler": "zig", "index": 36, "iteration": 2, "kind": "exec", "ms": 1.283213, "workers": 1}
+{"compiler": "zig", "index": 37, "iteration": 2, "kind": "exec", "ms": 1.277281, "workers": 1}
+{"compiler": "zig", "index": 38, "iteration": 2, "kind": "exec", "ms": 1.25539, "workers": 1}
+{"compiler": "zig", "index": 39, "iteration": 2, "kind": "exec", "ms": 1.28686, "workers": 1}
+{"compiler": "zig", "index": 40, "iteration": 2, "kind": "exec", "ms": 1.28699, "workers": 1}
+{"compiler": "zig", "index": 41, "iteration": 2, "kind": "exec", "ms": 1.296779, "workers": 1}
+{"compiler": "zig", "index": 42, "iteration": 2, "kind": "exec", "ms": 1.348585, "workers": 1}
+{"compiler": "zig", "index": 43, "iteration": 2, "kind": "exec", "ms": 1.289574, "workers": 1}
+{"compiler": "zig", "index": 44, "iteration": 2, "kind": "exec", "ms": 1.278444, "workers": 1}
+{"compiler": "zig", "index": 45, "iteration": 2, "kind": "exec", "ms": 1.310073, "workers": 1}
+{"compiler": "zig", "index": 46, "iteration": 2, "kind": "exec", "ms": 1.346692, "workers": 1}
+{"compiler": "zig", "index": 47, "iteration": 2, "kind": "exec", "ms": 1.291208, "workers": 1}
+{"compiler": "zig", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 63.909347, "workers": 1}
+{"compiler": "zig", "index": 0, "kind": "build", "ms": 64.028061, "serial": true, "sha256": "a11c152609bac1b3d095448f343ef5a2fe773383052585bf304f2bb292cad050", "workers": 3}
+{"compiler": "zig", "index": 1, "kind": "build", "ms": 64.164759, "serial": true, "sha256": "da97820c8ce82af57261dd226489ba4726ee4eb56a180302ffacebea97ec0f2c", "workers": 3}
+{"compiler": "zig", "index": 2, "kind": "build", "ms": 64.231847, "serial": true, "sha256": "40a11186e4ff6594b3cf24e1733f6e386cccae2d5037f889dc8378ea698efed9", "workers": 3}
+{"compiler": "zig", "index": 3, "kind": "build", "ms": 64.176192, "serial": true, "sha256": "4d341f013468eb4fd7891f5b3de090b8e38392ff429dbcd57670825c9091c6d7", "workers": 3}
+{"compiler": "zig", "index": 4, "kind": "build", "ms": 64.135128, "serial": true, "sha256": "904638fd38bc6ad0102f3fa96d95cdf116e202195c040b0cd5e8c5cdfb697f60", "workers": 3}
+{"compiler": "zig", "index": 5, "kind": "build", "ms": 64.253725, "serial": true, "sha256": "65c347fd88d9bdbe8c633f8d758198f8a2d44f78431253016407b0c24b085c48", "workers": 3}
+{"compiler": "zig", "index": 6, "kind": "build", "ms": 32.012594, "serial": true, "sha256": "c22844ac41c7b4c9085ff80927cdb3bc6cb65e9a1a248e0851f3b0a27bc9f968", "workers": 3}
+{"compiler": "zig", "index": 7, "kind": "build", "ms": 32.010313, "serial": true, "sha256": "4b7e281a6da58adba8bedf3de863272fb0557190f09cb4251c2db2026822b2b8", "workers": 3}
+{"compiler": "zig", "index": 8, "kind": "build", "ms": 64.016722, "serial": true, "sha256": "5baa1b9ac55c2f4dd07d43970afe1a1cee6dee85dda75bb993f18adae2befb1b", "workers": 3}
+{"compiler": "zig", "index": 9, "kind": "build", "ms": 64.221041, "serial": true, "sha256": "3e1942f9b6317a5903ff147eb285a633ca09f145564faeed6ecc46e210586c11", "workers": 3}
+{"compiler": "zig", "index": 10, "kind": "build", "ms": 64.165297, "serial": true, "sha256": "e1c081c15e2e36362d39b8e1330fa05d3b938af41b2e323e03dc4016c9bc5cfc", "workers": 3}
+{"compiler": "zig", "index": 11, "kind": "build", "ms": 32.021049, "serial": true, "sha256": "5bae9c98336f36a333b687a29a6e6e0db428e130bc63518c4ef739deff905752", "workers": 3}
+{"compiler": "zig", "index": 12, "kind": "build", "ms": 31.906919, "serial": true, "sha256": "5b48529394dae37ef0c7af68d91f27c6b68e0c12c04d11d537e0a5b469c1ed02", "workers": 3}
+{"compiler": "zig", "index": 13, "kind": "build", "ms": 64.051444, "serial": true, "sha256": "d684e89201a8473f1c1241338986956a2dc6e1b39bb374a8d73b3b91fdfbe4cb", "workers": 3}
+{"compiler": "zig", "index": 14, "kind": "build", "ms": 64.194856, "serial": true, "sha256": "fc574a83cc1c75f1bebc9fed92e4b59ea79cee99097f27f78b7497830bce3c8b", "workers": 3}
+{"compiler": "zig", "index": 15, "kind": "build", "ms": 64.275448, "serial": true, "sha256": "f3c188318031af5307ef9a99064f1568ff92b784c22e529a618e74bc22f1d2ae", "workers": 3}
+{"compiler": "zig", "index": 16, "kind": "build", "ms": 64.258876, "serial": true, "sha256": "43d1b79bff9015fc32a9b9923a5aa9360042a7b1675e9f0003423fe4e87eae47", "workers": 3}
+{"compiler": "zig", "index": 17, "kind": "build", "ms": 64.15277, "serial": true, "sha256": "3905ef07bf2d2e95ed86d960b38bcec7dbcb662307ac147221ca58dece539d9c", "workers": 3}
+{"compiler": "zig", "index": 18, "kind": "build", "ms": 64.163536, "serial": true, "sha256": "78a2e8ab15a569116c22cc032e9d27c7c52992526026872640a58e4779506cc2", "workers": 3}
+{"compiler": "zig", "index": 19, "kind": "build", "ms": 64.170486, "serial": true, "sha256": "36faebbf3040d13fb13cec9d5340e5033bca0be066445d89f9b98e858b2c0d62", "workers": 3}
+{"compiler": "zig", "index": 20, "kind": "build", "ms": 64.159449, "serial": true, "sha256": "3aef77de702e9761e2fa052ca7eef6c4e88282913c03ce11409aceea0fa831b7", "workers": 3}
+{"compiler": "zig", "index": 21, "kind": "build", "ms": 64.03473, "serial": true, "sha256": "508255c2b2616d1b0ea5f232ac3ba048cfc47692a78cc5f26142c24f13f98366", "workers": 3}
+{"compiler": "zig", "index": 22, "kind": "build", "ms": 64.171488, "serial": true, "sha256": "e674e026f7d7fcdbdb6471bac4c5f2d45d04f3960710975431e2353d2213e042", "workers": 3}
+{"compiler": "zig", "index": 23, "kind": "build", "ms": 64.034083, "serial": true, "sha256": "9b0d54b383a6b0f2df905b7dffdb669b347904186dbc1342d1e8a6dda00ad5af", "workers": 3}
+{"compiler": "zig", "index": 24, "kind": "build", "ms": 64.136419, "serial": true, "sha256": "1555b33aee0fdd1d771c1b9d6883fc2a22b287ed9732aae12f816dbaa9abcece", "workers": 3}
+{"compiler": "zig", "index": 25, "kind": "build", "ms": 64.123273, "serial": true, "sha256": "8f3bcb3541581b24dbf68c09e1ff4aa1a5de4cf7d9342c448098d884ba378a11", "workers": 3}
+{"compiler": "zig", "index": 26, "kind": "build", "ms": 64.124582, "serial": true, "sha256": "11f7b794b736e0aa6d2727a13dadd048d46f3b7cc596e2a544108f3b716a6cff", "workers": 3}
+{"compiler": "zig", "index": 27, "kind": "build", "ms": 64.160216, "serial": true, "sha256": "3c5b8e48fe159fe0af5f9e1d11a42983be1bbb50c87d622765aabae56721c3f4", "workers": 3}
+{"compiler": "zig", "index": 28, "kind": "build", "ms": 64.10348, "serial": true, "sha256": "22313d3414bf3c1c3dc09dfb8837eae72cad3967911af7b43a2661e7eaf3c228", "workers": 3}
+{"compiler": "zig", "index": 29, "kind": "build", "ms": 64.060851, "serial": true, "sha256": "76e507b52c28ef7a22d57a6fa635f9016410d2d6a662c88b115f3d0128c78c58", "workers": 3}
+{"compiler": "zig", "index": 30, "kind": "build", "ms": 64.138594, "serial": true, "sha256": "cc8337ff0346c96c3a80cbe9fb1f4c7bfc371c6d9f48bd19185ce86f18f17c9e", "workers": 3}
+{"compiler": "zig", "index": 31, "kind": "build", "ms": 64.040703, "serial": true, "sha256": "b382fb707bca3242259eda85be7e920c2dcffd88b7b6bbb9571ed635988eb7a6", "workers": 3}
+{"compiler": "zig", "index": 32, "kind": "build", "ms": 64.17539, "serial": true, "sha256": "b9e029cbf16a53745b3b9eb92fe1bccf9e3c7fef4ba19d8bbff960260630fe57", "workers": 3}
+{"compiler": "zig", "index": 33, "kind": "build", "ms": 64.117543, "serial": true, "sha256": "ecfdf2c2eabd626df90dd47d4f497ed59f782b25bf88dbe65b38ba6ee8d410a0", "workers": 3}
+{"compiler": "zig", "index": 34, "kind": "build", "ms": 64.250582, "serial": true, "sha256": "976abd246c0b9d95b8777b5d75541866c118e0d1417756ca016cea7769bfae6b", "workers": 3}
+{"compiler": "zig", "index": 35, "kind": "build", "ms": 31.988016, "serial": true, "sha256": "72537ca080871fb556d79315e29373cee99d57c175a74dbe48848da470ca296e", "workers": 3}
+{"compiler": "zig", "index": 36, "kind": "build", "ms": 31.873444, "serial": true, "sha256": "4148cb7fef3df018e929665f2ed46075cee5763f7ff159c7ab4eb811e79f5430", "workers": 3}
+{"compiler": "zig", "index": 37, "kind": "build", "ms": 31.852409, "serial": true, "sha256": "6df9bed9fb87f5a7ddc2d63ff3f341f1071be4b1eec801a704bdefa788db6645", "workers": 3}
+{"compiler": "zig", "index": 38, "kind": "build", "ms": 31.844154, "serial": true, "sha256": "697ae6a1048c91b7c9c67994961922c3235a1e5bfd0dc16ccd013872a32b3770", "workers": 3}
+{"compiler": "zig", "index": 39, "kind": "build", "ms": 31.955651, "serial": true, "sha256": "266d9f6d69fbb9b04abe480f09ea1c4c5fe432388dbb7c2f2d9777c6e6a20917", "workers": 3}
+{"compiler": "zig", "index": 40, "kind": "build", "ms": 31.951132, "serial": true, "sha256": "e0c58eeddce7cbcfe29b32ce2b0be797b727a5ab1627250cfbc65f18efb15024", "workers": 3}
+{"compiler": "zig", "index": 41, "kind": "build", "ms": 63.997113, "serial": true, "sha256": "5bc3d1f47564c190087c59d9323951d5024ec4253f1d3634e310e036b16ccb39", "workers": 3}
+{"compiler": "zig", "index": 42, "kind": "build", "ms": 31.954201, "serial": true, "sha256": "871b5b20f2bc579d880b64dd1203ad1408416eb2c9234a02ce467425a1d74984", "workers": 3}
+{"compiler": "zig", "index": 43, "kind": "build", "ms": 31.906568, "serial": true, "sha256": "04c13026e85d7767367cf2a0e915b5d67ad89edc1d2f99fbe7a3b61425b9e494", "workers": 3}
+{"compiler": "zig", "index": 44, "kind": "build", "ms": 31.907991, "serial": true, "sha256": "c7e4b8eaf2a234229e0629e98f3086b14623e93e8b6db5f9d4086bad3adaacd0", "workers": 3}
+{"compiler": "zig", "index": 45, "kind": "build", "ms": 31.87756, "serial": true, "sha256": "dc8f75f152812adbb16bc92b8376e3d2cf654e4322dacc2150cdd66083733ba1", "workers": 3}
+{"compiler": "zig", "index": 46, "kind": "build", "ms": 31.936345, "serial": true, "sha256": "393a12e43697ac9c58be3218afa4d5d5ba86efc340bd693b690f0f701c7acf1f", "workers": 3}
+{"compiler": "zig", "index": 47, "kind": "build", "ms": 64.076721, "serial": true, "sha256": "d78be3b71e7e416cfd23943baf8224550c601581a437de046aa2fab41df60dca", "workers": 3}
+{"cache": "warm Zig cache", "compiler": "zig", "kind": "build-total", "ms": 2613.715092, "serial": true, "workers": 3}
+{"compiler": "zig", "index": 0, "iteration": 1, "kind": "exec", "ms": 2.354225, "workers": 3}
+{"compiler": "zig", "index": 1, "iteration": 1, "kind": "exec", "ms": 2.269556, "workers": 3}
+{"compiler": "zig", "index": 2, "iteration": 1, "kind": "exec", "ms": 2.131216, "workers": 3}
+{"compiler": "zig", "index": 3, "iteration": 1, "kind": "exec", "ms": 1.48733, "workers": 3}
+{"compiler": "zig", "index": 4, "iteration": 1, "kind": "exec", "ms": 1.638418, "workers": 3}
+{"compiler": "zig", "index": 5, "iteration": 1, "kind": "exec", "ms": 1.475816, "workers": 3}
+{"compiler": "zig", "index": 6, "iteration": 1, "kind": "exec", "ms": 1.560856, "workers": 3}
+{"compiler": "zig", "index": 7, "iteration": 1, "kind": "exec", "ms": 1.5116, "workers": 3}
+{"compiler": "zig", "index": 8, "iteration": 1, "kind": "exec", "ms": 1.358712, "workers": 3}
+{"compiler": "zig", "index": 9, "iteration": 1, "kind": "exec", "ms": 1.487478, "workers": 3}
+{"compiler": "zig", "index": 10, "iteration": 1, "kind": "exec", "ms": 1.293347, "workers": 3}
+{"compiler": "zig", "index": 11, "iteration": 1, "kind": "exec", "ms": 1.479198, "workers": 3}
+{"compiler": "zig", "index": 12, "iteration": 1, "kind": "exec", "ms": 1.321826, "workers": 3}
+{"compiler": "zig", "index": 13, "iteration": 1, "kind": "exec", "ms": 1.537111, "workers": 3}
+{"compiler": "zig", "index": 14, "iteration": 1, "kind": "exec", "ms": 1.559156, "workers": 3}
+{"compiler": "zig", "index": 15, "iteration": 1, "kind": "exec", "ms": 1.317999, "workers": 3}
+{"compiler": "zig", "index": 16, "iteration": 1, "kind": "exec", "ms": 1.429623, "workers": 3}
+{"compiler": "zig", "index": 17, "iteration": 1, "kind": "exec", "ms": 1.345103, "workers": 3}
+{"compiler": "zig", "index": 18, "iteration": 1, "kind": "exec", "ms": 1.293874, "workers": 3}
+{"compiler": "zig", "index": 19, "iteration": 1, "kind": "exec", "ms": 1.436001, "workers": 3}
+{"compiler": "zig", "index": 20, "iteration": 1, "kind": "exec", "ms": 1.440489, "workers": 3}
+{"compiler": "zig", "index": 21, "iteration": 1, "kind": "exec", "ms": 1.327717, "workers": 3}
+{"compiler": "zig", "index": 22, "iteration": 1, "kind": "exec", "ms": 1.348492, "workers": 3}
+{"compiler": "zig", "index": 23, "iteration": 1, "kind": "exec", "ms": 1.333067, "workers": 3}
+{"compiler": "zig", "index": 24, "iteration": 1, "kind": "exec", "ms": 1.335552, "workers": 3}
+{"compiler": "zig", "index": 25, "iteration": 1, "kind": "exec", "ms": 1.360429, "workers": 3}
+{"compiler": "zig", "index": 26, "iteration": 1, "kind": "exec", "ms": 1.393197, "workers": 3}
+{"compiler": "zig", "index": 27, "iteration": 1, "kind": "exec", "ms": 1.306487, "workers": 3}
+{"compiler": "zig", "index": 28, "iteration": 1, "kind": "exec", "ms": 1.360449, "workers": 3}
+{"compiler": "zig", "index": 29, "iteration": 1, "kind": "exec", "ms": 1.32922, "workers": 3}
+{"compiler": "zig", "index": 30, "iteration": 1, "kind": "exec", "ms": 1.308161, "workers": 3}
+{"compiler": "zig", "index": 31, "iteration": 1, "kind": "exec", "ms": 1.330817, "workers": 3}
+{"compiler": "zig", "index": 32, "iteration": 1, "kind": "exec", "ms": 1.331785, "workers": 3}
+{"compiler": "zig", "index": 33, "iteration": 1, "kind": "exec", "ms": 1.387951, "workers": 3}
+{"compiler": "zig", "index": 34, "iteration": 1, "kind": "exec", "ms": 1.367144, "workers": 3}
+{"compiler": "zig", "index": 35, "iteration": 1, "kind": "exec", "ms": 1.336665, "workers": 3}
+{"compiler": "zig", "index": 36, "iteration": 1, "kind": "exec", "ms": 1.326611, "workers": 3}
+{"compiler": "zig", "index": 37, "iteration": 1, "kind": "exec", "ms": 1.443496, "workers": 3}
+{"compiler": "zig", "index": 38, "iteration": 1, "kind": "exec", "ms": 1.460958, "workers": 3}
+{"compiler": "zig", "index": 39, "iteration": 1, "kind": "exec", "ms": 1.322501, "workers": 3}
+{"compiler": "zig", "index": 40, "iteration": 1, "kind": "exec", "ms": 1.32929, "workers": 3}
+{"compiler": "zig", "index": 41, "iteration": 1, "kind": "exec", "ms": 1.339716, "workers": 3}
+{"compiler": "zig", "index": 42, "iteration": 1, "kind": "exec", "ms": 1.343109, "workers": 3}
+{"compiler": "zig", "index": 43, "iteration": 1, "kind": "exec", "ms": 1.363434, "workers": 3}
+{"compiler": "zig", "index": 44, "iteration": 1, "kind": "exec", "ms": 1.363662, "workers": 3}
+{"compiler": "zig", "index": 45, "iteration": 1, "kind": "exec", "ms": 1.311968, "workers": 3}
+{"compiler": "zig", "index": 46, "iteration": 1, "kind": "exec", "ms": 1.319101, "workers": 3}
+{"compiler": "zig", "index": 47, "iteration": 1, "kind": "exec", "ms": 1.29747, "workers": 3}
+{"compiler": "zig", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 24.074651, "workers": 3}
+{"compiler": "zig", "index": 0, "iteration": 2, "kind": "exec", "ms": 1.819799, "workers": 3}
+{"compiler": "zig", "index": 1, "iteration": 2, "kind": "exec", "ms": 0.831493, "workers": 3}
+{"compiler": "zig", "index": 2, "iteration": 2, "kind": "exec", "ms": 0.834457, "workers": 3}
+{"compiler": "zig", "index": 3, "iteration": 2, "kind": "exec", "ms": 0.663979, "workers": 3}
+{"compiler": "zig", "index": 4, "iteration": 2, "kind": "exec", "ms": 0.88773, "workers": 3}
+{"compiler": "zig", "index": 5, "iteration": 2, "kind": "exec", "ms": 1.810696, "workers": 3}
+{"compiler": "zig", "index": 6, "iteration": 2, "kind": "exec", "ms": 0.927485, "workers": 3}
+{"compiler": "zig", "index": 7, "iteration": 2, "kind": "exec", "ms": 0.816857, "workers": 3}
+{"compiler": "zig", "index": 8, "iteration": 2, "kind": "exec", "ms": 1.353887, "workers": 3}
+{"compiler": "zig", "index": 9, "iteration": 2, "kind": "exec", "ms": 1.362853, "workers": 3}
+{"compiler": "zig", "index": 10, "iteration": 2, "kind": "exec", "ms": 1.318389, "workers": 3}
+{"compiler": "zig", "index": 11, "iteration": 2, "kind": "exec", "ms": 1.446398, "workers": 3}
+{"compiler": "zig", "index": 12, "iteration": 2, "kind": "exec", "ms": 1.40853, "workers": 3}
+{"compiler": "zig", "index": 13, "iteration": 2, "kind": "exec", "ms": 1.332937, "workers": 3}
+{"compiler": "zig", "index": 14, "iteration": 2, "kind": "exec", "ms": 1.439401, "workers": 3}
+{"compiler": "zig", "index": 15, "iteration": 2, "kind": "exec", "ms": 1.269027, "workers": 3}
+{"compiler": "zig", "index": 16, "iteration": 2, "kind": "exec", "ms": 1.347765, "workers": 3}
+{"compiler": "zig", "index": 17, "iteration": 2, "kind": "exec", "ms": 1.399272, "workers": 3}
+{"compiler": "zig", "index": 18, "iteration": 2, "kind": "exec", "ms": 1.450708, "workers": 3}
+{"compiler": "zig", "index": 19, "iteration": 2, "kind": "exec", "ms": 1.326391, "workers": 3}
+{"compiler": "zig", "index": 20, "iteration": 2, "kind": "exec", "ms": 1.35029, "workers": 3}
+{"compiler": "zig", "index": 21, "iteration": 2, "kind": "exec", "ms": 1.32893, "workers": 3}
+{"compiler": "zig", "index": 22, "iteration": 2, "kind": "exec", "ms": 1.37691, "workers": 3}
+{"compiler": "zig", "index": 23, "iteration": 2, "kind": "exec", "ms": 1.351171, "workers": 3}
+{"compiler": "zig", "index": 24, "iteration": 2, "kind": "exec", "ms": 1.380376, "workers": 3}
+{"compiler": "zig", "index": 25, "iteration": 2, "kind": "exec", "ms": 1.346092, "workers": 3}
+{"compiler": "zig", "index": 26, "iteration": 2, "kind": "exec", "ms": 1.32377, "workers": 3}
+{"compiler": "zig", "index": 27, "iteration": 2, "kind": "exec", "ms": 1.319986, "workers": 3}
+{"compiler": "zig", "index": 28, "iteration": 2, "kind": "exec", "ms": 1.323779, "workers": 3}
+{"compiler": "zig", "index": 29, "iteration": 2, "kind": "exec", "ms": 1.331945, "workers": 3}
+{"compiler": "zig", "index": 30, "iteration": 2, "kind": "exec", "ms": 1.348723, "workers": 3}
+{"compiler": "zig", "index": 31, "iteration": 2, "kind": "exec", "ms": 1.365868, "workers": 3}
+{"compiler": "zig", "index": 32, "iteration": 2, "kind": "exec", "ms": 1.428153, "workers": 3}
+{"compiler": "zig", "index": 33, "iteration": 2, "kind": "exec", "ms": 1.375808, "workers": 3}
+{"compiler": "zig", "index": 34, "iteration": 2, "kind": "exec", "ms": 1.366992, "workers": 3}
+{"compiler": "zig", "index": 35, "iteration": 2, "kind": "exec", "ms": 1.478371, "workers": 3}
+{"compiler": "zig", "index": 36, "iteration": 2, "kind": "exec", "ms": 1.451831, "workers": 3}
+{"compiler": "zig", "index": 37, "iteration": 2, "kind": "exec", "ms": 1.438633, "workers": 3}
+{"compiler": "zig", "index": 38, "iteration": 2, "kind": "exec", "ms": 1.558201, "workers": 3}
+{"compiler": "zig", "index": 39, "iteration": 2, "kind": "exec", "ms": 1.442346, "workers": 3}
+{"compiler": "zig", "index": 40, "iteration": 2, "kind": "exec", "ms": 1.382496, "workers": 3}
+{"compiler": "zig", "index": 41, "iteration": 2, "kind": "exec", "ms": 1.315428, "workers": 3}
+{"compiler": "zig", "index": 42, "iteration": 2, "kind": "exec", "ms": 1.496318, "workers": 3}
+{"compiler": "zig", "index": 43, "iteration": 2, "kind": "exec", "ms": 1.375474, "workers": 3}
+{"compiler": "zig", "index": 44, "iteration": 2, "kind": "exec", "ms": 1.325442, "workers": 3}
+{"compiler": "zig", "index": 45, "iteration": 2, "kind": "exec", "ms": 1.409771, "workers": 3}
+{"compiler": "zig", "index": 46, "iteration": 2, "kind": "exec", "ms": 1.394767, "workers": 3}
+{"compiler": "zig", "index": 47, "iteration": 2, "kind": "exec", "ms": 1.354087, "workers": 3}
+{"compiler": "zig", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 22.446609, "workers": 3}
+{"compiler": "zig", "kind": "dylib-build", "ms": 63.994657}
+{"compiler": "zig", "iteration": 1, "kind": "dlopen", "ms": 0.214253, "note": "second load retains first handle"}
+{"compiler": "zig", "iteration": 2, "kind": "dlopen", "ms": 0.042621, "note": "second load retains first handle"}
+{"cache": "uncontrolled", "compiler": "host-clang", "kind": "warmup-build", "ms": 1317.701195}
+{"compiler": "host-clang", "kind": "warmup-exec", "ms": 1.582934}
+{"compiler": "host-clang", "index": 0, "kind": "build", "ms": 164.143282, "serial": true, "sha256": "c2514c25f75b43726249725ab1ad3e19855e112a9405ffb5c4341644480d031c", "workers": 1}
+{"compiler": "host-clang", "index": 1, "kind": "build", "ms": 64.140025, "serial": true, "sha256": "e2d37694adca595db742e62ce4c1479fef2a6e55bc7d82998ff3963fd713f9fd", "workers": 1}
+{"compiler": "host-clang", "index": 2, "kind": "build", "ms": 64.057532, "serial": true, "sha256": "c51de587c6d7ba42d9b71e10ab09befaf85062b117aacadc2c03cdce9d33e0e0", "workers": 1}
+{"compiler": "host-clang", "index": 3, "kind": "build", "ms": 64.137293, "serial": true, "sha256": "f7302e228d41a0bb3c3a2f2f4313dd6a4c221bd4dd15548460a55443769456f3", "workers": 1}
+{"compiler": "host-clang", "index": 4, "kind": "build", "ms": 64.283828, "serial": true, "sha256": "1639b9e5b01d64bf894347b45db4625155c3b221a438bec3ab095b4c1e765d55", "workers": 1}
+{"compiler": "host-clang", "index": 5, "kind": "build", "ms": 64.128385, "serial": true, "sha256": "c736039920a8735bd7435c361befb30e159c4330737c9acf60c361743161a297", "workers": 1}
+{"compiler": "host-clang", "index": 6, "kind": "build", "ms": 64.128396, "serial": true, "sha256": "f96e53ec6a706c5882bb82208204546803808c06f76be6b610a597b7c12db23d", "workers": 1}
+{"compiler": "host-clang", "index": 7, "kind": "build", "ms": 64.148714, "serial": true, "sha256": "aaae65494b243caf829105cd9c7537b1426ad34389f3c8bb750046ff29df2e46", "workers": 1}
+{"compiler": "host-clang", "index": 8, "kind": "build", "ms": 64.099802, "serial": true, "sha256": "2bcd54025ae6bf79d3e52f009feace8105e3eeb9ef15b65e6d60f38f8c4de35a", "workers": 1}
+{"compiler": "host-clang", "index": 9, "kind": "build", "ms": 64.161659, "serial": true, "sha256": "19b49aad05d935a429d55a892e8a15f49bbe87017408f8f1407d0769536ac6e5", "workers": 1}
+{"compiler": "host-clang", "index": 10, "kind": "build", "ms": 64.067922, "serial": true, "sha256": "d1d9ea9cf88e70081fe580faa5d15f6af4453a9be669991e435a3365249b8147", "workers": 1}
+{"compiler": "host-clang", "index": 11, "kind": "build", "ms": 64.111356, "serial": true, "sha256": "ed11f7811e5b5026c9b704a1b94d59e4ad6295c1a7a33bc886db45a7ab9f9d15", "workers": 1}
+{"compiler": "host-clang", "index": 12, "kind": "build", "ms": 64.074184, "serial": true, "sha256": "202ecfd6096e1d897e090521ec59277b56bebe3e572502bfbadf689034dfcc8b", "workers": 1}
+{"compiler": "host-clang", "index": 13, "kind": "build", "ms": 64.121253, "serial": true, "sha256": "c931c7cc843b168ffc718d0c32c0e1974340acbcaa63a13ec0212dabf6f54c9c", "workers": 1}
+{"compiler": "host-clang", "index": 14, "kind": "build", "ms": 64.148534, "serial": true, "sha256": "71fc4c795b2194b85b44cc38942bc8978cafef0b7bf71628b1a474943480f95d", "workers": 1}
+{"compiler": "host-clang", "index": 15, "kind": "build", "ms": 64.060215, "serial": true, "sha256": "056a825f28c59075f32ad495a41ba0609c50e8471db4626db5d7aae299420f60", "workers": 1}
+{"compiler": "host-clang", "index": 16, "kind": "build", "ms": 64.08775, "serial": true, "sha256": "56b3d11ce098f32303cd612e0e82990dfb818ac025b009a531c1c525c6b8cae5", "workers": 1}
+{"compiler": "host-clang", "index": 17, "kind": "build", "ms": 64.124239, "serial": true, "sha256": "7ceca3d2cef8e0d60493d5dabef673d2dd5e88651f83e91cb488bf0277bab9e6", "workers": 1}
+{"compiler": "host-clang", "index": 18, "kind": "build", "ms": 64.152531, "serial": true, "sha256": "51b8dc3e82f91f6153a1d3fa904578eabd95dac9dfc67bbe20376e2a9e2afd6e", "workers": 1}
+{"compiler": "host-clang", "index": 19, "kind": "build", "ms": 64.12567, "serial": true, "sha256": "2c9315f60db941a77fe453358af6111c3710a12aaf29544155af28093e2ba431", "workers": 1}
+{"compiler": "host-clang", "index": 20, "kind": "build", "ms": 64.093831, "serial": true, "sha256": "edd1baa56c2cfe606ce1f085a6ebcedf9f8d8ed81cb42b6269c885838f2578ed", "workers": 1}
+{"compiler": "host-clang", "index": 21, "kind": "build", "ms": 64.078653, "serial": true, "sha256": "3ff74568d7f3811365251d8f3cfe54c6aad76b5be80df271872ffe32c2c3cc18", "workers": 1}
+{"compiler": "host-clang", "index": 22, "kind": "build", "ms": 64.125701, "serial": true, "sha256": "368aa7077ef05ca5f1d54a7cfe5d4f069b06e7b87e13d389f6bbf6087a260a2c", "workers": 1}
+{"compiler": "host-clang", "index": 23, "kind": "build", "ms": 64.110693, "serial": true, "sha256": "d24d5bb5450aca9f07387802c0c6624d20ea31cabe8cab528cf154653b5a0b8b", "workers": 1}
+{"compiler": "host-clang", "index": 24, "kind": "build", "ms": 64.061079, "serial": true, "sha256": "8b65003fe095f660a01cbe004188319a62a1cdcccd76f061c3b988bff9c25be2", "workers": 1}
+{"compiler": "host-clang", "index": 25, "kind": "build", "ms": 64.052202, "serial": true, "sha256": "c6cba5ea7f559eb8d19487f2d58eb647f29ba71f16b1fa98c2c65b31a799c757", "workers": 1}
+{"compiler": "host-clang", "index": 26, "kind": "build", "ms": 64.153022, "serial": true, "sha256": "a300a5d0b4ba9ebc6f2a0dc949384b0c75a8a5019aef2c983847ae8db3cee84a", "workers": 1}
+{"compiler": "host-clang", "index": 27, "kind": "build", "ms": 64.157581, "serial": true, "sha256": "a9b5e8178224e84854d02a7766556ce8973ce0f13c0bc3e52617b79e73060472", "workers": 1}
+{"compiler": "host-clang", "index": 28, "kind": "build", "ms": 64.101134, "serial": true, "sha256": "8c207fa01b797b7011fef04e45437185351ce59b6f942688f5c285599e4352e1", "workers": 1}
+{"compiler": "host-clang", "index": 29, "kind": "build", "ms": 64.133907, "serial": true, "sha256": "19f464d88ef831c300b82083e21c959c9da8e60dd826c7485180be5039635b82", "workers": 1}
+{"compiler": "host-clang", "index": 30, "kind": "build", "ms": 64.083141, "serial": true, "sha256": "4483c9ded05a1c85e0edf8f20d340f30c63008e2af3d2feb1bf6aecf4a32fd4d", "workers": 1}
+{"compiler": "host-clang", "index": 31, "kind": "build", "ms": 64.132043, "serial": true, "sha256": "fdc45087d18a703d88ea8eed970ebe4877a5a2ff8412f785dbb185035bf8a51e", "workers": 1}
+{"compiler": "host-clang", "index": 32, "kind": "build", "ms": 64.080195, "serial": true, "sha256": "95ec8d1f0a954b7fc28c5a6e28df3202bc686304e1822b881bde93195da11479", "workers": 1}
+{"compiler": "host-clang", "index": 33, "kind": "build", "ms": 64.142051, "serial": true, "sha256": "d6b46fcadea369d82463fbc68dabb29db47486b6ac7a1f428df3773348e7d77b", "workers": 1}
+{"compiler": "host-clang", "index": 34, "kind": "build", "ms": 64.090195, "serial": true, "sha256": "2d1ea98af6b6512635f521ba382d0dd6b849090145dee4c97aadc9c921ddb5b7", "workers": 1}
+{"compiler": "host-clang", "index": 35, "kind": "build", "ms": 64.127183, "serial": true, "sha256": "639f95fba87ae43f79b694f52d580370ff92572647f59c7131d43efbaca9b81c", "workers": 1}
+{"compiler": "host-clang", "index": 36, "kind": "build", "ms": 64.153633, "serial": true, "sha256": "998eabc943443ba60bf6a2f53775d5c724699d074f50c8435acc860767451495", "workers": 1}
+{"compiler": "host-clang", "index": 37, "kind": "build", "ms": 64.105282, "serial": true, "sha256": "921dd640c3e24711cab4f1297b70dd6c18139c43c7680ae5bd3df440dae4c426", "workers": 1}
+{"compiler": "host-clang", "index": 38, "kind": "build", "ms": 64.139327, "serial": true, "sha256": "137031306e684a3b0cb0c72dbf336bc658efe7c90868aefb792af1d573c02839", "workers": 1}
+{"compiler": "host-clang", "index": 39, "kind": "build", "ms": 64.121052, "serial": true, "sha256": "c3099b2d8cb1ca2a20d445755a0b3502c1dd4b861c1d9a368a46a36716468672", "workers": 1}
+{"compiler": "host-clang", "index": 40, "kind": "build", "ms": 64.098419, "serial": true, "sha256": "34f1fb13b8338ee9220b26f7e84ca49ea411a95bd6844777a816fa81b01d92d3", "workers": 1}
+{"compiler": "host-clang", "index": 41, "kind": "build", "ms": 64.029129, "serial": true, "sha256": "51df24250b9d46c4f38b2299270cbdd80f41d605b214cb5eb805f46cdd91aecb", "workers": 1}
+{"compiler": "host-clang", "index": 42, "kind": "build", "ms": 64.116454, "serial": true, "sha256": "a7647a094e0fbdb16240b3922a915d674d6245cf693a54c2ffd8d3510fbe3702", "workers": 1}
+{"compiler": "host-clang", "index": 43, "kind": "build", "ms": 64.104391, "serial": true, "sha256": "a85bbf31f9c24802822f2afd032aae09fb0dc3dd27fdbaa757982f7a6ae6b23d", "workers": 1}
+{"compiler": "host-clang", "index": 44, "kind": "build", "ms": 64.097047, "serial": true, "sha256": "248d19c005c9bf9d125a566caa8f0770590e016347c14661128211bbbaa6c204", "workers": 1}
+{"compiler": "host-clang", "index": 45, "kind": "build", "ms": 64.161748, "serial": true, "sha256": "b13d50bb8afd76fe6df83d29da73e4953aa4160efbca10ac93e66eb31464f5b9", "workers": 1}
+{"compiler": "host-clang", "index": 46, "kind": "build", "ms": 64.120722, "serial": true, "sha256": "f8ecb488b12e779d14e8bcf1843758140e034e1cd04a481eb483e135bab07a67", "workers": 1}
+{"compiler": "host-clang", "index": 47, "kind": "build", "ms": 64.163161, "serial": true, "sha256": "f21b532094d7ec1c1914239db9d60dc5b876f98439607d78bf5765e1261fc3ee", "workers": 1}
+{"cache": "uncontrolled", "compiler": "host-clang", "kind": "build-total", "ms": 3193.95094, "serial": true, "workers": 1}
+{"compiler": "host-clang", "index": 0, "iteration": 1, "kind": "exec", "ms": 1.748368, "workers": 1}
+{"compiler": "host-clang", "index": 1, "iteration": 1, "kind": "exec", "ms": 1.316456, "workers": 1}
+{"compiler": "host-clang", "index": 2, "iteration": 1, "kind": "exec", "ms": 1.300706, "workers": 1}
+{"compiler": "host-clang", "index": 3, "iteration": 1, "kind": "exec", "ms": 1.339119, "workers": 1}
+{"compiler": "host-clang", "index": 4, "iteration": 1, "kind": "exec", "ms": 1.30257, "workers": 1}
+{"compiler": "host-clang", "index": 5, "iteration": 1, "kind": "exec", "ms": 1.294525, "workers": 1}
+{"compiler": "host-clang", "index": 6, "iteration": 1, "kind": "exec", "ms": 1.313931, "workers": 1}
+{"compiler": "host-clang", "index": 7, "iteration": 1, "kind": "exec", "ms": 1.28648, "workers": 1}
+{"compiler": "host-clang", "index": 8, "iteration": 1, "kind": "exec", "ms": 1.288052, "workers": 1}
+{"compiler": "host-clang", "index": 9, "iteration": 1, "kind": "exec", "ms": 1.335572, "workers": 1}
+{"compiler": "host-clang", "index": 10, "iteration": 1, "kind": "exec", "ms": 1.287432, "workers": 1}
+{"compiler": "host-clang", "index": 11, "iteration": 1, "kind": "exec", "ms": 1.28622, "workers": 1}
+{"compiler": "host-clang", "index": 12, "iteration": 1, "kind": "exec", "ms": 1.273335, "workers": 1}
+{"compiler": "host-clang", "index": 13, "iteration": 1, "kind": "exec", "ms": 1.287552, "workers": 1}
+{"compiler": "host-clang", "index": 14, "iteration": 1, "kind": "exec", "ms": 1.291759, "workers": 1}
+{"compiler": "host-clang", "index": 15, "iteration": 1, "kind": "exec", "ms": 1.289395, "workers": 1}
+{"compiler": "host-clang", "index": 16, "iteration": 1, "kind": "exec", "ms": 1.31318, "workers": 1}
+{"compiler": "host-clang", "index": 17, "iteration": 1, "kind": "exec", "ms": 1.285468, "workers": 1}
+{"compiler": "host-clang", "index": 18, "iteration": 1, "kind": "exec", "ms": 1.287892, "workers": 1}
+{"compiler": "host-clang", "index": 19, "iteration": 1, "kind": "exec", "ms": 1.301899, "workers": 1}
+{"compiler": "host-clang", "index": 20, "iteration": 1, "kind": "exec", "ms": 1.307038, "workers": 1}
+{"compiler": "host-clang", "index": 21, "iteration": 1, "kind": "exec", "ms": 1.305986, "workers": 1}
+{"compiler": "host-clang", "index": 22, "iteration": 1, "kind": "exec", "ms": 1.360338, "workers": 1}
+{"compiler": "host-clang", "index": 23, "iteration": 1, "kind": "exec", "ms": 1.280729, "workers": 1}
+{"compiler": "host-clang", "index": 24, "iteration": 1, "kind": "exec", "ms": 1.282973, "workers": 1}
+{"compiler": "host-clang", "index": 25, "iteration": 1, "kind": "exec", "ms": 1.304965, "workers": 1}
+{"compiler": "host-clang", "index": 26, "iteration": 1, "kind": "exec", "ms": 1.308982, "workers": 1}
+{"compiler": "host-clang", "index": 27, "iteration": 1, "kind": "exec", "ms": 1.278024, "workers": 1}
+{"compiler": "host-clang", "index": 28, "iteration": 1, "kind": "exec", "ms": 1.23884, "workers": 1}
+{"compiler": "host-clang", "index": 29, "iteration": 1, "kind": "exec", "ms": 1.290427, "workers": 1}
+{"compiler": "host-clang", "index": 30, "iteration": 1, "kind": "exec", "ms": 1.289144, "workers": 1}
+{"compiler": "host-clang", "index": 31, "iteration": 1, "kind": "exec", "ms": 1.290177, "workers": 1}
+{"compiler": "host-clang", "index": 32, "iteration": 1, "kind": "exec", "ms": 1.273796, "workers": 1}
+{"compiler": "host-clang", "index": 33, "iteration": 1, "kind": "exec", "ms": 1.332657, "workers": 1}
+{"compiler": "host-clang", "index": 34, "iteration": 1, "kind": "exec", "ms": 1.287201, "workers": 1}
+{"compiler": "host-clang", "index": 35, "iteration": 1, "kind": "exec", "ms": 1.363415, "workers": 1}
+{"compiler": "host-clang", "index": 36, "iteration": 1, "kind": "exec", "ms": 1.276441, "workers": 1}
+{"compiler": "host-clang", "index": 37, "iteration": 1, "kind": "exec", "ms": 1.299324, "workers": 1}
+{"compiler": "host-clang", "index": 38, "iteration": 1, "kind": "exec", "ms": 1.3664, "workers": 1}
+{"compiler": "host-clang", "index": 39, "iteration": 1, "kind": "exec", "ms": 1.281079, "workers": 1}
+{"compiler": "host-clang", "index": 40, "iteration": 1, "kind": "exec", "ms": 1.303772, "workers": 1}
+{"compiler": "host-clang", "index": 41, "iteration": 1, "kind": "exec", "ms": 1.351281, "workers": 1}
+{"compiler": "host-clang", "index": 42, "iteration": 1, "kind": "exec", "ms": 1.280769, "workers": 1}
+{"compiler": "host-clang", "index": 43, "iteration": 1, "kind": "exec", "ms": 1.290287, "workers": 1}
+{"compiler": "host-clang", "index": 44, "iteration": 1, "kind": "exec", "ms": 1.298042, "workers": 1}
+{"compiler": "host-clang", "index": 45, "iteration": 1, "kind": "exec", "ms": 1.273465, "workers": 1}
+{"compiler": "host-clang", "index": 46, "iteration": 1, "kind": "exec", "ms": 1.300066, "workers": 1}
+{"compiler": "host-clang", "index": 47, "iteration": 1, "kind": "exec", "ms": 1.234812, "workers": 1}
+{"compiler": "host-clang", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 63.777696, "workers": 1}
+{"compiler": "host-clang", "index": 0, "iteration": 2, "kind": "exec", "ms": 1.722192, "workers": 1}
+{"compiler": "host-clang", "index": 1, "iteration": 2, "kind": "exec", "ms": 1.343777, "workers": 1}
+{"compiler": "host-clang", "index": 2, "iteration": 2, "kind": "exec", "ms": 1.332766, "workers": 1}
+{"compiler": "host-clang", "index": 3, "iteration": 2, "kind": "exec", "ms": 1.277152, "workers": 1}
+{"compiler": "host-clang", "index": 4, "iteration": 2, "kind": "exec", "ms": 1.309914, "workers": 1}
+{"compiler": "host-clang", "index": 5, "iteration": 2, "kind": "exec", "ms": 1.33979, "workers": 1}
+{"compiler": "host-clang", "index": 6, "iteration": 2, "kind": "exec", "ms": 1.301628, "workers": 1}
+{"compiler": "host-clang", "index": 7, "iteration": 2, "kind": "exec", "ms": 1.306046, "workers": 1}
+{"compiler": "host-clang", "index": 8, "iteration": 2, "kind": "exec", "ms": 1.256293, "workers": 1}
+{"compiler": "host-clang", "index": 9, "iteration": 2, "kind": "exec", "ms": 1.310845, "workers": 1}
+{"compiler": "host-clang", "index": 10, "iteration": 2, "kind": "exec", "ms": 1.283684, "workers": 1}
+{"compiler": "host-clang", "index": 11, "iteration": 2, "kind": "exec", "ms": 1.304253, "workers": 1}
+{"compiler": "host-clang", "index": 12, "iteration": 2, "kind": "exec", "ms": 1.315024, "workers": 1}
+{"compiler": "host-clang", "index": 13, "iteration": 2, "kind": "exec", "ms": 1.297451, "workers": 1}
+{"compiler": "host-clang", "index": 14, "iteration": 2, "kind": "exec", "ms": 1.272203, "workers": 1}
+{"compiler": "host-clang", "index": 15, "iteration": 2, "kind": "exec", "ms": 1.316426, "workers": 1}
+{"compiler": "host-clang", "index": 16, "iteration": 2, "kind": "exec", "ms": 1.271181, "workers": 1}
+{"compiler": "host-clang", "index": 17, "iteration": 2, "kind": "exec", "ms": 1.298603, "workers": 1}
+{"compiler": "host-clang", "index": 18, "iteration": 2, "kind": "exec", "ms": 1.30834, "workers": 1}
+{"compiler": "host-clang", "index": 19, "iteration": 2, "kind": "exec", "ms": 1.302059, "workers": 1}
+{"compiler": "host-clang", "index": 20, "iteration": 2, "kind": "exec", "ms": 1.273636, "workers": 1}
+{"compiler": "host-clang", "index": 21, "iteration": 2, "kind": "exec", "ms": 1.274036, "workers": 1}
+{"compiler": "host-clang", "index": 22, "iteration": 2, "kind": "exec", "ms": 1.301348, "workers": 1}
+{"compiler": "host-clang", "index": 23, "iteration": 2, "kind": "exec", "ms": 1.270319, "workers": 1}
+{"compiler": "host-clang", "index": 24, "iteration": 2, "kind": "exec", "ms": 1.30232, "workers": 1}
+{"compiler": "host-clang", "index": 25, "iteration": 2, "kind": "exec", "ms": 1.294164, "workers": 1}
+{"compiler": "host-clang", "index": 26, "iteration": 2, "kind": "exec", "ms": 1.272353, "workers": 1}
+{"compiler": "host-clang", "index": 27, "iteration": 2, "kind": "exec", "ms": 1.296979, "workers": 1}
+{"compiler": "host-clang", "index": 28, "iteration": 2, "kind": "exec", "ms": 1.322327, "workers": 1}
+{"compiler": "host-clang", "index": 29, "iteration": 2, "kind": "exec", "ms": 1.273225, "workers": 1}
+{"compiler": "host-clang", "index": 30, "iteration": 2, "kind": "exec", "ms": 1.299724, "workers": 1}
+{"compiler": "host-clang", "index": 31, "iteration": 2, "kind": "exec", "ms": 1.346162, "workers": 1}
+{"compiler": "host-clang", "index": 32, "iteration": 2, "kind": "exec", "ms": 1.293864, "workers": 1}
+{"compiler": "host-clang", "index": 33, "iteration": 2, "kind": "exec", "ms": 1.272062, "workers": 1}
+{"compiler": "host-clang", "index": 34, "iteration": 2, "kind": "exec", "ms": 1.298101, "workers": 1}
+{"compiler": "host-clang", "index": 35, "iteration": 2, "kind": "exec", "ms": 1.312595, "workers": 1}
+{"compiler": "host-clang", "index": 36, "iteration": 2, "kind": "exec", "ms": 1.398781, "workers": 1}
+{"compiler": "host-clang", "index": 37, "iteration": 2, "kind": "exec", "ms": 1.346292, "workers": 1}
+{"compiler": "host-clang", "index": 38, "iteration": 2, "kind": "exec", "ms": 1.313571, "workers": 1}
+{"compiler": "host-clang", "index": 39, "iteration": 2, "kind": "exec", "ms": 1.310234, "workers": 1}
+{"compiler": "host-clang", "index": 40, "iteration": 2, "kind": "exec", "ms": 1.333288, "workers": 1}
+{"compiler": "host-clang", "index": 41, "iteration": 2, "kind": "exec", "ms": 1.28115, "workers": 1}
+{"compiler": "host-clang", "index": 42, "iteration": 2, "kind": "exec", "ms": 1.300065, "workers": 1}
+{"compiler": "host-clang", "index": 43, "iteration": 2, "kind": "exec", "ms": 1.271592, "workers": 1}
+{"compiler": "host-clang", "index": 44, "iteration": 2, "kind": "exec", "ms": 1.280008, "workers": 1}
+{"compiler": "host-clang", "index": 45, "iteration": 2, "kind": "exec", "ms": 1.305485, "workers": 1}
+{"compiler": "host-clang", "index": 46, "iteration": 2, "kind": "exec", "ms": 1.2759, "workers": 1}
+{"compiler": "host-clang", "index": 47, "iteration": 2, "kind": "exec", "ms": 1.319241, "workers": 1}
+{"compiler": "host-clang", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 63.696056, "workers": 1}
+{"compiler": "host-clang", "index": 0, "kind": "build", "ms": 63.989054, "serial": true, "sha256": "2605978322c149f7324bc989cd0b82da1bbdb0ae63dc9ddae9d873a3000f3a5c", "workers": 3}
+{"compiler": "host-clang", "index": 1, "kind": "build", "ms": 64.105303, "serial": true, "sha256": "61b17f4664c2480ba4ec439e12a2f8794041585f148af3c806abe4db2f782cdc", "workers": 3}
+{"compiler": "host-clang", "index": 2, "kind": "build", "ms": 64.115662, "serial": true, "sha256": "3fa12cecbc21da2ad1e0aa68d22d8281f2b87fac0a1bee9f960f649b48e4f9d3", "workers": 3}
+{"compiler": "host-clang", "index": 3, "kind": "build", "ms": 64.190332, "serial": true, "sha256": "c65c4a18d03e701b941d326f1f9ccdbdf6527c45f4e1e267eee95523b6ff3f48", "workers": 3}
+{"compiler": "host-clang", "index": 4, "kind": "build", "ms": 64.036223, "serial": true, "sha256": "ccfeaa8a41751a18d68564172646deba25f1a0750bfd2f093e4eee648e90a901", "workers": 3}
+{"compiler": "host-clang", "index": 5, "kind": "build", "ms": 64.153092, "serial": true, "sha256": "2baa9d53e9567550fb4bb330803574e79b55c218416ccc559dbb1fc2a5188d55", "workers": 3}
+{"compiler": "host-clang", "index": 6, "kind": "build", "ms": 64.06187, "serial": true, "sha256": "f54ab005f3f57caf850b04e648e074f0b3464358a6f1a3ac50f332ccae2c1d05", "workers": 3}
+{"compiler": "host-clang", "index": 7, "kind": "build", "ms": 64.142603, "serial": true, "sha256": "51bee2e475af564165fcb7e3d27446319a675be143191b9edff79ba56348e943", "workers": 3}
+{"compiler": "host-clang", "index": 8, "kind": "build", "ms": 64.169921, "serial": true, "sha256": "995c6d330d80070c5cc5d4cd2243723a57c54e72f46708595181e21c7750f8a8", "workers": 3}
+{"compiler": "host-clang", "index": 9, "kind": "build", "ms": 64.043406, "serial": true, "sha256": "5d045512434bf37c499f279dea339bafe274641283593cf622c3972fbdd6eca1", "workers": 3}
+{"compiler": "host-clang", "index": 10, "kind": "build", "ms": 64.118498, "serial": true, "sha256": "e615a6fd34ac7b78722939d8ab40d26eeb524fe58e129c7ec44c7a1bd09d5925", "workers": 3}
+{"compiler": "host-clang", "index": 11, "kind": "build", "ms": 64.100623, "serial": true, "sha256": "64d7aed2536b30a7191215d7fa5440ad6ff948b73f9435519f0b9c7175ef342f", "workers": 3}
+{"compiler": "host-clang", "index": 12, "kind": "build", "ms": 64.105954, "serial": true, "sha256": "5d62900fc2eb52a192d280126d1759431eb7bce9c0c532c1d754fec92c200f44", "workers": 3}
+{"compiler": "host-clang", "index": 13, "kind": "build", "ms": 64.107417, "serial": true, "sha256": "5bc6a14a8c440ea553bb131912ae8b6b7fcecf53008189541a610c24632d5e74", "workers": 3}
+{"compiler": "host-clang", "index": 14, "kind": "build", "ms": 64.115942, "serial": true, "sha256": "85ed5cf58552586e9aa96dbe02aa23c71b67acddb21987080bbd46c2c84c5695", "workers": 3}
+{"compiler": "host-clang", "index": 15, "kind": "build", "ms": 64.079904, "serial": true, "sha256": "c5394920b51c57e3768a67e254d0128305da67213d37cbb8a63d001571c96fd4", "workers": 3}
+{"compiler": "host-clang", "index": 16, "kind": "build", "ms": 64.110823, "serial": true, "sha256": "e291f9dff9b3868e3bc37a7a317af8d75ef5afc58c4b86cdbc0a5bae6c2a5184", "workers": 3}
+{"compiler": "host-clang", "index": 17, "kind": "build", "ms": 64.069966, "serial": true, "sha256": "f04a3c6839e2decaf213441df7a98d9d1e08612e331da5750d95c53db0a376b2", "workers": 3}
+{"compiler": "host-clang", "index": 18, "kind": "build", "ms": 64.10437, "serial": true, "sha256": "befb1b57f7e520b0ef1ef8c1c4a0f69c738c4a11612b7d2c588da061de730717", "workers": 3}
+{"compiler": "host-clang", "index": 19, "kind": "build", "ms": 64.098951, "serial": true, "sha256": "59e8ca71a0128899889c8d620dfa93f7d1af5d061785351671477e1ba4fb0aeb", "workers": 3}
+{"compiler": "host-clang", "index": 20, "kind": "build", "ms": 64.073233, "serial": true, "sha256": "0570a115295fcdcad0d4b1b6a7f9b4383da2cb95bd2ac521c9c30a79a7775390", "workers": 3}
+{"compiler": "host-clang", "index": 21, "kind": "build", "ms": 64.100544, "serial": true, "sha256": "96dad1245145078673acee3a1a14b3001da736b9d050758cdf53fe42808144cf", "workers": 3}
+{"compiler": "host-clang", "index": 22, "kind": "build", "ms": 64.093731, "serial": true, "sha256": "995b315f930b795b8ebd83edb6179a928b224686176a1b8b26a97057a2c5f132", "workers": 3}
+{"compiler": "host-clang", "index": 23, "kind": "build", "ms": 64.142102, "serial": true, "sha256": "1ddc839a81f39a5a0a0cda34d4aa06dbb49c25295c43270b31af716497ddf543", "workers": 3}
+{"compiler": "host-clang", "index": 24, "kind": "build", "ms": 64.095334, "serial": true, "sha256": "1378065877fd2e03329dee6e2d3b836303b07d830bdff9f57cddd85a1f44879f", "workers": 3}
+{"compiler": "host-clang", "index": 25, "kind": "build", "ms": 64.110663, "serial": true, "sha256": "36f3ebca14a9b757402b1bc843650d6b9cdf84d257c2deefd7e82ed1ac6a4c0d", "workers": 3}
+{"compiler": "host-clang", "index": 26, "kind": "build", "ms": 64.170499, "serial": true, "sha256": "cdfd27de220fd3a6f4410ad0de9fd7d0c8accd92534277388cbe63abd55f10e9", "workers": 3}
+{"compiler": "host-clang", "index": 27, "kind": "build", "ms": 64.176162, "serial": true, "sha256": "b6fa704392f4368507dcc1f94e10cb19f8fb073e977e6928d955c7fc984edcff", "workers": 3}
+{"compiler": "host-clang", "index": 28, "kind": "build", "ms": 64.11463, "serial": true, "sha256": "c88e621ddecb51d7883d8f832a1fba04aeedccf1bd3e9f675e0e505e8d0dd18e", "workers": 3}
+{"compiler": "host-clang", "index": 29, "kind": "build", "ms": 64.070938, "serial": true, "sha256": "bf4f3a1a394d1d46f84a5dafe20c7c8cc8f4cf4fdb517733bb8c404f6a17a2ec", "workers": 3}
+{"compiler": "host-clang", "index": 30, "kind": "build", "ms": 64.083695, "serial": true, "sha256": "38c23c1d64b04b1d291df7c1e94fa6b1b900dc52e913bbca88b5b0ab810cf8e5", "workers": 3}
+{"compiler": "host-clang", "index": 31, "kind": "build", "ms": 64.011818, "serial": true, "sha256": "566057a711197e8a89bd699c4ae48026599c12970fc242db4cf7c00476265562", "workers": 3}
+{"compiler": "host-clang", "index": 32, "kind": "build", "ms": 64.067026, "serial": true, "sha256": "159b30cd5db2df5e7858b4a6661a0f4db926ce36f38d4f529a40311271ed47cb", "workers": 3}
+{"compiler": "host-clang", "index": 33, "kind": "build", "ms": 64.172427, "serial": true, "sha256": "1f1eb155caaa61f0b5d8fbc0f5457e959382c0d0c1764edd8a0feab83f522a21", "workers": 3}
+{"compiler": "host-clang", "index": 34, "kind": "build", "ms": 64.123629, "serial": true, "sha256": "f58b61008734918ba48227bb7623232d9e884d6d7bdb5755578aa66a1303d4fd", "workers": 3}
+{"compiler": "host-clang", "index": 35, "kind": "build", "ms": 64.060597, "serial": true, "sha256": "63d7ce6e57dbaec92cd9442009ac60a99e6d37c42ec9f9d6ad6a188eea218fec", "workers": 3}
+{"compiler": "host-clang", "index": 36, "kind": "build", "ms": 64.130736, "serial": true, "sha256": "599fbb2f09739d750226510516b7d35f699468a88a20962ac55218776a9def8a", "workers": 3}
+{"compiler": "host-clang", "index": 37, "kind": "build", "ms": 64.125142, "serial": true, "sha256": "56da26ad878412c5927b46668356da62b3daf1fdf0fc2cc4089b2454430ab576", "workers": 3}
+{"compiler": "host-clang", "index": 38, "kind": "build", "ms": 64.14143, "serial": true, "sha256": "f239b168c7d5514e5d32fe76ce412acdaaae313a4cd77615f1082b003945afd6", "workers": 3}
+{"compiler": "host-clang", "index": 39, "kind": "build", "ms": 64.15812, "serial": true, "sha256": "4c5412470c89b27a35fd3355b3f546cced6baa3dd971a497b9fda41fd83398d7", "workers": 3}
+{"compiler": "host-clang", "index": 40, "kind": "build", "ms": 64.194659, "serial": true, "sha256": "6cf8bf496a22751b3ed86dbf48576fc286ccde3fda1ad411d5a12bc4a3ef01bf", "workers": 3}
+{"compiler": "host-clang", "index": 41, "kind": "build", "ms": 64.111099, "serial": true, "sha256": "373e69a55bb24372db4da19ee1d0b39bb731c7960bd692ca13717a25e1ce7663", "workers": 3}
+{"compiler": "host-clang", "index": 42, "kind": "build", "ms": 64.152079, "serial": true, "sha256": "5c2f1589442aaa32f9fd4848069dc8aca405dae5a420a1ae651f9ac89691e346", "workers": 3}
+{"compiler": "host-clang", "index": 43, "kind": "build", "ms": 64.110531, "serial": true, "sha256": "ec15fd2456a8c0fd80e975018e87e1cd52f3673322b99e9b839d44e167841cb1", "workers": 3}
+{"compiler": "host-clang", "index": 44, "kind": "build", "ms": 64.124737, "serial": true, "sha256": "de16322bfbc4ea25c5d98f89c088f02e102bd9cf547d5d8290e9421604ee00cc", "workers": 3}
+{"compiler": "host-clang", "index": 45, "kind": "build", "ms": 64.204938, "serial": true, "sha256": "358d4d005d65876220f360fef30b1457733def5d505025090a891ae0e02e246c", "workers": 3}
+{"compiler": "host-clang", "index": 46, "kind": "build", "ms": 64.188107, "serial": true, "sha256": "c2d8a7c6afffc336a10cdf1b9dc0deaea0d85059df89ab939fbe675e1f91b2d1", "workers": 3}
+{"compiler": "host-clang", "index": 47, "kind": "build", "ms": 64.145359, "serial": true, "sha256": "dca4231dbfd3d267d0441c515e63016e8ae5682db5f1bf93c8112ee0d0d59623", "workers": 3}
+{"cache": "uncontrolled", "compiler": "host-clang", "kind": "build-total", "ms": 3093.980632, "serial": true, "workers": 3}
+{"compiler": "host-clang", "index": 0, "iteration": 1, "kind": "exec", "ms": 1.589699, "workers": 3}
+{"compiler": "host-clang", "index": 1, "iteration": 1, "kind": "exec", "ms": 1.037343, "workers": 3}
+{"compiler": "host-clang", "index": 2, "iteration": 1, "kind": "exec", "ms": 0.815248, "workers": 3}
+{"compiler": "host-clang", "index": 3, "iteration": 1, "kind": "exec", "ms": 1.331734, "workers": 3}
+{"compiler": "host-clang", "index": 4, "iteration": 1, "kind": "exec", "ms": 1.513195, "workers": 3}
+{"compiler": "host-clang", "index": 5, "iteration": 1, "kind": "exec", "ms": 1.420284, "workers": 3}
+{"compiler": "host-clang", "index": 6, "iteration": 1, "kind": "exec", "ms": 1.307983, "workers": 3}
+{"compiler": "host-clang", "index": 7, "iteration": 1, "kind": "exec", "ms": 1.351218, "workers": 3}
+{"compiler": "host-clang", "index": 8, "iteration": 1, "kind": "exec", "ms": 1.350894, "workers": 3}
+{"compiler": "host-clang", "index": 9, "iteration": 1, "kind": "exec", "ms": 1.289467, "workers": 3}
+{"compiler": "host-clang", "index": 10, "iteration": 1, "kind": "exec", "ms": 1.350142, "workers": 3}
+{"compiler": "host-clang", "index": 11, "iteration": 1, "kind": "exec", "ms": 1.391399, "workers": 3}
+{"compiler": "host-clang", "index": 12, "iteration": 1, "kind": "exec", "ms": 1.308152, "workers": 3}
+{"compiler": "host-clang", "index": 13, "iteration": 1, "kind": "exec", "ms": 1.429021, "workers": 3}
+{"compiler": "host-clang", "index": 14, "iteration": 1, "kind": "exec", "ms": 1.357923, "workers": 3}
+{"compiler": "host-clang", "index": 15, "iteration": 1, "kind": "exec", "ms": 1.329503, "workers": 3}
+{"compiler": "host-clang", "index": 16, "iteration": 1, "kind": "exec", "ms": 1.365607, "workers": 3}
+{"compiler": "host-clang", "index": 17, "iteration": 1, "kind": "exec", "ms": 1.353933, "workers": 3}
+{"compiler": "host-clang", "index": 18, "iteration": 1, "kind": "exec", "ms": 1.34907, "workers": 3}
+{"compiler": "host-clang", "index": 19, "iteration": 1, "kind": "exec", "ms": 1.405861, "workers": 3}
+{"compiler": "host-clang", "index": 20, "iteration": 1, "kind": "exec", "ms": 1.358901, "workers": 3}
+{"compiler": "host-clang", "index": 21, "iteration": 1, "kind": "exec", "ms": 1.317209, "workers": 3}
+{"compiler": "host-clang", "index": 22, "iteration": 1, "kind": "exec", "ms": 1.443641, "workers": 3}
+{"compiler": "host-clang", "index": 23, "iteration": 1, "kind": "exec", "ms": 1.329473, "workers": 3}
+{"compiler": "host-clang", "index": 24, "iteration": 1, "kind": "exec", "ms": 1.329138, "workers": 3}
+{"compiler": "host-clang", "index": 25, "iteration": 1, "kind": "exec", "ms": 1.313933, "workers": 3}
+{"compiler": "host-clang", "index": 26, "iteration": 1, "kind": "exec", "ms": 1.379528, "workers": 3}
+{"compiler": "host-clang", "index": 27, "iteration": 1, "kind": "exec", "ms": 1.308123, "workers": 3}
+{"compiler": "host-clang", "index": 28, "iteration": 1, "kind": "exec", "ms": 1.446092, "workers": 3}
+{"compiler": "host-clang", "index": 29, "iteration": 1, "kind": "exec", "ms": 1.398973, "workers": 3}
+{"compiler": "host-clang", "index": 30, "iteration": 1, "kind": "exec", "ms": 1.337504, "workers": 3}
+{"compiler": "host-clang", "index": 31, "iteration": 1, "kind": "exec", "ms": 1.546521, "workers": 3}
+{"compiler": "host-clang", "index": 32, "iteration": 1, "kind": "exec", "ms": 1.368817, "workers": 3}
+{"compiler": "host-clang", "index": 33, "iteration": 1, "kind": "exec", "ms": 1.348459, "workers": 3}
+{"compiler": "host-clang", "index": 34, "iteration": 1, "kind": "exec", "ms": 1.31879, "workers": 3}
+{"compiler": "host-clang", "index": 35, "iteration": 1, "kind": "exec", "ms": 1.342487, "workers": 3}
+{"compiler": "host-clang", "index": 36, "iteration": 1, "kind": "exec", "ms": 1.363357, "workers": 3}
+{"compiler": "host-clang", "index": 37, "iteration": 1, "kind": "exec", "ms": 1.340273, "workers": 3}
+{"compiler": "host-clang", "index": 38, "iteration": 1, "kind": "exec", "ms": 1.335895, "workers": 3}
+{"compiler": "host-clang", "index": 39, "iteration": 1, "kind": "exec", "ms": 1.357345, "workers": 3}
+{"compiler": "host-clang", "index": 40, "iteration": 1, "kind": "exec", "ms": 1.358026, "workers": 3}
+{"compiler": "host-clang", "index": 41, "iteration": 1, "kind": "exec", "ms": 1.306319, "workers": 3}
+{"compiler": "host-clang", "index": 42, "iteration": 1, "kind": "exec", "ms": 1.353388, "workers": 3}
+{"compiler": "host-clang", "index": 43, "iteration": 1, "kind": "exec", "ms": 1.417108, "workers": 3}
+{"compiler": "host-clang", "index": 44, "iteration": 1, "kind": "exec", "ms": 1.296661, "workers": 3}
+{"compiler": "host-clang", "index": 45, "iteration": 1, "kind": "exec", "ms": 1.3224, "workers": 3}
+{"compiler": "host-clang", "index": 46, "iteration": 1, "kind": "exec", "ms": 1.304302, "workers": 3}
+{"compiler": "host-clang", "index": 47, "iteration": 1, "kind": "exec", "ms": 1.339856, "workers": 3}
+{"compiler": "host-clang", "count": 48, "iteration": 1, "kind": "exec-total", "ms": 22.565928, "workers": 3}
+{"compiler": "host-clang", "index": 0, "iteration": 2, "kind": "exec", "ms": 1.535904, "workers": 3}
+{"compiler": "host-clang", "index": 1, "iteration": 2, "kind": "exec", "ms": 0.856914, "workers": 3}
+{"compiler": "host-clang", "index": 2, "iteration": 2, "kind": "exec", "ms": 1.757889, "workers": 3}
+{"compiler": "host-clang", "index": 3, "iteration": 2, "kind": "exec", "ms": 1.377757, "workers": 3}
+{"compiler": "host-clang", "index": 4, "iteration": 2, "kind": "exec", "ms": 1.343947, "workers": 3}
+{"compiler": "host-clang", "index": 5, "iteration": 2, "kind": "exec", "ms": 1.449095, "workers": 3}
+{"compiler": "host-clang", "index": 6, "iteration": 2, "kind": "exec", "ms": 1.413316, "workers": 3}
+{"compiler": "host-clang", "index": 7, "iteration": 2, "kind": "exec", "ms": 1.333484, "workers": 3}
+{"compiler": "host-clang", "index": 8, "iteration": 2, "kind": "exec", "ms": 1.333, "workers": 3}
+{"compiler": "host-clang", "index": 9, "iteration": 2, "kind": "exec", "ms": 1.332253, "workers": 3}
+{"compiler": "host-clang", "index": 10, "iteration": 2, "kind": "exec", "ms": 1.360548, "workers": 3}
+{"compiler": "host-clang", "index": 11, "iteration": 2, "kind": "exec", "ms": 1.46099, "workers": 3}
+{"compiler": "host-clang", "index": 12, "iteration": 2, "kind": "exec", "ms": 1.451809, "workers": 3}
+{"compiler": "host-clang", "index": 13, "iteration": 2, "kind": "exec", "ms": 1.340537, "workers": 3}
+{"compiler": "host-clang", "index": 14, "iteration": 2, "kind": "exec", "ms": 1.334245, "workers": 3}
+{"compiler": "host-clang", "index": 15, "iteration": 2, "kind": "exec", "ms": 1.354493, "workers": 3}
+{"compiler": "host-clang", "index": 16, "iteration": 2, "kind": "exec", "ms": 1.378224, "workers": 3}
+{"compiler": "host-clang", "index": 17, "iteration": 2, "kind": "exec", "ms": 1.403312, "workers": 3}
+{"compiler": "host-clang", "index": 18, "iteration": 2, "kind": "exec", "ms": 1.477354, "workers": 3}
+{"compiler": "host-clang", "index": 19, "iteration": 2, "kind": "exec", "ms": 1.406127, "workers": 3}
+{"compiler": "host-clang", "index": 20, "iteration": 2, "kind": "exec", "ms": 1.399315, "workers": 3}
+{"compiler": "host-clang", "index": 21, "iteration": 2, "kind": "exec", "ms": 1.332789, "workers": 3}
+{"compiler": "host-clang", "index": 22, "iteration": 2, "kind": "exec", "ms": 1.343479, "workers": 3}
+{"compiler": "host-clang", "index": 23, "iteration": 2, "kind": "exec", "ms": 1.471119, "workers": 3}
+{"compiler": "host-clang", "index": 24, "iteration": 2, "kind": "exec", "ms": 1.390414, "workers": 3}
+{"compiler": "host-clang", "index": 25, "iteration": 2, "kind": "exec", "ms": 1.400416, "workers": 3}
+{"compiler": "host-clang", "index": 26, "iteration": 2, "kind": "exec", "ms": 1.319213, "workers": 3}
+{"compiler": "host-clang", "index": 27, "iteration": 2, "kind": "exec", "ms": 1.348338, "workers": 3}
+{"compiler": "host-clang", "index": 28, "iteration": 2, "kind": "exec", "ms": 1.355091, "workers": 3}
+{"compiler": "host-clang", "index": 29, "iteration": 2, "kind": "exec", "ms": 1.337952, "workers": 3}
+{"compiler": "host-clang", "index": 30, "iteration": 2, "kind": "exec", "ms": 1.351568, "workers": 3}
+{"compiler": "host-clang", "index": 31, "iteration": 2, "kind": "exec", "ms": 1.389292, "workers": 3}
+{"compiler": "host-clang", "index": 32, "iteration": 2, "kind": "exec", "ms": 1.388016, "workers": 3}
+{"compiler": "host-clang", "index": 33, "iteration": 2, "kind": "exec", "ms": 1.385526, "workers": 3}
+{"compiler": "host-clang", "index": 34, "iteration": 2, "kind": "exec", "ms": 1.355752, "workers": 3}
+{"compiler": "host-clang", "index": 35, "iteration": 2, "kind": "exec", "ms": 1.368413, "workers": 3}
+{"compiler": "host-clang", "index": 36, "iteration": 2, "kind": "exec", "ms": 1.365724, "workers": 3}
+{"compiler": "host-clang", "index": 37, "iteration": 2, "kind": "exec", "ms": 1.338974, "workers": 3}
+{"compiler": "host-clang", "index": 38, "iteration": 2, "kind": "exec", "ms": 1.34875, "workers": 3}
+{"compiler": "host-clang", "index": 39, "iteration": 2, "kind": "exec", "ms": 1.360003, "workers": 3}
+{"compiler": "host-clang", "index": 40, "iteration": 2, "kind": "exec", "ms": 1.393333, "workers": 3}
+{"compiler": "host-clang", "index": 41, "iteration": 2, "kind": "exec", "ms": 1.365223, "workers": 3}
+{"compiler": "host-clang", "index": 42, "iteration": 2, "kind": "exec", "ms": 1.352416, "workers": 3}
+{"compiler": "host-clang", "index": 43, "iteration": 2, "kind": "exec", "ms": 1.348739, "workers": 3}
+{"compiler": "host-clang", "index": 44, "iteration": 2, "kind": "exec", "ms": 1.300889, "workers": 3}
+{"compiler": "host-clang", "index": 45, "iteration": 2, "kind": "exec", "ms": 1.337297, "workers": 3}
+{"compiler": "host-clang", "index": 46, "iteration": 2, "kind": "exec", "ms": 1.329813, "workers": 3}
+{"compiler": "host-clang", "index": 47, "iteration": 2, "kind": "exec", "ms": 1.306279, "workers": 3}
+{"compiler": "host-clang", "count": 48, "iteration": 2, "kind": "exec-total", "ms": 23.177349, "workers": 3}
+{"compiler": "host-clang", "kind": "dylib-build", "ms": 114.114449}
+{"compiler": "host-clang", "iteration": 1, "kind": "dlopen", "ms": 0.241725, "note": "second load retains first handle"}
+{"compiler": "host-clang", "iteration": 2, "kind": "dlopen", "ms": 0.043371, "note": "second load retains first handle"}
