@@ -52,6 +52,8 @@ path rather than through `RECORDER`.
     *packages/testkit*, which this unit leaves unchanged.
  -  *ci-compare.py*: compares two CI runs' test262 job and execution-step
     seconds, and their per-family job minutes.
+ -  *ci-comparison.txt*: its output for branch run 36496566681 against main
+    run 36369711059.
 
 
 Reproducing
@@ -110,15 +112,18 @@ The host is a shared developer machine running other lanes, so `load1` is
 recorded for every run and each configuration was measured at least twice.
 Shard 1/100 is the deterministic round-robin sample of the reviewed order, not
 a hand-picked subset, but it is one 214-path sample of 21,383 paths and its
-per-path cost is not identical to a whole-corpus average. No measurement in
-this directory was taken on macOS or on a GitHub runner; the macOS and Linux
-CI figures in the baseline section are derived from these Linux observations
-and the previously recorded CI step times, and are labelled as estimates.
+per-path cost is not identical to a whole-corpus average. Every local
+experiment here was run on that one Linux host, so the estimates the baseline
+section derives from them, including its projections of macOS and Linux CI
+time, are labelled as estimates. The one exception is *ci-comparison.txt*,
+which is measured from two GitHub runs' own timestamps and covers both hosts;
+it is one run per side.
 
-The one branch CI run of this unit so far, 36451319573 on `f483a129`, was
-cancelled by the coordinator about three minutes in, after a review of that
-commit found the two cache-safety defects the pinned compiler and the
-snapshot-only runtime bytes now close. Every test262 job was stopped during
-setup, so the run holds no execution-step time. *ci-compare.py* is the script
-that will compare a completed branch run against main run 36369711059; it is
-kept here unused rather than rewritten later.
+An earlier branch CI run, 36451319573 on `f483a129`, was cancelled by the
+coordinator about three minutes in, after a review of that commit found the
+two cache-safety defects the pinned compiler and the snapshot-only runtime
+bytes now close. Every test262 job was stopped during setup, so that run holds
+no execution-step time. Branch run 36496566681 on `390cf60d` then succeeded in
+all 58 jobs; *ci-comparison.txt* holds its comparison against main run
+36369711059, produced by *ci-compare.py*. Both runs were measured once, so the
+comparison is one observation per side.

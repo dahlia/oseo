@@ -1993,13 +1993,44 @@ process's single thread was also releasing the pool earlier.
 Applying the measured 17.8 to 26.3 percent band to the measured macOS
 execution-step sums of 16,159 to 18,935 s at 21,383 paths estimates 2,876 to
 4,980 s, a derived 47.9 to 83.0 min per run. At 41,091 paths the same per-path
-rate estimates a derived 92.1 to 159.5 min. Those are estimates: the band was
-measured on a Linux host restricted to three and four cores, not on a GitHub
-macOS runner. The one branch CI run so far, 36451319573 on `f483a129`, was
-cancelled by the coordinator about three minutes in, after a review of that
-commit found the two cache-safety defects this section's pinning and
-snapshot-bytes rules now close; every test262 job was stopped during setup, so
-it produced no step time and no CI measurement has been obtained yet.
+rate estimates a derived 92.1 to 159.5 min. Those estimates were made on a
+Linux host restricted to three and four cores, not on a GitHub macOS runner.
+One branch CI run has since measured the change, and the paragraphs below
+record it. An earlier branch run, 36451319573 on `f483a129`, was cancelled by
+the coordinator about three minutes in, after a review of that commit found the
+two cache-safety defects this section's pinning and snapshot-bytes rules now
+close; every test262 job was stopped during setup, so it produced no step time.
+
+Branch run [36496566681] on `390cf60d` succeeded in all 58 jobs and is
+compared here against main run [36369711059] on `98e66719`, the same twelve
+shard totals on both hosts. Both runs were measured once. Per-shard values are
+in [*evidence/u13/ci-comparison.txt*](./evidence/u13/ci-comparison.txt),
+produced by *evidence/u13/ci-compare.py* from each run's measured job and step
+timestamps.
+
+| Host  | Measured before s | Measured after s | Derived change | Derived saving |
+| ----- | ----------------- | ---------------- | -------------- | -------------- |
+| macOS | 17,878            | 14,018           | -21.6%         | 64.3 min       |
+| Linux | 12,130            | 9,664            | -20.3%         | 41.1 min       |
+
+Those are the sums of the twelve `Run mise run test:test262 --shard N/12`
+steps, which exclude job setup and cleanup. The corresponding family job-minute
+totals fall from a measured 308.37 to 243.10 min on macOS, a derived 21.2
+percent, and from 206.42 to 165.20 min on Linux, a derived 20.0 percent. Both
+land inside the 17.8 to 26.3 percent band measured locally, and the macOS
+saving lands inside the estimated 47.9 to 83.0 min.
+
+One run per side cannot separate that from runner variance, and the per-shard
+numbers show why: individual test262 shards move between a derived -53.1 and
++12.4 percent. The families this change does not touch moved in the same pair
+of runs too, by a derived -18.9 percent (Linux host C sanitizers), -17.3 and
+-15.0 percent (the `test` families), -11.8 percent (macOS native), and +8.7,
++2.2 and +1.8 percent (Linux native and both native-support families). What
+the run establishes is that all 58 jobs succeeded and that the change is
+consistent with the local measurement in direction and rough size on both
+hosts; it does not on its own measure the saving to the precision of the local
+before-and-after, and it cannot show the absence of a regression in any
+individual job, several of which took longer than their counterpart.
 
 Native support and property native executions do go through the same shape of
 per-execution work, through `packages/testkit`'s own native workflow rather
@@ -2019,6 +2050,9 @@ Reviewed paths, variants, strictness modes, specialization policies, targets,
 sanitizer flags, retry policy, verdicts, result order, budgets, and timeouts
 are unchanged, and the run reproduces the checked-in manifest shard exactly in
 every measured run above.
+
+[36369711059]: https://github.com/dahlia/oseo/actions/runs/36369711059
+[36496566681]: https://github.com/dahlia/oseo/actions/runs/36496566681
 
 ### Historical per-path test262 investigation
 

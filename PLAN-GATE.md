@@ -989,13 +989,21 @@ to 35 percent of the largest, so U13 narrows the gap materially without
 closing it. That comparison applies the measured
 fraction to a projection of the measured macOS execution-step sums rather than
 to each scenario's own job-by-job decomposition, which this plan does not
-carry at 41,091 paths. The band is measured on a Linux host restricted to
-three and four cores, not on a GitHub macOS runner. No CI run has been
-measured with the change: the one branch run so far was cancelled by the
-coordinator for review findings, before any test262 job executed. U13 recovers
-runner minutes without touching reviewed paths, variants, targets, sanitizer
-flags, budgets, or verdicts. Its measurements and their sources are in
-[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and
+carry at 41,091 paths. That band is measured on a Linux host restricted to
+three and four cores. Branch CI run 36496566681 on `390cf60d` has since
+measured the change against main run 36369711059. The twelve test262
+execution steps sum to a measured 17,878 s before and 14,018 s after on macOS,
+a derived 21.6 percent, and 12,130 s before and 9,664 s after on Linux, a
+derived 20.3 percent, which is a derived 64.3 and 41.1 min. The whole-job
+totals of the same family fall from a measured 308.37 to 243.10 min on macOS
+and 206.42 to 165.20 min on Linux, a derived 21.2 and 20.0 percent. Both step
+figures land inside the local band. One run per side cannot separate that from
+runner variance: individual shards moved between a derived -53.1 and +12.4
+percent, and families this change does not touch moved by up to a derived 18.9
+percent in the same pair of runs. All 58 jobs of the branch run succeeded. U13
+recovers runner minutes without touching reviewed paths, variants, targets,
+sanitizer flags, budgets, or verdicts. Its measurements and their sources are
+in [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and
 [U13 evidence](./docs/evidence/u13/README.md).
 
 One limitation surfaced while reviewing U13 and is recorded here rather than

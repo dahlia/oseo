@@ -1,0 +1,61 @@
+# U13: branch CI run 36496566681 (390cf60d) against main run
+# 36369711059 (98e66719), one run each, same 12-shard totals. Produced by
+# docs/evidence/u13/ci-compare.py from each run's measured job and step
+# startedAt/completedAt. Step seconds are the step named
+# 'Run mise run test:test262 --shard N/12' and exclude job setup and
+# cleanup; job seconds are the whole job. Percentages are derived.
+
+base 98e66719692411581785abe756d509e5f264ca00
+head 390cf60dfb856134e9e99d7a90731c385dd71608
+
+  host  shard  base job s  head job s  base step s  head step s  step diff
+ Linux   1/12        1027         877         1006          859     -14.6%
+ Linux  10/12         970         467          950          446     -53.1%
+ Linux  11/12        1008         829          983          809     -17.7%
+ Linux  12/12        1008         504          989          485     -51.0%
+ Linux   2/12         767         810          742          789      +6.3%
+ Linux   3/12         925         765          907          745     -17.9%
+ Linux   4/12         837         811          816          793      -2.8%
+ Linux   5/12        1268         844         1249          822     -34.2%
+ Linux   6/12        1309        1174         1289         1153     -10.6%
+ Linux   7/12         983         859          961          837     -12.9%
+ Linux   8/12        1303        1183         1284         1157      -9.9%
+ Linux   9/12         980         789          954          769     -19.4%
+ macOS   1/12        1376        1286         1334         1233      -7.6%
+ macOS  10/12        1389         900         1333          856     -35.8%
+ macOS  11/12        1311        1255         1255         1196      -4.7%
+ macOS  12/12        1269        1189         1228         1144      -6.8%
+ macOS   2/12        1651        1379         1598         1331     -16.7%
+ macOS   3/12        1496         995         1440          955     -33.7%
+ macOS   4/12        1309        1074         1270         1025     -19.3%
+ macOS   5/12        1747        1098         1689         1064     -37.0%
+ macOS   6/12        1862        1618         1807         1564     -13.4%
+ macOS   7/12        1896         945         1839          901     -51.0%
+ macOS   8/12        1479        1668         1430         1608     +12.4%
+ macOS   9/12        1717        1179         1655         1141     -31.1%
+
+Linux: 12 shards; job sum 12385 -> 9912 s (-20.0%); step sum 12130 -> 9664 s (-20.3%); step saving 2466 s (41.1 min)
+macOS: 12 shards; job sum 18502 -> 14586 s (-21.2%); step sum 17878 -> 14018 s (-21.6%); step saving 3860 s (64.3 min)
+
+base family job-minute sums:
+   Linux check               1 jobs     1.58 min
+   Linux host C sanitizers   3 jobs   138.33 min
+   Linux native              4 jobs    39.03 min
+   Linux native support      5 jobs   227.10 min
+   Linux test                4 jobs    45.83 min
+   Linux test262            12 jobs   206.42 min
+   macOS native              3 jobs    48.90 min
+   macOS native support     12 jobs   298.10 min
+   macOS test                2 jobs    52.93 min
+   macOS test262            12 jobs   308.37 min
+head family job-minute sums:
+   Linux check               1 jobs     1.63 min
+   Linux host C sanitizers   3 jobs   112.17 min
+   Linux native              4 jobs    42.43 min
+   Linux native support      5 jobs   232.12 min
+   Linux test                4 jobs    37.88 min
+   Linux test262            12 jobs   165.20 min
+   macOS native              3 jobs    43.12 min
+   macOS native support     12 jobs   303.55 min
+   macOS test                2 jobs    44.97 min
+   macOS test262            12 jobs   243.10 min
