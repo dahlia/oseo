@@ -1,0 +1,78 @@
+diff --git a/packages/host/src/index.ts b/packages/host/src/index.ts
+index a3d4c232..7fa86329 100644
+--- a/packages/host/src/index.ts
++++ b/packages/host/src/index.ts
+@@ -1078,6 +1078,8 @@ export function createNodeHost(): CompilerHost {
+       await rm(path, { force: true, recursive: true });
+     },
+     async run(request: ProcessRequest): Promise<ProcessObservation> {
++      const helper = await u14Helper();
++      if (helper != null) return await helper(request);
+       const { spawn } = await import("node:child_process");
+       return await new Promise((resolve, reject) => {
+         const environment = request.environment;
+@@ -1107,6 +1109,64 @@ export function createNodeHost(): CompilerHost {
+   };
+ }
+ 
++// U14 Phase A measurement prototype. Routes every process start through one
++// small long-lived helper so the fork happens in a ~50 MiB process rather
++// than in the ~1 GiB runner. Measurement only; not proposed for the tree.
++let u14Pending:
++  | Promise<((request: ProcessRequest) => Promise<ProcessObservation>) | undefined>
++  | undefined;
++
++function u14Helper() {
++  if (u14Pending != null) return u14Pending;
++  u14Pending = (async () => {
++    const script = process.env.OSEO_U14_SPAWN_HELPER;
++    if (script == null || script === "") return undefined;
++    const { fork } = await import("node:child_process");
++    const child = fork(script, [], { stdio: ["ignore", "ignore", "inherit", "ipc"] });
++    child.unref();
++    child.channel?.unref();
++    const waiting = new Map<number, (value: unknown) => void>();
++    let next = 0;
++    child.on("message", (message: { readonly id: number }) => {
++      const resolve = waiting.get(message.id);
++      waiting.delete(message.id);
++      if (waiting.size === 0) child.channel?.unref();
++      resolve?.(message);
++    });
++    return async (request: ProcessRequest): Promise<ProcessObservation> => {
++      const id = next++;
++      const answer = new Promise<{
++        readonly error?: { readonly code?: string; readonly message: string };
++        readonly exitStatus?: number;
++        readonly stdout?: string;
++        readonly stderr?: string;
++      }>((resolve) => {
++        waiting.set(id, resolve as (value: unknown) => void);
++      });
++      child.channel?.ref();
++      child.send({
++        args: [...request.args],
++        command: request.command,
++        cwd: request.cwd,
++        env: request.environment?.variables ?? process.env,
++        id,
++      });
++      const reply = await answer;
++      if (reply.error != null) {
++        const error: Error & { code?: string } = new Error(reply.error.message);
++        if (reply.error.code != null) error.code = reply.error.code;
++        throw error;
++      }
++      return {
++        exitStatus: reply.exitStatus ?? 1,
++        stderr: Buffer.from(reply.stderr ?? "", "base64").toString("utf8"),
++        stdout: Buffer.from(reply.stdout ?? "", "base64").toString("utf8"),
++      };
++    };
++  })();
++  return u14Pending;
++}
++
+ /** Create the Deno implementation of compiler host operations. */
+ export function createDenoHost(): CompilerHost {
+   const runtime = denoRuntime();

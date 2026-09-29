@@ -1,0 +1,17 @@
+# U14 measurement host
+
+Linux 7.2.7-200.fc44.x86_64 x86_64
+cpu: AMD Ryzen 7 7700X 8-Core Processor x 16 logical
+memory: 61 GiB
+node: v24.21.0
+zig: 0.16.0
+repo: 97278fc625066758744c962f5ebefcfbc8730fb6
+reviewed paths: 21383
+ZIG_GLOBAL_CACHE_DIR: /data/zig-cache/m5ci-native-spawn-cost
+note: shared multi-lane developer host; loadavg is recorded per run
+
+# macOS comparison host (micro-benchmarks only, no repository run)
+
+Darwin 24.2.0 arm64
+cpu: Apple M4 x 10 logical
+node: v24.21.0

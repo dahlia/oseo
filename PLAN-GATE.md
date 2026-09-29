@@ -1019,6 +1019,26 @@ does not close the gap. Closing it means hashing the library tree, or
 recording a stronger toolchain identity, and belongs to whichever unit owns
 the archive key rather than to this one.
 
+Reviewed runner process starts, U14. U14 measured what the reviewed runner
+spends on starting processes after U13 and found the largest remaining
+main-thread item on Linux: a derived 36.6 percent of sampled main-thread
+self time, and a measured 9.65 to 9.73 s of main-thread time blocked inside
+the start call against a 21.2 to 21.8 s runner duration on the same 214-path
+shard, at two starts per native execution. The cost is the parent's size
+rather than the child's, because libuv starts a process with `fork` on Linux
+and each start copies the page tables of the roughly one-gigabyte runner. The
+same measurement on macOS does not find it, which is what `posix_spawn`
+would predict: a flat measured 0.263 to 0.265 ms per start across a tenfold
+range of resident set, on a desktop M4 rather than a GitHub runner. A small
+long-lived helper process that owns the starts was measured on the reviewed
+shard with a throwaway prototype and reduces Linux wall time by a derived 6.9
+to 13.1 percent across four configurations, with all twelve paired
+comparisons reductions. U14 therefore has no demonstrated macOS runner
+minutes to recover and is not adopted in M5CI; it is recorded as a measured
+candidate for local Linux gate speed. The measurements are in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and their sources
+in [U14 evidence](./docs/evidence/u14/README.md).
+
 Shard sizing, U6. Raising the test262 or native support shard total leaves the
 executed work unchanged, so it recovers no runner minutes and adds a derived
 1 min or so of fixed cost for each added macOS job. Its effect is on the tail

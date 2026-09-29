@@ -1,0 +1,57 @@
+// Measure the synchronous main-thread cost of child_process.spawn() as a
+// function of the parent's resident set.  spawn() performs the fork/exec
+// inline on the calling thread, so the wall time of the call itself is
+// main-thread blocked time.
+import { spawn } from "node:child_process";
+
+const megabytes = Number(process.argv[2] ?? "50");
+const count = Number(process.argv[3] ?? "200");
+const command = process.argv[4] ?? "/bin/true";
+
+// Touch every page so the resident set is real, not just reserved.
+const ballast = [];
+for (let index = 0; index < megabytes; index++) {
+  const block = Buffer.allocUnsafe(1024 * 1024);
+  block.fill(index & 0xff);
+  ballast.push(block);
+}
+
+function rssMiB() {
+  return process.memoryUsage().rss / (1024 * 1024);
+}
+
+const samples = [];
+let done = 0;
+async function once() {
+  const started = performance.now();
+  const child = spawn(command, [], { stdio: ["ignore", "pipe", "pipe"] });
+  samples.push(performance.now() - started);
+  child.stdout.resume();
+  child.stderr.resume();
+  await new Promise((resolve) => child.on("close", resolve));
+  done++;
+}
+
+const beforeRss = rssMiB();
+const cpuBefore = process.cpuUsage();
+const wallBefore = performance.now();
+for (let index = 0; index < count; index++) await once();
+const wall = performance.now() - wallBefore;
+const cpu = process.cpuUsage(cpuBefore);
+samples.sort((a, b) => a - b);
+const sum = samples.reduce((a, b) => a + b, 0);
+console.log(
+  JSON.stringify({
+    ballastMiB: megabytes,
+    count: done,
+    rssMiB: Number(beforeRss.toFixed(1)),
+    rssAfterMiB: Number(rssMiB().toFixed(1)),
+    spawnCallMsMean: Number((sum / samples.length).toFixed(3)),
+    spawnCallMsMedian: Number(samples[Math.floor(samples.length / 2)].toFixed(3)),
+    spawnCallMsP90: Number(samples[Math.floor(samples.length * 0.9)].toFixed(3)),
+    spawnCallMsTotal: Number(sum.toFixed(1)),
+    wallMs: Number(wall.toFixed(1)),
+    processUserMs: Number((cpu.user / 1000).toFixed(1)),
+    processSystemMs: Number((cpu.system / 1000).toFixed(1)),
+  }),
+);

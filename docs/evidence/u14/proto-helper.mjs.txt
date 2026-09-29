@@ -1,0 +1,37 @@
+// U14 Phase A measurement prototype: a small long-lived process that owns the
+// process launches so the large runner parent never forks. Not repository
+// code.
+import { spawn } from "node:child_process";
+
+process.on("message", (request) => {
+  let child;
+  try {
+    child = spawn(request.command, request.args, {
+      cwd: request.cwd,
+      env: request.env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  } catch (error) {
+    process.send({ id: request.id, error: { code: error?.code, message: String(error?.message ?? error) } });
+    return;
+  }
+  const out = [];
+  const err = [];
+  let failed = false;
+  child.stdout.on("data", (chunk) => out.push(chunk));
+  child.stderr.on("data", (chunk) => err.push(chunk));
+  child.on("error", (error) => {
+    failed = true;
+    process.send({ id: request.id, error: { code: error?.code, message: String(error?.message ?? error) } });
+  });
+  child.on("close", (code) => {
+    if (failed) return;
+    process.send({
+      id: request.id,
+      exitStatus: code ?? 1,
+      stdout: Buffer.concat(out).toString("base64"),
+      stderr: Buffer.concat(err).toString("base64"),
+    });
+  });
+});
+process.on("disconnect", () => process.exit(0));

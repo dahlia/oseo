@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# U14 Phase A A/B driver. The two arms differ only by the environment
+# variable that routes process starts through the measurement helper, so no
+# rebuild is needed between them and the arms can alternate run by run.
+set -euo pipefail
+OUT=${OUT:?}; REPS=${REPS:-3}; SHARD=${SHARD:-1/100}; CPUS=${CPUS:-}
+HELPER=${HELPER:?}
+: "${ZIG_GLOBAL_CACHE_DIR:?}"
+mkdir -p "$OUT"
+: > "$OUT/table.tsv"
+for rep in $(seq 1 "$REPS"); do
+  for arm in base helper; do
+    label="$arm-r$rep${CPUS:+-cpu$CPUS}"
+    prefix=()
+    [ -n "$CPUS" ] && prefix=(taskset -c "$CPUS")
+    # The base arm clears the selection rather than merely not setting it,
+    # so an exported value in the caller's environment cannot silently run
+    # both arms through the helper.
+    env_args=(--unset=OSEO_U14_SPAWN_HELPER)
+    [ "$arm" = helper ] && env_args=(OSEO_U14_SPAWN_HELPER="$HELPER")
+    load=$(cut -d' ' -f1 /proc/loadavg)
+    start=$(date +%s.%N)
+    env "${env_args[@]}" "${prefix[@]}" node tools/test262.ts --shard "$SHARD" \
+      > "$OUT/$label.log" 2>&1
+    end=$(date +%s.%N)
+    wall=$(echo "$end - $start" | bc)
+    runner=$(grep -o 'duration=[0-9.]*ms' "$OUT/$label.log" | tail -1 | tr -d 'duration=ms')
+    summary=$(grep -o 'pass=[0-9]* expected-negative=[0-9]* unsupported=[0-9]*' "$OUT/$label.log" | tail -1)
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$label" "$arm" "$wall" "$runner" "$load" "$summary" \
+      | tee -a "$OUT/table.tsv"
+  done
+done

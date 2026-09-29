@@ -1,0 +1,81 @@
+import { spawn } from "node:child_process";
+import { createInterface } from "node:readline";
+
+const megabytes = Number(process.argv[2] ?? "600");
+const count = Number(process.argv[3] ?? "300");
+const mode = process.argv[4] ?? "direct";
+const command = process.argv[5] ?? "/bin/true";
+const helperPath = new URL("./helper.mjs", import.meta.url).pathname;
+
+const ballast = [];
+for (let index = 0; index < megabytes; index++) {
+  const block = Buffer.allocUnsafe(1024 * 1024);
+  block.fill(index & 0xff);
+  ballast.push(block);
+}
+globalThis.__ballast = ballast; // keep it reachable
+
+const blocked = [];
+let helper;
+let pending;
+let nextId = 0;
+if (mode === "helper") {
+  helper = spawn(process.execPath, [helperPath], {
+    stdio: ["pipe", "pipe", "inherit"],
+  });
+  pending = new Map();
+  const lines = createInterface({ input: helper.stdout });
+  lines.on("line", (line) => {
+    if (line === "") return;
+    const response = JSON.parse(line);
+    const resolve = pending.get(response.id);
+    pending.delete(response.id);
+    resolve(response);
+  });
+}
+
+async function runDirect() {
+  const started = process.hrtime.bigint();
+  const child = spawn(command, [], { stdio: ["ignore", "pipe", "pipe"] });
+  blocked.push(Number(process.hrtime.bigint() - started) / 1e6);
+  const out = [];
+  const err = [];
+  child.stdout.on("data", (c) => out.push(c));
+  child.stderr.on("data", (c) => err.push(c));
+  await new Promise((resolve) => child.on("close", resolve));
+}
+
+async function runHelper() {
+  const id = nextId++;
+  const started = process.hrtime.bigint();
+  const answer = new Promise((resolve) => pending.set(id, resolve));
+  helper.stdin.write(`${JSON.stringify({ id, command, args: [] })}\n`);
+  blocked.push(Number(process.hrtime.bigint() - started) / 1e6);
+  await answer;
+}
+
+const cpuBefore = process.cpuUsage();
+const wallBefore = performance.now();
+for (let index = 0; index < count; index++) {
+  await (mode === "helper" ? runHelper() : runDirect());
+}
+const wall = performance.now() - wallBefore;
+const cpu = process.cpuUsage(cpuBefore);
+blocked.sort((a, b) => a - b);
+const sum = blocked.reduce((a, b) => a + b, 0);
+console.log(
+  JSON.stringify({
+    mode,
+    ballastMiB: megabytes,
+    rssMiB: Number((process.memoryUsage().rss / 1048576).toFixed(1)),
+    count,
+    blockedMsMean: Number((sum / blocked.length).toFixed(3)),
+    blockedMsMedian: Number(blocked[Math.floor(blocked.length / 2)].toFixed(3)),
+    blockedMsTotal: Number(sum.toFixed(1)),
+    wallMs: Number(wall.toFixed(1)),
+    parentUserMs: Number((cpu.user / 1000).toFixed(1)),
+    parentSystemMs: Number((cpu.system / 1000).toFixed(1)),
+  }),
+);
+helper?.kill();
+process.exit(0);
