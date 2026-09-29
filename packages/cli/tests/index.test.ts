@@ -17,6 +17,7 @@ import {
   runCli,
   runNativeCli,
   runNativeUnits,
+  verifyPreparedNativeRuntime,
 } from "../src/index.ts";
 import type { PreparedNativeRuntime } from "../src/index.ts";
 
@@ -2154,4 +2155,62 @@ test(noChangeTimeTitle, async () => {
       ),
     /does not report inode change times/u,
   );
+});
+
+/**
+ * A host that reaches its own state through `this` inside `describeFile`,
+ * which the `CompilerHost` contract permits. Every fingerprint read, in
+ * preparation and in each later recheck, has to keep that receiver.
+ */
+interface SelfReadingHost extends CompilerHost {
+  readonly table: ReadonlyMap<string, FileFingerprint>;
+}
+
+const receiverTitle =
+  "a prepared native runtime keeps the host receiver while rechecking";
+test(receiverTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  const host: SelfReadingHost = {
+    ...fixture.host,
+    table: fixture.fingerprints,
+    describeFile(path: string): Promise<FileFingerprint | undefined> {
+      return Promise.resolve(this.table.get(path));
+    },
+  };
+  // A call that drops the receiver must not report a file, so the recheck
+  // paths below prove they kept it rather than that the host ignores `this`.
+  const unbound: CompilerHost["describeFile"] = host.describeFile;
+  await assert.rejects(async () => await unbound?.("/opt/zig/zig"), TypeError);
+  const prepared = await prepareNativeRuntime(
+    host,
+    fixture.toolchain,
+    describeTarget("linux-x86_64-gnu"),
+  );
+  assert.deepEqual(
+    prepared.pinnedFiles.map((entry) => entry.path),
+    ["/opt/zig/zig", "/opt/zig/lib"],
+  );
+  // The composer entry point rechecks once, and each native execution
+  // rechecks again, so all three paths call describeFile on the host.
+  await verifyPreparedNativeRuntime(prepared);
+  const first = await runNativeUnits(
+    preparedRuntimeUnits,
+    "original.js",
+    host,
+    fixture.toolchain,
+    "enabled",
+    prepared,
+  );
+  const second = await runNativeUnits(
+    preparedRuntimeUnits,
+    "original.js",
+    host,
+    fixture.toolchain,
+    "enabled",
+    prepared,
+  );
+  assert.equal(first.exitStatus, 0);
+  assert.deepEqual(second, first);
+  assert.equal(first.stdout, "42\n");
+  assert.equal(fixture.plans.length, 2);
 });

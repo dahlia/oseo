@@ -1064,7 +1064,10 @@ async function requirePinnedToolchain(
   prepared: PreparedNativeRuntime,
   host: CompilerHost,
 ): Promise<void> {
-  const describeFile = host.describeFile;
+  // Bound to the host for the same reason preparation binds it: a host that
+  // implements describeFile as a method reading `this` must keep its receiver
+  // across every recheck, not just the one preparation performed.
+  const describeFile = host.describeFile?.bind(host);
   if (describeFile == null) {
     throw new PreparedNativeRuntimeMismatchError("compiler host");
   }
