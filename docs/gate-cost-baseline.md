@@ -1698,6 +1698,362 @@ All timings here are local Linux observations on the shared host described in
 manifests, revision pins, classifications, sanitizer flags, targets, and
 property budgets remain unchanged.
 
+### Reviewed test262 runner scaling (U13 Phase A)
+
+U13 asks why 2.7 times the reviewed execution pool buys only 1.2 to 1.5 times
+the throughput. The unit's opening hypothesis was that per-case parsing,
+lowering, and C generation run on the Node.js main thread while only the
+native build and run are parallel. That hypothesis is refuted. Frontend,
+lowering, and C emission are a measured 2.5 to 3.2 s of a 43.3 s main-thread
+CPU budget. The serial cost is per-execution work the runner repeats
+identically for every native execution: rereading the whole C runtime source
+set, hashing it into a runtime-archive key, and starting one extra process to
+identify the toolchain.
+
+Scripts, the measurement-only instrumentation patch, and the compact outputs
+are preserved in [*evidence/u13/README.md*](./evidence/u13/README.md), with
+the host in *evidence/u13/host.log*. Every run used only
+`ZIG_GLOBAL_CACHE_DIR=/data/zig-cache/m5ci-test262-serial-bottleneck` and
+reproduced the checked-in manifest shard exactly. No reviewed path, variant,
+mode, target, sanitizer flag, retry policy, or verdict was changed, and
+nothing in this section is a repository change.
+
+The workload is the reviewed shard 1/100, a measured 214 paths and 730 native
+executions. All rows are means of at least two runs on one shared Linux host;
+per-run values and host load are in *evidence/u13/measurements.txt*. The
+`cpus` column is a `taskset` restriction on the whole process tree, which
+models a small CI runner because the compiler subprocesses are restricted
+too. Unrestricted rows vary the pool directly on 16 logical CPUs. Node CPU is
+the runner process's own user plus system seconds; tree CPU adds every child.
+
+| CPUs | Pool | Measured wall s | Measured runner s | Measured node CPU s | Measured tree CPU s |
+| ---- | ---- | --------------- | ----------------- | ------------------- | ------------------- |
+| 16   | 1    | 122.9           | 115.2             | 46.9                | 174.6               |
+| 16   | 3    | 55.0            | 48.5              | 45.9                | 179.2               |
+| 16   | 8    | 45.9            | 39.6              | 48.3                | 192.8               |
+| 16   | 16   | 49.4            | 42.7              | 51.7                | 205.9               |
+| 3    | 3    | 64.1            | 57.8              | 42.2                | 151.4               |
+| 4    | 4    | 53.8            | 47.7              | 42.4                | 155.3               |
+
+Eight times the pool gives a derived 2.68 times the throughput, and sixteen
+times gives 2.49. Fitting Amdahl's law against the measured pool 1 wall time
+gives a derived serial fraction of 0.171 at pool 3, 0.284 at pool 8, and 0.362
+at pool 16. A fraction that grows with the worker count is the signature of a
+fixed single-threaded resource rather than a constant serial share. The
+measured node CPU identifies it: it stays within 42.0 to 52.8 s across every
+configuration from pool 1 to pool 16 and from 3 CPUs to 16, while wall time
+falls from 122.9 to 45.9 s. At pool 8 the runner process consumes a measured
+48.3 CPU s in a 45.9 s run, so it holds slightly more than one core
+continuously. The implied serial fraction is a derived 0.382, and the
+predicted floor of 46.9 s matches the measured 45.9 s minimum.
+
+The same table explains the unit's opening observation. Raising the pool from
+3 to 8 on a large host is a derived 1.20 times, which sits inside the 1.2 to
+1.5 times band observed on the Apple M4. A 3-core runner reaches 64.1 s where
+the same host at pool 3 with 16 CPUs available reaches 55.0 s, so the two
+regimes differ: on a large host the single runner process is the constraint,
+and on a 3-core runner total CPU is.
+
+Main-thread CPU was attributed with `--cpu-prof` on one pool 8 run, giving a
+measured 43.34 s of sampled self time. The heaviest entries are in
+*evidence/u13/cpu-profile-top.txt*.
+
+| Main-thread work                                  | Measured self s | Derived share |
+| ------------------------------------------------- | --------------- | ------------- |
+| `spawn` in *node:internal/child\_process*         | 15.26           | 35.2%         |
+| Runtime-archive key: hash, `TextEncoder`, SHA-256 | 11.88           | 27.4%         |
+| YAML parsing of the reviewed subset and manifest  | 3.42            | 7.9%          |
+| Garbage collector                                 | 1.79            | 4.1%          |
+| Idle                                              | 1.76            | 4.1%          |
+| Frontend, lowering, and C emission (instrumented) | 2.78            | 6.4%          |
+
+Three measured facts name the repeated work. The C runtime is 47 files and
+3,350,652 bytes. `executeNativeWorkflow` reads all of it, stringifies it, and
+SHA-256 hashes it once per native execution, so one 214-path shard performs a
+derived 2.446 GB of rereads and 730 identical key computations. It also starts
+one `zig env` process per execution purely to identify the toolchain, a
+measured 730 of the at least 2,190 process starts the instrumentation
+observed. Every start is charged to the main thread, and the runner's measured
+peak resident set is about 1,010 MiB, which is what makes each one expensive.
+
+Per-execution costs are cleanest in the uncontended pool 1 run, where nothing
+overlaps. Every interval below is elapsed time around an awaited operation,
+not processor time: the identity probe's interval is mostly a child process,
+and the key's interval is hashing plus its awaited digest. The archive key is
+a measured 17.21 ms per execution and the identity probe a measured 9.39 ms,
+against a measured 154.2 ms of runner time per execution. The two together are
+a derived 17.3 percent of fully serialized per-execution elapsed time. By
+contrast the body compile is a measured 0.57 ms, harness fragment emission
+2.41 ms, and case parsing 0.24 ms. Processor time for the same work is
+attributed separately by the profile above: the key group's 11.88 s of
+main-thread self time is measured, a derived 27.4 percent of the sampled
+total, and the identity probes are a derived 11.7 percent of it. That second
+figure applies their 730 of the observed 2,190 process starts to the measured
+`spawn` self time, which assumes every start costs the same. The profile does
+not separate an identity-probe start from a build or an execution start, so
+that assumption is unverified. It is plausible because the dominant term in a
+start is copying the parent's page tables, which does not depend on the
+child.
+
+Both values are invariant within one runner process: the runtime sources, the
+target, the captured toolchain environment, and the toolchain identity do not
+change between executions of one run. Computing them once per process would
+therefore produce byte-identical keys, the same cache lookups, the same build
+plans, and the same executions. The ordinary `oseo` CLI performs exactly one
+execution per process, so it would observe no change at all.
+
+Two estimates bound the saving, and both rest on an assumption this
+instrumentation does not establish. The first assumes the 26.60 ms of removed
+elapsed work per execution is also 26.60 ms of processor time somewhere in the
+tree, which is only true to the extent that the probe's child and the hashing
+actually occupy a processor. On that assumption, removing a derived 19.4 s of
+tree CPU per 214-path shard lowers the CPU floor on a 3-core runner from a
+derived 50.5 to 44.0 s and on a 4-core runner from 38.8 to 34.0 s. Holding the
+measured ratio of wall time to that floor constant estimates 55.9 s on 3 CPUs
+and 47.1 s on 4, a derived 12.4 to 12.8 percent. The second uses the profile's
+main-thread attribution instead, and inherits the equal-cost-per-start
+assumption above: on a large host, where the runner process is the binding
+constraint, the profile removes a derived 39.2 percent of main-thread CPU,
+which estimates 31 to 36 s against the measured 45.9 s at pool 8, a derived
+22 to 33 percent. These are estimates from the measured
+decomposition, not an observed before-and-after. The Phase B section below
+replaces them with a measured result.
+
+Applying the 12.4 to 12.8 percent small-runner estimate to the measured CI
+series gives the derived figures below. The macOS row uses the measured
+10-shard execution-step sums already recorded above, which exclude job setup
+and cleanup. The Linux row uses measured 10-job family totals, because this
+document does not separate the Linux test262 execution step from its job fixed
+cost; its saving is therefore stated only as a percentage of the execution
+portion. The 41,091-path column scales the measured per-path rate by a derived
+1.922 and assumes the same per-path cost, which the corpus has not
+demonstrated.
+
+| Host  | Measured current s, 21,383 paths | Derived saving, 21,383 paths | Derived saving, 41,091 paths |
+| ----- | -------------------------------- | ---------------------------- | ---------------------------- |
+| macOS | 16,159 to 18,935 execution       | 2,000 to 2,420 s             | 3,850 to 4,650 s             |
+| Linux | 8,447 to 11,544 whole job        | 12.4 to 12.8% of execution   | 12.4 to 12.8% of execution   |
+
+Cold and warm Oseo caches were separated at pool 8 with a fresh
+`XDG_CACHE_HOME`. A cold object and archive cache measured 46.0 s and the two
+warm runs 42.9 and 42.7 s, a derived 7.2 percent. The lane Zig cache was
+populated in both, so this separates only the Oseo harness objects and runtime
+archives. Fixed per-run cost, measured as wall time minus the runner's own
+duration, is 6.3 s on the 3-core configuration and is not a per-path cost.
+
+Two further observations are recorded without a proposal. The summed
+runtime-asset read interval grows from a measured 3.3 s at pool 1 to 260.3 s
+at pool 16 while the work is unchanged, which is queueing on the default
+four-thread libuv pool. Reading the checked-in manifest costs a measured 3.4 s
+of YAML parsing per run regardless of shard size, which matters only for small
+shards.
+
+### Reviewed test262 prepared runtime (U13 Phase B)
+
+Phase A named two per-execution costs that one runner process repeats without
+ever producing a different answer: rereading and rehashing the C runtime into a
+runtime-archive key, and starting one `zig env` process to identify the
+toolchain. Phase B derives both once per process and reuses them.
+
+The contract change is explicit rather than ambient. `prepareNativeRuntime`
+is a new public entry point in `@oseo/cli` that reads the runtime assets,
+identifies the toolchain, pins the executable that identity describes, and
+derives the archive key, once for one host, toolchain, target, and runtime
+provider. `runNativeUnits` takes the result as a new optional argument and
+then performs no per-execution runtime read, identity probe, or key
+derivation. A caller that passes nothing behaves exactly as before, so
+`runNativeCli`, the published CLI, the testkit native workflow, the native
+fixtures, and the property suites are unchanged. Only the reviewed test262
+fragment executor passes a prepared runtime, and it derives it from the same
+initialization that already builds the harness object key.
+
+Two properties make the reuse safe, and both are enforced rather than
+documented. First, the prepared snapshot is the only source of runtime bytes:
+every build that uses a prepared runtime stages the snapshotted contents, so
+the bytes compiled and archived are always the bytes hashed into the key, and
+a runtime file edited after preparation is neither read nor compiled. A test
+edits a runtime file after preparation and asserts that the staged bytes and
+the archive key are still the snapshot's, and that preparing again derives a
+different key. Second, the compiler is pinned. `prepareNativeRuntime` asks the
+toolchain which executable its identity output describes, resolves that path to
+its real location, fingerprints every watched path, repeats the identity probe
+through the resolved executable, and fingerprints again, accepting the
+preparation only when the repeat names the same executable and the same
+watched paths and nothing moved around it; a single probe would otherwise
+leave a window in which a replacement pairs a new compiler with an old
+identity, and accepting a repeat that watched different paths would record an
+identity describing a directory nothing rechecks. The fingerprint compares the
+inode change time as well as the device, inode, size, modification time, and
+resolved path, so an in-place rewrite that restores the size and the
+modification time is still caught; a host that cannot report a change time
+refuses to prepare rather than comparing the weaker set. Every build of that
+preparation then invokes the resolved path rather than a search-path name, and
+the fingerprints are rechecked after validation, after the archive cache lock
+is acquired, immediately before the compiler runs, and once the build has
+finished, before any artifact it produced is executed or published. The harness
+object build uses the same pinned path and the same checkpoints. A mismatch
+raises and is propagated rather than falling back to a build without archive
+reuse, so a compiler replaced in place, or a reported path repointed at a
+different file, cannot build, run, or publish under the previous compiler's
+key. Tests cover a replaced, a relinked, and a removed compiler, one rewritten
+in place with its size and modification time preserved, a confirming probe that
+names different watched paths, a host that reports no change time, one swapped
+inside the confirming probe, one swapped during the lock wait, and one swapped
+during the build with an archive published, with an archive already cached, and
+with archive reuse disabled, plus an uncached harness object whose pin fails at
+each of its three checkpoints. A toolchain that cannot name its executable, or
+a host that cannot fingerprint files, refuses to prepare rather than reusing an
+unpinned identity.
+
+What a prepared runtime checks, and when, is worth separating. At preparation
+the identity is taken twice and bracketed by fingerprints, as above. At every
+later use `runNativeUnits` compares the execution's compiler host, toolchain,
+target, captured environment snapshot, runtime ABI version and runtime asset
+set against the recorded ones, and re-fingerprints the watched paths; it does
+not probe the identity again. A search path that later resolves to a different
+installation therefore does not change what a prepared runtime builds with,
+because the pinned executable keeps being used, while an unprepared execution
+would pick up the new one. In the other direction the fingerprints catch a
+rewrite of the pinned executable that unchanged identity output alone would
+miss.
+
+One limitation is shared with the per-execution path rather than introduced
+here. A watched library directory is fingerprinted as a directory, and the
+archive key hashes the toolchain's identity output rather than its library
+tree, so an in-place edit to a file beneath that directory which leaves
+`zig env` output unchanged is observed by neither path. That belongs to the
+runtime-archive key itself and predates this unit;
+[*PLAN-GATE.md*](../PLAN-GATE.md) records it as a candidate follow-up.
+
+Each recheck is one `realpath` and one `stat` per watched path, with no
+process start. The inode change time the comparison
+includes comes out of that same stat, so it costs no extra call. Measured on
+the same host, four rechecks of the two paths the Zig identity reports cost
+59.8 to 64.2 ms for a whole 730-execution shard, a measured 0.082 to
+0.088 ms per execution, against the per-execution saving below. Its cost is a
+derived 0.5 to 0.6 percent of that saving. The figures are in
+[*evidence/u13/pin-recheck-cost.txt*](./evidence/u13/pin-recheck-cost.txt).
+
+A prepared runtime also records the host, toolchain, target, environment
+snapshot, ABI version, ordered asset set, and a digest of the asset contents
+it came from, taking immutable copies of the target, its sanitizer list, the
+environment variables, the ABI version, and each asset's location before any
+await. `runNativeUnits` compares those against the execution's own inputs and
+raises `PreparedNativeRuntimeMismatchError` on any difference, after removing
+the temporary directory and before any build plan is created. Hosts and
+toolchains are compared by identity, so a host that would read different
+runtime bytes and a toolchain with different flags are both refused. Package
+tests cover a rejected host, toolchain, target, sanitizer list, asset
+location, environment snapshot, and runtime provider, and assert that no build
+plan was created in any of them. Two further tests run the same units with and
+without a prepared runtime, against both a missing and a published archive,
+and assert that the result, the archive key, the cache lookups, the written
+artifacts, and the build plan are identical apart from the pinned compiler
+path, that the prepared execution reads no runtime asset and starts no
+identity probe, and that preparing reads exactly the assets one per-execution
+workflow reads. The existing Zig identity-probe retry test is unchanged and
+still passes: it uses `runNativeCli`, which never takes a prepared runtime.
+
+Before and after were measured on the same 214-path reviewed shard on one
+Linux host, with the whole process tree restricted by `taskset` to the CI
+runners' core counts, on an uninstrumented tree. Before is `98e66719`; every
+source this unit changes under *packages/* and *tools/* is checked out and
+rebuilt between arms, because the runner loads several of those packages from
+their built output. Both arms run inside one session, which alternates them
+once per repetition rather than run by run: a repetition runs all six of one
+arm's runs and then all six of the other's. Each arm has four warm and two
+cold runs per core count. Cold empties the Oseo object and archive cache; the
+lane Zig cache stays populated throughout, so this separates only the Oseo
+caches. Per-run values are in
+[*evidence/u13/before-after.txt*](./evidence/u13/before-after.txt).
+
+| CPUs | Cache | Measured before s | Measured after s | Derived change | Derived tree CPU change |
+| ---- | ----- | ----------------- | ---------------- | -------------- | ----------------------- |
+| 3    | warm  | 57.13             | 44.40            | -22.3%         | -16.0%                  |
+| 3    | cold  | 68.58             | 56.39            | -17.8%         | -12.1%                  |
+| 4    | warm  | 47.80             | 35.23            | -26.3%         | -15.6%                  |
+| 4    | cold  | 56.33             | 44.77            | -20.5%         | -12.4%                  |
+
+The host's one-minute load stayed between 1.3 and 5.6 across the session, and
+the widest spread inside any arm is a derived 1.28 s, far under the effect.
+Pairing each run against the run of the other arm at the same core count,
+cache state, and repetition gives derived means of 17.8 and 20.5 percent cold
+and 22.3 and 26.3 percent warm at three and four cores, and all twelve pairs
+are reductions, from a derived 16.9 to 26.9 percent. Host drift is reduced but
+not controlled, because the two runs of a pair are minutes apart rather than
+adjacent.
+
+The saving is a derived 15.8 to 17.4 ms of wall time per native execution
+across the four arms, each arm's measured difference divided by its 730
+executions, against the Phase A measurement of 26.60 ms of removable elapsed
+work per execution. It exceeds the Phase A estimate of 12.4 to 12.8 percent
+because that estimate assumed only the CPU floor moved, while the runner
+process's single thread was also releasing the pool earlier.
+
+Applying the measured 17.8 to 26.3 percent band to the measured macOS
+execution-step sums of 16,159 to 18,935 s at 21,383 paths estimates 2,876 to
+4,980 s, a derived 47.9 to 83.0 min per run. At 41,091 paths the same per-path
+rate estimates a derived 92.1 to 159.5 min. Those estimates were made on a
+Linux host restricted to three and four cores, not on a GitHub macOS runner.
+One branch CI run has since measured the change, and the paragraphs below
+record it. An earlier branch run, 36451319573 on `f483a129`, was cancelled by
+the coordinator about three minutes in, after a review of that commit found the
+two cache-safety defects this section's pinning and snapshot-bytes rules now
+close; every test262 job was stopped during setup, so it produced no step time.
+
+Branch run [36496566681] on `390cf60d` succeeded in all 58 jobs and is
+compared here against main run [36369711059] on `98e66719`, the same twelve
+shard totals on both hosts. Both runs were measured once. Per-shard values are
+in [*evidence/u13/ci-comparison.txt*](./evidence/u13/ci-comparison.txt),
+produced by *evidence/u13/ci-compare.py* from each run's measured job and step
+timestamps.
+
+| Host  | Measured before s | Measured after s | Derived change | Derived saving |
+| ----- | ----------------- | ---------------- | -------------- | -------------- |
+| macOS | 17,878            | 14,018           | -21.6%         | 64.3 min       |
+| Linux | 12,130            | 9,664            | -20.3%         | 41.1 min       |
+
+Those are the sums of the twelve `Run mise run test:test262 --shard N/12`
+steps, which exclude job setup and cleanup. The corresponding family job-minute
+totals fall from a measured 308.37 to 243.10 min on macOS, a derived 21.2
+percent, and from 206.42 to 165.20 min on Linux, a derived 20.0 percent. Both
+land inside the 17.8 to 26.3 percent band measured locally, and the macOS
+saving lands inside the estimated 47.9 to 83.0 min.
+
+One run per side cannot separate that from runner variance, and the per-shard
+numbers show why: individual test262 shards move between a derived -53.1 and
++12.4 percent. The families this change does not touch moved in the same pair
+of runs too, by a derived -18.9 percent (Linux host C sanitizers), -17.3 and
+-15.0 percent (the `test` families), -11.8 percent (macOS native), and +8.7,
++2.2 and +1.8 percent (Linux native and both native-support families). What
+the run establishes is that all 58 jobs succeeded and that the change is
+consistent with the local measurement in direction and rough size on both
+hosts; it does not on its own measure the saving to the precision of the local
+before-and-after, and it cannot show the absence of a regression in any
+individual job, several of which took longer than their counterpart.
+
+Native support and property native executions do go through the same shape of
+per-execution work, through `packages/testkit`'s own native workflow rather
+than through `@oseo/cli`. One measured run of
+*tests/property/m5-array-buffer.property.test.ts* starts 24 native executions
+and exactly 24 `zig env` identity probes, one per execution, alongside 24
+`zig cc` builds. At the Phase A per-execution figure that file holds a derived
+0.64 s of removable serial work against a measured 18.42 and 19.29 s of clean
+wall time, a derived 3.4 percent. The share is much smaller there than in the
+reviewed test262 runner because each of those executions compiles and links a
+whole program, while a reviewed test262 execution links against an already
+built harness object and a cached runtime archive, so the per-execution
+constant is a far larger fraction of it. Those lanes are a different function
+and were deliberately left unchanged in this unit.
+
+Reviewed paths, variants, strictness modes, specialization policies, targets,
+sanitizer flags, retry policy, verdicts, result order, budgets, and timeouts
+are unchanged, and the run reproduces the checked-in manifest shard exactly in
+every measured run above.
+
+[36369711059]: https://github.com/dahlia/oseo/actions/runs/36369711059
+[36496566681]: https://github.com/dahlia/oseo/actions/runs/36496566681
+
 ### Historical per-path test262 investigation
 
 The measurement sources, exact per-run values, and table-to-artifact map

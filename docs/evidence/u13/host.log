@@ -1,0 +1,12 @@
+# U13 measurement host
+
+Linux 7.2.7-200.fc44.x86_64 x86_64
+cpu: AMD Ryzen 7 7700X 8-Core Processor x 16 logical
+memory: 61 GiB
+node: v24.21.0
+zig: 0.16.0
+repo: 98e66719692411581785abe756d509e5f264ca00
+runtime C assets: 47 files, 3350652 bytes
+reviewed paths: 21383
+ZIG_GLOBAL_CACHE_DIR: /data/zig-cache/m5ci-test262-serial-bottleneck
+note: shared multi-lane developer host; loadavg is recorded per run

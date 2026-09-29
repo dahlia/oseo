@@ -8,7 +8,18 @@ import type {
 } from "@oseo/compiler";
 import { cRuntimeProvider } from "@oseo/runtime-c";
 
-import { runCli, runNativeCli, runNativeUnits } from "../src/index.ts";
+import { describeTarget } from "@oseo/compiler";
+import type { FileFingerprint } from "@oseo/compiler";
+
+import {
+  PreparedNativeRuntimeMismatchError,
+  prepareNativeRuntime,
+  runCli,
+  runNativeCli,
+  runNativeUnits,
+  verifyPreparedNativeRuntime,
+} from "../src/index.ts";
+import type { PreparedNativeRuntime } from "../src/index.ts";
 
 test("prints deterministic MIR and C for accepted source", () => {
   const help = runCli({ args: ["--help"], version: "0.0.0" });
@@ -1453,4 +1464,753 @@ test("links each agent unit beside the main unit", async () => {
   );
   assert.equal(moduleGoal.exitStatus, 1);
   assert.match(moduleGoal.stderr, /applies only to Scripts/u);
+});
+
+/**
+ * One recording host and toolchain pair for the prepared-runtime tests. The
+ * runtime asset text is mutable so that a test can edit the runtime after
+ * preparation, and the pinned toolchain's fingerprints are mutable so that a
+ * test can replace the compiler after preparation.
+ */
+function preparedRuntimeFixture(assetText: string, cached = false) {
+  const runtime = { text: assetText };
+  const compilerPath = "/opt/zig/zig";
+  const libraryPath = "/opt/zig/lib";
+  const fingerprints = new Map<string, FileFingerprint>([
+    [
+      compilerPath,
+      {
+        changedAtMilliseconds: 900,
+        device: 2049,
+        inode: 101,
+        modifiedAtMilliseconds: 1000,
+        realPath: "/opt/zig/zig-0.16.0",
+        size: 4096,
+      },
+    ],
+    [
+      libraryPath,
+      {
+        changedAtMilliseconds: 1900,
+        device: 2049,
+        inode: 102,
+        modifiedAtMilliseconds: 2000,
+        realPath: libraryPath,
+        size: 512,
+      },
+    ],
+  ]);
+  const reads: string[] = [];
+  const runs: string[][] = [];
+  const writes = new Map<string, string>();
+  const cacheLookups: string[] = [];
+  const plans: NativeBuildInput[] = [];
+  interface FixtureHooks {
+    identityProbes: number;
+    identityStdout?: string;
+    publications: number;
+    onAcquireLock?: () => void;
+    onBuildRequest?: () => void;
+    onIdentityProbe?: (probes: number) => void;
+  }
+  const hooks: FixtureHooks = { identityProbes: 0, publications: 0 };
+  const host: CompilerHost = {
+    cache: {
+      acquireFileLock: async () => {
+        hooks.onAcquireLock?.();
+        return { release: async () => {} };
+      },
+      getDirectory: async () => "/cache/runtime-archives",
+      hasFile: async (path) => {
+        cacheLookups.push(path);
+        return cached;
+      },
+      publishFile: async () => {
+        hooks.publications += 1;
+      },
+    },
+    captureEnvironment: async () => ({
+      variables: { PATH: "/opt/zig/bin" },
+    }),
+    executionHost: { architecture: "x86_64", operatingSystem: "linux" },
+    makeTemporaryDirectory: async () => "/work",
+    describeFile: async (path) => fingerprints.get(path),
+    readTextFile: async (path) => {
+      reads.push(String(path));
+      return runtime.text;
+    },
+    remove: async () => {},
+    run: async (request) => {
+      runs.push([request.command, ...request.args]);
+      if (request.args[0] === "cc") hooks.onBuildRequest?.();
+      if (request.args[0] !== "env") {
+        return { exitStatus: 0, stderr: "", stdout: "42\n" };
+      }
+      hooks.identityProbes += 1;
+      hooks.onIdentityProbe?.(hooks.identityProbes);
+      return {
+        exitStatus: 0,
+        stderr: "",
+        stdout: hooks.identityStdout ?? "zig_exe=/opt/zig/zig\n",
+      };
+    },
+    writeTextFile: async (path, source) => {
+      writes.set(path, source);
+    },
+  };
+  const toolchain: NativeToolchain = {
+    environment: { inherit: ["PATH"] },
+    runtimeArchiveReuse: {
+      createIdentityRequest: (workingDirectory, environment, pinnedPath) => ({
+        args: ["env"],
+        command: pinnedPath ?? "zig",
+        cwd: workingDirectory,
+        environment,
+      }),
+      pinToolchain: (identity) => ({
+        compilerPath,
+        watchedPaths: [
+          compilerPath,
+          identity.includes("relocated") ? "/opt/zig/other-lib" : libraryPath,
+        ],
+      }),
+      createKey: async (input) =>
+        [
+          input.toolchainIdentity,
+          input.target.name,
+          input.runtimeAbiVersion,
+          ...input.runtimeAssets.map(
+            (asset) => `${asset.kind}:${asset.name}:${asset.contents}`,
+          ),
+          ...Object.entries(input.toolchainEnvironment.variables).map(
+            ([name, value]) => `${name}=${value}`,
+          ),
+        ].join("|"),
+    },
+    createBuildPlan(input) {
+      plans.push(input);
+      return {
+        executablePath: "/work/program",
+        requests: [
+          {
+            args: ["cc"],
+            command: input.compilerPath ?? "zig",
+            cwd: "/work",
+          },
+        ],
+        runtimeArchivePath: "/work/liboseo-runtime.a",
+        target: input.target,
+      };
+    },
+  };
+  return {
+    cacheLookups,
+    fingerprints,
+    host,
+    plans,
+    reads,
+    runs,
+    runtime,
+    toolchain,
+    writes,
+    set onAcquireLock(hook: () => void) {
+      hooks.onAcquireLock = hook;
+    },
+    set onBuildRequest(hook: () => void) {
+      hooks.onBuildRequest = hook;
+    },
+    set onIdentityProbe(hook: (probes: number) => void) {
+      hooks.onIdentityProbe = hook;
+    },
+    set identityStdout(stdout: string) {
+      hooks.identityStdout = stdout;
+    },
+    get identityProbes() {
+      return hooks.identityProbes;
+    },
+    get publications() {
+      return hooks.publications;
+    },
+  };
+}
+
+const preparedRuntimeUnits = {
+  sources: [{ sourceName: "case.c", source: "body" }],
+  prebuiltObjectPaths: [],
+} as const;
+
+for (const cached of [false, true]) {
+  const state = cached ? "a published" : "no";
+  const name =
+    "a prepared native runtime reproduces the workflow with " +
+    `${state} archive`;
+  test(name, async () => {
+    const direct = preparedRuntimeFixture("runtime asset", cached);
+    const direct2 = preparedRuntimeFixture("runtime asset", cached);
+    const plain = await runNativeUnits(
+      preparedRuntimeUnits,
+      "original.js",
+      direct.host,
+      direct.toolchain,
+    );
+    const prepared = await prepareNativeRuntime(
+      direct2.host,
+      direct2.toolchain,
+      describeTarget("linux-x86_64-gnu"),
+    );
+    const runsAfterPreparation = direct2.runs.length;
+    const readsAfterPreparation = direct2.reads.length;
+    const reused = await runNativeUnits(
+      preparedRuntimeUnits,
+      "original.js",
+      direct2.host,
+      direct2.toolchain,
+      "enabled",
+      prepared,
+    );
+    assert.deepEqual(reused, plain);
+    assert.deepEqual(direct2.cacheLookups, direct.cacheLookups);
+    assert.deepEqual(
+      [...direct2.writes].toSorted(),
+      [...direct.writes].toSorted(),
+    );
+    // The build plans agree except that the prepared one invokes the pinned
+    // executable instead of letting the host resolve a search-path name.
+    const { compilerPath, ...reusedPlan } = direct2.plans[0] ?? {};
+    assert.deepEqual(reusedPlan, direct.plans[0]);
+    assert.equal(compilerPath, prepared.compilerPath);
+    assert.equal(prepared.compilerPath, "/opt/zig/zig-0.16.0");
+    assert.deepEqual(
+      prepared.pinnedFiles.map((entry) => entry.path),
+      ["/opt/zig/zig", "/opt/zig/lib"],
+    );
+    assert.equal(
+      prepared.archiveKey,
+      direct.cacheLookups[0]
+        ?.replace("/cache/runtime-archives/liboseo-runtime-", "")
+        .replace(/\.a$/u, ""),
+    );
+    // The reused execution reads no runtime asset and starts no identity probe.
+    assert.equal(direct2.reads.length, readsAfterPreparation);
+    assert.deepEqual(direct2.runs.slice(runsAfterPreparation), [
+      ["/opt/zig/zig-0.16.0", "cc"],
+      ["/work/program"],
+    ]);
+    assert.ok(direct.runs.some((request) => request[1] === "env"));
+    // Preparing reads exactly the assets one per-execution workflow reads.
+    assert.equal(readsAfterPreparation, direct.reads.length);
+    assert.equal(prepared.assetDigest.length, 64);
+  });
+}
+
+test("a prepared native runtime is refused for different inputs", async () => {
+  const origin = preparedRuntimeFixture("runtime asset");
+  const target = describeTarget("linux-x86_64-gnu");
+  const prepared = await prepareNativeRuntime(
+    origin.host,
+    origin.toolchain,
+    target,
+  );
+  const refused = async (
+    value: PreparedNativeRuntime,
+    fixture: ReturnType<typeof preparedRuntimeFixture>,
+    subject: string,
+  ) => {
+    let mismatch: PreparedNativeRuntimeMismatchError | undefined;
+    try {
+      await runNativeUnits(
+        preparedRuntimeUnits,
+        "original.js",
+        fixture.host,
+        fixture.toolchain,
+        "enabled",
+        value,
+      );
+    } catch (error) {
+      if (!(error instanceof PreparedNativeRuntimeMismatchError)) throw error;
+      mismatch = error;
+    }
+    if (mismatch == null) {
+      throw new Error(`The ${subject} mismatch was accepted.`);
+    }
+    assert.match(mismatch.message, new RegExp(subject, "u"));
+    assert.equal(fixture.plans.length, 0);
+  };
+  // A host that reads different runtime bytes is a different host.
+  const otherContent = preparedRuntimeFixture("other runtime asset");
+  await refused(prepared, otherContent, "compiler host");
+  // A toolchain with different flags is a different toolchain.
+  const otherToolchain = preparedRuntimeFixture("runtime asset");
+  await refused(
+    { ...prepared, host: otherToolchain.host },
+    otherToolchain,
+    "native toolchain",
+  );
+  // A different native target.
+  const sameHost = preparedRuntimeFixture("runtime asset");
+  const crossTarget = await prepareNativeRuntime(
+    sameHost.host,
+    sameHost.toolchain,
+    describeTarget("linux-aarch64-musl"),
+  );
+  await refused(crossTarget, sameHost, "native target");
+  // A different captured environment snapshot.
+  const otherEnvironment = preparedRuntimeFixture("runtime asset");
+  await refused(
+    {
+      ...crossTarget,
+      target,
+      toolchainEnvironment: { variables: { PATH: "/usr/bin" } },
+      host: otherEnvironment.host,
+      toolchain: otherEnvironment.toolchain,
+    },
+    otherEnvironment,
+    "toolchain environment",
+  );
+  // The same target name with different sanitizers derives a different key.
+  const otherSanitizers = preparedRuntimeFixture("runtime asset");
+  await refused(
+    {
+      ...prepared,
+      host: otherSanitizers.host,
+      toolchain: otherSanitizers.toolchain,
+      target: { ...target, sanitizers: [...target.sanitizers, "address"] },
+    },
+    otherSanitizers,
+    "native target",
+  );
+  // Emptying the caller's sanitizer array after preparation cannot make a
+  // prepared runtime derived from an unsanitized target look canonical.
+  const mutated = preparedRuntimeFixture("runtime asset");
+  const mutableSanitizers = [...target.sanitizers];
+  const fromMutable = await prepareNativeRuntime(
+    mutated.host,
+    mutated.toolchain,
+    { ...target, sanitizers: mutableSanitizers },
+  );
+  mutableSanitizers.length = 0;
+  assert.deepEqual(fromMutable.target.sanitizers, target.sanitizers);
+  await refused(
+    {
+      archiveKey: fromMutable.archiveKey,
+      assetDigest: fromMutable.assetDigest,
+      assets: fromMutable.assets,
+      compilerPath: fromMutable.compilerPath,
+      host: mutated.host,
+      pinnedFiles: fromMutable.pinnedFiles,
+      runtimeAbiVersion: fromMutable.runtimeAbiVersion,
+      target: { ...target, sanitizers: mutableSanitizers },
+      toolchain: mutated.toolchain,
+      toolchainEnvironment: fromMutable.toolchainEnvironment,
+      toolchainIdentity: fromMutable.toolchainIdentity,
+    },
+    mutated,
+    "native target",
+  );
+  // A recorded asset location that no longer matches the provider's.
+  const otherLocation = preparedRuntimeFixture("runtime asset");
+  await refused(
+    {
+      ...prepared,
+      host: otherLocation.host,
+      toolchain: otherLocation.toolchain,
+      assets: prepared.assets.map((asset, index) =>
+        index === 0
+          ? {
+              contents: asset.contents,
+              kind: asset.kind,
+              location: "file:///elsewhere.c",
+              name: asset.name,
+            }
+          : asset,
+      ),
+    },
+    otherLocation,
+    "runtime asset set",
+  );
+  // The ABI version is read once, before any await, so a provider that
+  // changes it while preparation is pending cannot make the returned record
+  // describe a different runtime from the one the key was derived from.
+  const shifting = preparedRuntimeFixture("runtime asset");
+  let abiReads = 0;
+  const shiftingPrepared = await prepareNativeRuntime(
+    shifting.host,
+    shifting.toolchain,
+    target,
+    {
+      getRuntimeInput: () => ({
+        get abiVersion() {
+          abiReads += 1;
+          return abiReads === 1
+            ? "not-the-reviewed-abi"
+            : cRuntimeProvider.getRuntimeInput().abiVersion;
+        },
+        assets: cRuntimeProvider.getRuntimeInput().assets,
+      }),
+    },
+  );
+  assert.equal(abiReads, 1);
+  assert.equal(shiftingPrepared.runtimeAbiVersion, "not-the-reviewed-abi");
+  await refused(shiftingPrepared, shifting, "runtime ABI version");
+  // A different runtime provider: a different ABI version and asset set.
+  const otherRuntime = preparedRuntimeFixture("runtime asset");
+  const foreign = await prepareNativeRuntime(
+    otherRuntime.host,
+    otherRuntime.toolchain,
+    target,
+    {
+      getRuntimeInput: () => ({
+        abiVersion: "not-the-reviewed-abi",
+        assets: [
+          {
+            kind: "source",
+            name: "foreign.c",
+            url: new URL("file:///foreign.c"),
+          },
+        ],
+      }),
+    },
+  );
+  await refused(foreign, otherRuntime, "runtime ABI version");
+});
+
+test("a prepared native runtime builds from its snapshot bytes", async () => {
+  const fixture = preparedRuntimeFixture("original runtime");
+  const target = describeTarget("linux-x86_64-gnu");
+  const prepared = await prepareNativeRuntime(
+    fixture.host,
+    fixture.toolchain,
+    target,
+  );
+  // The runtime changes on disk after preparation, without changing any
+  // asset's name, kind, location, or the ABI version.
+  fixture.runtime.text = "edited runtime";
+  const readsAfterPreparation = fixture.reads.length;
+  const result = await runNativeUnits(
+    preparedRuntimeUnits,
+    "original.js",
+    fixture.host,
+    fixture.toolchain,
+    "enabled",
+    prepared,
+  );
+  assert.equal(result.exitStatus, 0);
+  // Nothing was reread, every staged runtime file carries the snapshot
+  // bytes, and the archive the build publishes to is the snapshot's key.
+  assert.equal(fixture.reads.length, readsAfterPreparation);
+  const staged = [...fixture.writes].filter(
+    ([path]) => path !== "/work/case.c",
+  );
+  assert.ok(staged.length > 0);
+  for (const [, contents] of staged) {
+    assert.equal(contents, "original runtime");
+  }
+  assert.deepEqual(fixture.cacheLookups, [
+    `/cache/runtime-archives/liboseo-runtime-${prepared.archiveKey}.a`,
+  ]);
+  // Preparing again observes the edit and derives a different key.
+  const second = await prepareNativeRuntime(
+    fixture.host,
+    fixture.toolchain,
+    target,
+  );
+  assert.notEqual(second.archiveKey, prepared.archiveKey);
+  assert.notEqual(second.assetDigest, prepared.assetDigest);
+  assert.ok(second.archiveKey.includes("edited runtime"));
+  assert.ok(prepared.archiveKey.includes("original runtime"));
+});
+
+for (const swap of ["replaced", "relinked", "removed"] as const) {
+  const title = `a prepared native runtime refuses a ${swap} compiler`;
+  test(title, async () => {
+    const fixture = preparedRuntimeFixture("runtime asset");
+    const prepared = await prepareNativeRuntime(
+      fixture.host,
+      fixture.toolchain,
+      describeTarget("linux-x86_64-gnu"),
+    );
+    const before = fixture.fingerprints.get("/opt/zig/zig");
+    assert.ok(before != null);
+    if (swap === "removed") {
+      fixture.fingerprints.delete("/opt/zig/zig");
+    } else if (swap === "replaced") {
+      // The same path, rewritten in place: a new size and time.
+      fixture.fingerprints.set("/opt/zig/zig", {
+        device: before.device,
+        inode: before.inode,
+        modifiedAtMilliseconds: before.modifiedAtMilliseconds + 1,
+        realPath: before.realPath,
+        size: before.size + 1,
+      });
+    } else {
+      // The same path, now resolving to a different file.
+      fixture.fingerprints.set("/opt/zig/zig", {
+        device: before.device,
+        inode: before.inode + 1,
+        modifiedAtMilliseconds: before.modifiedAtMilliseconds,
+        realPath: "/opt/zig/zig-0.17.0",
+        size: before.size,
+      });
+    }
+    let mismatch: PreparedNativeRuntimeMismatchError | undefined;
+    try {
+      await runNativeUnits(
+        preparedRuntimeUnits,
+        "original.js",
+        fixture.host,
+        fixture.toolchain,
+        "enabled",
+        prepared,
+      );
+    } catch (error) {
+      if (!(error instanceof PreparedNativeRuntimeMismatchError)) throw error;
+      mismatch = error;
+    }
+    if (mismatch == null) throw new Error(`A ${swap} compiler was accepted.`);
+    assert.match(mismatch.message, /pinned native toolchain/u);
+    assert.equal(fixture.plans.length, 0);
+    // Restoring the pinned file makes the same prepared runtime usable again.
+    fixture.fingerprints.set("/opt/zig/zig", before);
+    const result = await runNativeUnits(
+      preparedRuntimeUnits,
+      "original.js",
+      fixture.host,
+      fixture.toolchain,
+      "enabled",
+      prepared,
+    );
+    assert.equal(result.exitStatus, 0);
+    assert.equal(fixture.plans.length, 1);
+  });
+}
+
+for (const moment of ["lock", "publish", "cached", "disabled"] as const) {
+  const swapTitle =
+    "a prepared native runtime refuses a compiler swapped at " + moment;
+  test(swapTitle, async () => {
+    // "cached" consumes an existing archive and "disabled" turns archive
+    // reuse off, so neither reaches the publication branch; the build still
+    // has to have run under the pinned compiler.
+    const fixture = preparedRuntimeFixture(
+      "runtime asset",
+      moment === "cached",
+    );
+    const prepared = await prepareNativeRuntime(
+      fixture.host,
+      fixture.toolchain,
+      describeTarget("linux-x86_64-gnu"),
+    );
+    const original = fixture.fingerprints.get("/opt/zig/zig");
+    assert.ok(original != null);
+    const swap = () => {
+      fixture.fingerprints.set("/opt/zig/zig", {
+        device: original.device,
+        inode: original.inode,
+        modifiedAtMilliseconds: original.modifiedAtMilliseconds + 1,
+        realPath: original.realPath,
+        size: original.size + 1,
+      });
+    };
+    // The swap lands while the cache lock is being acquired, or after the
+    // build has run and before its archive would be published.
+    if (moment === "lock") fixture.onAcquireLock = swap;
+    else fixture.onBuildRequest = swap;
+    let mismatch: PreparedNativeRuntimeMismatchError | undefined;
+    try {
+      await runNativeUnits(
+        preparedRuntimeUnits,
+        "original.js",
+        fixture.host,
+        fixture.toolchain,
+        moment === "disabled" ? "disabled" : "enabled",
+        prepared,
+      );
+    } catch (error) {
+      if (!(error instanceof PreparedNativeRuntimeMismatchError)) throw error;
+      mismatch = error;
+    }
+    if (mismatch == null) {
+      throw new Error(`A compiler swapped at ${moment} was accepted.`);
+    }
+    assert.match(mismatch.message, /pinned native toolchain/u);
+    assert.equal(fixture.publications, 0);
+    if (moment === "lock") assert.equal(fixture.plans.length, 0);
+  });
+}
+
+const pinMoveTitle = "preparing refuses a toolchain that moves while pinned";
+test(pinMoveTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  const original = fixture.fingerprints.get("/opt/zig/zig");
+  assert.ok(original != null);
+  // Preparation fingerprints the pinned paths, confirms the identity through
+  // the resolved executable, and fingerprints again. A replacement inside
+  // that confirming probe is the window a single probe would leave open: the
+  // recorded identity would then describe a file the fingerprint does not.
+  fixture.onIdentityProbe = (probes) => {
+    if (probes !== 2) return;
+    fixture.fingerprints.set("/opt/zig/zig", {
+      device: original.device,
+      inode: original.inode,
+      modifiedAtMilliseconds: original.modifiedAtMilliseconds + 1,
+      realPath: original.realPath,
+      size: original.size + 1,
+    });
+  };
+  await assert.rejects(
+    async () =>
+      await prepareNativeRuntime(
+        fixture.host,
+        fixture.toolchain,
+        describeTarget("linux-x86_64-gnu"),
+      ),
+    /changed while it was being pinned/u,
+  );
+  // The confirming probe runs through the resolved executable, not the name
+  // the search path would resolve again.
+  assert.deepEqual(
+    fixture.runs.filter((request) => request[1] === "env"),
+    [
+      ["zig", "env"],
+      ["/opt/zig/zig-0.16.0", "env"],
+    ],
+  );
+});
+
+const relocatedTitle =
+  "preparing refuses a confirming probe that watches other paths";
+test(relocatedTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  // The confirming probe names the same executable but a different library
+  // directory. Keeping the first probe's fingerprints would leave the
+  // recorded key describing a directory nothing ever rechecks.
+  fixture.onIdentityProbe = (probes) => {
+    if (probes === 2) fixture.identityStdout = "zig_exe=/opt/zig/zig relocated";
+  };
+  await assert.rejects(
+    async () =>
+      await prepareNativeRuntime(
+        fixture.host,
+        fixture.toolchain,
+        describeTarget("linux-x86_64-gnu"),
+      ),
+    /changed while it was being pinned/u,
+  );
+});
+
+const inPlaceTitle =
+  "a prepared native runtime refuses a rewrite that keeps size and time";
+test(inPlaceTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  const prepared = await prepareNativeRuntime(
+    fixture.host,
+    fixture.toolchain,
+    describeTarget("linux-x86_64-gnu"),
+  );
+  const before = fixture.fingerprints.get("/opt/zig/zig");
+  assert.ok(before != null);
+  // Only the inode change time moves, which is what an in-place rewrite that
+  // restores the size and the modification time leaves behind.
+  fixture.fingerprints.set("/opt/zig/zig", {
+    changedAtMilliseconds: (before.changedAtMilliseconds ?? 0) + 1,
+    device: before.device,
+    inode: before.inode,
+    modifiedAtMilliseconds: before.modifiedAtMilliseconds,
+    realPath: before.realPath,
+    size: before.size,
+  });
+  let mismatch: PreparedNativeRuntimeMismatchError | undefined;
+  try {
+    await runNativeUnits(
+      preparedRuntimeUnits,
+      "original.js",
+      fixture.host,
+      fixture.toolchain,
+      "enabled",
+      prepared,
+    );
+  } catch (error) {
+    if (!(error instanceof PreparedNativeRuntimeMismatchError)) throw error;
+    mismatch = error;
+  }
+  if (mismatch == null) throw new Error("An in-place rewrite was accepted.");
+  assert.match(mismatch.message, /pinned native toolchain/u);
+  assert.equal(fixture.plans.length, 0);
+});
+
+const noChangeTimeTitle =
+  "preparing refuses a host that reports no inode change time";
+test(noChangeTimeTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  for (const [path, fingerprint] of fixture.fingerprints) {
+    const { changedAtMilliseconds: _dropped, ...rest } = fingerprint;
+    fixture.fingerprints.set(path, rest);
+  }
+  await assert.rejects(
+    async () =>
+      await prepareNativeRuntime(
+        fixture.host,
+        fixture.toolchain,
+        describeTarget("linux-x86_64-gnu"),
+      ),
+    /does not report inode change times/u,
+  );
+});
+
+/**
+ * A host that reaches its own state through `this` inside `describeFile`,
+ * which the `CompilerHost` contract permits. Every fingerprint read, in
+ * preparation and in each later recheck, has to keep that receiver.
+ */
+interface SelfReadingHost extends CompilerHost {
+  readonly table: ReadonlyMap<string, FileFingerprint>;
+}
+
+const receiverTitle =
+  "a prepared native runtime keeps the host receiver while rechecking";
+test(receiverTitle, async () => {
+  const fixture = preparedRuntimeFixture("runtime asset");
+  const host: SelfReadingHost = {
+    ...fixture.host,
+    table: fixture.fingerprints,
+    describeFile(path: string): Promise<FileFingerprint | undefined> {
+      return Promise.resolve(this.table.get(path));
+    },
+  };
+  // A call that drops the receiver must not report a file, so the recheck
+  // paths below prove they kept it rather than that the host ignores `this`.
+  const unbound: CompilerHost["describeFile"] = host.describeFile;
+  await assert.rejects(async () => await unbound?.("/opt/zig/zig"), TypeError);
+  const prepared = await prepareNativeRuntime(
+    host,
+    fixture.toolchain,
+    describeTarget("linux-x86_64-gnu"),
+  );
+  assert.deepEqual(
+    prepared.pinnedFiles.map((entry) => entry.path),
+    ["/opt/zig/zig", "/opt/zig/lib"],
+  );
+  // The composer entry point rechecks once, and each native execution
+  // rechecks again, so all three paths call describeFile on the host.
+  await verifyPreparedNativeRuntime(prepared);
+  const first = await runNativeUnits(
+    preparedRuntimeUnits,
+    "original.js",
+    host,
+    fixture.toolchain,
+    "enabled",
+    prepared,
+  );
+  const second = await runNativeUnits(
+    preparedRuntimeUnits,
+    "original.js",
+    host,
+    fixture.toolchain,
+    "enabled",
+    prepared,
+  );
+  assert.equal(first.exitStatus, 0);
+  assert.deepEqual(second, first);
+  assert.equal(first.stdout, "42\n");
+  assert.equal(fixture.plans.length, 2);
 });

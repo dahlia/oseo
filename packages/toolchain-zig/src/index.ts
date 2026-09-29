@@ -107,6 +107,54 @@ function request(
   };
 }
 
+/**
+ * Read one string field out of `zig env` output. The report is ZON, whose
+ * string values use the same escapes as JSON for the characters a path can
+ * contain, so an escaped value is parsed rather than taken literally.
+ */
+function zigEnvironmentField(
+  identity: string,
+  name: string,
+): string | undefined {
+  const match = new RegExp(`\\.${name} = ("(?:[^"\\\\]|\\\\.)*")`, "u").exec(
+    identity,
+  );
+  const token = match?.[1];
+  if (token == null) return undefined;
+  // Zig writes a path's bytes, so a non-ASCII path arrives as one hex escape
+  // per UTF-8 byte. The escapes are decoded into bytes first and the whole
+  // sequence is decoded once, which a per-escape character conversion would
+  // corrupt.
+  const bytes: number[] = [];
+  const body = token.slice(1, -1);
+  const encoder = new TextEncoder();
+  for (let index = 0; index < body.length; index += 1) {
+    if (body[index] !== "\\") {
+      bytes.push(...encoder.encode(body[index]));
+      continue;
+    }
+    const escape = body[index + 1];
+    index += 1;
+    if (escape === "x") {
+      bytes.push(Number.parseInt(body.slice(index + 1, index + 3), 16));
+      index += 2;
+    } else if (escape === "u") {
+      const close = body.indexOf("}", index);
+      if (close < 0) return undefined;
+      const point = Number.parseInt(body.slice(index + 2, close), 16);
+      bytes.push(...encoder.encode(String.fromCodePoint(point)));
+      index = close;
+    } else if (escape === "n") bytes.push(0x0a);
+    else if (escape === "r") bytes.push(0x0d);
+    else if (escape === "t") bytes.push(0x09);
+    else if (escape != null) bytes.push(...encoder.encode(escape));
+  }
+  const value = new TextDecoder("utf-8", { fatal: false }).decode(
+    Uint8Array.from(bytes),
+  );
+  return value === "" ? undefined : value;
+}
+
 function sanitizerFlags(target: TargetDescription): readonly string[] {
   return target.sanitizers.length === 0
     ? []
@@ -295,13 +343,16 @@ export const zigToolchain: NativeToolchain = {
     const runtimeCommon = runtimeCompileFlags(input.target, ".");
     const linkCommon = commonFlags(input.target, input.runtimeDirectory);
     const runtimePaths = runtimePathFlags();
+    // A composer that pinned this toolchain supplies the absolute path the
+    // recorded identity describes; otherwise the host resolves "zig".
+    const compiler = input.compilerPath ?? "zig";
     return {
       executablePath,
       requests: [
         ...runtimeSources.map((source) =>
           request(
             input.runtimeDirectory,
-            "zig",
+            compiler,
             [
               "cc",
               ...runtimeCommon,
@@ -319,7 +370,7 @@ export const zigToolchain: NativeToolchain = {
           : [
               request(
                 input.workingDirectory,
-                "zig",
+                compiler,
                 [
                   "ar",
                   "rcs",
@@ -331,7 +382,7 @@ export const zigToolchain: NativeToolchain = {
             ]),
         request(
           input.workingDirectory,
-          "zig",
+          compiler,
           [
             "cc",
             ...linkCommon,
@@ -390,7 +441,7 @@ export const zigToolchain: NativeToolchain = {
     createBuildRequest(input) {
       return request(
         input.workingDirectory,
-        "zig",
+        input.compilerPath ?? "zig",
         [
           "cc",
           ...harnessFlags(input.target),
@@ -406,8 +457,25 @@ export const zigToolchain: NativeToolchain = {
   },
   runtimeArchiveReuse: {
     createKey: createRuntimeArchiveKey,
-    createIdentityRequest(workingDirectory, environment) {
-      return request(workingDirectory, "zig", ["env"], environment);
+    createIdentityRequest(workingDirectory, environment, compilerPath) {
+      return request(
+        workingDirectory,
+        compilerPath ?? "zig",
+        ["env"],
+        environment,
+      );
+    },
+    pinToolchain(identity: string) {
+      const compilerPath = zigEnvironmentField(identity, "zig_exe");
+      if (compilerPath == null) return undefined;
+      const libraryDirectory = zigEnvironmentField(identity, "lib_dir");
+      return {
+        compilerPath,
+        watchedPaths:
+          libraryDirectory == null
+            ? [compilerPath]
+            : [compilerPath, libraryDirectory],
+      };
     },
   },
 };

@@ -962,6 +962,63 @@ compiler, not a new cache. The measurements are in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and their sources
 in [*docs/evidence/u5/*](./docs/evidence/u5/README.md).
 
+Reviewed runner per-execution cost, U13. This is the same family again, and
+it is now measured rather than estimated. U13 Phase A found that the reviewed
+test262 runner's throughput is bounded by its own single process rather than by
+the pool: the measured Node process CPU stays at 42.0 to 52.8 s across pool 1
+to 16 and 3 to 16 CPUs while wall time falls from 122.9 to 45.9 s for the same
+214-path shard. Frontend, lowering, and C emission are a measured 6.4 percent
+of that main-thread budget. The cost is per-execution work that never produces
+a different answer: rereading and rehashing the 3,350,652-byte C runtime into a
+runtime-archive key, and starting one `zig env` process to identify the
+toolchain, for each of the shard's 730 native executions. Phase B derives both
+once per runner process through an explicit prepared value that is rejected
+when the execution's host, toolchain, target, runtime provider, or environment
+snapshot differs, and which pins the compiler the recorded identity describes
+so that a replaced or repointed executable cannot build under the previous
+one's key. The measured before-and-after on the same shard, with the two arms
+alternating by batch inside one session, is a 22.3 percent warm and 17.8
+percent cold reduction with three cores, and 26.3 and 20.5 percent with four,
+at 12.1 to 16.0 percent less tree CPU; all twelve position-paired comparisons
+are reductions. Applying that 17.8 to 26.3 percent band to the measured macOS
+execution-step sums estimates a derived 47.9 to 83.0 min per run at 21,383
+paths and 92.1 to 159.5 min at 41,091. The 41,091-path figure is the one to
+set against the derived gaps of +215.99 and +458.12 min, which are themselves
+stated at 41,091 paths: it is a derived 43 to 74 percent of the smallest and 20
+to 35 percent of the largest, so U13 narrows the gap materially without
+closing it. That comparison applies the measured
+fraction to a projection of the measured macOS execution-step sums rather than
+to each scenario's own job-by-job decomposition, which this plan does not
+carry at 41,091 paths. That band is measured on a Linux host restricted to
+three and four cores. Branch CI run 36496566681 on `390cf60d` has since
+measured the change against main run 36369711059. The twelve test262
+execution steps sum to a measured 17,878 s before and 14,018 s after on macOS,
+a derived 21.6 percent, and 12,130 s before and 9,664 s after on Linux, a
+derived 20.3 percent, which is a derived 64.3 and 41.1 min. The whole-job
+totals of the same family fall from a measured 308.37 to 243.10 min on macOS
+and 206.42 to 165.20 min on Linux, a derived 21.2 and 20.0 percent. Both step
+figures land inside the local band. One run per side cannot separate that from
+runner variance: individual shards moved between a derived -53.1 and +12.4
+percent, and families this change does not touch moved by up to a derived 18.9
+percent in the same pair of runs. All 58 jobs of the branch run succeeded. U13
+recovers runner minutes without touching reviewed paths, variants, targets,
+sanitizer flags, budgets, or verdicts. Its measurements and their sources are
+in [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) and
+[U13 evidence](./docs/evidence/u13/README.md).
+
+One limitation surfaced while reviewing U13 and is recorded here rather than
+fixed by it, because it predates the unit and belongs to the runtime-archive
+key. The key an adapter derives hashes the toolchain's identity output, which
+for Zig is `zig env`: a version string and a set of paths. It does not hash
+the contents of the library tree that identity points at. An in-place edit to
+a file beneath that directory, a rewritten header or a replaced nested file,
+therefore changes what a build compiles against without changing the key, on
+the per-execution path and the prepared path alike. U13's pinned toolchain
+matches that guarantee and adds an executable fingerprint on top of it; it
+does not close the gap. Closing it means hashing the library tree, or
+recording a stronger toolchain identity, and belongs to whichever unit owns
+the archive key rather than to this one.
+
 Shard sizing, U6. Raising the test262 or native support shard total leaves the
 executed work unchanged, so it recovers no runner minutes and adds a derived
 1 min or so of fixed cost for each added macOS job. Its effect is on the tail

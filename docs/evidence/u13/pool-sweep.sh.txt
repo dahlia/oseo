@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# U13 Phase A pool sweep. Runs one reviewed test262 shard at several pool
+# limits with the phase instrumentation loaded, and records tree CPU, wall
+# time, and host load for every run. Requires the phase-instrumentation patch.
+#
+#   RECORDER=<path> OUT=<dir> SHARD=1/100 REPS=2 POOLS="1 3 8 16" \
+#     ./pool-sweep.sh
+#
+# RECORDER is phase-recorder.mjs.txt copied to a path ending in .mjs.
+#
+# CPUS restricts the whole process tree to a CPU list, which models a small
+# CI runner: the compiler subprocesses are restricted too. With CPUS set,
+# use POOLS=default so availableParallelism() chooses the pool.
+# XDG_CACHE_HOME selects the Oseo object and archive cache to measure a cold
+# or a warm run; the Zig global cache stays on the lane directory.
+set -euo pipefail
+
+OUT=${OUT:?set OUT to an output directory}
+RECORDER=${RECORDER:?set RECORDER to the copied phase-recorder .mjs path}
+SHARD=${SHARD:-1/100}
+REPS=${REPS:-2}
+POOLS=${POOLS:-"1 3 8 16"}
+: "${ZIG_GLOBAL_CACHE_DIR:?set ZIG_GLOBAL_CACHE_DIR to the lane cache}"
+
+mkdir -p "$OUT"
+for rep in $(seq 1 "$REPS"); do
+  for pool in $POOLS; do
+    label="p${pool}-r${rep}"
+    echo "== $label $(date -Is) load=$(cut -d' ' -f1-3 /proc/loadavg)"
+    prefix=()
+    if [ -n "${CPUS:-}" ]; then prefix=(taskset -c "$CPUS"); fi
+    poolEnv=()
+    if [ "$pool" != default ]; then poolEnv=(OSEO_U13_POOL="$pool"); fi
+    env OSEO_U13_LABEL="$label" "${poolEnv[@]}" \
+      OSEO_U13_OUT="$OUT/phases.jsonl" \
+      "${prefix[@]}" \
+      /usr/bin/time -v -o "$OUT/time-$label.txt" \
+      node --import "$RECORDER" \
+        tools/test262.ts --shard "$SHARD" > "$OUT/run-$label.log" 2>&1
+    cut -d' ' -f1-3 /proc/loadavg > "$OUT/load-$label.txt"
+    grep -E "duration=" "$OUT/run-$label.log" || true
+  done
+done

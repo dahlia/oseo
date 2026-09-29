@@ -1,0 +1,33 @@
+total sampled 43.34 s
+   15.26 s   35.2%  spawn @ node:internal/child_process:356
+    7.54 s   17.4%  createRuntimeArchiveKey @ packages/toolchain-zig/src/index.ts:210
+    2.19 s    5.1%  encode @ node:internal/encoding:355
+    1.79 s    4.1%  (garbage collector) @ :0
+    1.76 s    4.1%  (idle) @ :0
+    1.65 s    3.8%  encodeUtf8String @ :0
+    1.16 s    2.7%  next @ node_modules/yaml/dist/parse/parser.js:176
+    0.67 s    1.6%  createHarnessObjectKey @ packages/compiler/dist/native-fragments.js:58
+    0.50 s    1.1%  (anonymous) @ node:internal/crypto/hash:232
+    0.47 s    1.1%  (program) @ :0
+    0.32 s    0.7%  parseDocument @ node_modules/yaml/dist/parse/lexer.js:319
+    0.31 s    0.7%  toString @ node:buffer:918
+    0.31 s    0.7%  foldLines @ node_modules/yaml/dist/compose/resolve-flow-scalar.js:76
+    0.28 s    0.7%  (anonymous) @ :0
+    0.25 s    0.6%  parse @ node_modules/yaml/dist/parse/parser.js:165
+    0.25 s    0.6%  parseNext @ node_modules/yaml/dist/parse/lexer.js:225
+    0.24 s    0.6%  write @ node:string_decoder:76
+    0.24 s    0.6%  step @ node_modules/yaml/dist/parse/parser.js:240
+    0.21 s    0.5%  emitFunction @ packages/backend-c/src/index.ts:4151
+    0.20 s    0.5%  lex @ node_modules/yaml/dist/parse/lexer.js:152
+    0.20 s    0.5%  emitOperation @ packages/backend-c/src/index.ts:2790
+    0.19 s    0.4%  emitBlocks @ packages/backend-c/src/index.ts:4010
+    0.17 s    0.4%  NodeBase @ node_modules/yaml/dist/nodes/Node.js:8
+    0.15 s    0.4%  createSourceIndex @ packages/parser-babel/dist/locations.js:8
+    0.14 s    0.3%  parsePlainScalar @ node_modules/yaml/dist/parse/lexer.js:572
+    0.14 s    0.3%  normalizeSpawnArguments @ node:child_process:584
+    0.14 s    0.3%  maximumValueId @ packages/backend-c/src/index.ts:3365
+    0.13 s    0.3%  composeNode @ node_modules/yaml/dist/compose/compose-node.js:11
+    0.13 s    0.3%  lowerExpression @ packages/compiler/dist/mir-build.js:2368
+    0.13 s    0.3%  composeScalar @ node_modules/yaml/dist/compose/compose-scalar.js:8
+    0.12 s    0.3%  createUnsafeBuffer @ node:internal/buffer:1106
+    0.12 s    0.3%  resolveBlockMap @ node_modules/yaml/dist/compose/resolve-block-map.js:11

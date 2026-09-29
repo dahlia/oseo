@@ -1,5 +1,6 @@
 import type {
   CompilerHost,
+  HarnessObjectBuildInput,
   HarnessObjectKeyInput,
   NativeToolchain,
 } from "./native.ts";
@@ -12,6 +13,18 @@ export interface PreparedHarnessObject {
 }
 
 /**
+ * A composer's pinned compiler for one harness object build. `verify` is
+ * awaited after the key lock is acquired, before the compiler runs, and
+ * before the object is published, so a compiler that moves during the lock
+ * wait or the build cannot publish an object under this key. It raises to
+ * stop the build.
+ */
+export interface HarnessObjectPin {
+  readonly compilerPath: string;
+  verify(): Promise<void>;
+}
+
+/**
  * Build a normalized harness object once under the host's exclusive key lock.
  * Without persistent storage the caller owns the returned temporary directory.
  */
@@ -19,6 +32,7 @@ export async function prepareHarnessObject(
   host: CompilerHost,
   toolchain: NativeToolchain,
   input: HarnessObjectKeyInput,
+  pin?: HarnessObjectPin,
 ): Promise<PreparedHarnessObject> {
   const reuse = toolchain.harnessObjectReuse;
   if (reuse == null) throw new Error("Toolchain lacks harness object support.");
@@ -33,6 +47,7 @@ export async function prepareHarnessObject(
       : await cache!.acquireFileLock(`${objectPath}.lock`);
   let work: string | undefined;
   try {
+    await pin?.verify();
     if (objectPath != null && (await cache!.hasFile(objectPath))) {
       return { key, objectPath, cacheHit: true };
     }
@@ -47,16 +62,27 @@ export async function prepareHarnessObject(
       }),
     );
     await host.writeTextFile(`${work}/harness.c`, input.generatedSource);
-    const observed = await host.run(
-      reuse.createBuildRequest({
-        workingDirectory: work,
-        target: input.target,
-        environment: input.toolchainEnvironment,
-      }),
-    );
+    const buildInput: HarnessObjectBuildInput =
+      pin == null
+        ? {
+            workingDirectory: work,
+            target: input.target,
+            environment: input.toolchainEnvironment,
+          }
+        : {
+            compilerPath: pin.compilerPath,
+            workingDirectory: work,
+            target: input.target,
+            environment: input.toolchainEnvironment,
+          };
+    await pin?.verify();
+    const observed = await host.run(reuse.createBuildRequest(buildInput));
     if (observed.exitStatus !== 0) {
       throw new Error(`Harness object build failed: ${observed.stderr}`);
     }
+    // The object is keyed by the pinned compiler whether it is published or
+    // handed back directly, so it is verified before either.
+    await pin?.verify();
     const built = `${work}/harness.o`;
     if (objectPath == null) {
       work = undefined;

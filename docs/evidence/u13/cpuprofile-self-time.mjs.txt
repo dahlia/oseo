@@ -1,0 +1,24 @@
+// Sum self time per function from a V8 .cpuprofile and print the heaviest
+// entries. Self time is attributed from consecutive sample deltas.
+import { readFileSync } from "node:fs";
+import process from "node:process";
+
+const profile = JSON.parse(readFileSync(process.argv[2], "utf8"));
+const byId = new Map(profile.nodes.map((node) => [node.id, node]));
+const self = new Map();
+let total = 0;
+for (let index = 0; index < profile.samples.length; index += 1) {
+  const delta = profile.timeDeltas[index] ?? 0;
+  if (delta <= 0) continue;
+  const node = byId.get(profile.samples[index]);
+  if (node == null) continue;
+  const frame = node.callFrame;
+  const file = (frame.url ?? "").replace(/^.*\/(packages|tools|node_modules)\//u, "$1/");
+  const name = `${frame.functionName || "(anonymous)"} @ ${file}:${frame.lineNumber + 1}`;
+  self.set(name, (self.get(name) ?? 0) + delta);
+  total += delta;
+}
+console.log(`total sampled ${(total / 1e6).toFixed(2)} s`);
+for (const [name, micros] of [...self].sort((a, b) => b[1] - a[1]).slice(0, Number(process.argv[3] ?? 25))) {
+  console.log(`${(micros / 1e6).toFixed(2).padStart(8)} s  ${((micros / total) * 100).toFixed(1).padStart(5)}%  ${name}`);
+}
