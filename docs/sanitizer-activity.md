@@ -331,8 +331,10 @@ The [GitHub runner specification] lists `macos-15` as arm64 with three M1 CPUs
 and 7 GB of RAM. The [macOS 15 arm64 image README], checked on 2026-09-17,
 lists image `20260907.0337.1`, macOS 15.7.9, Clang/LLVM 17.0.0, and default
 Xcode 16.4. This differs from the M4/macOS 27/Apple Clang 21 sample above.
-Runner images change; the first run must record the actual image and compiler
-identity and confirm the self-check diagnostics on that compiler.
+Runner images change. Branch run `36598029271` used image
+`macos-15-arm64` version `20260907.0337.1` and macOS 15.7.9 (24G830).
+Both jobs used Apple clang 17.0.0 (clang-1700.0.13.5) from Xcode 16.4;
+their sanitizer self-checks passed on that compiler.
 
 The Linux runner's self, GCC self, runtime, native, and property steps took
 about 0.1, 0.1, 2.7, 29.0, and 25.2 minutes. The local Apple sample's
@@ -363,23 +365,34 @@ The full and shard property tasks accept this environment override and default
 to 3, leaving the Linux workflow at its existing settings. The multiplier
 widens only the interrupt deadline; it changes no seeds, sizes, or case counts,
 and `markInterruptAsFailure` remains enabled. It does not double successful
-run time. The first run must establish whether this allowance is sufficient.
+run time. Branch run `36598029271` completed the macOS property job without
+an interrupt; it is one observation of this allowance.
 
 Both jobs upload _oseo-native-\*_ failure directories from `runner.temp` on
 failure or cancellation, using distinct artifact names and the Linux lane's
 warning when no files are found. Step-level `TMPDIR` makes the test output and
-upload paths agree. Matrix fail-fast is disabled so one failed suite does not
-cancel the other. The Linux sanitizer job has no aggregate `needs` wiring;
-the macOS jobs likewise report independent checks. The `native` aggregate
-continues to cover the ordinary native, native-support, and test262 shards.
-At configuration time, GitHub reported no main-branch protection or applicable
-rules; no server-side required-check settings were changed.
+upload paths agree. The macOS suites are separate jobs, so one failed suite
+does not cancel the other. The Linux sanitizer job has no aggregate `needs`
+wiring; the macOS jobs likewise report independent checks. The `native`
+aggregate continues to cover the ordinary native, native-support, and test262
+shards. At configuration time, GitHub reported no main-branch protection or
+applicable rules; no server-side required-check settings were changed.
 
-No macOS CI run has happened for this configuration. The first GitHub run must
-confirm both runtime and generated-code ASan/UBSan self-checks, completion of
-all runtime/native/ordinary property tests without interrupts, actual step
-costs and timeout headroom, and retained diagnostics on any failure. The local
-sample is evidence only for that sample. LeakSanitizer remains explicitly
+Branch run `36598029271` at `d0a39f79` completed both macOS sanitizer jobs
+successfully. The native job passed the ASan/UBSan self-check, runtime, and
+native suite; the property job passed the self-check and ordinary property
+suite without an interrupt. Their measured job durations were 40.3 and
+36.0 minutes, respectively. Main run `36516215200` measured 36.6 and
+32.1 minutes for the same jobs. These two runs show job-time variation,
+with queue delay and cache state not isolated. The branch run has
+matrix-suffixed check names; neither job tested artifact upload on failure.
+The same run's unchanged Linux sanitizer job failed before compiling the
+`monotonic-timer-wakeups` fixture: Node and Deno disagreed on timer order in
+its differential reference comparison. The fixture's 30 ms spacing
+assumption did not hold in this run;
+the following property step was skipped. The corrected workflow removes
+macOS matrices and awaits another branch run to verify check names. This
+name fix does not remove the reference-divergence risk. LeakSanitizer remains
 excluded on macOS arm64; these jobs make no leak-detection claim.
 
 [GitHub runner specification]: https://docs.github.com/en/actions/reference/runners/github-hosted-runners

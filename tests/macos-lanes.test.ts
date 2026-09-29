@@ -3,8 +3,12 @@ import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import type { SpawnSyncReturns } from "node:child_process";
 import { test } from "node:test";
-import { isString } from "../tools/value-kinds.ts";
-import type { StructuredDataValue } from "../tools/structured-data.ts";
+import { isNumber, isObject, isString } from "../tools/value-kinds.ts";
+import type {
+  StructuredDataRecord,
+  StructuredDataValue,
+} from "../tools/structured-data.ts";
+import { parsedMapping } from "../tools/structured-data.ts";
 import { parse } from "yaml";
 import {
   generateMacosWorkflow,
@@ -27,6 +31,10 @@ interface Job {
 interface Workflow {
   readonly jobs: Readonly<Record<string, Job>>;
 }
+interface NameBaseline {
+  readonly sourceRun: number;
+  readonly checkNamesObserved: readonly string[];
+}
 
 const template = readFileSync("tools/main-workflow.template.yaml", "utf8");
 const generated = generateMacosWorkflow(template);
@@ -34,6 +42,10 @@ const generated = generateMacosWorkflow(template);
 const before = parse(template) as Workflow;
 // SAFETY: Generation retains the checked-in workflow schema.
 const after = parse(generated) as Workflow;
+// SAFETY: This checked-in fixture is the named GitHub run's string name list.
+const nameBaseline = JSON.parse(
+  readFileSync("docs/evidence/u16/baseline-check-names.json", "utf8"),
+) as NameBaseline;
 
 function entries(
   job: Job,
@@ -77,18 +89,120 @@ function names(workflow: Workflow): readonly string[] {
           ? job.strategy == null
             ? id
             : `${id} (${Object.values(row).join(", ")})`
-          : expand(job.name, row),
+          : job.strategy != null && !job.name.includes("matrix.")
+            ? `${job.name} (${Object.values(row).join(", ")})`
+            : expand(job.name, row),
       ),
     )
     .toSorted();
 }
 
+// This evaluator compares observable step inputs independently of the
+// generator's textual binding. Its domain is this template's expressions.
+function evaluate(
+  expression: string,
+  row: Readonly<Record<string, StructuredDataValue>>,
+): string | number | boolean | undefined {
+  const text = expression.trim();
+  const equality = /^(.+?)\s*==\s*(.+)$/.exec(text);
+  if (equality != null) {
+    const left = evaluate(equality[1]!, row);
+    const right = evaluate(equality[2]!, row);
+    return left == null || right == null ? undefined : left === right;
+  }
+  const format = /^format\(\s*'([^']+)',([\s\S]+)\)$/.exec(text);
+  if (format != null) {
+    const args = format[2]!.split(",").map((arg) => evaluate(arg, row));
+    assert.ok(args.every((arg) => arg != null));
+    return format[1]!.replace(/\{(\d+)}/g, (_, index: string) =>
+      String(args[Number(index)]),
+    );
+  }
+  const path = /^matrix\.([\w.]+)$/.exec(text);
+  if (path != null) {
+    let value: StructuredDataValue | undefined = row;
+    for (const key of path[1]!.split(".")) {
+      value = parsedMapping(value, "Test matrix")[key];
+    }
+    assert.ok(isString(value) || isNumber(value));
+    return value;
+  }
+  const quoted = /^'(.*)'$/.exec(text);
+  if (quoted != null) return quoted[1]!.replaceAll("''", "'");
+  if (/^\d+$/.test(text)) return Number(text);
+  return undefined;
+}
+
+function normalize(
+  value: StructuredDataValue | undefined,
+  row: Readonly<Record<string, StructuredDataValue>>,
+): StructuredDataValue | undefined {
+  if (isString(value)) {
+    const wrapped = /^\$\{\{([\s\S]*?)}}$/.exec(value);
+    if (wrapped != null) {
+      const result = evaluate(wrapped[1]!, row);
+      if (result != null) return result;
+    }
+    const evaluated = evaluate(value, row);
+    if (evaluated != null) return evaluated;
+    return value.replace(
+      /\$\{\{([\s\S]*?)}}/g,
+      (whole: string, expression: string) =>
+        String(evaluate(expression, row) ?? whole),
+    );
+  }
+  if (Array.isArray(value)) {
+    return value.map((entry) => normalize(entry, row) ?? null);
+  }
+  if (isObject(value)) {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, normalize(entry, row)]),
+    );
+  }
+  return value;
+}
+
+function executedSteps(
+  job: Job,
+  row: Readonly<Record<string, StructuredDataValue>>,
+): readonly StructuredDataRecord[] {
+  const steps: StructuredDataRecord[] = [];
+  for (const step of job.steps) {
+    const normalized = parsedMapping(normalize(step, row), "Test step");
+    const { if: condition, ...unconditional } = normalized;
+    if (condition === false) continue;
+    steps.push(condition === true ? unconditional : normalized);
+  }
+  return steps;
+}
+
 test("every check name and concurrency policy is preserved", () => {
   assert.deepEqual(names(after), names(before));
+  assert.equal(nameBaseline.sourceRun, 36516215200);
+  assert.deepEqual(names(after), nameBaseline.checkNamesObserved.toSorted());
   assert.equal(names(after).length, 58);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
+});
+
+test("literal names acquire a suffix when a matrix remains", () => {
+  const workflow: Workflow = {
+    jobs: {
+      sample: {
+        name: "host C sanitizers (macOS, native)",
+        "runs-on": "macos-15",
+        strategy: {
+          "fail-fast": false,
+          matrix: { include: [{ suite: "native" }] },
+        },
+        steps: [],
+      },
+    },
+  };
+  assert.deepEqual(names(workflow), [
+    "host C sanitizers (macOS, native) (native)",
+  ]);
 });
 
 test("every macOS job occurs exactly once in five LPT chains", () => {
@@ -115,8 +229,11 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       assert.equal(actual.needs, lane[index - 1]?.id);
       assert.equal(actual.name, planned.name);
       assert.equal(actual["runs-on"], planned.os);
-      assert.deepEqual(entries(actual), [planned.matrix]);
-      assert.equal(actual.strategy?.["fail-fast"], false);
+      assert.equal(
+        actual.strategy,
+        undefined,
+        "macOS jobs must not acquire automatic matrix name suffixes",
+      );
       if (index > 0) assert.ok(lane[index - 1]!.seconds >= planned.seconds);
     }
   }
@@ -136,18 +253,30 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
     const {
       name: _name,
       strategy: _strategy,
+      steps: _steps,
       "runs-on": _os,
       ...originalContract
     } = original;
     const {
       name: _newName,
       strategy: _newStrategy,
+      steps: _newSteps,
       "runs-on": _newOs,
       if: _if,
       needs: _needs,
       ...actualContract
     } = actual;
-    assert.deepEqual(actualContract, originalContract, planned.name);
+    assert.deepEqual(
+      normalize(actualContract, {}),
+      normalize(originalContract, planned.matrix),
+      planned.name,
+    );
+    assert.deepEqual(
+      executedSteps(actual, {}),
+      executedSteps(original, planned.matrix),
+      planned.name,
+    );
+    assert.ok(!JSON.stringify(actual).includes("matrix."));
     assert.ok(
       entries(original).some(
         (row) => JSON.stringify(row) === JSON.stringify(planned.matrix),

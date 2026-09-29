@@ -2,8 +2,9 @@ macOS static lane evidence (U16)
 ================================
 
 The generator expands the existing macOS workload into five explicit job
-chains. A one-entry matrix in each job binds its original commands and
-artifact names. It does not combine workloads. Linux and Windows keep their
+chains. Original matrix values are bound directly into commands, conditions,
+and artifact names. The macOS jobs have no matrices, so GitHub cannot append
+matrix values to their required check names. Linux and Windows keep their
 existing matrix jobs.
 
 The source template is *tools/main-workflow.template.yaml*; regenerate with
@@ -77,11 +78,56 @@ The two `macos-latest` tests retain that exact runner label; the other macOS
 jobs retain `macos-15`.
 
 
+Live name correction
+--------------------
+
+Branch run [36598029271] started at revision `d0a39f79`, which used one-entry
+macOS matrices and literal job names. Its measured GitHub job names included
+`test (macos-latest, node) (macos-latest, node)`. This falsified the original
+local name-expansion model: GitHub appends matrix values to a literal name,
+even when the matrix has only one entry. The lane topology and workloads in
+that revision remain a timing sample; it does not prove name preservation.
+
+The same run's unchanged [Linux sanitizer job] failed in
+`test:sanitizer:native` before compiling the `monotonic-timer-wakeups` fixture.
+Node printed `nested zero delay` before the equal-time callbacks; Deno
+printed it afterward. Both reference processes exited with status zero, but
+their differential comparison failed, so the following property step was
+skipped. The fixture assumes timers spaced by at least 30 ms cannot reorder
+under host stalls; that assumption did not hold in this sanitizer run. The
+name fix does not remove the risk of another reference divergence. This run
+cannot supply a push-to-green time. Its macOS lane timings remain a
+failed-run observation.
+
+The corrected generator binds the original matrix values directly and emits
+no macOS matrices. It selects the same active conditional steps. The
+corrected workflow awaits a second branch run after the first sample.
+Both samples will be recorded by revision, with runner variance and queue
+delays left unseparated.
+
+*baseline-check-names.json* records all 58 measured job names from main run
+[36516215200]. It was obtained with:
+
+~~~~ sh
+gh api repos/dahlia/oseo/actions/runs/36516215200/jobs \
+  --paginate --slurp
+~~~~
+
+The fixture contains the sorted `name` fields from every page's `jobs` array,
+plus the source run and URL. The generator tests compare the rendered names
+against this observed list and require every macOS job to have no matrix.
+
+[Linux sanitizer job]: https://github.com/dahlia/oseo/actions/runs/36598029271/job/109507894548
+[36516215200]: https://github.com/dahlia/oseo/actions/runs/36516215200
+[36598029271]: https://github.com/dahlia/oseo/actions/runs/36598029271
+
+
 Check name inventory
 --------------------
 
-The before column expands the source workflow matrices; the after column
-expands the generated workflow. All 58 names are identical, including the
+The before column expands the source workflow matrices and matches the
+observed baseline fixture; the after column renders the current generated
+workflow. No macOS job has a matrix. All 58 names match, including the
 aggregate and Linux/Windows checks. The focused generator test repeats this
 comparison; explicit job IDs change only for macOS lane dependencies.
 

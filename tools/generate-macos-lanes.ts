@@ -1,9 +1,9 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
-import { parse, stringify } from "yaml";
+import { parse } from "yaml";
 import type { StructuredDataValue } from "./structured-data.ts";
 import { parsedMapping } from "./structured-data.ts";
-import { isString } from "./value-kinds.ts";
+import { isNumber, isString } from "./value-kinds.ts";
 import { macosJobCosts } from "./macos-job-costs.ts";
 
 /** A single existing job, assigned to one capacity lane. */
@@ -99,6 +99,46 @@ export function macosLanes(): readonly (readonly MacosLaneJob[])[] {
   return lanes;
 }
 
+/** Bind existing matrix expressions without creating a matrix check name. */
+function bindMatrix(
+  source: string,
+  matrix: Readonly<Record<string, StructuredDataValue>>,
+): string {
+  function scalar(path: string): string | number {
+    let value: StructuredDataValue | undefined = matrix;
+    for (const key of path.split(".")) {
+      value = parsedMapping(value, `Matrix path ${path}`)[key];
+    }
+    if (!isString(value) && !isNumber(value)) {
+      throw new Error(`Matrix expression is not scalar: ${path}`);
+    }
+    return value;
+  }
+  const conditionalStep = new RegExp(
+    "^      - if: matrix\\.([\\w.]+) == ('[^']*'|\\d+)\\n" +
+      "[\\s\\S]*?(?=^      - |$(?![\\s\\S]))",
+    "gm",
+  );
+  return source
+    .replace(conditionalStep, (step: string, path: string, literal: string) => {
+      const expected = literal.startsWith("'")
+        ? literal.slice(1, -1)
+        : Number(literal);
+      return scalar(path) === expected
+        ? step.replace(/^      - if:[^\n]*\n        /, "      - ")
+        : "";
+    })
+    .replace(/\$\{\{ matrix\.([\w.]+) }}/g, (_, path: string) =>
+      String(scalar(path)),
+    )
+    .replace(/\bmatrix\.([\w.]+)/g, (_, path: string) => {
+      const value = scalar(path);
+      return isString(value)
+        ? `'${value.replaceAll("'", "''")}'`
+        : String(value);
+    });
+}
+
 /** Generate explicit lane jobs, retaining the template's step text. */
 export function generateMacosWorkflow(template: string): string {
   const blocks = new Map<string, string>();
@@ -161,8 +201,8 @@ export function generateMacosWorkflow(template: string): string {
     generated.push(`  # macOS lane ${laneIndex + 1}, longest jobs first.`);
     for (const [index, job] of lane.entries()) {
       let block = blocks.get(job.sourceId)!;
-      // A one-entry matrix binds the unchanged commands and artifact names.
-      // Dependencies belong to the explicit job, never to a matrix entry.
+      // GitHub appends matrix values to names without matrix expressions.
+      // Bind values directly so required check names remain unchanged.
       block = block.replace(/^  \w+:/, `  ${job.id}:`);
       block = block.replace(/^    name: >-\n(?:      [^\n]*\n)+/m, "");
       block = block.replace(/^    name: [^\n]*\n/m, "");
@@ -170,15 +210,11 @@ export function generateMacosWorkflow(template: string): string {
         /^    runs-on: [^\n]*\n/m,
         `    name: ${job.name}\n    runs-on: ${job.os}\n`,
       );
-      const matrix = stringify({ include: [job.matrix] }, { lineWidth: 80 })
-        .trimEnd()
-        .split("\n")
-        .map((line) => `        ${line}`)
-        .join("\n");
       block = block.replace(
         /^    strategy:\n[\s\S]*?(?=^    (?:env|steps):)/m,
-        `    strategy:\n      fail-fast: false\n      matrix:\n${matrix}\n`,
+        "",
       );
+      block = bindMatrix(block, job.matrix);
       const predecessor = lane[index - 1];
       block = block.replace(
         /^    runs-on: [^\n]*\n/m,

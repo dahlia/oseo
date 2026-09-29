@@ -1158,6 +1158,20 @@ commands, and `mise run check:macos-lanes` rejects generated workflow drift.
 The derived longest lane is 147.9 minutes using measured durations from main
 run `36516215200`; this assumes five exclusive slots and excludes additional
 queue delays. Workflow concurrency is unchanged, so other runs can still
-compete for those slots. The single branch CI observation is pending.
+compete for those slots.
+
+The first branch run, `36598029271` at `d0a39f79`, falsified the original
+one-entry-matrix name model: GitHub appended matrix values to literal job
+names. The corrected generator binds values directly and emits no macOS
+matrices; its 58 rendered names are compared with the measured names from
+main run `36516215200`. The first revision remains a lane timing sample.
+Its unchanged Linux sanitizer job failed before compiling the
+`monotonic-timer-wakeups` fixture when Node and Deno disagreed on timer
+ordering in a differential reference comparison. The fixture's 30 ms
+spacing assumption did not hold in this run;
+the name fix does not eliminate that risk. This run has no push-to-green
+time, and its lane timings are a failed-run observation. The corrected
+configuration awaits a second branch run; both observations will be labeled
+by revision.
 [U16 evidence](./docs/evidence/u16/README.md) records the complete lane plan,
 check name inventory, and scheduling limits.

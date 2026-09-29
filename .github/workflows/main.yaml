@@ -323,25 +323,16 @@ jobs:
     runs-on: macos-15
     if: ${{ !cancelled() }}
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 1
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
+      - run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 1/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -351,9 +342,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            1,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -363,25 +354,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_1
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 7
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 7/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -391,9 +372,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            7,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -403,14 +384,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_7
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 9
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -419,7 +392,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 9/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -428,9 +401,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            9,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -440,25 +413,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_9
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 12
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 12/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -468,9 +431,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            12,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -480,25 +443,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_12
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 10
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 10/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -508,9 +461,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            10,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -520,27 +473,19 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_10
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform:
-              os: macos-15
-              target: macos-aarch64
-            shard: 1
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - run: mise run test:native --shard ${{ matrix.shard }}/3
+      - run: mise run test:native --shard 1/3
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: native-${{ matrix.platform.target }}-${{ matrix.shard }}-of-3
+          name: native-macos-aarch64-1-of-3
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -549,12 +494,6 @@ jobs:
     name: test (macos-latest, node)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            runtime: node
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -562,7 +501,7 @@ jobs:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
-      - run: mise run test:${{ matrix.runtime }}
+      - run: mise run test:node
 
   test_native_support_macos_2:
     name: native support (macos-aarch64, 2/12)
@@ -570,25 +509,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_macos_node
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 2
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 2/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -598,9 +527,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            2,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -610,14 +539,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_2
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 2
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -626,7 +547,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 2/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -635,9 +556,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            2,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -647,14 +568,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_2
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 7
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -663,7 +576,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 7/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -672,9 +585,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            7,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -684,14 +597,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_7
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 3
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -700,7 +605,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 3/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -709,9 +614,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            3,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -721,27 +626,19 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_3
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform:
-              os: macos-15
-              target: macos-aarch64
-            shard: 2
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - run: mise run test:native --shard ${{ matrix.shard }}/3
+      - run: mise run test:native --shard 2/3
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: native-${{ matrix.platform.target }}-${{ matrix.shard }}-of-3
+          name: native-macos-aarch64-2-of-3
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -754,11 +651,6 @@ jobs:
     # About 36–44 minutes for runtime/native and 29–35 for properties;
     # 75 minutes leaves room for setup, cold caches, and slower runner images.
     timeout-minutes: 75
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - suite: native
     env:
       OSEO_HOST_CC: clang
     steps:
@@ -775,25 +667,16 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
       # No GCC verification: macOS gcc is an Apple Clang alias.
-      - if: matrix.suite == 'native'
-        run: mise run test:sanitizer:runtime
+      - run: mise run test:sanitizer:runtime
         env:
           TMPDIR: ${{ runner.temp }}
-      - if: matrix.suite == 'native'
-        run: mise run test:sanitizer:native
+      - run: mise run test:sanitizer:native
         env:
-          TMPDIR: ${{ runner.temp }}
-      - if: matrix.suite == 'property'
-        run: mise run test:sanitizer:property
-        env:
-          # Four workers share three CPUs. Double Linux's interrupt allowance,
-          # retaining every ordinary case and seed; interruptions still fail.
-          OSEO_PROPERTY_TIME_SCALE: "6"
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-macos-${{ matrix.suite }}-failures
+          name: host-cc-sanitizer-macos-native-failures
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -803,25 +686,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_sanitizer_macos_macos_native
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 4
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 4/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -831,9 +704,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            4,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -843,25 +716,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_4
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 5
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 5/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -871,9 +734,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            5,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -883,25 +746,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_5
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 3
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 3/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -911,9 +764,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            3,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -923,14 +776,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_3
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 4
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -939,7 +784,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 4/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -948,9 +793,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            4,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -960,14 +805,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_4
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 1
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -976,7 +813,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 1/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -985,9 +822,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            1,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -997,14 +834,6 @@ jobs:
     runs-on: macos-15
     if: ${{ !cancelled() }}
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 8
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -1013,7 +842,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 8/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1022,9 +851,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            8,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1034,25 +863,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_8
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 9
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 9/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -1062,9 +881,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            9,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1074,25 +893,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_9
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 11
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 11/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -1102,9 +911,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            11,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1114,25 +923,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_11
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 6
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 6/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -1142,9 +941,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            6,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1154,14 +953,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_6
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 10
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -1170,7 +961,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 10/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1179,9 +970,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            10,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1191,14 +982,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_10
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 6
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -1207,7 +990,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 6/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1216,9 +999,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            6,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1231,11 +1014,6 @@ jobs:
     # About 36–44 minutes for runtime/native and 29–35 for properties;
     # 75 minutes leaves room for setup, cold caches, and slower runner images.
     timeout-minutes: 75
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - suite: property
     env:
       OSEO_HOST_CC: clang
     steps:
@@ -1252,16 +1030,7 @@ jobs:
         env:
           TMPDIR: ${{ runner.temp }}
       # No GCC verification: macOS gcc is an Apple Clang alias.
-      - if: matrix.suite == 'native'
-        run: mise run test:sanitizer:runtime
-        env:
-          TMPDIR: ${{ runner.temp }}
-      - if: matrix.suite == 'native'
-        run: mise run test:sanitizer:native
-        env:
-          TMPDIR: ${{ runner.temp }}
-      - if: matrix.suite == 'property'
-        run: mise run test:sanitizer:property
+      - run: mise run test:sanitizer:property
         env:
           # Four workers share three CPUs. Double Linux's interrupt allowance,
           # retaining every ordinary case and seed; interruptions still fail.
@@ -1270,7 +1039,7 @@ jobs:
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-macos-${{ matrix.suite }}-failures
+          name: host-cc-sanitizer-macos-property-failures
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1280,14 +1049,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_sanitizer_macos_macos_property
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 5
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -1296,7 +1057,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 5/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1305,9 +1066,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            5,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1317,25 +1078,15 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_5
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 8
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - if: matrix.shard == 1
-        run: mise run test:property:extended:package
       - run: >-
           mise run test:property:extended:native:shard
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 8/12
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -1345,9 +1096,9 @@ jobs:
           name: >-
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            8,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1357,14 +1108,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_8
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 12
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -1373,7 +1116,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 12/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1382,9 +1125,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            12,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1394,14 +1137,6 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_12
     timeout-minutes: 120
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-15
-            target: macos-aarch64
-            shard: 11
-            total: 12
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -1410,7 +1145,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --shard 11/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1419,9 +1154,9 @@ jobs:
           name: >-
             ${{ format(
             'test262-{0}-{1}-of-{2}',
-            matrix.target,
-            matrix.shard,
-            matrix.total) }}
+            'macos-aarch64',
+            11,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1431,27 +1166,19 @@ jobs:
     if: ${{ !cancelled() }}
     needs: test_test262_macos_11
     timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform:
-              os: macos-15
-              target: macos-aarch64
-            shard: 3
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - run: mise run test:native --shard ${{ matrix.shard }}/3
+      - run: mise run test:native --shard 3/3
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: native-${{ matrix.platform.target }}-${{ matrix.shard }}-of-3
+          name: native-macos-aarch64-3-of-3
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1460,12 +1187,6 @@ jobs:
     runs-on: macos-latest
     if: ${{ !cancelled() }}
     needs: test_native_macos_3
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            runtime: deno
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -1473,4 +1194,4 @@ jobs:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
-      - run: mise run test:${{ matrix.runtime }}
+      - run: mise run test:deno
