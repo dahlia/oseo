@@ -101,9 +101,11 @@ failed-run observation.
 
 The corrected generator binds the original matrix values directly and emits
 no macOS matrices. It selects the same active conditional steps. The
-corrected workflow awaits a second branch run after the first sample.
-Both samples will be recorded by revision, with runner variance and queue
-delays left unseparated.
+corrected workflow passed branch run [36640728403] at `82bba77e`.
+Its 58 displayed check names match the main-run inventory. Both samples
+are recorded by revision in
+[*docs/gate-cost-baseline.md*](../../gate-cost-baseline.md), with runner
+variance and queue delays left unseparated.
 
 *baseline-check-names.json* records all 58 measured job names from main run
 [36516215200]. It was obtained with:
@@ -120,6 +122,7 @@ against this observed list and require every macOS job to have no matrix.
 [Linux sanitizer job]: https://github.com/dahlia/oseo/actions/runs/36598029271/job/109507894548
 [36516215200]: https://github.com/dahlia/oseo/actions/runs/36516215200
 [36598029271]: https://github.com/dahlia/oseo/actions/runs/36598029271
+[36640728403]: https://github.com/dahlia/oseo/actions/runs/36640728403
 
 
 Check name inventory

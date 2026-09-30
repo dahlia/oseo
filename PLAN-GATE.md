@@ -1155,10 +1155,13 @@ failure does not skip coverage; the native aggregate requires success from
 every native and test262 shard. *tools/main-workflow.template.yaml* owns the
 commands, and `mise run check:macos-lanes` rejects generated workflow drift.
 
-The derived longest lane is 147.9 minutes using measured durations from main
-run `36516215200`; this assumes five exclusive slots and excludes additional
-queue delays. Workflow concurrency is unchanged, so other runs can still
-compete for those slots.
+The derived longest lane is 8872 s (147.87 min, or 147.9 at one decimal
+place) using measured durations from main run `36516215200`; this models
+five exclusive slots and excludes additional queue delays. The measured
+peak was five macOS jobs in that run and same-size main run `36369711059`,
+where the jobs were eligible together. Both branch runs also reached five,
+as constrained by the new lanes. Workflow concurrency is unchanged, so
+other runs can still compete for those slots.
 
 The first branch run, `36598029271` at `d0a39f79`, falsified the original
 one-entry-matrix name model: GitHub appended matrix values to literal job
@@ -1171,7 +1174,26 @@ ordering in a differential reference comparison. The fixture's 30 ms
 spacing assumption did not hold in this run;
 the name fix does not eliminate that risk. This run has no push-to-green
 time, and its lane timings are a failed-run observation. The corrected
-configuration awaits a second branch run; both observations will be labeled
-by revision.
+configuration passed branch run `36640728403` at `82bba77e`. Its 58
+displayed check names match main run `36516215200`. From workflow creation
+to completion, the first branch run took a derived 162.62 min and the green
+second run took 160.10 min. Their derived sums of measured macOS job times
+were 729.02 and 701.75 min; comparison main run `36516215200` took a
+derived 175.83 min and 718.15 macOS job minutes. The branch runs differ
+from it by 13.21 and 15.73 min in wall time; these differences are not
+separated from runner variance. A second main run with 31 macOS jobs,
+`36369711059`, took a derived 165.55 min and 775.63 macOS
+job minutes. Its branch wall differences are 2.93 and 5.45 min. The longest
+macOS job in `36516215200` started last among macOS jobs, 125.42 min after
+workflow creation; it started at 0.10 and 0.13 min in the branch runs.
+This verifies a changed dispatch order, while the wall-time effect remains
+unseparated. In lane 2,
+the final lane in both branch runs, derived handoff gaps totaled 0.68 and
+0.80 min, with initial start delays of 0.15 and 0.13 min. The remaining
+13.82 and 11.18 min above the 147.87 min ideal
+model came from different summed job wall times. The failed run has no
+push-to-green result; the green run's 160.10 min uses workflow creation as
+the available push timestamp proxy. The per-lane measurements are in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 [U16 evidence](./docs/evidence/u16/README.md) records the complete lane plan,
 check name inventory, and scheduling limits.
