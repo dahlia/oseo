@@ -17,6 +17,7 @@ if (
 const controller = new AbortController();
 const interruptGraceMs = 2_000;
 const processListMaxBuffer = 16 * 1024 * 1024;
+const processListTimeoutMs = 1_000;
 let interrupted: NodeJS.Signals | undefined;
 let escalationTimer: ReturnType<typeof setTimeout> | undefined;
 const reportedEscalationErrors = new Set<string>();
@@ -60,6 +61,8 @@ function listFileChildrenWithPs(): readonly number[] {
   const result = spawnSync("ps", ["-A", "-o", "pid=", "-o", "ppid="], {
     encoding: "utf8",
     maxBuffer: processListMaxBuffer,
+    timeout: processListTimeoutMs,
+    killSignal: "SIGKILL",
   });
   if (result.error) throw result.error;
   if (result.status !== 0 || result.pid == null) {
@@ -84,6 +87,8 @@ function listFileChildrenWithPgrep(): readonly number[] {
   const result = spawnSync("pgrep", ["-P", String(process.pid)], {
     encoding: "utf8",
     maxBuffer: processListMaxBuffer,
+    timeout: processListTimeoutMs,
+    killSignal: "SIGKILL",
   });
   if (result.error) throw result.error;
   if (result.status === 1 && result.stdout.trim() === "") return [];

@@ -142,9 +142,9 @@ for (const sharded of [false, true]) {
   }
 }
 
-for (const failedPs of [false, true]) {
+for (const probeMode of ["normal", "failed", "hung", "both-hung"] as const) {
   test(
-    `kills and reaps a sharded file with failed ps=${failedPs}`,
+    `handles a SIGTERM-ignoring file with probes=${probeMode}`,
     {
       skip: process.platform === "win32" ? "requires POSIX signals" : false,
       timeout: 10_000,
@@ -155,15 +155,25 @@ for (const failedPs of [false, true]) {
       const relativeFile = "tests/property/wait.property.test.ts";
       const fixture = join(directory, relativeFile);
       const psMarker = join(directory, "ps-attempted");
+      const pgrepMarker = join(directory, "pgrep-attempted");
       await mkdir(join(directory, "tests/property"), { recursive: true });
-      if (failedPs) {
+      if (probeMode !== "normal") {
         const bin = join(directory, "bin");
         await mkdir(bin);
         await writeFile(
           join(bin, "ps"),
-          '#!/bin/sh\nprintf attempted > "$PS_MARKER"\nexit 2\n',
+          '#!/bin/sh\nprintf attempted > "$PS_MARKER"\n' +
+            (probeMode === "failed" ? "exit 2\n" : "exec sleep 10\n"),
           { mode: 0o755 },
         );
+        if (probeMode === "both-hung") {
+          await writeFile(
+            join(bin, "pgrep"),
+            '#!/bin/sh\nprintf attempted > "$PGREP_MARKER"\n' +
+              "exec sleep 10\n",
+            { mode: 0o755 },
+          );
+        }
       }
       await writeFile(
         fixture,
@@ -191,9 +201,11 @@ for (const failedPs of [false, true]) {
             ...process.env,
             READY: ready,
             PS_MARKER: psMarker,
-            PATH: failedPs
-              ? `${join(directory, "bin")}:${process.env.PATH ?? ""}`
-              : process.env.PATH,
+            PGREP_MARKER: pgrepMarker,
+            PATH:
+              probeMode !== "normal"
+                ? `${join(directory, "bin")}:${process.env.PATH ?? ""}`
+                : process.env.PATH,
             NODE_TEST_CONTEXT: undefined,
           },
           stdio: ["ignore", "ignore", "pipe"],
@@ -223,16 +235,42 @@ for (const failedPs of [false, true]) {
         const reapedPid = testPid;
         const signaledAt = Date.now();
         child.kill("SIGTERM");
+        if (probeMode === "both-hung") {
+          const probeDeadline = Date.now() + 5_000;
+          let fallbackStarted = false;
+          while (!fallbackStarted && Date.now() < probeDeadline) {
+            try {
+              fallbackStarted =
+                // eslint-disable-next-line no-await-in-loop -- Await probe.
+                (await readFile(pgrepMarker, "utf8")) === "attempted";
+            } catch {
+              /* The fallback probe has not started yet. */
+            }
+            if (!fallbackStarted) {
+              // eslint-disable-next-line no-await-in-loop -- Bound polling.
+              await new Promise((resolve) => setTimeout(resolve, 10));
+            }
+          }
+          assert.ok(fallbackStarted);
+          child.kill("SIGTERM");
+        }
         const [, exitSignal] = await exited;
         await closed;
         assert.equal(exitSignal, "SIGTERM");
         const elapsed = Date.now() - signaledAt;
         assert.ok(elapsed >= 1_500 && elapsed < 6_000);
-        assert.equal(stderr.join(""), "");
-        if (failedPs)
+        if (probeMode !== "normal") {
           assert.equal(await readFile(psMarker, "utf8"), "attempted");
-        assert.throws(() => process.kill(reapedPid, 0), { code: "ESRCH" });
-        testPid = undefined;
+        }
+        if (probeMode === "both-hung") {
+          assert.equal(await readFile(pgrepMarker, "utf8"), "attempted");
+          assert.match(stderr.join(""), /Cannot enumerate test-file children/u);
+          assert.doesNotThrow(() => process.kill(reapedPid, 0));
+        } else {
+          assert.equal(stderr.join(""), "");
+          assert.throws(() => process.kill(reapedPid, 0), { code: "ESRCH" });
+          testPid = undefined;
+        }
       } finally {
         child.kill("SIGKILL");
         if (testPid != null) {
