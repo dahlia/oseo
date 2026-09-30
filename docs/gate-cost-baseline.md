@@ -41,6 +41,82 @@ and the separately measured property bottleneck.
 [36243816479]: https://github.com/dahlia/oseo/actions/runs/36243816479
 [36261458909]: https://github.com/dahlia/oseo/actions/runs/36261458909
 
+### U16 static macOS lane branch observations
+
+GitHub Actions run and job timestamps provide one measured observation at
+each branch revision. Run [36598029271] at `d0a39f79` failed only in the
+unchanged Linux `host C sanitizers (Linux)` timer-order fixture. Run
+[36640728403] at `82bba77e` succeeded. The second run's 58 displayed job
+names match all 58 names in comparison main run [36516215200]; the first
+run appended matrix suffixes. Both branch runs executed all 31 macOS jobs. The
+first revision remains a timing sample, not a successful gate.
+
+The table derives each lane's first job start and last job finish in minutes
+relative to the run's `created_at`. The first start is the initial start
+delay. A handoff gap is the next job's `started_at` minus its predecessor's
+`completed_at`; it includes GitHub's successor scheduling and runner
+assignment. The individual gaps follow chain order in seconds, with their
+sum in minutes. Minute values are derived from measured job timestamps and
+rounded to 0.01 min.
+The lane membership is the generated plan in
+[*docs/evidence/u16/README.md*](./evidence/u16/README.md).
+
+| Source run  | Lane | First start (min) | Last finish (min) | Handoff gaps (s, chain order) | Gap sum (min) |
+| ----------- | ---- | ----------------- | ----------------- | ----------------------------- | ------------- |
+| 36598029271 | 1    | 0.10              | 148.17            | 11, 7, 7, 10, 7               | 0.70          |
+| 36598029271 | 2    | 0.15              | 162.52            | 10, 7, 8, 8, 8                | 0.68          |
+| 36598029271 | 3    | 0.15              | 142.67            | 5, 8, 6, 8, 8                 | 0.58          |
+| 36598029271 | 4    | 0.15              | 138.42            | 9, 11, 7, 8, 6                | 0.68          |
+| 36598029271 | 5    | 0.12              | 141.47            | 9, 10, 7, 6, 12, 10           | 0.90          |
+| 36640728403 | 1    | 0.13              | 140.67            | 6, 6, 10, 7, 10               | 0.65          |
+| 36640728403 | 2    | 0.13              | 159.98            | 11, 8, 12, 8, 9               | 0.80          |
+| 36640728403 | 3    | 0.15              | 146.25            | 8, 8, 7, 8, 10                | 0.68          |
+| 36640728403 | 4    | 0.17              | 134.17            | 7, 8, 6, 8, 9                 | 0.63          |
+| 36640728403 | 5    | 0.10              | 124.95            | 8, 9, 8, 5, 8, 11             | 0.82          |
+
+Run `36598029271` was created at `2026-09-29T16:28:58Z`; its last recorded
+update was at `19:11:35Z`, a derived 162.62 min. It has no
+push-to-green observation. Run `36640728403` was created at
+`2026-09-29T22:38:08Z` and last updated at `2026-09-30T01:18:14Z`:
+160.10 min from workflow creation to green. Workflow creation is the
+available timestamp proxy for the push; neither duration measures the
+push-to-workflow-creation delay. Derived sums of measured macOS job times are
+729.02 and 701.75 min, respectively, versus 718.15 min in comparison
+main run `36516215200` at `97278fc6`. That run's derived
+creation-to-completion time is 175.83 min. These branch observations are
+13.21 and 15.73 min shorter than that one main run, respectively; this
+difference is not separated from runner variance. Another successful main
+run, [36369711059] at `98e66719`, also had 31 macOS jobs and a measured
+five-job peak. Its derived creation-to-completion time was 165.55 min and
+its macOS job sum was 775.63 min. The branch wall differences from this
+second same-size sample are only 2.93 and 5.45 min, while their job sums
+differ by 46.61 and 73.88 min. This spread prevents a causal wall-time
+improvement claim from these single-run comparisons.
+
+In comparison main run `36516215200`, the 50.30 min
+`native support (macos-aarch64, 1/12)` job started 125.42 min after run
+creation and finished last among macOS jobs at 175.72 min. The same job
+started at 0.10 and 0.13 min in the branch runs. This directly observes
+the intended dispatch-order change; it does not isolate its wall-time effect
+from job-duration spread. The measured peak macOS concurrency was five in
+both same-size main runs and both
+branch runs.
+
+The derived ideal longest lane is 8872 s (147.87 min, or 147.9 at one
+decimal place) from the main run's measured whole-job costs, with immediate
+starts and handoffs. Lane 2 was the last macOS chain in both branch runs.
+Its derived 14.65 and 12.11 min finish gaps from that model contain only
+0.68 and 0.80 min of derived handoff gaps, plus 0.15 and 0.13 min of initial
+assignment delay. The remaining 13.82 and 11.18 min are differences in
+summed job wall time from the model's source run. Thus chain assignment
+delays explain part of the model gap, but these one-run samples cannot
+attribute the larger job-time difference to the lane change.
+
+[36369711059]: https://github.com/dahlia/oseo/actions/runs/36369711059
+[36516215200]: https://github.com/dahlia/oseo/actions/runs/36516215200
+[36598029271]: https://github.com/dahlia/oseo/actions/runs/36598029271
+[36640728403]: https://github.com/dahlia/oseo/actions/runs/36640728403
+
 ### Family costs and shard imbalance
 
 Derived count/sum/max and max/mean from measured `startedAt`/`completedAt`
@@ -2094,7 +2170,6 @@ sanitizer flags, retry policy, verdicts, result order, budgets, and timeouts
 are unchanged, and the run reproduces the checked-in manifest shard exactly in
 every measured run above.
 
-[36369711059]: https://github.com/dahlia/oseo/actions/runs/36369711059
 [36496566681]: https://github.com/dahlia/oseo/actions/runs/36496566681
 
 ### Reviewed test262 process starts (U14 Phase A)
