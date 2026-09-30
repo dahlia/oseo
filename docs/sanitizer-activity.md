@@ -391,9 +391,11 @@ The same run's unchanged Linux sanitizer job failed before compiling the
 its differential reference comparison. The fixture's 30 ms spacing
 assumption did not hold in this run;
 the following property step was skipped. The corrected workflow removes
-macOS matrices and awaits another branch run to verify check names. This
-name fix does not remove the reference-divergence risk. LeakSanitizer remains
-excluded on macOS arm64; these jobs make no leak-detection claim.
+macOS matrices. In the measured successful branch run `36640728403` at
+`82bba77e`, all 58 displayed check names matched those observed in main
+run `36516215200`. This name fix does not remove the reference-divergence
+risk. LeakSanitizer remains excluded on macOS arm64; these jobs make no
+leak-detection claim.
 
 [GitHub runner specification]: https://docs.github.com/en/actions/reference/runners/github-hosted-runners
 [macOS 15 arm64 image README]: https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
