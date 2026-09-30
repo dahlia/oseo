@@ -37,10 +37,24 @@ const forwarders = {
 for (const [signal, forward] of Object.entries(forwarders)) {
   process.on(signal, forward);
 }
+function hasLiveChildren(): boolean {
+  // Aborting node:test can end its stream before its file processes exit.
+  // Node keeps each file's ProcessWrap active until it reaps that child.
+  return process.getActiveResourcesInfo().includes("ProcessWrap");
+}
+function finishInterrupt(): void {
+  if (hasLiveChildren()) {
+    // A single signal waits; a second one forces exit through interrupt().
+    setTimeout(finishInterrupt, 10);
+    return;
+  }
+  restoreSignals();
+  process.kill(process.pid, interrupted);
+}
 const stream = run({ files, concurrency, signal: controller.signal });
 stream.on("end", () => {
-  restoreSignals();
-  if (interrupted != null) process.kill(process.pid, interrupted);
+  if (interrupted == null) restoreSignals();
+  else finishInterrupt();
 });
 stream.on("test:fail", () => {
   process.exitCode = 1;

@@ -70,6 +70,14 @@ for (const sharded of [false, true]) {
           fixture,
           [
             'import { writeFileSync } from "node:fs";',
+            // Only sharded files delay exit; the plain file owns its signal.
+            ...(sharded
+              ? [
+                  'process.on("SIGTERM", () => {',
+                  "  setTimeout(() => process.exit(0), 100);",
+                  "});",
+                ]
+              : []),
             'writeFileSync(process.env.READY, "");',
             "setTimeout(() => {",
             "  writeFileSync(process.env.READY, String(process.pid));",
@@ -114,7 +122,8 @@ for (const sharded of [false, true]) {
           assert.ok(testPid != null);
           const reapedPid = testPid;
           child.kill(signal);
-          await exited;
+          const [, exitSignal] = await exited;
+          if (sharded) assert.equal(exitSignal, signal);
           assert.throws(() => process.kill(reapedPid, 0), { code: "ESRCH" });
           testPid = undefined;
         } finally {
