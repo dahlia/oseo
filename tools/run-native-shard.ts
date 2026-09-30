@@ -16,6 +16,7 @@ if (
 // Node's CLI sorts file arguments. The API keeps this measured-cost order.
 const controller = new AbortController();
 const interruptGraceMs = 2_000;
+const processListMaxBuffer = 16 * 1024 * 1024;
 let interrupted: NodeJS.Signals | undefined;
 let escalationTimer: ReturnType<typeof setTimeout> | undefined;
 const reportedEscalationErrors = new Set<string>();
@@ -53,47 +54,87 @@ function reportEscalationError(error: Error): void {
   reportedEscalationErrors.add(error.message);
   console.error(error);
 }
+function listFileChildrenWithPs(): readonly number[] {
+  // Portable ps has no common parent filter on Linux and macOS. Restrict
+  // its output to PID columns, and cap the full process-list read.
+  const result = spawnSync("ps", ["-A", "-o", "pid=", "-o", "ppid="], {
+    encoding: "utf8",
+    maxBuffer: processListMaxBuffer,
+  });
+  if (result.error) throw result.error;
+  if (result.status !== 0 || result.pid == null) {
+    throw new Error(`Could not list test processes: ${result.stderr}`);
+  }
+  const children: number[] = [];
+  let parsedRows = 0;
+  for (const line of result.stdout.split("\n")) {
+    if (line.trim() === "") continue;
+    const match = /^\s*(\d+)\s+(\d+)\s*$/.exec(line);
+    if (!match) throw new Error(`Unexpected ps output: ${line}`);
+    parsedRows++;
+    const pid = Number(match[1]);
+    const parentPid = Number(match[2]);
+    if (parentPid === process.pid && pid !== result.pid) children.push(pid);
+  }
+  if (parsedRows === 0) throw new Error("ps returned no process rows.");
+  return children;
+}
+function listFileChildrenWithPgrep(): readonly number[] {
+  // pgrep -P selects only immediate children on both supported hosts.
+  const result = spawnSync("pgrep", ["-P", String(process.pid)], {
+    encoding: "utf8",
+    maxBuffer: processListMaxBuffer,
+  });
+  if (result.error) throw result.error;
+  if (result.status === 1 && result.stdout.trim() === "") return [];
+  if (result.status !== 0 || result.pid == null) {
+    throw new Error(`Could not find test processes: ${result.stderr}`);
+  }
+  const children: number[] = [];
+  for (const line of result.stdout.split("\n")) {
+    if (line.trim() === "") continue;
+    if (!/^\d+$/.test(line)) {
+      throw new Error(`Unexpected pgrep output: ${line}`);
+    }
+    const pid = Number(line);
+    if (pid !== result.pid) children.push(pid);
+  }
+  if (children.length === 0) {
+    throw new Error("pgrep returned no process rows.");
+  }
+  return children;
+}
 function killFileChildren(): void {
   if (!hasLiveChildren()) return;
+  let children: readonly number[] = [];
   try {
-    // Linux and macOS ps report direct children by parent PID. The wrapper
-    // starts only node:test file processes, besides this temporary ps child.
-    // SIGKILL can orphan a file's own children; only file children are reaped.
-    const result = spawnSync("ps", ["-A", "-o", "pid=", "-o", "ppid="], {
-      encoding: "utf8",
-    });
-    if (result.error) throw result.error;
-    if (result.status !== 0 || result.pid == null) {
-      throw new Error(`Could not list test processes: ${result.stderr}`);
+    children = listFileChildrenWithPs();
+  } catch (psError) {
+    try {
+      children = listFileChildrenWithPgrep();
+    } catch (pgrepError) {
+      // Never re-raise while Node still owns a live file process. Retry
+      // enumeration; a second signal or the CI runner can force exit.
+      reportEscalationError(
+        new Error("Cannot enumerate test-file children", {
+          cause: { psError, pgrepError },
+        }),
+      );
     }
-    let parsedRows = 0;
-    for (const line of result.stdout.split("\n")) {
-      if (line.trim() === "") continue;
-      const match = /^\s*(\d+)\s+(\d+)\s*$/.exec(line);
-      if (!match) {
-        reportEscalationError(new Error(`Unexpected ps output: ${line}`));
-        continue;
-      }
-      parsedRows++;
-      const pid = Number(match[1]);
-      const parentPid = Number(match[2]);
-      if (parentPid !== process.pid || pid === result.pid) continue;
-      try {
-        process.kill(pid, "SIGKILL");
-      } catch (error) {
-        if (
-          !(error instanceof Error && "code" in error && error.code === "ESRCH")
-        )
-          reportEscalationError(
-            error instanceof Error ? error : new Error(String(error)),
-          );
-      }
+  }
+  // Only node:test file processes remain, apart from temporary probes.
+  // SIGKILL can orphan a file's own children; only file children are reaped.
+  for (const pid of children) {
+    try {
+      process.kill(pid, "SIGKILL");
+    } catch (error) {
+      if (
+        !(error instanceof Error && "code" in error && error.code === "ESRCH")
+      )
+        reportEscalationError(
+          error instanceof Error ? error : new Error(String(error)),
+        );
     }
-    if (parsedRows === 0) throw new Error("ps returned no process rows.");
-  } catch (error) {
-    reportEscalationError(
-      error instanceof Error ? error : new Error(String(error)),
-    );
   }
   if (hasLiveChildren()) escalationTimer = setTimeout(killFileChildren, 100);
 }

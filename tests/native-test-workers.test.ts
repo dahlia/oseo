@@ -142,84 +142,108 @@ for (const sharded of [false, true]) {
   }
 }
 
-test(
-  "kills and reaps a sharded file that ignores SIGTERM",
-  {
-    skip: process.platform === "win32" ? "requires POSIX signals" : false,
-    timeout: 10_000,
-  },
-  async () => {
-    const directory = await mkdtemp(join(tmpdir(), "oseo-test-launcher-"));
-    const ready = join(directory, "ready");
-    const relativeFile = "tests/property/wait.property.test.ts";
-    const fixture = join(directory, relativeFile);
-    await mkdir(join(directory, "tests/property"), { recursive: true });
-    await writeFile(
-      fixture,
-      [
-        'import { writeFileSync } from "node:fs";',
-        'process.on("SIGTERM", () => {});',
-        "writeFileSync(process.env.READY, String(process.pid));",
-        "setInterval(() => {}, 1000);",
-        "",
-      ].join("\n"),
-    );
-    const child = spawn(
-      process.execPath,
-      [
-        fileURLToPath(new URL("../tools/run-native-tests.ts", import.meta.url)),
-        "--shard",
-        "1/12",
-        relativeFile,
-      ],
-      {
-        cwd: directory,
-        env: { ...process.env, READY: ready, NODE_TEST_CONTEXT: undefined },
-        stdio: ["ignore", "ignore", "pipe"],
-      },
-    );
-    const exited = once(child, "exit");
-    const closed = once(child, "close");
-    const stderr: string[] = [];
-    child.stderr.on("data", (chunk) => stderr.push(String(chunk)));
-    let testPid: number | undefined;
-    try {
-      const deadline = Date.now() + 5000;
-      while (testPid == null && Date.now() < deadline) {
-        try {
-          // eslint-disable-next-line no-await-in-loop -- Await readiness.
-          const pid = Number(await readFile(ready, "utf8"));
-          if (Number.isSafeInteger(pid) && pid > 0) testPid = pid;
-        } catch {
-          /* The marker has not been created yet. */
-        }
-        if (testPid == null) {
-          // eslint-disable-next-line no-await-in-loop -- Bound polling.
-          await new Promise((resolve) => setTimeout(resolve, 10));
-        }
+for (const failedPs of [false, true]) {
+  test(
+    `kills and reaps a sharded file with failed ps=${failedPs}`,
+    {
+      skip: process.platform === "win32" ? "requires POSIX signals" : false,
+      timeout: 10_000,
+    },
+    async () => {
+      const directory = await mkdtemp(join(tmpdir(), "oseo-test-launcher-"));
+      const ready = join(directory, "ready");
+      const relativeFile = "tests/property/wait.property.test.ts";
+      const fixture = join(directory, relativeFile);
+      const psMarker = join(directory, "ps-attempted");
+      await mkdir(join(directory, "tests/property"), { recursive: true });
+      if (failedPs) {
+        const bin = join(directory, "bin");
+        await mkdir(bin);
+        await writeFile(
+          join(bin, "ps"),
+          '#!/bin/sh\nprintf attempted > "$PS_MARKER"\nexit 2\n',
+          { mode: 0o755 },
+        );
       }
-      assert.ok(testPid != null);
-      const reapedPid = testPid;
-      const signaledAt = Date.now();
-      child.kill("SIGTERM");
-      const [, exitSignal] = await exited;
-      await closed;
-      assert.equal(exitSignal, "SIGTERM");
-      const elapsed = Date.now() - signaledAt;
-      assert.ok(elapsed >= 1_500 && elapsed < 6_000);
-      assert.equal(stderr.join(""), "");
-      assert.throws(() => process.kill(reapedPid, 0), { code: "ESRCH" });
-      testPid = undefined;
-    } finally {
-      child.kill("SIGKILL");
-      if (testPid != null) {
-        try {
-          process.kill(testPid, "SIGKILL");
-        } catch {
-          /* Already reaped. */
+      await writeFile(
+        fixture,
+        [
+          'import { writeFileSync } from "node:fs";',
+          'process.on("SIGTERM", () => {});',
+          "writeFileSync(process.env.READY, String(process.pid));",
+          "setInterval(() => {}, 1000);",
+          "",
+        ].join("\n"),
+      );
+      const child = spawn(
+        process.execPath,
+        [
+          fileURLToPath(
+            new URL("../tools/run-native-tests.ts", import.meta.url),
+          ),
+          "--shard",
+          "1/12",
+          relativeFile,
+        ],
+        {
+          cwd: directory,
+          env: {
+            ...process.env,
+            READY: ready,
+            PS_MARKER: psMarker,
+            PATH: failedPs
+              ? `${join(directory, "bin")}:${process.env.PATH ?? ""}`
+              : process.env.PATH,
+            NODE_TEST_CONTEXT: undefined,
+          },
+          stdio: ["ignore", "ignore", "pipe"],
+        },
+      );
+      const exited = once(child, "exit");
+      const closed = once(child, "close");
+      const stderr: string[] = [];
+      child.stderr.on("data", (chunk) => stderr.push(String(chunk)));
+      let testPid: number | undefined;
+      try {
+        const deadline = Date.now() + 5000;
+        while (testPid == null && Date.now() < deadline) {
+          try {
+            // eslint-disable-next-line no-await-in-loop -- Await readiness.
+            const pid = Number(await readFile(ready, "utf8"));
+            if (Number.isSafeInteger(pid) && pid > 0) testPid = pid;
+          } catch {
+            /* The marker has not been created yet. */
+          }
+          if (testPid == null) {
+            // eslint-disable-next-line no-await-in-loop -- Bound polling.
+            await new Promise((resolve) => setTimeout(resolve, 10));
+          }
         }
+        assert.ok(testPid != null);
+        const reapedPid = testPid;
+        const signaledAt = Date.now();
+        child.kill("SIGTERM");
+        const [, exitSignal] = await exited;
+        await closed;
+        assert.equal(exitSignal, "SIGTERM");
+        const elapsed = Date.now() - signaledAt;
+        assert.ok(elapsed >= 1_500 && elapsed < 6_000);
+        assert.equal(stderr.join(""), "");
+        if (failedPs)
+          assert.equal(await readFile(psMarker, "utf8"), "attempted");
+        assert.throws(() => process.kill(reapedPid, 0), { code: "ESRCH" });
+        testPid = undefined;
+      } finally {
+        child.kill("SIGKILL");
+        if (testPid != null) {
+          try {
+            process.kill(testPid, "SIGKILL");
+          } catch {
+            /* Already reaped. */
+          }
+        }
+        await rm(directory, { recursive: true, force: true });
       }
-      await rm(directory, { recursive: true, force: true });
-    }
-  },
-);
+    },
+  );
+}
