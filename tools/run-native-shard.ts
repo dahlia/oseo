@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { run } from "node:test";
 import { spec } from "node:test/reporters";
 
@@ -14,7 +15,10 @@ if (
 }
 // Node's CLI sorts file arguments. The API keeps this measured-cost order.
 const controller = new AbortController();
+const interruptGraceMs = 2_000;
 let interrupted: NodeJS.Signals | undefined;
+let escalationTimer: ReturnType<typeof setTimeout> | undefined;
+const reportedEscalationErrors = new Set<string>();
 function restoreSignals(): void {
   for (const [signal, forward] of Object.entries(forwarders)) {
     process.removeListener(signal, forward);
@@ -28,6 +32,8 @@ function interrupt(signal: NodeJS.Signals): void {
     return;
   }
   interrupted = signal;
+  // Let file processes finish normal cleanup before forcing cancellation.
+  escalationTimer = setTimeout(killFileChildren, interruptGraceMs);
   controller.abort();
 }
 const forwarders = {
@@ -39,8 +45,57 @@ for (const [signal, forward] of Object.entries(forwarders)) {
 }
 function hasLiveChildren(): boolean {
   // Aborting node:test can end its stream before its file processes exit.
-  // Node keeps each file's ProcessWrap active until it reaps that child.
+  // This Node-only wrapper observes each file until Node reaps it.
   return process.getActiveResourcesInfo().includes("ProcessWrap");
+}
+function reportEscalationError(error: Error): void {
+  if (reportedEscalationErrors.has(error.message)) return;
+  reportedEscalationErrors.add(error.message);
+  console.error(error);
+}
+function killFileChildren(): void {
+  if (!hasLiveChildren()) return;
+  try {
+    // Linux and macOS ps report direct children by parent PID. The wrapper
+    // starts only node:test file processes, besides this temporary ps child.
+    // SIGKILL can orphan a file's own children; only file children are reaped.
+    const result = spawnSync("ps", ["-A", "-o", "pid=", "-o", "ppid="], {
+      encoding: "utf8",
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0 || result.pid == null) {
+      throw new Error(`Could not list test processes: ${result.stderr}`);
+    }
+    let parsedRows = 0;
+    for (const line of result.stdout.split("\n")) {
+      if (line.trim() === "") continue;
+      const match = /^\s*(\d+)\s+(\d+)\s*$/.exec(line);
+      if (!match) {
+        reportEscalationError(new Error(`Unexpected ps output: ${line}`));
+        continue;
+      }
+      parsedRows++;
+      const pid = Number(match[1]);
+      const parentPid = Number(match[2]);
+      if (parentPid !== process.pid || pid === result.pid) continue;
+      try {
+        process.kill(pid, "SIGKILL");
+      } catch (error) {
+        if (
+          !(error instanceof Error && "code" in error && error.code === "ESRCH")
+        )
+          reportEscalationError(
+            error instanceof Error ? error : new Error(String(error)),
+          );
+      }
+    }
+    if (parsedRows === 0) throw new Error("ps returned no process rows.");
+  } catch (error) {
+    reportEscalationError(
+      error instanceof Error ? error : new Error(String(error)),
+    );
+  }
+  if (hasLiveChildren()) escalationTimer = setTimeout(killFileChildren, 100);
 }
 function finishInterrupt(): void {
   if (hasLiveChildren()) {
@@ -48,6 +103,7 @@ function finishInterrupt(): void {
     setTimeout(finishInterrupt, 10);
     return;
   }
+  if (escalationTimer != null) clearTimeout(escalationTimer);
   restoreSignals();
   process.kill(process.pid, interrupted);
 }
