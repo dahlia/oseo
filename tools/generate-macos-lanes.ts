@@ -78,8 +78,20 @@ export function macosJobs(): readonly MacosLaneJob[] {
       });
     }
   }
+  for (let caseShard = 1; caseShard <= 3; caseShard++) {
+    add(
+      "test_property_case",
+      String(caseShard),
+      `own-key cases (macos-aarch64, ${caseShard}/3)`,
+      {
+        os: "macos-15",
+        target: "macos-aarch64",
+        caseShard,
+      },
+    );
+  }
   if (jobs.length !== Object.keys(macosJobCosts).length) {
-    throw new Error("Measured cost table has stale jobs");
+    throw new Error("macOS cost table has stale jobs");
   }
   return jobs;
 }
@@ -186,6 +198,17 @@ export function generateMacosWorkflow(template: string): string {
     '              results.every(result => result === "success");',
     "            process.exit(success ? 0 : 1);",
     "          '",
+    "      - uses: actions/checkout@v7",
+    "      - uses: jdx/mise-action@v4",
+    "        with:",
+    "          install: true",
+    "      - uses: actions/download-artifact@v7",
+    "        with:",
+    "          pattern: own-key-duration-*",
+    "          path: ${{ runner.temp }}/property-case-durations",
+    "      - run: >-",
+    "          mise run check:property-case-durations",
+    '          "${{ runner.temp }}/property-case-durations"',
     "",
   ].join("\n");
   const aggregate = blocks

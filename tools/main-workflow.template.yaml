@@ -404,6 +404,7 @@ jobs:
       - run: >-
           mise run test:property:extended:native:shard
           --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --exclude-case-sharded
           tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
@@ -419,12 +420,71 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
+  test_property_case:
+    name: >-
+      own-key cases (${{ matrix.target }},
+      ${{ matrix.caseShard }}/3)
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 1
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 2
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            caseShard: 3
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 1
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 2
+          - os: macos-15
+            target: macos-aarch64
+            caseShard: 3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:property:extended:native:shard
+          tests/property/m5-object-own-keys.property.test.ts
+        env:
+          OSEO_PROPERTY_CASE_SHARD: ${{ matrix.caseShard }}/3
+          OSEO_PROPERTY_DURATION_FILE: ${{ runner.temp }}/duration.json
+          TMPDIR: ${{ runner.temp }}
+      - if: success()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format('own-key-duration-{0}-{1}-of-3',
+            matrix.target, matrix.caseShard) }}
+          path: ${{ runner.temp }}/duration.json
+          if-no-files-found: error
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format('own-key-cases-{0}-{1}-of-3',
+            matrix.target, matrix.caseShard) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   native:
     # The generator expands needs and replaces steps with success checks.
     if: ${{ always() }}
     needs:
       - test_native
       - test_native_support
+      - test_property_case
       - test_test262
     runs-on: ubuntu-latest
     steps:

@@ -265,3 +265,26 @@ export const nativeShardCosts = {
     "tests/property/unicode-tables.property.test.ts": 1,
   },
 };
+
+/**
+ * Derived case-shard weights from the U6 concurrent-duration table above.
+ * These are scheduling estimates, not measured case-shard job times.
+ */
+interface OwnKeyCaseShardCosts {
+  readonly "linux-x86_64-gnu": number;
+  readonly "macos-aarch64": number;
+}
+
+/** Derived one-third own-key costs for dedicated case-shard job planning. */
+export const ownKeyCaseShardCosts: OwnKeyCaseShardCosts = {
+  "linux-x86_64-gnu": Math.ceil(
+    nativeShardCosts["linux-x86_64-gnu"][
+      "tests/property/m5-object-own-keys.property.test.ts"
+    ] / 3,
+  ),
+  "macos-aarch64": Math.ceil(
+    nativeShardCosts["macos-aarch64"][
+      "tests/property/m5-object-own-keys.property.test.ts"
+    ] / 3,
+  ),
+};

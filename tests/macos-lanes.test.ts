@@ -15,6 +15,7 @@ import {
   macosJobs,
   macosLanes,
 } from "../tools/generate-macos-lanes.ts";
+import { ownKeyCaseContract } from "../tools/check-property-case-durations.ts";
 
 interface Job {
   readonly name?: string;
@@ -95,6 +96,12 @@ function names(workflow: Workflow): readonly string[] {
       ),
     )
     .toSorted();
+}
+
+function numberFrom(text: string, pattern: RegExp): number {
+  const matches = [...text.matchAll(pattern)];
+  assert.equal(matches.length, 1);
+  return Number(matches[0]![1]!.replaceAll("_", ""));
 }
 
 // This evaluator compares observable step inputs independently of the
@@ -179,11 +186,37 @@ function executedSteps(
 test("every check name and concurrency policy is preserved", () => {
   assert.deepEqual(names(after), names(before));
   assert.equal(nameBaseline.sourceRun, 36516215200);
-  assert.deepEqual(names(after), nameBaseline.checkNamesObserved.toSorted());
-  assert.equal(names(after).length, 58);
+  const existingNames = names(after).filter(
+    (name) => !name.startsWith("own-key cases ("),
+  );
+  assert.deepEqual(existingNames, nameBaseline.checkNamesObserved.toSorted());
+  assert.equal(names(after).length, 64);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
+});
+
+test("case duration contract matches the suite and extended task", () => {
+  const source = readFileSync(
+    "tests/property/m5-object-own-keys.property.test.ts",
+    "utf8",
+  );
+  const mise = readFileSync("mise.toml", "utf8");
+  const header = '[tasks."test:property:extended:native:shard".env]';
+  const section = mise.split(header)[1]?.split("\n[")[0];
+  assert.ok(section);
+  const ordinaryRuns = numberFrom(source, /\bnumRuns:\s*([\d_]+)/gu);
+  const ordinaryLimit = numberFrom(
+    source,
+    /\btimeLimitMilliseconds:\s*([\d_]+)/gu,
+  );
+  const scale = numberFrom(section, /\bOSEO_PROPERTY_RUN_SCALE = "(\d+)"/gu);
+  const seed = numberFrom(section, /\bOSEO_PROPERTY_SEED = "(\d+)"/gu);
+  const profile = /\bprofile:\s*"([^"]+)"/u.exec(source)?.[1];
+  assert.equal(ordinaryRuns * scale, ownKeyCaseContract.numRuns);
+  assert.equal(ordinaryLimit * scale, ownKeyCaseContract.limitMilliseconds);
+  assert.equal(seed, ownKeyCaseContract.seed);
+  assert.equal(profile, ownKeyCaseContract.profile);
 });
 
 test("literal names acquire a suffix when a matrix remains", () => {
@@ -209,8 +242,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 31);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 31);
+  assert.equal(jobs.length, 34);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 34);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -237,12 +270,12 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       if (index > 0) assert.ok(lane[index - 1]!.seconds >= planned.seconds);
     }
   }
-  // Derived from the measured seconds in main run 36516215200.
+  // Estimates include three case-shard jobs pending CI measurement.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    8872,
+    9414,
   );
 });
 
@@ -290,6 +323,7 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
     "test_sanitizer",
     "test_test262",
     "test_native_support",
+    "test_property_case",
   ]) {
     const original = before.jobs[id]!;
     const actual = after.jobs[id]!;
@@ -323,7 +357,7 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     throw new Error("Aggregate requires an explicit dependency list");
   }
   assert.deepEqual(needs.toSorted(), expected);
-  assert.equal(expected.length, 30);
+  assert.equal(expected.length, 34);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -345,6 +379,18 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     env: { ...process.env, RESULTS: "[]" },
   });
   assert.equal(empty.status, 1);
+  const download = aggregate.steps.find(
+    (step) => step.uses === "actions/download-artifact@v7",
+  );
+  assert.ok(download);
+  assert.equal(
+    parsedMapping(download.with, "Duration download").pattern,
+    "own-key-duration-*",
+  );
+  assert.match(
+    String(aggregate.steps.at(-1)?.run),
+    /mise run check:property-case-durations/u,
+  );
 });
 
 test("aggregate follows additional dependencies in the source template", () => {
@@ -357,7 +403,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 31);
+  assert.equal(needs.length, 35);
 });
 
 test("committed workflow matches generator output exactly", () => {

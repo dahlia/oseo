@@ -1197,3 +1197,65 @@ the available push timestamp proxy. The per-lane measurements are in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 [U16 evidence](./docs/evidence/u16/README.md) records the complete lane plan,
 check name inventory, and scheduling limits.
+
+
+U19 property case partition
+---------------------------
+
+The extended native CI gate now executes the own-key property in three
+case-shard jobs on each native host. Every job generates the same 160-case
+sequence (16 reviewed runs times the existing extended scale of 10), with
+the same seed, replay path, generator, and size. Job `k` of three executes
+the predicate for generated indices congruent to `k - 1` modulo three.
+The three job sets are disjoint and cover the unsharded set. The existing
+native-support job names and file-shard totals remain unchanged; those jobs
+exclude this one file, and the `native` aggregate requires every new job.
+The Proxy and Reflect properties remain in the file shards for this first
+measurement; their case-shard value can be judged from the branch run.
+
+Each job retains the original 3,600,000 ms extended hard interrupt limit.
+Every successful job uploads the interval measured around its property
+assertion. The `native` aggregate requires all six records and sums the
+three durations separately for Linux and macOS, failing either sum above
+3,600,000 ms through `mise run check:property-case-durations`. This
+preserves the original aggregate deadline while allowing
+case costs to vary. An interrupt remains a failure. A failing shard runs the
+usual shrinker, and its seed and path replay the counterexample without the
+shard filter. The first counterexample may differ from an unsharded run.
+Case-sharded properties must be precondition-free, so every shard generates
+the same run sequence. The local `mise run test:property:extended` task
+remains unsharded.
+
+The previous unsharded macOS own-key interval was observed at 3,565,117 ms
+in run `36243816479`, leaving a derived 34,883 ms margin (0.97%) below the
+3,600,000 ms limit. Other U6 branch observations differed by a derived
+11.80 case-minutes, so the margin is sensitive to runner variance. Each
+case shard repeats generation of the complete stream; summing three runs
+can cost more than one unsharded run even when all predicates pass. The
+branch CI run must report each host's measured three-shard sum and derived
+margin, as well as every per-job duration. A negative margin fails the gate;
+the deadline is not relaxed to absorb variance.
+
+The scheduling weights for the three new macOS jobs are derived estimates:
+1,300 seconds each from the U6 measured 3,566 concurrent case seconds for
+the own-key file divided by three, plus estimated setup margin. The macOS
+native-support shard 1 weight is a derived 1,958 seconds from 71 seconds of
+observed fixed cost plus its remaining variable cost times the modeled
+worker-load ratio 2,283/3,566. All twelve native-support weights use the
+same derived ratio rule because excluding own-keys changes their file sets.
+The U6 concurrent-duration inputs came from CI runs `36243816479` and
+`36261458909`; the 3,018-second job observation came from main run
+`36516215200`. These are estimates for the changed job layout;
+one branch CI run must replace them with measured per-job times and separate
+fixed setup cost from case execution. The corresponding Linux U6 weight is
+3,327 concurrent case seconds, or a derived 1,109 seconds per case shard.
+With only five hosted macOS slots, the changed layout has a derived longest
+lane of 9,414 seconds versus the baseline model's 8,872 seconds. U19 must
+merge together with the Mac mini capacity lanes in U20; merging U19 alone
+would make the modeled hosted-lane wait longer. One branch CI run is needed
+to measure the new jobs before treating this model as observed timing.
+The `native` aggregate also adds checkout, pinned tool installation,
+workspace dependency setup, artifact download, and the duration check.
+Its previous job wall time was an observed three seconds in main run
+`36516215200`; the new fixed cost is unmeasured and is outside the
+9,414-second macOS lane model. The branch run must report it separately.
