@@ -1,0 +1,2 @@
+native support (macos-aarch64, 1/12)	UNKNOWN STEP	2026-09-30T14:10:03.1717270Z ✔ generated Object own-key statics match the M5 model (2812747.633708ms)
+native support (macos-aarch64, 1/12)	UNKNOWN STEP	2026-09-30T02:44:50.1865100Z ✔ generated Object own-key statics match the M5 model (2692250.600583ms)

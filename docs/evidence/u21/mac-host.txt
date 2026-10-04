@@ -1,0 +1,23 @@
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+arm64
+Mac18,5
+Apple M6
+12
+17179869184
+/Library/Developer/CommandLineTools
+package-id: com.apple.pkg.CLTools_Executables
+version: 27.0.0.0.1788430756
+volume: /
+location: /
+Apple clang version 21.0.0 (clang-2100.3.34.2)
+Target: arm64-apple-darwin27.0.0
+Thread model: posix
+assessments enabled
+2434dd8b73f187fafca2baf85425b0ccd6fba1dc
+deno                  2.9.7    ~/Desktop/oseo-m5ci-u21/mise.toml  2.9.7
+node                  24.21.0  ~/Desktop/oseo-m5ci-u21/mise.toml  24.21.0
+zig                   0.16.0   ~/Desktop/oseo-m5ci-u21/mise.toml  0.16.0
+id: uid=501(dahlia) gid=20(staff) groups=20(staff),12(everyone),61(localaccounts),79(_appserverusr),80(admin),81(_appserveradm),701(com.apple.sharepoint.group.1),33(_appstore),98(_lpadmin),100(_lpoperator),204(_developer),250(_analyticsusers),395(com.apple.access_ftp),398(com.apple.access_screensharing),399(com.apple.access_ssh),400(com.apple.access_remote_ae)
+dsmemberutil checkmembership -U dahlia -G admin: user is a member of the group

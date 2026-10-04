@@ -1,0 +1,10 @@
+test (macos-latest, node)	UNKNOWN STEP	2026-09-30T13:22:26.2598820Z Version: 20260828.587
+test (macos-latest, node)	UNKNOWN STEP	2026-09-30T13:22:26.2659510Z Image: macos-26-arm64
+test (macos-latest, node)	UNKNOWN STEP	2026-09-30T13:22:26.2659890Z Version: 20260907.0351.1
+host C sanitizers (macOS, native)	UNKNOWN STEP	2026-09-30T13:22:24.0184950Z Version: 20260828.587
+host C sanitizers (macOS, native)	UNKNOWN STEP	2026-09-30T13:22:24.0201400Z Image: macos-15-arm64
+host C sanitizers (macOS, native)	UNKNOWN STEP	2026-09-30T13:22:24.0202420Z Version: 20260907.0337.1
+host C sanitizers (macOS, native)	UNKNOWN STEP	2026-09-30T13:23:21.3558080Z Apple clang version 17.0.0 (clang-1700.0.13.5)
+host C sanitizers (macOS, native)	UNKNOWN STEP	2026-09-30T13:23:27.2143370Z Apple clang version 17.0.0 (clang-1700.0.13.5)
+test (macos-latest, node)	UNKNOWN STEP	2026-09-30T13:22:26.2658100Z 26.6.2
+host C sanitizers (macOS, native)	UNKNOWN STEP	2026-09-30T13:22:24.0197320Z 15.7.9

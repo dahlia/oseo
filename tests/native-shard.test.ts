@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readdir } from "node:fs/promises";
 import test from "node:test";
 
-import { nativeShardCosts } from "../tools/native-shard-costs.ts";
+import {
+  nativeShardCosts,
+  ownKeyCaseShardCosts,
+} from "../tools/native-shard-costs.ts";
 
 import {
   nativeTestArguments,
@@ -66,6 +69,31 @@ test("Linux isolates own-key properties from every other file", async () => {
       ),
     );
   }
+});
+
+test("case-sharded file leaves both CI file partitions", async () => {
+  const files = (await readdir(new URL("property/", import.meta.url)))
+    .filter((path) => path.endsWith(".property.test.ts"))
+    .map((path) => `tests/property/${path}`);
+  const ownKeys = "tests/property/m5-object-own-keys.property.test.ts";
+  for (const [platform, total] of [
+    ["linux", 5],
+    ["darwin", 12],
+  ] as const) {
+    const selected = Array.from({ length: total }, (_, offset) =>
+      nativeTestArguments(
+        [`--shard=${offset + 1}/${total}`, "--exclude-case-sharded", ...files],
+        platform,
+      ),
+    ).flat();
+    assert.deepEqual(
+      selected.toSorted(),
+      files.filter((path) => path !== ownKeys).toSorted(),
+    );
+    assert.equal(new Set(selected).size, files.length - 1);
+  }
+  assert.equal(ownKeyCaseShardCosts["linux-x86_64-gnu"], 1109);
+  assert.equal(ownKeyCaseShardCosts["macos-aarch64"], 1189);
 });
 
 test("native shards start the measured expensive batch first", () => {
@@ -150,6 +178,14 @@ test("native wrapper translates shards and rejects ambiguous input", () => {
     ["--shard=0/12", ...files],
     ["--shard=1/12", "--shard=2/12", ...files],
     ["--shard=1/12", "--test-shard=1/12", ...files],
+    ["--exclude-case-sharded", ...files],
+    ["--exclude-case-sharded=true", ...files],
+    [
+      "--shard=1/12",
+      "--exclude-case-sharded",
+      "--exclude-case-sharded",
+      ...files,
+    ],
     ["--shard=1/12"],
     ["--shard=1/12", "tests/property/*.property.test.ts"],
     ["--shard=1/12", ...files, ...files],

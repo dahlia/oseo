@@ -1,0 +1,18 @@
+Commands: date -u; ps -axo pid,etime,%cpu,command | sort -k3 -rn | head -n 6
+Fourth sample used comm instead of command for the last ps field.
+Sat Oct  3 17:58:18 UTC 2026
+  913 04:35:09 112.3 /System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd
+92422    00:01  65.5 node tools/test262.ts --shard 1/12
+Sat Oct  3 18:11:59 UTC 2026
+  913 04:48:50 121.9 /System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd
+24134    04:02   1.5 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared -s mdworker -c MDSImporterWorker -m com.apple.mdworker.shared
+Sat Oct  3 18:18:54 UTC 2026
+  913 04:55:45 119.7 /System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd
+ 1786 04:51:35   6.1 /System/Library/PrivateFrameworks/XprotectFramework.framework/Versions/A/XPCServices/XprotectService.xpc/Contents/MacOS/XprotectService
+Sat Oct  3 18:43:04 UTC 2026
+  913 05:19:55 117.5 /System/Library/PrivateFrameworks/MediaAnalysis.framework/Versions/A/mediaanalysisd
+95407    00:00  96.2 /Users/dahlia/.local/share/mise/installs/zig/0.16.0/zig
+95435    00:00  44.5 /Users/dahlia/.local/share/mise/installs/zig/0.16.0/zig
+81766    07:05  23.4 /System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared
+95436    00:00  12.1 sshd-session: dahlia [priv]
+81675    07:06   7.6 /Users/dahlia/.local/share/mise/installs/node/24.21.0/bin/node

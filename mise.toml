@@ -51,6 +51,7 @@ depends = [
   "check:native-host-guards",
   "check:native-toolchains",
   "check:packages",
+  "check:selfhosted-mac-shell",
   "check:types",
   "check:unicode-tables",
   "check:versions",
@@ -84,6 +85,11 @@ run = "node tools/compatibility-ratchet.ts"
 [tasks."check:evidence-lanes"]
 description = "Validate normative per-family evidence records"
 run = "node tools/evidence-lanes.ts"
+
+[tasks."check:property-case-durations"]
+description = "Require complete case shards within the original deadline"
+raw_args = true
+run = "node tools/check-property-case-durations.ts"
 
 [tasks."check:fmt"]
 depends = ["check:fmt:md", "check:fmt:mise", "check:fmt:oxfmt"]
@@ -365,3 +371,7 @@ run = """
 node tools/generate-macos-lanes.ts --check
 node --test tests/macos-lanes.test.ts
 """
+
+[tasks."check:selfhosted-mac-shell"]
+description = "Lint dedicated Mac setup scripts"
+run = "shellcheck tools/selfhosted-mac/*.sh"
