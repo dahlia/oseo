@@ -1390,3 +1390,135 @@ all jobs on hosted runners. A later branch run with the switch on must
 measure the same jobs at least twice, separate cold and warm caches, and
 record the macOS version printed by every macOS job. No coverage count,
 shard total, seed, target, or sanitizer lane changes here.
+
+### Measured Mac-lane ratios (U23)
+
+The first three runs with the switch on, branch run `37194069657`
+attempts 1 and 2 and main run `37206614757`, each placed the same 11
+jobs on `oseo-mac-1`. Their measured push-to-green times were 107.9,
+111.1, and 113.5 min. The Mac lane finished at a measured 82.3, 84.6,
+and 80.1 min after run creation, while the hosted macOS lanes ran until
+the end. The U22 ratios had predicted 101.0 min of Mac job time; the
+measured sums were 81.5, 83.7, and 79.0 min.
+
+*tools/macos-job-costs.ts* now uses derived pooled ratios calibrated
+against the cost weights the model consumes: 4.5 for test262, 2.9 for
+native support, and 3.2 for own-key cases. Each is rounded down from
+the pooled value over all three runs and lies inside the per-run range,
+which was 4.39 to 4.63, 2.83 to 3.03, and 3.15 to 3.43, respectively.
+Against the same jobs' hosted walls in all-hosted runs `37167895777`
+and `37121778924`, the derived runner-mode ratios were 4.4, 2.9, and
+2.2. The own-key difference comes from its 1,300-second weight, which
+exceeds the 704 to 1,085 hosted seconds measured there. The native
+fixture ratio stays at the derived U21 value of 2.2 because no native
+fixture job had run on the Mac. The cache states of the three runs were
+not separated, and their per-run ratios show no monotonic trend.
+
+With these ratios the generator moves `native (macos-aarch64, 3/3)` and
+`native support (macos-aarch64, 6/12, 8/12, 12/12)` to the Mac and
+`test262 (macos-aarch64, 1/12, 2/12, 11/12)` to hosted lanes, for 12
+Mac jobs. The model predicts a derived 102.7-min macOS makespan and
+482.7 hosted macOS minutes, against 105.1 min and 502.9 min for the U22
+ratios with the same costs. The observed push-to-green times exceeded
+the old prediction by 2.8 to 8.4 min. The model omits job waiting and
+the aggregate, and the hosted sanitizer jobs, for example, ran a derived
+11 to 23 percent above their weights. Adding any further
+eligible job to the Mac would raise its predicted lane above the
+makespan, so the greedy assignment is kept.
+
+A second concurrent Mac lane was modeled but not enabled. U21 measured
+1.55 times the throughput for two concurrent jobs, a derived per-job
+latency factor of 1.29. Under that factor the model predicts a derived
+82.1-min makespan with 17 Mac jobs; a latency factor of 1.5 still
+predicts 86.2 min. U21 also observed about 243 MB of free memory with
+two concurrent jobs, so enabling it needs a memory measurement under
+runner mode first. Job names, the aggregate's required set, Zig-only
+eligibility, hosted fallback, shard totals, and coverage are unchanged.
+
+### Measured runs of the U23 ratios
+
+Branch run `37215661294` at `29f11948` passed in both attempts, with the
+same 12 jobs on `oseo-mac-1`. The measured push-to-green times were 112.2
+and 105.3 min, the Mac lane ended at 80.4 and 80.3 min, and the last hosted
+macOS job ended at 111.8 and 104.8 min. The model had predicted a derived
+102.7-min makespan with a 99.5-min Mac lane, so the prediction did not
+hold. Against the earlier measured 107.9, 111.1, and 113.5 min, the
+difference is smaller than the run-to-run spread, so these runs cannot
+distinguish a retune effect from runner variation.
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) records the
+measured per-run, per-job, and per-lane values.
+
+The model erred on both sides. The Mac jobs measured 79.5 and 78.8 min
+against a derived 98.5 modeled minutes, about 0.8 times the model:
+
+ -  The five Mac jobs also run in earlier attempts were modeled at
+    44.2 min and measured 38.4 and 37.9 min.
+ -  Native support 6/12, 8/12, and 12/12, newly moved to the Mac, were
+    modeled at 23.5 min and measured 16.4 and 16.1 min. Against their
+    weights they ran at derived ratios of 4.0 to 4.8, not 2.9.
+ -  Native fixture 3/3 was modeled at 8.4 min with the U21 ratio 2.2 and
+    measured 6.1 and 6.0 min, a derived ratio of 3.2.
+ -  The three own-key shards were modeled at 22.5 min and measured 18.7
+    and 18.8 min.
+
+Only `native support (macos-aarch64, 1/12)` ran slower than modeled. Its
+derived ratio against its weight is 2.7, and it dominated the earlier
+pooled native-support ratio. Within that family, per-job ratios against
+the current weights range from a derived 2.7 to 4.8, and within test262
+from 3.6 to 6.4. One ratio per family cannot fit both.
+
+The hosted side was underestimated. Lane 3 ended a measured 19.3 and 7.2
+min after its modeled 92.5 min; it set the makespan in attempt 1.
+`test262 (macos-aarch64, 6/12)` measured 26.6 and 24.8 min against an
+18.1-min weight that lies below all seven hosted observations, 1,366 to
+1,617 s, of runs `37121778924`, `37167895777`, and the five Mac-lane
+attempts. `host C sanitizers (macOS, property)` measured 42.4 and 28.7 min
+against a 32.0-min weight. Its weight lies inside the observed 1,723 to
+2,727 s range, but 266 s below the 2,189-second median, so that job is
+mostly noisy. Lane 2 ended 8.8 and 9.3 min late in both attempts:
+`test262 (macos-aarch64, 1/12)` measured 21.5 and 21.4 min against a
+17.9-min weight below its four hosted observations, and test262 9/12
+measured 25.4 and 24.3 min against 21.3. Queueing does not explain the
+gap: each hosted lane's measured start delay and handoffs summed to 0.5 to
+0.7 min per attempt, and the Mac lane's to 0.9 and 1.5 min against the
+modeled 1.0 min.
+
+Pooled over all five Mac-lane attempts against the current weights and
+rounded down, the corrected derived ratios would be 4.8 for test262 over
+14 job observations, 3.2 for native support over 26, 3.5 for own-key
+cases over 15, and 3.2 for native fixtures over 2. Changing only these
+ratios moves 14 jobs to the Mac. The model then predicts a derived 92.0
+min. Evaluated against the hosted medians and the measured Mac
+medians, the same assignment gives a derived 97.3 min, because the stale
+hosted weights remain.
+
+The recommended next retune changes three things. It is not applied here:
+
+1.  Replace every hosted weight with the median of the job's hosted
+    observations in the seven runs. Jobs placed on the Mac in all five
+    Mac-lane attempts have only 2 hosted observations, and others have
+    up to 7. For example, the median is 1,540 s for test262 6/12 instead of
+    1,083, 2,189 s for the sanitizer property job instead of 1,923, and 1,288 s
+    for test262 1/12 instead of 1,074.
+2.  Model a Mac job by its measured Mac median when one exists, which
+    covers 15 jobs. Convert any other job from its hosted median with
+    ratios pooled against hosted medians: a derived 4.2 for test262, 3.2
+    for native support, and 3.1 for native fixtures.
+3.  Assign the three own-key shards before the other jobs. They must run
+    on the Mac lane, and with hosted-median weights of 810 to 995 s the
+    longest-first order would place them near the end. The model would then
+    overload that lane to a derived 106.4 min.
+
+With these inputs the greedy assignment puts 15 jobs on the Mac and
+gives a derived, unvalidated scheduling estimate of a 93.3-min makespan,
+set by the Mac lane. Hosted lanes end at a derived 80.8 to 92.8 min,
+using 439.1 hosted macOS job minutes. The current assignment evaluated
+the same way gives 106.1 min and 494.5 min. That evaluation lies between
+the measured 105.3 and 112.2 min, so the medians model this run better
+than the weights did. Medians omit the measured 0.5 to 1.5 min of lane
+overhead and per-job spread, and the current assignment's 106.1-min
+estimate was exceeded by 6.1 min in one attempt. Only a branch
+measurement of the retuned assignment can establish its makespan. The
+retune needs generator and cost-table changes and the usual two-attempt
+branch measurement. Job names, eligibility, the aggregate's required
+set, shard totals, and coverage would not change.

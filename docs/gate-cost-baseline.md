@@ -211,6 +211,105 @@ a measured guest setup and a Zig-only bare-host assignment.
 [36657614384]: https://github.com/dahlia/oseo/actions/runs/36657614384
 [36721134885]: https://github.com/dahlia/oseo/actions/runs/36721134885
 
+### Runner-mode Mac lane runs (U23)
+
+Five run attempts have executed with `OSEO_SELFHOSTED_MAC_ENABLED` on and
+`oseo-mac-1` online. The table reads every value from the GitHub jobs API
+for the named attempt. Push-to-green time runs from the attempt's
+`run_started_at` to the last job's `completed_at`. Job minutes are summed
+job walls from `started_at` to `completed_at`, so they exclude queue waiting.
+Mac jobs are those whose `runner_name` is `oseo-mac-1`; hosted macOS jobs
+are the other jobs of the 34-job macOS matrix. The Linux-hosted
+`macOS self-hosted availability` probe is counted in neither. Lane ends are
+minutes after `run_started_at`. All values are measured and rounded to
+0.1 min.
+
+| Source run, attempt | Commit     | Push-to-green | Mac jobs | Mac job min | Mac lane end | Hosted jobs | Hosted job min | Last hosted end |
+| ------------------- | ---------- | ------------: | -------: | ----------: | -----------: | ----------: | -------------: | --------------: |
+| [37194069657], 1    | `1c64f3cd` |         107.9 |       11 |        81.5 |         82.3 |          23 |          505.0 |           107.5 |
+| [37194069657], 2    | `1c64f3cd` |         111.1 |       11 |        83.7 |         84.7 |          23 |          514.8 |           111.1 |
+| [37206614757], 1    | `e115c408` |         113.5 |       11 |        79.0 |         80.2 |          23 |          527.1 |           113.1 |
+| [37215661294], 1    | `29f11948` |         112.2 |       12 |        79.5 |         80.4 |          22 |          499.8 |           111.8 |
+| [37215661294], 2    | `29f11948` |         105.3 |       12 |        78.8 |         80.3 |          22 |          489.4 |           104.8 |
+
+The second and third Mac lane ends were recorded as 84.6 and 80.1 min in
+[*PLAN-GATE.md*](../PLAN-GATE.md). The first used `created_at`, which
+follows that attempt's `run_started_at` by 2 s; the second is 80.15 min
+rounded down. The first three attempts placed the same 11 jobs on the Mac.
+The two `29f11948` attempts placed the same 12 jobs there.
+
+The earlier three push-to-green times span a derived 5.6 min. The two
+attempts of `29f11948` alone span 6.9 min. Their derived mean of 108.7 min
+is 2.1 min below the earlier mean of 110.8 min, less than either spread.
+With two and three samples whose ranges overlap, these runs cannot
+distinguish a retune effect on push-to-green time from runner variation. The
+Mac lane ends of 80.4 and 80.3 min also lie inside the earlier 80.2 to 84.7
+min. Hosted macOS job minutes fell by a derived 5.2 to 37.7 min with one fewer
+hosted job, but the earlier three attempts alone span 22.1 min, so the size of
+that reduction is not established.
+
+Every Mac job in both `29f11948` attempts printed macOS 27.0.1 and reported
+action cache hits for its mise and runtime-archive keys. The runner's
+cleanup removed its whole Zig global cache after
+`native support (macos-aarch64, 1/12)`, the last Mac job of attempt 1,
+because free disk fell below 40 GiB. Attempt 2 therefore started with an
+empty Zig cache and pruned nothing. Attempt 1 started with the cache left
+by earlier runs; main run [37206614757] had pruned it after its first Mac
+job. The Mac job minutes measured 78.8 in attempt 2 against 79.5 in
+attempt 1. With one attempt per starting state and different job order,
+this does not isolate a cold-cache effect, which was not measured
+separately. It does not contradict the U5 finding that per-run staging
+paths defeat Zig cache reuse.
+
+The lane model in `29f11948` converts a Mac job's weight through
+`60 + (weight - 60) / ratio` seconds and adds a 60-second probe allowance.
+Each Mac job's modeled minutes below are derived from that formula; the
+attempt columns are measured job walls from run [37215661294]:
+
+| Mac job                                 | Weight (s) | Ratio | Modeled | Attempt 1 | Attempt 2 |
+| --------------------------------------- | ---------: | ----: | ------: | --------: | --------: |
+| `test262 (macos-aarch64, 8/12)`         |      2,007 |   4.5 |     8.2 |       6.1 |       6.0 |
+| `native support (macos-aarch64, 1/12)`  |      1,958 |   2.9 |    11.9 |      12.5 |      12.2 |
+| `native support (macos-aarch64, 4/12)`  |      1,410 |   2.9 |     8.8 |       6.6 |       6.6 |
+| `native support (macos-aarch64, 2/12)`  |      1,351 |   2.9 |     8.4 |       8.1 |       8.1 |
+| `native support (macos-aarch64, 8/12)`  |      1,333 |   2.9 |     8.3 |       5.5 |       5.3 |
+| `own-key cases (macos-aarch64, 1/3)`    |      1,300 |   3.2 |     7.5 |       6.3 |       6.4 |
+| `own-key cases (macos-aarch64, 2/3)`    |      1,300 |   3.2 |     7.5 |       6.2 |       6.2 |
+| `own-key cases (macos-aarch64, 3/3)`    |      1,300 |   3.2 |     7.5 |       6.2 |       6.2 |
+| `native support (macos-aarch64, 6/12)`  |      1,236 |   2.9 |     7.8 |       5.9 |       5.9 |
+| `native support (macos-aarch64, 12/12)` |      1,175 |   2.9 |     7.4 |       5.0 |       4.9 |
+| `native support (macos-aarch64, 10/12)` |      1,091 |   2.9 |     6.9 |       5.1 |       5.0 |
+| `native (macos-aarch64, 3/3)`           |      1,039 |   2.2 |     8.4 |       6.1 |       6.0 |
+
+The five hosted lanes are serial chains in the generated order. The
+modeled end is the derived sum of the chain's weights. Overhead is the
+measured lane end minus the measured sum of its job walls, so it contains
+the first start delay and every handoff:
+
+| Lane | Jobs in chain order                                                          | Modeled end | Attempt 1 end | Attempt 2 end | Overhead 1 | Overhead 2 |
+| ---- | ---------------------------------------------------------------------------- | ----------: | ------------: | ------------: | ---------: | ---------: |
+| 1    | `test (macos-latest, node)`, native support 5/12, test262 4/12, native 1/3   |       101.7 |         100.5 |         104.5 |        0.5 |        0.6 |
+| 2    | sanitizers native, test262 9/12, test262 11/12, test262 1/12                 |        95.5 |         104.3 |         104.8 |        0.5 |        0.6 |
+| 3    | sanitizers property, native support 11/12, native support 3/12, test262 6/12 |        92.5 |         111.8 |          99.7 |        0.6 |        0.6 |
+| 4    | test262 5/12, 2/12, 7/12, 3/12, `test (macos-latest, deno)`                  |        90.4 |          83.6 |          84.0 |        0.6 |        0.6 |
+| 5    | native support 9/12, 7/12, test262 12/12, 10/12, native 2/3                  |       102.7 |         102.5 |          99.5 |        0.7 |        0.7 |
+| Mac  | the 12 jobs above, plus the 1.0-min probe allowance                          |        99.5 |          80.4 |          80.3 |        0.9 |        1.5 |
+
+The Mac lane's attempt 2 overhead includes the availability probe, which
+started a measured 0.67 min after `run_started_at`. Over seven runs,
+all-hosted [37121778924] and [37167895777] plus the five attempts above,
+hosted `test262 (macos-aarch64, 6/12)` measured 1,366 to 1,617 s against
+its 1,083-second weight. Hosted `host C sanitizers (macOS, property)`
+measured 1,723 to 2,727 s, with a 2,189-second median, against 1,923 s.
+[*PLAN-GATE.md*](../PLAN-GATE.md) explains these gaps and derives the
+recommended next retune.
+
+[37121778924]: https://github.com/dahlia/oseo/actions/runs/37121778924
+[37167895777]: https://github.com/dahlia/oseo/actions/runs/37167895777
+[37194069657]: https://github.com/dahlia/oseo/actions/runs/37194069657
+[37206614757]: https://github.com/dahlia/oseo/actions/runs/37206614757
+[37215661294]: https://github.com/dahlia/oseo/actions/runs/37215661294
+
 ### U16 static macOS lane branch observations
 
 GitHub Actions run and job timestamps provide one measured observation at
