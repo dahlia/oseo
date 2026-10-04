@@ -21,7 +21,12 @@ type RunnerFetch = (
   },
 ) => Promise<{ readonly ok: boolean; json(): Promise<RunnerList> }>;
 
-/** Decide once before dispatch; any uncertainty retains hosted coverage. */
+/**
+ * Any push to dahlia/oseo, branch or tag, can select the Mac when enabled,
+ * authenticated, and idle. Only write-access collaborators can push there.
+ * PRs and forks stay hosted; decide once before dispatch, with uncertainty
+ * retaining hosted coverage.
+ */
 export async function runnerSelections(
   env: Readonly<Record<string, string | undefined>>,
   // SAFETY: Only Response.ok and its JSON result are used and validated.

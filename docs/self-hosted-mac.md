@@ -34,9 +34,11 @@ duration sum therefore comes from one Mac class, either the selected
 
 An Ubuntu job uses `OSEO_RUNNER_STATUS_TOKEN` with repository
 Administration: read to check whether the exact runner label is online and
-idle. The repository variable must equal `true`, the event must be a push in
-`dahlia/oseo`, and the secret must exist. Otherwise the job emits hosted
-`macos-15`. Pull requests, including fork PRs, always fall back. An API
+idle. The repository variable must equal `true`, the event must be a push to
+`dahlia/oseo` (any branch or tag), and the secret must exist. Only
+collaborators with write access can push there. Otherwise the job emits
+hosted `macos-15`.
+Pull requests, including fork PRs, always fall back. An API
 failure or a busy/offline runner also falls back. A machine that goes offline
 after selection can leave a job queued; the operator must disable the switch
 and rerun the workflow, preserving the complete gate verdict.
