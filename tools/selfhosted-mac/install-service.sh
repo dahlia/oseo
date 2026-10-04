@@ -8,6 +8,14 @@ runner_label=oseo-mac-1
 service_label=org.oseo.runner.$runner_label
 plist=/Library/LaunchDaemons/$service_label.plist
 script_dir=$(cd "$(dirname "$0")" && pwd)
+is_unlinked_directory() {
+  local path=$1 logical physical
+  [[ $path == /* && $path != */../* && $path != */.. &&
+    -d $path ]] || return 1
+  logical=$(cd "$path" 2>/dev/null && pwd -L) || return 1
+  physical=$(cd -P "$path" 2>/dev/null && pwd -P) || return 1
+  [[ $logical == "$physical" ]]
+}
 
 [[ $runner_root == /* && $runner_root != / ]] || {
   echo 'Runner root must be an absolute non-root path' >&2
@@ -29,6 +37,10 @@ fi
   echo 'Register the pinned persistent runner first' >&2
   exit 2
 }
+is_unlinked_directory "$runner_root" || {
+  echo 'Runner root must have no linked path component' >&2
+  exit 2
+}
 [[ $(id -Gn "$runner_user") != *admin* ]] || {
   echo 'Runner account must not be an administrator' >&2
   exit 2
@@ -42,6 +54,10 @@ runner_home=$(
 )
 [[ $runner_home == /* && -d $runner_home ]] || {
   echo 'Runner account needs a home directory' >&2
+  exit 2
+}
+is_unlinked_directory "$runner_home" || {
+  echo 'Runner home must have no linked path component' >&2
   exit 2
 }
 [[ $(stat -f %Su "$runner_home") == "$runner_user" ]] || {

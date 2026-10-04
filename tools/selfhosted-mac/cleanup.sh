@@ -4,8 +4,20 @@ umask 077
 
 root=${OSEO_RUNNER_ROOT:?Set OSEO_RUNNER_ROOT}
 phase=${1:?Set started or completed}
+is_unlinked_directory() {
+  local path=$1 logical physical
+  [[ $path == /* && $path != */../* && $path != */.. &&
+    -d $path ]] || return 1
+  logical=$(cd "$path" 2>/dev/null && pwd -L) || return 1
+  physical=$(cd -P "$path" 2>/dev/null && pwd -P) || return 1
+  [[ $logical == "$physical" ]]
+}
 [[ $root == /* && $root != / && -f $root/.runner ]] || {
   echo 'Refusing cleanup outside a registered runner root' >&2
+  exit 2
+}
+is_unlinked_directory "$root" || {
+  echo 'Refusing cleanup through a linked runner root' >&2
   exit 2
 }
 [[ $(uname -s) == Darwin && $EUID -ne 0 ]] || {
@@ -47,10 +59,17 @@ diag=$root/_diag
 if [[ -d $diag && ! -L $diag ]]; then
   find "$diag" -type f -mtime +7 -delete || true
 fi
-cache=$HOME/.cache/zig
+cache_parent=$HOME/.cache
+cache=$cache_parent/zig
 free_kib=$(df -Pk "$root" | awk 'NR == 2 {print $4}') || true
 if [[ $free_kib =~ ^[0-9]+$ && $free_kib -lt 41943040 &&
-      -d $cache && ! -L $cache ]]; then
-  rm -rf -- "$cache"
-  echo 'Pruned Zig cache because free disk fell below 40 GiB'
+      -d $cache ]]; then
+  if [[ $HOME == /* && $HOME != / && ! -L $cache ]] &&
+      is_unlinked_directory "$HOME" &&
+      is_unlinked_directory "$cache_parent"; then
+    (cd -P "$cache_parent" && rm -rf -- zig)
+    echo 'Pruned Zig cache because free disk fell below 40 GiB'
+  else
+    echo 'Skipped Zig cache prune through a linked path' >&2
+  fi
 fi

@@ -6,6 +6,7 @@ import {
   mkdtempSync,
   readFileSync,
   readdirSync,
+  realpathSync,
   rmSync,
   statSync,
   symlinkSync,
@@ -745,7 +746,7 @@ test(
     skip: process.platform === "win32" ? "requires Bash" : false,
   },
   () => {
-    const root = mkdtempSync(join(tmpdir(), "oseo-mac-cleanup-"));
+    const root = realpathSync(mkdtempSync(join(tmpdir(), "oseo-mac-cleanup-")));
     try {
       const runner = join(root, "runner");
       const bin = join(root, "bin");
@@ -773,13 +774,44 @@ test(
         PATH: `${bin}:${process.env.PATH ?? ""}`,
       };
       const cleanup = "tools/selfhosted-mac/cleanup.sh";
-      const started = spawnSync("bash", [cleanup, "started"], { env });
+      symlinkSync(runner, join(root, "linked-root"));
+      symlinkSync(root, join(root, "linked-parent"));
+      for (const linkedRoot of [
+        join(root, "linked-root"),
+        join(root, "linked-parent", "runner"),
+      ]) {
+        const linked = spawnSync("/bin/bash", [cleanup, "started"], {
+          env: { ...env, OSEO_RUNNER_ROOT: linkedRoot },
+        });
+        assert.equal(linked.status, 2);
+        assert.match(String(linked.stderr), /linked runner root/u);
+        assert.ok(existsSync(join(checkout, "stale")));
+      }
+      const patternRoot = join(root, "a?c");
+      const patternCheckout = join(patternRoot, "_work", "oseo", "oseo");
+      mkdirSync(patternCheckout, { recursive: true });
+      writeFileSync(join(patternRoot, ".runner"), "registered");
+      writeFileSync(join(patternCheckout, "stale"), "stale");
+      symlinkSync(patternRoot, join(root, "abc"));
+      const patternLink = spawnSync("/bin/bash", [cleanup, "started"], {
+        env: { ...env, OSEO_RUNNER_ROOT: join(root, "abc") },
+      });
+      assert.equal(patternLink.status, 2);
+      assert.match(String(patternLink.stderr), /linked runner root/u);
+      assert.ok(existsSync(join(patternCheckout, "stale")));
+      const parentTraversal = spawnSync("/bin/bash", [cleanup, "started"], {
+        env: { ...env, OSEO_RUNNER_ROOT: `${runner}/../runner` },
+      });
+      assert.equal(parentTraversal.status, 2);
+      assert.match(String(parentTraversal.stderr), /linked runner root/u);
+      assert.ok(existsSync(join(checkout, "stale")));
+      const started = spawnSync("/bin/bash", [cleanup, "started"], { env });
       assert.equal(started.status, 0, String(started.stderr));
       assert.ok(!existsSync(join(checkout, "stale")));
       assert.ok(existsSync(join(actions, "action.yml")));
       assert.ok(existsSync(join(temp, "event.json")));
       assert.ok(!existsSync(join(temp, "duration.json")));
-      const completed = spawnSync("bash", [cleanup, "completed"], { env });
+      const completed = spawnSync("/bin/bash", [cleanup, "completed"], { env });
       assert.equal(completed.status, 0, String(completed.stderr));
       assert.ok(!existsSync(actions));
       assert.ok(!existsSync(join(runner, "_work", "oseo")));
@@ -787,8 +819,100 @@ test(
       assert.ok(!existsSync(join(temp, "event.json")));
       assert.ok(existsSync(join(runner, "oseo-temp", "listener.pipe")));
       assert.ok(existsSync(join(runner, ".runner")));
+      const trailingSlash = spawnSync("/bin/bash", [cleanup, "started"], {
+        env: { ...env, OSEO_RUNNER_ROOT: `${runner}/` },
+      });
+      assert.equal(trailingSlash.status, 0, String(trailingSlash.stderr));
     } finally {
       rmSync(root, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
+  "Mac cleanup refuses a linked Zig cache parent",
+  {
+    skip: process.platform === "win32" ? "requires Bash" : false,
+  },
+  () => {
+    const root = realpathSync(mkdtempSync(join(tmpdir(), "oseo-mac-cache-")));
+    const external = realpathSync(
+      mkdtempSync(join(tmpdir(), "oseo-mac-external-")),
+    );
+    try {
+      const runner = join(root, "runner");
+      const bin = join(root, "bin");
+      mkdirSync(runner);
+      mkdirSync(bin);
+      writeFileSync(join(runner, ".runner"), "registered");
+      for (const [name, body] of [
+        ["uname", "#!/bin/sh\necho Darwin\n"],
+        [
+          "df",
+          "#!/bin/sh\n" +
+            "echo 'Filesystem Blocks Used Available'\n" +
+            "echo 'disk 1 1 100'\n",
+        ],
+      ] as const) {
+        const executable = join(bin, name);
+        writeFileSync(executable, body);
+        chmodSync(executable, 0o700);
+      }
+      mkdirSync(join(external, "zig"));
+      const externalMarker = join(external, "zig", "keep");
+      writeFileSync(externalMarker, "keep");
+      symlinkSync(external, join(root, ".cache"));
+      const env = {
+        ...process.env,
+        HOME: root,
+        OSEO_RUNNER_ROOT: runner,
+        PATH: `${bin}:${process.env.PATH ?? ""}`,
+      };
+      const cleanup = "tools/selfhosted-mac/cleanup.sh";
+      const linked = spawnSync("/bin/bash", [cleanup, "completed"], { env });
+      assert.equal(linked.status, 0, String(linked.stderr));
+      assert.ok(existsSync(externalMarker));
+      assert.doesNotMatch(String(linked.stdout), /Pruned Zig cache/u);
+      assert.match(String(linked.stderr), /Skipped Zig cache prune/u);
+      const externalCache = join(external, ".cache", "zig");
+      mkdirSync(externalCache, { recursive: true });
+      const linkedHomeMarker = join(externalCache, "keep-home");
+      writeFileSync(linkedHomeMarker, "keep");
+      const linkedHome = join(root, "linked-home");
+      symlinkSync(external, linkedHome);
+      const homeResult = spawnSync("/bin/bash", [cleanup, "completed"], {
+        env: { ...env, HOME: linkedHome },
+      });
+      assert.equal(homeResult.status, 0, String(homeResult.stderr));
+      assert.ok(existsSync(linkedHomeMarker));
+      assert.doesNotMatch(String(homeResult.stdout), /Pruned Zig cache/u);
+      assert.match(String(homeResult.stderr), /Skipped Zig cache prune/u);
+      rmSync(join(root, ".cache"));
+      const localCache = join(root, ".cache", "zig");
+      mkdirSync(localCache, { recursive: true });
+      writeFileSync(join(localCache, "prune"), "prune");
+      const local = spawnSync("/bin/bash", [cleanup, "completed"], { env });
+      assert.equal(local.status, 0, String(local.stderr));
+      assert.ok(!existsSync(localCache));
+      mkdirSync(localCache);
+      writeFileSync(join(localCache, "prune-again"), "prune");
+      const trailingHome = spawnSync("/bin/bash", [cleanup, "completed"], {
+        env: { ...env, HOME: `${root}/` },
+      });
+      assert.equal(trailingHome.status, 0, String(trailingHome.stderr));
+      assert.ok(!existsSync(localCache));
+      const otherHome = join(root, "other-home");
+      const otherCache = join(otherHome, ".cache", "zig");
+      mkdirSync(otherCache, { recursive: true });
+      writeFileSync(join(otherCache, "prune"), "prune");
+      const nonnested = spawnSync("/bin/bash", [cleanup, "completed"], {
+        env: { ...env, HOME: otherHome },
+      });
+      assert.equal(nonnested.status, 0, String(nonnested.stderr));
+      assert.ok(!existsSync(otherCache));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(external, { recursive: true, force: true });
     }
   },
 );

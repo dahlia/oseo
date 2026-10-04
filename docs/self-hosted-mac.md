@@ -65,6 +65,8 @@ registration, so the operator must update the pinned runner when required.
 The installer sets */usr/local*, */usr/local/libexec*, and the hook
 directory to mode `755` with owner `root:wheel`. It verifies that the
 runner account can execute every hook and owns and can traverse its home.
+The installer rejects linked components in the runner root and home; the
+hooks reject a linked runner root.
 It sets the runner home and root to mode `700` and its `.credentials*`
 files to mode `600` after registration. The installer calls
 *tools/selfhosted-mac/prepare-service-files.sh* internally; run the
@@ -83,7 +85,8 @@ directory itself and registration files. The daemon's
 there, and worker and job processes can leave cache files. Hooks never
 clear it. Inspect its size through the health check and remove stale files
 only while the daemon is stopped. If free disk falls below 40 GiB on the
-256 GiB disk, either hook prunes the fixed Zig cache.
+256 GiB disk, either hook prunes the fixed Zig cache when its home and cache
+paths have no linked component. A skipped prune is logged by the hook.
 The hook removes runner diagnostic logs older than seven days; launchd
 output is discarded. Check the daemon, recent diagnostics, and disk with
 *tools/selfhosted-mac/health.sh* under `sudo`. Keep the runner account,
