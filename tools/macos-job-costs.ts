@@ -62,24 +62,56 @@ export const macosJobCosts: MacosJobCosts = {
 };
 
 /**
- * Conservative derived ratios from U21 one-machine measurements.
- * See docs/evidence/u21/README.md. These are scheduling estimates, not
- * runner-mode measurements; the switch remains disabled by default.
+ * Derived ratios calibrated from the first three Mac-lane runs, branch
+ * run 37194069657 attempts 1 and 2 and main run 37206614757.
+ * Each run placed the same 11 jobs on `oseo-mac-1`, giving 12 test262,
+ * 12 native-support, and 9 own-key job observations.
+ *
+ * A ratio converts one entry of `macosJobCosts` into Mac elapsed seconds
+ * through `macosFixedSetupSeconds + (cost - setup) / ratio`, so it is
+ * calibrated against that weight rather than against a hosted job. Each
+ * value is the derived pooled ratio `sum(cost - setup) / sum(observed
+ * wall - setup)` over all three runs, rounded down to one decimal. The
+ * per-run pooled values were 4.39, 4.61, and 4.63 for test262; 2.83,
+ * 2.88, and 3.03 for native support; and 3.15, 3.27, and 3.43 for
+ * own-key cases, so each chosen value is central rather than the best
+ * run. Against the same jobs' hosted walls in all-hosted runs
+ * 37167895777 and 37121778924, the derived pooled ratios were 4.4 for
+ * test262 and 2.9 for native support, but 2.2 for own-key cases: their
+ * 1,300-second weights exceed the 704 to 1,085 hosted seconds observed
+ * there. Own-key cases always run on this lane when it exists, so the
+ * weight-calibrated value predicts their Mac time.
+ *
+ * The native fixture family has no runner-mode observation yet, because
+ * the previous ratios never placed one of its jobs on the Mac lane. It
+ * keeps the derived 2.2 from the U21 one-machine repeats in
+ * docs/evidence/u21/README.md. The host C sanitizer and cross-platform
+ * test families stay at 1 because they are not Mac-lane eligible.
  */
 interface SelfHostedFamilySpeedRatios {
   readonly [family: string]: number;
 }
 
 export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
-  "native support": 2.4,
-  "own-key cases": 2.4,
+  "native support": 2.9,
+  "own-key cases": 3.2,
   native: 2.2,
-  test262: 3.5,
+  test262: 4.5,
   "host C sanitizers": 1,
   test: 1,
 };
 
-/** Estimated checkout, Node setup, and runner-status probe delay. */
+/**
+ * Lane-level allowance for the readiness probe and serial job handover.
+ * In the three runs above, the `mac_ready` job started a measured 3 to 5
+ * seconds after the run attempt started and took 15, 18, and 32 seconds;
+ * the first Mac job then waited 2 to 3 seconds, and the ten later
+ * handovers took 29 to 32 seconds in total. These measured intervals sum
+ * to a derived 49, 58, and 68 seconds.
+ * Sixty seconds is a central value for that sum, so the model need not
+ * represent each handover. Hosted lanes waited a measured median of 7
+ * to 8 seconds per job, which the model also omits.
+ */
 export const selfHostedProbeSeconds = 60;
 
 /** Rounded derived setup share per job from the U6 fixed-cost audit. */

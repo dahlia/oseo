@@ -1390,3 +1390,47 @@ all jobs on hosted runners. A later branch run with the switch on must
 measure the same jobs at least twice, separate cold and warm caches, and
 record the macOS version printed by every macOS job. No coverage count,
 shard total, seed, target, or sanitizer lane changes here.
+
+### Measured Mac-lane ratios (U23)
+
+The first three runs with the switch on, branch run `37194069657`
+attempts 1 and 2 and main run `37206614757`, each placed the same 11
+jobs on `oseo-mac-1`. Their measured push-to-green times were 107.9,
+111.1, and 113.5 min. The Mac lane finished at a measured 82.3, 84.6,
+and 80.1 min after run creation, while the hosted macOS lanes ran until
+the end. The U22 ratios had predicted 101.0 min of Mac job time; the
+measured sums were 81.5, 83.7, and 79.0 min.
+
+*tools/macos-job-costs.ts* now uses derived pooled ratios calibrated
+against the cost weights the model consumes: 4.5 for test262, 2.9 for
+native support, and 3.2 for own-key cases. Each is rounded down from
+the pooled value over all three runs and lies inside the per-run range,
+which was 4.39 to 4.63, 2.83 to 3.03, and 3.15 to 3.43, respectively.
+Against the same jobs' hosted walls in all-hosted runs `37167895777`
+and `37121778924`, the derived runner-mode ratios were 4.4, 2.9, and
+2.2. The own-key difference comes from its 1,300-second weight, which
+exceeds the 704 to 1,085 hosted seconds measured there. The native
+fixture ratio stays at the derived U21 value of 2.2 because no native
+fixture job had run on the Mac. The cache states of the three runs were
+not separated, and their per-run ratios show no monotonic trend.
+
+With these ratios the generator moves `native (macos-aarch64, 3/3)` and
+`native support (macos-aarch64, 6/12, 8/12, 12/12)` to the Mac and
+`test262 (macos-aarch64, 1/12, 2/12, 11/12)` to hosted lanes, for 12
+Mac jobs. The model predicts a derived 102.7-min macOS makespan and
+482.7 hosted macOS minutes, against 105.1 min and 502.9 min for the U22
+ratios with the same costs. The observed push-to-green times exceeded
+the old prediction by 2.8 to 8.4 min. The model omits job waiting and
+the aggregate, and the hosted sanitizer jobs, for example, ran a derived
+11 to 23 percent above their weights. Adding any further
+eligible job to the Mac would raise its predicted lane above the
+makespan, so the greedy assignment is kept.
+
+A second concurrent Mac lane was modeled but not enabled. U21 measured
+1.55 times the throughput for two concurrent jobs, a derived per-job
+latency factor of 1.29. Under that factor the model predicts a derived
+82.1-min makespan with 17 Mac jobs; a latency factor of 1.5 still
+predicts 86.2 min. U21 also observed about 243 MB of free memory with
+two concurrent jobs, so enabling it needs a memory measurement under
+runner mode first. Job names, the aggregate's required set, Zig-only
+eligibility, hosted fallback, shard totals, and coverage are unchanged.
