@@ -1,0 +1,45 @@
+#!/bin/zsh
+set -eu
+export PATH="$HOME/.local/bin:$PATH"
+RESULTS="$HOME/m5ci-results"
+REPO="$HOME/Desktop/oseo-m5ci-u21"
+cd "$REPO"
+echo "sha=$(git rev-parse HEAD)" > "$RESULTS/repeat-2-status.txt"
+for family in test262 native ownkeys sanitizer; do
+  cache="$RESULTS/caches/$family-serial-repeat-2"
+  tmp="$RESULTS/tmp/$family-serial-repeat-2"
+  xdg="$RESULTS/xdg/$family-serial-repeat-2"
+  mkdir -p "$cache" "$tmp" "$xdg"
+  export ZIG_GLOBAL_CACHE_DIR="$cache" TMPDIR="$tmp/" XDG_CACHE_HOME="$xdg"
+  for state in cold warm; do
+    log="$RESULTS/$family-serial-$state-2.log"
+    echo "$(date -u +%FT%TZ) $family $state start" >> "$RESULTS/repeat-2-status.txt"
+    {
+      echo "sha=$(git rev-parse HEAD)"
+      echo "policy=Developer Tools for sshd-keygen-wrapper, user enabled"
+      echo "cache=$state; concurrency=1 job"
+      echo "start=$(date -u +%FT%TZ)"
+      if [[ "$state" == cold ]]; then
+        /usr/bin/time -p mise run build
+        if [[ "$family" == sanitizer ]]; then
+          OSEO_HOST_CC=clang OSEO_NATIVE_TOOLCHAIN=host-cc \
+            /usr/bin/time -p mise run test:sanitizer:self
+          OSEO_HOST_CC=clang OSEO_NATIVE_TOOLCHAIN=host-cc \
+            /usr/bin/time -p mise run test:sanitizer:runtime
+        fi
+      fi
+      case "$family" in
+        test262) /usr/bin/time -p mise run test:test262 --shard 1/12 ;;
+        native) /usr/bin/time -p mise run test:native --shard 1/3 ;;
+        ownkeys)
+          /usr/bin/time -p mise run test:property:extended:native:shard \
+            --shard 1/12 tests/property/*.property.test.ts ;;
+        sanitizer)
+          OSEO_HOST_CC=clang OSEO_NATIVE_TOOLCHAIN=host-cc \
+            /usr/bin/time -p mise run test:sanitizer:native ;;
+      esac
+      echo "end=$(date -u +%FT%TZ)"
+    } > "$log" 2>&1
+    echo "$(date -u +%FT%TZ) $family $state done" >> "$RESULTS/repeat-2-status.txt"
+  done
+done

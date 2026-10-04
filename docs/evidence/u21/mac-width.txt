@@ -1,0 +1,4 @@
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 duration=219051.36ms pool=8 retries=0
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 duration=195920.79ms pool=8 retries=0
+native-shard {"workers":3,"files":["tests/property/m5-object-own-keys.property.test.ts","tests/property/m5-reflect-namespace.property.test.ts","tests/property/m5-proxy-exotic-object.property.test.ts"]}
+native-shard {"workers":3,"files":["tests/property/m5-object-own-keys.property.test.ts","tests/property/m5-reflect-namespace.property.test.ts","tests/property/m5-proxy-exotic-object.property.test.ts"]}

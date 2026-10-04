@@ -280,6 +280,8 @@ margin. Those observations do not establish that this cohort preserves the
 margin under runner variance. This documentation-only integration retains the
 reviewed partition; a macOS singleton reservation remains a possible follow-up
 if the coordinator authorizes changing the implementation and validating it.
+U19 later moved the own-key file into three case-shard jobs on each host;
+see the case-sharding section of [*PLAN-GATE.md*](../../../PLAN-GATE.md).
 
 The final evidence-only `mise run check` also passed in 64.98 observed seconds
 with the assigned Zig cache and `MISE_JOBS=1`; this is gate context, not a

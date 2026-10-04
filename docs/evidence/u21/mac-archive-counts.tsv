@@ -1,0 +1,9 @@
+sequence	family	start_utc	end_utc	surviving_archives_born
+first	test262	2026-10-03T13:59:13Z	2026-10-03T14:02:58Z	1
+first	native	2026-10-03T14:17:11Z	2026-10-03T14:22:28Z	4
+first	ownkeys	2026-10-03T14:27:23Z	2026-10-03T14:45:22Z	1
+first	sanitizer	2026-10-03T15:04:42Z	2026-10-03T15:17:59Z	12
+repeat	test262	2026-10-03T17:51:05Z	2026-10-03T17:58:17Z	1
+repeat	native	2026-10-03T18:05:05Z	2026-10-03T18:11:11Z	4
+repeat	ownkeys	2026-10-03T18:16:42Z	2026-10-03T18:35:58Z	1
+repeat	sanitizer	2026-10-03T18:54:56Z	2026-10-03T19:11:59Z	12

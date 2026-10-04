@@ -1,0 +1,5 @@
+Sat Oct  3 19:27:41 UTC 2026
+Filesystem      Size    Used   Avail Capacity iused ifree %iused  Mounted on
+/dev/disk3s5   228Gi   113Gi    89Gi    56%    877k  933M    0%   /System/Volumes/Data
+total = 1024.00M  used = 57.31M  free = 966.69M  (encrypted)
+assessments enabled

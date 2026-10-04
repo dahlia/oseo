@@ -4,6 +4,10 @@ import { nativeShardCosts } from "./native-shard-costs.ts";
 import { parseTestShardArguments } from "./shard.ts";
 import type { TestShard } from "./shard.ts";
 
+/** This one case-sharded file runs outside the native file shards. */
+export const caseShardedNativeFile =
+  "tests/property/m5-object-own-keys.property.test.ts";
+
 /** Fixed host-specific scheduling model for native property partitions. */
 export interface NativeShardModel {
   readonly costs: Readonly<Record<string, number>>;
@@ -37,7 +41,7 @@ export function selectNativeTestShard(
   // This property approached its deadline in two historical Linux runs and
   // exceeded it when cost batching put other heavyweight files beside it.
   // Reserve a singleton shard whenever a partition can provide one.
-  const isolated = "tests/property/m5-object-own-keys.property.test.ts";
+  const isolated = caseShardedNativeFile;
   if (platform === "linux" && shard.total > 1 && files.includes(isolated)) {
     if (shard.index === 1) return [isolated];
     return selectNativeTestShard(
@@ -80,16 +84,35 @@ export function nativeTestArguments(
   platform: string,
 ): readonly string[] {
   if (!args.some((arg) => arg === "--shard" || arg.startsWith("--shard="))) {
+    if (
+      args.some(
+        (arg) =>
+          arg === "--exclude-case-sharded" ||
+          arg.startsWith("--exclude-case-sharded="),
+      )
+    ) {
+      throw new Error("Excluding case-sharded files requires --shard.");
+    }
     return args;
   }
   const parsed = parseArgs({
     args,
     allowPositionals: true,
-    options: { shard: { type: "string" } },
+    options: {
+      shard: { type: "string" },
+      "exclude-case-sharded": { type: "boolean" },
+    },
     tokens: true,
   });
   const flags = parsed.tokens.filter((token) => token.kind === "option");
-  if (flags.length !== 1 || parsed.values.shard == null) {
+  const shardFlags = flags.filter((token) => token.name === "shard");
+  const excludeFlags = flags.filter(
+    (token) => token.name === "exclude-case-sharded",
+  );
+  if (excludeFlags.length > 1) {
+    throw new Error("Native sharding allows one exclusion flag.");
+  }
+  if (shardFlags.length !== 1 || parsed.values.shard == null) {
     throw new Error("Native sharding requires exactly one --shard flag.");
   }
   const { shard } = parseTestShardArguments(["--shard", parsed.values.shard]);
@@ -101,7 +124,10 @@ export function nativeTestArguments(
   ) {
     throw new Error("Native sharding requires explicit property file paths.");
   }
-  const selected = selectNativeTestShard(parsed.positionals, shard!, platform);
+  const files = parsed.values["exclude-case-sharded"]
+    ? parsed.positionals.filter((path) => path !== caseShardedNativeFile)
+    : parsed.positionals;
+  const selected = selectNativeTestShard(files, shard!, platform);
   // Node without files discovers the full suite; never launch an empty shard.
   return selected;
 }

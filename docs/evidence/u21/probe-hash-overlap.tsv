@@ -1,0 +1,13 @@
+probe_a	probe_b	compiler	workers	cohort_a_hashes	cohort_b_hashes	shared_hashes
+probe-default-1	probe-default-2	zig	1	48	48	0
+probe-default-1	probe-default-2	zig	3	48	48	0
+probe-default-1	probe-default-2	apple-clang	1	48	48	0
+probe-default-1	probe-default-2	apple-clang	3	48	48	0
+probe-default-2	probe-devtools-1	zig	1	48	48	0
+probe-default-2	probe-devtools-1	zig	3	48	48	0
+probe-default-2	probe-devtools-1	apple-clang	1	48	48	0
+probe-default-2	probe-devtools-1	apple-clang	3	48	48	0
+probe-devtools-1	probe-devtools-2	zig	1	48	48	0
+probe-devtools-1	probe-devtools-2	zig	3	48	48	0
+probe-devtools-1	probe-devtools-2	apple-clang	1	48	48	0
+probe-devtools-1	probe-devtools-2	apple-clang	3	48	48	0

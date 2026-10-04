@@ -1197,3 +1197,196 @@ the available push timestamp proxy. The per-lane measurements are in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md).
 [U16 evidence](./docs/evidence/u16/README.md) records the complete lane plan,
 check name inventory, and scheduling limits.
+
+
+U19 property case partition
+---------------------------
+
+The extended native CI gate now executes the own-key property in three
+case-shard jobs on each native host. Every job generates the same 160-case
+sequence (16 reviewed runs times the existing extended scale of 10), with
+the same seed, replay path, generator, and size. Job `k` of three executes
+the predicate for generated indices congruent to `k - 1` modulo three.
+The three job sets are disjoint and cover the unsharded set. The existing
+native-support job names and file-shard totals remain unchanged; those jobs
+exclude this one file, and the `native` aggregate requires every new job.
+The Proxy and Reflect properties remain in the file shards for this first
+measurement. This branch run does not isolate their per-property costs:
+the macOS support shard 1/12 ran Reflect, Proxy, and Math together with
+three file workers. Their case-shard value remains undecided.
+
+Each job retains the original 3,600,000 ms extended hard interrupt limit.
+Every successful job uploads the interval measured around its property
+assertion. The `native` aggregate requires all six records and sums the
+three durations separately for Linux and macOS, failing either sum above
+3,600,000 ms through `mise run check:property-case-durations`. This
+preserves the original aggregate deadline while allowing
+case costs to vary. An interrupt remains a failure. A failing shard runs the
+usual shrinker, and its seed and path replay the counterexample without the
+shard filter. The first counterexample may differ from an unsharded run.
+Case-sharded properties must be precondition-free, so every shard generates
+the same run sequence. The local `mise run test:property:extended` task
+remains unsharded.
+
+The previous unsharded macOS own-key interval was observed at 3,565,117 ms
+in run `36243816479`, leaving a derived 34,883 ms margin (0.97%) below the
+3,600,000 ms limit. Other U6 branch observations differed by a derived
+11.80 case-minutes, so the margin is sensitive to runner variance. Each
+case shard repeats generation of the complete stream; summing three runs
+can cost more than one unsharded run even when all predicates pass. The
+branch CI run reports each host's measured three-shard sum and derived
+margin, as well as every per-job duration. A negative margin fails the gate;
+the deadline is not relaxed to absorb variance.
+
+The scheduling weights for the three new macOS jobs are derived estimates:
+1,300 seconds each from the U6 measured 3,566 concurrent case seconds for
+the own-key file divided by three, plus estimated setup margin. The macOS
+native-support shard 1 weight is a derived 1,958 seconds from 71 seconds of
+observed fixed cost plus its remaining variable cost times the modeled
+worker-load ratio 2,283/3,566. All twelve native-support weights use the
+same derived ratio rule because excluding own-keys changes their file sets.
+The U6 concurrent-duration inputs came from CI runs `36243816479` and
+`36261458909`; the 3,018-second job observation came from main run
+`36516215200`. These are estimates for the changed job layout;
+the branch CI observation below compares them with measured per-job times
+and separates fixed setup cost from case execution. The corresponding
+Linux U6 weight is 3,327 concurrent case seconds, or a derived 1,109
+seconds per case shard.
+
+With only five hosted macOS slots, the changed layout has a derived longest
+lane of 9,414 seconds versus the baseline model's 8,872 seconds. U19 must
+merge together with the Mac mini capacity lanes in U20; merging U19 alone
+would make the modeled hosted-lane wait longer. The lane values remain
+pre-run scheduling estimates; one branch run cannot establish repeatable
+lane timing or turn these estimates into observed results.
+
+The `native` aggregate also adds checkout, pinned tool installation,
+workspace dependency setup, artifact download, and the duration check.
+Its previous job wall time was an observed three seconds in main run
+`36516215200`; its new fixed cost is reported below and remains outside
+the 9,414-second macOS lane model.
+
+One branch CI observation from run `37121778924` measured the six new
+case-shard jobs. Job wall and task-step times below come from GitHub job
+timestamps, rounded to whole seconds. Property intervals come from the
+uploaded duration records, rounded to one decimal second. The final column
+is the derived difference between job wall and task-step time; it includes
+job setup, checkout, tool installation, the workspace build and runtime
+archive cache setup in the composite action, artifact upload, and cleanup.
+It does not include generated-case execution.
+
+| Host               | Shard | Observed job wall (s) | Observed task step (s) | Observed property (s) | Derived other (s) |
+| ------------------ | ----: | --------------------: | ---------------------: | --------------------: | ----------------: |
+| `linux-x86_64-gnu` |   1/3 |                   556 |                    523 |                 521.0 |                33 |
+| `linux-x86_64-gnu` |   2/3 |                 1,053 |                    671 |                 669.1 |               382 |
+| `linux-x86_64-gnu` |   3/3 |                   547 |                    517 |                 514.6 |                30 |
+| `macos-aarch64`    |   1/3 |                   916 |                    861 |                 858.9 |                55 |
+| `macos-aarch64`    |   2/3 |                 1,085 |                  1,032 |               1,029.2 |                53 |
+| `macos-aarch64`    |   3/3 |                   806 |                    753 |                 750.8 |                53 |
+
+The 382-second derived non-task interval on Linux shard 2/3 includes an
+observed 372-second `jdx/mise-action` step; the other Linux shards' mise
+steps were observed at 23 and 20 seconds. These are fixed setup variations
+in this run, not evidence that a generated case became slower. The task
+step also includes the Node test runner around the measured property.
+Shard 2/3 had the largest property interval on both hosts: a derived
+30% above shard 3/3 on Linux and 37% above it on macOS. The repeated
+ordering suggests an uneven generated-case cost distribution; the longer
+Linux mise step is a separate fixed-cost effect. All three Linux case
+jobs logged a missing mise tool cache for the same key, so that step
+variation is not explained by different cache-hit states.
+
+The gate reported a measured Linux sum of 1,704,680.7 ms, derived from the
+three duration records, leaving a derived 1,895,319.3 ms margin to the
+unchanged 3,600,000 ms deadline. The same gate reported a measured macOS
+sum of 2,638,897.5 ms, derived from its records, leaving a derived
+961,102.5 ms margin. All six job logs report a runtime archive cache hit;
+Zig object cache reuse was not separately measured. The case jobs used
+separate runners and warm runtime archives; no cold-run comparison was
+measured. Their different job wall times do not establish a repeatable
+speedup over the historical unsharded job. The case jobs also have a
+different scope from the former native-support shard.
+
+Main run `36516215200` observed the unsharded own-key property at
+2,944,315.2 ms on macOS within a three-file, three-worker cohort and at
+2,276,373.5 ms on Linux as a one-file singleton. Relative to those
+observations, the branch run's case-shard sums were a derived 305,417.7 ms
+(10.4%) lower on macOS and 571,692.8 ms (25.1%) lower on Linux, using
+the one-decimal values stated here. The macOS case jobs ran own-keys
+alone, unlike the old three-file cohort. The U6 macOS own-key jobs passed
+in failed branch run `36343919872` and corrected run `36358067906`;
+their observed durations ranged from 33.27 to 45.07 case-minutes,
+bracketing the new 43.98-minute derived sum. The first run failed on a
+Linux property deadline, so its macOS duration is a valid job observation
+but not an end-to-end green-run result. These one-run differences do not
+establish that partitioning made the same cases cheaper; the strict
+aggregate rule remains useful when case cost or runner load varies.
+
+The macOS case-job planning weight was a derived 1,300 seconds per shard,
+versus observed job walls of 916, 1,085, and 806 seconds in run
+`37121778924`. The Linux U6 planning weight was a derived 1,109 seconds
+per shard, versus observed 556, 1,053, and 547 seconds. These one-run
+observations do not recalibrate the planning weights in
+*tools/macos-job-costs.ts* or the five-slot lane model built from them:
+setup varied across jobs, and repeat runs would be needed to separate
+scheduling behavior from runner variance. The twelve derived macOS
+native-support weights sum to 16,163 seconds; their observed job walls
+summed to 16,590 seconds in run `37121778924`.
+Seven of twelve weights were below observed walls, and the total was a
+derived 427 seconds low. The derived 9,414-second five-slot model remains
+a pre-run planning estimate, not an observed completion time or a bound
+on future runs.
+
+The unchanged native-support shard 1 job names allow a before/after
+observation, although removing the own-key file changed their workloads.
+Main run `36516215200` observed 3,018 s for macOS shard 1/12, including
+2,947 s in its property step and a derived 71 s outside that step.
+Branch run `37121778924` observed 1,963 s for the same named job,
+including 1,882 s in its native-property step and a derived 81 s of
+package property work and setup. For Linux shard 1/5, the main run
+observed 2,310 s total and 2,279 s in its property step, with a derived
+31 s outside it. The branch run observed 3,010 s total, including
+2,965 s in its native-property step and a derived 45 s of package
+property work and setup. The old Linux job was a reserved own-key
+singleton with one file worker; the new job ran 20 other files with four
+workers. Its two wall times therefore compare unrelated workloads.
+The macOS job had three files and three workers on each side, with
+own-keys replaced by Math. Each comparison is one observation per run,
+so neither establishes a repeatable per-file speedup or slowdown.
+
+The branch run's required `native` aggregate passed. Its log reports
+the two measured duration sums above and the unchanged 3,600,000 ms
+limit for each host. Its observed job wall time was 24 s, compared with
+the observed 3 s of the old aggregate in main run `36516215200`.
+The new run spent observed whole-second step intervals of 2 s setting
+up, 3 s requiring all dependencies, 2 s checking out, 12 s installing
+mise tools, and 1 s downloading all six artifacts. The duration-check
+step completed within one GitHub timestamp second. The aggregate runs
+no generated case; this 24-second wall time is fixed gate overhead for
+the changed workflow, measured once.
+
+### One optional self-hosted Mac lane (U22)
+
+The workflow now generates one optional `oseo-mac-1` lane beside five hosted
+macOS lanes. `OSEO_SELFHOSTED_MAC_ENABLED` is off until the operator completes
+registration and the runner-path U17 probe. The readiness job uses a
+repository-scoped Administration: read token only on a push and falls back
+to hosted `macos-15` when the switch, token, API, or runner is unavailable.
+Pull requests remain hosted. The lane accepts only Zig-backed test262,
+extended native-property, own-key case, and native-fixture jobs. Apple clang
+host sanitizers and `macos-latest` Node.js/Deno jobs stay hosted.
+Optional jobs have no predecessor chain, so they can fill the five hosted
+slots concurrently when the readiness probe selects fallback.
+All three own-key case shards use the same readiness decision so their
+duration sum represents one Mac class under the unchanged hard limit.
+
+The scheduling ratios are conservative derived estimates from the U21
+one-machine cold/warm and repeat observations: 3.5 for test262, 2.2 for
+native fixtures, and 2.4 for extended properties. They exclude a derived
+60-second fixed setup share per job and do not claim runner-mode speedup.
+The persistent registration removes the proposed per-job token and
+registration step. The first branch CI run keeps the switch off and checks
+all jobs on hosted runners. A later branch run with the switch on must
+measure the same jobs at least twice, separate cold and warm caches, and
+record the macOS version printed by every macOS job. No coverage count,
+shard total, seed, target, or sanitizer lane changes here.

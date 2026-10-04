@@ -1,0 +1,3 @@
+cache	interval_s	samples	min_unused	max_used	swap_mib	min_disk_gib
+cold	30	43	243M	15G	63.12	135
+warm	30	45	260M	15G	63.12	124

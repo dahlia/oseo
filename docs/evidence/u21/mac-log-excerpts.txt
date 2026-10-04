@@ -1,0 +1,122 @@
+### mise-install.log
+mise ✓ node@24.21.0                  6.4s  node-v24.21.0-darwin-arm64.tar.gz
+mise ✓ zig@0.16.0                    19.8s
+mise ✓ deno@2.9.7                    215.5s  deno-aarch64-apple-darwin.zip
+### test262-serial-cold-1.log
+real 0.65
+test262-builds {"attempts":{"split":6039,"agents":48,"diagnostic":14,"module":8,"with":2},"executed":{"split":6037,"agents":48,"module":8,"with":2},"harnessComparisons":5915,"deterministicObjects":0,"objectsBuilt":124,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 duration=219051.36ms pool=8 retries=0
+real 224.06
+
+### test262-serial-warm-1.log
+test262-builds {"attempts":{"split":6039,"agents":48,"diagnostic":14,"module":8,"with":2},"executed":{"split":6037,"agents":48,"module":8,"with":2},"harnessComparisons":5915,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":124}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 duration=195920.79ms pool=8 retries=0
+real 200.26
+
+### native-serial-cold-2.log
+real 0.52
+native fixtures: 88/264 Node, Deno, and macos-aarch64 outputs match
+cross fixtures: 89 linux-aarch64-musl builds passed
+real 272.71
+
+### native-serial-warm-2.log
+native fixtures: 88/264 Node, Deno, and macos-aarch64 outputs match
+cross fixtures: 89 linux-aarch64-musl builds passed
+real 242.95
+
+### sanitizer-serial-cold-1.log
+real 0.61
+[test:sanitizer:self] $ node --test tests/host-cc-*.test.ts
+real 1.26
+[test:sanitizer:runtime] $ node --test --test-concurrency=1 tests/runtime-*.tes…
+real 70.65
+native fixtures: 264/264 Node, Deno, and macos-aarch64 outputs match
+real 723.74
+
+### sanitizer-serial-warm-1.log
+native fixtures: 264/264 Node, Deno, and macos-aarch64 outputs match
+real 719.09
+
+### health.log
+ProductName:		macOS
+ProductVersion:		27.0.1
+BuildVersion:		26A434
+arm64
+/Library/Developer/CommandLineTools
+Apple clang version 21.0.0 (clang-2100.3.34.2)
+Target: arm64-apple-darwin27.0.0
+Thread model: posix
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+0.16.0
+Filesystem      Size    Used   Avail Capacity iused ifree %iused  Mounted on
+/dev/disk3s5   228Gi    46Gi   156Gi    23%    699k  1.6G    0%   /System/Volumes/Data
+### test262-serial-cold-2.log
+real 0.78
+test262-builds {"attempts":{"split":6039,"agents":48,"diagnostic":14,"module":8,"with":2},"executed":{"split":6037,"agents":48,"module":8,"with":2},"harnessComparisons":5915,"deterministicObjects":0,"objectsBuilt":124,"objectsReused":0}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 duration=426838.19ms pool=8 retries=0
+real 431.30
+### test262-serial-warm-2.log
+test262-builds {"attempts":{"split":6039,"agents":48,"diagnostic":14,"module":8,"with":2},"executed":{"split":6037,"agents":48,"module":8,"with":2},"harnessComparisons":5915,"deterministicObjects":0,"objectsBuilt":0,"objectsReused":124}
+test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 duration=404012.44ms pool=8 retries=0
+real 408.14
+### ownkeys-serial-cold-1.log
+real 0.53
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+real 3.70
+native-shard {"workers":3,"files":["tests/property/m5-object-own-keys.property.test.ts","tests/property/m5-reflect-namespace.property.test.ts","tests/property/m5-proxy-exotic-object.property.test.ts"]}
+✔ generated Object own-key statics match the M5 model (1074196.532041ms)
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+real 1074.85
+### ownkeys-serial-warm-1.log
+native-shard {"workers":3,"files":["tests/property/m5-object-own-keys.property.test.ts","tests/property/m5-reflect-namespace.property.test.ts","tests/property/m5-proxy-exotic-object.property.test.ts"]}
+✔ generated Object own-key statics match the M5 model (1069143.918042ms)
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+real 1069.89
+### native-serial-cold-repeat-2.log
+real 0.55
+native fixtures: 88/264 Node, Deno, and macos-aarch64 outputs match
+cross fixtures: 89 linux-aarch64-musl builds passed
+real 365.54
+### native-serial-warm-repeat-2.log
+native fixtures: 88/264 Node, Deno, and macos-aarch64 outputs match
+cross fixtures: 89 linux-aarch64-musl builds passed
+real 330.64
+### native-serial-cold-1.log (excluded)
+real 0.60
+native fixtures: 88/264 Node, Deno, and macos-aarch64 outputs match
+cross fixtures: 89 linux-aarch64-musl builds passed
+real 540.51
+Finished in 286.79s
+### ownkeys-serial-cold-2.log
+real 0.50
+native-shard {"workers":3,"files":["tests/property/m5-object-own-keys.property.test.ts","tests/property/m5-reflect-namespace.property.test.ts","tests/property/m5-proxy-exotic-object.property.test.ts"]}
+✔ generated Object own-key statics match the M5 model (1154423.432375ms)
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+real 1155.07
+### ownkeys-serial-warm-2.log
+native-shard {"workers":3,"files":["tests/property/m5-object-own-keys.property.test.ts","tests/property/m5-reflect-namespace.property.test.ts","tests/property/m5-proxy-exotic-object.property.test.ts"]}
+✔ generated Object own-key statics match the M5 model (1137636.984542ms)
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+real 1138.32
+### sanitizer-serial-cold-2.log
+real 0.54
+real 4.25
+real 74.15
+native fixtures: 264/264 Node, Deno, and macos-aarch64 outputs match
+real 944.02
+### sanitizer-serial-warm-2.log
+native fixtures: 264/264 Node, Deno, and macos-aarch64 outputs match
+real 844.51

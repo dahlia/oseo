@@ -41,6 +41,176 @@ and the separately measured property bottleneck.
 [36243816479]: https://github.com/dahlia/oseo/actions/runs/36243816479
 [36261458909]: https://github.com/dahlia/oseo/actions/runs/36261458909
 
+### U21 dedicated Mac mini day-one measurements
+
+The new dedicated Mac mini is an Apple M6 with 12 logical CPUs and 16 GiB
+RAM. It runs macOS 27.0.1 (26A434), Apple clang 21.0.0, and mise-pinned
+Zig 0.16.0. These observed host facts and the commands are in
+[*docs/evidence/u21/README.md*](./evidence/u21/README.md). All Mac job
+measurements use main commit `2434dd8b`. The machine remains unregistered
+as a GitHub runner, and the self-hosted routing switch remains off.
+
+The exact U17 probe measured 48 fresh binaries in each cohort, twice
+under each policy. With the default policy, the serial first pass took
+11.29–12.90 s for Zig or Apple clang across the two trials, and an
+immediate second pass took 0.32–0.36 s. After the user granted Developer
+Tools permission to the SSH wrapper in the GUI, the serial first pass
+took 0.108–0.109 s for both compilers in both new trials. Three launch
+workers reduced the default-policy first pass to 4.29–4.36 s in three
+of four trials; one Apple-clang trial took 0.218 s and remains an
+unexplained outlier. These measurements show the first-execution penalty
+on this M6 and its mitigation for SSH descendants. The eventual launchd
+runner needs a separate permission check.
+
+The hosted reference is main run [36721134885] at the same SHA. Its
+four compared macOS steps were each measured once at that SHA. Main run
+[36657614384] is a second observation at the older SHA `df5cb7a1`, so it
+shows a spread but is not an exact-SHA repeat. The table uses step wall
+seconds, excluding checkout, mise install, runtime archive restore, and
+job cleanup. Mac setup and test wall times are reported separately. The
+Mac's cold and warm Zig caches are separate from the hosted cache state.
+The Mac cold steps also built their representative runtime archive keys
+inside the timed step, while every compared hosted job hit its action
+cache key in setup. Additional variant keys can be created by both
+machines, and [*mac-archive-counts.tsv*](./evidence/u21/mac-archive-counts.tsv)
+records their Mac-side counts. Thus the cold ratios below mix archive
+states. The warm ratios are closer in
+cache state, but still use different operating systems and, for the
+sanitizer, different Apple clang versions.
+All four compared hosted jobs reported runtime archive cache hits in
+[*docs/evidence/u21/hosted-cache.txt*](./evidence/u21/hosted-cache.txt).
+All retained Mac family steps below ran after the user enabled Developer
+Tools access for the SSH wrapper. Their ratios are conditional on that
+grant; the unconfigured launchd runner may face the default-policy
+first-execution cost.
+Only the 48-binary probe has a same-host default-policy comparison;
+the M6 test262 shard was measured only after the GUI grant.
+
+| Family and shard              | Hosted same SHA | First Mac cold | First Mac warm | Derived hosted/Mac cold | Derived hosted/Mac warm |
+| ----------------------------- | --------------: | -------------: | -------------: | ----------------------: | ----------------------: |
+| test262 1/12                  |         1,508 s |       224.06 s |       200.26 s |      6.73 (pool 8 vs 3) |      7.53 (pool 8 vs 3) |
+| native fixture 1/3            |           817 s |       272.71 s |       242.95 s |                    3.00 |                    3.36 |
+| extended native property 1/12 |         2,815 s |     1,074.85 s |     1,069.89 s |                    2.62 |                    2.63 |
+| Apple-clang sanitizer native  |         1,935 s |       723.74 s |       719.09 s |                    2.67 |                    2.69 |
+
+The second Mac sequence used the same SHA, shard, seed, worker width,
+and toolchain within each family. The ratios again use the one same-SHA
+hosted step per family as their numerator:
+
+| Family and shard              | Second Mac cold | Second Mac warm | Derived r cold | Derived r warm |
+| ----------------------------- | --------------: | --------------: | -------------: | -------------: |
+| test262 1/12                  |        431.30 s |        408.14 s |           3.50 |           3.69 |
+| native fixture 1/3            |        365.54 s |        330.64 s |           2.24 |           2.47 |
+| extended native property 1/12 |      1,155.07 s |      1,138.32 s |           2.44 |           2.47 |
+| Apple-clang sanitizer native  |        944.02 s |        844.51 s |           2.05 |           2.29 |
+
+These are measured task seconds and derived ratios, not a confidence
+interval. [*serial-repeats.tsv*](./evidence/u21/serial-repeats.tsv)
+retains the Mac start/end times and pass verdicts. The repeat driver
+ran detached from SSH, and its exact first-execution policy was not
+separately probed. Neither sequence establishes runner-mode speed.
+The second sequence preserved the first sequence's test262 counts,
+88 native host fixtures plus 89 cross-builds, six extended-property
+tests, and all 264 sanitizer fixtures, with no reported failure.
+
+The test262 run selected 1,782 of 21,383 reviewed paths and passed all
+expected classifications in each first-pair Mac trial: 1,535 passes, 131
+expected negatives, and 116 unsupported-profile cases. The native fixture shard
+passed 88 of 264 host fixtures and all 89 AArch64 Linux cross-builds in each
+first-pair trial. A first native cold attempt measured 540.51 s of wall time
+but overlapped a Tailscale/SSH outage and was excluded from the speed ratios.
+Its own harness reported 286.79 s; the 253.72 s gap is derived from those two
+observations and may include sleep or another unknown pause. A temporary
+user-level `caffeinate` assertion preceded the retained cold and warm trials.
+
+These ratios compare complete task steps at their actual worker widths.
+The Mac test262 pool used eight workers, while the hosted macOS runner
+used three, as the [U21 width records] show. Its ratios describe
+one-runner whole-shard throughput, not per-worker speed, and cannot be
+used unchanged for two concurrent Mac jobs.
+The older-SHA hosted test262 step took 1,188 s instead of 1,508 s;
+substituting it would yield derived 5.30 cold and 5.93 warm ratios.
+That is a sensitivity illustration, not an exact-SHA repeat or a
+confidence interval. Both hosted runs reported a three-worker pool.
+The Mac's second same-SHA test262 sequence measured 431.30 s cold and
+408.14 s warm with the same eight-worker pool and all 1,782 paths
+passing. Against the same hosted step, its derived ratios are 3.50
+and 3.69. [*repeat-load-sample.txt*](./evidence/u21/repeat-load-sample.txt)
+begins one second into the second warm step and shows `mediaanalysisd`
+active then. No process sample covers the second cold step, and the
+source of the spread was not isolated. It limits the precision
+of any scheduling ratio from the first sequence.
+
+The Mac's native fixture job
+used the same shard definition as hosted, and its first retained cold
+trial used a fresh Zig cache. The macOS runtime-archive directory was
+shared across families despite separate `XDG_CACHE_HOME` values. The
+native trial's key file was born after that cold trial began, as
+[*mac-archives.tsv*](./evidence/u21/mac-archives.tsv) records. The
+hosted native job also hit the runtime archive cache.
+The second native fixture sequence measured 365.54 s cold and 330.64 s
+warm, yielding derived 2.24 and 2.47 ratios against the same hosted
+step. All 88 host fixtures and 89 cross-builds passed again.
+The extended-property shard used three workers and the same three files
+on both machines. Its own-keys file dominated the wall time: measured
+1,074.20 s cold and 1,069.14 s warm on the Mac, versus 2,812.75 s in
+the same-SHA hosted job. The derived same-width own-keys file ratios are
+2.62 and 2.63. The 4.96 s difference between the two Mac shard steps
+is measured once at each cache state; it is too small to claim a cache
+benefit without repetitions within each state.
+The second same-SHA Mac sequence measured 1,155.07 s cold and
+1,138.32 s warm for the same shard, with its own-keys file taking
+1,154.42 s and 1,137.64 s. The derived same-width file ratios against
+the hosted 2,812.75 s are 2.44 and 2.47. This same-state spread
+exceeds either within-sequence cold-to-warm gap.
+The native fixture and Apple-clang sanitizer harness iterate fixtures
+sequentially in one Node process on both machines at this SHA; this is
+source-derived, rather than a runtime-reported worker count.
+
+The Apple-clang sanitizer native step passed all 264 fixtures in every
+Mac trial. The Mac used Apple clang 21 on macOS 27; the hosted reference used
+Apple clang 17 on macOS 15. Its derived 2.67 and 2.69 ratios measure
+throughput across distinct toolchains and cannot substitute for the hosted
+sanitizer verdict. The native step's 4.65 s cold-to-warm gap was measured
+once per state and is too small to attribute to cache reuse. The measured
+Mac self-check and runtime sanitizer steps took 1.26 s and 70.65 s once;
+the same-SHA hosted steps took 8 s and 308 s.
+The second Mac sequence measured 944.02 s cold and 844.51 s warm for
+the native step, with separate self-check and runtime setup of 4.25 s
+and 74.15 s. Its 99.51 s cold-to-warm gap exceeds the first pair's
+4.65 s, so neither pair establishes a cache saving. The second
+derived native-step ratios are 2.05 and 2.29 across the different
+Apple clang and macOS versions.
+
+For two-runner capacity, two clones with separate Zig caches ran the same
+extended native-property 1/12 shard at once. Both jobs passed six tests in
+each of the cold and warm pairs. The measured pair elapsed time was 1,381 s
+in each state, versus 1,074.85 s cold and 1,069.89 s warm for one serial
+job. The derived throughput gain over two serial jobs was 1.56 cold and
+1.55 warm; each job's latency increased about 27–28%. Thirty-second
+samples recorded as little as `243M` unused memory cold and `260M` warm,
+with sampled swap unchanged at 63.12 MiB. This one repeated-shard test
+supports a capacity benefit, but its small sampled memory margin does not
+justify enabling two runner services before mixed-job validation.
+Both processes used one macOS runtime-archive directory, with distinct
+keys because their Zig cache paths differed. Contention on a shared key
+in an eventual runner setup was not measured.
+
+Tart 2.40.1 installed and booted Apple macOS 15.6.1 and 26.6.2 restore
+images on the M6, with each guest observed in `running` state with a DHCP
+address. [*docs/evidence/u21/vm-images.txt*](./evidence/u21/vm-images.txt)
+records the verified image digests and timestamps. The 15.6.1
+guest differs from hosted `macos-15` 15.7.9; neither guest has a measured
+Command Line Tools version or Oseo gate result. The bare host's pinned-Zig
+jobs keep the `macos-aarch64` target class but carry macOS 27 provenance.
+Apple-clang sanitizer evidence remains on hosted macOS 15 with clang 17.
+The self-hosted route remains disabled pending an explicit choice between
+a measured guest setup and a Zig-only bare-host assignment.
+
+[U21 width records]: ./evidence/u21/README.md
+[36657614384]: https://github.com/dahlia/oseo/actions/runs/36657614384
+[36721134885]: https://github.com/dahlia/oseo/actions/runs/36721134885
+
 ### U16 static macOS lane branch observations
 
 GitHub Actions run and job timestamps provide one measured observation at

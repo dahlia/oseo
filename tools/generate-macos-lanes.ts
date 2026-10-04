@@ -4,7 +4,13 @@ import { parse } from "yaml";
 import type { StructuredDataValue } from "./structured-data.ts";
 import { parsedMapping } from "./structured-data.ts";
 import { isNumber, isString } from "./value-kinds.ts";
-import { macosJobCosts } from "./macos-job-costs.ts";
+import { configuredSelfHostedLanes } from "./macos-lane-config.ts";
+import {
+  macosJobCosts,
+  macosFixedSetupSeconds,
+  selfHostedFamilySpeedRatios,
+  selfHostedProbeSeconds,
+} from "./macos-job-costs.ts";
 
 /** A single existing job, assigned to one capacity lane. */
 export interface MacosLaneJob {
@@ -14,6 +20,7 @@ export interface MacosLaneJob {
   readonly matrix: Readonly<Record<string, StructuredDataValue>>;
   readonly os: string;
   readonly seconds: number;
+  readonly family: string;
 }
 
 const templatePath = "tools/main-workflow.template.yaml";
@@ -40,6 +47,18 @@ export function macosJobs(): readonly MacosLaneJob[] {
       matrix,
       os,
       seconds,
+      family:
+        sourceId === "test_property_case"
+          ? "own-key cases"
+          : sourceId === "test_native_support"
+            ? "native support"
+            : sourceId === "test_sanitizer_macos"
+              ? "host C sanitizers"
+              : sourceId === "test_test262"
+                ? "test262"
+                : sourceId === "test_native"
+                  ? "native"
+                  : "test",
     });
   }
   for (const runtime of ["node", "deno"]) {
@@ -78,23 +97,86 @@ export function macosJobs(): readonly MacosLaneJob[] {
       });
     }
   }
+  for (let caseShard = 1; caseShard <= 3; caseShard++) {
+    add(
+      "test_property_case",
+      String(caseShard),
+      `own-key cases (macos-aarch64, ${caseShard}/3)`,
+      {
+        os: "macos-15",
+        target: "macos-aarch64",
+        caseShard,
+      },
+    );
+  }
   if (jobs.length !== Object.keys(macosJobCosts).length) {
-    throw new Error("Measured cost table has stale jobs");
+    throw new Error("macOS cost table has stale jobs");
   }
   return jobs;
 }
 
-/** LPT on five slots; equal costs use names, equal loads use lane index. */
-export function macosLanes(): readonly (readonly MacosLaneJob[])[] {
-  const lanes: MacosLaneJob[][] = Array.from({ length: 5 }, () => []);
-  const loads = [0, 0, 0, 0, 0];
+/** Place longer jobs on five hosted and optional weighted Mac lanes. */
+export function macosLanes(
+  selfHostedCount = 0,
+): readonly (readonly MacosLaneJob[])[] {
+  if (selfHostedCount !== 0 && selfHostedCount !== 1) {
+    throw new Error("Only zero or one self-hosted Mac lane is supported");
+  }
+  const lanes: MacosLaneJob[][] = Array.from(
+    { length: 5 + selfHostedCount },
+    () => [],
+  );
+  const loads: number[] = lanes.map((_, index) =>
+    index < 5 ? 0 : selfHostedProbeSeconds,
+  );
   const jobs = macosJobs().toSorted(
     (a, b) => b.seconds - a.seconds || a.name.localeCompare(b.name, "en"),
   );
   for (const job of jobs) {
-    const index = loads.indexOf(Math.min(...loads));
+    const eligible =
+      job.os === "macos-15" &&
+      ["native", "native support", "test262", "own-key cases"].includes(
+        job.family,
+      )
+        ? loads.length
+        : 5;
+    if (
+      job.family === "own-key cases" &&
+      selfHostedCount === 1 &&
+      eligible !== loads.length
+    ) {
+      throw new Error("Own-key cases must be Mac-lane eligible together");
+    }
+    let index = 0;
+    let finish = Number.POSITIVE_INFINITY;
+    for (let candidate = 0; candidate < eligible; candidate++) {
+      // One measured deadline covers all three own-key case shards.
+      if (
+        job.family === "own-key cases" &&
+        selfHostedCount === 1 &&
+        candidate !== 5
+      )
+        continue;
+      const ratio = candidate < 5 ? 1 : selfHostedFamilySpeedRatios[job.family];
+      if (ratio == null || !Number.isFinite(ratio) || ratio <= 0) {
+        throw new Error(`Invalid self-hosted speed ratio: ${job.family}`);
+      }
+      const elapsed =
+        candidate < 5
+          ? job.seconds
+          : macosFixedSetupSeconds +
+            (job.seconds - macosFixedSetupSeconds) / ratio;
+      const projected = loads[candidate]! + elapsed;
+      if (projected < finish) {
+        finish = projected;
+        index = candidate;
+      }
+    }
+    if (!Number.isFinite(finish)) {
+      throw new Error(`No eligible macOS lane for ${job.name}`);
+    }
     lanes[index]!.push(job);
-    loads[index]! += job.seconds;
+    loads[index] = finish;
   }
   return lanes;
 }
@@ -140,7 +222,10 @@ function bindMatrix(
 }
 
 /** Generate explicit lane jobs, retaining the template's step text. */
-export function generateMacosWorkflow(template: string): string {
+export function generateMacosWorkflow(
+  template: string,
+  selfHostedCount = 0,
+): string {
   const blocks = new Map<string, string>();
   for (const match of template.matchAll(
     /^  (\w+):\n[\s\S]*?(?=^  \w+:|$(?![\s\S]))/gm,
@@ -186,6 +271,17 @@ export function generateMacosWorkflow(template: string): string {
     '              results.every(result => result === "success");',
     "            process.exit(success ? 0 : 1);",
     "          '",
+    "      - uses: actions/checkout@v7",
+    "      - uses: jdx/mise-action@v4",
+    "        with:",
+    "          install: true",
+    "      - uses: actions/download-artifact@v7",
+    "        with:",
+    "          pattern: own-key-duration-*",
+    "          path: ${{ runner.temp }}/property-case-durations",
+    "      - run: >-",
+    "          mise run check:property-case-durations",
+    '          "${{ runner.temp }}/property-case-durations"',
     "",
   ].join("\n");
   const aggregate = blocks
@@ -197,7 +293,10 @@ export function generateMacosWorkflow(template: string): string {
     .replace(/^    steps:\n[\s\S]*/m, aggregateSteps);
   output = output.replace(blocks.get("native")!, aggregate);
   const generated: string[] = [];
-  for (const [laneIndex, lane] of macosLanes().entries()) {
+  if (selfHostedCount > 0) {
+    generated.push(selfHostedAvailabilityJob(selfHostedCount));
+  }
+  for (const [laneIndex, lane] of macosLanes(selfHostedCount).entries()) {
     generated.push(`  # macOS lane ${laneIndex + 1}, longest jobs first.`);
     for (const [index, job] of lane.entries()) {
       let block = blocks.get(job.sourceId)!;
@@ -206,21 +305,37 @@ export function generateMacosWorkflow(template: string): string {
       block = block.replace(/^  \w+:/, `  ${job.id}:`);
       block = block.replace(/^    name: >-\n(?:      [^\n]*\n)+/m, "");
       block = block.replace(/^    name: [^\n]*\n/m, "");
+      const selfHosted = laneIndex >= 5;
+      const runnerOutput = `r${laneIndex - 4}`;
+      const runner = selfHosted
+        ? `\${{ fromJSON(needs.mac_ready.outputs.${runnerOutput}` +
+          ` || '"macos-15"') }}`
+        : job.os;
       block = block.replace(
         /^    runs-on: [^\n]*\n/m,
-        `    name: ${job.name}\n    runs-on: ${job.os}\n`,
+        `    name: ${job.name}\n    runs-on: ${runner}\n`,
       );
       block = block.replace(
         /^    strategy:\n[\s\S]*?(?=^    (?:env|steps):)/m,
         "",
       );
       block = bindMatrix(block, job.matrix);
+      block = block.replace(
+        /^    steps:\n/m,
+        "    steps:\n" +
+          "      - name: Record macOS host version\n" +
+          "        run: sw_vers -productVersion\n",
+      );
       const predecessor = lane[index - 1];
       block = block.replace(
         /^    runs-on: [^\n]*\n/m,
         (line) =>
           `${line}    if: \${{ !cancelled() }}\n` +
-          (predecessor == null ? "" : `    needs: ${predecessor.id}\n`),
+          (selfHosted
+            ? "    needs:\n      - mac_ready\n"
+            : predecessor == null
+              ? ""
+              : `    needs: ${predecessor.id}\n`),
       );
       generated.push(block.trimEnd(), "");
     }
@@ -233,20 +348,68 @@ export function generateMacosWorkflow(template: string): string {
   );
 }
 
+/** The readiness job emits a hosted fallback for each configured Mac lane. */
+function selfHostedAvailabilityJob(count: number): string {
+  const outputs = Array.from({ length: count }, (_, index) => {
+    const key = `r${index + 1}`;
+    return `      ${key}: \${{ steps.probe.outputs.${key} }}`;
+  }).join("\n");
+  return [
+    "  mac_ready:",
+    "    name: macOS self-hosted availability",
+    "    runs-on: ubuntu-latest",
+    "    timeout-minutes: 5",
+    "    permissions:",
+    "      contents: read",
+    "    outputs:",
+    outputs,
+    "    steps:",
+    "      - uses: actions/checkout@v7",
+    "      - uses: jdx/mise-action@v4",
+    "        with:",
+    "          install: true",
+    "          install_args: node",
+    "      - id: probe",
+    "        if: >-",
+    "          ${{ github.event_name == 'push' &&",
+    "              github.repository == 'dahlia/oseo' }}",
+    "        env:",
+    `          OSEO_SELFHOSTED_LANES: ${count}`,
+    "          OSEO_SELFHOSTED_ENABLED: >-",
+    "            ${{ vars.OSEO_SELFHOSTED_MAC_ENABLED }}",
+    "          OSEO_EVENT: ${{ github.event_name }}",
+    "          OSEO_REPOSITORY: ${{ github.repository }}",
+    "          OSEO_RUNNER_STATUS_TOKEN: >-",
+    "            ${{ secrets.OSEO_RUNNER_STATUS_TOKEN }}",
+    "        run: node tools/selfhosted-mac/availability.ts",
+    "",
+  ].join("\n");
+}
+
 if (
   process.argv[1] != null &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  const expected = generateMacosWorkflow(await readFile(templatePath, "utf8"));
+  const laneFlag = process.argv.indexOf("--self-hosted-lanes");
+  const count =
+    laneFlag < 0
+      ? configuredSelfHostedLanes
+      : Number(process.argv[laneFlag + 1]);
+  const expected = generateMacosWorkflow(
+    await readFile(templatePath, "utf8"),
+    count,
+  );
   // Parse as well as compare, so malformed template changes fail locally.
   parse(expected);
   if (process.argv.includes("--check")) {
     if ((await readFile(workflowPath, "utf8")) !== expected) {
       throw new Error(
-        "Workflow is stale; edit tools/main-workflow.template.yaml, " +
-          "then run mise run generate:macos-lanes",
+        `Workflow differs from generated ${count}-Mac-lane output; ` +
+          "update tools/macos-lane-config.ts or regenerate the workflow",
       );
     }
+  } else if (laneFlag >= 0) {
+    process.stdout.write(expected);
   } else {
     await writeFile(workflowPath, expected);
   }
