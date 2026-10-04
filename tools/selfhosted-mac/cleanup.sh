@@ -59,17 +59,41 @@ diag=$root/_diag
 if [[ -d $diag && ! -L $diag ]]; then
   find "$diag" -type f -mtime +7 -delete || true
 fi
-cache_parent=$HOME/.cache
-cache=$cache_parent/zig
 free_kib=$(df -Pk "$root" | awk 'NR == 2 {print $4}') || true
-if [[ $free_kib =~ ^[0-9]+$ && $free_kib -lt 41943040 &&
-      -d $cache ]]; then
-  if [[ $HOME == /* && $HOME != / && ! -L $cache ]] &&
-      is_unlinked_directory "$HOME" &&
-      is_unlinked_directory "$cache_parent"; then
-    (cd -P "$cache_parent" && rm -rf -- zig)
-    echo 'Pruned Zig cache because free disk fell below 40 GiB'
+if [[ $free_kib =~ ^[0-9]+$ && $free_kib -lt 41943040 ]]; then
+  runner_user=$(id -un 2>/dev/null) || runner_user=''
+  account_home=''
+  if [[ -n $runner_user ]]; then
+    account_home=$(
+      dscl . -read "/Users/$runner_user" NFSHomeDirectory 2>/dev/null |
+        sed -n 's/^NFSHomeDirectory: //p'
+    ) || account_home=''
+  fi
+  physical_home=''
+  if [[ $account_home != / ]] &&
+      is_unlinked_directory "$account_home"; then
+    physical_home=$(cd -P "$account_home" && pwd -P) || physical_home=''
+  fi
+  if [[ -z $physical_home ]]; then
+    echo 'Skipped Zig cache prune: account home unavailable or linked' >&2
   else
-    echo 'Skipped Zig cache prune through a linked path' >&2
+    cache_parent=$physical_home/.cache
+    cache=$cache_parent/zig
+    if [[ -d $cache ]]; then
+      if [[ ! -L $cache ]] &&
+          is_unlinked_directory "${HOME:-}" &&
+          [[ $(cd -P "$HOME" && pwd -P) == "$physical_home" ]] &&
+          is_unlinked_directory "$cache_parent"; then
+        if (cd -P "$cache_parent" &&
+            [[ $(pwd -P) == "$cache_parent" ]] &&
+            rm -rf -- zig); then
+          echo 'Pruned Zig cache because free disk fell below 40 GiB'
+        else
+          echo 'Skipped Zig cache prune: path changed or removal failed' >&2
+        fi
+      else
+        echo 'Skipped Zig cache prune: unsafe home or cache path' >&2
+      fi
+    fi
   fi
 fi

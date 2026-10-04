@@ -767,6 +767,14 @@ test(
       const uname = join(bin, "uname");
       writeFileSync(uname, "#!/bin/sh\necho Darwin\n");
       chmodSync(uname, 0o700);
+      const df = join(bin, "df");
+      writeFileSync(
+        df,
+        "#!/bin/sh\n" +
+          "echo 'Filesystem Blocks Used Available'\n" +
+          "echo 'disk 1 1 50000000'\n",
+      );
+      chmodSync(df, 0o700);
       const env = {
         ...process.env,
         HOME: root,
@@ -847,6 +855,17 @@ test(
       writeFileSync(join(runner, ".runner"), "registered");
       for (const [name, body] of [
         ["uname", "#!/bin/sh\necho Darwin\n"],
+        ["id", '#!/bin/sh\n[ "$*" = "-un" ] || exit 1\necho oseo-runner\n'],
+        [
+          "dscl",
+          [
+            "#!/bin/sh\n",
+            '[ "$*" = ". -read /Users/oseo-runner NFSHomeDirectory" ]',
+            " || exit 1\n",
+            '[ -n "$OSEO_TEST_ACCOUNT_HOME" ] || exit 1\n',
+            `printf 'NFSHomeDirectory: %s\\n' "$OSEO_TEST_ACCOUNT_HOME"\n`,
+          ].join(""),
+        ],
         [
           "df",
           "#!/bin/sh\n" +
@@ -865,6 +884,7 @@ test(
       const env = {
         ...process.env,
         HOME: root,
+        OSEO_TEST_ACCOUNT_HOME: root,
         OSEO_RUNNER_ROOT: runner,
         PATH: `${bin}:${process.env.PATH ?? ""}`,
       };
@@ -873,7 +893,7 @@ test(
       assert.equal(linked.status, 0, String(linked.stderr));
       assert.ok(existsSync(externalMarker));
       assert.doesNotMatch(String(linked.stdout), /Pruned Zig cache/u);
-      assert.match(String(linked.stderr), /Skipped Zig cache prune/u);
+      assert.match(String(linked.stderr), /unsafe home or cache path/u);
       const externalCache = join(external, ".cache", "zig");
       mkdirSync(externalCache, { recursive: true });
       const linkedHomeMarker = join(externalCache, "keep-home");
@@ -881,12 +901,28 @@ test(
       const linkedHome = join(root, "linked-home");
       symlinkSync(external, linkedHome);
       const homeResult = spawnSync("/bin/bash", [cleanup, "completed"], {
-        env: { ...env, HOME: linkedHome },
+        env: {
+          ...env,
+          HOME: linkedHome,
+          OSEO_TEST_ACCOUNT_HOME: external,
+        },
       });
       assert.equal(homeResult.status, 0, String(homeResult.stderr));
       assert.ok(existsSync(linkedHomeMarker));
       assert.doesNotMatch(String(homeResult.stdout), /Pruned Zig cache/u);
-      assert.match(String(homeResult.stderr), /Skipped Zig cache prune/u);
+      assert.match(String(homeResult.stderr), /unsafe home or cache path/u);
+      const linkedAccountHome = spawnSync("/bin/bash", [cleanup, "completed"], {
+        env: { ...env, OSEO_TEST_ACCOUNT_HOME: linkedHome },
+      });
+      assert.equal(
+        linkedAccountHome.status,
+        0,
+        String(linkedAccountHome.stderr),
+      );
+      assert.match(
+        String(linkedAccountHome.stderr),
+        /account home unavailable or linked/u,
+      );
       rmSync(join(root, ".cache"));
       const localCache = join(root, ".cache", "zig");
       mkdirSync(localCache, { recursive: true });
@@ -894,6 +930,7 @@ test(
       const local = spawnSync("/bin/bash", [cleanup, "completed"], { env });
       assert.equal(local.status, 0, String(local.stderr));
       assert.ok(!existsSync(localCache));
+      assert.match(String(local.stdout), /Pruned Zig cache/u);
       mkdirSync(localCache);
       writeFileSync(join(localCache, "prune-again"), "prune");
       const trailingHome = spawnSync("/bin/bash", [cleanup, "completed"], {
@@ -901,15 +938,57 @@ test(
       });
       assert.equal(trailingHome.status, 0, String(trailingHome.stderr));
       assert.ok(!existsSync(localCache));
+      mkdirSync(localCache);
+      writeFileSync(join(localCache, "keep-account"), "keep");
       const otherHome = join(root, "other-home");
       const otherCache = join(otherHome, ".cache", "zig");
       mkdirSync(otherCache, { recursive: true });
       writeFileSync(join(otherCache, "prune"), "prune");
-      const nonnested = spawnSync("/bin/bash", [cleanup, "completed"], {
+      const mismatched = spawnSync("/bin/bash", [cleanup, "completed"], {
         env: { ...env, HOME: otherHome },
       });
-      assert.equal(nonnested.status, 0, String(nonnested.stderr));
+      assert.equal(mismatched.status, 0, String(mismatched.stderr));
+      assert.ok(existsSync(otherCache));
+      assert.ok(existsSync(join(localCache, "keep-account")));
+      assert.match(String(mismatched.stderr), /unsafe home or cache path/u);
+      const noAccountHome = spawnSync("/bin/bash", [cleanup, "completed"], {
+        env: { ...env, OSEO_TEST_ACCOUNT_HOME: "" },
+      });
+      assert.equal(noAccountHome.status, 0, String(noAccountHome.stderr));
+      assert.ok(existsSync(join(localCache, "keep-account")));
+      assert.match(String(noAccountHome.stderr), /account home unavailable/u);
+      const matchingAccountHome = spawnSync(
+        "/bin/bash",
+        [cleanup, "completed"],
+        {
+          env: {
+            ...env,
+            HOME: otherHome,
+            OSEO_TEST_ACCOUNT_HOME: otherHome,
+          },
+        },
+      );
+      assert.equal(
+        matchingAccountHome.status,
+        0,
+        String(matchingAccountHome.stderr),
+      );
       assert.ok(!existsSync(otherCache));
+      mkdirSync(otherCache);
+      writeFileSync(join(otherCache, "keep-on-error"), "keep");
+      const failingRm = join(bin, "rm");
+      writeFileSync(failingRm, "#!/bin/sh\nexit 1\n");
+      chmodSync(failingRm, 0o700);
+      const removalFailure = spawnSync("/bin/bash", [cleanup, "completed"], {
+        env: {
+          ...env,
+          HOME: otherHome,
+          OSEO_TEST_ACCOUNT_HOME: otherHome,
+        },
+      });
+      assert.equal(removalFailure.status, 0, String(removalFailure.stderr));
+      assert.ok(existsSync(join(otherCache, "keep-on-error")));
+      assert.match(String(removalFailure.stderr), /removal failed/u);
     } finally {
       rmSync(root, { recursive: true, force: true });
       rmSync(external, { recursive: true, force: true });

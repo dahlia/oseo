@@ -85,8 +85,9 @@ directory itself and registration files. The daemon's
 there, and worker and job processes can leave cache files. Hooks never
 clear it. Inspect its size through the health check and remove stale files
 only while the daemon is stopped. If free disk falls below 40 GiB on the
-256 GiB disk, either hook prunes the fixed Zig cache when its home and cache
-paths have no linked component. A skipped prune is logged by the hook.
+256 GiB disk, either hook prunes the Zig cache under the runner account home
+reported by the directory service. The hook requires `$HOME` to resolve to that
+home and rejects linked home or cache paths. A skipped prune is logged.
 The hook removes runner diagnostic logs older than seven days; launchd
 output is discarded. Check the daemon, recent diagnostics, and disk with
 *tools/selfhosted-mac/health.sh* under `sudo`. Keep the runner account,
