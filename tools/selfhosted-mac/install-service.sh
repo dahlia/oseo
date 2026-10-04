@@ -44,13 +44,37 @@ runner_home=$(
   echo 'Runner account needs a home directory' >&2
   exit 2
 }
+[[ $(stat -f %Su "$runner_home") == "$runner_user" ]] || {
+  echo 'Runner account must own its home directory' >&2
+  exit 2
+}
 service_script=/usr/local/libexec/oseo-runner
-install -d -m 755 -o root -g wheel "$service_script"
-install -d -m 700 -o "$runner_user" -g staff "$runner_root/oseo-temp"
+runner_group=$(id -gn "$runner_user")
+bash "$script_dir/prepare-service-files.sh" \
+  "$runner_root" "$runner_home" "$runner_user" "$runner_group" \
+  /usr/local root wheel "$script_dir"
 for file in job-started.sh job-completed.sh cleanup.sh; do
-  install -m 555 -o root -g wheel "$script_dir/$file" \
-    "$service_script/$file"
+  sudo -u "$runner_user" /bin/test -x "$service_script/$file" || {
+    echo "Runner cannot execute hook: $service_script/$file" >&2
+    exit 2
+  }
 done
+for directory in "$runner_home" "$runner_root"; do
+  sudo -u "$runner_user" /bin/test -x "$directory" || {
+    echo "Runner cannot traverse directory: $directory" >&2
+    exit 2
+  }
+done
+sudo -u "$runner_user" /bin/test -r \
+  "$runner_root/.credentials" || {
+  echo 'Runner cannot read its registration credential' >&2
+  exit 2
+}
+sudo -u "$runner_user" /bin/test -w \
+  "$runner_root/oseo-temp" || {
+  echo 'Runner cannot write to its daemon temp directory' >&2
+  exit 2
+}
 RUNNER_PLIST=$plist RUNNER_ROOT=$runner_root RUNNER_USER=$runner_user \
 RUNNER_HOME=$runner_home \
 RUNNER_SERVICE_LABEL=$service_label \

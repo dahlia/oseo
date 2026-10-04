@@ -7,11 +7,13 @@ import {
   readFileSync,
   readdirSync,
   rmSync,
+  statSync,
+  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { spawnSync } from "node:child_process";
 import type { SpawnSyncReturns } from "node:child_process";
-import { tmpdir } from "node:os";
+import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
 import { isNumber, isObject, isString } from "../tools/value-kinds.ts";
@@ -738,7 +740,7 @@ test("macOS extended shard one contains own-keys", () => {
 });
 
 test(
-  "Mac cleanup preserves prepared job files until completion",
+  "Mac cleanup clears job files but preserves listener IPC",
   {
     skip: process.platform === "win32" ? "requires Bash" : false,
   },
@@ -760,7 +762,7 @@ test(
       writeFileSync(join(actions, "action.yml"), "prepared");
       writeFileSync(join(temp, "event.json"), "prepared");
       writeFileSync(join(temp, "duration.json"), "stale");
-      writeFileSync(join(runner, "oseo-temp", "stale"), "stale");
+      writeFileSync(join(runner, "oseo-temp", "listener.pipe"), "live");
       const uname = join(bin, "uname");
       writeFileSync(uname, "#!/bin/sh\necho Darwin\n");
       chmodSync(uname, 0o700);
@@ -780,10 +782,88 @@ test(
       const completed = spawnSync("bash", [cleanup, "completed"], { env });
       assert.equal(completed.status, 0, String(completed.stderr));
       assert.ok(!existsSync(actions));
+      assert.ok(!existsSync(join(runner, "_work", "oseo")));
       assert.ok(existsSync(temp));
       assert.ok(!existsSync(join(temp, "event.json")));
-      assert.ok(!existsSync(join(runner, "oseo-temp", "stale")));
+      assert.ok(existsSync(join(runner, "oseo-temp", "listener.pipe")));
       assert.ok(existsSync(join(runner, ".runner")));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
+  "Mac service setup repairs parent and credential permissions",
+  {
+    skip: process.platform === "win32" ? "requires Bash" : false,
+  },
+  () => {
+    const root = mkdtempSync(join(tmpdir(), "oseo-mac-service-"));
+    try {
+      const home = join(root, "home");
+      const runner = join(home, "actions-runner");
+      const prefix = join(root, "usr", "local");
+      mkdirSync(runner, { recursive: true, mode: 0o755 });
+      mkdirSync(prefix, { recursive: true, mode: 0o700 });
+      writeFileSync(join(runner, ".credentials"), "token");
+      writeFileSync(join(runner, ".credentials_rsaparams"), "key");
+      chmodSync(join(runner, ".credentials"), 0o644);
+      chmodSync(join(runner, ".credentials_rsaparams"), 0o644);
+      const owner = userInfo().username;
+      const group = spawnSync("id", ["-gn"], {
+        encoding: "utf8",
+      }).stdout.trim();
+      const args = [
+        "tools/selfhosted-mac/prepare-service-files.sh",
+        runner,
+        home,
+        owner,
+        group,
+        prefix,
+        owner,
+        group,
+        "tools/selfhosted-mac",
+      ];
+      const result = spawnSync("bash", args, { encoding: "utf8" });
+      assert.equal(result.status, 0, result.stderr);
+      for (const directory of [
+        prefix,
+        join(prefix, "libexec"),
+        join(prefix, "libexec", "oseo-runner"),
+      ]) {
+        assert.equal(statSync(directory).mode & 0o777, 0o755);
+      }
+      for (const directory of [home, runner, join(runner, "oseo-temp")]) {
+        assert.equal(statSync(directory).mode & 0o777, 0o700);
+      }
+      for (const name of [".credentials", ".credentials_rsaparams"]) {
+        assert.equal(statSync(join(runner, name)).mode & 0o777, 0o600);
+      }
+      for (const name of ["job-started.sh", "job-completed.sh", "cleanup.sh"]) {
+        assert.equal(
+          statSync(join(prefix, "libexec", "oseo-runner", name)).mode & 0o777,
+          0o555,
+        );
+      }
+      const linkedTarget = join(root, "linked-target");
+      mkdirSync(linkedTarget, { mode: 0o755 });
+      rmSync(join(runner, "oseo-temp"), { recursive: true });
+      symlinkSync(linkedTarget, join(runner, "oseo-temp"));
+      const linked = spawnSync("bash", args, { encoding: "utf8" });
+      assert.notEqual(linked.status, 0);
+      assert.equal(statSync(linkedTarget).mode & 0o777, 0o755);
+      const relative = spawnSync(
+        "bash",
+        [
+          "tools/selfhosted-mac/prepare-service-files.sh",
+          ".",
+          ...args.slice(2),
+        ],
+        { encoding: "utf8" },
+      );
+      assert.notEqual(relative.status, 0);
+      assert.match(relative.stderr, /absolute non-system roots/u);
     } finally {
       rmSync(root, { recursive: true, force: true });
     }

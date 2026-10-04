@@ -13,6 +13,7 @@ phase=${1:?Set started or completed}
   exit 2
 }
 work=$root/_work
+job_temp=$work/_temp
 case $phase in
   started)
     checkout=$work/oseo/oseo
@@ -23,22 +24,18 @@ case $phase in
     if [[ -d $checkout ]]; then
       find "$checkout" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
     fi
-    if [[ -d $work/_temp && ! -L $work/_temp ]]; then
-      rm -f -- "$work/_temp/duration.json"
+    if [[ -d $job_temp && ! -L $job_temp ]]; then
+      rm -f -- "$job_temp/duration.json"
     fi
     ;;
   completed)
     if [[ -d $work && ! -L $work ]]; then
       find "$work" -mindepth 1 -maxdepth 1 ! -name _temp \
         -exec rm -rf -- {} +
-      if [[ -d $work/_temp && ! -L $work/_temp ]]; then
-        find "$work/_temp" -mindepth 1 -maxdepth 1 \
+      if [[ -d $job_temp && ! -L $job_temp ]]; then
+        find "$job_temp" -mindepth 1 -maxdepth 1 \
           -exec rm -rf -- {} +
       fi
-    fi
-    temp=$root/oseo-temp
-    if [[ -d $temp && ! -L $temp ]]; then
-      find "$temp" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
     fi
     ;;
   *)
