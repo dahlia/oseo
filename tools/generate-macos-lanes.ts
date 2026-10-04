@@ -9,6 +9,7 @@ import {
   macosJobCosts,
   macosFixedSetupSeconds,
   selfHostedFamilySpeedRatios,
+  selfHostedJobSeconds,
   selfHostedProbeSeconds,
 } from "./macos-job-costs.ts";
 
@@ -115,7 +116,23 @@ export function macosJobs(): readonly MacosLaneJob[] {
   return jobs;
 }
 
-/** Place longer jobs on five hosted and optional weighted Mac lanes. */
+/** Whether a job may run on the Zig-only self-hosted Mac lane. */
+function selfHostedEligible(job: MacosLaneJob): boolean {
+  return (
+    job.os === "macos-15" &&
+    ["native", "native support", "test262", "own-key cases"].includes(
+      job.family,
+    )
+  );
+}
+
+/**
+ * Place longer jobs on five hosted and optional weighted Mac lanes.
+ *
+ * With a Mac lane, the own-key case shards are placed first: they must
+ * share that lane, and placing them by weight would leave the lane no
+ * room for them after the longer jobs had filled it.
+ */
 export function macosLanes(
   selfHostedCount = 0,
 ): readonly (readonly MacosLaneJob[])[] {
@@ -129,17 +146,23 @@ export function macosLanes(
   const loads: number[] = lanes.map((_, index) =>
     index < 5 ? 0 : selfHostedProbeSeconds,
   );
-  const jobs = macosJobs().toSorted(
-    (a, b) => b.seconds - a.seconds || a.name.localeCompare(b.name, "en"),
+  const all = macosJobs();
+  for (const name of Object.keys(selfHostedJobSeconds)) {
+    const job = all.find((candidate) => candidate.name === name);
+    if (job == null || !selfHostedEligible(job)) {
+      throw new Error(`Stale self-hosted measurement: ${name}`);
+    }
+  }
+  const pinned = (job: MacosLaneJob): number =>
+    selfHostedCount === 1 && job.family === "own-key cases" ? 0 : 1;
+  const jobs = all.toSorted(
+    (a, b) =>
+      pinned(a) - pinned(b) ||
+      b.seconds - a.seconds ||
+      a.name.localeCompare(b.name, "en"),
   );
   for (const job of jobs) {
-    const eligible =
-      job.os === "macos-15" &&
-      ["native", "native support", "test262", "own-key cases"].includes(
-        job.family,
-      )
-        ? loads.length
-        : 5;
+    const eligible = selfHostedEligible(job) ? loads.length : 5;
     if (
       job.family === "own-key cases" &&
       selfHostedCount === 1 &&
@@ -161,11 +184,15 @@ export function macosLanes(
       if (ratio == null || !Number.isFinite(ratio) || ratio <= 0) {
         throw new Error(`Invalid self-hosted speed ratio: ${job.family}`);
       }
+      const measured = Object.entries(selfHostedJobSeconds).find(
+        ([key]) => key === job.name,
+      )?.[1];
       const elapsed =
         candidate < 5
           ? job.seconds
-          : macosFixedSetupSeconds +
-            (job.seconds - macosFixedSetupSeconds) / ratio;
+          : (measured ??
+            macosFixedSetupSeconds +
+              (job.seconds - macosFixedSetupSeconds) / ratio);
       const projected = loads[candidate]! + elapsed;
       if (projected < finish) {
         finish = projected;

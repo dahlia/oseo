@@ -32,6 +32,12 @@ import {
 import { ownKeyCaseContract } from "../tools/check-property-case-durations.ts";
 import { runnerSelections } from "../tools/selfhosted-mac/availability.ts";
 import { configuredSelfHostedLanes } from "../tools/macos-lane-config.ts";
+import {
+  macosFixedSetupSeconds,
+  selfHostedFamilySpeedRatios,
+  selfHostedJobSeconds,
+  selfHostedProbeSeconds,
+} from "../tools/macos-job-costs.ts";
 import { selectNativeTestShard } from "../tools/native-shard.ts";
 
 interface Job {
@@ -287,12 +293,12 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       if (index > 0) assert.ok(lane[index - 1]!.seconds >= planned.seconds);
     }
   }
-  // Estimates include three case-shard jobs pending CI measurement.
+  // Hosted medians of seven measured run attempts, all on hosted lanes.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    9414,
+    9135,
   );
 });
 
@@ -665,6 +671,44 @@ test("availability fails to hosted without skipping a lane", async () => {
   )) {
     assert.deepEqual(result, hosted);
   }
+});
+
+test("own-key cases lead the Mac lane with measured Mac seconds", () => {
+  const lanes = macosLanes(1);
+  const mac = lanes[5]!;
+  assert.deepEqual(
+    mac.slice(0, 3).map((job) => job.family),
+    ["own-key cases", "own-key cases", "own-key cases"],
+  );
+  // Without the pin, longer jobs would precede them on the Mac lane.
+  assert.ok(mac.slice(3).some((job) => job.seconds > mac[0]!.seconds));
+  for (const lane of [...lanes.slice(0, 5), mac.slice(3)]) {
+    for (const [index, job] of lane.entries()) {
+      if (index > 0) assert.ok(lane[index - 1]!.seconds >= job.seconds);
+    }
+  }
+  assert.ok(Object.keys(selfHostedJobSeconds).length > 0);
+  for (const name of Object.keys(selfHostedJobSeconds)) {
+    const job = macosJobs().find((candidate) => candidate.name === name);
+    assert.ok(job != null, name);
+    assert.equal(job.os, "macos-15");
+    assert.ok(
+      ["native", "native support", "test262", "own-key cases"].includes(
+        job.family,
+      ),
+    );
+  }
+  // The modeled Mac lane uses the measured seconds where present.
+  const modeled = mac.reduce(
+    (sum, job) =>
+      sum +
+      (selfHostedJobSeconds[job.name] ??
+        macosFixedSetupSeconds +
+          (job.seconds - macosFixedSetupSeconds) /
+            selfHostedFamilySpeedRatios[job.family]!),
+    selfHostedProbeSeconds,
+  );
+  assert.equal(Math.round(modeled), 5609);
 });
 
 test("faster native support work uses additional capacity", () => {

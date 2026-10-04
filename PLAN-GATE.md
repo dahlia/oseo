@@ -1522,3 +1522,71 @@ measurement of the retuned assignment can establish its makespan. The
 retune needs generator and cost-table changes and the usual two-attempt
 branch measurement. Job names, eligibility, the aggregate's required
 set, shard totals, and coverage would not change.
+
+### Median weights (U24)
+
+*tools/macos-job-costs.ts* now applies the recommended retune. Every
+hosted weight is the measured median of the job's hosted walls in the
+seven run attempts above: all-hosted runs `37121778924` and
+`37167895777`, branch run `37194069657` attempts 1 and 2, main run
+`37206614757`, and branch run `37215661294` attempts 1 and 2. A job
+placed on the Mac in some attempts has 2, 4, or 5 hosted observations;
+the table records the count. A new `selfHostedJobSeconds` table holds the
+measured median Mac wall of each of the 15 jobs that ran on `oseo-mac-1`,
+with 2, 3, or 5 observations each. The generator models those jobs on the
+Mac lane by that median. Other eligible jobs convert their hosted median
+through derived ratios pooled against hosted medians and rounded down:
+4.2 for test262, 3.2 for native support, and 3.1 for native fixtures.
+With a Mac lane, the generator places the three own-key case shards
+first, then the rest longest first. Main run `37230598930` of `840c387e`
+was still running when the medians were taken and is not included.
+
+The resulting assignment puts 15 jobs on the Mac: the three own-key
+shards, test262 1/12, 3/12, 4/12, 5/12, 7/12, 8/12, 9/12, and 12/12,
+native support 3/12, 4/12, and 12/12, and native 1/3. Its derived model
+gives a 93.5-min makespan, set by the Mac lane at 93.5 min, with hosted
+lanes ending at 80.8 to 93.3 min and 439.6 hosted macOS job minutes. The
+model omits the measured 0.5 to 1.5 min of lane overhead.
+
+The assignment was chosen for its worst case across runs, not only its
+median fit. Each candidate was evaluated against each of the seven
+attempts separately, using that attempt's measured wall for every job
+that ran on the same runner class, and otherwise the job's median or,
+for a Mac job never observed there, the attempt's hosted wall converted
+by the family ratio. These are derived evaluations of measured inputs:
+
+| Assignment rule                        | Mac jobs | Per-run makespan (min) | Mac lane last |
+| -------------------------------------- | -------: | ---------------------: | ------------: |
+| U23 weights and ratios (previous)      |       12 |            103.7–115.3 |           0/7 |
+| Medians, own-key shards first (chosen) |       15 |             91.7–102.7 |           2/7 |
+| Medians, longest first                 |       15 |            100.7–110.2 |           7/7 |
+| Hosted means, Mac medians              |       14 |             94.0–100.8 |           0/7 |
+| Hosted upper quartiles, Mac medians    |       15 |              92.7–99.9 |           4/7 |
+| Hosted maxima, Mac maxima              |       15 |             97.1–104.0 |           2/7 |
+
+The previous U23 assignment's derived evaluation of the two `29f11948`
+attempts gives 111.2 and 104.3 min, against their measured 112.2 and
+105.3 min, so the per-run evaluation omits about one minute of overhead.
+Because every rule was fitted to the same seven attempts, the table also
+overstates how well upper quantiles generalize. Leave-one-out
+evaluation, which derives the weights from six attempts and evaluates
+the seventh, gives the chosen rule a derived worst case of 101.9 min and
+a mean of 97.7 min. Hosted means gave 104.5 and 99.1, hosted upper
+quartiles 108.4 and 98.7, and maxima on both runner classes 101.8 and
+99.8 min. No other rule tested had both a lower worst case and a lower
+mean, so the medians are kept.
+
+The Mac lane would be the last lane in a derived 2 of 7 per-run
+evaluations, ending at 89.9 to 95.4 min. In the other five, hosted lane 3
+ends last: it holds `host C sanitizers (macOS, property)`, the job with
+the widest measured hosted range of 1,723 to 2,727 s. One Mac job's walls
+ranged by at most a measured 84 s, and the Mac lane's derived ends vary
+less than any hosted lane's. That spread is understated, because the
+evaluation uses a median or converted value for each Mac job not observed
+on the Mac in that attempt. If every job took its slowest observed
+wall, the derived makespan would be 107.1 min with the Mac lane at
+102.3 min. A Mac lane that runs last has no hosted slot to spill to, but
+neither does a hosted chain. Its jobs run hosted only when the readiness
+probe selects fallback, and that fallback schedule is not modeled. Only the
+two-attempt branch measurement still to run can establish the retune's
+push-to-green time.
