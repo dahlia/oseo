@@ -69,11 +69,12 @@ not grow in the six measured pairings, but each job added 0.9 to 3.8 GiB of
 Zig cache files. The 40 GiB prune below removes only the invoking account's
 cache, so it does not bound an idle runner's cache. A second runner is
 therefore preconditioned on a per-account Zig cache size cap. The hooks
-apply one, derived in [U26 evidence] from measurements under `sudo`, and are
-installed for `oseo-mac-1`. Two runners must use two accounts: the installer
-rejects a second runner service with the same account or root, because the
-hooks cap only the invoking account's cache. Registering `oseo-mac-2` is the
-maintainer's; the steps are below.
+apply one, derived in [U26 evidence] from measurements under `sudo`. The
+maintainer installed them for `oseo-mac-1` on 2026-10-06, and branch run
+`37360463788` verified the cap; see the next sections. Two runners must use two
+accounts: the installer rejects a second runner service with the same account
+or root, because the hooks cap only the invoking account's cache. Registering
+`oseo-mac-2` is the maintainer's; the steps are below.
 
 [U21 evidence]: ./evidence/u21/README.md
 [U25 evidence]: ./evidence/u25/README.md
@@ -159,14 +160,15 @@ preservation has local test evidence only. The operator should
 review and remove the earlier SSH-wrapper grant if it is no longer needed.
 
 
-Installing the updated hooks (proposal)
----------------------------------------
+Installing the updated hooks
+----------------------------
 
 The hooks on the Mac change only when the maintainer reruns the installer
-under `sudo`. These commands are a proposal and have not been run. They
-assume the runner layout of the original setup: the account `oseo-runner`
-with its runner root at */Users/oseo-runner/actions-runner*. Replace
-`<commit>` with the main commit that contains the cap.
+under `sudo`. The maintainer ran these steps for `oseo-mac-1` on 2026-10-06,
+at about 03:40 KST, with `<commit>` set to main `6654ccf7`. They assume the
+runner layout of the original setup: the account `oseo-runner` with its
+runner root at */Users/oseo-runner/actions-runner*. Rerun them with the
+reviewed main commit whenever the hooks change.
 
 1.  Keep the switch off so no new job selects the runner, and wait until
     `oseo-mac-1` is idle. The installer restarts the daemon, which would end
@@ -204,11 +206,35 @@ with its runner root at */Users/oseo-runner/actions-runner*. Replace
 
 The installer restarts the daemon with the same *bin/Runner.Listener*, so
 the existing **Developer Tools** grant applies; confirm it with the U17
-probe as after any restart. The live cache was a measured 63.6 GiB after
-run `37315038080`, above the cap, so the first job hook removes it and the
-next jobs build with an empty cache. Removing a synthetic tree of that
-shape took a measured 39 seconds. Then re-enable the switch for a branch
-push and watch free disk and the hook output in the job logs.
+probe as after any restart. Then re-enable the switch for a branch push and
+watch free disk and the hook output in the job logs.
+
+In the 2026-10-06 installation, PlistBuddy printed 30, and `cmp` found the
+installed *cleanup.sh* equal to the repository copy. The installer also
+printed `chown`/`chmod` “Operation not permitted” for */usr/local*, a
+known harmless message: System Integrity Protection refuses that change,
+and the copied hooks matched.
+
+Branch run `37360463788` verified the installation on `m5ci-cap-verify`, a
+commit whose tree equals main `6654ccf7`. The live cache was a measured
+63.6 GiB after run `37315038080`, above the cap. The first Mac job, test262
+7/12 (job `111933637542`), entered the job-started hook at 19:02:44Z and
+logged `Pruned Zig cache because it exceeded the 30 GiB cap` at 19:08:15Z.
+The hook took a measured 5.5 min from entry to that message, measuring and
+removing the cache, against the measured 39 seconds for
+a synthetic tree of that shape in [U26 evidence], and made the job a
+measured 10.0 min. It was a one-off cost of the oversized cache; a later
+prune removes the 30 GiB cap plus one job's growth, a derived 33.8 GiB
+with U25's measured 3.8 GiB maximum growth, an estimate rather than a
+bound, whose removal time has not been measured. The coordinator
+observed free disk rise from the measured 92.5 GiB U26 minimum to 155 GiB.
+The other 14 Mac jobs took a measured 4.3 to 6.9 min after the cache was
+emptied, with no sign of the first-execution penalty after the daemon
+restart; the U17 probe was not rerun. All 15 Mac jobs passed, a derived
+87.1 min as the sum of their measured durations, measured once. Attempt 1
+failed only because three hosted macOS jobs were never acquired by a hosted
+runner (“The job was not acquired by Runner of type hosted even after multiple
+attempts”); the `--failed` rerun, attempt 2, passed.
 
 
 Adding the second runner (proposal)

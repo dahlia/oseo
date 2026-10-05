@@ -1406,8 +1406,8 @@ work-directory and temporary use are measured under `sudo`, with a reserve
 for other growth. A shared account also needs a separate
 cache per runner and a hook that caps and prunes each runner's path. Neither
 is applied. Runner mode, the second runner's Developer Tools grant, and its U17
-probe are untested. The README lists the maintainer steps. Nothing is
-applied.
+probe are untested. The README lists the maintainer steps. Nothing was
+applied in U25; U26 below installed the cap on `oseo-mac-1`.
 
 #### Per-account Zig cache cap (U26)
 
@@ -1419,11 +1419,33 @@ derived 75.2 GiB. Keeping 40 GiB free with two accounts at the cap, both
 running a job, gives a derived cap of at most 38.8 GiB with a 20 GiB
 reserve. The hooks now remove the invoking account's cache above
 `OSEO_ZIG_CACHE_CAP_GIB`, 30 GiB by default and at most 38 GiB, and keep the 40
-GiB free-space prune as a backstop. The cap costs at most a derived 4.5 min of
-Mac lane time per trip, about once per run, and a measured 1.1 to 3.3 s per
-hook to measure a cache of that shape. The maintainer has not installed the
-hooks on the Mac, and a second runner is still not registered. The
-shared-account layout remains unsupported.
+GiB free-space prune as a backstop. The cap's lost warm reuse costs at most a
+derived 4.5 min of Mac lane time per trip, about once per run, excluding
+the prune itself, and a measured 1.1 to 3.3 s per
+hook to measure a cache of that shape. A second runner is still not
+registered, and the shared-account layout remains unsupported.
+
+The maintainer installed the U26 hooks for `oseo-mac-1` on 2026-10-06
+(about 03:40 KST) with *install-service.sh* at main `6654ccf7` and
+`OSEO_ZIG_CACHE_CAP_GIB=30`; PlistBuddy printed 30, and `cmp` found the
+installed *cleanup.sh* equal to the repository copy. Branch run
+`37360463788` (`m5ci-cap-verify`, a commit whose tree equals `6654ccf7`)
+verified it. Its first Mac job, test262 7/12 (job `111933637542`), entered
+the job-started hook at 19:02:44Z and logged at 19:08:15Z that it pruned
+the Zig cache for exceeding the 30 GiB cap. The hook, measuring and
+removing the 63.6 GiB cache, took a measured 5.5 min from entry to that
+message, against the measured 39 s for a
+synthetic tree of that size, and made that job a measured 10.0 min. This
+was a one-off cost of the oversized cache: a later prune removes the 30 GiB
+cap plus one job's growth, a derived 33.8 GiB with U25's measured 3.8 GiB
+maximum growth, an estimate rather than a bound. The coordinator
+observed free disk rise from the measured 92.5 GiB U26 minimum to 155 GiB.
+The other 14 Mac jobs took a measured 4.3 to 6.9 min after the cache was
+emptied, with no sign of a first-execution penalty after the installer's
+daemon restart, though the U17 probe was not rerun. All 15 Mac jobs passed
+in a derived 87.1 min, the sum of their measured durations, measured once.
+Attempt 1 failed only because three hosted macOS jobs were never acquired by a
+hosted runner; the `--failed` rerun, attempt 2, passed.
 
 #### Two Mac lanes (U27)
 

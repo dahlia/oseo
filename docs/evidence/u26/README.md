@@ -145,10 +145,10 @@ discarded; the trees were then moved under a *.noindex* directory and
 timed after the load average fell to 2.0 to 2.4. Measured on the Mac mini,
 once each in sequence:
 
-| Tree shape                   | Entries | `du -skx` (s)                      | Whole hook (s)         |
-| ---------------------------- | ------: | ---------------------------------- | ---------------------- |
-| 30 GiB                       | 205,894 | 3.29, 1.11, 1.12; 2.07, 1.25, 1.29 | 3.26, 1.11, 1.11, 1.11 |
-| 63.6 GiB (the live size now) | 436,489 | 7.71, 4.43, 4.42                   | 39.04 with removal     |
+| Tree shape                                   | Entries | `du -skx` (s)                      | Whole hook (s)         |
+| -------------------------------------------- | ------: | ---------------------------------- | ---------------------- |
+| 30 GiB                                       | 205,894 | 3.29, 1.11, 1.12; 2.07, 1.25, 1.29 | 3.26, 1.11, 1.11, 1.11 |
+| 63.6 GiB (the live size before installation) | 436,489 | 7.71, 4.43, 4.42                   | 39.04 with removal     |
 
 The second group of 30 GiB `du` timings ran after the 63.6 GiB tree had
 evicted it from the vnode cache, whose limit `kern.maxvnodes` is 249,770.
@@ -183,4 +183,45 @@ warning for an invalid value; the installer rejects one.
 used the real `dscl` and BSD `du`.
 
 *docs/self-hosted-mac.md* gives the maintainer's commands to install the
-updated hooks. Until they run, `oseo-mac-1` keeps the previous hooks.
+updated hooks.
+
+
+Installation and verification
+-----------------------------
+
+The measurements above predate the installation. The maintainer installed
+the hooks for `oseo-mac-1` on 2026-10-06, at about 03:40 KST, with
+*install-service.sh* at main `6654ccf7` and `OSEO_ZIG_CACHE_CAP_GIB=30`.
+PlistBuddy printed 30, and `cmp` found the installed *cleanup.sh* equal to
+the repository copy.
+
+Branch run `37360463788`, on `m5ci-cap-verify` at a commit whose tree
+equals `6654ccf7`, ran 15 Mac jobs on `oseo-mac-1`. According to the
+GitHub jobs API and job logs:
+
+ -  The first, test262 7/12 (job `111933637542`), entered the job-started
+    hook at 19:02:44Z and logged
+    `Pruned Zig cache because it exceeded the 30 GiB cap` at 19:08:15Z.
+    The hook took a measured 5.5 min from entry to that message, which
+    includes measuring and removing the 63.6 GiB live cache. The log does
+    not separate the two. That is far above the measured 39.04 seconds for
+    measuring and removing the synthetic 63.6 GiB tree above, so the
+    synthetic shape understates the real cache's cost. The job took a
+    measured 10.0 min.
+ -  That prune was a one-off: the cache had grown past the cap before the
+    hooks were installed. With the cap in place, a hook finds the cap plus
+    one job's growth, a derived 33.8 GiB with U25's measured 3.8 GiB maximum
+    growth. That is an estimate rather than a bound, but a later prune is
+    expected to remove far less than this one. Its removal time has not been
+    measured.
+ -  The coordinator observed free disk rise from the measured 92.5 GiB
+    minimum of run `37315038080` to 155 GiB after the prune.
+ -  The other 14 jobs took a measured 4.3 to 6.9 min after the cache was
+    emptied, with no sign of the first-execution penalty after the
+    installer's daemon restart. The U17 probe was not rerun.
+ -  All 15 jobs passed, a derived 87.1 min as the sum of their measured
+    durations. This run was measured
+    once.
+
+Attempt 1 of the run failed only because three hosted macOS jobs were never
+acquired by a hosted runner; the `--failed` rerun, attempt 2, passed.
