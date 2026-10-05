@@ -1347,8 +1347,8 @@ none of which is applied, are:
     hold the goal in all three scenarios, the second by 7.5 min in the
     maximum one. U25, below, measured memory and slowdowns for six
     pairings: memory pressure stayed normal, and per-family factors
-    derived from its measured job walls give a derived 93.2 to 110.6 min. It is
-    not applied, because it needs a second registered runner.
+    derived from its measured job walls give a derived 93.2 to 110.6 min. U27
+    below configures it; it takes effect once a second runner is registered.
 3.  Add a second Mac with the same measured speed as an independent lane.
     With the recomputed assignment over the two Macs, the model gives a
     derived 78.3 to 103.0 min. It also halves the exposure to one machine's
@@ -1424,6 +1424,80 @@ Mac lane time per trip, about once per run, and a measured 1.1 to 3.3 s per
 hook to measure a cache of that shape. The maintainer has not installed the
 hooks on the Mac, and a second runner is still not registered. The
 shared-account layout remains unsupported.
+
+#### Two Mac lanes (U27)
+
+The generator now emits two optional Mac lanes, `oseo-mac-1` and
+`oseo-mac-2`, beside the five hosted lanes, for two persistent runners on
+the same Mac mini under two standard accounts. `oseo-mac-2` is not
+registered yet; until it is, its lane falls back to hosted `macos-15`. The
+readiness job's single probe makes one decision per lane: a lane selects
+its runner only when exactly one runner carries the lane's label, that
+runner's name is the label, it carries no other lane's label, and it is
+online and idle. A busy, offline, or ambiguous runner sends only its own
+lane to hosted, and an API failure sends both. Eligibility stays Zig-only,
+routing stays push-only, and the job names, the aggregate's required set,
+shard totals, and coverage are unchanged. The three own-key case shards stay
+together on the `oseo-mac-1` lane, so one readiness decision still gives
+their duration sum one runner class. The installer and health check take
+the runner from `OSEO_RUNNER_LABEL`, `oseo-mac-1` by default, and the
+installer prints the same `oseo-mac-1` property list as before, byte for
+byte, which *tests/macos-lanes.test.ts* checks against a fixture written by
+the previous installer's plist writer.
+
+The model treats the two Mac lanes as two queues sharing one machine. Each
+lane starts after the 60-second readiness allowance and runs its jobs back
+to back from their one-lane costs, the same measured Mac medians or
+converted hosted medians as before. While both lanes are busy, a job
+advances at its one-lane speed divided by a pair factor for its family and
+its partner's family; while the other lane is idle or done, it advances at
+one-lane speed. The factors in `selfHostedPairSlowdowns` of
+*tools/macos-job-costs.ts* are the largest overlapped factor that U25
+derived for each measured pairing, rounded up: 1.26 for test262 beside
+test262, at most 1.08 for test262 beside another family, 1.37, 1.13, and
+1.05 for native support beside test262, native support, and the other two,
+1.45 and 1.27 for own-key cases beside test262 and native support, and 1.41
+and 1.04 for native fixtures beside test262 and native support. The three
+unmeasured pairings use the family's largest factor. This model was chosen
+over U25's family maxima applied to every Mac job because U25 measured the
+interference to be asymmetric, test262 ran at a measured 0.997 to 1.073
+times its solo wall beside a property or fixture job, and a lane's tail
+runs alone. The greedy assignment places each job on the lane with the
+earliest derived end among the lanes the placement changes, which on a Mac
+lane includes the other Mac lane that the new overlap delays. With one Mac
+lane this reduces to the previous rule and reproduces the U24 assignment.
+
+`node tools/macos-lane-report.ts` prints the derived values below. With the
+current cost tables, the derived macOS makespan is 77.2 min with two Mac
+lanes, against 93.5 min for the current one-lane assignment. The two-lane
+assignment puts 19 jobs on the Mac, 10 on `oseo-mac-1` and 9 on
+`oseo-mac-2`, and its lanes end at a derived 66.3 to 77.2 min, with the
+`oseo-mac-1` lane last. Evaluated against each of the ten measured attempts in
+*docs/evidence/u25/model/*, with each attempt's measured wall for a job
+that ran on the same runner class there and the cost tables otherwise, the
+derived makespan is 72.1 to 86.5 min with two Mac lanes and 91.7 to
+102.7 min with one. Two lanes are lower in every attempt, by a derived 16.2
+to 25.3 min. These are derived scheduling estimates at the current 21,383
+paths. The generated Mac jobs need only the readiness job, so each runner
+may take its lane's queued jobs in any order, and the model's order is one of
+them. Over the generated order and 1,000 seeded random orders of each Mac
+lane, the report gives a derived 76.3 to 78.3 min with current costs, and
+the per-run range over the same orders is also a derived 72.1 to 86.5 min. That
+is a sample of orders, not a bound. Chaining the Mac jobs would fix the order
+but would also chain them when the probe falls back to hosted, so they stay
+unchained. The pair factors come from SSH runs, not runner mode, and the model
+omits the measured 0.5 to 1.5 min of lane overhead. A pessimistic check that
+slows every Mac job of the two-lane assignment by 1.45 for its whole wall,
+beyond any test262 factor U25 measured, gives a derived 96.1 min. The fallback
+schedule while `oseo-mac-2` is offline, nine more hosted jobs without a
+predecessor chain, is not modeled and is expected to be slower than the
+one-lane assignment.
+
+This change is a proposal for measurement, not a measured gain. The
+maintainer's steps to register `oseo-mac-2` are in
+[*docs/self-hosted-mac.md*](./docs/self-hosted-mac.md). A two-attempt branch
+run with both runners online must then measure push-to-green, each Mac
+lane's end, the own-key duration records, and free disk on the Mac.
 
 ### macOS static capacity lanes (U16)
 

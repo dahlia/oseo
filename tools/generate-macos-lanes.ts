@@ -10,6 +10,7 @@ import {
   macosFixedSetupSeconds,
   selfHostedFamilySpeedRatios,
   selfHostedJobSeconds,
+  selfHostedPairSlowdowns,
   selfHostedProbeSeconds,
 } from "./macos-job-costs.ts";
 
@@ -116,7 +117,7 @@ export function macosJobs(): readonly MacosLaneJob[] {
   return jobs;
 }
 
-/** Whether a job may run on the Zig-only self-hosted Mac lane. */
+/** Whether a job may run on a Zig-only self-hosted Mac lane. */
 function selfHostedEligible(job: MacosLaneJob): boolean {
   return (
     job.os === "macos-15" &&
@@ -126,26 +127,142 @@ function selfHostedEligible(job: MacosLaneJob): boolean {
   );
 }
 
+/** Hosted lanes precede the optional Mac lanes in lane order. */
+const hostedLaneCount = 5;
+
+/** Mac lanes share one machine; concurrency beyond two was not measured. */
+const maxSelfHostedLanes = 2;
+
+/** Seconds a job takes on one runner class, before Mac-lane overlap. */
+export type MacosJobSeconds = (
+  job: MacosLaneJob,
+  selfHosted: boolean,
+) => number;
+
 /**
- * Place longer jobs on five hosted and optional weighted Mac lanes.
+ * The generator's cost model: a hosted job takes its hosted median, and a
+ * Mac job its measured Mac median or its hosted median converted by the
+ * family ratio after the fixed setup share.
+ */
+export const modeledJobSeconds: MacosJobSeconds = (job, selfHosted) => {
+  if (!selfHosted) return job.seconds;
+  const ratio = selfHostedFamilySpeedRatios[job.family];
+  if (ratio == null || !Number.isFinite(ratio) || ratio <= 0) {
+    throw new Error(`Invalid self-hosted speed ratio: ${job.family}`);
+  }
+  const measured = Object.entries(selfHostedJobSeconds).find(
+    ([key]) => key === job.name,
+  )?.[1];
+  return (
+    measured ??
+    macosFixedSetupSeconds + (job.seconds - macosFixedSetupSeconds) / ratio
+  );
+};
+
+/** The derived slowdown of `job` while `partner` runs on the other lane. */
+function pairSlowdown(job: MacosLaneJob, partner: MacosLaneJob): number {
+  const factor = selfHostedPairSlowdowns[job.family]?.[partner.family];
+  if (factor == null || !Number.isFinite(factor) || factor < 1) {
+    throw new Error(
+      `Invalid Mac pair slowdown: ${job.family} beside ${partner.family}`,
+    );
+  }
+  return factor;
+}
+
+/**
+ * Derived end times, in seconds after the run starts, of Mac lanes on one
+ * machine. Every lane starts after the readiness allowance and runs its
+ * jobs back to back. While both lanes are busy, each job advances at its
+ * one-lane speed divided by its pair slowdown; a lane running alone, after
+ * the other finished, advances at one-lane speed. One lane is a plain sum.
+ */
+export function selfHostedLaneEnds(
+  lanes: readonly (readonly MacosLaneJob[])[],
+  seconds: MacosJobSeconds = modeledJobSeconds,
+): readonly number[] {
+  if (lanes.length > maxSelfHostedLanes) {
+    throw new Error("More than two Mac lanes were not measured");
+  }
+  const ends = lanes.map(() => selfHostedProbeSeconds);
+  const next = lanes.map(() => 0);
+  const remaining = lanes.map(() => 0);
+  function start(lane: number): void {
+    const job = lanes[lane]![next[lane]!];
+    remaining[lane] = job == null ? 0 : seconds(job, true);
+  }
+  lanes.forEach((_, lane) => start(lane));
+  let now = selfHostedProbeSeconds;
+  for (;;) {
+    const active = lanes
+      .map((_, lane) => lane)
+      .filter((lane) => next[lane]! < lanes[lane]!.length);
+    if (active.length === 0) return ends;
+    const rates = active.map((lane) => {
+      const partnerLane = active.find((other) => other !== lane);
+      if (partnerLane == null) return 1;
+      const job = lanes[lane]![next[lane]!]!;
+      const partner = lanes[partnerLane]![next[partnerLane]!]!;
+      return 1 / pairSlowdown(job, partner);
+    });
+    const step = Math.min(
+      ...active.map((lane, index) => remaining[lane]! / rates[index]!),
+    );
+    now += step;
+    for (const [index, lane] of active.entries()) {
+      remaining[lane] = remaining[lane]! - step * rates[index]!;
+      // Tolerate rounding so a job ending in this step cannot linger.
+      if (remaining[lane]! <= 1e-6) {
+        next[lane] = next[lane]! + 1;
+        ends[lane] = now;
+        start(lane);
+      }
+    }
+  }
+}
+
+/**
+ * Derived end time of every lane, hosted lanes first, under one cost
+ * function. Hosted lanes run their jobs back to back from the start.
+ */
+export function macosLaneEnds(
+  lanes: readonly (readonly MacosLaneJob[])[],
+  seconds: MacosJobSeconds = modeledJobSeconds,
+): readonly number[] {
+  return [
+    ...lanes
+      .slice(0, hostedLaneCount)
+      .map((lane) => lane.reduce((sum, job) => sum + seconds(job, false), 0)),
+    ...selfHostedLaneEnds(lanes.slice(hostedLaneCount), seconds),
+  ];
+}
+
+/**
+ * Place longer jobs on five hosted and optional Mac lanes.
  *
  * With a Mac lane, the own-key case shards are placed first: they must
- * share that lane, and placing them by weight would leave the lane no
- * room for them after the longer jobs had filled it.
+ * share one Mac lane, the first, so that one readiness decision gives
+ * their duration sum one runner class, and placing them by weight would
+ * leave that lane no room for them after the longer jobs had filled it.
+ * Each job then goes to the candidate lane with the earliest derived end
+ * among the lanes the placement changes: the candidate itself and, on a
+ * Mac lane, any other Mac lane that the new overlap delays.
  */
 export function macosLanes(
   selfHostedCount = 0,
 ): readonly (readonly MacosLaneJob[])[] {
-  if (selfHostedCount !== 0 && selfHostedCount !== 1) {
-    throw new Error("Only zero or one self-hosted Mac lane is supported");
+  if (
+    !Number.isInteger(selfHostedCount) ||
+    selfHostedCount < 0 ||
+    selfHostedCount > maxSelfHostedLanes
+  ) {
+    throw new Error("Only zero, one, or two self-hosted Mac lanes");
   }
   const lanes: MacosLaneJob[][] = Array.from(
-    { length: 5 + selfHostedCount },
+    { length: hostedLaneCount + selfHostedCount },
     () => [],
   );
-  const loads: number[] = lanes.map((_, index) =>
-    index < 5 ? 0 : selfHostedProbeSeconds,
-  );
+  const loads: number[] = lanes.map(() => 0);
   const all = macosJobs();
   for (const name of Object.keys(selfHostedJobSeconds)) {
     const job = all.find((candidate) => candidate.name === name);
@@ -154,56 +271,64 @@ export function macosLanes(
     }
   }
   const pinned = (job: MacosLaneJob): number =>
-    selfHostedCount === 1 && job.family === "own-key cases" ? 0 : 1;
+    selfHostedCount > 0 && job.family === "own-key cases" ? 0 : 1;
   const jobs = all.toSorted(
     (a, b) =>
       pinned(a) - pinned(b) ||
       b.seconds - a.seconds ||
       a.name.localeCompare(b.name, "en"),
   );
+  let macEnds = selfHostedLaneEnds(lanes.slice(hostedLaneCount));
   for (const job of jobs) {
-    const eligible = selfHostedEligible(job) ? loads.length : 5;
+    const eligible = selfHostedEligible(job) ? lanes.length : hostedLaneCount;
     if (
       job.family === "own-key cases" &&
-      selfHostedCount === 1 &&
-      eligible !== loads.length
+      selfHostedCount > 0 &&
+      eligible !== lanes.length
     ) {
       throw new Error("Own-key cases must be Mac-lane eligible together");
     }
     let index = 0;
     let finish = Number.POSITIVE_INFINITY;
+    let chosenMacEnds = macEnds;
     for (let candidate = 0; candidate < eligible; candidate++) {
       // One measured deadline covers all three own-key case shards.
       if (
         job.family === "own-key cases" &&
-        selfHostedCount === 1 &&
-        candidate !== 5
+        selfHostedCount > 0 &&
+        candidate !== hostedLaneCount
       )
         continue;
-      const ratio = candidate < 5 ? 1 : selfHostedFamilySpeedRatios[job.family];
-      if (ratio == null || !Number.isFinite(ratio) || ratio <= 0) {
-        throw new Error(`Invalid self-hosted speed ratio: ${job.family}`);
+      let projected: number;
+      let candidateMacEnds = macEnds;
+      if (candidate < hostedLaneCount) {
+        projected = loads[candidate]! + modeledJobSeconds(job, false);
+      } else {
+        const mac = lanes
+          .slice(hostedLaneCount)
+          .map((lane, offset) =>
+            offset === candidate - hostedLaneCount ? lane.concat([job]) : lane,
+          );
+        candidateMacEnds = selfHostedLaneEnds(mac);
+        projected = Math.max(
+          ...candidateMacEnds.filter(
+            (end, offset) =>
+              offset === candidate - hostedLaneCount || end > macEnds[offset]!,
+          ),
+        );
       }
-      const measured = Object.entries(selfHostedJobSeconds).find(
-        ([key]) => key === job.name,
-      )?.[1];
-      const elapsed =
-        candidate < 5
-          ? job.seconds
-          : (measured ??
-            macosFixedSetupSeconds +
-              (job.seconds - macosFixedSetupSeconds) / ratio);
-      const projected = loads[candidate]! + elapsed;
       if (projected < finish) {
         finish = projected;
         index = candidate;
+        chosenMacEnds = candidateMacEnds;
       }
     }
     if (!Number.isFinite(finish)) {
       throw new Error(`No eligible macOS lane for ${job.name}`);
     }
     lanes[index]!.push(job);
-    loads[index] = finish;
+    if (index < hostedLaneCount) loads[index] = finish;
+    else macEnds = chosenMacEnds;
   }
   return lanes;
 }
@@ -332,8 +457,8 @@ export function generateMacosWorkflow(
       block = block.replace(/^  \w+:/, `  ${job.id}:`);
       block = block.replace(/^    name: >-\n(?:      [^\n]*\n)+/m, "");
       block = block.replace(/^    name: [^\n]*\n/m, "");
-      const selfHosted = laneIndex >= 5;
-      const runnerOutput = `r${laneIndex - 4}`;
+      const selfHosted = laneIndex >= hostedLaneCount;
+      const runnerOutput = `r${laneIndex - hostedLaneCount + 1}`;
       const runner = selfHosted
         ? `\${{ fromJSON(needs.mac_ready.outputs.${runnerOutput}` +
           ` || '"macos-15"') }}`

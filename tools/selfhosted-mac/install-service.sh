@@ -6,9 +6,12 @@ runner_root=${OSEO_RUNNER_ROOT:?Set OSEO_RUNNER_ROOT}
 runner_user=${OSEO_RUNNER_USER:?Set OSEO_RUNNER_USER}
 # Per-account Zig cache cap in GiB; docs/evidence/u26/ derives the default.
 zig_cache_cap_gib=${OSEO_ZIG_CACHE_CAP_GIB:-30}
-runner_label=oseo-mac-1
+# Each runner has its own account, root, and LaunchDaemon. All runners
+# share the reviewed root-owned hooks under /usr/local/libexec/oseo-runner.
+runner_label=${OSEO_RUNNER_LABEL:-oseo-mac-1}
 service_label=org.oseo.runner.$runner_label
 plist=/Library/LaunchDaemons/$service_label.plist
+service_script=/usr/local/libexec/oseo-runner
 script_dir=$(cd "$(dirname "$0")" && pwd)
 is_unlinked_directory() {
   local path=$1 logical physical
@@ -18,93 +21,16 @@ is_unlinked_directory() {
   physical=$(cd -P "$path" 2>/dev/null && pwd -P) || return 1
   [[ $logical == "$physical" ]]
 }
-
-[[ $runner_root == /* && $runner_root != / ]] || {
-  echo 'Runner root must be an absolute non-root path' >&2
-  exit 2
-}
-[[ $runner_user =~ ^[a-z_][a-z_0-9-]*$ ]] || {
-  echo 'Runner user must be a local account name' >&2
-  exit 2
-}
-# 38 GiB is the derived two-account ceiling in docs/evidence/u26/.
-[[ $zig_cache_cap_gib =~ ^[1-9][0-9]?$ && $zig_cache_cap_gib -le 38 ]] || {
-  echo 'Zig cache cap must be a whole number of GiB from 1 to 38' >&2
-  exit 2
-}
-if [[ ${1:-} == --dry-run ]]; then
-  echo "Would install $plist for $runner_user at $runner_root" \
-    "with a $zig_cache_cap_gib GiB Zig cache cap"
-  exit 0
-fi
-[[ $(uname -s) == Darwin && $EUID -eq 0 ]] || {
-  echo 'Run as root on macOS' >&2
-  exit 2
-}
-[[ -x $runner_root/bin/Runner.Listener && -f $runner_root/.runner ]] || {
-  echo 'Register the pinned persistent runner first' >&2
-  exit 2
-}
-is_unlinked_directory "$runner_root" || {
-  echo 'Runner root must have no linked path component' >&2
-  exit 2
-}
-[[ $(id -Gn "$runner_user") != *admin* ]] || {
-  echo 'Runner account must not be an administrator' >&2
-  exit 2
-}
-[[ $(stat -f %Su "$runner_root") == "$runner_user" ]] || {
-  echo 'Runner account must own the runner root' >&2
-  exit 2
-}
-runner_home=$(
-  dscl . -read "/Users/$runner_user" NFSHomeDirectory | awk '{print $2}'
-)
-[[ $runner_home == /* && -d $runner_home ]] || {
-  echo 'Runner account needs a home directory' >&2
-  exit 2
-}
-is_unlinked_directory "$runner_home" || {
-  echo 'Runner home must have no linked path component' >&2
-  exit 2
-}
-[[ $(stat -f %Su "$runner_home") == "$runner_user" ]] || {
-  echo 'Runner account must own its home directory' >&2
-  exit 2
-}
-service_script=/usr/local/libexec/oseo-runner
-runner_group=$(id -gn "$runner_user")
-bash "$script_dir/prepare-service-files.sh" \
-  "$runner_root" "$runner_home" "$runner_user" "$runner_group" \
-  /usr/local root wheel "$script_dir"
-for file in job-started.sh job-completed.sh cleanup.sh; do
-  sudo -u "$runner_user" /bin/test -x "$service_script/$file" || {
-    echo "Runner cannot execute hook: $service_script/$file" >&2
-    exit 2
-  }
-done
-for directory in "$runner_home" "$runner_root"; do
-  sudo -u "$runner_user" /bin/test -x "$directory" || {
-    echo "Runner cannot traverse directory: $directory" >&2
-    exit 2
-  }
-done
-sudo -u "$runner_user" /bin/test -r \
-  "$runner_root/.credentials" || {
-  echo 'Runner cannot read its registration credential' >&2
-  exit 2
-}
-sudo -u "$runner_user" /bin/test -w \
-  "$runner_root/oseo-temp" || {
-  echo 'Runner cannot write to its daemon temp directory' >&2
-  exit 2
-}
-RUNNER_PLIST=$plist RUNNER_ROOT=$runner_root RUNNER_USER=$runner_user \
-RUNNER_HOME=$runner_home RUNNER_ZIG_CACHE_CAP_GIB=$zig_cache_cap_gib \
-RUNNER_SERVICE_LABEL=$service_label \
-RUNNER_SERVICE_SCRIPT=$service_script /usr/bin/python3 - <<'PY'
+# Write the LaunchDaemon property list to $1, or to stdout for "-", with
+# the Python interpreter $2. plistlib sorts keys, so the bytes are stable.
+write_plist() {
+  RUNNER_PLIST=$1 RUNNER_ROOT=$runner_root RUNNER_USER=$runner_user \
+  RUNNER_HOME=$runner_home RUNNER_ZIG_CACHE_CAP_GIB=$zig_cache_cap_gib \
+  RUNNER_SERVICE_LABEL=$service_label \
+  RUNNER_SERVICE_SCRIPT=$service_script "$2" - <<'PY'
 import os
 import plistlib
+import sys
 
 root = os.environ['RUNNER_ROOT']
 hooks = os.environ['RUNNER_SERVICE_SCRIPT']
@@ -134,9 +60,138 @@ data = {
             os.path.join(hooks, 'job-completed.sh'),
     },
 }
-with open(os.environ['RUNNER_PLIST'], 'wb') as output:
-    plistlib.dump(data, output)
+if os.environ['RUNNER_PLIST'] == '-':
+    plistlib.dump(data, sys.stdout.buffer)
+else:
+    with open(os.environ['RUNNER_PLIST'], 'wb') as output:
+        plistlib.dump(data, output)
 PY
+}
+
+# The generated workflow and the availability probe know only these lanes.
+[[ $runner_label =~ ^oseo-mac-[12]$ ]] || {
+  echo 'Runner label must be oseo-mac-1 or oseo-mac-2' >&2
+  exit 2
+}
+[[ $runner_root == /* && $runner_root != / ]] || {
+  echo 'Runner root must be an absolute non-root path' >&2
+  exit 2
+}
+[[ $runner_user =~ ^[a-z_][a-z_0-9-]*$ ]] || {
+  echo 'Runner user must be a local account name' >&2
+  exit 2
+}
+# 38 GiB is the derived two-account ceiling in docs/evidence/u26/.
+[[ $zig_cache_cap_gib =~ ^[1-9][0-9]?$ && $zig_cache_cap_gib -le 38 ]] || {
+  echo 'Zig cache cap must be a whole number of GiB from 1 to 38' >&2
+  exit 2
+}
+if [[ ${1:-} == --dry-run ]]; then
+  echo "Would install $plist for $runner_user at $runner_root" \
+    "with a $zig_cache_cap_gib GiB Zig cache cap"
+  exit 0
+fi
+# Print the property list for review without touching the system. The
+# real install reads the home from the directory service instead.
+if [[ ${1:-} == --print-plist ]]; then
+  runner_home=${OSEO_RUNNER_HOME:?Set OSEO_RUNNER_HOME}
+  [[ $runner_home == /* && $runner_home != / ]] || {
+    echo 'Runner home must be an absolute non-root path' >&2
+    exit 2
+  }
+  write_plist - python3
+  exit 0
+fi
+[[ $(uname -s) == Darwin && $EUID -eq 0 ]] || {
+  echo 'Run as root on macOS' >&2
+  exit 2
+}
+[[ -x $runner_root/bin/Runner.Listener && -f $runner_root/.runner ]] || {
+  echo 'Register the pinned persistent runner first' >&2
+  exit 2
+}
+is_unlinked_directory "$runner_root" || {
+  echo 'Runner root must have no linked path component' >&2
+  exit 2
+}
+# The availability probe selects a lane only when the runner's name equals
+# its label, so a root registered under another name is rejected here.
+registered_name=$(
+  /usr/bin/python3 -c '
+import json, sys
+with open(sys.argv[1], encoding="utf-8-sig") as source:
+    print(json.load(source).get("agentName", ""))
+' "$runner_root/.runner"
+) || registered_name=
+[[ $registered_name == "$runner_label" ]] || {
+  echo "Runner root is not registered as $runner_label" >&2
+  exit 2
+}
+# Each hook caps only its own account's Zig cache, so two runner services
+# must not share an account or a root.
+for other in /Library/LaunchDaemons/org.oseo.runner.*.plist; do
+  [[ -e $other && $other != "$plist" ]] || continue
+  /usr/bin/python3 -c '
+import plistlib, sys
+with open(sys.argv[1], "rb") as source:
+    data = plistlib.load(source)
+sys.exit(data.get("UserName") == sys.argv[2] or
+         data.get("WorkingDirectory") == sys.argv[3])
+' "$other" "$runner_user" "$runner_root" || {
+    echo "Another runner service uses this account or root: $other" >&2
+    exit 2
+  }
+done
+[[ $(id -Gn "$runner_user") != *admin* ]] || {
+  echo 'Runner account must not be an administrator' >&2
+  exit 2
+}
+[[ $(stat -f %Su "$runner_root") == "$runner_user" ]] || {
+  echo 'Runner account must own the runner root' >&2
+  exit 2
+}
+runner_home=$(
+  dscl . -read "/Users/$runner_user" NFSHomeDirectory | awk '{print $2}'
+)
+[[ $runner_home == /* && -d $runner_home ]] || {
+  echo 'Runner account needs a home directory' >&2
+  exit 2
+}
+is_unlinked_directory "$runner_home" || {
+  echo 'Runner home must have no linked path component' >&2
+  exit 2
+}
+[[ $(stat -f %Su "$runner_home") == "$runner_user" ]] || {
+  echo 'Runner account must own its home directory' >&2
+  exit 2
+}
+runner_group=$(id -gn "$runner_user")
+bash "$script_dir/prepare-service-files.sh" \
+  "$runner_root" "$runner_home" "$runner_user" "$runner_group" \
+  /usr/local root wheel "$script_dir"
+for file in job-started.sh job-completed.sh cleanup.sh; do
+  sudo -u "$runner_user" /bin/test -x "$service_script/$file" || {
+    echo "Runner cannot execute hook: $service_script/$file" >&2
+    exit 2
+  }
+done
+for directory in "$runner_home" "$runner_root"; do
+  sudo -u "$runner_user" /bin/test -x "$directory" || {
+    echo "Runner cannot traverse directory: $directory" >&2
+    exit 2
+  }
+done
+sudo -u "$runner_user" /bin/test -r \
+  "$runner_root/.credentials" || {
+  echo 'Runner cannot read its registration credential' >&2
+  exit 2
+}
+sudo -u "$runner_user" /bin/test -w \
+  "$runner_root/oseo-temp" || {
+  echo 'Runner cannot write to its daemon temp directory' >&2
+  exit 2
+}
+write_plist "$plist" /usr/bin/python3
 chown root:wheel "$plist"
 chmod 600 "$plist"
 launchctl bootout system "$plist" 2>/dev/null || true

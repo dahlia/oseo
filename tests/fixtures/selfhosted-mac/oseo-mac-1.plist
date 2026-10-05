@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>ACTIONS_RUNNER_HOOK_JOB_COMPLETED</key>
+		<string>/usr/local/libexec/oseo-runner/job-completed.sh</string>
+		<key>ACTIONS_RUNNER_HOOK_JOB_STARTED</key>
+		<string>/usr/local/libexec/oseo-runner/job-started.sh</string>
+		<key>HOME</key>
+		<string>/Users/oseo-runner</string>
+		<key>OSEO_RUNNER_ROOT</key>
+		<string>/Users/oseo-runner/actions-runner</string>
+		<key>OSEO_ZIG_CACHE_CAP_GIB</key>
+		<string>30</string>
+		<key>PATH</key>
+		<string>/Users/oseo-runner/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+		<key>TMPDIR</key>
+		<string>/Users/oseo-runner/actions-runner/oseo-temp/</string>
+		<key>ZIG_GLOBAL_CACHE_DIR</key>
+		<string>/Users/oseo-runner/.cache/zig</string>
+	</dict>
+	<key>KeepAlive</key>
+	<true/>
+	<key>Label</key>
+	<string>org.oseo.runner.oseo-mac-1</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/oseo-runner/actions-runner/bin/Runner.Listener</string>
+		<string>run</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>StandardErrorPath</key>
+	<string>/dev/null</string>
+	<key>StandardOutPath</key>
+	<string>/dev/null</string>
+	<key>ThrottleInterval</key>
+	<integer>60</integer>
+	<key>UserName</key>
+	<string>oseo-runner</string>
+	<key>WorkingDirectory</key>
+	<string>/Users/oseo-runner/actions-runner</string>
+</dict>
+</plist>

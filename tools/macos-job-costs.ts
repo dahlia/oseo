@@ -144,3 +144,51 @@ export const selfHostedProbeSeconds = 60;
 
 /** Rounded derived setup share per job from the U6 fixed-cost audit. */
 export const macosFixedSetupSeconds = 60;
+
+/**
+ * Derived slowdown of a Mac-lane job, by its family and the family of the
+ * job running at the same time on the other Mac lane of the same machine.
+ * A job progresses at `1 / factor` of its one-lane speed while the other
+ * lane is busy, and at its one-lane speed while that lane is idle or done.
+ *
+ * Each measured value is the largest overlapped factor of that pairing in
+ * *docs/evidence/u25/pair-jobs.tsv*, rounded up to two decimals: the
+ * overlapped seconds of a job divided by the solo work left for the
+ * overlap, both derived from measured SSH job walls with separate Zig
+ * caches. Native support beside own-key and native fixture jobs was
+ * measured only as one sequence of both partners, so 1.05 covers both.
+ * Native fixture + native fixture, own-key + own-key, and own-key + native
+ * fixture were not measured; each uses the family's largest measured
+ * factor, 1.41 or 1.45, as a pessimistic stand-in. The generator keeps all
+ * own-key shards on one Mac lane, so own-key + own-key cannot occur.
+ */
+interface SelfHostedPairSlowdowns {
+  readonly [family: string]: Readonly<Record<string, number>>;
+}
+
+export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
+  test262: {
+    test262: 1.26,
+    "native support": 1.08,
+    "own-key cases": 1.01,
+    native: 1.01,
+  },
+  "native support": {
+    test262: 1.37,
+    "native support": 1.13,
+    "own-key cases": 1.05,
+    native: 1.05,
+  },
+  "own-key cases": {
+    test262: 1.45,
+    "native support": 1.27,
+    "own-key cases": 1.45,
+    native: 1.45,
+  },
+  native: {
+    test262: 1.41,
+    "native support": 1.04,
+    "own-key cases": 1.41,
+    native: 1.41,
+  },
+};
