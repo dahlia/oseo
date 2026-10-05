@@ -1,0 +1,51 @@
+# Fixed assignment from median costs, evaluated under min/med/max costs.
+exec(open('proj.py').read().split("for mode in ['min','med','max']:")[0])
+def jobs_for(mode,T,lf=1.0):
+  jobs={}
+  base=[n for n in macjobs if fam(n)!='test262']
+  t262=[n for n in macjobs if fam(n)=='test262']
+  for n in base:
+    h=stat(H[n],mode) if n in H else None
+    m=stat(M[n],mode)*lf if n in M else None
+    if m is None and fam(n) in elig: m=(SETUP+(h-SETUP)/R[fam(n)])*lf
+    jobs[n]=(h,m)
+  hv=[stat(H[n],mode)-SETUP for n in t262]
+  mv=[stat(M[n],mode)-SETUP if n in M else (stat(H[n],mode)-SETUP)/R['test262'] for n in t262]
+  if T==12:
+    for n,a,b in zip(t262,hv,mv): jobs[n]=(SETUP+a*S,(SETUP+b*S)*lf)
+  else:
+    ha=sum(hv)*S/T; ma=sum(mv)*S/T
+    for i in range(T): jobs[f"test262 {i+1}/{T}"]=(SETUP+ha,(SETUP+ma)*lf)
+  return jobs
+def assign(jobs,maclanes):
+  hosted=[0.0]*5; mac=[60.0]*maclanes; where={}
+  ok=[n for n in jobs if fam(n)=='own-key cases']
+  rest=[n for n in jobs if fam(n)!='own-key cases']
+  if maclanes:
+    for n in ok:
+      i=mac.index(min(mac)); mac[i]+=jobs[n][1]; where[n]=('m',i)
+  else: rest+=ok
+  for n in sorted(rest,key=lambda n:-jobs[n][0]):
+    h,m=jobs[n]; hi=hosted.index(min(hosted)); hend=hosted[hi]+h
+    if m is not None and maclanes:
+      mi=mac.index(min(mac)); mend=mac[mi]+m
+      if mend<hend: mac[mi]=mend; where[n]=('m',mi); continue
+    hosted[hi]=hend; where[n]=('h',hi)
+  return where
+def evaluate(jobs,where,maclanes):
+  L={('h',i):0.0 for i in range(5)}; L.update({('m',i):60.0 for i in range(maclanes)})
+  for n,(k,i) in where.items(): L[(k,i)]+=jobs[n][0 if k=='h' else 1]
+  return max(L.values())/60
+def run(T=12,maclanes=1,lf=1.0,scale=None):
+  global S
+  s0=S
+  if scale: S=scale
+  w=assign(jobs_for('med',T,lf),maclanes)
+  out=[round(evaluate(jobs_for(m,T,lf),w,maclanes),1) for m in ['min','med','max']]
+  S=s0; return out
+a=run(); b=run(scale=1.0)
+print("41091 T12", a, "21383", b, "incr", [round(x-y,1) for x,y in zip(a,b)])
+for T in [16,20,24]: print("T",T,run(T))
+for lf in [1.29,1.5]: print("2lanes lf",lf,run(maclanes=2,lf=lf))
+print("2 macs",run(maclanes=2))
+print("fallback",run(maclanes=0),run(maclanes=0,scale=1.0))

@@ -1,0 +1,47 @@
+#!/bin/bash
+# U25 Linux-side driver. Usage: drive.sh PLANFILE
+# Each plan line: LABEL SLOT [SLOT]   (SLOT = clone:job,job)
+set -u
+dir=$(dirname "$0"); plan=$1
+host=dahlia@mac-mini-m6.squirrel-crocodile.ts.net
+mon=$dir/monitor.tsv; log=$dir/driver.log
+busy() { # prints "runnerbusy active_runs"
+  local b r
+  b=$(gh api repos/dahlia/oseo/actions/runners \
+      --jq '[.runners[]|select(.name=="oseo-mac-1")|.busy][0]' 2>/dev/null)
+  r=$(( $(gh run list -R dahlia/oseo --status in_progress --json databaseId --jq length 2>/dev/null || echo 9) \
+      + $(gh run list -R dahlia/oseo --status queued --json databaseId --jq length 2>/dev/null || echo 9) ))
+  echo "${b:-unknown} $r"
+}
+run_one() {
+  local label=$1; shift
+  while :; do
+    read -r b r < <(busy)
+    printf '%s\t%s\tpre\t%s\t%s\n' "$(date -u +%FT%TZ)" "$label" "$b" "$r" >>"$mon"
+    [ "$b" = false ] && [ "$r" = 0 ] && break
+    echo "$(date -u +%T) $label waiting: busy=$b runs=$r" >>"$log"; sleep 60
+  done
+  if ssh -n "$host" "test -d \$HOME/m5ci-results/u25/runs/$label"; then
+    echo "$(date -u +%T) attach $label" >>"$log"
+  else
+  echo "$(date -u +%T) start $label $*" >>"$log"
+  ssh -n "$host" "nohup \$HOME/m5ci-results/u25/bin/exp.sh $label $* >/dev/null 2>&1 </dev/null &" || return 1
+  fi
+  local contaminated=0
+  while :; do
+    sleep 30
+    read -r b r < <(busy)
+    printf '%s\t%s\tduring\t%s\t%s\n' "$(date -u +%FT%TZ)" "$label" "$b" "$r" >>"$mon"
+    [ "$b" = false ] && [ "$r" = 0 ] || contaminated=1
+    ssh -n "$host" "test -e \$HOME/m5ci-results/u25/runs/$label/done" 2>/dev/null && break
+  done
+  echo "$(date -u +%T) done $label contaminated=$contaminated" >>"$log"
+  return $contaminated
+}
+while read -r label rest; do
+  [ -z "$label" ] || [ "${label#\#}" != "$label" ] && continue
+  n=0; l=$label
+  until run_one "$l" $rest; do n=$((n+1)); l=$label-redo$n
+    [ $n -ge 3 ] && { echo "giving up $label" >>"$log"; break; }; done
+done <"$plan"
+echo "$(date -u +%T) plan complete" >>"$log"

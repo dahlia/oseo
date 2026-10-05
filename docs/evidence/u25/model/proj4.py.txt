@@ -1,0 +1,45 @@
+import json
+src=open('proj2.py').read().split("a=run(); b=run(scale=1.0)")[0]
+src=src.replace("exec(open('proj.py').read()","exec(open('proj.py').read().replace('runs=[\"37121778924-1\"','runs=[\"37230598930-1\",\"37237684441-1\",\"37237684441-2\",\"37121778924-1\"')")
+exec(src)
+print("runs",runs)
+print("R",{k:round(v,2) for k,v in R.items()})
+def fixed(c):
+  lanes=json.load(open(f'lanes-{c}.json')); where={}
+  for i,l in enumerate(lanes):
+    for n in l: where[n]=('h',i) if i<5 else ('m',0)
+  assert set(where)==set(macjobs),set(where)^set(macjobs)
+  return where
+def ev(where,scale,maclanes=1,lf=1.0):
+  global S
+  s0=S;S=scale
+  r=[round(evaluate(jobs_for(m,12,lf),where,maclanes),1) for m in ['min','med','max']]
+  S=s0;return r
+for c,lab in [('e115c408','U22'),('840c387e','U23'),('bdf2dddd','U24')]:
+  w=fixed(c)
+  print(lab,c,"macjobs",sum(1 for v in w.values() if v[0]=='m'),"21383",ev(w,1.0),"41091",ev(w,41091/21383))
+a=run(); b=run(scale=1.0)
+w=assign(jobs_for('med',12),1); print("recomputed medians macjobs",sum(1 for v in w.values() if v[0]=='m'))
+print("recomputed 41091",a,"21383",b)
+for T in [16,20,24]: print("T",T,run(T))
+for lf in [1.29,1.5]: print("2lanes lf",lf,run(maclanes=2,lf=lf))
+print("2 macs",run(maclanes=2))
+print("fallback",run(maclanes=0),run(maclanes=0,scale=1.0))
+u24=fixed('bdf2dddd')
+# per-lane ends for U24 med at 41091
+S0=S
+for sc in [1.0,41091/21383]:
+  S=sc; J=jobs_for('med',12)
+  L={}
+  for n,(k,i) in u24.items(): L[(k,i)]=L.get((k,i),60.0 if k=='m' else 0)+J[n][0 if k=='h' else 1]
+  print(sc,{f"{k}{i}":round(v/60,1) for (k,i),v in sorted(L.items())})
+S=S0
+for mode in ['med','max']:
+  print("t262 hosted job scaled",mode, round(max(SETUP+(stat(H[n],mode)-SETUP)*S for n in macjobs if fam(n)=='test262' and n in H)/60,1))
+lin=[n for n in H if ('linux' in n or 'Linux' in n or 'ubuntu' in n)]
+t=[n for n in lin if n.startswith('test262')]
+print("linux t262 max scaled med", round(max(SETUP+(st.median(H[n])-SETUP)*S for n in t)/60,1))
+for n in lin:
+  if 'sanitizer' in n: print(n, round(st.median(H[n])/60,1), round(max(H[n])/60,1))
+print("allhosted", [round(sum(j[0] for j in jobs_for(m,12).values())/60,1) for m in ['min','med','max']])
+S=1.0;print("allhosted 21383", [round(sum(j[0] for j in jobs_for(m,12).values())/60,1) for m in ['min','med','max']])

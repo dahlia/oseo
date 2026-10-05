@@ -1,0 +1,60 @@
+"""Summarize U25 runs pulled from the Mac into runs/."""
+import csv, glob, json, os, sys
+PAGE = 16384
+root = sys.argv[1] if len(sys.argv) > 1 else "runs"
+runs_out, jobs_out = [], []
+for d in sorted(glob.glob(f"{root}/*/")):
+    label = os.path.basename(d.rstrip("/"))
+    if not os.path.exists(d + "done"):
+        continue
+    start = float(open(d + "start").read()); end = float(open(d + "end").read())
+    rows = list(csv.DictReader(open(d + "samples.tsv"), delimiter="\t"))
+    rows = [r for r in rows if r["mem_level"]]
+    win = [r for r in rows if start - 1 <= float(r["t"]) <= end + 1] or rows
+    f, l = win[0], win[-1]
+    delta = lambda k: int(l[k]) - int(f[k])
+    peak_jobs, peak_sum = {}, 0
+    for r in win:
+        s = 0
+        for part in filter(None, r["jobs"].split(";")):
+            name, v = part.split("=")
+            kib = int(v.split("/")[0]); s += kib
+            peak_jobs[name] = max(peak_jobs.get(name, 0), kib)
+        peak_sum = max(peak_sum, s)
+    runs_out.append(dict(
+        run=label, slots=" | ".join(open(d + "slots").read().split()),
+        elapsed_s=f"{end-start:.1f}", samples=len(win),
+        min_mem_level=min(int(r["mem_level"]) for r in win),
+        max_pressure_level=max(int(r["pressure_level"]) for r in win),
+        swap_start_mib=f["swap_used_mib"],
+        swap_max_mib=max(float(r["swap_used_mib"]) for r in win),
+        pageouts=delta("pageouts"), swapouts=delta("swapouts"),
+        swapins=delta("swapins"), compressions=delta("compressions"),
+        decompressions=delta("decompressions"),
+        max_compressor_mib=round(max(int(r["cocc"]) for r in win)*PAGE/2**20),
+        min_free_mib=round(min(int(r["free"]) for r in win)*PAGE/2**20),
+        peak_job_rss_sum_mib=round(peak_sum/1024),
+        max_load1=max(float(r["load1"]) for r in win)))
+    for st in sorted(glob.glob(d + "*.steps.tsv")):
+        key = os.path.basename(st)[:-len(".steps.tsv")]
+        steps = list(csv.DictReader(open(st), delimiter="\t"))
+        s0 = float(steps[0]["start"]); e0 = float(steps[-1]["end"])
+        test = sum(float(x["end"]) - float(x["start"]) for x in steps
+                   if x["step"] in ("test", "package"))
+        dur = ""
+        dj = d + key + ".duration.json"
+        if os.path.exists(dj):
+            j = json.load(open(dj))
+            dur = f'{j.get("durationMilliseconds",0)/1000:.1f}/{j.get("limitMilliseconds",0)/1000:.0f}'
+        jobs_out.append(dict(run=label, job=key,
+            start_offset_s=f"{s0-start:.1f}", job_wall_s=f"{e0-s0:.1f}",
+            test_steps_s=f"{test:.1f}",
+            exit="/".join(x["exit"] for x in steps),
+            fail=open(d + key + ".fail").read().strip() if os.path.exists(d + key + ".fail") else "?",
+            peak_tree_rss_mib=round(peak_jobs.get(key, 0)/1024),
+            ownkey_duration_s_per_limit=dur))
+for name, data in (("runs.tsv", runs_out), ("jobs.tsv", jobs_out)):
+    if data:
+        with open(name, "w") as fh:
+            w = csv.DictWriter(fh, data[0].keys(), delimiter="\t"); w.writeheader(); w.writerows(data)
+        print(open(name).read())

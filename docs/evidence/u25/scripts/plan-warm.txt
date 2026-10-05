@@ -1,0 +1,10 @@
+warm-a-t262-8 a:t262-8
+warm-a-t262-1 a:t262-1
+warm-a-ns-1 a:ns-1
+warm-a-ok-3 a:ok-3
+warm-a-nat-3 a:nat-3
+warm-b-t262-8 b:t262-8
+warm-b-t262-1 b:t262-1
+warm-b-ns-1 b:ns-1
+warm-b-ok-3 b:ok-3
+warm-b-nat-3 b:nat-3

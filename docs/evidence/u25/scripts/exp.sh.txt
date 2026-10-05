@@ -1,0 +1,23 @@
+#!/bin/bash
+# Usage: exp.sh LABEL "CLONE:JOB,JOB" ["CLONE:JOB,JOB"]
+# Starts the sampler, runs each slot concurrently, and writes done.
+label=$1; shift
+out=$HOME/m5ci-results/u25/runs/$label
+if [ -e "$out" ]; then echo "exists: $out"; exit 2; fi
+mkdir -p "$out"
+bin=$HOME/m5ci-results/u25/bin
+python3 "$bin/sampler.py" "$out" 2 >"$out/sampler.err" 2>&1 &
+sp=$!
+python3 -c 'import time;print(f"{time.time():.3f}")' >"$out/start"
+pids=()
+for spec in "$@"; do
+  clone=${spec%%:*} jobs=${spec#*:}
+  echo "$spec" >>"$out/slots"
+  "$bin/slot.sh" "$clone" "$out" ${jobs//,/ } &
+  pids+=($!)
+done
+for p in "${pids[@]}"; do wait "$p"; done
+python3 -c 'import time;print(f"{time.time():.3f}")' >"$out/end"
+sleep 6
+kill "$sp"
+touch "$out/done"

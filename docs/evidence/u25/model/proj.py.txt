@@ -1,0 +1,101 @@
+import datetime as d, statistics as st, glob, sys
+p=lambda s:d.datetime.fromisoformat(s.replace('Z','+00:00'))
+runs=["37121778924-1","37167895777-1","37194069657-1","37194069657-2","37206614757-1","37215661294-1","37215661294-2"]
+H={};M={}
+for r in runs:
+  for l in open(f"jobs-{r}.tsv"):
+    n,rn,s,c,cc=l.rstrip('\n').split('\t')
+    w=(p(c)-p(s)).total_seconds()
+    (M if rn=='oseo-mac-1' else H).setdefault(n,[]).append(w)
+S=41091/21383
+SETUP=60
+def mac_job(n): return ('macos' in n or 'macOS' in n) and 'availability' not in n
+macjobs=sorted(n for n in H.keys()|M.keys() if mac_job(n))
+assert len(macjobs)==34,len(macjobs)
+fam=lambda n:n.split(' (')[0]
+elig={'test262','native support','own-key cases','native'}
+def stat(xs,mode): return {'min':min,'med':st.median,'max':max}[mode](xs)
+# pooled ratio hosted-median -> mac per family (against hosted medians), for jobs w/o mac obs
+def ratios(mode):
+  R={}
+  for f in elig:
+    num=den=0
+    for n in macjobs:
+      if fam(n)==f and n in M and n in H:
+        num+=stat(H[n],'med')-SETUP; den+=stat(M[n],'med')-SETUP
+    R[f]=num/den if den else None
+  return R
+R=ratios('med')
+def scale(n,c,T):
+  if fam(n)!='test262': return c
+  return SETUP+(c-SETUP)*S*12/T
+def model(mode,T,maclanes=1,linux=False):
+  # build job list (name, hosted cost, mac cost)
+  jobs=[]
+  base=[n for n in macjobs if fam(n)!='test262']
+  t262=[n for n in macjobs if fam(n)=='test262']
+  for n in base:
+    h=stat(H[n],mode) if n in H else None
+    m=stat(M[n],mode) if n in M else None
+    if h is None: h=SETUP+(m-SETUP)*R[fam(n)]
+    if m is None and fam(n) in elig: m=SETUP+(h-SETUP)/R[fam(n)]
+    jobs.append((n,h,m))
+  # test262: per-job variable; for T!=12 distribute family variable evenly with current max/mean tail
+  hv=[stat(H[n],mode)-SETUP if n in H else (stat(M[n],mode)-SETUP)*R['test262'] for n in t262]
+  mv=[stat(M[n],mode)-SETUP if n in M else (stat(H[n],mode)-SETUP)/R['test262'] for n in t262]
+  if T==12:
+    for n,a,b in zip(t262,hv,mv): jobs.append((n,SETUP+a*S,SETUP+b*S))
+  else:
+    ha=sum(hv)*S/T; ma=sum(mv)*S/T
+    for i in range(T): jobs.append((f"test262 {i+1}/{T}",SETUP+ha,SETUP+ma))
+  # greedy: own-key first to mac, then LPT
+  hosted=[0.0]*5; mac=[60.0]*maclanes
+  ok=[j for j in jobs if fam(j[0])=='own-key cases']
+  rest_ok=ok if not maclanes else []
+  for j in (ok if maclanes else []):
+    i=mac.index(min(mac)); mac[i]+=j[2]
+  rest=sorted([j for j in jobs if fam(j[0])!='own-key cases']+rest_ok,key=lambda j:-j[1])
+  for n,h,m in rest:
+    hi=hosted.index(min(hosted)); hend=hosted[hi]+h
+    if m is not None and maclanes:
+      mi=mac.index(min(mac)); mend=mac[mi]+m
+      if mend<hend: mac[mi]=mend; continue
+    hosted[hi]=hend
+  allhosted=sum(j[1] for j in jobs)
+  t262max=max(j[1] for j in jobs if fam(j[0]).startswith('test262'))
+  return max(hosted+mac)/60, (max(mac) if mac else 0)/60, max(hosted)/60, allhosted/60, t262max/60
+for mode in ['min','med','max']:
+  for T in [12,16,20,24]:
+    mk,me,he,ah,tm=model(mode,T)
+    print(f"{mode} T={T} makespan={mk:.1f} macend={me:.1f} hostedend={he:.1f} allhosted_min={ah:.1f} t262job_hosted_avg/max={tm:.1f}")
+  mk,me,he,ah,tm=model(mode,12,2); print(f"{mode} T=12 two mac lanes(no latency factor) makespan={mk:.1f}")
+  mk,me,he,ah,tm=model(mode,20,2); print(f"{mode} T=20 two mac lanes makespan={mk:.1f}")
+print(R)
+# test262 hosted per-job max at T=12 scaled
+for mode in ['med','max']:
+  print(mode, max(SETUP+(stat(H[n],mode)-SETUP)*S for n in macjobs if fam(n)=='test262' and n in H)/60)
+print("today macOS hosted total, med:", sum(stat(H[n],'med') if n in H else 0 for n in macjobs)/60)
+print("---- calibration S=1")
+S0=S
+S=1.0
+for mode in ['min','med','max']:
+  print(mode, [round(x,1) for x in model(mode,12)])
+S=S0
+print("---- two mac lanes with latency factor")
+def model2(mode,T,lf):
+  global M
+  saved=M; M={k:[v*lf for v in vs] for k,vs in saved.items()}
+  r=model(mode,T,2); M=saved; return r
+for lf in [1.29,1.5]:
+  for mode in ['min','med','max']:
+    print(lf,mode,[round(x,1) for x in model2(mode,12,lf)])
+print("---- linux")
+lin=[n for n in H if ('linux' in n or 'Linux' in n or 'ubuntu' in n)]
+for n in sorted(lin):
+  c=st.median(H[n]); sc=SETUP+(c-SETUP)*S if n.startswith('test262') else c
+  print(f"{n:45s} med={c/60:.1f} scaled={sc/60:.1f} max={max(H[n])/60:.1f}")
+print("---- hosted only fallback")
+for mode in ['min','med','max']:
+  a=model(mode,12,0); S=1.0; b=model(mode,12,0); S=S0
+  print(mode, round(a[0],1), round(b[0],1))
+print("S",S, "test262 hosted med var sum min", sum(st.median(H[n])-60 for n in macjobs if fam(n)=='test262')/60)

@@ -1,0 +1,49 @@
+#!/bin/bash
+# U25: run one Mac-eligible CI job's post-checkout steps exactly as the
+# generated workflow does. Usage: job.sh CLONE JOB OUTDIR
+# CLONE is a or b; JOB is t262-8, t262-1, ns-1, ok-3, or nat-3.
+set -u
+clone=$1 job=$2 out=$3
+repo=$HOME/Desktop/oseo-m5ci-u25-$clone
+export PATH=$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH
+export ZIG_GLOBAL_CACHE_DIR=$HOME/m5ci-results/u25/zig-$clone
+export GITHUB_ACTIONS=true CI=true
+temp=$HOME/m5ci-results/u25/tmp/$clone-$job-$$
+rm -rf "$temp"; mkdir -p "$temp" "$out"
+log=$out/$job-$clone.log steps=$out/$job-$clone.steps.tsv
+echo $$ > "$out/$job-$clone.pid"
+cd "$repo" || exit 99
+step() { # name, command...
+  local name=$1; shift
+  local s e rc
+  s=$(python3 -c 'import time;print(f"{time.time():.3f}")')
+  echo "=== $name: $*" >>"$log"
+  "$@" >>"$log" 2>&1; rc=$?
+  e=$(python3 -c 'import time;print(f"{time.time():.3f}")')
+  printf '%s\t%s\t%s\t%s\t%s\n' "$job" "$name" "$s" "$e" "$rc" >>"$steps"
+  return $rc
+}
+printf 'job\tstep\tstart\tend\texit\n' >"$steps"
+fail=0
+step build mise run build || fail=1
+OSEO_NATIVE_TOOLCHAIN=zig step archive-key mise run ci:runtime-archive-cache || fail=1
+export TMPDIR=$temp
+case $job in
+  t262-8) step test mise run test:test262 --shard 8/12 || fail=1 ;;
+  t262-1) step test mise run test:test262 --shard 1/12 || fail=1 ;;
+  nat-3) step test mise run test:native --shard 3/3 || fail=1 ;;
+  ns-1)
+    step package mise run test:property:extended:package || fail=1
+    step test mise run test:property:extended:native:shard --shard 1/12 \
+      --exclude-case-sharded tests/property/*.property.test.ts || fail=1 ;;
+  ok-3)
+    OSEO_PROPERTY_CASE_SHARD=3/3 \
+    OSEO_PROPERTY_DURATION_FILE=$temp/duration.json \
+      step test mise run test:property:extended:native:shard \
+      tests/property/m5-object-own-keys.property.test.ts || fail=1
+    cp "$temp/duration.json" "$out/$job-$clone.duration.json" 2>/dev/null ;;
+  *) echo "unknown job $job" >>"$log"; fail=1 ;;
+esac
+echo "$fail" >"$out/$job-$clone.fail"
+rm -rf "$temp"
+exit $fail
