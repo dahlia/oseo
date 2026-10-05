@@ -179,7 +179,7 @@ failure to the experiment, so these per-job records are the source of the
 verdict. [*results.txt*](./results.txt) keeps each job's result lines: 1,782
 selected test262 paths with the same pass, expected-negative, and unsupported
 counts in every run of each shard; 88 of 264 native fixtures and 88 cross
-builds; and zero failed or cancelled property tests. No job hit a timeout.
+builds; and zero failed or canceled property tests. No job hit a timeout.
 
 The own-key shard used its hard limit least of all. Its measured
 `durationMilliseconds` was 347.5 to 348.5 s solo (*solo.tsv*), 439.9 and 441.0
@@ -253,7 +253,7 @@ Three limits remain:
     probe as `oseo-mac-1`.
  -  Disk, not memory, is the binding resource. A second runner doubles the
     rate at which Zig caches grow, and the existing 40 GiB prune does not
-    bound either runner's cache; the next section analyses it.
+    bound either runner's cache; the next section analyzes it.
  -  Three or more concurrent jobs were not measured.
 
 
