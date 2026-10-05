@@ -1,0 +1,69 @@
+05:21:28 start cold-a-t262-8 a:t262-8
+05:22:22 attach cold-a-t262-8
+05:29:08 done cold-a-t262-8 contaminated=0
+05:29:10 start cold-a-t262-1 a:t262-1
+05:35:27 done cold-a-t262-1 contaminated=0
+05:35:28 start cold-a-ns-1 a:ns-1
+05:51:39 done cold-a-ns-1 contaminated=0
+05:51:41 start cold-a-ok-3 a:ok-3
+05:57:56 done cold-a-ok-3 contaminated=0
+05:57:58 start cold-a-nat-3 a:nat-3
+06:04:45 done cold-a-nat-3 contaminated=0
+06:04:46 start cold-b-t262-8 b:t262-8
+06:12:35 done cold-b-t262-8 contaminated=0
+06:12:37 start cold-b-t262-1 b:t262-1
+06:18:53 done cold-b-t262-1 contaminated=0
+06:18:54 start cold-b-ns-1 b:ns-1
+06:35:07 done cold-b-ns-1 contaminated=0
+06:35:08 start cold-b-ok-3 b:ok-3
+06:41:23 done cold-b-ok-3 contaminated=0
+06:41:25 start cold-b-nat-3 b:nat-3
+06:48:13 done cold-b-nat-3 contaminated=0
+06:48:13 plan complete
+06:48:26 start warm-a-t262-8 a:t262-8
+06:55:45 done warm-a-t262-8 contaminated=0
+06:55:46 start warm-a-t262-1 a:t262-1
+07:02:03 done warm-a-t262-1 contaminated=0
+07:02:04 start warm-a-ns-1 a:ns-1
+07:18:16 done warm-a-ns-1 contaminated=0
+07:18:17 start warm-a-ok-3 a:ok-3
+07:24:33 done warm-a-ok-3 contaminated=0
+07:24:34 start warm-a-nat-3 a:nat-3
+07:31:22 done warm-a-nat-3 contaminated=0
+07:31:23 start warm-b-t262-8 b:t262-8
+07:38:43 done warm-b-t262-8 contaminated=0
+07:38:45 start warm-b-t262-1 b:t262-1
+07:45:00 done warm-b-t262-1 contaminated=0
+07:45:02 start warm-b-ns-1 b:ns-1
+08:01:14 done warm-b-ns-1 contaminated=0
+08:01:15 start warm-b-ok-3 b:ok-3
+08:07:32 done warm-b-ok-3 contaminated=0
+08:07:33 start warm-b-nat-3 b:nat-3
+08:14:21 done warm-b-nat-3 contaminated=0
+08:14:21 plan complete
+08:14:37 start p-t262-t262-1 a:t262-8 b:t262-1
+08:23:30 done p-t262-t262-1 contaminated=0
+08:23:31 start p-t262-ns-1 a:ns-1 b:t262-8,t262-1
+08:43:22 done p-t262-ns-1 contaminated=0
+08:43:23 start p-ok-ns-1 a:ns-1 b:ok-3,nat-3
+09:00:09 done p-ok-ns-1 contaminated=0
+09:00:11 start p-ok-t262-1 a:ok-3 b:t262-8
+09:08:32 done p-ok-t262-1 contaminated=0
+09:08:33 start p-t262-t262-2 b:t262-8 a:t262-1
+09:17:26 done p-t262-t262-2 contaminated=0
+09:17:27 start p-t262-ns-2 b:ns-1 a:t262-8,t262-1
+09:37:21 done p-t262-ns-2 contaminated=0
+09:37:22 start p-ok-ns-2 b:ns-1 a:ok-3,nat-3
+09:54:06 done p-ok-ns-2 contaminated=0
+09:54:07 start p-ok-t262-2 b:ok-3 a:t262-8
+10:02:29 done p-ok-t262-2 contaminated=0
+10:02:29 plan complete
+10:03:45 start p-nat-t262-1 a:nat-3 b:t262-8
+10:12:39 done p-nat-t262-1 contaminated=0
+10:12:40 start p-ns-ns-1 a:ns-1 b:ns-1
+10:30:58 done p-ns-ns-1 contaminated=0
+10:31:00 start p-nat-t262-2 b:nat-3 a:t262-8
+10:39:52 done p-nat-t262-2 contaminated=0
+10:39:53 start p-ns-ns-2 b:ns-1 a:ns-1
+10:58:17 done p-ns-ns-2 contaminated=0
+10:58:17 plan complete

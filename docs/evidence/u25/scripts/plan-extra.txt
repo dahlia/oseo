@@ -1,0 +1,4 @@
+p-nat-t262-1 a:nat-3 b:t262-8
+p-ns-ns-1 a:ns-1 b:ns-1
+p-nat-t262-2 b:nat-3 a:t262-8
+p-ns-ns-2 b:ns-1 a:ns-1

@@ -1,0 +1,49 @@
+run	job_and_clone	observed_result_lines
+cold-a-nat-3	nat-3-a	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+cold-a-ns-1	ns-1-a	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+cold-a-ok-3	ok-3-a	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+cold-a-t262-1	t262-1-a	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+cold-a-t262-8	t262-8-a	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+cold-b-nat-3	nat-3-b	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+cold-b-ns-1	ns-1-b	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+cold-b-ok-3	ok-3-b	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+cold-b-t262-1	t262-1-b	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+cold-b-t262-8	t262-8-b	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-nat-t262-1	nat-3-a	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+p-nat-t262-1	t262-8-b	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-nat-t262-2	nat-3-b	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+p-nat-t262-2	t262-8-a	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-ns-ns-1	ns-1-a	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-ns-ns-1	ns-1-b	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-ns-ns-2	ns-1-a	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-ns-ns-2	ns-1-b	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-ok-ns-1	nat-3-b	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+p-ok-ns-1	ns-1-a	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-ok-ns-1	ok-3-b	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+p-ok-ns-2	nat-3-a	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+p-ok-ns-2	ns-1-b	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-ok-ns-2	ok-3-a	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+p-ok-t262-1	ok-3-a	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+p-ok-t262-1	t262-8-b	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-ok-t262-2	ok-3-b	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+p-ok-t262-2	t262-8-a	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-t262-ns-1	ns-1-a	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-t262-ns-1	t262-1-b	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+p-t262-ns-1	t262-8-b	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-t262-ns-2	ns-1-b	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+p-t262-ns-2	t262-1-a	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+p-t262-ns-2	t262-8-a	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-t262-t262-1	t262-1-b	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+p-t262-t262-1	t262-8-a	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+p-t262-t262-2	t262-1-a	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+p-t262-t262-2	t262-8-b	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+warm-a-nat-3	nat-3-a	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+warm-a-ns-1	ns-1-a	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+warm-a-ok-3	ok-3-a	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+warm-a-t262-1	t262-1-a	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+warm-a-t262-8	t262-8-a	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 
+warm-b-nat-3	nat-3-b	native fixtures: 88/264 cross fixtures: 88 linux-aarch64-musl builds passed 
+warm-b-ns-1	ns-1-b	ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 ℹ pass 6 ℹ fail 0 ℹ cancelled 0 
+warm-b-ok-3	ok-3-b	ℹ pass 1 ℹ fail 0 ℹ cancelled 0 
+warm-b-t262-1	t262-1-b	tests=1782/21383 pass=1535 expected-negative=131 unsupported=116 
+warm-b-t262-8	t262-8-b	tests=1782/21383 pass=1522 expected-negative=134 unsupported=126 

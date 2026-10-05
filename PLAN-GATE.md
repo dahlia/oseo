@@ -1340,13 +1340,15 @@ none of which is applied, are:
     paths grow. The recomputed rows above estimate a derived 112.1 to
     132.3 min at 41,091 paths. A two-attempt branch measurement must
     confirm any recomputed assignment.
-2.  Run a second concurrent job on `oseo-mac-1`. With the recomputed
+2.  Run a second concurrent job on the Mac mini. With the recomputed
     assignment over two Mac lanes and the U21 derived latency factor of
     1.29 applied to every Mac job, the model gives a derived 90.3 to 110.6
     min at 41,091 paths. A factor of 1.5 gives 98.5 to 112.5 min. Both
     hold the goal in all three scenarios, the second by 7.5 min in the
-    maximum one. U23 requires a runner-mode memory measurement first,
-    because U21 observed about 243 MB free with two concurrent jobs.
+    maximum one. U25, below, measured memory and slowdowns for six
+    pairings: memory pressure stayed normal, and per-family factors
+    derived from its measured job walls give a derived 93.2 to 110.6 min. It is
+    not applied, because it needs a second registered runner.
 3.  Add a second Mac with the same measured speed as an independent lane.
     With the recomputed assignment over the two Macs, the model gives a
     derived 78.3 to 103.0 min. It also halves the exposure to one machine's
@@ -1362,6 +1364,50 @@ current paths they give 642.2, 737.7, and 832.7 min, against a measured
 716.0 and 734.8 min in the two all-hosted runs. These figures use
 different inputs from the 844 to 1,086 min projected above, which predates
 U13 and the own-key case shards, and neither is a goal any more.
+
+#### Two concurrent Mac jobs (U25)
+
+[U25 evidence](./docs/evidence/u25/README.md) measured lever 2 on the
+Mac mini at `317b58bb`, over SSH in two clones with separate Zig caches,
+using the exact post-checkout commands of five Mac-eligible jobs. It ran
+20 solo and 12 paired experiments, and the runner was idle in all 674
+checks. All 48 jobs passed with unchanged counts. In every paired
+2-second sample the memory pressure level stayed normal. Swap did not
+grow and recorded no swapouts. Pageouts were 0 to 4 per experiment, as
+in solo runs, and the summed peak RSS of both jobs was at most a measured
+5,996 MiB. The compressor absorbed the extra demand, compressing up to
+3.9 GiB in one pair.
+
+The slowdowns were asymmetric. Test262 ran a measured 0.997 to 1.073
+times its solo wall beside a property or fixture job and 1.19 to 1.21 times
+slower beside another test262 job. Beside test262, the jobs with fewer workers
+ran a derived 1.36 to 1.37 (native support), 1.398 to 1.404 (native fixture),
+and 1.44 to 1.45 (own-key) times slower while overlapped. Pair throughput was a
+derived 1.49 to 1.79. The own-key shard's measured duration was at most 479.7 s
+against its 3,600 s limit. None of the six measured pairings needs to be
+excluded. Native fixture + native fixture, own-key + own-key, and own-key +
+native fixture were not measured and have no verdict; their sums of solo peaks,
+derived, are 2,504 to 3,934 MiB.
+
+With those family maxima applied to every Mac job, the U12 model gives
+a derived 93.2, 96.3, and 110.6 min at 41,091 paths. That is 18.9 to
+21.7 min below one Mac lane with recomputed medians, and it holds the goal
+in all three scenarios. A uniform 1.45 gives 94.4 to 112.5 min. At the
+current paths the gain over the U24 assignment is a derived 6.2 to
+17.5 min. Disk is the binding resource. Every job, warm or cold, added
+0.9 to 3.8 GiB of Zig cache files, so a second runner doubles cache growth
+under the existing 40 GiB prune. That prune is a shared free-space trigger
+that removes only the invoking account's cache, so it bounds neither cache
+alone: an idle runner can keep a derived 142.2 GiB of cache on the measured
+228.2 GiB volume, and the hook guarantees no free-space floor. A second
+runner is therefore preconditioned on a per-account Zig cache size cap,
+derived strictly below 34.3 GiB once both accounts' usage and a job's peak
+work-directory and temporary use are measured under `sudo`, with a reserve
+for other growth. A shared account also needs a separate
+cache per runner and a hook that caps and prunes each runner's path. Neither
+is applied. Runner mode, the second runner's Developer Tools grant, and its U17
+probe are untested. The README lists the maintainer steps. Nothing is
+applied.
 
 ### macOS static capacity lanes (U16)
 

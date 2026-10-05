@@ -1,0 +1,10 @@
+cold-a-t262-8 a:t262-8
+cold-a-t262-1 a:t262-1
+cold-a-ns-1 a:ns-1
+cold-a-ok-3 a:ok-3
+cold-a-nat-3 a:nat-3
+cold-b-t262-8 b:t262-8
+cold-b-t262-1 b:t262-1
+cold-b-ns-1 b:ns-1
+cold-b-ok-3 b:ok-3
+cold-b-nat-3 b:nat-3

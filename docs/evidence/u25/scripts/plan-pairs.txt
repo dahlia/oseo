@@ -1,0 +1,8 @@
+p-t262-t262-1 a:t262-8 b:t262-1
+p-t262-ns-1 a:ns-1 b:t262-8,t262-1
+p-ok-ns-1 a:ns-1 b:ok-3,nat-3
+p-ok-t262-1 a:ok-3 b:t262-8
+p-t262-t262-2 b:t262-8 a:t262-1
+p-t262-ns-2 b:ns-1 a:t262-8,t262-1
+p-ok-ns-2 b:ns-1 a:ok-3,nat-3
+p-ok-t262-2 b:ok-3 a:t262-8

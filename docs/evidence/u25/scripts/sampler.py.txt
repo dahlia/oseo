@@ -1,0 +1,73 @@
+"""U25 resource sampler: system memory counters and per-job tree RSS."""
+import os, re, subprocess, sys, time
+
+out, interval = sys.argv[1], float(sys.argv[2])
+VM_KEYS = {
+    "Pages free": "free", "Pages active": "active",
+    "Pages inactive": "inactive", "Pages speculative": "spec",
+    "Pages wired down": "wired", "File-backed pages": "file",
+    "Anonymous pages": "anon",
+    "Pages stored in compressor": "cstored",
+    "Pages occupied by compressor": "cocc",
+    "Compressions": "compressions", "Decompressions": "decompressions",
+    "Pageins": "pageins", "Pageouts": "pageouts",
+    "Swapins": "swapins", "Swapouts": "swapouts",
+}
+cols = (["t", "mem_level", "pressure_level", "swap_used_mib"]
+        + list(VM_KEYS.values()) + ["load1", "jobs"])
+
+def sysctl(name):
+    return subprocess.run(["sysctl", "-n", name], capture_output=True,
+                          text=True).stdout.strip()
+
+def vmstat():
+    r = {}
+    for line in subprocess.run(["vm_stat"], capture_output=True,
+                               text=True).stdout.splitlines():
+        k, _, v = line.partition(":")
+        k = k.strip().strip('"')
+        if k in VM_KEYS:
+            r[VM_KEYS[k]] = v.strip().rstrip(".")
+    return r
+
+def job_rss():
+    """RSS KiB and process count of each job script's descendant tree."""
+    roots = {}
+    for f in os.listdir(out):
+        if f.endswith(".pid"):
+            try:
+                roots[f[:-4]] = int(open(os.path.join(out, f)).read())
+            except ValueError:
+                pass
+    ps = subprocess.run(["ps", "-axo", "pid=,ppid=,rss="],
+                        capture_output=True, text=True).stdout
+    kids, rss = {}, {}
+    for line in ps.splitlines():
+        p, pp, r = map(int, line.split())
+        kids.setdefault(pp, []).append(p)
+        rss[p] = r
+    res = []
+    for name, root in sorted(roots.items()):
+        if root not in rss:
+            continue
+        stack, total, n = [root], 0, 0
+        while stack:
+            p = stack.pop()
+            total += rss.get(p, 0); n += 1
+            stack.extend(kids.get(p, []))
+        res.append(f"{name}={total}/{n}")
+    return ";".join(res)
+
+with open(os.path.join(out, "samples.tsv"), "w") as fh:
+    fh.write("\t".join(cols) + "\n")
+    while True:
+        t = time.time()
+        sw = re.search(r"used = ([\d.]+)M", sysctl("vm.swapusage"))
+        v = vmstat()
+        row = [f"{t:.1f}", sysctl("kern.memorystatus_level"),
+               sysctl("kern.memorystatus_vm_pressure_level"),
+               sw.group(1) if sw else ""]
+        row += [v.get(k, "") for k in VM_KEYS.values()]
+        row += [os.getloadavg()[0].__format__(".2f"), job_rss()]
+        fh.write("\t".join(row) + "\n"); fh.flush()
+        time.sleep(max(0.0, interval - (time.time() - t)))

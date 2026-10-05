@@ -1,0 +1,5 @@
+#!/bin/bash
+# Run a sequence of jobs in one clone back to back, as one runner slot.
+# Usage: slot.sh CLONE OUTDIR JOB...
+clone=$1 out=$2; shift 2
+for j in "$@"; do "$HOME/m5ci-results/u25/bin/job.sh" "$clone" "$j" "$out"; done

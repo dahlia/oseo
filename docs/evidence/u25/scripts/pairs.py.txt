@@ -1,0 +1,50 @@
+"""Per-job pair slowdowns against warm solo means, with overlap."""
+import csv, glob, os, statistics as st
+solo = {}
+for st_f in glob.glob("runs/warm-*/*.steps.tsv"):
+    rows = list(csv.DictReader(open(st_f), delimiter="\t"))
+    solo.setdefault(rows[0]["job"], []).append(
+        float(rows[-1]["end"]) - float(rows[0]["start"]))
+solo_m = {k: st.mean(v) for k, v in solo.items()}
+out = []; pair_rows = []
+for d in sorted(glob.glob("runs/p-*/")):
+    label = os.path.basename(d.rstrip("/"))
+    start = float(open(d + "start").read()); end = float(open(d + "end").read())
+    slots = open(d + "slots").read().split()
+    iv = {}
+    for spec in slots:
+        clone, jobs = spec.split(":")
+        for j in jobs.split(","):
+            rows = list(csv.DictReader(open(f"{d}{j}-{clone}.steps.tsv"), delimiter="\t"))
+            iv[(spec, j, clone)] = (float(rows[0]["start"]), float(rows[-1]["end"]))
+    slot_span = {s: (min(v[0] for k, v in iv.items() if k[0] == s),
+                     max(v[1] for k, v in iv.items() if k[0] == s)) for s in slots}
+    total_solo = 0
+    for (spec, j, clone), (s, e) in iv.items():
+        other = [slot_span[o] for o in slots if o != spec][0]
+        ov = max(0.0, min(e, other[1]) - max(s, other[0]))
+        wall = e - s; solo_w = solo_m[j]; total_solo += solo_w
+        alone = wall - ov
+        full = ov / (solo_w - alone) if solo_w - alone > 0 else float("nan")
+        rows = list(csv.DictReader(open(f"{d}{j}-{clone}.steps.tsv"), delimiter="\t"))
+        exits = "/".join(x["exit"] for x in rows)
+        fail = open(f"{d}{j}-{clone}.fail").read().strip()
+        dj = f"{d}{j}-{clone}.duration.json"
+        dur = ""
+        if os.path.exists(dj):
+            import json
+            dd = json.load(open(dj))
+            dur = f'{dd["durationMilliseconds"]/1000:.1f}/{dd["limitMilliseconds"]/1000:.0f}'
+        out.append(dict(pair=label, job=f"{j}-{clone}", step_exits=exits,
+            fail_flag=fail, ownkey_duration_s_per_limit=dur, wall_s=f"{wall:.1f}",
+            warm_solo_mean_s=f"{solo_w:.1f}", slowdown=f"{wall/solo_w:.3f}",
+            overlap_s=f"{ov:.1f}", overlap_fraction=f"{ov/wall:.2f}",
+            overlapped_factor=f"{full:.3f}"))
+    pair_rows.append(dict(pair=label, slots=" | ".join(slots),
+        elapsed_s=f"{end-start:.1f}", sum_warm_solo_s=f"{total_solo:.1f}",
+        throughput_factor=f"{total_solo/(end-start):.3f}"))
+for name, data in (("pair-jobs.tsv", out), ("pair-throughput.tsv", pair_rows)):
+    with open(name, "w") as fh:
+        w = csv.DictWriter(fh, data[0].keys(), delimiter="\t"); w.writeheader(); w.writerows(data)
+    print(open(name).read())
+print({k: [round(x,1) for x in v] for k, v in solo.items()})
