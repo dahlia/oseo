@@ -310,6 +310,53 @@ recommended next retune.
 [37206614757]: https://github.com/dahlia/oseo/actions/runs/37206614757
 [37215661294]: https://github.com/dahlia/oseo/actions/runs/37215661294
 
+### Median-weight Mac lane runs (U24)
+
+Branch run [37237684441] at `54d2c336` applied the U24 median weights and
+passed in both attempts. Main run [37230598930] at `840c387e`, which still
+used the U23 assignment, finished between the U24 commit and its branch
+push. The table uses the U23 definitions above, so the hosted counts exclude
+the Linux-hosted availability probe. All values are measured and rounded to
+0.1 min:
+
+| Source run, attempt | Commit     | Push-to-green | Mac jobs | Mac job min | Mac lane end | Hosted jobs | Hosted job min | Last hosted end |
+| ------------------- | ---------- | ------------: | -------: | ----------: | -----------: | ----------: | -------------: | --------------: |
+| [37230598930], 1    | `840c387e` |         106.8 |       12 |        79.0 |         79.8 |          22 |          479.9 |           106.4 |
+| [37237684441], 1    | `54d2c336` |          98.3 |       15 |        80.8 |         82.0 |          19 |          443.6 |            97.9 |
+| [37237684441], 2    | `54d2c336` |          95.8 |       15 |        81.8 |         83.0 |          19 |          449.3 |            95.5 |
+
+Both U24 attempts placed the same 15 jobs on `oseo-mac-1`, the 15 that the
+generator assigns there. The modeled ends below are derived from
+*tools/macos-job-costs.ts*: hosted lanes sum their medians, and the Mac lane
+adds measured Mac medians, ratio-converted hosted medians, and the 60-second
+probe allowance. Overhead is the measured lane end minus the measured sum of
+its job walls:
+
+| Lane | Jobs in chain order                                                               | Modeled end | Attempt 1 end | Attempt 2 end | Overhead 1 | Overhead 2 |
+| ---- | --------------------------------------------------------------------------------- | ----------: | ------------: | ------------: | ---------: | ---------: |
+| 1    | `test (macos-latest, node)`, native support 10/12, test262 11/12                  |        86.6 |          85.7 |          85.7 |        0.4 |        0.5 |
+| 2    | sanitizers native, native support 5/12, test262 2/12, `test (macos-latest, deno)` |        80.8 |          79.7 |          84.0 |        0.5 |        0.6 |
+| 3    | sanitizers property, native support 11/12, native support 6/12, native 2/3        |        93.3 |          88.9 |          95.5 |        0.5 |        0.6 |
+| 4    | native support 1/12, 9/12, 8/12, native 3/3                                       |        91.3 |          97.9 |          91.4 |        0.5 |        0.5 |
+| 5    | test262 6/12, native support 7/12, test262 10/12, native support 2/12             |        87.5 |          94.0 |          95.4 |        0.5 |        0.6 |
+| Mac  | the 15 jobs listed below, without a chain; observed pickup order varied           |        93.5 |          82.0 |          83.0 |        1.1 |        1.1 |
+
+The 12 Mac jobs other than the own-key shards were test262 8/12, 9/12,
+5/12, 1/12, 7/12, 12/12, 4/12, and 3/12, native support 4/12, 3/12, and
+12/12, and native 1/3. The seven Mac jobs with a measured Mac median were
+modeled at 45.1 min and measured 40.6 and 41.6 min. The eight converted
+from hosted medians were modeled at 47.4 min and measured 40.2 min in
+both attempts. Against their hosted medians, the converted test262 jobs
+ran at a derived pooled ratio of 5.43 in both attempts, against the
+modeled 4.2. The converted native support and native jobs ran at 3.60
+and 3.55, and 3.12 and 3.18, against 3.2 and 3.1.
+
+[*PLAN-GATE.md*](../PLAN-GATE.md) compares these runs with the prediction
+and with the earlier spread.
+
+[37230598930]: https://github.com/dahlia/oseo/actions/runs/37230598930
+[37237684441]: https://github.com/dahlia/oseo/actions/runs/37237684441
+
 ### U16 static macOS lane branch observations
 
 GitHub Actions run and job timestamps provide one measured observation at

@@ -1590,3 +1590,48 @@ neither does a hosted chain. Its jobs run hosted only when the readiness
 probe selects fallback, and that fallback schedule is not modeled. Only the
 two-attempt branch measurement still to run can establish the retune's
 push-to-green time.
+
+### Measured runs of the median weights
+
+Branch run `37237684441` at `54d2c336` passed in both attempts with the
+15 planned jobs on `oseo-mac-1`. The measured push-to-green times were 98.3
+and 95.8 min. The Mac lane ended at 82.0 and 83.0 min, and the last hosted
+macOS job at 97.9 and 95.5 min. Hosted macOS jobs used 443.6 and 449.3
+measured job minutes over 19 jobs, against the derived 439.6.
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) records the
+per-run and per-lane values.
+
+Six earlier measured runs with the Mac lane on had push-to-green times of
+107.9, 111.1, 113.5, 112.2, 105.3, and 106.8 min. The last is main run
+`37230598930` at `840c387e`, which still used the U23 assignment and
+finished before this branch was pushed. Both U24 attempts lie below that
+spread's minimum, by a derived 7.0 and 9.5 min, so the difference is not
+within the observed run-to-run noise. Their derived mean of 97.0 min is
+12.5 min below the earlier mean of 109.5 min. With two samples, the size of
+the improvement is not established; a slow hosted runner could still produce
+a run inside the old spread.
+
+The derived 93.5-min model makespan was exceeded by 4.8 and 2.3 min, and
+it was not set by the Mac lane as predicted. Both attempts lie inside the
+derived 91.7 to 102.7 min per-run evaluation. The two sides erred in
+opposite directions:
+
+ -  The Mac lane ended 11.5 and 10.5 min before its modeled 93.5 min. Its
+    seven jobs with Mac medians from earlier attempts were modeled at
+    45.1 min and measured 40.6 and 41.6 min. The eight jobs converted from
+    hosted medians were modeled at 47.4 min and measured 40.2 min twice;
+    the converted test262 jobs ran at a derived pooled ratio of 5.43,
+    against the modeled 4.2.
+ -  Hosted lanes 4 and 5 ended a derived 6.62 and 6.50 min after their modeled
+    ends in attempt 1, and lanes 2, 3, and 5 ended 3.15, 2.10, and 7.95 min
+    after theirs in attempt 2. The largest per-job excess was native support
+    7/12, measured at 1,537 and 1,605 s against its 1,367-second median. Native
+    support 2/12 measured 1,292 and 1,297 s against a 1,117-second median from
+    only two hosted observations.
+
+The Mac lane therefore sat idle for a derived 16.0 and 12.5 min before
+the last hosted job ended. Recomputing both median tables with these two
+attempts would likely move more hosted work onto the Mac. That retune is
+not applied here and would need its own two-attempt measurement. Job
+names, the aggregate's required set, Zig-only eligibility, hosted
+fallback, shard totals, and coverage did not change.
