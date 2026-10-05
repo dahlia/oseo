@@ -1,0 +1,33 @@
+#!/bin/bash
+# Samples oseo-mac-1's per-job disk use during real CI jobs (read-only).
+# Run as: sudo bash /Users/Shared/oseo-runner-staging/disk-sampler.sh
+# It detaches, samples every 30 s for 3 hours, and writes
+# /Users/Shared/oseo-disk/samples.tsv. Stop early with:
+#   sudo pkill -f oseo-disk-sampler-loop
+set -uo pipefail
+[[ $EUID -eq 0 ]] || { echo 'Run with sudo' >&2; exit 2; }
+out_dir=/Users/Shared/oseo-disk
+mkdir -p "$out_dir"
+out=$out_dir/samples.tsv
+home=/Users/oseo-runner
+root=$home/actions-runner
+kib() { du -skx "$1" 2>/dev/null | cut -f1; }
+loop() {
+  printf 'utc\tfree_kib\twork_kib\ttemp_kib\tzig_kib\tarchive_kib\tjob_running\n' > "$out"
+  chmod 644 "$out"
+  end=$(( $(date +%s) + 3 * 3600 ))
+  while (( $(date +%s) < end )); do
+    running=0
+    pgrep -qf 'Runner.Worker' && running=1
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$(date -u +%FT%TZ)" \
+      "$(df -Pk "$root" | awk 'NR == 2 {print $4}')" \
+      "$(kib "$root/_work")" "$(kib "$root/oseo-temp")" \
+      "$(kib "$home/.cache/zig")" "$(kib "$home/Library/Caches/oseo")" \
+      "$running" >> "$out"
+    sleep 30
+  done
+}
+export -f loop kib
+export out root home
+nohup bash -c 'exec -a oseo-disk-sampler-loop bash -c loop' >/dev/null 2>&1 &
+echo "Sampling to $out for 3 hours (pid $!)"

@@ -1041,6 +1041,183 @@ test(
 );
 
 test(
+  "Mac cleanup caps the account Zig cache by size",
+  {
+    skip: process.platform === "win32" ? "requires Bash" : false,
+  },
+  () => {
+    const root = realpathSync(mkdtempSync(join(tmpdir(), "oseo-mac-cap-")));
+    const external = realpathSync(
+      mkdtempSync(join(tmpdir(), "oseo-mac-cap-external-")),
+    );
+    try {
+      const runner = join(root, "runner");
+      const bin = join(root, "bin");
+      const duLog = join(root, "du.log");
+      mkdirSync(runner);
+      mkdirSync(bin);
+      writeFileSync(join(runner, ".runner"), "registered");
+      for (const [name, body] of [
+        ["uname", "#!/bin/sh\necho Darwin\n"],
+        ["id", '#!/bin/sh\n[ "$*" = "-un" ] || exit 1\necho oseo-runner\n'],
+        [
+          "dscl",
+          "#!/bin/sh\n" +
+            `printf 'NFSHomeDirectory: %s\\n' "$OSEO_TEST_ACCOUNT_HOME"\n`,
+        ],
+        [
+          "df",
+          "#!/bin/sh\n" +
+            "echo 'Filesystem Blocks Used Available'\n" +
+            'echo "disk 1 1 $OSEO_TEST_FREE_KIB"\n',
+        ],
+        [
+          "du",
+          [
+            "#!/bin/sh\n",
+            `printf '%s %s\\n' "$PWD" "$*" >> "$OSEO_TEST_DU_LOG"\n`,
+            '[ "$OSEO_TEST_DU_KIB" = fail ] && exit 1\n',
+            '[ -n "$OSEO_TEST_DU_KIB" ] || exec /usr/bin/du "$@"\n',
+            `printf '%s\\tzig\\n' "$OSEO_TEST_DU_KIB"\n`,
+          ].join(""),
+        ],
+      ] as const) {
+        const executable = join(bin, name);
+        writeFileSync(executable, body);
+        chmodSync(executable, 0o700);
+      }
+      const cacheParent = join(root, ".cache");
+      const cache = join(cacheParent, "zig");
+      const marker = join(cache, "entry");
+      const fillCache = () => {
+        mkdirSync(cache, { recursive: true });
+        writeFileSync(marker, "entry");
+      };
+      const env = {
+        ...process.env,
+        HOME: root,
+        OSEO_TEST_ACCOUNT_HOME: root,
+        OSEO_TEST_DU_LOG: duLog,
+        OSEO_TEST_FREE_KIB: "100000000",
+        OSEO_RUNNER_ROOT: runner,
+        OSEO_ZIG_CACHE_CAP_GIB: "2",
+        PATH: `${bin}:${process.env.PATH ?? ""}`,
+      };
+      const cleanup = "tools/selfhosted-mac/cleanup.sh";
+      const run = (
+        phase: string,
+        overrides: Readonly<Record<string, string>>,
+      ) => {
+        rmSync(duLog, { force: true });
+        const result = spawnSync("/bin/bash", [cleanup, phase], {
+          encoding: "utf8",
+          env: { ...env, ...overrides },
+        });
+        assert.equal(result.status, 0, result.stderr);
+        const duCalls = existsSync(duLog)
+          ? readFileSync(duLog, "utf8").trim().split("\n")
+          : [];
+        return { ...result, duCalls };
+      };
+
+      fillCache();
+      const real = run("started", {});
+      assert.ok(existsSync(marker));
+      assert.deepEqual(real.duCalls, [`${cacheParent} -skPx zig`]);
+      assert.doesNotMatch(real.stdout, /Pruned Zig cache/u);
+      assert.equal(real.stderr, "");
+
+      const atCap = run("completed", { OSEO_TEST_DU_KIB: "2097152" });
+      assert.ok(existsSync(marker));
+      assert.doesNotMatch(atCap.stdout, /Pruned Zig cache/u);
+
+      for (const phase of ["started", "completed"]) {
+        fillCache();
+        const over = run(phase, { OSEO_TEST_DU_KIB: "2097153" });
+        assert.ok(!existsSync(cache));
+        assert.ok(existsSync(cacheParent));
+        assert.match(
+          over.stdout,
+          /Pruned Zig cache because it exceeded the 2 GiB cap/u,
+        );
+      }
+
+      fillCache();
+      const defaultCap = run("completed", {
+        OSEO_TEST_DU_KIB: String(30 * 1048576),
+        OSEO_ZIG_CACHE_CAP_GIB: "",
+      });
+      assert.ok(existsSync(marker));
+      assert.doesNotMatch(defaultCap.stdout, /Pruned Zig cache/u);
+      for (const invalid of ["0", "-1", "1.5", "30GiB", "39", "100"]) {
+        fillCache();
+        const result = run("completed", {
+          OSEO_TEST_DU_KIB: String(30 * 1048576 + 1),
+          OSEO_ZIG_CACHE_CAP_GIB: invalid,
+        });
+        assert.match(result.stderr, /using the 30 GiB default/u);
+        assert.match(result.stdout, /exceeded the 30 GiB cap/u);
+        assert.ok(!existsSync(cache));
+      }
+
+      fillCache();
+      const failed = run("completed", { OSEO_TEST_DU_KIB: "fail" });
+      assert.ok(existsSync(marker));
+      assert.match(failed.stderr, /size measurement failed/u);
+
+      const lowFree = run("completed", {
+        OSEO_TEST_DU_KIB: "1",
+        OSEO_TEST_FREE_KIB: "100",
+      });
+      assert.ok(!existsSync(cache));
+      assert.deepEqual(lowFree.duCalls, []);
+      assert.match(
+        lowFree.stdout,
+        /Pruned Zig cache because free disk fell below 40 GiB/u,
+      );
+
+      const externalCache = join(external, "zig");
+      const externalMarker = join(externalCache, "keep");
+      mkdirSync(externalCache);
+      writeFileSync(externalMarker, "keep");
+      symlinkSync(externalCache, cache);
+      const linkedCache = run("completed", { OSEO_TEST_DU_KIB: "9999999999" });
+      assert.ok(existsSync(externalMarker));
+      assert.deepEqual(linkedCache.duCalls, []);
+      assert.match(linkedCache.stderr, /unsafe home or cache path/u);
+      rmSync(cache);
+
+      rmSync(cacheParent, { recursive: true });
+      symlinkSync(external, cacheParent);
+      const linkedParent = run("completed", {
+        OSEO_TEST_DU_KIB: "9999999999",
+      });
+      assert.ok(existsSync(externalMarker));
+      assert.deepEqual(linkedParent.duCalls, []);
+      assert.match(linkedParent.stderr, /unsafe home or cache path/u);
+      rmSync(cacheParent);
+
+      const otherHome = join(root, "other-home");
+      const otherCache = join(otherHome, ".cache", "zig");
+      mkdirSync(otherCache, { recursive: true });
+      writeFileSync(join(otherCache, "keep"), "keep");
+      fillCache();
+      const otherAccount = run("completed", {
+        HOME: otherHome,
+        OSEO_TEST_DU_KIB: "9999999999",
+      });
+      assert.ok(existsSync(join(otherCache, "keep")));
+      assert.ok(existsSync(marker));
+      assert.deepEqual(otherAccount.duCalls, []);
+      assert.match(otherAccount.stderr, /unsafe home or cache path/u);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+      rmSync(external, { recursive: true, force: true });
+    }
+  },
+);
+
+test(
   "Mac service setup repairs parent and credential permissions",
   {
     skip: process.platform === "win32" ? "requires Bash" : false,
@@ -1141,6 +1318,25 @@ test(
         const dry = spawnSync("bash", args, { env });
         assert.equal(dry.status, 0, `${path}: ${dry.stderr}`);
       }
+    }
+    const installer = "tools/selfhosted-mac/install-service.sh";
+    const defaultCap = spawnSync("bash", [installer, "--dry-run"], {
+      encoding: "utf8",
+      env,
+    });
+    assert.match(defaultCap.stdout, /with a 30 GiB Zig cache cap/u);
+    const configuredCap = spawnSync("bash", [installer, "--dry-run"], {
+      encoding: "utf8",
+      env: { ...env, OSEO_ZIG_CACHE_CAP_GIB: "24" },
+    });
+    assert.match(configuredCap.stdout, /with a 24 GiB Zig cache cap/u);
+    for (const invalid of ["0", "1.5", "30GiB", "39", "10000"]) {
+      const rejected = spawnSync("bash", [installer, "--dry-run"], {
+        encoding: "utf8",
+        env: { ...env, OSEO_ZIG_CACHE_CAP_GIB: invalid },
+      });
+      assert.equal(rejected.status, 2, invalid);
+      assert.match(rejected.stderr, /whole number of GiB/u);
     }
   },
 );

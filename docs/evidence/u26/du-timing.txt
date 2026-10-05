@@ -1,0 +1,41 @@
+# Hook measurement timings on the Mac mini (macOS 27.0.1, Apple M6,
+# kern.maxvnodes 249770), as dahlia over SSH, 2026-10-05/06 UTC.
+# Trees from scripts/synthetic-cache.py.txt: s30 = 30 GiB shape (205,894
+# entries), s64 = 63.6 GiB shape (436,489 entries). Wall seconds.
+
+## Discarded: Spotlight was indexing the new trees (load average 16.78)
+3.463	du -skx s30
+2.024	du -skx s30
+1.941	du -skx s30
+8.583	du -skx s64
+7.840	du -skx s64
+7.701	du -skx s64
+3.478	du -skx s30
+1.426	du -skx s30
+1.984	du -skx s30
+
+## Kept: trees moved under ~/Desktop/u26-du.noindex, load average 2.24 -> 2.02
+3.291	du -skx s30
+1.109	du -skx s30
+1.119	du -skx s30
+7.711	du -skx s64
+4.430	du -skx s64
+4.423	du -skx s64
+2.072	du -skx s30
+1.250	du -skx s30
+1.291	du -skx s30
+0.141	find s30/o -mindepth 1 -maxdepth 1
+0.138	find s30/o -mindepth 1 -maxdepth 1
+0.137	find s30/o -mindepth 1 -maxdepth 1
+
+## Whole hook: cleanup.sh completed, s30 moved to ~/.cache/zig, cap 30
+## (load average 1.47); kept, no output
+3.26
+1.11
+1.11
+1.11
+## Same tree, cap 1 (536 MiB allocated): kept, no output
+## s64 moved to ~/.cache/zig, cap 1 (1.1 GiB allocated): measured and removed
+39.04	Pruned Zig cache because it exceeded the 1 GiB cap
+## ~/.cache/zig as a symlink to a directory, cap 1
+Skipped Zig cache prune: unsafe home or cache path

@@ -56,13 +56,16 @@ SSH, without a second runner. Memory pressure stayed normal and swap did
 not grow in the six measured pairings, but each job added 0.9 to 3.8 GiB of
 Zig cache files. The 40 GiB prune below removes only the invoking account's
 cache, so it does not bound an idle runner's cache. A second runner is
-therefore preconditioned on a per-account Zig cache size cap. When two
-runners share one account, it also needs a separate cache per runner and a
-hook that caps and prunes each runner's path. It is a maintainer
-decision and is not configured.
+therefore preconditioned on a per-account Zig cache size cap. The hooks now
+apply one, derived in [U26 evidence] from measurements under `sudo`; the
+maintainer has not yet installed them on the Mac. When two runners share
+one account, a second runner also needs a separate cache per runner and a
+hook that caps and prunes each runner's path. Registering a second runner
+is a maintainer decision and is not configured.
 
 [U21 evidence]: ./evidence/u21/README.md
 [U25 evidence]: ./evidence/u25/README.md
+[U26 evidence]: ./evidence/u26/README.md
 
 
 Runner service
@@ -99,16 +102,23 @@ directory itself and registration files. The daemon's
 *oseo-temp/* is separate: the live listener keeps .NET pipes and sockets
 there, and worker and job processes can leave cache files. Hooks never
 clear it. Inspect its size through the health check and remove stale files
-only while the daemon is stopped. If free disk falls below 40 GiB on the
-256 GiB disk, either hook prunes the Zig cache under the runner account home
-reported by the directory service. The hook requires `$HOME` to resolve to that
-home and rejects linked home or cache paths. A skipped prune is logged.
-The hook removes runner diagnostic logs older than seven days; launchd
-output is discarded. Check the daemon, recent diagnostics, and disk with
-*tools/selfhosted-mac/health.sh* under `sudo`. Keep the runner account,
-root, hook scripts, and logs inaccessible to other standard accounts.
-Keep the machine isolated from the home LAN and do not mount personal data
-or credentials into jobs.
+only while the daemon is stopped. Either hook removes the Zig cache under
+the runner account home reported by the directory service when the cache
+exceeds `OSEO_ZIG_CACHE_CAP_GIB`, 30 GiB by default, or when free disk falls
+below 40 GiB on the 228 GiB volume. The free-space prune is the backstop
+and skips the size measurement. The installer writes the cap into the
+LaunchDaemon environment and rejects a value that is not a whole number of
+GiB from 1 to 38, the derived two-account ceiling; the hook falls back to 30
+GiB for such a value. Measuring a cache near the cap took a measured 1.1 to 3.3
+seconds per hook on synthetic trees in [U26 evidence]. The hook requires
+`$HOME` to resolve to that home and rejects linked home or cache paths. A
+skipped prune or a failed measurement is logged and keeps the cache. The hook
+removes runner diagnostic logs older than seven days; launchd output is
+discarded. Check the daemon, recent diagnostics, and disk with
+*tools/selfhosted-mac/health.sh* under `sudo`. Keep the runner account, root,
+hook scripts, and logs inaccessible to other standard accounts. Keep the
+machine isolated from the home LAN and do not mount personal data or
+credentials into jobs.
 
 The operator grants **Developer Tools** to the exact
 *bin/Runner.Listener* executable used by the LaunchDaemon. The U17
@@ -131,6 +141,58 @@ inaccessible parent directory was then identified. Attempts 2 and 3
 showed the old hook removing live listener IPC. The revised hook's IPC
 preservation has local test evidence only. The operator should
 review and remove the earlier SSH-wrapper grant if it is no longer needed.
+
+
+Installing the updated hooks (proposal)
+---------------------------------------
+
+The hooks on the Mac change only when the maintainer reruns the installer
+under `sudo`. These commands are a proposal and have not been run. They
+assume the runner layout of the original setup: the account `oseo-runner`
+with its runner root at */Users/oseo-runner/actions-runner*. Replace
+`<commit>` with the main commit that contains the cap.
+
+1.  Keep the switch off so no new job selects the runner, and wait until
+    `oseo-mac-1` is idle. The installer restarts the daemon, which would end
+    a running job.
+
+    ~~~~ sh
+    gh variable set OSEO_SELFHOSTED_MAC_ENABLED --body false \
+      --repo dahlia/oseo
+    gh api repos/dahlia/oseo/actions/runners \
+      --jq '.runners[] | select(.name == "oseo-mac-1") | .busy'
+    ~~~~
+
+2.  As `dahlia` on the Mac, check out the reviewed commit in a fresh clone.
+    Do not commit there.
+
+    ~~~~ sh
+    git clone https://github.com/dahlia/oseo.git ~/Desktop/oseo-m5ci-u26
+    git -C ~/Desktop/oseo-m5ci-u26 checkout --detach <commit>
+    ~~~~
+
+3.  Install the hooks and the LaunchDaemon with the cap, then verify them.
+
+    ~~~~ sh
+    sudo env OSEO_RUNNER_ROOT=/Users/oseo-runner/actions-runner \
+      OSEO_RUNNER_USER=oseo-runner OSEO_ZIG_CACHE_CAP_GIB=30 \
+      bash ~/Desktop/oseo-m5ci-u26/tools/selfhosted-mac/install-service.sh
+    sudo /usr/libexec/PlistBuddy \
+      -c 'Print :EnvironmentVariables:OSEO_ZIG_CACHE_CAP_GIB' \
+      /Library/LaunchDaemons/org.oseo.runner.oseo-mac-1.plist
+    cmp ~/Desktop/oseo-m5ci-u26/tools/selfhosted-mac/cleanup.sh \
+      /usr/local/libexec/oseo-runner/cleanup.sh
+    sudo env OSEO_RUNNER_ROOT=/Users/oseo-runner/actions-runner \
+      bash ~/Desktop/oseo-m5ci-u26/tools/selfhosted-mac/health.sh
+    ~~~~
+
+The installer restarts the daemon with the same *bin/Runner.Listener*, so
+the existing **Developer Tools** grant applies; confirm it with the U17
+probe as after any restart. The live cache was a measured 63.6 GiB after
+run `37315038080`, above the cap, so the first job hook removes it and the
+next jobs build with an empty cache. Removing a synthetic tree of that
+shape took a measured 39 seconds. Then re-enable the switch for a branch
+push and watch free disk and the hook output in the job logs.
 
 
 Security and activation

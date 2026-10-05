@@ -60,40 +60,65 @@ if [[ -d $diag && ! -L $diag ]]; then
   find "$diag" -type f -mtime +7 -delete || true
 fi
 free_kib=$(df -Pk "$root" | awk 'NR == 2 {print $4}') || true
+low_free=false
 if [[ $free_kib =~ ^[0-9]+$ && $free_kib -lt 41943040 ]]; then
-  runner_user=$(id -un 2>/dev/null) || runner_user=''
-  account_home=''
-  if [[ -n $runner_user ]]; then
-    account_home=$(
-      dscl . -read "/Users/$runner_user" NFSHomeDirectory 2>/dev/null |
-        sed -n 's/^NFSHomeDirectory: //p'
-    ) || account_home=''
-  fi
-  physical_home=''
-  if [[ $account_home != / ]] &&
-      is_unlinked_directory "$account_home"; then
-    physical_home=$(cd -P "$account_home" && pwd -P) || physical_home=''
-  fi
-  if [[ -z $physical_home ]]; then
-    echo 'Skipped Zig cache prune: account home unavailable or linked' >&2
-  else
-    cache_parent=$physical_home/.cache
-    cache=$cache_parent/zig
-    if [[ -d $cache ]]; then
-      if [[ ! -L $cache ]] &&
-          is_unlinked_directory "${HOME:-}" &&
-          [[ $(cd -P "$HOME" && pwd -P) == "$physical_home" ]] &&
-          is_unlinked_directory "$cache_parent"; then
+  low_free=true
+fi
+# Per-account Zig cache size cap in GiB. install-service.sh writes it into
+# the LaunchDaemon environment; docs/evidence/u26/ derives the default.
+cap_gib=${OSEO_ZIG_CACHE_CAP_GIB:-30}
+if [[ ! $cap_gib =~ ^[1-9][0-9]?$ || $cap_gib -gt 38 ]]; then
+  echo 'Invalid OSEO_ZIG_CACHE_CAP_GIB; using the 30 GiB default' >&2
+  cap_gib=30
+fi
+runner_user=$(id -un 2>/dev/null) || runner_user=''
+account_home=''
+if [[ -n $runner_user ]]; then
+  account_home=$(
+    dscl . -read "/Users/$runner_user" NFSHomeDirectory 2>/dev/null |
+      sed -n 's/^NFSHomeDirectory: //p'
+  ) || account_home=''
+fi
+physical_home=''
+if [[ $account_home != / ]] &&
+    is_unlinked_directory "$account_home"; then
+  physical_home=$(cd -P "$account_home" && pwd -P) || physical_home=''
+fi
+if [[ -z $physical_home ]]; then
+  echo 'Skipped Zig cache prune: account home unavailable or linked' >&2
+else
+  cache_parent=$physical_home/.cache
+  cache=$cache_parent/zig
+  if [[ -d $cache ]]; then
+    if [[ ! -L $cache ]] &&
+        is_unlinked_directory "${HOME:-}" &&
+        [[ $(cd -P "$HOME" && pwd -P) == "$physical_home" ]] &&
+        is_unlinked_directory "$cache_parent"; then
+      reason=''
+      if [[ $low_free == true ]]; then
+        reason='free disk fell below 40 GiB'
+      elif cache_kib=$(
+          cd -P "$cache_parent" &&
+            [[ $(pwd -P) == "$cache_parent" && ! -L zig ]] &&
+            du -skPx zig | awk 'NR == 1 {print $1}'
+        ) && [[ $cache_kib =~ ^[0-9]+$ ]]; then
+        if ((cache_kib > cap_gib * 1048576)); then
+          reason="it exceeded the $cap_gib GiB cap"
+        fi
+      else
+        echo 'Skipped Zig cache cap: size measurement failed' >&2
+      fi
+      if [[ -n $reason ]]; then
         if (cd -P "$cache_parent" &&
             [[ $(pwd -P) == "$cache_parent" ]] &&
             rm -rf -- zig); then
-          echo 'Pruned Zig cache because free disk fell below 40 GiB'
+          echo "Pruned Zig cache because $reason"
         else
           echo 'Skipped Zig cache prune: path changed or removal failed' >&2
         fi
-      else
-        echo 'Skipped Zig cache prune: unsafe home or cache path' >&2
       fi
+    else
+      echo 'Skipped Zig cache prune: unsafe home or cache path' >&2
     fi
   fi
 fi

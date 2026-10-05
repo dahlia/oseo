@@ -405,16 +405,18 @@ that need `sudo` or GitHub credentials are the maintainer's to run:
 2.  Grant **Developer Tools** to that runner's *bin/Runner.Listener*,
     restart its daemon with `sudo launchctl kickstart -k`, and run the U17
     first-execution probe through it, as for `oseo-mac-1`.
-3.  Precondition, not done: before the second runner takes jobs, bound
-    each runner's Zig cache as the previous section derives. Under `sudo`,
-    measure both accounts' disk usage and one job's peak work-directory and
-    *oseo-temp/* use, keep a reserve for other growth, derive the
-    per-account size cap from them (strictly below 34.3 GiB), and add it
-    to *tools/selfhosted-mac/cleanup.sh* in a separate reviewed change. With
-    a shared account, also give each runner its own `ZIG_GLOBAL_CACHE_DIR`
+3.  Precondition, implemented by U26 for separate accounts: before the
+    second runner takes jobs, bound each runner's Zig cache as the previous
+    section derives. [U26 evidence](../u26/README.md) measured the runner
+    account's disk usage and one job's peak work-directory and
+    *oseo-temp/* use under `sudo`, derived a per-account size cap of at
+    most 38.8 GiB with a 20 GiB reserve, and added a 30 GiB default cap to
+    *tools/selfhosted-mac/cleanup.sh*. Installing those hooks on the Mac
+    and registering the second runner remain the maintainer's. With a
+    shared account, also give each runner its own `ZIG_GLOBAL_CACHE_DIR`
     and make the hook cap and prune each runner's path, so that the combined
-    size stays bounded and one runner's prune cannot delete a cache in use.
-    Watch free disk during the first runs.
+    size stays bounded and one runner's prune cannot delete a cache in use;
+    that is not implemented. Watch free disk during the first runs.
 4.  Setting `configuredSelfHostedLanes` in *tools/macos-lane-config.ts* to
     2 and regenerating the workflow is a separate change with its own
     two-attempt branch measurement. It would also change the availability

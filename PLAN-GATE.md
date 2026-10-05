@@ -1409,6 +1409,22 @@ is applied. Runner mode, the second runner's Developer Tools grant, and its U17
 probe are untested. The README lists the maintainer steps. Nothing is
 applied.
 
+#### Per-account Zig cache cap (U26)
+
+[U26 evidence](./docs/evidence/u26/README.md) used a `sudo` inventory and
+disk samples taken during the 15 Mac jobs of branch run `37315038080`. The
+runner account's cache grew a measured 38.6 to 63.6 GiB, a job's work
+directory peaked at a measured 0.49 GiB, and non-cache use peaked at a
+derived 75.2 GiB. Keeping 40 GiB free with two accounts at the cap, both
+running a job, gives a derived cap of at most 38.8 GiB with a 20 GiB
+reserve. The hooks now remove the invoking account's cache above
+`OSEO_ZIG_CACHE_CAP_GIB`, 30 GiB by default and at most 38 GiB, and keep the 40
+GiB free-space prune as a backstop. The cap costs at most a derived 4.5 min of
+Mac lane time per trip, about once per run, and a measured 1.1 to 3.3 s per
+hook to measure a cache of that shape. The maintainer has not installed the
+hooks on the Mac, and a second runner is still not registered. The
+shared-account layout remains unsupported.
+
 ### macOS static capacity lanes (U16)
 
 The workflow now generates five macOS job chains from measured whole-job

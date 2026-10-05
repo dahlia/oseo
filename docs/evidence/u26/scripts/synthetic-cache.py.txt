@@ -1,0 +1,13 @@
+import os, sys
+# Synthetic Zig cache shape: per GiB, 2,286 o/<hash>/ dirs with one file
+# each and 2,291 h/ files (ratios from a 97.5 GiB Linux lane cache).
+root, gib = sys.argv[1], float(sys.argv[2])
+dirs = int(gib * 2286); hfiles = int(gib * 2291)
+os.makedirs(root + "/o"); os.makedirs(root + "/h"); os.makedirs(root + "/z")
+blob = b"x" * 4096
+for i in range(dirs):
+    d = "%s/o/%032x" % (root, i * 2654435761)
+    os.mkdir(d)
+    with open(d + "/a.o", "wb") as f: f.write(blob)
+for i in range(hfiles):
+    with open("%s/h/%032x.txt" % (root, i), "wb") as f: f.write(blob)
