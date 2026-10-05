@@ -1,0 +1,54 @@
+# KiB per path; 2026-10-05T12:53:45Z
+Filesystem     1024-blocks      Used Available Capacity  Mounted on
+/dev/disk3s1s1   239311296  13333872 124913084    10%    /
+/dev/disk3s5     239311296  86931224 124913084    42%    /System/Volumes/Data
+
+## APFS local snapshots
+Snapshots for disk /:
+
+## oseo-runner account
+43718868	/Users/oseo-runner
+491780	/Users/oseo-runner/actions-runner
+87940	/Users/oseo-runner/actions-runner/bin
+357876	/Users/oseo-runner/actions-runner/externals
+0	/Users/oseo-runner/actions-runner/_work
+41680	/Users/oseo-runner/actions-runner/_diag
+4236	/Users/oseo-runner/actions-runner/oseo-temp
+40482536	/Users/oseo-runner/.cache
+40482120	/Users/oseo-runner/.cache/zig
+1224664	/Users/oseo-runner/Library
+1223620	/Users/oseo-runner/Library/Caches
+629116	/Users/oseo-runner/Library/Caches/oseo
+1519888	/Users/oseo-runner/.local
+1171164	/Users/oseo-runner/.local/share/mise
+
+## other root-only or large locations
+0	/private/var/vm
+1711696	/private/var/db
+1278328	/private/var/folders
+28280	/private/var/log
+104	/Library/Updates
+1068052	/System/Volumes/Data/.Spotlight-V100
+3124812	/System/Volumes/Data/private
+50981128	/Users
+
+## top level of the data volume
+50951436	/System/Volumes/Data/Users
+6670936	/System/Volumes/Data/Applications
+6130116	/System/Volumes/Data/System
+4097360	/System/Volumes/Data/Library
+3124812	/System/Volumes/Data/private
+1144564	/System/Volumes/Data/.fseventsd
+1068052	/System/Volumes/Data/.Spotlight-V100
+229560	/System/Volumes/Data/opt
+4216	/System/Volumes/Data/usr
+292	/System/Volumes/Data/.PreviousSystemInformation
+252	/System/Volumes/Data/.exclave
+4	/System/Volumes/Data/MobileSoftwareUpdate
+1	/System/Volumes/Data/home
+0	/System/Volumes/Data/sw
+0	/System/Volumes/Data/pkg
+0	/System/Volumes/Data/mnt
+0	/System/Volumes/Data/cores
+0	/System/Volumes/Data/Volumes
+0	/System/Volumes/Data/.TemporaryItems

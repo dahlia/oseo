@@ -1,0 +1,33 @@
+#!/bin/bash
+# One-shot, read-only disk inventory for the U25 second-runner cap.
+# Run as: sudo bash /Users/Shared/oseo-runner-staging/disk-inventory.sh
+# Writes /Users/Shared/oseo-disk/inventory.txt (readable by dahlia).
+# Changes and deletes nothing.
+set -uo pipefail
+[[ $EUID -eq 0 ]] || { echo 'Run with sudo' >&2; exit 2; }
+out_dir=/Users/Shared/oseo-disk
+mkdir -p "$out_dir"
+out=$out_dir/inventory.txt
+home=/Users/oseo-runner
+root=$home/actions-runner
+size() { [[ -e $1 ]] && printf '%s\t%s\n' "$(du -skx "$1" 2>/dev/null | cut -f1)" "$1" || printf -- '-\t%s (absent)\n' "$1"; }
+{
+  echo "# KiB per path; $(date -u +%FT%TZ)"
+  df -Pk / /System/Volumes/Data
+  echo; echo '## APFS local snapshots'
+  tmutil listlocalsnapshots / 2>&1
+  echo; echo '## oseo-runner account'
+  size "$home"
+  for p in "$root" "$root/bin" "$root/externals" "$root/_work" "$root/_diag" \
+    "$root/oseo-temp" "$home/.cache" "$home/.cache/zig" "$home/Library" \
+    "$home/Library/Caches" "$home/Library/Caches/oseo" "$home/.local" \
+    "$home/.local/share/mise"; do size "$p"; done
+  echo; echo '## other root-only or large locations'
+  for p in /private/var/vm /private/var/db /private/var/folders /private/var/log \
+    /Library/Updates /System/Volumes/Data/.Spotlight-V100 \
+    /System/Volumes/Data/private /Users; do size "$p"; done
+  echo; echo '## top level of the data volume'
+  du -skx /System/Volumes/Data/* /System/Volumes/Data/.[!.]* 2>/dev/null | sort -rn | head -25
+} > "$out" 2>&1
+chmod 644 "$out"
+echo "Wrote $out"

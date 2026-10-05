@@ -4,6 +4,8 @@ umask 077
 
 runner_root=${OSEO_RUNNER_ROOT:?Set OSEO_RUNNER_ROOT}
 runner_user=${OSEO_RUNNER_USER:?Set OSEO_RUNNER_USER}
+# Per-account Zig cache cap in GiB; docs/evidence/u26/ derives the default.
+zig_cache_cap_gib=${OSEO_ZIG_CACHE_CAP_GIB:-30}
 runner_label=oseo-mac-1
 service_label=org.oseo.runner.$runner_label
 plist=/Library/LaunchDaemons/$service_label.plist
@@ -25,8 +27,14 @@ is_unlinked_directory() {
   echo 'Runner user must be a local account name' >&2
   exit 2
 }
+# 38 GiB is the derived two-account ceiling in docs/evidence/u26/.
+[[ $zig_cache_cap_gib =~ ^[1-9][0-9]?$ && $zig_cache_cap_gib -le 38 ]] || {
+  echo 'Zig cache cap must be a whole number of GiB from 1 to 38' >&2
+  exit 2
+}
 if [[ ${1:-} == --dry-run ]]; then
-  echo "Would install $plist for $runner_user at $runner_root"
+  echo "Would install $plist for $runner_user at $runner_root" \
+    "with a $zig_cache_cap_gib GiB Zig cache cap"
   exit 0
 fi
 [[ $(uname -s) == Darwin && $EUID -eq 0 ]] || {
@@ -92,7 +100,7 @@ sudo -u "$runner_user" /bin/test -w \
   exit 2
 }
 RUNNER_PLIST=$plist RUNNER_ROOT=$runner_root RUNNER_USER=$runner_user \
-RUNNER_HOME=$runner_home \
+RUNNER_HOME=$runner_home RUNNER_ZIG_CACHE_CAP_GIB=$zig_cache_cap_gib \
 RUNNER_SERVICE_LABEL=$service_label \
 RUNNER_SERVICE_SCRIPT=$service_script /usr/bin/python3 - <<'PY'
 import os
@@ -119,6 +127,7 @@ data = {
         'OSEO_RUNNER_ROOT': root,
         'TMPDIR': os.path.join(root, 'oseo-temp') + '/',
         'ZIG_GLOBAL_CACHE_DIR': os.path.join(home, '.cache/zig'),
+        'OSEO_ZIG_CACHE_CAP_GIB': os.environ['RUNNER_ZIG_CACHE_CAP_GIB'],
         'ACTIONS_RUNNER_HOOK_JOB_STARTED':
             os.path.join(hooks, 'job-started.sh'),
         'ACTIONS_RUNNER_HOOK_JOB_COMPLETED':
