@@ -48,6 +48,14 @@ with the unit.
 No checkpoint changes case counts, result order, execution modes, sanitizer
 coverage, or target coverage.
 
+The M5CI CI capacity work now has a merge-wait goal: one push should reach a
+green run in about two hours or less. The maintainer chose this goal on
+2026-10-05 in place of the earlier ceiling of 628 macOS runner minutes per
+run, without giving up any coverage. The old ceiling and its evidence remain
+below, marked as superseded. The new goal, the measured values, and the
+projection at 41,091 reviewed paths are in
+[Merge-wait goal and projection (U12)](#merge-wait-goal-and-projection-u12).
+
 
 Non-goals
 ---------
@@ -640,7 +648,12 @@ reports. It contains no new measurement and triggered no CI run. Every figure
 is either quoted from that baseline as measured or derived from it by the model
 stated below, and each is labeled.
 
-The planning ceiling is 628 macOS runner minutes for one CI run. The baseline
+The merge-wait goal in
+[Merge-wait goal and projection (U12)](#merge-wait-goal-and-projection-u12)
+superseded this ceiling on 2026-10-05. This section keeps the ceiling and its
+projection as the record of that decision.
+
+The planning ceiling was 628 macOS runner minutes for one CI run. The baseline
 records it as the value the M5CI planning brief specifies and states that its
 exact value is not reproduced by rounding or flooring the preserved timestamps,
 so it is a specified planning budget rather than a measurement. The brief names
@@ -1145,6 +1158,210 @@ current workload on its most favorable assumptions, so the remaining
 alternatives are a lever this plan has not yet identified or a maintainer
 decision that the ceiling itself moves. This projection makes neither and does
 not claim the ceiling is reachable.
+
+### Merge-wait goal and projection (U12)
+
+On 2026-10-05 the maintainer replaced the M5CI goal. The old goal was a
+ceiling of 628 macOS runner minutes for one CI run at 41,091 reviewed paths,
+taken from main run `35456667007` at `32ece7f4` with 20,841 measured paths.
+Every coverage-preserving lever, U1 through U8 and U10 through U22, was
+measured, and the projection above stayed above that ceiling: a derived 844
+to 1,086 min before the self-hosted Mac lane, with the stacks above leaving
+150 to 214 min that no measured lever closed. The previous section left two
+options, an unidentified lever or a maintainer decision to move the ceiling.
+The maintainer took the second and kept coverage. No reviewed path, case
+count, seed, property budget, shard total, job, target, sanitizer lane,
+timeout, or verdict changed for this decision.
+
+The goal is now merge wait: the push-to-green wall time of one merge should
+be about two hours or less. Push-to-green runs from the attempt's
+`run_started_at` to the last job's `completed_at`, read from the GitHub jobs
+API. The 628-minute ceiling is superseded, not deleted. Its derivation in the
+sections above remains the record of why the goal changed. Hosted macOS
+runner minutes are no longer a goal. GitHub's standard hosted runners,
+macOS included, are free for this public repository, so those minutes cost
+merge wait only through the five concurrent macOS slots.
+
+#### Measured push-to-green
+
+Every value below was read from the GitHub jobs API for the named attempt
+and is measured, rounded to 0.1 min. The assignment column names the Mac
+lane assignment the run used: none for all-hosted runs, U22 for the ratios
+merged at `e115c408`, U23 for the ratios merged at `840c387e`, and U24 for
+the median weights merged at `bdf2dddd`. Mac job minutes are summed job walls
+on runner `oseo-mac-1`; hosted macOS job minutes are the other jobs of the
+macOS matrix, excluding the Linux-hosted availability probe.
+
+| Run, attempt     | Commit     | Assignment | Push-to-green | Hosted macOS job min | Mac job min |
+| ---------------- | ---------- | ---------- | ------------: | -------------------: | ----------: |
+| `36312192623`, 1 | `af9bb68c` | none       |         173.2 |                778.1 |         n/a |
+| `36496566681`, 1 | `390cf60d` | none       |         147.0 |                705.6 |         n/a |
+| `36516215200`, 1 | `97278fc6` | none       |         175.8 |                718.2 |         n/a |
+| `36640728403`, 1 | `82bba77e` | none       |         160.1 |                701.8 |         n/a |
+| `36704198556`, 1 | `49a38d5d` | none       |         155.5 |                728.1 |         n/a |
+| `36721134885`, 1 | `2434dd8b` | none       |         159.0 |                755.7 |         n/a |
+| `37121778924`, 1 | `2528f040` | none       |         172.1 |                734.8 |         n/a |
+| `37167895777`, 1 | `2fadb275` | none       |         156.6 |                716.0 |         n/a |
+| `37194069657`, 1 | `1c64f3cd` | U22        |         107.9 |                505.0 |        81.5 |
+| `37194069657`, 2 | `1c64f3cd` | U22        |         111.1 |                514.8 |        83.7 |
+| `37206614757`, 1 | `e115c408` | U22        |         113.5 |                527.1 |        79.0 |
+| `37215661294`, 1 | `29f11948` | U23        |         112.2 |                499.8 |        79.5 |
+| `37215661294`, 2 | `29f11948` | U23        |         105.3 |                489.4 |        78.8 |
+| `37230598930`, 1 | `840c387e` | U23        |         106.8 |                480.0 |        79.0 |
+| `37237684441`, 1 | `54d2c336` | U24        |          98.3 |                443.6 |        80.8 |
+| `37237684441`, 2 | `54d2c336` | U24        |          95.8 |                449.3 |        81.8 |
+
+Main run `36312192623` at `af9bb68c` measured 173.2 min when this work
+started. After U13 (`390cf60d`, merged as `97278fc6`) and U16 (`82bba77e`,
+merged as `df5cb7a1`), the seven green all-hosted attempts measured 147.0 to
+175.8 min. Main run `36657614384` at `df5cb7a1` is omitted: its first attempt
+failed at a measured 145.4 min, and its second attempt reran only the failed
+job. With the U22 and U23 assignments, the six green attempts measured 105.3
+to 113.5 min. The two U24 attempts measured 98.3 and 95.8 min. Every value
+above is one attempt. The seven all-hosted attempts after U13 span an
+observed 28.8 min, but they straddle U16 and other merged work, so that
+spread is not runner variance alone. The six U22 and U23 attempts span an
+observed 8.2 min, and a difference of that size between two single attempts
+does not by itself separate an assignment effect from runner variation. A
+main run of `bdf2dddd`, the first main run with the U24 assignment, had not
+finished when this section was last updated.
+
+#### Projection at 41,091 paths
+
+This projection is derived. It uses the same split as the projection above:
+test262 work scales linearly in reviewed paths, and every other family is
+held, because its inputs are property files, native fixtures, or sanitizer
+suites. Its inputs are the per-job walls of the ten newest green attempts:
+all-hosted runs `37121778924` and `37167895777`, and the eight Mac-lane
+attempts above. The model is:
+
+ -  Each job's hosted and Mac costs are the minimum, median, and maximum of
+    its own observations on that runner class, which gives three cost
+    scenarios. Every job that one of the evaluated assignments places on
+    the Mac has at least two Mac observations.
+ -  A test262 job keeps the 60-second fixed setup share of
+    *tools/macos-job-costs.ts*. Its remainder is multiplied by
+    41,091 / 21,383, a derived 1.922. The 21,383 is the current reviewed
+    count that test262 job logs report as `tests=1782/21383` in runs
+    `37206614757` and `37237684441`.
+ -  A Mac-eligible job with no Mac observation is converted from its hosted
+    cost in the same scenario by a pooled ratio, the sum of hosted medians less
+    setup divided by the sum of Mac medians less setup over jobs with both: a
+    derived 4.91 for test262, 3.63 for native support, and 3.21 for native
+    fixtures. These differ from the rounded 4.2, 3.2, and 3.1 in
+    *tools/macos-job-costs.ts* because they include the U24 attempts, in
+    which the converted test262 jobs ran faster than modeled. Only the
+    recomputed assignment below uses them.
+ -  Each scenario holds one assignment fixed and sums its lanes' costs. The
+    Mac lane starts after the 60-second probe allowance. The U22, U23, and
+    U24 rows hold each job on the lane that `macosLanes(1)` in
+    *tools/generate-macos-lanes.ts* assigns at `e115c408`, `840c387e`, and
+    `bdf2dddd`, respectively. U24 is the assignment on current main.
+ -  The recomputed rows are not a merged assignment. They model the U24
+    rule, own-key case shards on the Mac lane first and then the other jobs
+    longest first to whichever of five hosted lanes or one Mac lane would
+    finish them sooner, applied to median costs from the ten attempts. At
+    41,091 paths the assignment uses the scaled medians, standing in for
+    medians that would be measured at that path count. Only Zig-backed
+    families are Mac-eligible.
+ -  The model omits hosted job waits, the aggregate job, and the Linux and
+    Windows jobs. At 41,091 paths the longest Linux test262 shard is a
+    derived 35.9 min at its median. The longest unscaled job is the Linux
+    sanitizer job, at a measured 64.6-min median and 72.2-min maximum. Both
+    stay below the macOS makespan.
+
+| Assignment, scenario        | Derived at 21,383 | Derived at 41,091 |
+| --------------------------- | ----------------: | ----------------: |
+| U22 (`e115c408`), minimum   |              93.3 |             130.6 |
+| U22 (`e115c408`), median    |             105.1 |             155.9 |
+| U22 (`e115c408`), maximum   |             119.8 |             181.0 |
+| U23 (`840c387e`), minimum   |              89.9 |             139.9 |
+| U23 (`840c387e`), median    |             105.4 |             156.8 |
+| U23 (`840c387e`), maximum   |             121.2 |             193.8 |
+| U24 (`bdf2dddd`), minimum   |              82.7 |             113.3 |
+| U24 (`bdf2dddd`), median    |              94.1 |             130.3 |
+| U24 (`bdf2dddd`), maximum   |             108.1 |             145.1 |
+| Recomputed medians, minimum |              89.8 |             112.1 |
+| Recomputed medians, median  |              93.2 |             116.3 |
+| Recomputed medians, maximum |             115.3 |             132.3 |
+
+At the current paths each fixed assignment's median evaluation lies near
+its measured attempts. U24 gives 94.1 min against a measured 98.3 and 95.8
+min, 4.2 and 1.7 min above it. U23 gives 105.4 min against a measured
+112.2, 105.3, and 106.8 min, and U22 gives 105.1 min against a measured
+107.9, 111.1, and 113.5 min. The modeled U24 Mac lane ends at a derived 83.2
+min at the median, against a measured 82.0 and 83.0 min. The maximum
+scenario puts every job at its own worst observation at once, which no
+single measured run did; it is a pessimistic bound rather than an expected
+value.
+
+At 41,091 paths the U24 assignment grows by a derived 30.6 to 37.0 min,
+because the scaled test262 jobs stay on the lanes chosen for their current
+weights. At the median, hosted lane 5 grows from 89.7 to 130.3 min with
+test262 6/12 and 10/12, and the Mac lane grows from 83.2 to 112.4 min with
+eight test262 shards. The two-hour goal therefore holds with the current
+U24 assignment only in the minimum scenario, by 6.7 min. It does not hold at
+the median, a derived 130.3 min, or in the maximum scenario, 145.1 min, both
+before the unmodeled overhead. The U22 and U23 assignments, at a derived
+130.6 to 193.8 min, do not hold it in any scenario.
+
+The recomputed assignment holds the goal in the minimum and median
+scenarios, the median by 3.7 min, which is less than one run's spread. In
+the maximum scenario it exceeds two hours by 12.3 min. At the current paths
+it gives no improvement over U24: its median is 0.9 min lower and its
+maximum 7.2 min higher. Its effect at 41,091 paths comes from assigning the
+scaled test262 jobs, so it depends on recomputing the medians as reviewed
+paths grow.
+
+The goal also depends on `oseo-mac-1` being online. When the readiness
+probe falls back to hosted macOS, the same model gives a derived 177.2 to
+228.2 min on five hosted lanes at 41,091 paths, against 136.4 to 177.9 min
+at the current paths. Both use the longest-first assignment, because the
+fallback schedule is not modeled separately.
+
+Shard totals are held at the current twelve for test262 and twelve for
+macOS native support. Raising the test262 total is allowed and lowering it
+is not. With each total's family work split evenly, one fixed setup share
+per job, and the recomputed assignment, the median scenario gives a derived
+118.2, 120.0, and 121.5 min at 16, 20, and 24 test262 shards against 116.3
+min at twelve. The minimum scenario gives 113.5, 113.2, and 112.7 min
+against 112.1, and the maximum gives 131.8, 130.5, and 138.5 min against
+132.3. Raising the total therefore does not improve the median scenario,
+and no modeled total makes the goal hold in the maximum scenario. The
+longest scaled hosted test262 job at twelve shards is a derived 48.3 min at
+its median and 55.1 min at its maximum, below the 120-minute job timeout,
+so raising the total is not needed for timeout margin either.
+
+U22, U23, and U24 are applied. The remaining coverage-preserving levers,
+none of which is applied, are:
+
+1.  Recompute the median tables in *tools/macos-job-costs.ts* from the
+    newer attempts, including the two U24 attempts, and again as reviewed
+    paths grow. The recomputed rows above estimate a derived 112.1 to
+    132.3 min at 41,091 paths. A two-attempt branch measurement must
+    confirm any recomputed assignment.
+2.  Run a second concurrent job on `oseo-mac-1`. With the recomputed
+    assignment over two Mac lanes and the U21 derived latency factor of
+    1.29 applied to every Mac job, the model gives a derived 90.3 to 110.6
+    min at 41,091 paths. A factor of 1.5 gives 98.5 to 112.5 min. Both
+    hold the goal in all three scenarios, the second by 7.5 min in the
+    maximum one. U23 requires a runner-mode memory measurement first,
+    because U21 observed about 243 MB free with two concurrent jobs.
+3.  Add a second Mac with the same measured speed as an independent lane.
+    With the recomputed assignment over the two Macs, the model gives a
+    derived 78.3 to 103.0 min. It also halves the exposure to one machine's
+    absence.
+4.  Raise shard totals only as tail or timeout insurance. Under this model
+    they do not improve the median makespan or make the goal hold in the
+    maximum scenario.
+
+Hosted macOS runner minutes at 41,091 paths are restated for reference
+only. With every macOS job on hosted runners, the same inputs give a
+derived 834.5, 962.4, and 1,091.1 min for the three scenarios. At the
+current paths they give 642.2, 737.7, and 832.7 min, against a measured
+716.0 and 734.8 min in the two all-hosted runs. These figures use
+different inputs from the 844 to 1,086 min projected above, which predates
+U13 and the own-key case shards, and neither is a goal any more.
 
 ### macOS static capacity lanes (U16)
 

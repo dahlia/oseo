@@ -27,13 +27,17 @@ ceiling of 628 macOS minutes and identifies its baseline source as main run
 20,841 using the count command below. The brief itself is not checked into
 this repository. The baseline run's derived macOS family total is 629.52 min
 from measured job timestamps, or 629 min when the aggregate is floored.
-The brief's 628-minute ceiling is retained as the planning budget; its exact
+The brief's 628-minute ceiling was retained as the planning budget; its exact
 value is not reproduced by rounding or flooring the preserved timestamps.
 The measured source is preserved in the family table below.
-The target is the measured inventory of 41,091 applicable paths recorded in
-[*PLAN-M5C.md*](../PLAN-M5C.md) and reported by
-`mise run check:test262-inventory`. Against that planning ceiling, neither
-current run fits even at its measured smaller workload. Scaling test262
+On 2026-10-05 the maintainer superseded that ceiling with a push-to-green
+goal of about two hours per merge, without reducing coverage; see
+[Merge-wait goal and projection (U12)](../PLAN-GATE.md#merge-wait-goal-and-projection-u12)
+in [*PLAN-GATE.md*](../PLAN-GATE.md). The ceiling stays here as historical
+context for the measurements below. The target is the measured inventory of
+41,091 applicable paths recorded in [*PLAN-M5C.md*](../PLAN-M5C.md) and
+reported by `mise run check:test262-inventory`. Against that planning ceiling,
+neither current run fits even at its measured smaller workload. Scaling test262
 alone by path count would ignore fixed cost, classifications, runner spread,
 and the separately measured property bottleneck.
 
