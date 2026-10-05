@@ -18,14 +18,18 @@ runners. Every generated macOS job logs `sw_vers -productVersion` before
 its test steps. The existing check names, targets, shard totals, seeds,
 commands, timeouts, and native aggregate remain required.
 
-The weights in *tools/macos-job-costs.ts* are derived scheduling estimates
-from one Mac mini, not runner-mode results. [U21 evidence] observed the same
-SHA on hosted and Mac machines, with both cold and warm cache runs and a
-repeat Mac sequence. Conservative lower derived ratios are 3.5 for test262,
-2.2 for native fixtures, and 2.4 for extended properties including own-key
-cases. The model applies ratios only after a derived 60-second fixed setup
-share. It starts the Mac lane with an estimated 60-second availability probe.
-There is no per-job registration cost: the runner stays registered.
+The weights in *tools/macos-job-costs.ts* are measured medians of hosted job
+walls from seven CI run attempts, two all-hosted and five with the Mac lane
+on. A job that has run on `oseo-mac-1` is modeled there by its measured
+median Mac wall. Other eligible jobs convert their hosted median by derived
+family ratios pooled from those runner-mode attempts: 4.2 for test262, 3.2
+for native support, and 3.1 for native fixtures, applied only after a
+derived 60-second fixed setup share. The generator places the three own-key
+case shards on the Mac lane first, then the rest longest first. It starts
+the Mac lane with an estimated 60-second availability probe. The earlier
+U21 one-machine ratios are kept in [U21 evidence]; *PLAN-GATE.md* records
+why they were replaced. There is no per-job registration cost: the runner
+stays registered.
 The optional jobs have no predecessor chain. One selected Mac runner accepts
 them serially; hosted fallback can use all five hosted slots.
 All three own-key case shards use the same readiness decision. Their

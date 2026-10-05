@@ -1519,6 +1519,120 @@ than the weights did. Medians omit the measured 0.5 to 1.5 min of lane
 overhead and per-job spread, and the current assignment's 106.1-min
 estimate was exceeded by 6.1 min in one attempt. Only a branch
 measurement of the retuned assignment can establish its makespan. The
-retune needs generator and cost-table changes and the usual two-attempt
-branch measurement. Job names, eligibility, the aggregate's required
-set, shard totals, and coverage would not change.
+retune needed generator and cost-table changes and the usual two-attempt
+branch measurement; the two U24 sections below record both. Job names,
+eligibility, the aggregate's required set, shard totals, and coverage
+would not change.
+
+### Median weights (U24)
+
+*tools/macos-job-costs.ts* now applies the recommended retune. Every
+hosted weight is the measured median of the job's hosted walls in the
+seven run attempts above: all-hosted runs `37121778924` and
+`37167895777`, branch run `37194069657` attempts 1 and 2, main run
+`37206614757`, and branch run `37215661294` attempts 1 and 2. A job
+placed on the Mac in some attempts has 2, 4, or 5 hosted observations;
+the table records the count. A new `selfHostedJobSeconds` table holds the
+measured median Mac wall of each of the 15 jobs that ran on `oseo-mac-1`,
+with 2, 3, or 5 observations each. The generator models those jobs on the
+Mac lane by that median. Other eligible jobs convert their hosted median
+through derived ratios pooled against hosted medians and rounded down:
+4.2 for test262, 3.2 for native support, and 3.1 for native fixtures.
+With a Mac lane, the generator places the three own-key case shards
+first, then the rest longest first. Main run `37230598930` of `840c387e`
+was still running when the medians were taken and is not included.
+
+The resulting assignment puts 15 jobs on the Mac: the three own-key
+shards, test262 1/12, 3/12, 4/12, 5/12, 7/12, 8/12, 9/12, and 12/12,
+native support 3/12, 4/12, and 12/12, and native 1/3. Its derived model
+gives a 93.5-min makespan, set by the Mac lane at 93.5 min, with hosted
+lanes ending at 80.8 to 93.3 min and 439.6 hosted macOS job minutes. The
+model omits the measured 0.5 to 1.5 min of lane overhead.
+
+The assignment was chosen for its worst case across runs, not only its
+median fit. Each candidate was evaluated against each of the seven
+attempts separately, using that attempt's measured wall for every job
+that ran on the same runner class, and otherwise the job's median or,
+for a Mac job never observed there, the attempt's hosted wall converted
+by the family ratio. These are derived evaluations of measured inputs:
+
+| Assignment rule                        | Mac jobs | Per-run makespan (min) | Mac lane last |
+| -------------------------------------- | -------: | ---------------------: | ------------: |
+| U23 weights and ratios (previous)      |       12 |            103.7–115.3 |           0/7 |
+| Medians, own-key shards first (chosen) |       15 |             91.7–102.7 |           2/7 |
+| Medians, longest first                 |       15 |            100.7–110.2 |           7/7 |
+| Hosted means, Mac medians              |       14 |             94.0–100.8 |           0/7 |
+| Hosted upper quartiles, Mac medians    |       15 |              92.7–99.9 |           4/7 |
+| Hosted maxima, Mac maxima              |       15 |             97.1–104.0 |           2/7 |
+
+The previous U23 assignment's derived evaluation of the two `29f11948`
+attempts gives 111.2 and 104.3 min, against their measured 112.2 and
+105.3 min, so the per-run evaluation omits about one minute of overhead.
+Because every rule was fitted to the same seven attempts, the table also
+overstates how well upper quantiles generalize. Leave-one-out
+evaluation, which derives the weights from six attempts and evaluates
+the seventh, gives the chosen rule a derived worst case of 101.9 min and
+a mean of 97.7 min. Hosted means gave 104.5 and 99.1, hosted upper
+quartiles 108.4 and 98.7, and maxima on both runner classes 101.8 and
+99.8 min. No other rule tested had both a lower worst case and a lower
+mean, so the medians are kept.
+
+The Mac lane would be the last lane in a derived 2 of 7 per-run
+evaluations, ending at 89.9 to 95.4 min. In the other five, hosted lane 3
+ends last: it holds `host C sanitizers (macOS, property)`, the job with
+the widest measured hosted range of 1,723 to 2,727 s. One Mac job's walls
+ranged by at most a measured 84 s, and the Mac lane's derived ends vary
+less than any hosted lane's. That spread is understated, because the
+evaluation uses a median or converted value for each Mac job not observed
+on the Mac in that attempt. If every job took its slowest observed
+wall, the derived makespan would be 107.1 min with the Mac lane at
+102.3 min. A Mac lane that runs last has no hosted slot to spill to, but
+neither does a hosted chain. Its jobs run hosted only when the readiness
+probe selects fallback, and that fallback schedule is not modeled. These
+derived estimates predate the branch measurement; the next section records
+the two measured attempts and compares them with this model.
+
+### Measured runs of the median weights
+
+Branch run `37237684441` at `54d2c336` passed in both attempts with the
+15 planned jobs on `oseo-mac-1`. The measured push-to-green times were 98.3
+and 95.8 min. The Mac lane ended at 82.0 and 83.0 min, and the last hosted
+macOS job at 97.9 and 95.5 min. Hosted macOS jobs used 443.6 and 449.3
+measured job minutes over 19 jobs, against the derived 439.6.
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) records the
+per-run and per-lane values.
+
+Six earlier measured runs with the Mac lane on had push-to-green times of
+107.9, 111.1, 113.5, 112.2, 105.3, and 106.8 min. The last is main run
+`37230598930` at `840c387e`, which still used the U23 assignment and
+finished before this branch was pushed. Both U24 attempts lie below that
+spread's minimum, by a derived 7.0 and 9.5 min, so the difference is not
+within the observed run-to-run noise. Their derived mean of 97.0 min is
+12.5 min below the earlier mean of 109.5 min. With two samples, the size of
+the improvement is not established; a slow hosted runner could still produce
+a run inside the old spread.
+
+The derived 93.5-min model makespan was exceeded by 4.8 and 2.3 min, and
+it was not set by the Mac lane as predicted. Both attempts lie inside the
+derived 91.7 to 102.7 min per-run evaluation. The two sides erred in
+opposite directions:
+
+ -  The Mac lane ended 11.5 and 10.5 min before its modeled 93.5 min. Its
+    seven jobs with Mac medians from earlier attempts were modeled at
+    45.1 min and measured 40.6 and 41.6 min. The eight jobs converted from
+    hosted medians were modeled at 47.4 min and measured 40.2 min twice;
+    the converted test262 jobs ran at a derived pooled ratio of 5.43,
+    against the modeled 4.2.
+ -  Hosted lanes 4 and 5 ended a derived 6.62 and 6.50 min after their modeled
+    ends in attempt 1, and lanes 2, 3, and 5 ended 3.15, 2.10, and 7.95 min
+    after theirs in attempt 2. The largest per-job excess was native support
+    7/12, measured at 1,537 and 1,605 s against its 1,367-second median. Native
+    support 2/12 measured 1,292 and 1,297 s against a 1,117-second median from
+    only two hosted observations.
+
+The Mac lane therefore sat idle for a derived 16.0 and 12.5 min before
+the last hosted job ended. Recomputing both median tables with these two
+attempts would likely move more hosted work onto the Mac. That retune is
+not applied here and would need its own two-attempt measurement. Job
+names, the aggregate's required set, Zig-only eligibility, hosted
+fallback, shard totals, and coverage did not change.
