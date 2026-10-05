@@ -1519,9 +1519,10 @@ than the weights did. Medians omit the measured 0.5 to 1.5 min of lane
 overhead and per-job spread, and the current assignment's 106.1-min
 estimate was exceeded by 6.1 min in one attempt. Only a branch
 measurement of the retuned assignment can establish its makespan. The
-retune needs generator and cost-table changes and the usual two-attempt
-branch measurement. Job names, eligibility, the aggregate's required
-set, shard totals, and coverage would not change.
+retune needed generator and cost-table changes and the usual two-attempt
+branch measurement; the two U24 sections below record both. Job names,
+eligibility, the aggregate's required set, shard totals, and coverage
+would not change.
 
 ### Median weights (U24)
 
@@ -1587,9 +1588,9 @@ on the Mac in that attempt. If every job took its slowest observed
 wall, the derived makespan would be 107.1 min with the Mac lane at
 102.3 min. A Mac lane that runs last has no hosted slot to spill to, but
 neither does a hosted chain. Its jobs run hosted only when the readiness
-probe selects fallback, and that fallback schedule is not modeled. Only the
-two-attempt branch measurement still to run can establish the retune's
-push-to-green time.
+probe selects fallback, and that fallback schedule is not modeled. These
+derived estimates predate the branch measurement; the next section records
+the two measured attempts and compares them with this model.
 
 ### Measured runs of the median weights
 
