@@ -1384,7 +1384,10 @@ slower beside another test262 job. Beside test262, the jobs with fewer workers
 ran a derived 1.36 to 1.37 (native support), 1.398 to 1.404 (native fixture),
 and 1.44 to 1.45 (own-key) times slower while overlapped. Pair throughput was a
 derived 1.49 to 1.79. The own-key shard's measured duration was at most 479.7 s
-against its 3,600 s limit. No pairing needs to be excluded.
+against its 3,600 s limit. None of the six measured pairings needs to be
+excluded. Native fixture + native fixture, own-key + own-key, and own-key +
+native fixture were not measured and have no verdict; their sums of solo peaks,
+derived, are 2,504 to 3,934 MiB.
 
 With those family maxima applied to every Mac job, the U12 model gives
 a derived 93.2, 96.3, and 110.6 min at 41,091 paths. That is 18.9 to
@@ -1393,9 +1396,18 @@ in all three scenarios. A uniform 1.45 gives 94.4 to 112.5 min. At the
 current paths the gain over the U24 assignment is a derived 6.2 to
 17.5 min. Disk is the binding resource. Every job, warm or cold, added
 0.9 to 3.8 GiB of Zig cache files, so a second runner doubles cache growth
-under the existing 40 GiB prune. Runner mode, the second runner's Developer
-Tools grant, and its U17 probe are untested. The README lists the
-maintainer steps. Nothing is applied.
+under the existing 40 GiB prune. That prune is a shared free-space trigger
+that removes only the invoking account's cache, so it bounds neither cache
+alone: an idle runner can keep a derived 142.2 GiB of cache on the measured
+228.2 GiB volume, and the hook guarantees no free-space floor. A second
+runner is therefore preconditioned on a per-account Zig cache size cap,
+derived strictly below 34.3 GiB once both accounts' usage and a job's peak
+work-directory and temporary use are measured under `sudo`, with a reserve
+for other growth. A shared account also needs a separate
+cache per runner and a hook that caps and prunes each runner's path. Neither
+is applied. Runner mode, the second runner's Developer Tools grant, and its U17
+probe are untested. The README lists the maintainer steps. Nothing is
+applied.
 
 ### macOS static capacity lanes (U16)
 

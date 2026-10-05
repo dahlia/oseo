@@ -1,0 +1,39 @@
+# Read-only disk usage on the Mac mini, as dahlia over SSH.
+# Commands: date -u; df -Pk / /System/Volumes/Data; diskutil apfs list;
+# du -skx on each listed path; find / -xdev -name '*.ipsw' -size +1G;
+# mdfind -name .ipsw; ls -d ~/m5ci-images; du -sk /Users/oseo-runner.
+# Nothing was changed or deleted.
+2026-10-05T11:21:24Z
+
+Filesystem     1024-blocks      Used Available Capacity  Mounted on
+/dev/disk3s1s1   239311296  13333872 121976128    10%    /
+/dev/disk3s5     239311296  89868180 121976128    43%    /System/Volumes/Data
+
+APFS container: Size (Capacity Ceiling) 245054767104 B (245.1 GB)
+  Capacity In Use By Volumes 120151212032 B; Not Allocated 124903555072 B
+  disk3s1 System    13653884928 B
+  disk3s2 Preboot   11250868224 B
+  disk3s3 Recovery   1985290240 B
+  disk3s5 Data      92025016320 B
+  disk3s6 VM         1073762304 B
+
+du -skx (KiB), paths readable by dahlia:
+7137432	/Users/dahlia
+6670936	/Applications
+3914608	/Library
+2859408	/private/var
+229560	/opt
+16	/usr/local
+124804	/Users/Shared
+
+Within /Users/dahlia (KiB):
+4278552	Library (1921472 of it Library/Caches/oseo)
+1519768	.local (1051960 of it .local/share/mise)
+549288	m5ci-results
+350864	.cache
+328780	Desktop (U21 and U25 clones)
+99248	m5ci-tools
+
+du: /Users/oseo-runner: Permission denied (mode 700; no sudo)
+find and mdfind: no *.ipsw file visible to dahlia
+ls: /Users/dahlia/m5ci-images: No such file or directory

@@ -53,8 +53,13 @@ the switch off during concurrent CI runs.
 
 Two concurrent jobs on the same Mac were measured in [U25 evidence] over
 SSH, without a second runner. Memory pressure stayed normal and swap did
-not grow in six pairings, but each job added 0.9 to 3.8 GiB of Zig cache
-files. A second runner is a maintainer decision and is not configured.
+not grow in the six measured pairings, but each job added 0.9 to 3.8 GiB of
+Zig cache files. The 40 GiB prune below removes only the invoking account's
+cache, so it does not bound an idle runner's cache. A second runner is
+therefore preconditioned on a per-account Zig cache size cap. When two
+runners share one account, it also needs a separate cache per runner and a
+hook that caps and prunes each runner's path. It is a maintainer
+decision and is not configured.
 
 [U21 evidence]: ./evidence/u21/README.md
 [U25 evidence]: ./evidence/u25/README.md

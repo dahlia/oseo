@@ -219,15 +219,31 @@ listener measured 76 MiB RSS.
 Verdict
 -------
 
-Two concurrent jobs were memory-safe for every measured pairing: memory
-pressure stayed normal, swap did not grow, pageouts stayed at solo levels,
-no deadline came close to its limit, and every test passed with unchanged
-counts. No pairing needs to be excluded for memory or deadlines. The
-measured pairings cover every eligible family against test262, the
-heaviest-memory family and the most common partner, and native support
-against itself and own-key cases. Native fixture + native fixture,
-own-key + own-key, and own-key + native fixture were not measured; their
-summed tree RSS is lower than any measured pair.
+Two concurrent jobs were memory-safe in each of the six measured pairings:
+memory pressure stayed normal, swap did not grow, pageouts stayed at solo
+levels, no deadline came close to its limit, and every test passed with
+unchanged counts. None of the six measured pairings needs to be excluded for
+memory or deadlines. That verdict is limited to those six. They cover every
+eligible family against test262, the heaviest-memory family and the most
+common partner, and native support against itself, own-key cases, and native
+fixtures.
+
+Native fixture + native fixture, own-key + own-key, and own-key + native
+fixture were not measured, and this unit gives no verdict for them. Summing
+each job's largest measured solo peak tree RSS gives a derived figure for
+each, not a measurement, because the two peaks need not coincide and
+interference can change them:
+
+| Unmeasured pairing, derived     | Sum of solo peaks (MiB) |
+| ------------------------------- | ----------------------: |
+| native fixture + native fixture |   3,934 (1,967 + 1,967) |
+| own-key + native fixture        |   3,219 (1,252 + 1,967) |
+| own-key + own-key               |   2,504 (1,252 + 1,252) |
+
+All three are below the measured 5,996 MiB maximum pair and the 16 GiB of
+memory, but two exceed the measured 3,177 MiB peak of experiment `p-ok-ns-1`
+(native support beside own-key, then native fixture), so they are not
+bounded by every measured pair.
 
 Three limits remain:
 
@@ -236,8 +252,8 @@ Three limits remain:
     first-execution behavior needs the same Developer Tools grant and U17
     probe as `oseo-mac-1`.
  -  Disk, not memory, is the binding resource. A second runner doubles the
-    rate at which Zig caches grow, and the existing 40 GiB prune must cover
-    both runners' caches.
+    rate at which Zig caches grow, and the existing 40 GiB prune does not
+    bound either runner's cache; the next section analyses it.
  -  Three or more concurrent jobs were not measured.
 
 
@@ -292,6 +308,84 @@ measurements applied. A
 two-attempt branch run with two runner slots would need to confirm it.
 
 
+Disk with a second runner (derived)
+-----------------------------------
+
+[*disk-usage.txt*](./disk-usage.txt) records a read-only measurement as
+`dahlia` over SSH at 11:21 UTC, after the U25 caches were deleted. `df -Pk`
+measured a 228.2 GiB volume group with 116.3 GiB free and 111.9 GiB used,
+below the 256 GiB that *docs/self-hosted-mac.md* names. Of the used space, a
+measured 46.0 GiB is attributable without the runner account: 12.7 GiB on
+the system volume, 13.3 GiB on the preboot, recovery, and VM volumes, and
+20.0 GiB that `du` could read on the data volume. The other 65.7 GiB of the
+data volume is unattributed by this measurement. Known paths that `dahlia`
+cannot read include the mode-700 *~oseo-runner* home, with `oseo-mac-1`'s
+runner, tools, Zig cache, and runtime archive, and root-only system
+directories. Attributing it needs *tools/selfhosted-mac/health.sh* or
+`du` under `sudo`. The macOS 15.6.1 restore image that U21 kept in
+*~/m5ci-images/* is gone, and no *.ipsw* file was visible to `dahlia`.
+
+*tools/selfhosted-mac/cleanup.sh* runs at the start and the end of every job.
+It reads free space on the shared volume and, below 40 GiB, removes the
+*~/.cache/zig* of the invoking account only. The LaunchDaemon that
+*tools/selfhosted-mac/install-service.sh* writes sets `ZIG_GLOBAL_CACHE_DIR`
+to that same account-local path, and the workflow does not override it, so
+each job grows its own account's cache. The hook is therefore a shared
+free-space trigger with a per-account action, not a cap on any cache. With a
+second runner under a second account, derived from that logic and the
+measured 3.8 GiB maximum growth of one job:
+
+ -  The current hook guarantees no free-space floor and no bound on the
+    combined caches. A prune restores 40 GiB free only when the invoking
+    account's own cache is large enough; it cannot when the other account's
+    cache or other usage holds free space below 40 GiB, and a skipped prune
+    reclaims nothing. Even when every hook leaves at least 40 GiB free, two
+    concurrent jobs add up to 7.6 GiB between hooks, so free space can fall
+    to 32.4 GiB before the jobs' work directories and temporary files, which
+    this unit did not measure.
+ -  A runner whose last hook saw at least 40 GiB free keeps its cache when
+    it goes idle. For example, that cache can then be as large as 228.2 GiB
+    minus the non-cache usage, the other cache, and 40 GiB: 142.2 GiB with
+    the measured 46.0 GiB lower bound of non-cache usage and an empty other
+    cache. A skipped or failed prune can leave a cache intact below 40 GiB
+    free as well. Nothing on the other account shrinks it afterwards.
+ -  Beside such an idle cache, the active runner sees less than 40 GiB at
+    nearly every hook and prunes its own cache, which holds its own jobs'
+    growth. While those prunes succeed, job growth alone cannot push free
+    space below about 36.2 GiB with one active job at the measured rates.
+    The active runner loses its cache each time, which cost at most the
+    measured 14 to 18 s warm saving, and nothing reclaims the idle cache
+    when other usage grows, such as runner updates, *oseo-temp/*,
+    diagnostics, or macOS updates.
+ -  With two runner roots under one account, both LaunchDaemons point
+    `ZIG_GLOBAL_CACHE_DIR` at one *~/.cache/zig*, and either runner's hook
+    can delete it while the other runner's job is building in it. That
+    layout was not measured and is not safe with the current hook.
+
+A lower free-space threshold would not bound the idle cache, because the
+threshold is only the trigger level. A per-account size cap would: each
+hook also removes its own account's cache when it exceeds a size `S`, with
+the 40 GiB trigger kept as the backstop. For two accounts it suffices when
+two full caches, two jobs' growth, each job's work directory and
+temporary files `W` (including the runner's `TMPDIR`, *oseo-temp/*, which
+the hooks never clear), the second account's own non-cache usage `R`
+(runner, tools, and runtime archive), a reserve for other growth, and
+today's usage leave 40 GiB free. Counting all 111.9 GiB in use
+today as non-cache, which overstates it by `oseo-mac-1`'s current cache,
+that bounds twice `S`, plus `R`, plus twice `W`, plus the reserve at a
+derived 68.7 GiB. Neither
+`R` nor `W` was measured; for scale, `dahlia`'s own mise tools and runtime
+archive directory measured 1.0 and 1.8 GiB. `S` is therefore strictly below
+34.3 GiB, and a 34 GiB cap would leave about 0.7 GiB for `R`, both `W`, and
+the reserve, so the cap must be derived after measuring both accounts' usage
+and a job's peak work-directory and temporary use under `sudo`. The measured
+warm reuse is small enough that a much lower cap costs little. Two runner roots
+under one account need cross-runner management instead: a separate
+`ZIG_GLOBAL_CACHE_DIR` per runner, and a hook that caps and prunes each
+runner's own path so that the combined size stays bounded and no prune removes
+a cache in use. Neither change is made here.
+
+
 Proposal, not applied
 ---------------------
 
@@ -311,8 +405,16 @@ that need `sudo` or GitHub credentials are the maintainer's to run:
 2.  Grant **Developer Tools** to that runner's *bin/Runner.Listener*,
     restart its daemon with `sudo launchctl kickstart -k`, and run the U17
     first-execution probe through it, as for `oseo-mac-1`.
-3.  Confirm that the 40 GiB prune hook covers the second runner's Zig
-    cache, and watch free disk during the first runs.
+3.  Precondition, not done: before the second runner takes jobs, bound
+    each runner's Zig cache as the previous section derives. Under `sudo`,
+    measure both accounts' disk usage and one job's peak work-directory and
+    *oseo-temp/* use, keep a reserve for other growth, derive the
+    per-account size cap from them (strictly below 34.3 GiB), and add it
+    to *tools/selfhosted-mac/cleanup.sh* in a separate reviewed change. With
+    a shared account, also give each runner its own `ZIG_GLOBAL_CACHE_DIR`
+    and make the hook cap and prune each runner's path, so that the combined
+    size stays bounded and one runner's prune cannot delete a cache in use.
+    Watch free disk during the first runs.
 4.  Setting `configuredSelfHostedLanes` in *tools/macos-lane-config.ts* to
     2 and regenerating the workflow is a separate change with its own
     two-attempt branch measurement. It would also change the availability
