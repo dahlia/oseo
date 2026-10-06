@@ -21,8 +21,8 @@ results:
         stderr="test/built-ins/Function/length/S15.3.5.1_A1_T2.js:89:9:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -46,8 +46,8 @@ results:
         stderr="test/built-ins/Function/prototype/toString/AsyncGenerator.js:322:21:
         error[OSEO1001]: AsyncGeneratorFunction compiles source text at
         run time, which is outside the admitted profile.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

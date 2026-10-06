@@ -21,8 +21,8 @@ results:
         failed (1): stdout=\"\"
         stderr=\"test/built-ins/global/S10.2.3_A1.3_T2.js:134:1:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

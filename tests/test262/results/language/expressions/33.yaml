@@ -271,8 +271,8 @@ results:
         stdout="Test262:AsyncTestComplete\n"
         stderr="test/language/expressions/optional-chaining/member-expression-async-identifier.js:221:19:
         error[OSEO2001]: Unhandled promise rejection.\n"'
-      unsupportedCapability: unhandled-rejection-policy
       passed: false
+      unsupportedCapability: unhandled-rejection-policy
     unsupportedFeatures: []
   - case:
       async: false
@@ -294,7 +294,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/super/prop-expr-cls-val-from\
         -eval.js:107:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

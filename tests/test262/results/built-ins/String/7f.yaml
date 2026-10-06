@@ -144,8 +144,8 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/String/prototype/toLowerCase/S15.5.4.16\
         _A1_T3.js:87:5: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

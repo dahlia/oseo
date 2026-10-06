@@ -201,8 +201,8 @@ results:
         -set-values-diff-buffer-other-type-conversions-sab.js:1265:61:
         error[OSEO1001]: typeof standard global binding 'Float16Array'
         is outside the admitted global-object profile.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

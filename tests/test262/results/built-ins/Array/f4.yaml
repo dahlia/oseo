@@ -335,8 +335,8 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/map/15.4.4.19-5-7.js:85\
         :19: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

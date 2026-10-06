@@ -161,8 +161,8 @@ results:
         stderr=\"test/language/expressions/async-generator/named-eval-v\
         ar-scope-syntax-err.js:105:27: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

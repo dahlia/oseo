@@ -18,8 +18,8 @@ results:
     observation:
       detail: "test/language/module-code/instn-star-props-circular-a_FIXTURE.\
         js:5:8: error[OSEO1001]: This export is unsupported."
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

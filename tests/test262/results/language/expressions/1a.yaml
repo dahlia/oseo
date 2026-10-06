@@ -175,7 +175,7 @@ results:
         stderr="test/language/expressions/yield/star-in-rltn-expr.js:93:59:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
-      unsupportedCapability: primitive-wrapper
       passed: false
+      unsupportedCapability: primitive-wrapper
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

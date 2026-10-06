@@ -84,8 +84,8 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/forEach/15.4.4.18-5-7.j\
         s:87:22: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

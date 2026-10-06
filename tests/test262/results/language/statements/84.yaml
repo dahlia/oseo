@@ -207,8 +207,8 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/cptn-expr-abrupt-empty\
         .js:106:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

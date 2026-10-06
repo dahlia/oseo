@@ -20,8 +20,8 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T\
         9.js:87:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -75,8 +75,8 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9\
         .js:87:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

@@ -28,8 +28,8 @@ results:
         stderr="test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T3.js:91:3:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
-      unsupportedCapability: primitive-wrapper
       passed: false
+      unsupportedCapability: primitive-wrapper
     unsupportedFeatures: []
   - case:
       async: false
@@ -51,8 +51,8 @@ results:
         stderr="test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T5.js:88:3:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

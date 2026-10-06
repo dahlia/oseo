@@ -53,8 +53,8 @@ results:
         stderr="test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js:426:9:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
@@ -76,8 +76,8 @@ results:
         stderr="test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js:90:3:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

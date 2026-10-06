@@ -147,8 +147,8 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/every/15.4.4.16-5-7.js:\
         88:19: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

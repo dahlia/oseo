@@ -333,7 +333,9 @@ test("rejects a reviewed promotion when promotion acceptance is absent", () => {
 test("parses promotion acceptance only beside update", () => {
   assert.deepEqual(parseTest262Arguments(["--update", "--accept-promotions"]), {
     acceptPromotions: true,
+    changed: false,
     help: false,
+    reindex: false,
     update: true,
   });
   assert.throws(

@@ -120,8 +120,8 @@ results:
         stderr=\"test/language/expressions/class/elements/direct-eval-e\
         rr-contains-arguments.js:104:7: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

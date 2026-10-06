@@ -28,8 +28,8 @@ results:
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/Promise/all/invoke-then-error-close.js:115:14:
         error[OSEO2001]: Unhandled promise rejection.\n"'
-      unsupportedCapability: unhandled-rejection-policy
       passed: false
+      unsupportedCapability: unhandled-rejection-policy
     unsupportedFeatures: []
   - case:
       async: true

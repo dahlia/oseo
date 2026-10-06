@@ -231,7 +231,7 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/super/prop-dot-obj-val-from-\
         eval.js:110:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

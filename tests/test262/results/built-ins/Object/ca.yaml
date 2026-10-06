@@ -177,8 +177,8 @@ results:
         stderr="test/built-ins/Object/entries/tamper-with-global-object.js:91:14:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

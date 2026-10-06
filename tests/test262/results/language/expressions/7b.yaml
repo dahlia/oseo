@@ -58,8 +58,8 @@ results:
         stderr=\"test/language/expressions/async-generator/eval-var-sco\
         pe-syntax-err.js:105:25: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: true

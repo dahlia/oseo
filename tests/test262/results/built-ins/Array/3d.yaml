@@ -155,8 +155,8 @@ results:
         stderr="test/built-ins/Array/prototype/forEach/15.4.4.18-7-c-ii-18.js:89:25:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
-      unsupportedCapability: primitive-wrapper
       passed: false
+      unsupportedCapability: primitive-wrapper
     unsupportedFeatures: []
   - case:
       async: false

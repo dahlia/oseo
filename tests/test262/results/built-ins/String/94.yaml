@@ -112,8 +112,8 @@ results:
         stderr=\"test/built-ins/String/prototype/toLocaleUpperCase/S15.\
         5.4.19_A1_T3.js:87:5: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
