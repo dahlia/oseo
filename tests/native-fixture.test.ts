@@ -103,9 +103,12 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) {
           "600000",
           process.execPath,
           "-e",
-          'require("node:fs").writeFileSync(' +
-            "process.argv[1], String(process.pid));" +
-            'process.stdout.write("ready\\n"); setInterval(() => {}, 1000);',
+          // The marker follows the completed stdout write so the signal
+          // cannot precede output the supervisor must report. Deno inserts
+          // an eval script path into argv, so the marker path is read last.
+          'process.stdout.write("ready\\n", () => require("node:fs")' +
+            ".writeFileSync(process.argv.at(-1), String(process.pid)));" +
+            "setInterval(() => {}, 1000);",
           marker,
         ],
         {
