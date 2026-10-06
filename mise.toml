@@ -312,6 +312,7 @@ run = "node tools/test262.ts --update --changed"
 
 [tasks."test262:reindex"]
 description = "Rebuild the test262 index and parity from the partition files"
+depends = ["build"]
 run = "node tools/test262.ts --reindex"
 
 [tasks."test262:inventory:update"]

@@ -1,5 +1,3 @@
-import { nativeToolchain } from "../tests/native-toolchain.ts";
-import { runNativeCli } from "../tests/native-cli.ts";
 import { createTest262FragmentExecutor } from "./test262-fragments.ts";
 import type { Test262FragmentInput } from "./test262-fragments.ts";
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
@@ -89,6 +87,7 @@ import type {
   SerializedTest262Manifest,
   SerializedTest262Partition,
 } from "./test262-manifest.ts";
+import type { NativeToolchain } from "../packages/compiler/src/index.ts";
 
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
@@ -2550,42 +2549,69 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
   };
 }
 
-const fragmentExecutor = createTest262FragmentExecutor(
-  runnerHost,
-  nativeToolchain,
-);
-const nativeExecutor: Test262Executor = {
-  ...includePropertiesWhen(() => {
-    if (executionTarget == null) return undefined;
-    return {
-      target: executionTarget,
-    };
-  }),
-  async execute(request: Test262ExecutionRequest): Promise<CliResult> {
-    const entry =
-      request.mode === "module" && request.sourcePath != null
-        ? request.sourcePath
-        : request.sourceId;
-    const args = [
-      ...(request.mode === "module" ? ["--module"] : []),
-      ...(request.test262Host === true ? ["--test262-host"] : []),
-      ...(request.specialization === "disabled" ? ["--no-specialization"] : []),
-      ...(runtimeArchiveReuse === "disabled"
-        ? ["--no-runtime-archive-reuse"]
-        : []),
-      ...(executionTarget == null ? [] : ["--target", executionTarget]),
-      entry,
-    ];
-    return await fragmentExecutor.execute(request, () =>
-      runNativeCli({
-        args,
-        source: request.source,
-        sourceId: request.sourceId,
-        version: "0.1.0",
-      }),
-    );
-  },
-};
+/** The selected toolchain and the executors built on it, once loaded. */
+interface NativeExecution {
+  readonly executor: Test262Executor;
+  readonly fragmentExecutor: ReturnType<typeof createTest262FragmentExecutor>;
+  readonly toolchain: NativeToolchain;
+}
+
+let nativeExecution: NativeExecution | undefined;
+
+/**
+ * Load the integration toolchain selected by tests/native-toolchain.ts and
+ * build the executors on first use. Loading that module probes the host
+ * compiler under the sanitizer lane, so modes that execute nothing, such
+ * as `--reindex`, must never reach this function; the selection itself
+ * stays in that one module, as `check:native-toolchains` requires.
+ */
+async function loadNativeExecution(): Promise<NativeExecution> {
+  if (nativeExecution != null) return nativeExecution;
+  const [{ nativeToolchain }, { runNativeCli }] = await Promise.all([
+    import("../tests/native-toolchain.ts"),
+    import("../tests/native-cli.ts"),
+  ]);
+  const fragmentExecutor = createTest262FragmentExecutor(
+    runnerHost,
+    nativeToolchain,
+  );
+  const executor: Test262Executor = {
+    ...includePropertiesWhen(() => {
+      if (executionTarget == null) return undefined;
+      return {
+        target: executionTarget,
+      };
+    }),
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      const entry =
+        request.mode === "module" && request.sourcePath != null
+          ? request.sourcePath
+          : request.sourceId;
+      const args = [
+        ...(request.mode === "module" ? ["--module"] : []),
+        ...(request.test262Host === true ? ["--test262-host"] : []),
+        ...(request.specialization === "disabled"
+          ? ["--no-specialization"]
+          : []),
+        ...(runtimeArchiveReuse === "disabled"
+          ? ["--no-runtime-archive-reuse"]
+          : []),
+        ...(executionTarget == null ? [] : ["--target", executionTarget]),
+        entry,
+      ];
+      return await fragmentExecutor.execute(request, () =>
+        runNativeCli({
+          args,
+          source: request.source,
+          sourceId: request.sourceId,
+          version: "0.1.0",
+        }),
+      );
+    },
+  };
+  nativeExecution = { executor, fragmentExecutor, toolchain: nativeToolchain };
+  return nativeExecution;
+}
 
 function positiveInteger(value: number, description: string): number {
   if (!Number.isSafeInteger(value) || value < 1) {
@@ -2601,8 +2627,9 @@ function runMetadata(
 ): ReviewedTest262RunMetadata {
   return {
     ...includePropertiesWhen(() => {
-      if (nativeToolchain.identity == null) return undefined;
-      return { toolchainIdentity: nativeToolchain.identity };
+      const identity = nativeExecution?.toolchain.identity;
+      if (identity == null) return undefined;
+      return { toolchainIdentity: identity };
     }),
     durationMilliseconds:
       Math.round((performance.now() - startedAt) * 100) / 100,
@@ -2667,10 +2694,11 @@ export async function createReviewedManifest(
   subset: ReviewedTest262Subset,
   root: string,
   harnesses: Test262Harnesses,
-  executor: Test262Executor = nativeExecutor,
+  explicitExecutor?: Test262Executor,
   options: ReviewedTest262RunOptions = {},
 ): Promise<ReviewedTest262Run> {
   const startedAt = performance.now();
+  const executor = explicitExecutor ?? (await loadNativeExecution()).executor;
   const configuredPoolLimit = positiveInteger(
     options.poolLimit ?? reviewedExecutionPoolLimit,
     "Reviewed test262 pool limit",
@@ -3197,15 +3225,18 @@ async function main(): Promise<void> {
   };
   const root = await suiteRoot(subset.suiteRevision);
   const harnesses = await readHarnesses(root);
+  const native = await loadNativeExecution();
   const run = await createReviewedManifest(
     selectedSubset,
     root,
     harnesses,
-    nativeExecutor,
+    native.executor,
     { acceptPromotions: cliArguments.acceptPromotions },
   );
   const { manifest, metadata } = run;
-  console.log(`test262-builds ${JSON.stringify(fragmentExecutor.counts)}`);
+  console.log(
+    `test262-builds ${JSON.stringify(native.fragmentExecutor.counts)}`,
+  );
   const canonicalManifest = canonicalizeManifestTarget(manifest);
   const serialized = serializeTest262Manifest(
     scoped == null
