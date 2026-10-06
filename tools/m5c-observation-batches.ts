@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { test262Group } from "../packages/testkit/src/index.ts";
+import { test262Group } from "../packages/testkit/src/test262-summary.ts";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 
 import {
@@ -27,7 +27,7 @@ import {
   parseReviewedSubset,
   parseTest262Case,
   unresolvedReferenceNames,
-} from "./test262.ts";
+} from "./test262-source.ts";
 import { test262PartitionKey } from "./test262-manifest.ts";
 import { isString } from "./value-kinds.ts";
 

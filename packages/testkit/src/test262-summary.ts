@@ -6,6 +6,59 @@ import type {
   Test262Summary,
 } from "./index.ts";
 
+/**
+ * Reviewed semantic dependency tags admitted by ADR 0013. Any other value
+ * is a validation error until a reviewed change to that record admits it.
+ */
+export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
+  "abrupt-completion",
+  "array-buffer",
+  "async-functions",
+  "async-iteration",
+  "atomics-single-agent",
+  "atomics-and-shared-memory",
+  "bigint-primitive",
+  "classes",
+  "control-flow",
+  "data-view",
+  "date",
+  "default-parameters",
+  "destructuring-bindings",
+  "dynamic-source",
+  "error-intrinsics",
+  "expression-operators",
+  "functions",
+  "generators",
+  "iterator-protocol",
+  "json-parse",
+  "json-stringify",
+  "lexical-bindings",
+  "module-linking",
+  "object-literals",
+  "object-own-keys",
+  "object-properties",
+  "promise-settlement",
+  "property-enumeration",
+  "proxy-exotic-object",
+  "reflect-namespace",
+  "regular-expressions",
+  "rest-parameters",
+  "set-composition-methods",
+  "set-intrinsic",
+  "symbols",
+  "timers",
+  "top-level-await",
+  "typed-array-constructors",
+  "typed-array-core",
+  "typed-array-iterative",
+  "typed-array-mutation",
+  "typed-array-search-and-join",
+  "typed-array-sort",
+  "typed-array-statics",
+  "var-bindings",
+  "weak-collections",
+]);
+
 interface MutableTest262Counts {
   expectedNegatives: number;
   harnessFailures: number;
