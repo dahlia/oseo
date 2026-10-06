@@ -1,0 +1,10 @@
+version: 1
+id: regexp-pattern-extensions
+title: Admit remaining RegExp patterns
+delivers: "Admits the pattern extensions that report regexp-pattern-extension,
+  so the 5 reviewed paths with that unsupported capability are observed: 4
+  named-groups property-name cases and 1 String matchAll v and u flag case."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

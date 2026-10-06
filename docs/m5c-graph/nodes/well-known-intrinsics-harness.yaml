@@ -1,0 +1,11 @@
+version: 1
+id: well-known-intrinsics-harness
+title: Admit the intrinsics harness
+delivers: "Reviews the wellKnownIntrinsicObjects.js harness include, whose
+  upstream lookup compiles source with new Function, and admits a reviewed
+  form, so the 6 reviewed paths recorded as harness-include unsupported for
+  that include are observed."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

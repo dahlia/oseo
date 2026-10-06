@@ -1,0 +1,11 @@
+version: 1
+id: resizable-array-buffer-harness
+title: Admit the resizable buffer harness
+delivers: "Reviews and admits the resizableArrayBufferUtils.js harness
+  include and any resizable ArrayBuffer and TypedArray behavior it reaches,
+  so the 168 reviewed paths recorded as harness-include unsupported for that
+  include are observed."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

@@ -1,0 +1,12 @@
+version: 1
+id: eval-intrinsic-value
+title: Decide the eval function value
+delivers: "Owns the 16 reviewed paths rejected with Unknown binding 'eval'
+  that read %eval% only as a value and never call it: 8 Promise
+  ctx-non-ctor, 6 Array callback or element, and 2 global property cases.
+  ADR 0016 excludes eval in call position, not the binding, so this node
+  admits the value or obtains an accepted record that bounds its exclusion."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

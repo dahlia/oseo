@@ -1,0 +1,12 @@
+version: 1
+id: frontmatter-feature-tags
+title: Resolve frontmatter-only feature gates
+delivers: "Observes the 5 reviewed paths that never execute only because a
+  frontmatter feature tag is unadmitted although their source needs no
+  missing feature: 4 test/language/global-code/super-*.js parse negatives
+  gated by super, and the top-level-await catch-parameter.js case gated by
+  dynamic-import without calling import()."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

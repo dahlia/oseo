@@ -1,0 +1,10 @@
+version: 1
+id: primitive-wrapper-objects
+title: Admit primitive wrapper objects
+delivers: "Admits Boolean, Number, String, Symbol, and BigInt wrapper objects
+  at the runtime boundary that currently reports primitive-wrapper, so the
+  36 reviewed paths with that unsupported capability are observed."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

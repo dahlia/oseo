@@ -1,0 +1,10 @@
+version: 1
+id: promise-feature-admission
+title: Admit Promise feature tags
+delivers: "Admits Promise.prototype.finally and the Promise feature tag, so
+  the 30 reviewed paths whose unsupported frontmatter features are only
+  Promise or Promise.prototype.finally are observed."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

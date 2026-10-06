@@ -1,0 +1,12 @@
+version: 1
+id: test262-host-script-bindings
+title: Admit test262 host script bindings
+delivers: "Admits the $262.evalScript and print host bindings, so the 14
+  reviewed paths with the host-binding unsupported capability are observed:
+  13 global-code cases calling $262.evalScript and 1 RegExp case reading
+  print. ADR 0016 names no host binding; literal scripts can be compiled
+  ahead of time as ADR 0026 does for agent sources."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

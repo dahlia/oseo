@@ -1,0 +1,13 @@
+version: 1
+id: cross-realm-host
+title: Observe cross-realm cases
+delivers: "Implements realm creation beyond the initial realm and the
+  $262.createRealm host capability that ADR 0013 keeps inside the claim, so
+  the 84 reviewed paths whose unsupported frontmatter features include
+  cross-realm are observed. One of them also needs iterator-helpers. Six
+  carry the dynamic-source tag; a realm observation that then reaches the
+  ADR 0016 boundary is reassigned in the landing change, not claimed."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked
