@@ -9,4 +9,4 @@ delivers: "Observes the 273 unreviewed paths that
 dependencies:
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

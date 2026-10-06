@@ -7,4 +7,4 @@ delivers: "Admits the hashbang feature: #! comments at the start of Script and
 dependencies:
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

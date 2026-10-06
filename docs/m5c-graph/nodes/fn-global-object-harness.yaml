@@ -8,4 +8,4 @@ delivers: "Adds a reviewed fnGlobalObject.js harness that returns the global
 dependencies:
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

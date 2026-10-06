@@ -6,5 +6,5 @@ delivers: "Partitions every unreviewed path into deterministic bounded batches
   regeneration cost recorded for each batch."
 dependencies:
   - closure-ledger
-landed: false
+landed: true
 status: ready

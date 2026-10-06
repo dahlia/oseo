@@ -7,4 +7,4 @@ delivers: "Decides the caller feature tag for the 23 unreviewed paths that
 dependencies:
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

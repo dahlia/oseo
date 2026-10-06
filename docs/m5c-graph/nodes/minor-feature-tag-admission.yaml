@@ -8,4 +8,4 @@ delivers: "Decides the json-superset (4 paths), __proto__ (3), and
 dependencies:
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

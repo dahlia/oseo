@@ -8,4 +8,4 @@ delivers: "Admits the dynamic-import feature: import() in Script and Module
 dependencies:
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

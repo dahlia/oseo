@@ -6,4 +6,4 @@ delivers: "Admits the import.meta feature for Module code and its early errors
 dependencies:
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready
