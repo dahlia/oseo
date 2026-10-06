@@ -47,6 +47,7 @@ depends = [
   "check:macos-lanes",
   "check:m5b-graph",
   "check:m5b-node-scope",
+  "check:m5c-closure-ledger",
   "check:m5c-graph",
   "check:native-host-guards",
   "check:native-toolchains",
@@ -116,6 +117,10 @@ run = "node tools/m5b-graph.ts"
 [tasks."check:m5b-node-scope"]
 description = "Keep reviewed evidence within the named M5b node scope"
 run = "node tools/m5b-node-scope.ts"
+
+[tasks."check:m5c-closure-ledger"]
+description = "Validate the derived M5c inventory closure ledger"
+run = "node tools/m5c-closure-ledger.ts"
 
 [tasks."check:m5c-graph"]
 description = "Validate the checked-in M5c closure graph"
@@ -302,6 +307,10 @@ run = "node tools/test262.ts --update"
 [tasks."test262:inventory:update"]
 description = "Regenerate the pinned ECMA-262 applicable-test inventory"
 run = "node tools/test262-inventory.ts --update"
+
+[tasks."m5c:closure-ledger:update"]
+description = "Regenerate the M5c closure ledger from the reviewed manifest"
+run = "node tools/m5c-closure-ledger.ts --update"
 
 [tasks."unicode:update"]
 description = "Regenerate the pinned Unicode tables from the reviewed inputs"

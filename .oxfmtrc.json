@@ -4,6 +4,7 @@
     "**/*.md",
     "aube-lock.yaml",
     "artifacts/**",
+    "docs/m5c-closure/ledger.yaml",
     "mise.toml",
     "packages/*/dist/**",
     "packages/unicode/src/tables.ts",

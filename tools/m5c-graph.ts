@@ -9,6 +9,7 @@ import type {
 import { parse as parseYaml } from "yaml";
 
 import { parseReviewedManifest } from "./test262-manifest.ts";
+import type { ReviewedTest262Manifest } from "./test262-manifest.ts";
 import type {
   StructuredDataInput,
   StructuredDataRecord,
@@ -24,7 +25,8 @@ export const m5cWorkGraphPath = "docs/m5c-graph/graph.yaml";
 /** Directory containing one checked-in record per M5c work node. */
 export const m5cWorkGraphNodeDirectory = "docs/m5c-graph/nodes";
 
-const inventoryPath = "tests/test262/inventory.tsv";
+/** Checked-in applicable-test inventory. */
+export const m5cInventoryPath = "tests/test262/inventory.tsv";
 const resultsPath = "tests/test262/results.yaml";
 const exitNodeId = "m5-exit-audit";
 const baselineKeys: readonly (keyof M5cBaseline)[] = [
@@ -86,7 +88,8 @@ export interface M5cWorkGraphSummary {
   readonly ready: number;
 }
 
-interface InventorySnapshot {
+/** Included inventory paths in file order and the pinned suite revision. */
+export interface M5cInventorySnapshot {
   readonly includedPaths: readonly string[];
   readonly suiteRevision: string;
 }
@@ -175,7 +178,8 @@ function parseSource(
   return record(value, context);
 }
 
-function parseInventory(text: string): InventorySnapshot {
+/** Parse the checked-in inventory, rejecting repeated or uncounted paths. */
+export function parseM5cInventory(text: string): M5cInventorySnapshot {
   const headers = new Map<string, string>();
   const paths = new Set<string>();
   const includedPaths: string[] = [];
@@ -244,7 +248,7 @@ export function deriveM5cBaseline(
   inventoryText: string,
   manifest: M5cManifestInput,
 ): M5cBaseline {
-  const inventory = parseInventory(inventoryText);
+  const inventory = parseM5cInventory(inventoryText);
   if (inventory.suiteRevision !== manifest.suiteRevision) {
     throw new Error(
       "test262 inventory and reviewed manifest revisions do not match.",
@@ -653,16 +657,20 @@ function readNodeSources(): readonly M5cWorkGraphSource[] {
     .toSorted((left, right) => left.path.localeCompare(right.path));
 }
 
-/** Derive the current M5c baseline from checked-in evidence. */
-export function deriveCurrentM5cBaseline(): M5cBaseline {
+/** Read the checked-in partitioned reviewed manifest. */
+export function readCurrentM5cManifest(): ReviewedTest262Manifest {
   const absoluteResults = join(repositoryRoot, resultsPath);
   const indexText = readFileSync(absoluteResults, "utf8");
-  const manifest = parseReviewedManifest(indexText, (path) =>
+  return parseReviewedManifest(indexText, (path) =>
     readFileSync(join(repositoryRoot, "tests/test262", path), "utf8"),
   );
+}
+
+/** Derive the current M5c baseline from checked-in evidence. */
+export function deriveCurrentM5cBaseline(): M5cBaseline {
   return deriveM5cBaseline(
-    readFileSync(join(repositoryRoot, inventoryPath), "utf8"),
-    manifest,
+    readFileSync(join(repositoryRoot, m5cInventoryPath), "utf8"),
+    readCurrentM5cManifest(),
   );
 }
 
