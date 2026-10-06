@@ -1,20 +1,25 @@
 Self-hosted Mac capacity lane
 =============================
 
-Status: configured for one persistent runner, disabled by the repository
-variable `OSEO_SELFHOSTED_MAC_ENABLED`. The Mac mini adds one lane to the five
-hosted macOS lanes. The coordinator owns registration, repository variables,
-secrets, and branch pushes. The operator checklist is outside the repository.
+Status: configured for two persistent runners on one Mac mini, `oseo-mac-1`
+and `oseo-mac-2`, disabled by the repository variable
+`OSEO_SELFHOSTED_MAC_ENABLED`. The Mac mini adds two lanes to the five hosted
+macOS lanes, one per runner. Both runners are registered: `oseo-mac-1`
+earlier and `oseo-mac-2` on 2026-10-06. A lane whose runner is offline or
+busy falls back to hosted. Branch run `37398055382` measured both lanes;
+see *PLAN-GATE.md*. The coordinator owns
+registration, repository variables, secrets, and branch pushes. The operator
+checklist is outside the repository.
 
 
 Scheduling
 ----------
 
-*tools/macos-lane-config.ts* configures exactly one optional `oseo-mac-1`
-lane. The generator places only Zig-backed `macos-aarch64` test262, extended
-native property, own-key case, and native fixture jobs there. Apple clang
-host sanitizer jobs and `macos-latest` Node.js/Deno jobs always use hosted
-runners. Every generated macOS job logs `sw_vers -productVersion` before
+*tools/macos-lane-config.ts* configures two optional Mac lanes, `oseo-mac-1`
+and `oseo-mac-2`. The generator places only Zig-backed `macos-aarch64` test262,
+extended native property, own-key case, and native fixture jobs there. Apple
+clang host sanitizer jobs and `macos-latest` Node.js/Deno jobs always use
+hosted runners. Every generated macOS job logs `sw_vers -productVersion` before
 its test steps. The existing check names, targets, shard totals, seeds,
 commands, timeouts, and native aggregate remain required.
 
@@ -25,43 +30,53 @@ median Mac wall. Other eligible jobs convert their hosted median by derived
 family ratios pooled from those runner-mode attempts: 4.2 for test262, 3.2
 for native support, and 3.1 for native fixtures, applied only after a
 derived 60-second fixed setup share. The generator places the three own-key
-case shards on the Mac lane first, then the rest longest first. It starts
-the Mac lane with an estimated 60-second availability probe. The earlier
+case shards on the `oseo-mac-1` lane first, then the rest longest first. It
+starts each Mac lane with an estimated 60-second availability probe.
+Because both Mac lanes share one machine, the model slows a Mac job while
+the other Mac lane is busy, by the derived pair factor in
+`selfHostedPairSlowdowns` for its family and its partner's, and runs it at
+its one-lane speed while the other lane is idle. *PLAN-GATE.md* records the
+factors and the derived makespans; `node tools/macos-lane-report.ts` prints
+them. The earlier
 U21 one-machine ratios are kept in [U21 evidence]; *PLAN-GATE.md* records
 why they were replaced. There is no per-job registration cost: the runner
 stays registered.
-The optional jobs have no predecessor chain. One selected Mac runner accepts
-them serially; hosted fallback can use all five hosted slots.
-All three own-key case shards use the same readiness decision. Their
-duration sum therefore comes from one Mac class, either the selected
-`oseo-mac-1` or hosted `macos-15`, and keeps the original hard limit.
+The optional jobs have no predecessor chain. Each selected Mac runner accepts
+its own lane's jobs serially; hosted fallback can use all five hosted slots.
+All three own-key case shards are on the `oseo-mac-1` lane and use its
+readiness decision. Their duration sum therefore comes from one Mac class,
+either the selected `oseo-mac-1` or hosted `macos-15`, and keeps the original
+hard limit.
 
 An Ubuntu job uses `OSEO_RUNNER_STATUS_TOKEN` with repository
-Administration: read to check whether the exact runner label is online and
-idle. The repository variable must equal `true`, the event must be a push to
-`dahlia/oseo` (any branch or tag), and the secret must exist. Only
-collaborators with write access can push there. Otherwise the job emits
-hosted `macos-15`.
-Pull requests, including fork PRs, always fall back. An API
-failure or a busy/offline runner also falls back. A machine that goes offline
-after selection can leave a job queued; the operator must disable the switch
-and rerun the workflow, preserving the complete gate verdict.
-Two overlapping pushes can both observe the runner idle before either starts
-its first job. Their selected jobs then queue on the same Mac. The probe is
-an availability observation, not a reservation; watch the queue and keep
-the switch off during concurrent CI runs.
+Administration: read to check, once per lane, whether that lane's runner is
+online and idle. Lane `oseo-mac-N` selects the runner only when exactly one
+runner carries that label, its name is the label, and it carries no other
+lane's label; each lane decides independently. The repository variable must
+equal `true`, the event must be a push to `dahlia/oseo` (any branch or tag),
+and the secret must exist. Only collaborators with write access can push there.
+Otherwise the job emits hosted `macos-15`. Pull requests, including fork PRs,
+always fall back. An API failure falls back for both lanes; a busy, offline,
+unregistered, or ambiguously labeled runner falls back for its own lane only. A
+machine that goes offline after selection can leave a job queued; the operator
+must disable the switch and rerun the workflow, preserving the complete gate
+verdict. Two overlapping pushes can both observe a runner idle before either
+starts its first job. Their selected jobs then queue on the same runner. The
+probe is an availability observation, not a reservation; watch the queue and
+keep the switch off during concurrent CI runs.
 
 Two concurrent jobs on the same Mac were measured in [U25 evidence] over
 SSH, without a second runner. Memory pressure stayed normal and swap did
 not grow in the six measured pairings, but each job added 0.9 to 3.8 GiB of
 Zig cache files. The 40 GiB prune below removes only the invoking account's
 cache, so it does not bound an idle runner's cache. A second runner is
-therefore preconditioned on a per-account Zig cache size cap. The hooks now
-apply one, derived in [U26 evidence] from measurements under `sudo`; the
-maintainer has not yet installed them on the Mac. When two runners share
-one account, a second runner also needs a separate cache per runner and a
-hook that caps and prunes each runner's path. Registering a second runner
-is a maintainer decision and is not configured.
+therefore preconditioned on a per-account Zig cache size cap. The hooks
+apply one, derived in [U26 evidence] from measurements under `sudo`. The
+maintainer installed them for `oseo-mac-1` on 2026-10-06, and branch run
+`37360463788` verified the cap; see the next sections. Two runners must use two
+accounts: the installer rejects a second runner service with the same account
+or root, because the hooks cap only the invoking account's cache. The
+maintainer registered `oseo-mac-2` on 2026-10-06 with the steps below.
 
 [U21 evidence]: ./evidence/u21/README.md
 [U25 evidence]: ./evidence/u25/README.md
@@ -71,12 +86,16 @@ is a maintainer decision and is not configured.
 Runner service
 --------------
 
-The runner is registered once without `--ephemeral` under a dedicated
-standard macOS account. The account holds only the runner's own registration
+Each runner is registered once without `--ephemeral` under its own dedicated
+standard macOS account: `oseo-mac-1` under `oseo-runner`, and `oseo-mac-2`
+under `oseo-runner2`. The account holds only the runner's own registration
 credential. No PAT or GitHub API credential is stored on the Mac. The
 operator pins and verifies the downloaded runner archive, registers
 `oseo-mac-1` once, and installs the system LaunchDaemon with
-*tools/selfhosted-mac/install-service.sh*. The daemon's `UserName` is the
+*tools/selfhosted-mac/install-service.sh*. `OSEO_RUNNER_LABEL` selects the
+runner, `oseo-mac-1` by default or `oseo-mac-2`; any other value is rejected.
+The daemon is `org.oseo.runner.<label>`, and the installer requires the
+runner root to be registered under that name. The daemon's `UserName` is the
 dedicated account; it starts at boot without a GUI login. Its executable is
 *bin/Runner.Listener* with the `run` argument. Updates are disabled at
 registration, so the operator must update the pinned runner when required.
@@ -143,14 +162,15 @@ preservation has local test evidence only. The operator should
 review and remove the earlier SSH-wrapper grant if it is no longer needed.
 
 
-Installing the updated hooks (proposal)
----------------------------------------
+Installing the updated hooks
+----------------------------
 
 The hooks on the Mac change only when the maintainer reruns the installer
-under `sudo`. These commands are a proposal and have not been run. They
-assume the runner layout of the original setup: the account `oseo-runner`
-with its runner root at */Users/oseo-runner/actions-runner*. Replace
-`<commit>` with the main commit that contains the cap.
+under `sudo`. The maintainer ran these steps for `oseo-mac-1` on 2026-10-06,
+at about 03:40 KST, with `<commit>` set to main `6654ccf7`. They assume the
+runner layout of the original setup: the account `oseo-runner` with its
+runner root at */Users/oseo-runner/actions-runner*. Rerun them with the
+reviewed main commit whenever the hooks change.
 
 1.  Keep the switch off so no new job selects the runner, and wait until
     `oseo-mac-1` is idle. The installer restarts the daemon, which would end
@@ -188,11 +208,172 @@ with its runner root at */Users/oseo-runner/actions-runner*. Replace
 
 The installer restarts the daemon with the same *bin/Runner.Listener*, so
 the existing **Developer Tools** grant applies; confirm it with the U17
-probe as after any restart. The live cache was a measured 63.6 GiB after
-run `37315038080`, above the cap, so the first job hook removes it and the
-next jobs build with an empty cache. Removing a synthetic tree of that
-shape took a measured 39 seconds. Then re-enable the switch for a branch
-push and watch free disk and the hook output in the job logs.
+probe as after any restart. Then re-enable the switch for a branch push and
+watch free disk and the hook output in the job logs.
+
+In the 2026-10-06 installation, PlistBuddy printed 30, and `cmp` found the
+installed *cleanup.sh* equal to the repository copy. The installer also
+printed `chown`/`chmod` “Operation not permitted” for */usr/local*, a
+known harmless message: System Integrity Protection refuses that change,
+and the copied hooks matched.
+
+Branch run `37360463788` verified the installation on `m5ci-cap-verify`, a
+commit whose tree equals main `6654ccf7`. The live cache was a measured
+63.6 GiB after run `37315038080`, above the cap. The first Mac job, test262
+7/12 (job `111933637542`), entered the job-started hook at 19:02:44Z and
+logged `Pruned Zig cache because it exceeded the 30 GiB cap` at 19:08:15Z.
+The hook took a measured 5.5 min from entry to that message, measuring and
+removing the cache, against the measured 39 seconds for
+a synthetic tree of that shape in [U26 evidence], and made the job a
+measured 10.0 min. It was a one-off cost of the oversized cache; a later
+prune removes the 30 GiB cap plus one job's growth, a derived 33.8 GiB
+with U25's measured 3.8 GiB maximum growth, an estimate rather than a
+bound, whose removal time has not been measured. The coordinator
+observed free disk rise from the measured 92.5 GiB U26 minimum to 155 GiB.
+The other 14 Mac jobs took a measured 4.3 to 6.9 min after the cache was
+emptied, with no sign of the first-execution penalty after the daemon
+restart; the U17 probe was not rerun. All 15 Mac jobs passed, a derived
+87.1 min as the sum of their measured durations, measured once. Attempt 1
+failed only because three hosted macOS jobs were never acquired by a hosted
+runner (“The job was not acquired by Runner of type hosted even after multiple
+attempts”); the `--failed` rerun, attempt 2, passed.
+
+
+Adding the second runner
+------------------------
+
+`oseo-mac-2` runs on the same Mac mini as `oseo-mac-1`. The steps that
+need `sudo` or GitHub credentials are the maintainer's. The maintainer ran
+them on 2026-10-06; the record follows the steps. What differs from
+`oseo-mac-1`:
+
+ -  The account is `oseo-runner2`, a second standard account, with its own
+    home, runner root, `TMPDIR` (*oseo-temp/*), mise tools, runtime archive
+    directory, and Zig cache under that home.
+ -  The runner name and its only custom label are `oseo-mac-2`, and the
+    LaunchDaemon is `org.oseo.runner.oseo-mac-2`.
+ -  `OSEO_RUNNER_LABEL=oseo-mac-2` is passed to the installer and the health
+    check. Everything else in the LaunchDaemon has the same shape as
+    `oseo-mac-1`'s, including the 30 GiB `OSEO_ZIG_CACHE_CAP_GIB`.
+    *tests/fixtures/selfhosted-mac/* holds both expected property lists, and
+    the installer's `--print-plist` mode reproduces them without `sudo`.
+ -  Both runners share the root-owned hooks in
+    */usr/local/libexec/oseo-runner/*. Installing either runner reinstalls them
+    from the same reviewed commit.
+
+As `dahlia`, check out the reviewed main commit that contains this two-lane
+configuration in a fresh clone, as in the previous section, and set `src` to
+it in the shell used below. Do not commit there.
+
+~~~~ sh
+git clone https://github.com/dahlia/oseo.git ~/Desktop/oseo-m5ci-u27
+git -C ~/Desktop/oseo-m5ci-u27 checkout --detach <commit>
+src=~/Desktop/oseo-m5ci-u27
+~~~~
+
+1.  Keep the switch off and wait until `oseo-mac-1` is idle, as above.
+    Installing the second service rewrites the shared hooks but restarts
+    only `org.oseo.runner.oseo-mac-2`.
+
+2.  Create the standard account and its home. Do not add it to the `admin`
+    group; the installer rejects an administrator.
+
+    ~~~~ sh
+    sudo sysadminctl -addUser oseo-runner2 -fullName 'Oseo runner 2' \
+      -password -
+    sudo createhomedir -c -u oseo-runner2
+    ~~~~
+
+3.  As `oseo-runner2`, extract the same runner archive that `oseo-mac-1`
+    uses, v2.337.0 for macOS ARM64, after verifying it against the checksum
+    the operator recorded for `oseo-mac-1` and placing it where
+    `oseo-runner2` can read it, such as */Users/Shared/*. Then register it
+    once with a repository registration token, without `--ephemeral` and
+    with updates disabled. The default `self-hosted`, `macOS`, and `ARM64`
+    labels remain.
+
+    ~~~~ sh
+    sudo -u oseo-runner2 -H bash -c '
+      mkdir ~/actions-runner && cd ~/actions-runner &&
+      tar xzf /Users/Shared/actions-runner-osx-arm64-2.337.0.tar.gz'
+    sudo -u oseo-runner2 -H bash -c '
+      cd ~/actions-runner &&
+      ./config.sh --unattended --url https://github.com/dahlia/oseo \
+        --token <registration token> --name oseo-mac-2 \
+        --labels oseo-mac-2 --disableupdate'
+    ~~~~
+
+4.  Lock down the home, root, and credentials. The installer repeats this,
+    and also checks it.
+
+    ~~~~ sh
+    sudo chmod 700 /Users/oseo-runner2 /Users/oseo-runner2/actions-runner
+    sudo chmod 600 /Users/oseo-runner2/actions-runner/.credentials*
+    ~~~~
+
+5.  Install the LaunchDaemon with the cap, then compare it with the reviewed
+    property list and run the health check.
+
+    ~~~~ sh
+    sudo env OSEO_RUNNER_LABEL=oseo-mac-2 \
+      OSEO_RUNNER_ROOT=/Users/oseo-runner2/actions-runner \
+      OSEO_RUNNER_USER=oseo-runner2 OSEO_ZIG_CACHE_CAP_GIB=30 \
+      bash "$src/tools/selfhosted-mac/install-service.sh"
+    sudo cat /Library/LaunchDaemons/org.oseo.runner.oseo-mac-2.plist |
+      cmp - "$src/tests/fixtures/selfhosted-mac/oseo-mac-2.plist"
+    sudo env OSEO_RUNNER_LABEL=oseo-mac-2 \
+      OSEO_RUNNER_ROOT=/Users/oseo-runner2/actions-runner \
+      bash "$src/tools/selfhosted-mac/health.sh"
+    ~~~~
+
+6.  Grant **Developer Tools** to
+    */Users/oseo-runner2/actions-runner/bin/Runner.Listener*, as for
+    `oseo-mac-1`, then restart the daemon so the grant applies:
+
+    ~~~~ sh
+    sudo launchctl kickstart -k system/org.oseo.runner.oseo-mac-2
+    ~~~~
+
+7.  Confirm that the API lists `oseo-mac-2` online with exactly that custom
+    label. Then run the U17 first-execution probe through it and a
+    two-attempt branch run with the switch on, and watch free disk during
+    the first runs: [U26 evidence] measured only one runner account.
+
+    ~~~~ sh
+    gh api repos/dahlia/oseo/actions/runners \
+      --jq '.runners[] | {name, status, busy, labels: [.labels[].name]}'
+    ~~~~
+
+On 2026-10-06 the maintainer ran these steps for `oseo-mac-2` with
+*/Users/Shared/oseo-runner-staging/setup-mac2.sh*, a script outside the
+repository, from a checkout at `11634e90`. As reported to the coordinator,
+it created `oseo-runner2` with a random password, extracted runner archive
+v2.337.0 after verifying its checksum, and registered it with
+`--name oseo-mac-2 --labels oseo-mac-2 --disableupdate`. It then applied the
+lockdown and ran *install-service.sh* with `OSEO_RUNNER_LABEL=oseo-mac-2` and
+the 30 GiB cap, and compared the installed property list with the fixture. The
+maintainer granted **Developer Tools** to that runner's *Runner.Listener* and
+restarted its daemon. The API then listed both runners online, each with
+exactly its own custom label. Of step 7, the API check and the
+two-attempt branch run below were done, and the coordinator observed free
+disk after the runs; the U17 probe was not run through `oseo-mac-2` and remains
+outstanding.
+In branch run `37398055382` its test262 jobs took a derived 1.00 to 1.40 times
+their one-lane `oseo-mac-1` medians, so no penalty of the size seen before the
+`oseo-mac-1` grant appeared, but that run does not isolate one.
+
+Branch run `37398055382` at `11634e90` then ran with both runners. Both
+attempts passed every macOS job and ended their last job a measured 79.6
+and 78.9 min after starting. Attempt 1 was red only in a Linux-hosted job,
+so only attempt 2's 78.9 min is a push-to-green time. `oseo-mac-1`
+ran 10 jobs and `oseo-mac-2` 9 in each attempt, as generated. The
+coordinator measured 115 GiB free on the Mac after the runs. *PLAN-GATE.md*
+records the lane ends, pair slowdowns, own-key durations, and projection.
+
+While `oseo-mac-2` is offline or busy, its lane's nine jobs fall back to
+hosted `macos-15` without a predecessor chain and compete with the five
+hosted lanes for the five hosted slots. That fallback schedule is not
+modeled, and it is expected to be slower than the one-lane assignment.
 
 
 Security and activation

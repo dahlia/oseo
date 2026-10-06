@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 const hosted = JSON.stringify("macos-15");
 
 interface Runner {
+  readonly name?: string;
   readonly status?: string;
   readonly busy?: boolean;
   readonly labels?: readonly { readonly name?: string }[];
@@ -21,11 +22,26 @@ type RunnerFetch = (
   },
 ) => Promise<{ readonly ok: boolean; json(): Promise<RunnerList> }>;
 
+/** A runner's label names; a malformed entry throws and falls back. */
+function labelsOf(runner: Runner): readonly string[] {
+  return Array.isArray(runner.labels)
+    ? runner.labels.map((entry) => entry.name ?? "")
+    : [];
+}
+
+/** Mac lanes the generator may configure, one runner label each. */
+const maxLanes = 2;
+
 /**
- * Any push to dahlia/oseo, branch or tag, can select the Mac when enabled,
- * authenticated, and idle. Only write-access collaborators can push there.
- * PRs and forks stay hosted; decide once before dispatch, with uncertainty
- * retaining hosted coverage.
+ * Any push to dahlia/oseo, branch or tag, can select a Mac lane when
+ * enabled, authenticated, and its runner is idle. Only write-access
+ * collaborators can push there. PRs and forks stay hosted; decide once
+ * before dispatch, with uncertainty retaining hosted coverage.
+ *
+ * Lane `i` selects only the runner named `oseo-mac-i`, and only when that
+ * runner is the sole runner carrying the label, carries no other lane's
+ * label, and is online and idle. Each lane decides independently, so an
+ * offline or ambiguous runner sends only its own lane to hosted.
  */
 export async function runnerSelections(
   env: Readonly<Record<string, string | undefined>>,
@@ -33,8 +49,8 @@ export async function runnerSelections(
   fetchRunner: RunnerFetch = fetch as RunnerFetch,
 ): Promise<readonly string[]> {
   const count = Number(env.OSEO_SELFHOSTED_LANES);
-  if (count !== 1) {
-    throw new Error("OSEO_SELFHOSTED_LANES must be one");
+  if (!Number.isInteger(count) || count < 1 || count > maxLanes) {
+    throw new Error("OSEO_SELFHOSTED_LANES must be one or two");
   }
   const selections: string[] = Array.from({ length: count }, () => hosted);
   if (
@@ -73,16 +89,25 @@ export async function runnerSelections(
       return listRunners(page + 1, runners);
     }
     const runners = await listRunners(1, []);
+    const laneLabels = Array.from(
+      { length: maxLanes },
+      (_, index) => `oseo-mac-${index + 1}`,
+    );
     for (let index = 0; index < count; index++) {
-      const label = `oseo-mac-${index + 1}`;
-      const runner = runners.find(
-        (item) =>
-          item.status === "online" &&
-          item.busy === false &&
-          Array.isArray(item.labels) &&
-          item.labels.some((entry) => entry.name === label),
+      const label = laneLabels[index]!;
+      const carriers = runners.filter((runner) =>
+        labelsOf(runner).includes(label),
       );
-      if (runner != null) {
+      const runner = carriers.length === 1 ? carriers[0]! : undefined;
+      if (
+        runner != null &&
+        runner.name === label &&
+        runner.status === "online" &&
+        runner.busy === false &&
+        laneLabels.every(
+          (other) => other === label || !labelsOf(runner).includes(other),
+        )
+      ) {
         selections[index] = JSON.stringify([
           "self-hosted",
           "macOS",

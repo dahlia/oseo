@@ -1,2 +1,5 @@
-/** Generate one optional Mac lane; the repository variable keeps it off. */
-export const configuredSelfHostedLanes = 1;
+/**
+ * Generate two optional Mac lanes, `oseo-mac-1` and `oseo-mac-2`, on one
+ * machine; the repository variable keeps both off.
+ */
+export const configuredSelfHostedLanes = 2;

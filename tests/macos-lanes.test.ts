@@ -24,11 +24,15 @@ import type {
 } from "../tools/structured-data.ts";
 import { parsedMapping } from "../tools/structured-data.ts";
 import { parse } from "yaml";
+import type { MacosLaneJob } from "../tools/generate-macos-lanes.ts";
 import {
   generateMacosWorkflow,
   macosJobs,
+  macosLaneEnds,
   macosLanes,
+  selfHostedLaneEnds,
 } from "../tools/generate-macos-lanes.ts";
+import { macosLaneReport, parseAttempt } from "../tools/macos-lane-report.ts";
 import { ownKeyCaseContract } from "../tools/check-property-case-durations.ts";
 import { runnerSelections } from "../tools/selfhosted-mac/availability.ts";
 import { configuredSelfHostedLanes } from "../tools/macos-lane-config.ts";
@@ -36,6 +40,7 @@ import {
   macosFixedSetupSeconds,
   selfHostedFamilySpeedRatios,
   selfHostedJobSeconds,
+  selfHostedPairSlowdowns,
   selfHostedProbeSeconds,
 } from "../tools/macos-job-costs.ts";
 import { selectNativeTestShard } from "../tools/native-shard.ts";
@@ -504,7 +509,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
       .flat()
       .some((job) => job.family === "host C sanitizers"),
   );
-  assert.throws(() => macosLanes(2));
+  assert.throws(() => macosLanes(3));
   const rendered = generateMacosWorkflow(template, 1);
   if (process.platform !== "win32") {
     const lint = spawnSync(
@@ -581,6 +586,7 @@ async function oneAvailableRunner() {
     json: async () => ({
       runners: [
         {
+          name: "oseo-mac-1",
           status: "online",
           busy: false,
           labels: [{ name: "oseo-mac-1" }],
@@ -646,9 +652,36 @@ test("availability fails to hosted without skipping a lane", async () => {
     assert.deepEqual(result, hosted);
   }
   const rejectedRunners = [
-    { status: "offline", busy: false, labels: [{ name: "oseo-mac-1" }] },
-    { status: "online", busy: true, labels: [{ name: "oseo-mac-1" }] },
-    { status: "online", busy: false, labels: [{ name: "other" }] },
+    {
+      name: "oseo-mac-1",
+      status: "offline",
+      busy: false,
+      labels: [{ name: "oseo-mac-1" }],
+    },
+    {
+      name: "oseo-mac-1",
+      status: "online",
+      busy: true,
+      labels: [{ name: "oseo-mac-1" }],
+    },
+    {
+      name: "oseo-mac-1",
+      status: "online",
+      busy: false,
+      labels: [{ name: "other" }],
+    },
+    {
+      name: "other",
+      status: "online",
+      busy: false,
+      labels: [{ name: "oseo-mac-1" }],
+    },
+    {
+      name: "oseo-mac-1",
+      status: "online",
+      busy: false,
+      labels: [{ name: "oseo-mac-1" }, { name: "oseo-mac-2" }],
+    },
   ];
   for (const result of await Promise.all(
     rejectedRunners.map((runner) =>
@@ -723,8 +756,9 @@ test("faster native support work uses additional capacity", () => {
   ).length;
   assert.ok(dedicatedNative > 0);
   assert.ok(dedicatedNative > hostedNative / 5);
-  assert.throws(() => macosLanes(-1), /zero or one/);
-  assert.throws(() => macosLanes(1.5), /zero or one/);
+  for (const invalid of [-1, 1.5, 3]) {
+    assert.throws(() => macosLanes(invalid), /zero, one, or two/);
+  }
 });
 
 test("availability finds the one runner after a full page", async () => {
@@ -752,6 +786,7 @@ test("availability finds the one runner after a full page", async () => {
           ? filler
           : [
               {
+                name: "oseo-mac-1",
                 status: "online",
                 busy: false,
                 labels: [{ name: "oseo-mac-1" }],
@@ -772,6 +807,305 @@ test("availability finds the one runner after a full page", async () => {
   );
   assert.equal(calls, 10);
 });
+
+test("two Mac lanes route each label with its own hosted fallback", () => {
+  assert.equal(configuredSelfHostedLanes, 2);
+  const lanes = macosLanes(2);
+  assert.equal(lanes.length, 7);
+  assert.equal(lanes.flat().length, 34);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 34);
+  assert.ok(lanes[5]!.length > 0 && lanes[6]!.length > 0);
+  // One readiness output, so one runner class, for the shared deadline.
+  assert.deepEqual(
+    lanes
+      .flat()
+      .filter((job) => job.family === "own-key cases")
+      .map((job) => lanes.findIndex((lane) => lane.includes(job))),
+    [5, 5, 5],
+  );
+  for (const job of lanes.slice(5).flat()) {
+    assert.equal(job.os, "macos-15");
+    assert.ok(
+      ["native", "native support", "test262", "own-key cases"].includes(
+        job.family,
+      ),
+    );
+  }
+  const rendered = readFileSync(".github/workflows/main.yaml", "utf8");
+  // SAFETY: actionlint validates this generated workflow schema.
+  const workflow = parse(rendered) as Workflow;
+  assert.deepEqual(
+    names(workflow).filter((name) => name !== "macOS self-hosted availability"),
+    names(before),
+  );
+  assert.deepEqual(workflow.jobs.native!.needs, after.jobs.native!.needs);
+  const readiness = workflow.jobs.mac_ready!;
+  const outputs = parsedMapping(readiness.outputs, "Readiness outputs");
+  assert.deepEqual(Object.keys(outputs).toSorted(), ["r1", "r2"]);
+  const probe = readiness.steps.find((step) => step.id === "probe");
+  assert.ok(probe);
+  assert.equal(
+    parsedMapping(probe.env, "Probe environment").OSEO_SELFHOSTED_LANES,
+    2,
+  );
+  assert.match(String(probe.if), /github\.event_name == 'push'/);
+  for (const [index, lane] of lanes.entries()) {
+    for (const job of lane) {
+      const actual = workflow.jobs[job.id]!;
+      assert.equal(actual.name, job.name);
+      if (index < 5) {
+        assert.equal(actual["runs-on"], job.os);
+        assert.ok(!JSON.stringify(actual.needs ?? "").includes("mac_ready"));
+        continue;
+      }
+      assert.equal(
+        actual["runs-on"],
+        `\${{ fromJSON(needs.mac_ready.outputs.r${index - 4}` +
+          ` || '"macos-15"') }}`,
+      );
+      assert.deepEqual(actual.needs, ["mac_ready"]);
+      assert.equal(actual.if, "${{ !cancelled() }}");
+    }
+  }
+});
+
+function laneJob(family: string, name: string): MacosLaneJob {
+  return {
+    id: name,
+    name,
+    sourceId: name,
+    matrix: {},
+    os: "macos-15",
+    seconds: 0,
+    family,
+  };
+}
+
+test("Mac lane overlap applies measured pair slowdowns", () => {
+  const t262 = laneJob("test262", "t");
+  const support = laneJob("native support", "n");
+  const own = laneJob("own-key cases", "o");
+  const costs = new Map([
+    [t262, 100],
+    [support, 300],
+    [own, 50],
+  ]);
+  const seconds = (job: MacosLaneJob): number => costs.get(job)!;
+  const probe = selfHostedProbeSeconds;
+  // One lane is a plain sum after the readiness allowance.
+  assert.deepEqual(selfHostedLaneEnds([[t262, own, support]], seconds), [
+    probe + 450,
+  ]);
+  // Both lanes busy: each runs slower; the survivor then runs alone.
+  const ends = selfHostedLaneEnds([[t262], [support]], seconds);
+  const shared = 100 * selfHostedPairSlowdowns.test262!["native support"]!;
+  const supportDone =
+    shared / selfHostedPairSlowdowns["native support"]!.test262!;
+  assert.ok(Math.abs(ends[0]! - (probe + shared)) < 1e-6);
+  assert.ok(Math.abs(ends[1]! - (probe + shared + 300 - supportDone)) < 1e-6);
+  assert.ok(ends[1]! > probe + 300);
+  // An empty lane ends with the allowance and slows nothing.
+  assert.deepEqual(selfHostedLaneEnds([[own], []], seconds), [
+    probe + 50,
+    probe,
+  ]);
+  assert.throws(
+    () => selfHostedLaneEnds([[t262], [support], [own]], seconds),
+    /More than two Mac lanes/,
+  );
+  for (const [family, partners] of Object.entries(selfHostedPairSlowdowns)) {
+    for (const partner of Object.keys(selfHostedPairSlowdowns)) {
+      const factor = partners[partner];
+      assert.ok(factor != null && factor >= 1 && factor < 2, family);
+    }
+  }
+});
+
+test("two Mac lanes shorten the derived makespan in every attempt", () => {
+  const directory = "docs/evidence/u25/model";
+  const attempts = readdirSync(directory)
+    .filter((name) => /^jobs-\d+-\d+\.tsv$/.test(name))
+    .toSorted()
+    .map((name) =>
+      parseAttempt(name, readFileSync(join(directory, name), "utf8")),
+    );
+  assert.equal(attempts.length, 10);
+  const report = macosLaneReport(attempts);
+  const rows = report
+    .split("\n")
+    .filter((line) => line.startsWith("jobs-"))
+    .map((line) => line.split("\t").slice(1).map(Number));
+  assert.equal(rows.length, 10);
+  for (const [one, two] of rows) assert.ok(two! < one!, report);
+  assert.match(report, /^Range\t[\d.]+-[\d.]+\t[\d.]+-[\d.]+$/m);
+  const one = Math.max(...macosLaneEnds(macosLanes(1)));
+  const two = Math.max(...macosLaneEnds(macosLanes(2)));
+  assert.ok(two < one);
+  assert.throws(
+    () => parseAttempt("bad", "name\trunner\tnot-a-date\talso-not\n"),
+    /Invalid job wall/,
+  );
+  assert.throws(() => parseAttempt("bad", "name only\n"), /Malformed/);
+});
+
+interface FakeRunner {
+  readonly name: string;
+  readonly status: string;
+  readonly busy: boolean;
+  readonly labels: readonly { readonly name: string }[];
+}
+
+const twoRunners: readonly FakeRunner[] = [
+  {
+    name: "oseo-mac-1",
+    status: "online",
+    busy: false,
+    labels: [{ name: "self-hosted" }, { name: "oseo-mac-1" }],
+  },
+  {
+    name: "oseo-mac-2",
+    status: "online",
+    busy: false,
+    labels: [{ name: "self-hosted" }, { name: "oseo-mac-2" }],
+  },
+];
+
+test("availability decides each Mac lane independently", async () => {
+  const env = {
+    OSEO_SELFHOSTED_LANES: "2",
+    OSEO_SELFHOSTED_ENABLED: "true",
+    OSEO_EVENT: "push",
+    OSEO_REPOSITORY: "dahlia/oseo",
+    OSEO_RUNNER_STATUS_TOKEN: "test-token",
+  };
+  const hosted = '"macos-15"';
+  const mac1 = '["self-hosted","macOS","ARM64","oseo-mac-1"]';
+  const mac2 = '["self-hosted","macOS","ARM64","oseo-mac-2"]';
+  const select = (
+    runners: readonly FakeRunner[],
+    changes: Readonly<Record<string, string>> = {},
+  ) =>
+    runnerSelections({ ...env, ...changes }, async () => ({
+      ok: true,
+      json: async () => ({ runners }),
+    }));
+  assert.deepEqual(await select(twoRunners), [mac1, mac2]);
+  assert.deepEqual(await select(twoRunners, { OSEO_SELFHOSTED_LANES: "1" }), [
+    mac1,
+  ]);
+  const [first, second] = twoRunners;
+  assert.deepEqual(await select([first!, { ...second!, status: "offline" }]), [
+    mac1,
+    hosted,
+  ]);
+  assert.deepEqual(await select([{ ...first!, busy: true }, second!]), [
+    hosted,
+    mac2,
+  ]);
+  assert.deepEqual(await select([first!]), [mac1, hosted]);
+  // A second carrier of a label makes that lane's routing ambiguous.
+  assert.deepEqual(
+    await select([...twoRunners, { ...second!, name: "spare" }]),
+    [mac1, hosted],
+  );
+  // One runner carrying both lane labels could take both lanes' jobs.
+  assert.deepEqual(
+    await select([
+      {
+        ...first!,
+        labels: [{ name: "oseo-mac-1" }, { name: "oseo-mac-2" }],
+      },
+    ]),
+    [hosted, hosted],
+  );
+  // A lane needs its runner's name to equal its label.
+  assert.deepEqual(await select([first!, { ...second!, name: "oseo-mac-3" }]), [
+    mac1,
+    hosted,
+  ]);
+  assert.deepEqual(await select(twoRunners, { OSEO_EVENT: "pull_request" }), [
+    hosted,
+    hosted,
+  ]);
+  assert.deepEqual(
+    await runnerSelections(env, async () => {
+      throw new Error("offline");
+    }),
+    [hosted, hosted],
+  );
+  await Promise.all(
+    ["0", "3", "1.5", ""].map((lanes) =>
+      assert.rejects(
+        select(twoRunners, { OSEO_SELFHOSTED_LANES: lanes }),
+        /one or two/,
+      ),
+    ),
+  );
+});
+
+test(
+  "Mac installer keeps the oseo-mac-1 plist and names each runner",
+  {
+    skip: process.platform === "win32" ? "requires Bash" : false,
+  },
+  () => {
+    const installer = "tools/selfhosted-mac/install-service.sh";
+    const runners = [
+      { label: undefined, fixture: "oseo-mac-1", user: "oseo-runner" },
+      { label: "oseo-mac-2", fixture: "oseo-mac-2", user: "oseo-runner2" },
+    ];
+    for (const { label, fixture, user } of runners) {
+      const inherited = Object.fromEntries(
+        Object.entries(process.env).filter(
+          ([key]) =>
+            key !== "OSEO_RUNNER_LABEL" && key !== "OSEO_ZIG_CACHE_CAP_GIB",
+        ),
+      );
+      const base = {
+        ...inherited,
+        OSEO_RUNNER_ROOT: `/Users/${user}/actions-runner`,
+        OSEO_RUNNER_USER: user,
+        OSEO_RUNNER_HOME: `/Users/${user}`,
+      };
+      // The default runner is selected by leaving the label unset.
+      const env = label == null ? base : { ...base, OSEO_RUNNER_LABEL: label };
+      const printed = spawnSync("bash", [installer, "--print-plist"], {
+        env,
+      });
+      assert.equal(printed.status, 0, printed.stderr.toString());
+      assert.equal(
+        printed.stdout.toString(),
+        readFileSync(`tests/fixtures/selfhosted-mac/${fixture}.plist`, "utf8"),
+      );
+      const dry = spawnSync("bash", [installer, "--dry-run"], {
+        encoding: "utf8",
+        env,
+      });
+      assert.match(
+        dry.stdout,
+        new RegExp(`org\\.oseo\\.runner\\.${fixture}\\.plist for ${user}`),
+      );
+    }
+    for (const invalid of ["oseo-mac-0", "oseo-mac-3", "oseo-mac-1 ", "x"]) {
+      const env = {
+        ...process.env,
+        OSEO_RUNNER_ROOT: "/tmp/oseo-runner",
+        OSEO_RUNNER_USER: "oseo-runner",
+        OSEO_RUNNER_HOME: "/tmp",
+        OSEO_RUNNER_LABEL: invalid,
+      };
+      for (const args of [
+        [installer, "--dry-run"],
+        [installer, "--print-plist"],
+        ["tools/selfhosted-mac/health.sh"],
+      ]) {
+        const rejected = spawnSync("bash", args, { encoding: "utf8", env });
+        assert.equal(rejected.status, 2, `${invalid}: ${args.join(" ")}`);
+        assert.match(rejected.stderr, /oseo-mac-1 or oseo-mac-2/u);
+      }
+    }
+  },
+);
 
 test("macOS extended shard one contains own-keys", () => {
   const files = readdirSync("tests/property")

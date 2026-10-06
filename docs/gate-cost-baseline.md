@@ -361,6 +361,58 @@ and with the earlier spread.
 [37230598930]: https://github.com/dahlia/oseo/actions/runs/37230598930
 [37237684441]: https://github.com/dahlia/oseo/actions/runs/37237684441
 
+### Two-lane Mac runs (U27)
+
+Branch run [37398055382] at `11634e90` ran with two runners on the Mac
+mini, `oseo-mac-1` and `oseo-mac-2`, both online; the maintainer registered
+`oseo-mac-2` on 2026-10-06. Attempt 2 was a full rerun. The table uses the
+U23 definitions above, with Mac jobs split by `runner_name`, and the hosted
+counts exclude the Linux-hosted availability probe. All values are measured
+and rounded to 0.1 min:
+
+| Source run, attempt | Commit     | Wall to last job | `oseo-mac-1` jobs, min, end | `oseo-mac-2` jobs, min, end | Hosted jobs | Hosted job min | Last hosted end |
+| ------------------- | ---------- | ---------------: | --------------------------- | --------------------------- | ----------: | -------------: | --------------: |
+| [37398055382], 1    | `11634e90` |             79.6 | 10, 78.5, 79.3              | 9, 69.1, 69.9               |          15 |          332.3 |            72.7 |
+| [37398055382], 2    | `11634e90` |             78.9 | 10, 77.5, 78.5              | 9, 70.7, 71.7               |          15 |          338.2 |            77.8 |
+
+Attempt 1 was red only in the Linux-hosted `test (ubuntu-latest, node)`
+job; every macOS job passed in both attempts. Only attempt 2's wall to the
+last job is therefore a push-to-green time. Each attempt placed the 19
+generated Mac jobs on their generated runners. The one-lane runs after
+U24 measured 98.6 min (main run [37251028948] at `bdf2dddd`), 99.5 min
+(branch run [37315038080] at `4b20631b`, with the U26 disk sampler on the
+Mac), and 100.2 min (main run [37332256715] at `6654ccf7`, attempt 1, red
+only in the same Linux job), beside the 98.3 and 95.8 min of [37237684441].
+The two-lane attempts are a derived 16.2 to 21.3 min shorter, measured in
+one run of one commit. The derived prediction was 77.2 min, with a 72.1 to
+86.5 min per-run range; the last macOS job ended at a measured 79.3 and
+78.5 min, inside that range. The coordinator measured 115 GiB free on the
+Mac after the runs.
+
+Two-lane Mac job walls are longer than one-lane ones. The 19 Mac jobs
+summed a measured 147.5 and 148.2 min. Against each job's one-lane
+`oseo-mac-1` median, the derived pooled ratio was 1.297 and 1.282 on
+`oseo-mac-1` and 1.176 and 1.242 on `oseo-mac-2`, for the 17 jobs with a
+one-lane median. [*PLAN-GATE.md*](../PLAN-GATE.md) derives the per-job
+pair factors, compares them with U25, and projects the measured walls to
+41,091 paths at a derived 103.1 and 104.0 min.
+[*evidence/u27/*](./evidence/u27/) holds the job rows and scripts.
+
+The own-key case shards also ran longer beside the second lane. The three
+measured duration records of [37398055382] attempt 2 sum to a derived
+1,422.9 s, 39.5% of the 3,600 s hard limit, leaving a derived 2,177.1 s
+margin. The measured records of the one-lane runs [37194069657] attempt 2,
+[37206614757] 1, [37215661294] 2, [37230598930] 1, [37237684441] 2,
+[37251028948] 1, [37315038080] 1, and [37332256715] 1 sum to a derived
+930.5 to 960.2 s, leaving a derived 2,639.8 to 2,669.5 s margin. Attempt
+1's records of [37398055382] were no longer downloadable after the full
+rerun.
+
+[37251028948]: https://github.com/dahlia/oseo/actions/runs/37251028948
+[37315038080]: https://github.com/dahlia/oseo/actions/runs/37315038080
+[37332256715]: https://github.com/dahlia/oseo/actions/runs/37332256715
+[37398055382]: https://github.com/dahlia/oseo/actions/runs/37398055382
+
 ### U16 static macOS lane branch observations
 
 GitHub Actions run and job timestamps provide one measured observation at

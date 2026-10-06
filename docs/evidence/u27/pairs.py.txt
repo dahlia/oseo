@@ -1,0 +1,49 @@
+# U27: per-job two-lane walls against one-lane oseo-mac-1 medians.
+# Usage: python3 docs/evidence/u27/pairs.py.txt (from the repository root)
+# One-lane walls: the eight Mac-lane attempts in docs/evidence/u25/model/
+# and the three later one-lane attempts in docs/evidence/u27/one-lane/.
+import glob, statistics as st, datetime as d
+def t(s): return d.datetime.fromisoformat(s.replace('Z', '+00:00'))
+def fam(n): return n.split(' (')[0]
+files = [f for f in glob.glob('docs/evidence/u25/model/jobs-*.tsv')
+         if '37121778924' not in f and '37167895777' not in f]
+files += glob.glob('docs/evidence/u27/one-lane/jobs-*.tsv')
+obs = {}
+for f in files:
+    for line in open(f):
+        r = line.rstrip('\n').split('\t')
+        if r[1] == 'oseo-mac-1' and r[4] == 'success':
+            obs.setdefault(r[0], []).append((t(r[3]) - t(r[2])).total_seconds())
+med = {k: st.median(v) for k, v in obs.items()}
+starts = {1: '2026-10-06T01:13:17Z', 2: '2026-10-06T02:33:57Z'}
+for a in (1, 2):
+    rows = [l.rstrip('\n').split('\t')
+            for l in open(f'docs/evidence/u27/jobs-37398055382-{a}.tsv')]
+    mac = [(r[1], r[0], t(r[2]), t(r[3])) for r in rows
+           if r[1] in ('oseo-mac-1', 'oseo-mac-2')]
+    print(f'attempt {a}')
+    print('lane\tjob\twall\tone-lane median (n)\twall/median\toverlap\t'
+          'overlapped factor\tpartner seconds')
+    for lane, n, s, e in sorted(mac, key=lambda x: (x[0], x[2])):
+        w = (e - s).total_seconds()
+        o, partners = 0, {}
+        for l2, n2, s2, e2 in mac:
+            if l2 == lane:
+                continue
+            ov = (min(e, e2) - max(s, s2)).total_seconds()
+            if ov > 0:
+                o += ov
+                partners[fam(n2)] = partners.get(fam(n2), 0) + int(ov)
+        m = med.get(n)
+        # Solo work left for the overlap: median minus non-overlapped wall.
+        f = o / (m - (w - o)) if m and o > 0 and m > w - o else None
+        print('\t'.join([lane, n, f'{w:.0f}',
+                         f'{m:.0f} ({len(obs[n])})' if m else '-',
+                         f'{w / m:.2f}' if m else '-', f'{o:.0f}',
+                         f'{f:.2f}' if f else '-', str(partners)]))
+    for lane in ('oseo-mac-1', 'oseo-mac-2'):
+        js = [(e - s).total_seconds() for l, n, s, e in mac
+              if l == lane and n in med]
+        ms = [med[n] for l, n, s, e in mac if l == lane and n in med]
+        print(f'{lane}: {len(js)} jobs with a median, pooled wall/median '
+              f'{sum(js) / sum(ms):.3f}')
