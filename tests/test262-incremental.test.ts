@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
+import process from "node:process";
 import { dirname, join } from "node:path";
 import test from "node:test";
 
@@ -811,9 +812,22 @@ test("changed paths name a rename's origin and untracked files", async () => {
         "commit.gpgsign=false",
         ...args,
       ],
-      { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+      {
+        cwd: root,
+        encoding: "utf8",
+        // Isolate the fixture from the caller's global hooks and identity,
+        // as tests/check-commit-message.test.ts does; the function under
+        // test still reads the real configuration in production.
+        env: {
+          ...process.env,
+          GIT_CONFIG_GLOBAL: join(root, "empty-gitconfig"),
+          GIT_CONFIG_NOSYSTEM: "1",
+        },
+        stdio: ["ignore", "pipe", "pipe"],
+      },
     ).trim();
   try {
+    await writeFile(join(root, "empty-gitconfig"), "");
     run("init", "-q", "-b", "main");
     run("config", "diff.renames", "true");
     await mkdir(join(root, "packages"), { recursive: true });
