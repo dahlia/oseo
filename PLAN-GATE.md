@@ -1616,10 +1616,28 @@ attempts and is not done here.
 started without a Zig cache from earlier runs; cold and warm cache effects
 were not measured separately. The own-key duration records of attempt 2
 were a measured 392.5, 563.6, and 466.8 s for shards 1 to 3, a derived
-1,422.9 s sum against the 3,600 s hard limit. Shard 2, which overlapped
-test262 for most of its wall, exceeded U25's measured 479.7 s maximum.
-Attempt 1's records were no longer downloadable after the full rerun
-(HTTP 404). The coordinator measured 115 GiB free on the Mac after the
+1,422.9 s sum against the 3,600 s hard limit. That leaves a derived
+2,177.1 s margin; the sum is a derived 39.5% of the limit. Shard 2, which
+overlapped test262 for most of its wall, exceeded U25's measured 479.7 s
+maximum. Attempt 1's records were no longer downloadable after the full
+rerun (HTTP 404).
+
+The comparable one-lane sums come from the measured records of the eight
+one-lane Mac-lane runs. Each run keeps only the records of its latest
+attempt that ran the own-key jobs, so three earlier attempts have none. In
+each, the three shards ran on `oseo-mac-1` with no other job on the Mac:
+`37194069657` 2, `37206614757` 1, `37215661294` 2, `37230598930` 1,
+`37237684441` 2, `37251028948` 1, `37315038080` 1, and `37332256715` 1.
+Their derived sums were 930.5 to 960.2 s, a derived 25.8% to 26.7% of the
+limit, leaving 2,639.8 to 2,669.5 s; no one-lane shard exceeded a
+measured 337.3 s. The two-lane sum is a derived 462.7 to 492.4 s, or 1.48
+to 1.53 times, above those, so the second lane cost a derived 462.7 to
+492.4 s of the deadline margin in this one attempt. The margin is still
+more than half the limit. One attempt does not show whether that holds
+with other pickup orders, which decide how long each shard overlaps
+test262.
+[*docs/evidence/u27/own-key-durations.tsv*](./docs/evidence/u27/own-key-durations.tsv)
+keeps every record. The coordinator measured 115 GiB free on the Mac after the
 runs, above the 40 GiB backstop.
 
 At 41,091 paths, this projection is derived from the measured two-lane job

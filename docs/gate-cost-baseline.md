@@ -398,6 +398,16 @@ pair factors, compares them with U25, and projects the measured walls to
 41,091 paths at a derived 103.1 and 104.0 min.
 [*evidence/u27/*](./evidence/u27/) holds the job rows and scripts.
 
+The own-key case shards also ran longer beside the second lane. The three
+measured duration records of [37398055382] attempt 2 sum to a derived
+1,422.9 s, 39.5% of the 3,600 s hard limit, leaving a derived 2,177.1 s
+margin. The measured records of the one-lane runs [37194069657] attempt 2,
+[37206614757] 1, [37215661294] 2, [37230598930] 1, [37237684441] 2,
+[37251028948] 1, [37315038080] 1, and [37332256715] 1 sum to a derived
+930.5 to 960.2 s, leaving a derived 2,639.8 to 2,669.5 s margin. Attempt
+1's records of [37398055382] were no longer downloadable after the full
+rerun.
+
 [37251028948]: https://github.com/dahlia/oseo/actions/runs/37251028948
 [37315038080]: https://github.com/dahlia/oseo/actions/runs/37315038080
 [37332256715]: https://github.com/dahlia/oseo/actions/runs/37332256715
