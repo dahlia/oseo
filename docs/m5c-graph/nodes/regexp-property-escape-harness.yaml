@@ -9,4 +9,4 @@ delivers: "Adds buildString and testPropertyEscapes to the reviewed
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

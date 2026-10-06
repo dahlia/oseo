@@ -7,4 +7,4 @@ delivers: "Proves that every proposed M5 exclusion cites an accepted record,
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

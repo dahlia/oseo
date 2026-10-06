@@ -9,4 +9,4 @@ delivers: "Owns the 16 reviewed paths rejected with Unknown binding 'eval'
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

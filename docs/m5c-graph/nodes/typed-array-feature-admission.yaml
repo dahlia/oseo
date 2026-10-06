@@ -9,4 +9,4 @@ delivers: "Admits the concrete TypedArray constructor feature tags and the
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

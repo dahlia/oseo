@@ -7,4 +7,4 @@ delivers: "Admits Promise.prototype.finally and the Promise feature tag, so
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

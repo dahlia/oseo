@@ -10,4 +10,4 @@ delivers: "Implements realm creation beyond the initial realm and the
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

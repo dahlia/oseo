@@ -9,4 +9,4 @@ delivers: "Admits the $262.evalScript and print host bindings, so the 14
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

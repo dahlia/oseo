@@ -8,4 +8,4 @@ delivers: "Admits the ES2025 iterator helpers so the 392 reviewed unsupported
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

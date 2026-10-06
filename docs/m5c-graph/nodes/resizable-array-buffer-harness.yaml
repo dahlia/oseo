@@ -8,4 +8,4 @@ delivers: "Reviews and admits the resizableArrayBufferUtils.js harness
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

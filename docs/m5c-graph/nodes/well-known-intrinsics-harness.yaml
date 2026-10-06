@@ -8,4 +8,4 @@ delivers: "Reviews the wellKnownIntrinsicObjects.js harness include, whose
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

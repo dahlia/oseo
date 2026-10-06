@@ -9,4 +9,4 @@ delivers: "Observes the 5 reviewed paths that never execute only because a
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

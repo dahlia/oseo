@@ -7,4 +7,4 @@ delivers: "Observes the 2 reviewed Atomics.wait cannot-suspend-throws.js
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

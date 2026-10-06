@@ -7,4 +7,4 @@ delivers: "Admits the pattern extensions that report regexp-pattern-extension,
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

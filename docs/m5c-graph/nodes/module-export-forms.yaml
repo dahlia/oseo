@@ -9,4 +9,4 @@ delivers: "Admits arbitrary module namespace names, export * as namespace,
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready

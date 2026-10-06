@@ -8,4 +8,4 @@ delivers: "Owns the 2 reviewed tagged-template tco-*.js paths gated by
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready
