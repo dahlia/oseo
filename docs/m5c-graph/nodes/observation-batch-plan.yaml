@@ -7,4 +7,4 @@ delivers: "Partitions every unreviewed path into deterministic bounded batches
 dependencies:
   - closure-ledger
 landed: false
-status: blocked
+status: ready

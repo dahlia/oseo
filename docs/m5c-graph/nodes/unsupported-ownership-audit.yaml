@@ -7,4 +7,4 @@ delivers: "Assigns every reviewed unsupported result to a remediation owner
 dependencies:
   - closure-ledger
 landed: false
-status: blocked
+status: ready

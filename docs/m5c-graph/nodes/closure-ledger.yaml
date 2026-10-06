@@ -6,5 +6,5 @@ delivers: "Creates one canonical path-indexed ledger over all 41,091 included
   recording an explicit unreviewed state for every remaining path."
 dependencies:
   - bootstrap-graph
-landed: false
+landed: true
 status: ready
