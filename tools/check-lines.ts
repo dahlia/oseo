@@ -26,6 +26,11 @@ function exemptLine(path: string, line: string): boolean {
   ) {
     return true;
   }
+  // Generated closure-ledger entries are canonical one-line records that
+  // check:m5c-closure-ledger owns; its hand-edited header still wraps.
+  if (path === "docs/m5c-closure/ledger.yaml" && line.startsWith("  test/")) {
+    return true;
+  }
   // Upstream test262 paths are fixed identifiers like URLs: a manifest line
   // is exempt only when removing that unbreakable token would fit.
   if (

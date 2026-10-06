@@ -218,6 +218,8 @@ at or below 80 columns. Wrap prose and code instead of relying on an editor's
 soft wrapping. Markdown table rows and link destinations are exempt. A URL may
 also exceed the limit wherever it appears, including in a source-code comment.
 Generated lockfiles are exempt and must not be hand-edited.
+Path entry lines in the generated *docs/m5c-closure/ledger.yaml* are exempt
+because `mise run check:m5c-closure-ledger` owns their canonical layout.
 Vendored source under *tools/oxlint/anti-slop/* is also exempt so that it stays
 directly comparable with upstream. Do not reformat it.
 
