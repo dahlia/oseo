@@ -173,7 +173,6 @@ test("scoped merge and reindex reproduce the complete serialization", () => {
       const results = generated
         .map(toResult)
         .toSorted((left, right) => (left.case.path < right.case.path ? -1 : 1));
-      const reviewed = new Set(results.map((result) => result.case.path));
       const subset: ReviewedTest262Subset = {
         suiteRevision: revision,
         supportedFeatures: [],
@@ -216,8 +215,7 @@ test("scoped merge and reindex reproduce the complete serialization", () => {
 
       const collected = collectReviewedPartitionRecords(
         full.partitions.map(({ path, text }) => ({ path, text })),
-        revision,
-        reviewed,
+        subset,
       );
       const reindexed = serializeTest262Manifest({
         results: collected,

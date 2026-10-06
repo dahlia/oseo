@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -26,6 +27,7 @@ import type {
   SerializedTest262Manifest,
 } from "../tools/test262-manifest.ts";
 import {
+  changedPathsSince,
   createReviewedManifest,
   mergeScopedManifest,
   parseTest262Arguments,
@@ -430,9 +432,9 @@ test("reindex rebuilds the index from partition files alone", async () => {
     const subset = subsetOf(allPaths.map((path) => entry(path)));
     const full = serializeTest262Manifest(await observe(root, subset));
     const files = full.partitions.map(({ path, text }) => ({ path, text }));
-    const reviewed = new Set(allPaths);
+    const reviewed = subset;
     const rebuilt = serializeTest262Manifest(
-      manifestOf(collectReviewedPartitionRecords(files, revision, reviewed)),
+      manifestOf(collectReviewedPartitionRecords(files, reviewed)),
     );
     assertSameSerialization(rebuilt, full);
 
@@ -441,8 +443,7 @@ test("reindex rebuilds the index from partition files alone", async () => {
     const [first] = full.partitions;
     assert.ok(first);
     assert.throws(
-      () =>
-        collectReviewedPartitionRecords([...files, first], revision, reviewed),
+      () => collectReviewedPartitionRecords([...files, first], reviewed),
       /occurs in both/u,
     );
     const recordStart = first.text.indexOf("  - case:");
@@ -456,11 +457,7 @@ test("reindex rebuilds the index from partition files alone", async () => {
     };
     assert.throws(
       () =>
-        collectReviewedPartitionRecords(
-          [doubled, ...files.slice(1)],
-          revision,
-          reviewed,
-        ),
+        collectReviewedPartitionRecords([doubled, ...files.slice(1)], reviewed),
       /must be unique|must be sorted/u,
     );
     // A record outside the subset and a missing reviewed path are errors.
@@ -468,8 +465,7 @@ test("reindex rebuilds the index from partition files alone", async () => {
       () =>
         collectReviewedPartitionRecords(
           files,
-          revision,
-          new Set(allPaths.slice(1)),
+          subsetOf(allPaths.slice(1).map((path) => entry(path))),
         ),
       /outside the reviewed subset/u,
     );
@@ -477,10 +473,29 @@ test("reindex rebuilds the index from partition files alone", async () => {
       () =>
         collectReviewedPartitionRecords(
           files,
-          revision,
-          new Set([...allPaths, "test/built-ins/Array/absent.js"]),
+          subsetOf(
+            [...allPaths, "test/built-ins/Array/absent.js"].map((path) =>
+              entry(path),
+            ),
+          ),
         ),
       /has no record/u,
+    );
+    // A record whose tags or classification differ from its subset entry
+    // is refused, so reindex cannot launder a stale record past the subset.
+    assert.throws(
+      () =>
+        collectReviewedPartitionRecords(
+          files,
+          subsetOf(
+            allPaths.map((path) =>
+              path === allPaths[0]
+                ? entry(path, { dependencies: ["lexical-bindings"] })
+                : entry(path),
+            ),
+          ),
+        ),
+      /does not match its reviewed subset entry/u,
     );
     // A conflict marker is a parse error.
     assert.throws(() =>
@@ -489,7 +504,6 @@ test("reindex rebuilds the index from partition files alone", async () => {
           { path: first.path, text: `<<<<<<< ours\n${first.text}` },
           ...files.slice(1),
         ],
-        revision,
         reviewed,
       ),
     );
@@ -584,6 +598,26 @@ test("merging scoped observations enforces the selection algebra", () => {
         reviewed,
       ),
     /is unsupported-profile-feature but the reviewed subset expects pass/u,
+  );
+  // A kept record must also carry the dependency tags its entry lists.
+  assert.throws(
+    () =>
+      mergeReviewedResults(
+        records,
+        [observedReplacement],
+        selection,
+        subsetOf(
+          allPaths.map((path) =>
+            path === kept.case.path
+              ? entry(path, {
+                  dependencies: ["functions", "lexical-bindings"],
+                  expectedClassification: "pass",
+                })
+              : passEntry(path),
+          ),
+        ),
+      ),
+    /records dependencies functions but the reviewed subset lists/u,
   );
   // A failure anywhere in the union is refused, as the full update
   // refuses it, even when the subset expectation was hand-edited to match.
@@ -761,4 +795,48 @@ test("scoped and reindex arguments compose only with their modes", () => {
     () => parseTest262Arguments(["--update", "--changed", "--changed"]),
     /only once/u,
   );
+});
+
+test("changed paths name a rename's origin and untracked files", async () => {
+  const root = await mkdtemp(join(tmpdir(), "oseo-test262-guard-git-"));
+  const run = (...args: readonly string[]): string =>
+    execFileSync(
+      "git",
+      [
+        "-c",
+        "user.name=Test",
+        "-c",
+        "user.email=test@example.com",
+        "-c",
+        "commit.gpgsign=false",
+        ...args,
+      ],
+      { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+    ).trim();
+  try {
+    run("init", "-q", "-b", "main");
+    run("config", "diff.renames", "true");
+    await mkdir(join(root, "packages"), { recursive: true });
+    await mkdir(join(root, "docs"), { recursive: true });
+    await writeFile(join(root, "packages/input.ts"), "export const a = 1;\n");
+    await writeFile(join(root, "docs/notes.md"), "notes\n");
+    run("add", "-A");
+    run("commit", "-q", "-m", "baseline");
+    // A source file moved into the allow-list must still name its origin,
+    // so the guard sees the implementation input that disappeared.
+    run("mv", "packages/input.ts", "docs/input.ts");
+    // An untracked file counts as a difference too.
+    await writeFile(join(root, "tests-harness-new.js"), "// new\n");
+    assert.deepEqual(changedPathsSince("HEAD", root), [
+      "docs/input.ts",
+      "packages/input.ts",
+      "tests-harness-new.js",
+    ]);
+    assert.throws(
+      () => rejectScopedUpdateDifferences(changedPathsSince("HEAD", root), "x"),
+      /refused: packages\/input\.ts differs from x/u,
+    );
+  } finally {
+    await rm(root, { force: true, recursive: true });
+  }
 });

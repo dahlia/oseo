@@ -3006,9 +3006,9 @@ export function parseTest262Arguments(
   };
 }
 
-function git(args: readonly string[]): string {
+function git(args: readonly string[], cwd = repositoryRoot): string {
   return execFileSync("git", ["-c", "core.fsmonitor=false", ...args], {
-    cwd: repositoryRoot,
+    cwd,
     encoding: "utf8",
     maxBuffer: 128 * 1024 * 1024,
     stdio: ["ignore", "pipe", "pipe"],
@@ -3044,16 +3044,18 @@ function resolveScopedBaseline(explicit: string | undefined): string {
  * moved into the allow-list still names its forbidden origin, and NUL
  * delimiters keep unusual file names intact.
  */
-function changedPathsSince(revision: string): readonly string[] {
-  const tracked = git([
-    "diff",
-    "--no-renames",
-    "--name-only",
-    "-z",
-    revision,
-    "--",
-  ]);
-  const untracked = git(["ls-files", "--others", "--exclude-standard", "-z"]);
+export function changedPathsSince(
+  revision: string,
+  cwd: string = repositoryRoot,
+): readonly string[] {
+  const tracked = git(
+    ["diff", "--no-renames", "--name-only", "-z", revision, "--"],
+    cwd,
+  );
+  const untracked = git(
+    ["ls-files", "--others", "--exclude-standard", "-z"],
+    cwd,
+  );
   return [...tracked.split("\0"), ...untracked.split("\0")]
     .filter((path) => path.length > 0)
     .toSorted();
@@ -3122,8 +3124,7 @@ async function reindexManifest(): Promise<void> {
   const subset = parseReviewedSubset(await readFile(subsetPath, "utf8"));
   const results = collectReviewedPartitionRecords(
     await readPartitionFiles(),
-    subset.suiteRevision,
-    new Set(subset.tests.map((entry) => entry.path)),
+    subset,
   );
   const serialized = serializeTest262Manifest({
     results,

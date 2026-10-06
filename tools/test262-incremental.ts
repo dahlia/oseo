@@ -151,7 +151,7 @@ export function mergeReviewedResults(
   subset: ReviewedTest262Subset,
 ): readonly Test262Result[] {
   const expectations = new Map(
-    subset.tests.map((entry) => [entry.path, entry.expectedClassification]),
+    subset.tests.map((entry) => [entry.path, entry]),
   );
   const observedPaths = new Set<string>();
   for (const result of observed) {
@@ -181,10 +181,18 @@ export function mergeReviewedResults(
     if (keptPaths.has(path)) {
       throw new Error(`test262 result ${path} is repeated.`);
     }
-    if (result.classification !== expected) {
+    if (result.classification !== expected.expectedClassification) {
       throw new Error(
         `kept test262 result ${path} is ${result.classification} but the ` +
-          `reviewed subset expects ${expected}; run mise run test262:update.`,
+          `reviewed subset expects ${expected.expectedClassification}; run ` +
+          "mise run test262:update.",
+      );
+    }
+    if (!sameStrings(result.dependencies, expected.dependencies)) {
+      throw new Error(
+        `kept test262 result ${path} records dependencies ` +
+          `${result.dependencies.join(", ")} but the reviewed subset lists ` +
+          `${expected.dependencies.join(", ")}; run mise run test262:update.`,
       );
     }
     keptPaths.add(path);
@@ -260,14 +268,17 @@ export function requireCanonicalManifest(
  * the index. This is the reindex input after a merge whose index or parity
  * file may hold conflict markers or miss another branch's new partition.
  * Each file must still parse as a partition of the group and key its path
- * names at the pinned revision; a path recorded twice anywhere is an error
- * to resolve by hand, never a silent choice between two observations.
+ * names at the pinned revision, every record must carry the classification
+ * and dependency tags its subset entry states, and a path recorded twice
+ * anywhere is an error to resolve by hand, never a silent choice between
+ * two observations.
  */
 export function collectReviewedPartitionRecords(
   files: readonly ManifestFileText[],
-  suiteRevision: string,
-  reviewedPaths: ReadonlySet<string>,
+  subset: ReviewedTest262Subset,
 ): readonly Test262Result[] {
+  const suiteRevision = subset.suiteRevision;
+  const entries = new Map(subset.tests.map((entry) => [entry.path, entry]));
   const results: Test262Result[] = [];
   const owners = new Map<string, string>();
   for (const file of files.toSorted((left, right) =>
@@ -287,17 +298,27 @@ export function collectReviewedPartitionRecords(
           `test262 result ${path} occurs in both ${owner} and ${file.path}.`,
         );
       }
-      if (!reviewedPaths.has(path)) {
+      const entry = entries.get(path);
+      if (entry == null) {
         throw new Error(
           `test262 result ${path} in ${file.path} is outside the reviewed ` +
             "subset.",
+        );
+      }
+      if (
+        result.classification !== entry.expectedClassification ||
+        !sameStrings(result.dependencies, entry.dependencies)
+      ) {
+        throw new Error(
+          `test262 result ${path} in ${file.path} does not match its ` +
+            "reviewed subset entry; run mise run test262:update.",
         );
       }
       owners.set(path, file.path);
       results.push(result);
     }
   }
-  for (const path of reviewedPaths) {
+  for (const path of entries.keys()) {
     if (!owners.has(path)) {
       throw new Error(`reviewed test262 path ${path} has no record.`);
     }
