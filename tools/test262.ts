@@ -1,9 +1,8 @@
-import { nativeToolchain } from "../tests/native-toolchain.ts";
-import { runNativeCli } from "../tests/native-cli.ts";
 import { createTest262FragmentExecutor } from "./test262-fragments.ts";
 import type { Test262FragmentInput } from "./test262-fragments.ts";
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
+import { execFileSync } from "node:child_process";
 import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { availableParallelism } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -60,8 +59,19 @@ import type {
 } from "../packages/testkit/src/index.ts";
 import { isScalar, parse as parseYaml, parseDocument } from "yaml";
 
+import {
+  resolveCompatibilityBaseline,
+  selectBaselineIntent,
+} from "./compatibility-ratchet.ts";
 import { parseTestShardArguments, selectTestShard } from "./shard.ts";
 import type { TestShard, TestShardArguments } from "./shard.ts";
+import {
+  collectReviewedPartitionRecords,
+  mergeReviewedResults,
+  rejectScopedUpdateDifferences,
+  requireCanonicalManifest,
+  selectChangedReviewedPaths,
+} from "./test262-incremental.ts";
 import {
   canonicalTest262Target,
   normalizeReviewedManifestText,
@@ -77,6 +87,7 @@ import type {
   SerializedTest262Manifest,
   SerializedTest262Partition,
 } from "./test262-manifest.ts";
+import type { NativeToolchain } from "../packages/compiler/src/index.ts";
 
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
@@ -259,6 +270,12 @@ export interface ReviewedTest262RunOptions {
 /** Arguments owned by the reviewed test262 runner. */
 export interface Test262Arguments extends TestShardArguments {
   readonly acceptPromotions: boolean;
+  /** Baseline revision for a scoped update; undefined selects the default. */
+  readonly baseline?: string;
+  /** Observe only the subset entries changed against the baseline. */
+  readonly changed: boolean;
+  /** Rebuild the index and parity from partition files without executing. */
+  readonly reindex: boolean;
 }
 
 /** A reviewed run failure carrying reproducible operational metadata. */
@@ -2532,42 +2549,69 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
   };
 }
 
-const fragmentExecutor = createTest262FragmentExecutor(
-  runnerHost,
-  nativeToolchain,
-);
-const nativeExecutor: Test262Executor = {
-  ...includePropertiesWhen(() => {
-    if (executionTarget == null) return undefined;
-    return {
-      target: executionTarget,
-    };
-  }),
-  async execute(request: Test262ExecutionRequest): Promise<CliResult> {
-    const entry =
-      request.mode === "module" && request.sourcePath != null
-        ? request.sourcePath
-        : request.sourceId;
-    const args = [
-      ...(request.mode === "module" ? ["--module"] : []),
-      ...(request.test262Host === true ? ["--test262-host"] : []),
-      ...(request.specialization === "disabled" ? ["--no-specialization"] : []),
-      ...(runtimeArchiveReuse === "disabled"
-        ? ["--no-runtime-archive-reuse"]
-        : []),
-      ...(executionTarget == null ? [] : ["--target", executionTarget]),
-      entry,
-    ];
-    return await fragmentExecutor.execute(request, () =>
-      runNativeCli({
-        args,
-        source: request.source,
-        sourceId: request.sourceId,
-        version: "0.1.0",
-      }),
-    );
-  },
-};
+/** The selected toolchain and the executors built on it, once loaded. */
+interface NativeExecution {
+  readonly executor: Test262Executor;
+  readonly fragmentExecutor: ReturnType<typeof createTest262FragmentExecutor>;
+  readonly toolchain: NativeToolchain;
+}
+
+let nativeExecution: NativeExecution | undefined;
+
+/**
+ * Load the integration toolchain selected by tests/native-toolchain.ts and
+ * build the executors on first use. Loading that module probes the host
+ * compiler under the sanitizer lane, so modes that execute nothing, such
+ * as `--reindex`, must never reach this function; the selection itself
+ * stays in that one module, as `check:native-toolchains` requires.
+ */
+async function loadNativeExecution(): Promise<NativeExecution> {
+  if (nativeExecution != null) return nativeExecution;
+  const [{ nativeToolchain }, { runNativeCli }] = await Promise.all([
+    import("../tests/native-toolchain.ts"),
+    import("../tests/native-cli.ts"),
+  ]);
+  const fragmentExecutor = createTest262FragmentExecutor(
+    runnerHost,
+    nativeToolchain,
+  );
+  const executor: Test262Executor = {
+    ...includePropertiesWhen(() => {
+      if (executionTarget == null) return undefined;
+      return {
+        target: executionTarget,
+      };
+    }),
+    async execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      const entry =
+        request.mode === "module" && request.sourcePath != null
+          ? request.sourcePath
+          : request.sourceId;
+      const args = [
+        ...(request.mode === "module" ? ["--module"] : []),
+        ...(request.test262Host === true ? ["--test262-host"] : []),
+        ...(request.specialization === "disabled"
+          ? ["--no-specialization"]
+          : []),
+        ...(runtimeArchiveReuse === "disabled"
+          ? ["--no-runtime-archive-reuse"]
+          : []),
+        ...(executionTarget == null ? [] : ["--target", executionTarget]),
+        entry,
+      ];
+      return await fragmentExecutor.execute(request, () =>
+        runNativeCli({
+          args,
+          source: request.source,
+          sourceId: request.sourceId,
+          version: "0.1.0",
+        }),
+      );
+    },
+  };
+  nativeExecution = { executor, fragmentExecutor, toolchain: nativeToolchain };
+  return nativeExecution;
+}
 
 function positiveInteger(value: number, description: string): number {
   if (!Number.isSafeInteger(value) || value < 1) {
@@ -2583,8 +2627,9 @@ function runMetadata(
 ): ReviewedTest262RunMetadata {
   return {
     ...includePropertiesWhen(() => {
-      if (nativeToolchain.identity == null) return undefined;
-      return { toolchainIdentity: nativeToolchain.identity };
+      const identity = nativeExecution?.toolchain.identity;
+      if (identity == null) return undefined;
+      return { toolchainIdentity: identity };
     }),
     durationMilliseconds:
       Math.round((performance.now() - startedAt) * 100) / 100,
@@ -2649,10 +2694,11 @@ export async function createReviewedManifest(
   subset: ReviewedTest262Subset,
   root: string,
   harnesses: Test262Harnesses,
-  executor: Test262Executor = nativeExecutor,
+  explicitExecutor?: Test262Executor,
   options: ReviewedTest262RunOptions = {},
 ): Promise<ReviewedTest262Run> {
   const startedAt = performance.now();
+  const executor = explicitExecutor ?? (await loadNativeExecution()).executor;
   const configuredPoolLimit = positiveInteger(
     options.poolLimit ?? reviewedExecutionPoolLimit,
     "Reviewed test262 pool limit",
@@ -2890,43 +2936,232 @@ async function existingPartitionPaths(): Promise<readonly string[]> {
   }
 }
 
-async function writeSerializedManifest(
-  manifest: SerializedTest262Manifest,
-): Promise<void> {
-  const resultDirectory = dirname(resultPath);
-  const expected = new Set(manifest.partitions.map(({ path }) => path));
-  for (const existing of await existingPartitionPaths()) {
-    if (!expected.has(existing)) {
-      await rm(join(resultDirectory, existing));
-    }
-  }
-  for (const partition of manifest.partitions) {
-    const path = join(resultDirectory, partition.path);
-    await mkdir(dirname(path), { recursive: true });
-    await writeFile(path, partition.text);
-  }
-  await writeFile(resultPath, manifest.indexText);
-}
-
-/** Parse the reviewed runner's update-only promotion option. */
+/**
+ * Parse the reviewed runner's own options before the shared shard flags.
+ * `--accept-promotions`, `--changed`, and `--baseline REV` belong to
+ * `--update`; `--reindex` stands alone because it executes nothing.
+ */
 export function parseTest262Arguments(
   args: readonly string[],
 ): Test262Arguments {
-  const promotionArguments = args.filter(
-    (argument) => argument === "--accept-promotions",
-  );
-  if (promotionArguments.length > 1) {
-    throw new Error("accept-promotions may be specified only once.");
+  const remaining: string[] = [];
+  let acceptPromotions = false;
+  let changed = false;
+  let reindex = false;
+  let baseline: string | undefined;
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (argument === "--accept-promotions") {
+      if (acceptPromotions) {
+        throw new Error("accept-promotions may be specified only once.");
+      }
+      acceptPromotions = true;
+    } else if (argument === "--changed") {
+      if (changed) throw new Error("changed may be specified only once.");
+      changed = true;
+    } else if (argument === "--reindex") {
+      if (reindex) throw new Error("reindex may be specified only once.");
+      reindex = true;
+    } else if (
+      argument === "--baseline" ||
+      argument?.startsWith("--baseline=")
+    ) {
+      if (baseline != null) {
+        throw new Error("baseline may be specified only once.");
+      }
+      const value =
+        argument === "--baseline"
+          ? args[++index]
+          : argument.slice("--baseline=".length);
+      if (value == null || value.length === 0 || value.startsWith("-")) {
+        throw new Error("baseline requires a Git revision.");
+      }
+      baseline = value;
+    } else if (argument != null) {
+      remaining.push(argument);
+    }
   }
-  const shared = parseTestShardArguments(
-    args.filter((argument) => argument !== "--accept-promotions"),
-    { allowUpdate: true },
-  );
-  const acceptPromotions = promotionArguments.length === 1;
+  const shared = parseTestShardArguments(remaining, { allowUpdate: true });
   if (acceptPromotions && !shared.update) {
     throw new Error("accept-promotions requires update.");
   }
-  return { ...shared, acceptPromotions };
+  if (changed && !shared.update) {
+    throw new Error("changed requires update.");
+  }
+  if (baseline != null && !changed) {
+    throw new Error("baseline requires changed.");
+  }
+  if (reindex && (shared.update || shared.shard != null || acceptPromotions)) {
+    throw new Error("reindex cannot be combined with update or shard.");
+  }
+  return {
+    ...shared,
+    acceptPromotions,
+    ...includePropertiesWhen(() => {
+      if (baseline == null) return undefined;
+      return { baseline };
+    }),
+    changed,
+    reindex,
+  };
+}
+
+function git(args: readonly string[], cwd = repositoryRoot): string {
+  return execFileSync("git", ["-c", "core.fsmonitor=false", ...args], {
+    cwd,
+    encoding: "utf8",
+    maxBuffer: 128 * 1024 * 1024,
+    stdio: ["ignore", "pipe", "pipe"],
+  }).trim();
+}
+
+/**
+ * Resolve the scoped update's baseline: the explicit revision, or the
+ * compatibility ratchet's local rule (HEAD on main, otherwise the merge
+ * base with main) so the guard, the ratchet, and the reviewer compare the
+ * change against the same commit.
+ */
+function resolveScopedBaseline(explicit: string | undefined): string {
+  if (explicit != null) {
+    return git(["rev-parse", "--verify", `${explicit}^{commit}`]);
+  }
+  const branch = git(["branch", "--show-current"]);
+  const intent = selectBaselineIntent(
+    {},
+    undefined,
+    branch.length === 0 ? undefined : branch,
+  );
+  const resolved = resolveCompatibilityBaseline(intent);
+  if (resolved == null) {
+    throw new Error("scoped test262 update could not select a baseline.");
+  }
+  return resolved;
+}
+
+/**
+ * Tracked and untracked paths differing between a revision and the tree.
+ * Renames are reported as a deletion and an addition so a source path
+ * moved into the allow-list still names its forbidden origin, and NUL
+ * delimiters keep unusual file names intact.
+ */
+export function changedPathsSince(
+  revision: string,
+  cwd: string = repositoryRoot,
+): readonly string[] {
+  const tracked = git(
+    ["diff", "--no-renames", "--name-only", "-z", revision, "--"],
+    cwd,
+  );
+  const untracked = git(
+    ["ls-files", "--others", "--exclude-standard", "-z"],
+    cwd,
+  );
+  return [...tracked.split("\0"), ...untracked.split("\0")]
+    .filter((path) => path.length > 0)
+    .toSorted();
+}
+
+/** Write only files whose text differs; remove partitions no longer indexed. */
+async function writeChangedSerializedManifest(
+  manifest: SerializedTest262Manifest,
+): Promise<{
+  readonly removed: number;
+  readonly unchanged: number;
+  readonly written: number;
+}> {
+  const resultDirectory = dirname(resultPath);
+  const expected = new Set(manifest.partitions.map(({ path }) => path));
+  let removed = 0;
+  for (const existing of await existingPartitionPaths()) {
+    if (!expected.has(existing)) {
+      await rm(join(resultDirectory, existing));
+      removed += 1;
+    }
+  }
+  let written = 0;
+  let unchanged = 0;
+  const writeIfChanged = async (path: string, text: string): Promise<void> => {
+    let current: string | undefined;
+    try {
+      current = normalizeReviewedManifestText(await readFile(path, "utf8"));
+    } catch (error) {
+      if (!(isObject(error) && "code" in error && error.code === "ENOENT")) {
+        throw error;
+      }
+    }
+    if (current === text) {
+      unchanged += 1;
+      return;
+    }
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, text);
+    written += 1;
+  };
+  for (const partition of manifest.partitions) {
+    await writeIfChanged(join(resultDirectory, partition.path), partition.text);
+  }
+  await writeIfChanged(resultPath, manifest.indexText);
+  return { removed, unchanged, written };
+}
+
+async function readPartitionFiles(): Promise<
+  readonly { readonly path: string; readonly text: string }[]
+> {
+  const files: { readonly path: string; readonly text: string }[] = [];
+  for (const path of await existingPartitionPaths()) {
+    files.push({
+      path,
+      text: normalizeReviewedManifestText(
+        await readFile(join(dirname(resultPath), path), "utf8"),
+      ),
+    });
+  }
+  return files;
+}
+
+/** Rebuild the index, summary, and parity from the partition files alone. */
+async function reindexManifest(): Promise<void> {
+  const subset = parseReviewedSubset(await readFile(subsetPath, "utf8"));
+  const results = collectReviewedPartitionRecords(
+    await readPartitionFiles(),
+    subset,
+  );
+  const serialized = serializeTest262Manifest({
+    results,
+    suiteRevision: subset.suiteRevision,
+    summary: summarizeTest262(results),
+  });
+  const counts = await writeChangedSerializedManifest(serialized);
+  await writeFile(
+    parityPath,
+    serializeTargetParity(serialized, subset.suiteRevision),
+  );
+  console.log(
+    `test262 reindex revision=${subset.suiteRevision} ` +
+      `results=${results.length} partitions=${serialized.partitions.length} ` +
+      `written=${counts.written} unchanged=${counts.unchanged} ` +
+      `removed=${counts.removed}`,
+  );
+}
+
+/** Combine kept records with the scoped observations into one manifest. */
+export function mergeScopedManifest(
+  existing: ReviewedTest262Manifest,
+  observed: ReviewedTest262Manifest,
+  selected: ReadonlySet<string>,
+  subset: ReviewedTest262Subset,
+): ReviewedTest262Manifest {
+  const results = mergeReviewedResults(
+    existing.results,
+    observed.results,
+    selected,
+    subset,
+  );
+  return {
+    results,
+    suiteRevision: subset.suiteRevision,
+    summary: summarizeTest262(results),
+  };
 }
 
 async function main(): Promise<void> {
@@ -2934,36 +3169,92 @@ async function main(): Promise<void> {
   if (cliArguments.help) {
     console.log(
       "usage: node tools/test262.ts " +
-        "[--shard INDEX/TOTAL | --update [--accept-promotions]]",
+        "[--shard INDEX/TOTAL | --update [--accept-promotions] " +
+        "[--changed [--baseline REV]] | --reindex]",
     );
+    return;
+  }
+  if (cliArguments.reindex) {
+    await reindexManifest();
     return;
   }
   requireSupportedHost();
   const subsetText = await readFile(subsetPath, "utf8");
   const subset = parseReviewedSubset(subsetText);
+  let scoped:
+    | {
+        readonly baseline: string;
+        readonly existing: ReviewedTest262Manifest;
+        readonly selected: ReadonlySet<string>;
+      }
+    | undefined;
+  if (cliArguments.changed) {
+    const baseline = resolveScopedBaseline(cliArguments.baseline);
+    rejectScopedUpdateDifferences(changedPathsSince(baseline), baseline);
+    const baselineSubset = parseReviewedSubset(
+      git(["show", `${baseline}:tests/test262/subset.yaml`]),
+    );
+    const selected = new Set(
+      selectChangedReviewedPaths(baselineSubset, subset),
+    );
+    const onDisk = await readSerializedManifest();
+    const texts = new Map(
+      onDisk.partitions.map(({ path, text }) => [path, text]),
+    );
+    const existing = parseReviewedManifest(onDisk.indexText, (path) => {
+      const text = texts.get(path);
+      if (text == null) throw new Error(`Missing test262 partition ${path}.`);
+      return text;
+    });
+    if (existing.suiteRevision !== subset.suiteRevision) {
+      throw new Error(
+        "test262 results suite revision does not match the subset.",
+      );
+    }
+    requireCanonicalManifest(onDisk, existing);
+    scoped = { baseline, existing, selected };
+    console.log(
+      `test262 scoped update baseline=${baseline} selected=${selected.size}`,
+    );
+  }
   const selectedSubset = {
     ...subset,
-    tests: selectTestShard(subset.tests, cliArguments.shard),
+    tests:
+      scoped == null
+        ? selectTestShard(subset.tests, cliArguments.shard)
+        : subset.tests.filter((entry) => scoped.selected.has(entry.path)),
   };
   const root = await suiteRoot(subset.suiteRevision);
   const harnesses = await readHarnesses(root);
+  const native = await loadNativeExecution();
   const run = await createReviewedManifest(
     selectedSubset,
     root,
     harnesses,
-    nativeExecutor,
+    native.executor,
     { acceptPromotions: cliArguments.acceptPromotions },
   );
   const { manifest, metadata } = run;
-  console.log(`test262-builds ${JSON.stringify(fragmentExecutor.counts)}`);
+  console.log(
+    `test262-builds ${JSON.stringify(native.fragmentExecutor.counts)}`,
+  );
   const canonicalManifest = canonicalizeManifestTarget(manifest);
-  const serialized = serializeTest262Manifest(canonicalManifest);
+  const serialized = serializeTest262Manifest(
+    scoped == null
+      ? canonicalManifest
+      : mergeScopedManifest(
+          scoped.existing,
+          canonicalManifest,
+          scoped.selected,
+          subset,
+        ),
+  );
   if (cliArguments.update) {
     const rewrittenSubset = rewriteReviewedPromotions(
       subsetText,
       run.promotedPaths,
     );
-    await writeSerializedManifest(serialized);
+    const counts = await writeChangedSerializedManifest(serialized);
     await writeFile(
       parityPath,
       serializeTargetParity(serialized, manifest.suiteRevision),
@@ -2972,6 +3263,11 @@ async function main(): Promise<void> {
     for (const path of run.promotedPaths) {
       console.log(`promoted ${path}`);
     }
+    console.log(
+      `test262 manifest partitions=${serialized.partitions.length} ` +
+        `written=${counts.written} unchanged=${counts.unchanged} ` +
+        `removed=${counts.removed}`,
+    );
   } else {
     const expected = await readSerializedManifest();
     const partitionTexts = new Map(

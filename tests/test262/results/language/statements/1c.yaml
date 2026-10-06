@@ -48,8 +48,8 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/cptn-expr-itr.js:105:1\
         8: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

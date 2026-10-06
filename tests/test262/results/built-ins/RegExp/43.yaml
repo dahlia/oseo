@@ -141,8 +141,8 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/RegExp/prototype/source/value-u.js:99:6:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

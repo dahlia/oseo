@@ -60,8 +60,8 @@ results:
         stderr="test/built-ins/Array/prototype/every/15.4.4.16-5-23.js:89:10:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
-      unsupportedCapability: primitive-wrapper
       passed: false
+      unsupportedCapability: primitive-wrapper
     unsupportedFeatures: []
   - case:
       async: false

@@ -60,8 +60,8 @@ results:
         stderr="test/built-ins/Array/prototype/filter/15.4.4.20-9-c-ii-16.js:87:10:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
-      unsupportedCapability: primitive-wrapper
       passed: false
+      unsupportedCapability: primitive-wrapper
     unsupportedFeatures: []
   - case:
       async: false
@@ -91,8 +91,8 @@ results:
         stderr="test/built-ins/Array/prototype/filter/15.4.4.20-9-c-ii-17.js:87:16:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
-      unsupportedCapability: primitive-wrapper
       passed: false
+      unsupportedCapability: primitive-wrapper
     unsupportedFeatures: []
   - case:
       async: false
@@ -147,8 +147,8 @@ results:
         non-strict disabled failed (1): stdout=\"\"
         stderr=\"test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2\
         -8.js:94:12: error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

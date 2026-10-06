@@ -25,8 +25,8 @@ results:
         stderr="test/built-ins/Reflect/apply/arguments-list-is-not-array-like-but-still-valid.js:123:17:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

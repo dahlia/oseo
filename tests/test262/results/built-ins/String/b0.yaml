@@ -53,7 +53,7 @@ results:
         stderr=\"test/built-ins/String/prototype/split/separator-regexp\
         -limit-string-via-eval.js:94:56: error[OSEO1001]: Unknown
         binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

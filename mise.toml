@@ -304,6 +304,17 @@ description = "Regenerate the pinned reviewed test262 result manifest"
 depends = ["build"]
 run = "node tools/test262.ts --update"
 
+[tasks."test262:update:changed"]
+description = "Observe only reviewed subset entries changed since a baseline"
+depends = ["build"]
+raw_args = true
+run = "node tools/test262.ts --update --changed"
+
+[tasks."test262:reindex"]
+description = "Rebuild the test262 index and parity from the partition files"
+depends = ["build"]
+run = "node tools/test262.ts --reindex"
+
 [tasks."test262:inventory:update"]
 description = "Regenerate the pinned ECMA-262 applicable-test inventory"
 run = "node tools/test262-inventory.ts --update"

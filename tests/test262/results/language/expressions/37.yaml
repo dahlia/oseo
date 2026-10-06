@@ -251,8 +251,8 @@ results:
         stderr=\"test/language/expressions/optional-chaining/eval-optio\
         nal-call.js:107:10: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

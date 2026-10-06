@@ -520,3 +520,7 @@ families:
     owner: tests/property/m5-super-without-extends.property.test.ts
     start: 0x60008100
     end: 0x600081ff
+  - family: test262-incremental
+    owner: tests/test262-incremental.property.test.ts
+    start: 0x60008200
+    end: 0x600082ff

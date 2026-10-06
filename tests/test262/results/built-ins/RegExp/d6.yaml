@@ -59,8 +59,8 @@ results:
         stderr="test/built-ins/RegExp/named-groups/unicode-property-names.js:102:8:
         error[OSEO2001]: Regular expression pattern extension is not
         admitted yet.\n"'
-      unsupportedCapability: regexp-pattern-extension
       passed: false
+      unsupportedCapability: regexp-pattern-extension
     unsupportedFeatures: []
   - case:
       async: false

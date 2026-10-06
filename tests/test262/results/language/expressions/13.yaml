@@ -226,8 +226,8 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/expressions/equals/S11.9.1_A1.js:88:5:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

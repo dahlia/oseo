@@ -149,8 +149,8 @@ results:
         error[OSEO1001]: A named backreference in a pattern that
         declares no group name is admitted only by Annex B, which is
         outside the profile.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

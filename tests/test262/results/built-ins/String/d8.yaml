@@ -36,8 +36,8 @@ results:
         stderr="test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js:96:29:
         error[OSEO2001]: Regular expression pattern extension is not
         admitted yet.\n"'
-      unsupportedCapability: regexp-pattern-extension
       passed: false
+      unsupportedCapability: regexp-pattern-extension
     unsupportedFeatures: []
   - case:
       async: false

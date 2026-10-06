@@ -18,7 +18,7 @@ results:
     observation:
       detail: "test/language/module-code/instn-iee-star-cycle-indirect-x_FIXT\
         URE.js:8:8: error[OSEO1001]: This export is unsupported."
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

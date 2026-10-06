@@ -482,6 +482,45 @@ file set on each matching host. The unsharded tasks remain the local gates, and
 `mise run test262:update` always regenerates the complete manifest without
 sharding.
 
+### Scoped manifest regeneration
+
+`mise run test262:update:changed` observes only the reviewed subset entries
+that are new or changed against a baseline revision and rewrites only the
+partitions those paths occupy; the index summary, per-dependency counts, and
+*target-parity.yaml* digest are recomputed from the union of all partitions.
+The baseline defaults to the compatibility ratchet's local rule, `HEAD` on
+*main* and the merge base with *main* elsewhere; pass `--baseline REV` to
+name one explicitly, for example after a rebase.
+
+The scoped mode is sound only when every untouched record still describes the
+implementation being landed. The runner cannot verify that without observing
+the whole corpus, so it refuses the scoped mode unless every path that differs
+from the baseline is observation-neutral: *tests/test262/subset.yaml* with its
+`suiteRevision` and `supportedFeatures` unchanged and no path removed, the
+manifest files under *tests/test262/results/*, *results.yaml*,
+*target-parity.yaml*, *docs/*, and Markdown. Any change under *packages/*,
+*tools/*, *tests/test262/harness/*, the lockfile, or the toolchain pins
+requires `mise run test262:update`. The refusal is syntactic and deliberate:
+a comment-only change under *tools/* is refused like any other. It also
+refuses a checked-in manifest that is not canonical, meaning a partition
+whose text differs from what the serializer emits for its parsed values.
+
+A scoped update must be rerun after any rebase or merge that brings in a
+change outside that allow-list, because its earlier observations were made
+under the previous implementation. The runner cannot detect an omitted
+rerun; the full `test:test262` gate, which `mise run test` and every CI shard
+run, compares fresh observations against the checked-in manifest byte for
+byte and rejects a manifest whose records describe two implementations.
+Never land a scoped update with that gate skipped.
+
+`mise run test262:reindex` executes nothing. It discovers every partition
+file on disk, requires their path set to equal the reviewed subset exactly
+with no path recorded twice, and rewrites the index, summary, and parity
+from that union. Use it to repair the derived files after merging two
+branches whose scoped updates touched disjoint paths; it never changes a
+record, cannot judge freshness, and treats a path recorded twice as an error
+to resolve by hand.
+
 The wrapper's `--shard INDEX/TOTAL` uses the checked-in measured weights in
 *tools/native-shard-costs.ts*. It sorts files by descending weight, breaking
 ties by path, and groups them in batches of three on macOS and four on Linux.

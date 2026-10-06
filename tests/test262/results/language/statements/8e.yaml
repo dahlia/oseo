@@ -194,8 +194,8 @@ results:
         disabled failed (1): stdout=\"\"
         stderr=\"test/language/statements/for-in/S12.6.4_A4.js:90:15:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

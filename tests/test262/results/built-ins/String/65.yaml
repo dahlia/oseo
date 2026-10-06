@@ -20,8 +20,8 @@ results:
         failed (1): stdout=\"\"
         stderr=\"test/built-ins/String/S15.5.1.1_A1_T6.js:87:20:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

@@ -176,8 +176,8 @@ results:
         stderr="test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js:91:15:
         error[OSEO2001]: ReferenceError: print is not
         defined.\nOSEO_THROWN ReferenceError\n"'
-      unsupportedCapability: host-binding
       passed: false
+      unsupportedCapability: host-binding
     unsupportedFeatures: []
   - case:
       async: false

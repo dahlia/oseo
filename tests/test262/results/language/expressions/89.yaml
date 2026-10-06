@@ -324,7 +324,7 @@ results:
         stderr=\"test/language/expressions/tagged-template/cache-differ\
         ing-expressions-eval.js:99:1: error[OSEO1001]: Unknown binding
         'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

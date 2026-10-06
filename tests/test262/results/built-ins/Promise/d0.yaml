@@ -29,8 +29,8 @@ results:
         non-strict disabled failed (1): stdout=""
         stderr="test/built-ins/Promise/allSettled/capability-resolve-throws-no-close.js:128:7:
         error[OSEO2001]: Unhandled promise rejection.\n"'
-      unsupportedCapability: unhandled-rejection-policy
       passed: false
+      unsupportedCapability: unhandled-rejection-policy
     unsupportedFeatures: []
   - case:
       async: true

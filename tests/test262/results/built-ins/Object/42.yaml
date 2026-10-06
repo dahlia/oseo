@@ -233,8 +233,8 @@ results:
         stderr="test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-187.js:86:9:
         error[OSEO1001]: The Function constructor requires dynamic
         source and is unsupported in M5.\n"'
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

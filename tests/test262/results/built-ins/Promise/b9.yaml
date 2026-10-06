@@ -20,8 +20,8 @@ results:
         failed (1): stdout=\"\"
         stderr=\"test/built-ins/Promise/all/ctx-non-ctor.js:94:20:
         error[OSEO1001]: Unknown binding 'eval'.\\n\""
-      unsupportedCapability: profile-syntax
       passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: true

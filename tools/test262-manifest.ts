@@ -10,7 +10,13 @@ import type {
   Test262Result,
   Test262Summary,
 } from "../packages/testkit/src/index.ts";
-import { parse as parseYaml, Scalar, stringify as stringifyYaml } from "yaml";
+import {
+  isScalar,
+  parse as parseYaml,
+  Scalar,
+  stringify as stringifyYaml,
+} from "yaml";
+import type { Pair } from "yaml";
 
 import {
   parsedObject as record,
@@ -235,6 +241,84 @@ function assumeValidatedResult(
   return value as Test262Result;
 }
 
+/** Group, key, and validated records read from one partition file. */
+export interface ParsedTest262Partition {
+  readonly group: string;
+  readonly key: string;
+  readonly results: readonly Test262Result[];
+  readonly suiteRevision: string;
+}
+
+/** Derive the group and key one partition path names, or throw. */
+export function partitionReference(path: string): ManifestPartitionReference {
+  const match =
+    /^results\/(?<group>[^/]+\/[^/]+)\/(?<key>[0-9a-f]{2})\.yaml$/u.exec(path);
+  const group = match?.groups?.group;
+  const key = match?.groups?.key;
+  if (group == null || key == null) {
+    throw new Error(`test262 partition path ${path} is invalid.`);
+  }
+  validateGroup(group, `test262 partition ${path} group`);
+  return { group, key, path };
+}
+
+/**
+ * Parse one partition file against the group and key its path names and
+ * the suite revision the index pins. Records are validated individually
+ * and must be sorted and unique within the file; uniqueness across files
+ * is the caller's responsibility.
+ */
+export function parseReviewedPartition(
+  path: string,
+  text: string,
+  suiteRevision: string,
+  firstIndex = 0,
+): ParsedTest262Partition {
+  const reference = partitionReference(path);
+  // SAFETY: parsedObject validates each complete partition tree.
+  const partition = record(
+    parseYaml(text) as StructuredDataInput,
+    `test262 partition ${path}`,
+  );
+  if (partition.group !== reference.group) {
+    throw new Error(`${path} group does not match its index.`);
+  }
+  if (partition.key !== reference.key) {
+    throw new Error(`${path} key does not match its index.`);
+  }
+  if (partition.suiteRevision !== suiteRevision) {
+    throw new Error(`${path} suite revision does not match.`);
+  }
+  if (!Array.isArray(partition.results)) {
+    throw new Error(`${path} needs a results array.`);
+  }
+  const results: Test262Result[] = [];
+  for (const value of partition.results) {
+    results.push(
+      parseResult(
+        value,
+        firstIndex + results.length,
+        reference.group,
+        reference.key,
+      ),
+    );
+  }
+  const paths = results.map((result) => result.case.path);
+  const sortedPaths = paths.toSorted();
+  if (paths.some((candidate, index) => candidate !== sortedPaths[index])) {
+    throw new Error(`${path} result paths must be sorted.`);
+  }
+  if (new Set(paths).size !== paths.length) {
+    throw new Error(`${path} result paths must be unique.`);
+  }
+  return {
+    group: reference.group,
+    key: reference.key,
+    results,
+    suiteRevision,
+  };
+}
+
 /** Parse the index and all of its canonical result partitions. */
 export function parseReviewedManifest(
   indexText: string,
@@ -252,42 +336,13 @@ export function parseReviewedManifest(
   const references = parsePartitionReferences(indexText);
   const results: Test262Result[] = [];
   for (const reference of references) {
-    // SAFETY: parsedObject validates each complete partition tree.
-    const partition = record(
-      parseYaml(readPartition(reference.path)) as StructuredDataInput,
-      `test262 partition ${reference.path}`,
+    const partition = parseReviewedPartition(
+      reference.path,
+      readPartition(reference.path),
+      suiteRevision,
+      results.length,
     );
-    if (partition.group !== reference.group) {
-      throw new Error(`${reference.path} group does not match its index.`);
-    }
-    if (partition.key !== reference.key) {
-      throw new Error(`${reference.path} key does not match its index.`);
-    }
-    if (partition.suiteRevision !== suiteRevision) {
-      throw new Error(`${reference.path} suite revision does not match.`);
-    }
-    if (!Array.isArray(partition.results)) {
-      throw new Error(`${reference.path} needs a results array.`);
-    }
-    const partitionResults: Test262Result[] = [];
-    for (const value of partition.results) {
-      partitionResults.push(
-        parseResult(
-          value,
-          results.length + partitionResults.length,
-          reference.group,
-          reference.key,
-        ),
-      );
-    }
-    const partitionPaths = partitionResults.map((result) => result.case.path);
-    const sortedPartitionPaths = partitionPaths.toSorted();
-    if (
-      partitionPaths.some((path, index) => path !== sortedPartitionPaths[index])
-    ) {
-      throw new Error(`${reference.path} result paths must be sorted.`);
-    }
-    results.push(...partitionResults);
+    results.push(...partition.results);
   }
   results.sort((left, right) =>
     left.case.path < right.case.path
@@ -307,10 +362,55 @@ export function parseReviewedManifest(
   return { results, suiteRevision, summary };
 }
 
+const countKeys = new Set([
+  "expectedNegatives",
+  "harnessFailures",
+  "infrastructureFailures",
+  "passes",
+  "semanticFailures",
+  "unsupportedProfileFeatures",
+]);
+
+function mappingKeyRank(key: string): number {
+  if (key === "group" || key === "dependency") return 0;
+  if (countKeys.has(key)) return 1;
+  return 2;
+}
+
+function mappingKey(pair: Pair): string {
+  const key: unknown = pair.key;
+  return isScalar(key) ? String(key.value) : String(key);
+}
+
+/**
+ * The canonical mapping order: an identity key first, then the shared
+ * classification counts, then every other key alphabetically. Fresh
+ * records are built with this order already, apart from one observation
+ * shape, and parsed records keep whatever order their file had, so the
+ * serializer imposes the order rather than trusting construction or
+ * input order. Output is thereby a function of record values alone.
+ */
+function compareMappingKeys(left: Pair, right: Pair): number {
+  const leftKey = mappingKey(left);
+  const rightKey = mappingKey(right);
+  const rank = mappingKeyRank(leftKey) - mappingKeyRank(rightKey);
+  if (rank !== 0) return rank;
+  return leftKey < rightKey ? -1 : leftKey > rightKey ? 1 : 0;
+}
+
 function stringify<Candidate>(value: StructuredDataInput<Candidate>): string {
   // Detail strings can occur at deep indentation, so reserve eight columns
-  // below the repository limit for the serializer's indentation.
-  return stringifyYaml(value, { lineWidth: 72 });
+  // below the repository limit for the serializer's indentation. Two
+  // records may share one array object, for example after parsing a YAML
+  // alias or when a subset entry's dependency list reaches several
+  // records, so the output must not depend on object identity: an anchor
+  // would make the text differ between a full and a scoped regeneration
+  // of the same record values.
+  return stringifyYaml(value, {
+    aliasDuplicateObjects: false,
+    lineWidth: 72,
+    sortMapEntries: compareMappingKeys,
+  });
 }
 
 /** Serialize ordered group partitions and their derived index summary. */
