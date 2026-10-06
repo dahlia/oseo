@@ -9,6 +9,7 @@ dependencies:
   - authorized-exclusion-audit
   - cross-realm-host
   - dynamic-import
+  - dynamic-source-coverage-remediation
   - eval-intrinsic-value
   - fn-global-object-harness
   - frontmatter-feature-tags
@@ -57,6 +58,7 @@ dependencies:
   - proper-tail-calls
   - regexp-pattern-extensions
   - regexp-property-escape-harness
+  - regexp-split-coverage-remediation
   - remediation-work-graph
   - resizable-array-buffer-harness
   - test262-host-script-bindings

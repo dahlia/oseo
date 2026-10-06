@@ -48,6 +48,7 @@ depends = [
   "check:m5b-graph",
   "check:m5b-node-scope",
   "check:m5c-closure-ledger",
+  "check:m5c-exclusion-audit",
   "check:m5c-graph",
   "check:m5c-observation-batches",
   "check:native-host-guards",
@@ -122,6 +123,10 @@ run = "node tools/m5b-node-scope.ts"
 [tasks."check:m5c-closure-ledger"]
 description = "Validate the derived M5c inventory closure ledger"
 run = "node tools/m5c-closure-ledger.ts"
+
+[tasks."check:m5c-exclusion-audit"]
+description = "Validate bounded M5c exclusions and unresolved coverage"
+run = "node tools/m5c-exclusion-audit.ts"
 
 [tasks."check:m5c-graph"]
 description = "Validate the checked-in M5c closure graph"
