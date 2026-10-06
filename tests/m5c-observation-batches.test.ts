@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
+import { resolve } from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import type { M5cClosureLedger } from "../tools/m5c-closure-ledger.ts";
 import {
@@ -21,9 +24,35 @@ import type {
   M5cRegenerationMeasurement,
 } from "../tools/m5c-observation-batches.ts";
 
+const repositoryRoot = resolve(fileURLToPath(import.meta.url), "../..");
 const revision = "abc123";
 const supported = new Set(["class", "generators"]);
 const harnesses = new Set(["assert.js", "compareArray.js"]);
+
+test("loads the plan checker without package build artifacts", () => {
+  // CI's check job runs this checker before any package is built.
+  const program = `
+import { registerHooks } from "node:module";
+
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    const result = nextResolve(specifier, context);
+    if (/\\/packages\\/[^/]+\\/dist\\//u.test(result.url)) {
+      throw new Error(\`plan checker loaded \${result.url}\`);
+    }
+    return result;
+  },
+});
+
+await import("./tools/m5c-observation-batches.ts");
+`;
+  const result = spawnSync(
+    process.execPath,
+    ["--input-type=module", "--eval", program],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  );
+  assert.equal(result.status, 0, result.stderr);
+});
 
 function source(frontmatter: string, body = "", header = ""): string {
   return `${header}/*---\n${frontmatter}\n---*/\n${body}\n`;

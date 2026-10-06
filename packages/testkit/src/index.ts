@@ -20,7 +20,11 @@ function includePropertiesWhen<const Properties extends object>(
   return properties() ?? {};
 }
 
-export { summarizeTest262, test262Group } from "./test262-summary.ts";
+export {
+  summarizeTest262,
+  test262DependencyVocabulary,
+  test262Group,
+} from "./test262-summary.ts";
 
 /** Complete observation retained for one native fixture build and run. */
 export interface NativeFixtureObservation extends ProcessObservation {
@@ -87,59 +91,6 @@ export type Test262ExecutionMode = "module" | "script";
  * Failure phase declared by test262 metadata. Parse includes early errors.
  */
 export type Test262FailurePhase = "parse" | "resolution" | "runtime";
-
-/**
- * Reviewed semantic dependency tags admitted by ADR 0013. Any other value
- * is a validation error until a reviewed change to that record admits it.
- */
-export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
-  "abrupt-completion",
-  "array-buffer",
-  "async-functions",
-  "async-iteration",
-  "atomics-single-agent",
-  "atomics-and-shared-memory",
-  "bigint-primitive",
-  "classes",
-  "control-flow",
-  "data-view",
-  "date",
-  "default-parameters",
-  "destructuring-bindings",
-  "dynamic-source",
-  "error-intrinsics",
-  "expression-operators",
-  "functions",
-  "generators",
-  "iterator-protocol",
-  "json-parse",
-  "json-stringify",
-  "lexical-bindings",
-  "module-linking",
-  "object-literals",
-  "object-own-keys",
-  "object-properties",
-  "promise-settlement",
-  "property-enumeration",
-  "proxy-exotic-object",
-  "reflect-namespace",
-  "regular-expressions",
-  "rest-parameters",
-  "set-composition-methods",
-  "set-intrinsic",
-  "symbols",
-  "timers",
-  "top-level-await",
-  "typed-array-constructors",
-  "typed-array-core",
-  "typed-array-iterative",
-  "typed-array-mutation",
-  "typed-array-search-and-join",
-  "typed-array-sort",
-  "typed-array-statics",
-  "var-bindings",
-  "weak-collections",
-]);
 
 /** Frontmatter and suite identity needed to reproduce one reviewed case. */
 export interface Test262Case {
