@@ -1,0 +1,11 @@
+version: 1
+id: unhandled-rejection-observation
+title: Observe unhandled rejections
+delivers: "Defines the host rejection-tracking policy test262 cases need, so
+  the 19 reviewed paths with the unhandled-rejection-policy unsupported
+  capability are observed rather than stopped at the first unhandled
+  rejection checkpoint."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

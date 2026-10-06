@@ -1,0 +1,12 @@
+version: 1
+id: regexp-property-escape-harness
+title: Complete the RegExp utility harness
+delivers: "Adds buildString and testPropertyEscapes to the reviewed
+  regExpUtils.js harness, with the Unicode property data they exercise, so
+  the 453 reviewed paths recorded as harness-definition unsupported (441
+  under test/built-ins/RegExp/property-escapes/ and 12 under
+  test/built-ins/RegExp/CharacterClassEscapes/) are observed."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

@@ -1,0 +1,12 @@
+version: 1
+id: module-export-forms
+title: Admit the remaining export forms
+delivers: "Admits arbitrary module namespace names, export * as namespace,
+  and the star-export and trailing-comma forms that report This export is
+  unsupported, so 28 reviewed paths are observed: 15 gated by
+  arbitrary-module-namespace-names, 7 by export-star-as-namespace-from-module,
+  and 6 rejected with that OSEO1001 diagnostic."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

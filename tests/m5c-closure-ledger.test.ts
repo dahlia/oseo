@@ -5,7 +5,9 @@ import { parse as parseYaml } from "yaml";
 
 import {
   deriveM5cClosureLedger,
+  isAcceptedDecisionRecord,
   parseM5cClosureLedger,
+  readCurrentAcceptedRecords,
   serializeM5cClosureLedger,
   validateCurrentM5cClosureLedger,
   validateM5cClosureLedger,
@@ -13,6 +15,7 @@ import {
 import type {
   M5cClosureLedger,
   M5cLedgerManifestInput,
+  M5cLedgerOwnerTargets,
 } from "../tools/m5c-closure-ledger.ts";
 import { deriveCurrentM5cBaseline } from "../tools/m5c-graph.ts";
 
@@ -23,6 +26,12 @@ const nodeIds: ReadonlySet<string> = new Set([
   "realm-remediation",
   "unsupported-ownership-audit",
 ]);
+const authorizingRecord = "0016-dynamic-source-boundary";
+const recordOwner = `adr:${authorizingRecord}`;
+const targets: M5cLedgerOwnerTargets = {
+  acceptedRecords: new Set([authorizingRecord]),
+  nodeIds,
+};
 const passPath = "test/built-ins/A/pass.js";
 const negativePath = "test/language/B/negative.js";
 const realmPath = "test/built-ins/A/realm.js";
@@ -63,7 +72,7 @@ const manifest: M5cLedgerManifestInput = {
 };
 
 function derive(previous?: M5cClosureLedger): M5cClosureLedger {
-  return deriveM5cClosureLedger(inventoryText, manifest, nodeIds, previous);
+  return deriveM5cClosureLedger(inventoryText, manifest, targets, previous);
 }
 
 const ledgerText = serializeM5cClosureLedger(derive());
@@ -71,8 +80,9 @@ const ledgerText = serializeM5cClosureLedger(derive());
 function validate(
   text: string,
   input: M5cLedgerManifestInput = manifest,
+  owners: M5cLedgerOwnerTargets = targets,
 ): ReturnType<typeof validateM5cClosureLedger> {
-  return validateM5cClosureLedger(text, inventoryText, input, nodeIds);
+  return validateM5cClosureLedger(text, inventoryText, input, owners);
 }
 
 function entryLine(path: string): string {
@@ -87,15 +97,24 @@ function replaceLine(text: string, path: string, line: string): string {
   return text.replace(entryLine(path), line);
 }
 
-function withOwner(path: string, owner: string): M5cClosureLedger {
-  const ledger = derive();
+function withOwner(
+  path: string,
+  owner: string,
+  note?: string,
+  base: M5cClosureLedger = derive(),
+): M5cClosureLedger {
+  const ownerNotes = new Map(base.ownerNotes);
+  if (note != null) ownerNotes.set(owner, note);
   return {
-    ...ledger,
-    entries: ledger.entries.map((entry) =>
+    ...base,
+    entries: base.entries.map((entry) =>
       entry.path === path ? Object.assign({}, entry, { owner }) : entry,
     ),
+    ownerNotes,
   };
 }
+
+const recordNote = "Bounded dynamic source surface quoted from ADR 0016.";
 
 test("the derived ledger lists every included path once", () => {
   const summary = validate(ledgerText);
@@ -207,7 +226,7 @@ test("a ledger left behind by a manifest change fails", () => {
     /as unreviewed but the manifest derives pass/u,
   );
   const regenerated = serializeM5cClosureLedger(
-    deriveM5cClosureLedger(inventoryText, advanced, nodeIds, derive()),
+    deriveM5cClosureLedger(inventoryText, advanced, targets, derive()),
   );
   assert.equal(validate(regenerated, advanced).closedPaths, 3);
 });
@@ -258,7 +277,11 @@ test("owners must fit the path state", () => {
   const cases: readonly (readonly [string, string, RegExp])[] = [
     [passPath, "unassigned", /must be observation for a pass path/u],
     [unreviewedPath, "unassigned", /must name the M5c graph node/u],
-    [realmPath, "observation", /must be unassigned or a node: owner/u],
+    [
+      realmPath,
+      "observation",
+      /must be unassigned or a node: or adr: owner for a unsupported/u,
+    ],
     [realmPath, "node:missing-node", /unknown M5c graph node missing-node/u],
   ];
   for (const [path, owner, message] of cases) {
@@ -267,18 +290,151 @@ test("owners must fit the path state", () => {
   }
 });
 
-test("no owner form can authorize an exclusion yet", () => {
-  for (const owner of ["adr:dynamic-source", "exclusion:realms"]) {
-    const text = serializeM5cClosureLedger(withOwner(realmPath, owner));
+test("an accepted record with a note may authorize an exclusion", () => {
+  const text = serializeM5cClosureLedger(
+    withOwner(realmPath, recordOwner, recordNote),
+  );
+  const summary = validate(text);
+  assert.equal(summary.owners.get(recordOwner), 1);
+  assert.equal(summary.owners.get("unassigned"), undefined);
+  assert.equal(summary.openPaths, 2);
+  assert.equal(
+    entryLine(realmPath).replace("unassigned", recordOwner),
+    text.split("\n").find((line) => line.startsWith(`  ${realmPath}: `)),
+  );
+});
+
+test("an authorizing owner needs a note", () => {
+  const text = serializeM5cClosureLedger(withOwner(realmPath, recordOwner));
+  assert.throws(
+    () => validate(text),
+    /owner adr:0016-dynamic-source-boundary needs a note that bounds/u,
+  );
+});
+
+test("an authorizing owner must name an accepted record", () => {
+  const cases: readonly (readonly [string, RegExp])[] = [
+    [
+      "adr:0021-runtime-linking-exception",
+      /names no accepted record docs\/adr\/0021-runtime-linking-exception\.md/u,
+    ],
+    [
+      "adr:dynamic-source",
+      /names no accepted record docs\/adr\/dynamic-source\.md/u,
+    ],
+    ["exclusion:realms", /must be unassigned or a node: or adr: owner/u],
+  ];
+  for (const [owner, message] of cases) {
+    const text = serializeM5cClosureLedger(
+      withOwner(realmPath, owner, recordNote),
+    );
+    assert.throws(() => validate(text), message, owner);
+  }
+  const accepted = serializeM5cClosureLedger(
+    withOwner(realmPath, recordOwner, recordNote),
+  );
+  assert.throws(
+    () => validate(accepted, manifest, { acceptedRecords: new Set(), nodeIds }),
+    /names no accepted record docs\/adr\/0016-dynamic-source-boundary\.md/u,
+  );
+});
+
+test("only an unsupported path may cite an authorizing record", () => {
+  for (const path of [passPath, negativePath, unreviewedPath]) {
+    const text = serializeM5cClosureLedger(
+      withOwner(path, recordOwner, recordNote),
+    );
     assert.throws(
       () => validate(text),
-      new RegExp(
-        `owner ${owner} of .* must be unassigned or a node: owner`,
-        "u",
-      ),
-      owner,
+      /cannot authorize an exclusion of a [a-z-]+ path/u,
+      path,
     );
   }
+  const failed: M5cLedgerManifestInput = {
+    ...manifest,
+    results: manifest.results.map((result) =>
+      result.case.path === realmPath
+        ? Object.assign({}, result, { classification: "semantic-failure" })
+        : result,
+    ),
+  };
+  const failedLedger = deriveM5cClosureLedger(inventoryText, failed, targets);
+  assert.equal(
+    validate(serializeM5cClosureLedger(failedLedger), failed).owners.get(
+      "unassigned",
+    ),
+    1,
+  );
+  const cited = serializeM5cClosureLedger(
+    withOwner(realmPath, recordOwner, recordNote, failedLedger),
+  );
+  assert.throws(
+    () => validate(cited, failed),
+    /cannot authorize an exclusion of a semantic-failure path/u,
+  );
+  const observed = serializeM5cClosureLedger(
+    withOwner(realmPath, "observation", undefined, failedLedger),
+  );
+  assert.throws(
+    () => validate(observed, failed),
+    /must be unassigned or a node: owner for a semantic-failure path/u,
+  );
+});
+
+test("regeneration drops an authorization whose record is withdrawn", () => {
+  const assigned = withOwner(realmPath, recordOwner, recordNote);
+  const kept = derive(assigned);
+  assert.equal(
+    kept.entries.find((entry) => entry.path === realmPath)?.owner,
+    recordOwner,
+  );
+  assert.equal(kept.ownerNotes.get(recordOwner), recordNote);
+  const withdrawn = deriveM5cClosureLedger(
+    inventoryText,
+    manifest,
+    { acceptedRecords: new Set(), nodeIds },
+    assigned,
+  );
+  assert.equal(
+    withdrawn.entries.find((entry) => entry.path === realmPath)?.owner,
+    "unassigned",
+  );
+  assert.ok(!withdrawn.ownerNotes.has(recordOwner));
+});
+
+function decisionRecord(status: string): string {
+  return [
+    "ADR 9999: Example",
+    "=================",
+    "",
+    "Status",
+    "------",
+    "",
+    status,
+    "",
+  ].join("\n");
+}
+
+test("only a record whose status begins with Accepted is accepted", () => {
+  assert.ok(isAcceptedDecisionRecord(decisionRecord("Accepted.")));
+  assert.ok(isAcceptedDecisionRecord(decisionRecord("Accepted for M5b.")));
+  assert.ok(
+    !isAcceptedDecisionRecord(decisionRecord("Proposed. Accepted later.")),
+  );
+  assert.ok(
+    !isAcceptedDecisionRecord(decisionRecord("Superseded by ADR 0014.")),
+  );
+  assert.ok(!isAcceptedDecisionRecord(decisionRecord("Acceptedish.")));
+  assert.ok(!isAcceptedDecisionRecord("ADR 9999\n\nAccepted.\n"));
+});
+
+test("the checked-in accepted records exclude proposals", () => {
+  const accepted = readCurrentAcceptedRecords();
+  assert.ok(accepted.has("0013-m5-edition-and-manifest"));
+  assert.ok(accepted.has("0016-dynamic-source-boundary"));
+  assert.ok(!accepted.has("0021-runtime-linking-exception"));
+  assert.ok(!accepted.has("0022-async-context-boundary"));
+  assert.ok(!accepted.has("0000-template"));
 });
 
 test("a remediation node may own an unsupported path", () => {
@@ -363,7 +519,7 @@ test("regeneration keeps valid owners and notes only", () => {
   const reset = deriveM5cClosureLedger(
     inventoryText,
     passed,
-    nodeIds,
+    targets,
     assigned,
   );
   assert.equal(
@@ -391,4 +547,5 @@ test("the checked-in ledger matches the reviewed manifest", () => {
     summary.openPaths,
     baseline.inventoryPaths - baseline.passes - baseline.expectedNegatives,
   );
+  assert.equal(summary.owners.get("unassigned"), undefined);
 });

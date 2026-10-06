@@ -1,0 +1,11 @@
+version: 1
+id: iterator-helpers
+title: Admit iterator helpers
+delivers: "Admits the ES2025 iterator helpers so the 392 reviewed unsupported
+  paths whose only unsupported frontmatter feature is iterator-helpers are
+  observed as passes or expected negatives; the one path that also needs
+  cross-realm stays with cross-realm-host."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

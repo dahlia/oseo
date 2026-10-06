@@ -7,6 +7,22 @@ delivers: "Verifies that the manifest covers all 41,091 applicable paths, that
   required gates pass without claiming unqualified ECMA-262 conformance."
 dependencies:
   - authorized-exclusion-audit
+  - cross-realm-host
+  - eval-intrinsic-value
+  - frontmatter-feature-tags
+  - iterator-helpers
+  - module-export-forms
+  - non-blocking-agent
+  - primitive-wrapper-objects
+  - promise-feature-admission
+  - proper-tail-calls
+  - regexp-pattern-extensions
+  - regexp-property-escape-harness
   - remediation-work-graph
+  - resizable-array-buffer-harness
+  - test262-host-script-bindings
+  - typed-array-feature-admission
+  - unhandled-rejection-observation
+  - well-known-intrinsics-harness
 landed: false
 status: blocked

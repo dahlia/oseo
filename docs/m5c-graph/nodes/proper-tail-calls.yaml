@@ -1,0 +1,11 @@
+version: 1
+id: proper-tail-calls
+title: Decide proper tail calls
+delivers: "Owns the 2 reviewed tagged-template tco-*.js paths gated by
+  tail-call-optimization. Proper tail calls are inside the 16th edition and
+  no accepted record excludes them, so this node implements them or obtains
+  an accepted record that authorizes and bounds the exclusion."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

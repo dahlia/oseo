@@ -1,0 +1,10 @@
+version: 1
+id: non-blocking-agent
+title: Observe non-blocking agents
+delivers: "Observes the 2 reviewed Atomics.wait cannot-suspend-throws.js
+  paths that need an agent whose [[CanBlock]] is false, the non-blocking-agent
+  capability ADR 0026 leaves unsupported inside the claim."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

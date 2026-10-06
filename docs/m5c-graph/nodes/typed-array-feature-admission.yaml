@@ -1,0 +1,12 @@
+version: 1
+id: typed-array-feature-admission
+title: Admit concrete TypedArray features
+delivers: "Admits the concrete TypedArray constructor feature tags and the
+  Float16Array global binding, so 42 reviewed paths are observed: 40 whose
+  unsupported frontmatter features are only concrete TypedArray constructor
+  names, and 2 rejected because typeof Float16Array is outside the admitted
+  global-object profile."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: blocked

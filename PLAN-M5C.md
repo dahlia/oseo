@@ -124,14 +124,77 @@ The owner is the only per-path fact an M5c node edits:
     remediation owner or authorization yet, and the checker reports it as
     open;
  -  `node:<id>` names an M5c graph node: the remediation owner of a reviewed
-    open path, or the node that will observe an unreviewed path.
+    open path, or the node that will observe an unreviewed path;
+ -  `adr:<stem>` names the record *docs/adr/<stem>.md* as the authorization
+    of an unsupported path's M5 exclusion.
+
+The checker accepts an `adr:` owner only for an unsupported path, only when
+the paragraph under the record's Status heading begins with `Accepted`, and
+only with an owner note. The note quotes the text that authorizes and bounds
+the exclusion and states the path selector. A failure can never cite a
+record. The checker proves that the record exists and is accepted, not that
+its text covers each path; `authorized-exclusion-audit` verifies that bound
+and the record's reopening trigger.
 
 Regeneration keeps an owner while its path keeps the same state and resets it
 to the default for the new state otherwise: `observation`, `unassigned`, or
-`node:observation-batch-plan`. The closure-ledger node assigns only those
-defaults. No owner form authorizes an exclusion yet. The node that first
-records an accepted, bounded M5 exclusion adds that form and validates it
-against the authorizing record.
+`node:observation-batch-plan`. A remediation node whose landing leaves a path
+unsupported for a different reason reassigns that path in the same change.
+
+### Unsupported ownership
+
+The `unsupported-ownership-audit` node assigned every one of the 1,480
+reviewed unsupported paths from its observed reason, not from its dependency
+tags. The observed reason is the unsupported frontmatter feature, the named
+unsupported capability, or the `OSEO1001` diagnostic recorded in the
+manifest.
+
+| Owner                                  | Paths | Observed reason                                         |
+| -------------------------------------- | ----: | ------------------------------------------------------- |
+| `node:regexp-property-escape-harness`  |   453 | *regExpUtils.js* omits `buildString`                    |
+| `node:iterator-helpers`                |   392 | only `iterator-helpers` is unadmitted                   |
+| `adr:0016-dynamic-source-boundary`     |   177 | dynamic source rejection                                |
+| `node:resizable-array-buffer-harness`  |   168 | *resizableArrayBufferUtils.js* include                  |
+| `node:cross-realm-host`                |    84 | `cross-realm` is unadmitted                             |
+| `node:typed-array-feature-admission`   |    42 | concrete TypedArray tags or `typeof Float16Array`       |
+| `node:primitive-wrapper-objects`       |    36 | `primitive-wrapper`                                     |
+| `node:promise-feature-admission`       |    30 | `Promise` or `Promise.prototype.finally` is unadmitted  |
+| `node:module-export-forms`             |    28 | unadmitted export forms                                 |
+| `node:unhandled-rejection-observation` |    19 | `unhandled-rejection-policy`                            |
+| `node:eval-intrinsic-value`            |    16 | `eval` read only as a value                             |
+| `node:test262-host-script-bindings`    |    14 | `$262.evalScript` or `print`                            |
+| `node:well-known-intrinsics-harness`   |     6 | *wellKnownIntrinsicObjects.js* include                  |
+| `node:regexp-pattern-extensions`       |     5 | `regexp-pattern-extension`                              |
+| `node:frontmatter-feature-tags`        |     5 | `super` or `dynamic-import` tag the source does not use |
+| `node:non-blocking-agent`              |     2 | `non-blocking-agent`                                    |
+| `node:proper-tail-calls`               |     2 | `tail-call-optimization` is unadmitted                  |
+| `adr:0013-m5-edition-and-manifest`     |     1 | Annex B named backreference                             |
+
+Two accepted records authorize exclusions, and the 178 paths they own are
+proposed for `authorized-exclusion-audit`. ADR 0016 owns a path only when its
+observed `OSEO1001` diagnostic rejects the `Function` constructor, a
+constructor that compiles source text, or a call of `eval`, including
+`eval?.()` and `(0, eval)()`. ADR 0013 owns the one path whose diagnostic
+names an Annex B-only pattern. Every realm, agent, shared memory, host
+binding, and harness capability path has a remediation owner. So do `eval`
+read as a value, `$262.evalScript`, and proper tail calls, because no
+accepted record excludes them.
+
+The reviewed subset gives 120 of the 177 ADR 0016 paths no `dynamic-source`
+tag. Their owner rests on the observed diagnostic, and their ledger entries
+show the missing tag; retagging them is a separate manifest change.
+
+A path has source evaluation as its subject when it lies under
+*test/built-ins/AsyncFunction/*, *test/built-ins/AsyncGeneratorFunction/*,
+*test/built-ins/GeneratorFunction/*, *test/built-ins/Function/length/*,
+*test/built-ins/Function/prototype/toString/*, or *test/language/eval-code/*;
+when it is an `S15.3.5.2_*` case under *test/built-ins/Function/prototype/*;
+when its file name contains `eval` or `new-function` outside
+*test/built-ins/String/*; or when it is one of the two `scope-*-var-none.js`
+cases. That selects 66 paths. The other 111 use `eval` or `Function` only as
+scaffolding for another subject, so `authorized-exclusion-audit` checks them
+against the ADR 0019 trigger for a normative section that depends on dynamic
+source for behavior other than source evaluation.
 
 
 Work graph construction

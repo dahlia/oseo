@@ -57,7 +57,12 @@ export const m5cUnassignedOwner = "unassigned";
 /** Graph node that owns unreviewed paths until it partitions them. */
 export const m5cUnreviewedDefaultNode = "observation-batch-plan";
 
+/** Directory of architecture decision records an owner may cite. */
+export const m5cDecisionRecordDirectory = "docs/adr";
+
 const nodeOwnerPrefix = "node:";
+const recordOwnerPrefix = "adr:";
+const recordStemPattern = /^[0-9]{4}(?:-[a-z0-9]+)+$/u;
 const ledgerVersion = 1;
 const closedStates: ReadonlySet<M5cLedgerState> = new Set([
   "expected-negative",
@@ -92,9 +97,10 @@ const defaultOwnerNotes: ReadonlyMap<string, string> = new Map([
   ],
   [
     m5cUnassignedOwner,
-    "Reviewed unsupported paths awaiting the unsupported-ownership-audit " +
-      "node. Their prerequisites are ADR 0013 dependency tags, not exclusion " +
-      "authorizations, so every path here remains open.",
+    "Reviewed unsupported or failed paths with neither a remediation node " +
+      "nor an authorizing record. Their prerequisites are ADR 0013 " +
+      "dependency tags, not exclusion authorizations, so every path here " +
+      "remains open.",
   ],
 ]);
 const pathPattern = /^test\/[A-Za-z0-9._/-]+$/u;
@@ -115,9 +121,9 @@ export interface M5cLedgerEntry {
   /** Derived state; never edited by hand. */
   readonly state: M5cLedgerState;
   /**
-   * `observation`, `unassigned`, or `node:<id>` naming a graph node. An
-   * authorized-exclusion owner form does not exist until an accepted record
-   * authorizes and bounds one.
+   * `observation`, `unassigned`, `node:<id>` naming a graph node, or
+   * `adr:<stem>` naming the accepted record *docs/adr/<stem>.md* that
+   * explicitly authorizes and bounds an M5 exclusion of an unsupported path.
    */
   readonly owner: string;
   /**
@@ -179,11 +185,23 @@ interface ParsedLedger {
   readonly ledger: M5cClosureLedger;
 }
 
+/**
+ * Targets an owner may name. Both sets come from checked-in files, so an
+ * owner that names a removed node or a record that is no longer accepted
+ * fails validation instead of silently keeping its paths.
+ */
+export interface M5cLedgerOwnerTargets {
+  /** File stems of accepted records under *docs/adr/*. */
+  readonly acceptedRecords: ReadonlySet<string>;
+  /** IDs of the checked-in M5c graph nodes. */
+  readonly nodeIds: ReadonlySet<string>;
+}
+
 /** Checked-in inputs the current ledger is derived from. */
 interface CurrentInputs {
   readonly inventoryText: string;
   readonly manifest: M5cLedgerManifestInput;
-  readonly nodeIds: ReadonlySet<string>;
+  readonly targets: M5cLedgerOwnerTargets;
 }
 
 function isLedgerState(value: string): value is M5cLedgerState {
@@ -212,6 +230,13 @@ function ownerNode(owner: string): string | undefined {
     : undefined;
 }
 
+/** Name the authorizing record of an `adr:` owner, if any. */
+function authorizingRecord(owner: string): string | undefined {
+  return owner.startsWith(recordOwnerPrefix)
+    ? owner.slice(recordOwnerPrefix.length)
+    : undefined;
+}
+
 /** Owner a newly derived or newly changed state receives. */
 function defaultOwner(state: M5cLedgerState): string {
   if (closedStates.has(state)) return m5cObservationOwner;
@@ -224,16 +249,28 @@ function defaultOwner(state: M5cLedgerState): string {
 /**
  * Explain why an owner cannot own a path in a state, or return undefined.
  * Closed states belong to their observation, unreviewed paths to a graph
- * node, and reviewed open states to a node or explicitly to nobody yet.
+ * node, and reviewed open states to a node or explicitly to nobody yet. Only
+ * an unsupported path may cite an authorizing record: a failure is a defect
+ * to repair, never an exclusion.
  */
 function ownerProblem(
   state: M5cLedgerState,
   owner: string,
-  nodeIds: ReadonlySet<string>,
+  targets: M5cLedgerOwnerTargets,
 ): string | undefined {
   const node = ownerNode(owner);
-  if (node != null && !nodeIds.has(node)) {
+  if (node != null && !targets.nodeIds.has(node)) {
     return `names unknown M5c graph node ${node}`;
+  }
+  const authorizing = authorizingRecord(owner);
+  if (authorizing != null) {
+    if (state !== "unsupported-profile-feature") {
+      return `cannot authorize an exclusion of a ${state} path`;
+    }
+    return targets.acceptedRecords.has(authorizing)
+      ? undefined
+      : `names no accepted record ${m5cDecisionRecordDirectory}/` +
+          `${authorizing}.md`;
   }
   if (closedStates.has(state)) {
     return owner === m5cObservationOwner
@@ -246,9 +283,12 @@ function ownerProblem(
       : undefined;
   }
   if (ownerAssignableStates.has(state)) {
-    return node != null || owner === m5cUnassignedOwner
-      ? undefined
-      : `must be ${m5cUnassignedOwner} or a node: owner for a ${state} path`;
+    if (node != null || owner === m5cUnassignedOwner) return undefined;
+    const forms =
+      state === "unsupported-profile-feature"
+        ? "a node: or adr: owner"
+        : "a node: owner";
+    return `must be ${m5cUnassignedOwner} or ${forms} for a ${state} path`;
   }
   return `is not valid for state ${state}`;
 }
@@ -310,11 +350,11 @@ function deriveInventory(
 export function deriveM5cClosureLedger(
   inventoryText: string,
   manifest: M5cLedgerManifestInput,
-  nodeIds: ReadonlySet<string>,
+  targets: M5cLedgerOwnerTargets,
   previous?: M5cClosureLedger,
 ): M5cClosureLedger {
   const derived = deriveInventory(inventoryText, manifest);
-  if (!nodeIds.has(m5cUnreviewedDefaultNode)) {
+  if (!targets.nodeIds.has(m5cUnreviewedDefaultNode)) {
     throw new Error(
       `M5c graph needs node ${m5cUnreviewedDefaultNode} to own unreviewed ` +
         "paths.",
@@ -329,7 +369,7 @@ export function deriveM5cClosureLedger(
       const owner =
         earlier != null &&
         earlier.state === state &&
-        ownerProblem(state, earlier.owner, nodeIds) == null
+        ownerProblem(state, earlier.owner, targets) == null
           ? earlier.owner
           : defaultOwner(state);
       return { owner, path, prerequisites, state };
@@ -580,15 +620,16 @@ function validateHeaderCounts(
 
 /**
  * Validate a ledger against the inventory, the reviewed manifest, and the
- * graph's node IDs. Every included path must appear once with its derived
- * state and prerequisites, every owner must be valid for its state, the
+ * owner targets. Every included path must appear once with its derived
+ * state and prerequisites, every owner must be valid for its state, every
+ * authorizing-record owner must explain its bounded surface in a note, the
  * header counts must match the manifest, and the text must be canonical.
  */
 export function validateM5cClosureLedger(
   text: string,
   inventoryText: string,
   manifest: M5cLedgerManifestInput,
-  nodeIds: ReadonlySet<string>,
+  targets: M5cLedgerOwnerTargets,
 ): M5cLedgerSummary {
   const { header, ledger } = parseM5cClosureLedger(text);
   const derived = deriveInventory(inventoryText, manifest);
@@ -618,7 +659,7 @@ export function validateM5cClosureLedger(
           `the manifest dependencies [${expected.prerequisites.join(", ")}].`,
       );
     }
-    const problem = ownerProblem(entry.state, entry.owner, nodeIds);
+    const problem = ownerProblem(entry.state, entry.owner, targets);
     if (problem != null) {
       throw new Error(
         `M5c closure ledger owner ${entry.owner} of ${entry.path} ` +
@@ -637,6 +678,14 @@ export function validateM5cClosureLedger(
     );
   }
   const summary = summarizeM5cClosureLedger(ledger);
+  for (const owner of summary.owners.keys()) {
+    if (authorizingRecord(owner) != null && !ledger.ownerNotes.has(owner)) {
+      throw new Error(
+        `M5c closure ledger owner ${owner} needs a note that bounds the ` +
+          "surface its record authorizes.",
+      );
+    }
+  }
   validateHeaderCounts(header, countStates(derived.entries), summary.owners);
   if (serializeM5cClosureLedger(ledger) !== text) {
     throw new Error(
@@ -657,28 +706,63 @@ export function readCurrentM5cNodeIds(): ReadonlySet<string> {
   );
 }
 
+/**
+ * Report whether a decision record's status is accepted. The first line of
+ * the paragraph under its Status heading must begin with `Accepted`, so a
+ * proposed, deferred, or superseded record cannot authorize an exclusion.
+ */
+export function isAcceptedDecisionRecord(text: string): boolean {
+  const lines = text.split("\n");
+  const heading = lines.findIndex(
+    (line, index) => line === "Status" && /^-+$/u.test(lines[index + 1] ?? ""),
+  );
+  if (heading < 0) return false;
+  const status = lines.slice(heading + 2).find((line) => line.trim() !== "");
+  return status != null && /^Accepted\b/u.test(status);
+}
+
+/** Read the file stems of every accepted checked-in decision record. */
+export function readCurrentAcceptedRecords(): ReadonlySet<string> {
+  const absolute = join(repositoryRoot, m5cDecisionRecordDirectory);
+  return new Set(
+    readdirSync(absolute)
+      .filter((name) => name.endsWith(".md"))
+      .map((name) => name.slice(0, -".md".length))
+      .filter(
+        (stem) =>
+          recordStemPattern.test(stem) &&
+          isAcceptedDecisionRecord(
+            readFileSync(join(absolute, `${stem}.md`), "utf8"),
+          ),
+      ),
+  );
+}
+
 function readCurrentInputs(): CurrentInputs {
   return {
     inventoryText: readFileSync(join(repositoryRoot, m5cInventoryPath), "utf8"),
     manifest: readCurrentM5cManifest(),
-    nodeIds: readCurrentM5cNodeIds(),
+    targets: {
+      acceptedRecords: readCurrentAcceptedRecords(),
+      nodeIds: readCurrentM5cNodeIds(),
+    },
   };
 }
 
 /** Validate the checked-in ledger against checked-in evidence. */
 export function validateCurrentM5cClosureLedger(): M5cLedgerSummary {
-  const { inventoryText, manifest, nodeIds } = readCurrentInputs();
+  const { inventoryText, manifest, targets } = readCurrentInputs();
   return validateM5cClosureLedger(
     readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
     inventoryText,
     manifest,
-    nodeIds,
+    targets,
   );
 }
 
 /** Regenerate the checked-in ledger, keeping still-valid owners and notes. */
 export function updateCurrentM5cClosureLedger(): M5cLedgerSummary {
-  const { inventoryText, manifest, nodeIds } = readCurrentInputs();
+  const { inventoryText, manifest, targets } = readCurrentInputs();
   const absolute = join(repositoryRoot, m5cClosureLedgerPath);
   const previous = existsSync(absolute)
     ? parseM5cClosureLedger(readFileSync(absolute, "utf8")).ledger
@@ -686,7 +770,7 @@ export function updateCurrentM5cClosureLedger(): M5cLedgerSummary {
   const ledger = deriveM5cClosureLedger(
     inventoryText,
     manifest,
-    nodeIds,
+    targets,
     previous,
   );
   writeFileSync(absolute, serializeM5cClosureLedger(ledger));
