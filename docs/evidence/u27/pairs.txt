@@ -1,0 +1,46 @@
+attempt 1
+lane	job	wall	one-lane median (n)	wall/median	overlap	overlapped factor	partner seconds
+oseo-mac-1	native support (macos-aarch64, 3/12)	570	450 (5)	1.27	570	1.27	{'native support': 570}
+oseo-mac-1	own-key cases (macos-aarch64, 1/3)	631	405 (11)	1.56	625	1.57	{'native support': 339, 'test262': 286}
+oseo-mac-1	own-key cases (macos-aarch64, 2/3)	598	373 (11)	1.60	592	1.61	{'native support': 592}
+oseo-mac-1	native support (macos-aarch64, 6/12)	582	355 (3)	1.64	579	1.64	{'native support': 295, 'test262': 284}
+oseo-mac-1	own-key cases (macos-aarch64, 3/3)	543	374 (11)	1.45	537	1.46	{'test262': 191, 'native support': 346}
+oseo-mac-1	test262 (macos-aarch64, 3/12)	372	267 (5)	1.39	369	1.40	{'native support': 71, 'test262': 298}
+oseo-mac-1	native support (macos-aarch64, 8/12)	385	325 (3)	1.18	385	1.18	{'native support': 385}
+oseo-mac-1	native (macos-aarch64, 1/3)	364	320 (5)	1.14	364	1.14	{'native support': 364}
+oseo-mac-1	test262 (macos-aarch64, 1/12)	270	340 (8)	0.80	101	0.59	{'native support': 101}
+oseo-mac-1	native support (macos-aarch64, 4/12)	392	420 (11)	0.93	0	-	{}
+oseo-mac-2	native support (macos-aarch64, 2/12)	660	488 (6)	1.35	658	1.36	{'native support': 570, 'own-key cases': 88}
+oseo-mac-2	test262 (macos-aarch64, 12/12)	286	267 (5)	1.07	286	1.07	{'own-key cases': 286}
+oseo-mac-2	native support (macos-aarch64, 12/12)	317	294 (8)	1.08	314	1.08	{'own-key cases': 314}
+oseo-mac-2	native support (macos-aarch64, 10/12)	331	348 (6)	0.95	331	0.95	{'own-key cases': 331}
+oseo-mac-2	native support (macos-aarch64, 7/12)	496	-	-	493	-	{'own-key cases': 198, 'native support': 295}
+oseo-mac-2	test262 (macos-aarch64, 5/12)	390	391 (5)	1.00	387	1.00	{'native support': 284, 'own-key cases': 103}
+oseo-mac-2	native support (macos-aarch64, 9/12)	346	-	-	346	-	{'own-key cases': 346}
+oseo-mac-2	test262 (macos-aarch64, 9/12)	389	277 (5)	1.40	386	1.41	{'own-key cases': 88, 'test262': 298}
+oseo-mac-2	native support (macos-aarch64, 1/12)	929	744 (6)	1.25	921	1.25	{'test262': 172, 'native support': 385, 'native': 364}
+oseo-mac-1: 10 jobs with a median, pooled wall/median 1.297
+oseo-mac-2: 7 jobs with a median, pooled wall/median 1.176
+attempt 2
+lane	job	wall	one-lane median (n)	wall/median	overlap	overlapped factor	partner seconds
+oseo-mac-1	native support (macos-aarch64, 3/12)	634	450 (5)	1.41	631	1.41	{'test262': 512, 'native support': 119}
+oseo-mac-1	native (macos-aarch64, 1/3)	415	320 (5)	1.30	412	1.30	{'native support': 412}
+oseo-mac-1	test262 (macos-aarch64, 3/12)	304	267 (5)	1.14	304	1.14	{'native support': 304}
+oseo-mac-1	test262 (macos-aarch64, 1/12)	303	340 (8)	0.89	303	0.89	{'native support': 303}
+oseo-mac-1	own-key cases (macos-aarch64, 1/3)	465	405 (11)	1.15	461	1.15	{'native support': 461}
+oseo-mac-1	native support (macos-aarch64, 4/12)	479	420 (11)	1.14	476	1.14	{'test262': 93, 'native support': 383}
+oseo-mac-1	own-key cases (macos-aarch64, 2/3)	658	373 (11)	1.76	650	1.78	{'test262': 454, 'native support': 196}
+oseo-mac-1	own-key cases (macos-aarch64, 3/3)	540	374 (11)	1.44	534	1.45	{'native support': 534}
+oseo-mac-1	native support (macos-aarch64, 6/12)	532	355 (3)	1.50	447	1.66	{'native support': 447}
+oseo-mac-1	native support (macos-aarch64, 8/12)	320	325 (3)	0.98	0	-	{}
+oseo-mac-2	test262 (macos-aarch64, 5/12)	513	391 (5)	1.31	512	1.31	{'native support': 512}
+oseo-mac-2	native support (macos-aarch64, 9/12)	355	-	-	352	-	{'native support': 119, 'native': 233}
+oseo-mac-2	native support (macos-aarch64, 1/12)	1011	744 (6)	1.36	1001	1.36	{'own-key cases': 215, 'test262': 607, 'native': 179}
+oseo-mac-2	native support (macos-aarch64, 2/12)	632	488 (6)	1.30	629	1.30	{'own-key cases': 246, 'native support': 383}
+oseo-mac-2	test262 (macos-aarch64, 9/12)	279	277 (5)	1.01	276	1.01	{'native support': 93, 'own-key cases': 183}
+oseo-mac-2	test262 (macos-aarch64, 12/12)	271	267 (5)	1.01	271	1.01	{'own-key cases': 271}
+oseo-mac-2	native support (macos-aarch64, 10/12)	324	348 (6)	0.93	321	0.93	{'own-key cases': 321}
+oseo-mac-2	native support (macos-aarch64, 7/12)	401	-	-	401	-	{'own-key cases': 401}
+oseo-mac-2	native support (macos-aarch64, 12/12)	458	294 (8)	1.56	455	1.56	{'own-key cases': 8, 'native support': 447}
+oseo-mac-1: 10 jobs with a median, pooled wall/median 1.282
+oseo-mac-2: 7 jobs with a median, pooled wall/median 1.242

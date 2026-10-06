@@ -1,0 +1,84 @@
+// Derived U27 projections from measured two-lane job walls.
+// Usage: cp docs/evidence/u27/project.ts.txt tools/u27-project.ts &&
+//   node tools/u27-project.ts docs/evidence/u27
+import { readFileSync } from "node:fs";
+import {
+  macosLaneEnds,
+  macosLanes,
+  modeledJobSeconds,
+} from "./generate-macos-lanes.ts";
+import type { MacosJobSeconds } from "./generate-macos-lanes.ts";
+
+const dir = process.argv[2] ?? ".";
+const scale = 41091 / 21383;
+const setup = 60;
+const starts: Record<string, string> = {
+  "1": "2026-10-06T01:13:17Z",
+  "2": "2026-10-06T02:33:57Z",
+};
+const lanes = macosLanes(2);
+const laneOf = new Map<string, number>();
+lanes.forEach((lane, index) => lane.forEach((j) => laneOf.set(j.name, index)));
+const test262 = (name: string) => name.startsWith("test262 (macos");
+const min = (s: number) => (Math.round(s / 6) / 10).toFixed(1);
+
+for (const attempt of ["1", "2"]) {
+  const start = Date.parse(starts[attempt]!);
+  const ends = new Map<string, number>();
+  const extra = new Map<string, number>();
+  for (const line of readFileSync(
+    `${dir}/jobs-37398055382-${attempt}.tsv`,
+    "utf8",
+  ).split("\n")) {
+    if (line === "") continue;
+    const [name, runner, started, completed] = line.split("\t");
+    const index = laneOf.get(name!);
+    if (index == null) continue;
+    const key = runner!.startsWith("oseo-mac-") ? runner! : `hosted ${index + 1}`;
+    if (index >= 5 && key !== `oseo-mac-${index - 4}`) {
+      throw new Error(`${name} ran on ${runner}`);
+    }
+    const end = (Date.parse(completed!) - start) / 1000;
+    const wall = (Date.parse(completed!) - Date.parse(started!)) / 1000;
+    ends.set(key, Math.max(ends.get(key) ?? 0, end));
+    const grow = test262(name!) ? (wall - setup) * (scale - 1) : 0;
+    extra.set(key, (extra.get(key) ?? 0) + grow);
+  }
+  const rows = [...ends.keys()].toSorted().map((key) => {
+    const now = ends.get(key)!;
+    return [key, min(now), min(now + extra.get(key)!)];
+  });
+  const now = Math.max(...ends.values());
+  const later = Math.max(
+    ...[...ends.entries()].map(([k, v]) => v + extra.get(k)!),
+  );
+  console.log(`attempt ${attempt}: ${min(now)} -> ${min(later)}`);
+  for (const row of rows) console.log("  " + row.join("\t"));
+}
+
+const scaled: MacosJobSeconds = (job, selfHosted) => {
+  const base = modeledJobSeconds(job, selfHosted);
+  return job.family === "test262" ? setup + (base - setup) * scale : base;
+};
+for (const [label, seconds] of [
+  ["21,383", modeledJobSeconds],
+  ["41,091", scaled],
+] as const) {
+  const ends = macosLaneEnds(lanes, seconds).map((s) => min(s));
+  console.log(`model, fixed two-lane assignment, ${label}: ${ends.join(" ")}`);
+}
+
+// The model's Mac lane ends with each attempt's observed pickup order.
+const byName = new Map(lanes.flat().map((job) => [job.name, job]));
+for (const attempt of ["1", "2"]) {
+  const rows = readFileSync(`${dir}/jobs-37398055382-${attempt}.tsv`, "utf8")
+    .split("\n")
+    .filter((line) => line.includes("\toseo-mac-"))
+    .map((line) => line.split("\t"))
+    .toSorted((a, b) => Date.parse(a[2]!) - Date.parse(b[2]!));
+  const observed = ["oseo-mac-1", "oseo-mac-2"].map((runner) =>
+    rows.filter((row) => row[1] === runner).map((row) => byName.get(row[0]!)!),
+  );
+  const ends = macosLaneEnds([...lanes.slice(0, 5), ...observed]).slice(5);
+  console.log(`model, attempt ${attempt} order: ${ends.map(min).join(" ")}`);
+}

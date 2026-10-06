@@ -4,8 +4,10 @@ Self-hosted Mac capacity lane
 Status: configured for two persistent runners on one Mac mini, `oseo-mac-1`
 and `oseo-mac-2`, disabled by the repository variable
 `OSEO_SELFHOSTED_MAC_ENABLED`. The Mac mini adds two lanes to the five hosted
-macOS lanes, one per runner. `oseo-mac-1` is registered; `oseo-mac-2` is not
-yet, and its lane falls back to hosted until it is. The coordinator owns
+macOS lanes, one per runner. Both runners are registered: `oseo-mac-1`
+earlier and `oseo-mac-2` on 2026-10-06. A lane whose runner is offline or
+busy falls back to hosted. Branch run `37398055382` measured both lanes;
+see *PLAN-GATE.md*. The coordinator owns
 registration, repository variables, secrets, and branch pushes. The operator
 checklist is outside the repository.
 
@@ -73,8 +75,8 @@ apply one, derived in [U26 evidence] from measurements under `sudo`. The
 maintainer installed them for `oseo-mac-1` on 2026-10-06, and branch run
 `37360463788` verified the cap; see the next sections. Two runners must use two
 accounts: the installer rejects a second runner service with the same account
-or root, because the hooks cap only the invoking account's cache. Registering
-`oseo-mac-2` is the maintainer's; the steps are below.
+or root, because the hooks cap only the invoking account's cache. The
+maintainer registered `oseo-mac-2` on 2026-10-06 with the steps below.
 
 [U21 evidence]: ./evidence/u21/README.md
 [U25 evidence]: ./evidence/u25/README.md
@@ -237,12 +239,13 @@ runner (“The job was not acquired by Runner of type hosted even after multiple
 attempts”); the `--failed` rerun, attempt 2, passed.
 
 
-Adding the second runner (proposal)
------------------------------------
+Adding the second runner
+------------------------
 
-`oseo-mac-2` runs on the same Mac mini as `oseo-mac-1`. These steps are a
-proposal and have not been run; the ones that need `sudo` or GitHub
-credentials are the maintainer's. What differs from `oseo-mac-1`:
+`oseo-mac-2` runs on the same Mac mini as `oseo-mac-1`. The steps that
+need `sudo` or GitHub credentials are the maintainer's. The maintainer ran
+them on 2026-10-06; the record follows the steps. What differs from
+`oseo-mac-1`:
 
  -  The account is `oseo-runner2`, a second standard account, with its own
     home, runner root, `TMPDIR` (*oseo-temp/*), mise tools, runtime archive
@@ -341,10 +344,36 @@ src=~/Desktop/oseo-m5ci-u27
       --jq '.runners[] | {name, status, busy, labels: [.labels[].name]}'
     ~~~~
 
-Until `oseo-mac-2` is online, its lane's nine jobs fall back to hosted
-`macos-15` without a predecessor chain and compete with the five hosted
-lanes for the five hosted slots. That fallback schedule is not modeled, and
-it is expected to be slower than the one-lane assignment it replaces.
+On 2026-10-06 the maintainer ran these steps for `oseo-mac-2` with
+*/Users/Shared/oseo-runner-staging/setup-mac2.sh*, a script outside the
+repository, from a checkout at `11634e90`. As reported to the coordinator,
+it created `oseo-runner2` with a random password, extracted runner archive
+v2.337.0 after verifying its checksum, and registered it with
+`--name oseo-mac-2 --labels oseo-mac-2 --disableupdate`. It then applied the
+lockdown and ran *install-service.sh* with `OSEO_RUNNER_LABEL=oseo-mac-2` and
+the 30 GiB cap, and compared the installed property list with the fixture. The
+maintainer granted **Developer Tools** to that runner's *Runner.Listener* and
+restarted its daemon. The API then listed both runners online, each with
+exactly its own custom label. Of step 7, the API check and the
+two-attempt branch run below were done, and the coordinator observed free
+disk after the runs; the U17 probe was not run through `oseo-mac-2` and remains
+outstanding.
+In branch run `37398055382` its test262 jobs took a derived 1.00 to 1.40 times
+their one-lane `oseo-mac-1` medians, so no penalty of the size seen before the
+`oseo-mac-1` grant appeared, but that run does not isolate one.
+
+Branch run `37398055382` at `11634e90` then ran with both runners. Both
+attempts passed every macOS job and ended their last job a measured 79.6
+and 78.9 min after starting. Attempt 1 was red only in a Linux-hosted job,
+so only attempt 2's 78.9 min is a push-to-green time. `oseo-mac-1`
+ran 10 jobs and `oseo-mac-2` 9 in each attempt, as generated. The
+coordinator measured 115 GiB free on the Mac after the runs. *PLAN-GATE.md*
+records the lane ends, pair slowdowns, own-key durations, and projection.
+
+While `oseo-mac-2` is offline or busy, its lane's nine jobs fall back to
+hosted `macos-15` without a predecessor chain and compete with the five
+hosted lanes for the five hosted slots. That fallback schedule is not
+modeled, and it is expected to be slower than the one-lane assignment.
 
 
 Security and activation
