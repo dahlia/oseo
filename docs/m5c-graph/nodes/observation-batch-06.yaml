@@ -1,0 +1,12 @@
+version: 1
+id: observation-batch-06
+title: Observe language/eval-code/ and 1 more
+delivers: "Observes the 334 unreviewed paths that
+  docs/m5c-closure/observation-batches.yaml selects for observation-batch-06
+  (242 review units): admits them to the reviewed subset with dependency tags,
+  regenerates the manifest and the ledger, and assigns every unsupported
+  result an owner."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked

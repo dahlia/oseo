@@ -18,9 +18,9 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 23
+  nodes: 62
   ready: 21
-  blocked: 2
+  blocked: 41
   parked: 0
   landed: 3
 serializationPoints:
@@ -50,9 +50,16 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - cross-realm-host
+      - dynamic-import
       - eval-intrinsic-value
+      - fn-global-object-harness
       - frontmatter-feature-tags
+      - function-caller-restrictions
+      - hashbang-comments
+      - import-attributes
+      - import-meta
       - iterator-helpers
+      - minor-feature-tag-admission
       - module-export-forms
       - non-blocking-agent
       - primitive-wrapper-objects
@@ -65,7 +72,46 @@ collisions:
       - typed-array-feature-admission
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
-    note: "Each remediation node from unsupported-ownership-audit admits
-      behavior or harness capabilities, regenerates the reviewed manifest,
-      and moves its paths in the closure ledger, so their landings
-      serialize at the manifest and ledger."
+    note: "Each remediation node from unsupported-ownership-audit and each
+      prerequisite node from observation-batch-plan admits behavior or
+      harness capabilities, regenerates the reviewed manifest, and moves
+      its paths in the closure ledger, so their landings serialize at the
+      manifest and ledger."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - observation-batch-02
+      - observation-batch-03
+      - observation-batch-04
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-07
+      - observation-batch-08
+      - observation-batch-09
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+    note: "Every observation batch adds its paths to the reviewed subset,
+      updates the manifest index and its partitions and the ledger, and runs
+      the complete test:test262 gate, so batch landings serialize with each
+      other and with the prerequisite nodes they do not depend on."

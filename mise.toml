@@ -49,6 +49,7 @@ depends = [
   "check:m5b-node-scope",
   "check:m5c-closure-ledger",
   "check:m5c-graph",
+  "check:m5c-observation-batches",
   "check:native-host-guards",
   "check:native-toolchains",
   "check:packages",
@@ -125,6 +126,10 @@ run = "node tools/m5c-closure-ledger.ts"
 [tasks."check:m5c-graph"]
 description = "Validate the checked-in M5c closure graph"
 run = "node tools/m5c-graph.ts"
+
+[tasks."check:m5c-observation-batches"]
+description = "Validate the M5c observation batch plan and its owners"
+run = "node tools/m5c-observation-batches.ts"
 
 [tasks."check:native-host-guards"]
 description = "Require unsupported-host skips throughout tests/"
@@ -322,6 +327,14 @@ run = "node tools/test262-inventory.ts --update"
 [tasks."m5c:closure-ledger:update"]
 description = "Regenerate the M5c closure ledger from the reviewed manifest"
 run = "node tools/m5c-closure-ledger.ts --update"
+
+[tasks."m5c:observation-batches:update"]
+description = "Refresh M5c observation batch counts for fixed selectors"
+run = "node tools/m5c-observation-batches.ts --update"
+
+[tasks."m5c:observation-batches:plan"]
+description = "Repartition unreviewed M5c paths into observation batches"
+run = "node tools/m5c-observation-batches.ts --plan"
 
 [tasks."unicode:update"]
 description = "Regenerate the pinned Unicode tables from the reviewed inputs"

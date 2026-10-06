@@ -220,6 +220,9 @@ also exceed the limit wherever it appears, including in a source-code comment.
 Generated lockfiles are exempt and must not be hand-edited.
 Path entry lines in the generated *docs/m5c-closure/ledger.yaml* are exempt
 because `mise run check:m5c-closure-ledger` owns their canonical layout.
+A line in the generated *docs/m5c-closure/observation-batches.yaml* is exempt
+when it would fit without its upstream test path, as in the reviewed test262
+subset and manifest.
 Vendored source under *tools/oxlint/anti-slop/* is also exempt so that it stays
 directly comparable with upstream. Do not reformat it.
 

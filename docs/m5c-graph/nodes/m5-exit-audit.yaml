@@ -8,11 +8,50 @@ delivers: "Verifies that the manifest covers all 41,091 applicable paths, that
 dependencies:
   - authorized-exclusion-audit
   - cross-realm-host
+  - dynamic-import
   - eval-intrinsic-value
+  - fn-global-object-harness
   - frontmatter-feature-tags
+  - function-caller-restrictions
+  - hashbang-comments
+  - import-attributes
+  - import-meta
   - iterator-helpers
+  - minor-feature-tag-admission
   - module-export-forms
   - non-blocking-agent
+  - observation-batch-01
+  - observation-batch-02
+  - observation-batch-03
+  - observation-batch-04
+  - observation-batch-05
+  - observation-batch-06
+  - observation-batch-07
+  - observation-batch-08
+  - observation-batch-09
+  - observation-batch-10
+  - observation-batch-11
+  - observation-batch-12
+  - observation-batch-13
+  - observation-batch-14
+  - observation-batch-15
+  - observation-batch-16
+  - observation-batch-17
+  - observation-batch-18
+  - observation-batch-19
+  - observation-batch-20
+  - observation-batch-21
+  - observation-batch-22
+  - observation-batch-23
+  - observation-batch-24
+  - observation-batch-25
+  - observation-batch-26
+  - observation-batch-27
+  - observation-batch-28
+  - observation-batch-29
+  - observation-batch-30
+  - observation-batch-31
+  - observation-batch-32
   - primitive-wrapper-objects
   - promise-feature-admission
   - proper-tail-calls

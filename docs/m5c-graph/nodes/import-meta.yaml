@@ -1,0 +1,9 @@
+version: 1
+id: import-meta
+title: Admit import.meta
+delivers: "Admits the import.meta feature for Module code and its early errors
+  elsewhere, so the 23 unreviewed paths that need it can be observed."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked

@@ -1,0 +1,14 @@
+version: 1
+id: observation-batch-31
+title: Observe language/ after dynamic-import+import-attributes
+delivers: "Observes the 65 unreviewed paths that
+  docs/m5c-closure/observation-batches.yaml selects for observation-batch-31
+  (46 review units, after dynamic-import, import-attributes): admits them to
+  the reviewed subset with dependency tags, regenerates the manifest and the
+  ledger, and assigns every unsupported result an owner."
+dependencies:
+  - dynamic-import
+  - import-attributes
+  - observation-batch-plan
+landed: false
+status: blocked

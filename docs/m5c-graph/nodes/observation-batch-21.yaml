@@ -1,0 +1,12 @@
+version: 1
+id: observation-batch-21
+title: Observe language/statements/async- and 9 more
+delivers: "Observes the 2408 unreviewed paths that
+  docs/m5c-closure/observation-batches.yaml selects for observation-batch-21
+  (396 review units): admits them to the reviewed subset with dependency tags,
+  regenerates the manifest and the ledger, and assigns every unsupported
+  result an owner."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked

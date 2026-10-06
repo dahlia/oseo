@@ -1,0 +1,10 @@
+version: 1
+id: function-caller-restrictions
+title: Admit the caller feature tag
+delivers: "Decides the caller feature tag for the 23 unreviewed paths that
+  check strict-function caller restrictions, admitting the tag when the
+  profile already meets them or remediating the restriction first."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked

@@ -1,0 +1,10 @@
+version: 1
+id: hashbang-comments
+title: Admit hashbang comments
+delivers: "Admits the hashbang feature: #! comments at the start of Script and
+  Module source and their early errors elsewhere, so the 29 unreviewed paths
+  that need it can be observed."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked
