@@ -230,6 +230,153 @@ path is already supported, the batch admits it without inventing a semantic
 node. When a failure exposes a regression, the regression is repaired before
 the batch lands.
 
+### Observation batches
+
+The `observation-batch-plan` node partitioned the 19,708 unreviewed paths into
+32 deterministic batches, recorded in
+[*docs/m5c-closure/observation-batches.yaml*](./docs/m5c-closure/observation-batches.yaml).
+Each batch is the graph node `observation-batch-NN`, and the ledger owner of
+each unreviewed path is `node:observation-batch-NN`. The commands are:
+
+ -  `mise run m5c:observation-batches:plan` partitions the current unreviewed
+    paths from scratch and moves their ledger owners to the new batches;
+ -  `mise run m5c:observation-batches:update` keeps the selectors, drops the
+    prefixes, sets, and batches that no longer select a path, and refreshes
+    every count and cost, as a batch landing requires; and
+ -  `mise run check:m5c-observation-batches`, which `mise run check` includes,
+    regenerates the plan from the selectors and compares it with the
+    checked-in text.
+
+The check rejects a path that no batch selects, a prefix that two batches share
+for one prerequisite set, a prefix or listed set that selects nothing, a batch
+that selects a reviewed path, a batch without a graph node, a batch node
+missing a required dependency, and a ledger owner that differs from the batch.
+
+Each path's facts come from its upstream source at the pinned revision and
+from checked-in review state, never from its directory name:
+
+ -  frontmatter features, includes, flags, and negative phase;
+ -  the generator case and template files named in the header of a generated
+    test;
+ -  prerequisite keys: `feature:<tag>` for a feature absent from the reviewed
+    `supportedFeatures`, `harness:<file>` for an include without a reviewed
+    copy under *tests/test262/harness/* (except in a `raw` test),
+    `flag:CanBlockIsFalse`, and `host:$262.<member>` for an unresolved `$262`
+    read other than `$262.agent`; and
+ -  unresolved references to `eval` and `Function` in the parsed source.
+
+A fixed table in *tools/m5c-observation-batches.ts* maps each prerequisite key
+to the graph node that removes it, and a key without a node stops planning.
+The `eval` and `Function` references are counted per batch but do not split
+batches: ADR 0016 decides such a path by its observed diagnostic, so the batch
+review applies that boundary to the observation instead of predicting it.
+
+The plan file records the basis these keys are computed against: the reviewed
+`supportedFeatures` and harness files at planning time. A prerequisite node
+that later admits a feature or a harness therefore neither moves nor orphans
+the paths of a batch that waits on it. Only
+`mise run m5c:observation-batches:plan` takes a new basis.
+
+The prerequisite set of a path is the sorted set of its prerequisite nodes.
+Paths without a prerequisite are planned by locality. Each set with at least
+50 paths is planned separately. Every smaller set joins one tail batch that
+waits for all of their nodes, because a separate batch for each costs a full
+regeneration for a handful of paths. A selector lists prerequisite sets and
+path prefixes. A path belongs to the batch that lists its set and has the
+longest prefix the path starts with. The planner splits a prefix at its next
+`/`, `-`, `_`, or `.` only when its paths do not fit. It then packs adjacent
+results back together while they fit, so locality decides every boundary.
+
+A batch fits when it has at most 3,000 paths and 500 review units. A
+handwritten test is one review unit. A generated test counts its generator
+case and template files instead, because a reviewer reads those once for every
+expanded file. At one to two minutes per unit, 500 units is one or two working
+days for one reviewer. The path bound keeps the subset and manifest diff of
+one landing reviewable.
+
+The batches need seven new prerequisite nodes, in addition to remediation
+nodes from `unsupported-ownership-audit` that the unreviewed paths also need:
+
+| Node                           | Unreviewed paths | Prerequisite keys                                        |
+| ------------------------------ | ---------------: | -------------------------------------------------------- |
+| `dynamic-import`               |              629 | `feature:dynamic-import`                                 |
+| `import-attributes`            |               89 | `feature:import-attributes`, `feature:json-modules`      |
+| `fn-global-object-harness`     |               41 | `harness:fnGlobalObject.js`                              |
+| `hashbang-comments`            |               29 | `feature:hashbang`                                       |
+| `function-caller-restrictions` |               23 | `feature:caller`                                         |
+| `import-meta`                  |               23 | `feature:import.meta`                                    |
+| `minor-feature-tag-admission`  |               10 | `json-superset`, `__proto__`, and `proxy-missing-checks` |
+
+The existing remediation nodes cover the remaining keys: `cross-realm-host`
+(90 paths), `proper-tail-calls` (33), `typed-array-feature-admission` (18),
+`resizable-array-buffer-harness` (17), `frontmatter-feature-tags` (15, the
+`super` tag), `module-export-forms` (13), `promise-feature-admission` (2), and
+`well-known-intrinsics-harness` (1). The upstream *fnGlobalObject.js* calls
+the `Function` constructor, so its reviewed replacement must reach the global
+object without compiling source text.
+
+#### Regeneration cost
+
+Every batch landing runs the complete `test:test262` gate in `mise run test`,
+which observes the whole reviewed corpus as it stands at that landing, so the
+batch count still sets the M5c schedule. The manifest update itself no longer
+has to: a batch only adds entries to *tests/test262/subset.yaml*, which
+`mise run test262:update:changed` accepts as observation-neutral, so it
+observes just the batch's own paths and rewrites only the partitions they
+occupy. A prerequisite node that changes `supportedFeatures`, a harness file,
+or *tools/* still needs the complete `mise run test262:update`.
+
+Two complete `test262:update` runs regenerated the current 21,383 paths with
+a pool of 8 workers on 16 logical cores, and the manifest came back unchanged
+both times. Neither had the host to itself:
+
+ -  on 2026-10-06 it took 2,922 seconds (48.7 minutes), while another lane's
+    gate overlapped the first nine minutes and the mean one-minute load
+    average was 18.4; and
+ -  on 2026-10-07 it took 3,997 seconds (66.6 minutes), with a mean load
+    average of 31.9 from other sessions on the host.
+
+For reference, two `mise run test:test262` gates over the same 21,383 paths
+took 3,407 and 3,259 seconds. The cost model uses the slower 3,997-second
+update as its conservative figure for both kinds of complete run and divides
+it by the 72,749 native variants that run executed: 0.0549 seconds per
+variant. Each unreviewed path adds two variants per strictness mode, counted
+as if its prerequisites had landed, unless it is a parse or resolution
+negative. The 19,708 paths add 63,556 variants, so one complete run over the
+41,091-path corpus costs about 7,489 seconds (124.8 minutes).
+
+The plan records, for each batch, the seconds of its scoped update and of the
+complete corpus when it lands in plan order. A landing costs their sum; the
+schedule sums every landing, and the last column shows the same landings with
+the complete update instead of the scoped one:
+
+| Limits (paths, units) | Batches | Largest batch (paths, units) | Scoped hours | Complete-update hours |
+| --------------------- | ------: | ---------------------------: | -----------: | --------------------: |
+| 2,000, 300            |      51 |                   1,920, 300 |         82.6 |                 163.3 |
+| 3,000, 500 (chosen)   |      32 |                   2,408, 500 |         52.5 |                 103.1 |
+| 4,000, 600            |      27 |                   3,422, 600 |         45.4 |                  88.8 |
+| 8,000, 1,200          |      15 |                 4,045, 1,175 |         26.3 |                  50.6 |
+
+The scoped update halves each landing, but each additional batch still adds
+one complete gate of about 1.1 to 2.1 hours. The chosen limits accept 7.1 more
+hours than the 600-unit alternative to keep each batch within one reviewer's
+inspection. The 1,200-unit batches would halve the schedule again, but at 20
+to 40 hours of inspection one reviewer could not check their applicability
+and classifications. Prerequisite nodes add their own complete updates and
+gates outside these totals. The model is linear in executed variants;
+compile-stage rejections cost less than a full execution, and a corpus with
+more agent or module cases can cost more.
+
+#### Result partition overlap
+
+The reviewed manifest partitions results by ADR 0013 group and a two-character
+hash key, so a group has up to 256 partition files. Path locality chooses the
+groups a batch touches, not its keys: any batch with more than about 200 paths
+in one group touches most of that group's keys. 19 of the 32 batches touch one
+group, and only the small prerequisite tail touches 13. The batches touch
+7,090 partition files in sum, between 54 and 326 each. Group-confined batches
+bound the files a scoped update rewrites to one group's partitions.
+
 
 Concurrency and serialization
 -----------------------------

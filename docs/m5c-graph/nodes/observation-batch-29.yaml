@@ -1,0 +1,13 @@
+version: 1
+id: observation-batch-29
+title: Observe paths after cross-realm-host
+delivers: "Observes the 89 unreviewed paths that
+  docs/m5c-closure/observation-batches.yaml selects for observation-batch-29
+  (89 review units, after cross-realm-host): admits them to the reviewed
+  subset with dependency tags, regenerates the manifest and the ledger, and
+  assigns every unsupported result an owner."
+dependencies:
+  - cross-realm-host
+  - observation-batch-plan
+landed: false
+status: blocked

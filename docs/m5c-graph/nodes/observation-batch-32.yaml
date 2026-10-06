@@ -1,0 +1,33 @@
+version: 1
+id: observation-batch-32
+title: Observe the small prerequisite sets
+delivers: "Observes the 246 unreviewed paths that
+  docs/m5c-closure/observation-batches.yaml selects for observation-batch-32
+  (238 review units, after cross-realm-host, dynamic-import,
+  fn-global-object-harness, frontmatter-feature-tags,
+  function-caller-restrictions, hashbang-comments, import-attributes,
+  import-meta, minor-feature-tag-admission, module-export-forms,
+  promise-feature-admission, proper-tail-calls,
+  resizable-array-buffer-harness, typed-array-feature-admission,
+  well-known-intrinsics-harness): admits them to the reviewed subset with
+  dependency tags, regenerates the manifest and the ledger, and assigns every
+  unsupported result an owner."
+dependencies:
+  - cross-realm-host
+  - dynamic-import
+  - fn-global-object-harness
+  - frontmatter-feature-tags
+  - function-caller-restrictions
+  - hashbang-comments
+  - import-attributes
+  - import-meta
+  - minor-feature-tag-admission
+  - module-export-forms
+  - observation-batch-plan
+  - promise-feature-admission
+  - proper-tail-calls
+  - resizable-array-buffer-harness
+  - typed-array-feature-admission
+  - well-known-intrinsics-harness
+landed: false
+status: blocked

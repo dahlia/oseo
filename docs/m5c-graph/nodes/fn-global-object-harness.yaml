@@ -1,0 +1,11 @@
+version: 1
+id: fn-global-object-harness
+title: Review the fnGlobalObject harness
+delivers: "Adds a reviewed fnGlobalObject.js harness that returns the global
+  object without compiling source text, since the upstream copy uses the
+  Function constructor that ADR 0016 excludes, so the 41 unreviewed paths that
+  include it can be observed."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked

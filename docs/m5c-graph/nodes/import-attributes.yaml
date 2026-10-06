@@ -1,0 +1,10 @@
+version: 1
+id: import-attributes
+title: Admit import attributes
+delivers: "Admits import attributes and JSON modules (the import-attributes
+  and json-modules features), so the 89 unreviewed paths that need them can be
+  observed."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked

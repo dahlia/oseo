@@ -1,0 +1,11 @@
+version: 1
+id: minor-feature-tag-admission
+title: Decide three small feature tags
+delivers: "Decides the json-superset (4 paths), __proto__ (3), and
+  proxy-missing-checks (3) feature tags for the 10 unreviewed paths they gate,
+  admitting each tag once the profile meets it or remediating the behavior
+  first."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked

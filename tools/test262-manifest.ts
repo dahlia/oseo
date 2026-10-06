@@ -93,7 +93,8 @@ function classification(
   throw new Error(`${description} is invalid.`);
 }
 
-function partitionKey(path: string): string {
+/** Hash bucket of one path inside its ADR 0013 result group. */
+export function test262PartitionKey(path: string): string {
   return createHash("sha256").update(path).digest("hex").slice(0, 2);
 }
 
@@ -201,7 +202,7 @@ function parseResult(
   if (test262Group(path) !== group) {
     throw new Error(`test262 result ${index} does not belong to ${group}.`);
   }
-  if (partitionKey(path) !== key) {
+  if (test262PartitionKey(path) !== key) {
     throw new Error(`test262 result ${index} does not belong to key ${key}.`);
   }
   const resultClassification = classification(
@@ -447,7 +448,7 @@ export function serializeTest262Manifest(
     }
     const group = test262Group(result.case.path);
     validateGroup(group, `test262 result group for ${result.case.path}`);
-    const key = partitionKey(result.case.path);
+    const key = test262PartitionKey(result.case.path);
     const mapKey = `${group}\0${key}`;
     const partition = grouped.get(mapKey) ?? { group, key, results: [] };
     partition.results.push(result);

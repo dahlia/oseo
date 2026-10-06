@@ -1,0 +1,11 @@
+version: 1
+id: dynamic-import
+title: Admit dynamic import
+delivers: "Admits the dynamic-import feature: import() in Script and Module
+  code with host module loading, its promise and namespace results, and its
+  early errors, so the observation batches that list it can observe the 629
+  unreviewed paths whose frontmatter needs it."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: blocked
