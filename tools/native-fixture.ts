@@ -207,7 +207,14 @@ if (import.meta.main) {
     failure = reason;
     if (child.pid != null) diagnostics = sample(child.pid);
     kill();
-    reapTimer = setTimeout(finish, 1_000);
+    // A survivor holding the pipes would otherwise keep "close" from ever
+    // firing. The timer can already be overdue when a descheduled loop
+    // resumes, before it has read output that is in the pipes. A timer set
+    // from a timer callback runs only after the next I/O poll, which reads
+    // what is readable without waiting for more.
+    reapTimer = setTimeout(() => {
+      reapTimer = setTimeout(finish, 0);
+    }, 1_000);
   };
   const interruptions = {
     SIGINT: () => stop("interrupted by SIGINT"),
