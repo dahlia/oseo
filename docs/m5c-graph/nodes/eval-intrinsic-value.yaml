@@ -1,10 +1,13 @@
 version: 1
 id: eval-intrinsic-value
 title: Decide the eval function value
-delivers: "Owns the 17 reviewed paths rejected with Unknown binding 'eval'
+delivers: "Owns the 25 reviewed paths rejected with Unknown binding 'eval'
   that read %eval% as a value: 8 Promise
   ctx-non-ctor, 6 Array callback or element, 2 global property cases, and
-  test/built-ins/Proxy/create-target-is-not-a-constructor.js. The Proxy case
+  test/built-ins/Proxy/create-target-is-not-a-constructor.js, and 8 eval
+  intrinsic cases admitted by observation-batch-04. The eval cases observe
+  length, name, prototype absence, and nonconstructibility without source
+  evaluation. The Proxy case
   wraps eval and calls the proxy with no arguments, so it evaluates no source
   and observes callable/nonconstructible target behavior. Reobservation
   after ADR 0027 still rejects the bare eval identifier in that path,
