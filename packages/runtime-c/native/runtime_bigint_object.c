@@ -403,7 +403,8 @@ static OseoResult define_bigint_property(
  * splitting identities across two concurrent attempts.
  */
 static OseoResult bigint_intrinsic_build(OseoContext *context) {
-    OseoValue *marker = &context->intrinsics[OSEO_INTRINSIC_BIGINT_VALUE_OF];
+    OseoValue *marker =
+        &context->realm->intrinsics[OSEO_INTRINSIC_BIGINT_VALUE_OF];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -436,8 +437,9 @@ static OseoResult bigint_intrinsic_build(OseoContext *context) {
         frame.slots[1] = function_object(frame.slots[0])->prototype_object;
         OseoFunction *constructor = function_object(frame.slots[0]);
         constructor->prototype_writable = false;
-        context->intrinsics[OSEO_INTRINSIC_BIGINT] = frame.slots[0];
-        context->intrinsics[OSEO_INTRINSIC_BIGINT_PROTOTYPE] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_BIGINT] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_BIGINT_PROTOTYPE] =
+            frame.slots[1];
     }
     static const OseoIntrinsic static_intrinsics[] = {
         OSEO_INTRINSIC_BIGINT_AS_INT_N,
@@ -459,7 +461,8 @@ static OseoResult bigint_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[static_intrinsics[index]] = frame.slots[2];
+            context->realm->intrinsics[static_intrinsics[index]] =
+                frame.slots[2];
             result = define_bigint_property(
                 context,
                 frame.slots[0],
@@ -498,7 +501,8 @@ static OseoResult bigint_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[method_intrinsics[index]] = frame.slots[2];
+            context->realm->intrinsics[method_intrinsics[index]] =
+                frame.slots[2];
             result = define_bigint_property(
                 context,
                 frame.slots[1],
@@ -547,18 +551,18 @@ static OseoResult bigint_intrinsic_build(OseoContext *context) {
         );
     }
     if (result.status != OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_BIGINT_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_BIGINT_PROTOTYPE] =
             oseo_undefined();
         for (size_t index = OSEO_INTRINSIC_BIGINT;
              index <= OSEO_INTRINSIC_BIGINT_VALUE_OF;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
     }
     OseoValue value_of = frame.slots[2];
-    context->intrinsics[OSEO_INTRINSIC_BIGINT_VALUE_OF] = value_of;
+    context->realm->intrinsics[OSEO_INTRINSIC_BIGINT_VALUE_OF] = value_of;
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
@@ -569,7 +573,7 @@ static OseoResult bigint_intrinsic_build(OseoContext *context) {
 OseoResult oseo_internal_bigint_intrinsic(OseoContext *context) {
     OseoResult built = bigint_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_BIGINT]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_BIGINT]);
 }
 
 OseoResult oseo_internal_install_bigint_global(

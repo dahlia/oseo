@@ -286,16 +286,11 @@ static OseoResult data_view_prototype_from_target(
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[0]
+            frame.slots[0],
+            OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE
-            );
-        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];
@@ -918,7 +913,7 @@ static OseoResult define_data_view_accessor(
  */
 static OseoResult data_view_intrinsic_build(OseoContext *context) {
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64];
+        &context->realm->intrinsics[OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -942,7 +937,7 @@ static OseoResult data_view_intrinsic_build(OseoContext *context) {
         frame.slots[0] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE] =
             frame.slots[0];
         result = create_data_view_builtin(
             context,
@@ -956,7 +951,7 @@ static OseoResult data_view_intrinsic_build(OseoContext *context) {
     }
     const OseoPropertyAttributes method = {true, false, true, false};
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_DATA_VIEW] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_DATA_VIEW] = frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -996,7 +991,7 @@ static OseoResult data_view_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[accessor_intrinsics[index]] = frame.slots[2];
+        context->realm->intrinsics[accessor_intrinsics[index]] = frame.slots[2];
         result = define_data_view_accessor(
             context,
             frame.slots[0],
@@ -1048,7 +1043,7 @@ static OseoResult data_view_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[
+        context->realm->intrinsics[
             (size_t)OSEO_INTRINSIC_DATA_VIEW_GET_INT8 + index
         ] = frame.slots[2];
         result = define_data_view_property(
@@ -1063,7 +1058,7 @@ static OseoResult data_view_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE;
              index <= OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
@@ -1072,13 +1067,13 @@ static OseoResult data_view_intrinsic_build(OseoContext *context) {
         context->allocations = entry_allocations;
     }
     oseo_roots_release(context, &frame);
-    return normal(context->intrinsics[OSEO_INTRINSIC_DATA_VIEW]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_DATA_VIEW]);
 }
 
 OseoResult oseo_internal_data_view_intrinsic(OseoContext *context) {
     OseoResult built = data_view_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_DATA_VIEW]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_DATA_VIEW]);
 }
 
 OseoResult oseo_internal_install_data_view_global(

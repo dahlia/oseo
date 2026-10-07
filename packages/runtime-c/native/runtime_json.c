@@ -1411,7 +1411,7 @@ static OseoResult json_stringify_function(OseoContext *context) {
 }
 
 OseoResult oseo_internal_json_intrinsic(OseoContext *context) {
-    OseoValue *slot = &context->intrinsics[OSEO_INTRINSIC_JSON];
+    OseoValue *slot = &context->realm->intrinsics[OSEO_INTRINSIC_JSON];
     if (is_object(*slot)) return normal(*slot);
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -1432,7 +1432,7 @@ OseoResult oseo_internal_json_intrinsic(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_JSON_PARSE] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_JSON_PARSE] = frame.slots[1];
         result = oseo_internal_ascii_string(context, "parse");
         frame.slots[2] = result.value;
     }
@@ -1484,7 +1484,8 @@ OseoResult oseo_internal_json_intrinsic(OseoContext *context) {
     }
     if (result.status != OSEO_STATUS_NORMAL) {
         *slot = oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_JSON_PARSE] = oseo_undefined();
+        context->realm->intrinsics[OSEO_INTRINSIC_JSON_PARSE] =
+            oseo_undefined();
     } else if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }

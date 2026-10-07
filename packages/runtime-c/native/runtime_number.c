@@ -79,13 +79,11 @@ static OseoResult number_construct(
         result = oseo_internal_constructor_prototype(context, slots[0]);
         slots[1] = result.value;
         if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-            result = oseo_internal_validate_function_realm(context, slots[0]);
-            if (result.status == OSEO_STATUS_NORMAL) {
-                result = oseo_internal_intrinsic(
-                    context,
-                    OSEO_INTRINSIC_NUMBER_PROTOTYPE
-                );
-            }
+            result = oseo_internal_constructor_realm_default(
+                context,
+                slots[0],
+                OSEO_INTRINSIC_NUMBER_PROTOTYPE
+            );
             slots[1] = result.value;
         }
         if (result.status == OSEO_STATUS_NORMAL) {
@@ -1730,12 +1728,12 @@ static OseoResult define_number_property(
 
 OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_NUMBER_PARSE_INT];
+        &context->realm->intrinsics[OSEO_INTRINSIC_NUMBER_PARSE_INT];
     if (is_function(*marker)) {
-        return normal(context->intrinsics[OSEO_INTRINSIC_NUMBER]);
+        return normal(context->realm->intrinsics[OSEO_INTRINSIC_NUMBER]);
     }
     if (is_object(*marker)) {
-        return normal(context->intrinsics[OSEO_INTRINSIC_NUMBER]);
+        return normal(context->realm->intrinsics[OSEO_INTRINSIC_NUMBER]);
     }
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -1756,7 +1754,8 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
         prototype->number_value = oseo_number(0.0);
         prototype->primitive_data = true;
         prototype->primitive_value = oseo_number(0.0);
-        context->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_NUMBER_PROTOTYPE] =
+            frame.slots[0];
         *marker = frame.slots[0];
         result = create_number_function(
             context,
@@ -1768,7 +1767,7 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_NUMBER] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_NUMBER] = frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -1888,7 +1887,7 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
             OSEO_FUNCTION_INTERNAL
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[method_intrinsics[index]] = result.value;
+            context->realm->intrinsics[method_intrinsics[index]] = result.value;
             result = define_number_property(
                 context,
                 frame.slots[1],
@@ -1933,14 +1932,14 @@ OseoResult oseo_internal_number_intrinsic(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_NUMBER_PROTOTYPE;
              index <= OSEO_INTRINSIC_NUMBER_PARSE_INT;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
     } else if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
     oseo_roots_release(context, &frame);
     return result.status == OSEO_STATUS_NORMAL
-        ? normal(context->intrinsics[OSEO_INTRINSIC_NUMBER])
+        ? normal(context->realm->intrinsics[OSEO_INTRINSIC_NUMBER])
         : result;
 }
 
@@ -1972,7 +1971,7 @@ OseoResult oseo_internal_global_numeric_intrinsic(
     OseoContext *context,
     OseoIntrinsic intrinsic
 ) {
-    OseoValue *slot = &context->intrinsics[intrinsic];
+    OseoValue *slot = &context->realm->intrinsics[intrinsic];
     if (is_object(*slot)) return normal(*slot);
     bool finite = intrinsic == OSEO_INTRINSIC_IS_FINITE;
     if (!finite && intrinsic != OSEO_INTRINSIC_IS_NAN) {

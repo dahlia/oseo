@@ -66,13 +66,11 @@ static OseoResult iterator_create_from_constructor(
     );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_validate_function_realm(context, slots[0]);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_ITERATOR_PROTOTYPE
-            );
-        }
+        result = oseo_internal_constructor_realm_default(
+            context,
+            slots[0],
+            OSEO_INTRINSIC_ITERATOR_PROTOTYPE
+        );
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -313,7 +311,7 @@ OseoResult oseo_internal_iterator_method(
         name_length = sizeof(symbol_iterator_units) /
             sizeof(*symbol_iterator_units);
     }
-    OseoValue *cache = &context->intrinsics[intrinsic];
+    OseoValue *cache = &context->realm->intrinsics[intrinsic];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);
@@ -414,9 +412,9 @@ static OseoResult define_iterator_accessor(
 
 OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
     OseoValue *array_cache =
-        &context->intrinsics[OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE];
+        &context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_ITERATOR_PROTOTYPE];
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER];
+        &context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER];
     if (is_function(*marker)) {
         return normal(*array_cache);
     }
@@ -435,7 +433,7 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE] =
             frame.slots[1];
         *marker = frame.slots[1];
         result = create_iterator_builtin(
@@ -449,7 +447,7 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ITERATOR] = frame.slots[2];
+        context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR] = frame.slots[2];
         OseoFunction *constructor = function_object(frame.slots[2]);
         constructor->prototype_object = frame.slots[1];
         constructor->prototype_writable = false;
@@ -550,7 +548,7 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             prefixes[index]
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[intrinsics[index]] = result.value;
+            context->realm->intrinsics[intrinsics[index]] = result.value;
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -562,7 +560,7 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             context,
             frame.slots[2],
             frame.slots[3],
-            context->intrinsics[OSEO_INTRINSIC_ITERATOR_FROM]
+            context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_FROM]
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -592,12 +590,13 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        const OseoValue *intrinsics = context->realm->intrinsics;
         result = define_iterator_accessor(
             context,
             frame.slots[1],
             frame.slots[3],
-            context->intrinsics[OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_GETTER],
-            context->intrinsics[OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_SETTER]
+            intrinsics[OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_GETTER],
+            intrinsics[OSEO_INTRINSIC_ITERATOR_CONSTRUCTOR_SETTER]
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -612,8 +611,8 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             context,
             frame.slots[1],
             frame.slots[5],
-            context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_GETTER],
-            context->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER]
+            context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_GETTER],
+            context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_TAG_SETTER]
         );
     }
     /* The five lazy and six eager helper methods are ordinary writable,
@@ -630,7 +629,7 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
                 context,
                 frame.slots[1],
                 frame.slots[3],
-                context->intrinsics[intrinsics[index]]
+                context->realm->intrinsics[intrinsics[index]]
             );
         }
     }
@@ -638,7 +637,7 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
         result = oseo_object_create(context, frame.slots[1]);
         frame.slots[6] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[
+            context->realm->intrinsics[
                 OSEO_INTRINSIC_WRAP_FOR_VALID_ITERATOR_PROTOTYPE
             ] = frame.slots[6];
         }
@@ -658,7 +657,7 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
                 context,
                 frame.slots[6],
                 frame.slots[3],
-                context->intrinsics[wrap_methods[index]]
+                context->realm->intrinsics[wrap_methods[index]]
             );
         }
     }
@@ -712,23 +711,23 @@ OseoResult oseo_internal_array_iterator_prototype(OseoContext *context) {
             context->allocations = entry_allocations;
         }
     } else {
-        context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE] =
             oseo_undefined();
         *array_cache = oseo_undefined();
         for (size_t index = OSEO_INTRINSIC_ITERATOR;
              index <= OSEO_INTRINSIC_ITERATOR_TAG_SETTER;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         for (size_t index = OSEO_INTRINSIC_ITERATOR_MAP;
              index <= OSEO_INTRINSIC_ITERATOR_FLAT_MAP;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         for (size_t index = OSEO_INTRINSIC_ITERATOR_REDUCE;
              index <= OSEO_INTRINSIC_ITERATOR_FIND;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
     }
     oseo_roots_release(context, &frame);
@@ -964,7 +963,7 @@ static OseoResult iterator_setter(
         );
     slots[2] = result.value;
     OseoValue home =
-        context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE];
     if (result.status == OSEO_STATUS_NORMAL && slots[0] == home) {
         result = iterator_type_error(
             context,
@@ -1226,7 +1225,7 @@ static OseoResult helper_get_iterator_flattenable(
 
 OseoResult oseo_internal_iterator_helper_prototype(OseoContext *context) {
     OseoValue *cache =
-        &context->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_PROTOTYPE];
+        &context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_PROTOTYPE];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     size_t entry_allocations = context->allocations;
     /* 0 %IteratorPrototype%, 1 the helper prototype, 2 one key,
@@ -1264,7 +1263,7 @@ OseoResult oseo_internal_iterator_helper_prototype(OseoContext *context) {
             OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[methods[index]] = result.value;
+            context->realm->intrinsics[methods[index]] = result.value;
             result = ascii_iterator_string(context, names[index]);
             frame.slots[2] = result.value;
         }
@@ -1273,7 +1272,7 @@ OseoResult oseo_internal_iterator_helper_prototype(OseoContext *context) {
                 context,
                 frame.slots[1],
                 frame.slots[2],
-                context->intrinsics[methods[index]]
+                context->realm->intrinsics[methods[index]]
             );
         }
     }
@@ -1305,9 +1304,9 @@ OseoResult oseo_internal_iterator_helper_prototype(OseoContext *context) {
         }
     } else {
         *cache = oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_NEXT] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_NEXT] =
             oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_RETURN] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_HELPER_RETURN] =
             oseo_undefined();
     }
     oseo_roots_release(context, &frame);
@@ -2236,7 +2235,7 @@ OseoResult oseo_internal_array_iterator_next(
  */
 OseoResult oseo_internal_string_iterator_prototype(OseoContext *context) {
     OseoValue *cache =
-        &context->intrinsics[OSEO_INTRINSIC_STRING_ITERATOR_PROTOTYPE];
+        &context->realm->intrinsics[OSEO_INTRINSIC_STRING_ITERATOR_PROTOTYPE];
     if (is_object(*cache)) return normal(*cache);
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -2245,7 +2244,7 @@ OseoResult oseo_internal_string_iterator_prototype(OseoContext *context) {
     result = oseo_internal_array_iterator_prototype(context);
     if (result.status == OSEO_STATUS_NORMAL) {
         frame.slots[0] =
-            context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE];
+            context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE];
         result = oseo_object_create(context, frame.slots[0]);
         frame.slots[1] = result.value;
     }
@@ -2296,7 +2295,7 @@ OseoResult oseo_internal_string_iterator_prototype(OseoContext *context) {
         }
     } else {
         *cache = oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_STRING_ITERATOR_NEXT] =
+        context->realm->intrinsics[OSEO_INTRINSIC_STRING_ITERATOR_NEXT] =
             oseo_undefined();
     }
     oseo_roots_release(context, &frame);

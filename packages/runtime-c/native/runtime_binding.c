@@ -293,8 +293,8 @@ OseoResult oseo_module_namespace_create(
  * ordinary properties a program adds to this object.
  */
 static OseoResult global_this_object(OseoContext *context) {
-    if (tag_of(context->global_this) != OSEO_TAG_UNDEFINED) {
-        return normal(context->global_this);
+    if (tag_of(context->realm->global_this) != OSEO_TAG_UNDEFINED) {
+        return normal(context->realm->global_this);
     }
     OseoResult result = oseo_object_literal_create(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -451,6 +451,7 @@ static OseoResult global_this_object(OseoContext *context) {
         "URIError",
         "AggregateError",
         "Iterator",
+        "eval",
     };
     static const OseoIntrinsic intrinsic_values[] = {
         OSEO_INTRINSIC_FUNCTION,
@@ -464,6 +465,7 @@ static OseoResult global_this_object(OseoContext *context) {
         OSEO_INTRINSIC_URI_ERROR,
         OSEO_INTRINSIC_AGGREGATE_ERROR,
         OSEO_INTRINSIC_ITERATOR,
+        OSEO_INTRINSIC_EVAL,
     };
     _Static_assert(
         sizeof(intrinsic_names) / sizeof(intrinsic_names[0]) ==
@@ -542,7 +544,7 @@ static OseoResult global_this_object(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->global_this = frame.slots[0];
+        context->realm->global_this = frame.slots[0];
         result.value = frame.slots[0];
     }
     oseo_roots_pop(context, &frame);

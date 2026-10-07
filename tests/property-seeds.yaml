@@ -524,3 +524,7 @@ families:
     owner: tests/test262-incremental.property.test.ts
     start: 0x60008200
     end: 0x600082ff
+  - family: m5-cross-realm
+    owner: tests/property/m5-cross-realm.property.test.ts
+    start: 0x60008300
+    end: 0x600083ff

@@ -475,8 +475,8 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
         intrinsic == OSEO_INTRINSIC_STRING_PROTOTYPE ||
         intrinsic == OSEO_INTRINSIC_SYMBOL_PROTOTYPE) {
         result = oseo_internal_intrinsic(context, intrinsic);
-    } else if (is_object(context->intrinsics[intrinsic])) {
-        result = normal(context->intrinsics[intrinsic]);
+    } else if (is_object(context->realm->intrinsics[intrinsic])) {
+        result = normal(context->realm->intrinsics[intrinsic]);
     } else {
         result = oseo_internal_intrinsic(
             context,
@@ -486,7 +486,7 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
             result = oseo_object_create(context, result.value);
         }
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[intrinsic] = result.value;
+            context->realm->intrinsics[intrinsic] = result.value;
             created = true;
         }
     }
@@ -506,12 +506,12 @@ OseoResult oseo_internal_primitive_wrapper_prototype(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_internal_install_primitive_wrapper_methods(
             context,
-            context->intrinsics[intrinsic],
+            context->realm->intrinsics[intrinsic],
             false
         );
     }
     if (result.status != OSEO_STATUS_NORMAL && created) {
-        context->intrinsics[intrinsic] = oseo_undefined();
+        context->realm->intrinsics[intrinsic] = oseo_undefined();
     }
     return result;
 }
@@ -607,13 +607,11 @@ static OseoResult object_create_from_constructor(
     );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_validate_function_realm(context, slots[0]);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_OBJECT_PROTOTYPE
-            );
-        }
+        result = oseo_internal_constructor_realm_default(
+            context,
+            slots[0],
+            OSEO_INTRINSIC_OBJECT_PROTOTYPE
+        );
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1167,7 +1165,7 @@ static OseoResult object_prototype_function(
     const char *name,
     size_t length
 ) {
-    OseoValue *cache = &context->intrinsics[intrinsic];
+    OseoValue *cache = &context->realm->intrinsics[intrinsic];
     if (is_function(*cache)) return normal(*cache);
     OseoResult result = create_object_prototype_function(
         context,
@@ -1206,9 +1204,9 @@ static OseoResult object_constructor_function(OseoContext *context) {
 
 OseoResult oseo_internal_object_prototype(OseoContext *context) {
     OseoValue prototype =
-        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_OBJECT_SET_PROTOTYPE_OF];
+        &context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_SET_PROTOTYPE_OF];
     if (is_function(*marker)) return normal(prototype);
     if (is_object(*marker)) return normal(prototype);
     if (!is_object(prototype)) {
@@ -1218,7 +1216,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
     *marker = prototype;
     OseoResult result = object_constructor_function(context);
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_OBJECT] = result.value;
+        context->realm->intrinsics[OSEO_INTRINSIC_OBJECT] = result.value;
         OseoFunction *constructor = function_object(result.value);
         constructor->prototype_object = prototype;
         constructor->prototype_writable = false;
@@ -1265,7 +1263,8 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
             0u
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[OSEO_INTRINSIC_OBJECT_VALUE_OF] = result.value;
+            context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_VALUE_OF] =
+                result.value;
         }
     }
     static const OseoIntrinsic properties[] = {
@@ -1305,7 +1304,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
                 context,
                 frame.slots[0],
                 frame.slots[1],
-                context->intrinsics[properties[index]],
+                context->realm->intrinsics[properties[index]],
                 attributes
             );
         }
@@ -1343,9 +1342,9 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_object_define(
                 context,
-                context->intrinsics[OSEO_INTRINSIC_OBJECT],
+                context->realm->intrinsics[OSEO_INTRINSIC_OBJECT],
                 frame.slots[1],
-                context->intrinsics[static_intrinsics[index]],
+                context->realm->intrinsics[static_intrinsics[index]],
                 attributes
             );
         }
@@ -1419,7 +1418,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_object_define(
                 context,
-                context->intrinsics[OSEO_INTRINSIC_OBJECT],
+                context->realm->intrinsics[OSEO_INTRINSIC_OBJECT],
                 frame.slots[1],
                 frame.slots[2],
                 attributes
@@ -1429,7 +1428,7 @@ OseoResult oseo_internal_object_prototype(OseoContext *context) {
     if (frame.slots != NULL) oseo_roots_release(context, &frame);
     if (result.status != OSEO_STATUS_NORMAL) {
         *marker = oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_OBJECT] = oseo_undefined();
+        context->realm->intrinsics[OSEO_INTRINSIC_OBJECT] = oseo_undefined();
         return result;
     }
     if (context->observe_specialization) {

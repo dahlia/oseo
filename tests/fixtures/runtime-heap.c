@@ -24,7 +24,7 @@ static void test_primitive_prototype_intrinsics(OseoContext *context) {
          index < sizeof(intrinsics) / sizeof(intrinsics[0]);
          index += 1u) {
         OseoIntrinsic intrinsic = intrinsics[index];
-        assert(context->intrinsics[intrinsic] == oseo_undefined());
+        assert(context->realm->intrinsics[intrinsic] == oseo_undefined());
         OseoValue first = require_normal(oseo_intrinsic(context, intrinsic));
         assert(first != oseo_undefined());
         assert(require_normal(oseo_intrinsic(context, intrinsic)) == first);
@@ -259,13 +259,13 @@ static OseoResult run_bigint_allocation_operation(
 
 static void assert_bigint_cluster_unpublished(const OseoContext *context) {
     assert(
-        context->intrinsics[OSEO_INTRINSIC_BIGINT_PROTOTYPE] ==
+        context->realm->intrinsics[OSEO_INTRINSIC_BIGINT_PROTOTYPE] ==
         oseo_undefined()
     );
     for (size_t intrinsic = OSEO_INTRINSIC_BIGINT;
          intrinsic <= OSEO_INTRINSIC_BIGINT_VALUE_OF;
          intrinsic += 1u) {
-        assert(context->intrinsics[intrinsic] == oseo_undefined());
+        assert(context->realm->intrinsics[intrinsic] == oseo_undefined());
     }
 }
 
@@ -311,7 +311,7 @@ static void validate_bigint_allocation_retry(
         for (size_t intrinsic = OSEO_INTRINSIC_BIGINT;
              intrinsic <= OSEO_INTRINSIC_BIGINT_VALUE_OF;
              intrinsic += 1u) {
-            assert(context->intrinsics[intrinsic] != oseo_undefined());
+            assert(context->realm->intrinsics[intrinsic] != oseo_undefined());
         }
         return;
     }
@@ -1331,7 +1331,7 @@ static void test_global_this_install_failure(void) {
         oseo_this_value(&injected, oseo_undefined()).status ==
         OSEO_STATUS_THROW
     );
-    assert(injected.global_this == oseo_undefined());
+    assert(injected.realm->global_this == oseo_undefined());
     oseo_context_fail_allocation_at(&injected, 0u);
     OseoValue global = require_normal(
         oseo_this_value(&injected, oseo_undefined())
@@ -1435,7 +1435,7 @@ static void assert_data_view_cluster_unpublished(const OseoContext *context) {
     for (size_t intrinsic = OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE;
          intrinsic <= OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64;
          intrinsic += 1u) {
-        assert(context->intrinsics[intrinsic] == oseo_undefined());
+        assert(context->realm->intrinsics[intrinsic] == oseo_undefined());
     }
 }
 
@@ -1499,7 +1499,7 @@ static void validate_data_view_allocation_retry(
         for (size_t intrinsic = OSEO_INTRINSIC_DATA_VIEW_PROTOTYPE;
              intrinsic <= OSEO_INTRINSIC_DATA_VIEW_SET_BIG_UINT64;
              intrinsic += 1u) {
-            assert(context->intrinsics[intrinsic] != oseo_undefined());
+            assert(context->realm->intrinsics[intrinsic] != oseo_undefined());
         }
         return;
     }
@@ -1731,7 +1731,7 @@ static void assert_regexp_cluster_unpublished(const OseoContext *context) {
     for (size_t intrinsic = OSEO_INTRINSIC_REGEXP_PROTOTYPE;
          intrinsic <= OSEO_INTRINSIC_REGEXP_SPECIES;
          intrinsic += 1u) {
-        assert(context->intrinsics[intrinsic] == oseo_undefined());
+        assert(context->realm->intrinsics[intrinsic] == oseo_undefined());
     }
 }
 
@@ -1793,7 +1793,7 @@ static void validate_regexp_allocation_retry(
         for (size_t intrinsic = OSEO_INTRINSIC_REGEXP_PROTOTYPE;
              intrinsic <= OSEO_INTRINSIC_REGEXP_SPECIES;
              intrinsic += 1u) {
-            assert(context->intrinsics[intrinsic] != oseo_undefined());
+            assert(context->realm->intrinsics[intrinsic] != oseo_undefined());
         }
         return;
     }
@@ -2755,13 +2755,16 @@ static void test_math_intrinsic_api(bool install_global) {
         );
         assert(roots[1] != oseo_undefined());
     } else {
-        assert(context.intrinsics[OSEO_INTRINSIC_MATH] == oseo_undefined());
+        assert(
+            context.realm->intrinsics[OSEO_INTRINSIC_MATH] ==
+                oseo_undefined()
+        );
     }
     roots[0] = require_normal(
         oseo_intrinsic(&context, OSEO_INTRINSIC_MATH)
     );
     assert(roots[0] != oseo_undefined());
-    assert(context.intrinsics[OSEO_INTRINSIC_MATH] == roots[0]);
+    assert(context.realm->intrinsics[OSEO_INTRINSIC_MATH] == roots[0]);
     /* Repeating the request never publishes a second namespace object. */
     assert(
         require_normal(oseo_intrinsic(&context, OSEO_INTRINSIC_MATH)) ==
@@ -3178,6 +3181,116 @@ static void test_global_object_bindings(
     ));
 }
 
+/* Reads one named property of `object`. */
+static OseoValue get_named(
+    OseoContext *context,
+    OseoValue object,
+    const char *name
+) {
+    OseoValue slots[2] = {object, make_text(context, name)};
+    OseoRootFrame frame = {NULL, slots, 2u};
+    oseo_roots_push(context, &frame);
+    OseoValue value = require_normal(
+        oseo_object_get(context, slots[0], slots[1])
+    );
+    oseo_roots_pop(context, &frame);
+    return value;
+}
+
+/*
+ * Realms that `$262.createRealm` creates are collected heap records. A
+ * realm that only a dropped host object named is freed by the next
+ * collection, together with its intrinsic graph and global object, while
+ * a rooted one keeps working across collections. Every call returns with
+ * the initial realm running again, each created realm draws its own
+ * Math.random sequence, and destroying the context frees every realm
+ * that is still alive, which the sanitizer lanes check for leaks and
+ * use after free.
+ */
+static void test_created_realms(void) {
+    OseoContext context;
+    OseoValue roots[10];
+    for (size_t index = 0u; index < 10u; index += 1u) {
+        roots[index] = oseo_undefined();
+    }
+    OseoRootFrame frame = {NULL, roots, 10u};
+    oseo_context_init(&context, "runtime-heap.c", 14u);
+    oseo_roots_push(&context, &frame);
+    (void)require_normal(oseo_test262_host_install(&context, NULL, 0u));
+    roots[0] = require_normal(oseo_this_value(&context, oseo_undefined()));
+    roots[1] = get_named(&context, roots[0], "$262");
+    roots[2] = get_named(&context, roots[1], "createRealm");
+    assert(get_named(&context, roots[1], "global") == roots[0]);
+    roots[3] = get_named(&context, roots[0], "Array");
+    size_t kept = 0u;
+    for (size_t index = 0u; index < 12u; index += 1u) {
+        roots[4] = require_normal(oseo_call_function(
+            &context,
+            roots[2],
+            roots[1],
+            0u,
+            NULL,
+            oseo_undefined()
+        ));
+        assert(context.realm == &context.initial_realm);
+        assert(context.realm_record == oseo_undefined());
+        roots[5] = get_named(&context, roots[4], "global");
+        assert(roots[5] != roots[0]);
+        assert(get_named(&context, roots[5], "Array") != roots[3]);
+        if (index % 4u == 0u) {
+            roots[6 + kept] = roots[5];
+            kept += 1u;
+        }
+        roots[4] = oseo_undefined();
+        roots[5] = oseo_undefined();
+        oseo_collect(&context);
+    }
+    assert(kept == 3u);
+    for (size_t index = 0u; index < kept; index += 1u) {
+        OseoValue global = roots[6 + index];
+        roots[9] = get_named(&context, global, "Array");
+        OseoValue array = require_normal(oseo_call_function(
+            &context,
+            roots[9],
+            oseo_undefined(),
+            0u,
+            NULL,
+            roots[9]
+        ));
+        roots[4] = array;
+        roots[5] = get_named(&context, global, "Object");
+        roots[5] = get_named(&context, roots[5], "getPrototypeOf");
+        OseoValue prototype = require_normal(oseo_call_function(
+            &context,
+            roots[5],
+            oseo_undefined(),
+            1u,
+            &roots[4],
+            oseo_undefined()
+        ));
+        assert(prototype == get_named(&context, roots[9], "prototype"));
+        assert(context.realm == &context.initial_realm);
+        oseo_collect(&context);
+    }
+    /* Each created realm seeds Math.random from its own ordinal. */
+    OseoValue first[2];
+    for (size_t index = 0u; index < 2u; index += 1u) {
+        roots[4] = get_named(&context, roots[6 + index], "Math");
+        roots[5] = get_named(&context, roots[4], "random");
+        first[index] = require_normal(oseo_call_function(
+            &context,
+            roots[5],
+            roots[4],
+            0u,
+            NULL,
+            oseo_undefined()
+        ));
+    }
+    assert(first[0] != first[1]);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
 int main(void) {
     OseoContext context;
     OseoRootFrame frame;
@@ -3211,6 +3324,7 @@ int main(void) {
     test_regexp_duplicate_name_scale();
     test_regexp_prototype_and_conversion_order();
     test_realm_random_sequences();
+    test_created_realms();
     test_math_intrinsic_api(false);
     test_math_intrinsic_api(true);
     test_string_length_limit(&context);

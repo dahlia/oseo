@@ -200,14 +200,14 @@ static double math_imul(double left, double right) {
  * other realm's.
  */
 static double math_random(OseoContext *context) {
-    uint64_t first = context->random_state[0];
-    const uint64_t second = context->random_state[1];
-    context->random_state[0] = second;
+    uint64_t first = context->realm->random_state[0];
+    const uint64_t second = context->realm->random_state[1];
+    context->realm->random_state[0] = second;
     first ^= first << 23u;
     first ^= first >> 17u;
     first ^= second;
     first ^= second >> 26u;
-    context->random_state[1] = first;
+    context->realm->random_state[1] = first;
     /* The high 53 bits of the sum scale exactly onto [0, 1). */
     return (double)((first + second) >> 11u) * (1.0 / 9007199254740992.0);
 }
@@ -518,7 +518,7 @@ static OseoResult define_math_property(
 }
 
 OseoResult oseo_internal_math_intrinsic(OseoContext *context) {
-    OseoValue *slot = &context->intrinsics[OSEO_INTRINSIC_MATH];
+    OseoValue *slot = &context->realm->intrinsics[OSEO_INTRINSIC_MATH];
     if (is_object(*slot)) return normal(*slot);
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};

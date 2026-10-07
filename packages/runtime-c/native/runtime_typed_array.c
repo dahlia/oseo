@@ -190,13 +190,6 @@ static size_t typed_array_length(const OseoTypedArray *view) {
     return view->array_length;
 }
 
-static OseoResult typed_array_default_prototype(
-    OseoContext *context,
-    OseoTypedArrayKind kind
-) {
-    return oseo_internal_intrinsic(context, typed_array_prototypes[kind]);
-}
-
 static OseoResult typed_array_allocate_object(
     OseoContext *context,
     OseoTypedArrayKind kind,
@@ -224,13 +217,11 @@ static OseoResult typed_array_allocate_object(
         /* GetPrototypeFromConstructor reads the fallback realm through
          * GetFunctionRealm, so a revoked Proxy new target throws here
          * instead of silently borrowing this realm's default. */
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[0]
+            frame.slots[0],
+            typed_array_prototypes[kind]
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = typed_array_default_prototype(context, kind);
-        }
         frame.slots[2] = result.value;
     }
     if (result.status != OSEO_STATUS_NORMAL) {
@@ -4130,7 +4121,7 @@ static OseoResult typed_array_install_core(
 
 static OseoResult typed_array_intrinsic_build(OseoContext *context) {
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_BIGUINT64_ARRAY];
+        &context->realm->intrinsics[OSEO_INTRINSIC_BIGUINT64_ARRAY];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -4154,7 +4145,7 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE] =
             frame.slots[1];
         result = create_typed_array_builtin(
             context,
@@ -4169,7 +4160,7 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
     const OseoPropertyAttributes method = {true, false, true, false};
     const OseoPropertyAttributes constant = {false, false, false, false};
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY] = frame.slots[2];
+        context->realm->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY] = frame.slots[2];
         OseoFunction *constructor = function_object(frame.slots[2]);
         constructor->prototype_object = frame.slots[1];
         constructor->prototype_writable = false;
@@ -4195,7 +4186,8 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
         result = oseo_object_create(context, frame.slots[1]);
         frame.slots[3] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[typed_array_prototypes[index]] = frame.slots[3];
+        context->realm->intrinsics[typed_array_prototypes[index]] =
+            frame.slots[3];
         result = create_typed_array_builtin(
             context,
             typed_array_codes[index],
@@ -4212,7 +4204,7 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
         constructor->prototype_writable = false;
         if (typed_array_constructors[index] !=
             OSEO_INTRINSIC_BIGUINT64_ARRAY) {
-            context->intrinsics[typed_array_constructors[index]] =
+            context->realm->intrinsics[typed_array_constructors[index]] =
                 frame.slots[4];
         }
         result = define_typed_array_property(
@@ -4245,7 +4237,7 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE;
              index <= OSEO_INTRINSIC_BIGUINT64_ARRAY;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
@@ -4254,7 +4246,7 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
-    OseoValue value = context->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY];
+    OseoValue value = context->realm->intrinsics[OSEO_INTRINSIC_TYPED_ARRAY];
     oseo_roots_release(context, &frame);
     return normal(value);
 }
@@ -4275,7 +4267,7 @@ OseoResult oseo_internal_install_typed_array_globals(
          result.status == OSEO_STATUS_NORMAL &&
              index < TYPED_ARRAY_KIND_COUNT;
          index += 1u) {
-        slots[1] = context->intrinsics[typed_array_constructors[index]];
+        slots[1] = context->realm->intrinsics[typed_array_constructors[index]];
         result = define_typed_array_property(
             context,
             slots[0],

@@ -94,13 +94,11 @@ static OseoResult prototype_from_target(
     result = oseo_internal_constructor_prototype(context, frame.slots[0]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[0]
+            frame.slots[0],
+            fallback
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(context, fallback);
-        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];
@@ -1023,7 +1021,7 @@ static OseoResult weak_constructor_build(
     OseoResult result = oseo_object_create(context, slots[0]);
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[description->prototype_intrinsic] = slots[1];
+        context->realm->intrinsics[description->prototype_intrinsic] = slots[1];
         result = create_weak_builtin(
             context,
             description->constructor_code_id,
@@ -1034,7 +1032,8 @@ static OseoResult weak_constructor_build(
         slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[description->constructor_intrinsic] = slots[2];
+        context->realm->intrinsics[description->constructor_intrinsic] =
+            slots[2];
         OseoFunction *constructor = function_object(slots[2]);
         constructor->prototype_object = slots[1];
         constructor->prototype_writable = false;
@@ -1060,7 +1059,7 @@ static OseoResult weak_constructor_build(
         );
         slots[3] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[entry->intrinsic] = slots[3];
+        context->realm->intrinsics[entry->intrinsic] = slots[3];
         result = define_ascii_property(
             context,
             slots[1],
@@ -1093,8 +1092,9 @@ static OseoResult weak_constructor_build(
 }
 
 static OseoResult weak_collection_intrinsic_build(OseoContext *context) {
+    OseoValue *intrinsics = context->realm->intrinsics;
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER];
+        &intrinsics[OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -1124,7 +1124,7 @@ static OseoResult weak_collection_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_WEAK_MAP_PROTOTYPE;
              index <= OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
@@ -1152,8 +1152,9 @@ OseoResult oseo_internal_install_weak_collection_globals(
          result.status == OSEO_STATUS_NORMAL &&
              index < OSEO_WEAK_CONSTRUCTOR_COUNT;
          index += 1u) {
-        slots[1] =
-            context->intrinsics[weak_constructors[index].constructor_intrinsic];
+        OseoIntrinsic constructor =
+            weak_constructors[index].constructor_intrinsic;
+        slots[1] = context->realm->intrinsics[constructor];
         result = define_ascii_property(
             context,
             slots[0],

@@ -1437,7 +1437,7 @@ OseoResult oseo_internal_proxy_builtin_dispatch(
 }
 
 OseoResult oseo_internal_proxy_intrinsic(OseoContext *context) {
-    OseoValue *slot = &context->intrinsics[OSEO_INTRINSIC_PROXY];
+    OseoValue *slot = &context->realm->intrinsics[OSEO_INTRINSIC_PROXY];
     if (is_function(*slot)) return normal(*slot);
     OseoValue slots[4] = {
         oseo_undefined(), oseo_undefined(), oseo_undefined(), oseo_undefined(),

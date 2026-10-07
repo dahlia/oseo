@@ -1879,13 +1879,11 @@ static OseoResult string_construct(
         result = oseo_internal_constructor_prototype(context, slots[0]);
         slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[2])) {
-            result = oseo_internal_validate_function_realm(context, slots[0]);
-            if (result.status == OSEO_STATUS_NORMAL) {
-                result = oseo_internal_intrinsic(
-                    context,
-                    OSEO_INTRINSIC_STRING_PROTOTYPE
-                );
-            }
+            result = oseo_internal_constructor_realm_default(
+                context,
+                slots[0],
+                OSEO_INTRINSIC_STRING_PROTOTYPE
+            );
             slots[2] = result.value;
         }
         if (result.status == OSEO_STATUS_NORMAL) {
@@ -2137,9 +2135,9 @@ static OseoResult define_string_property(
 }
 
 OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
-    OseoValue *marker = &context->intrinsics[OSEO_INTRINSIC_STRING_RAW];
+    OseoValue *marker = &context->realm->intrinsics[OSEO_INTRINSIC_STRING_RAW];
     if (tag_of(*marker) != OSEO_TAG_UNDEFINED) {
-        return normal(context->intrinsics[OSEO_INTRINSIC_STRING]);
+        return normal(context->realm->intrinsics[OSEO_INTRINSIC_STRING]);
     }
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -2171,7 +2169,8 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         prototype->virtual_string_iterator_configurable = true;
         prototype->virtual_string_iterator_enumerable = false;
         prototype->virtual_string_iterator_writable = true;
-        context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] =
+            frame.slots[0];
         /*
          * The marker slot is claimed before the remaining allocations so
          * a nested materialization cannot start a second construction;
@@ -2326,7 +2325,7 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_STRING] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_STRING] = frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -2365,7 +2364,7 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[static_intrinsics[index]] = frame.slots[2];
+        context->realm->intrinsics[static_intrinsics[index]] = frame.slots[2];
         result = define_string_property(
             context,
             frame.slots[1],
@@ -2375,21 +2374,21 @@ OseoResult oseo_internal_string_intrinsic(OseoContext *context) {
         );
     }
     if (result.status != OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] =
             oseo_undefined();
         for (size_t index = OSEO_INTRINSIC_STRING;
              index <= OSEO_INTRINSIC_STRING_RAW;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
-        context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE_ITERATOR] =
+        context->realm->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE_ITERATOR] =
             oseo_undefined();
     } else if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
     oseo_roots_release(context, &frame);
     return result.status == OSEO_STATUS_NORMAL
-        ? normal(context->intrinsics[OSEO_INTRINSIC_STRING])
+        ? normal(context->realm->intrinsics[OSEO_INTRINSIC_STRING])
         : result;
 }
 

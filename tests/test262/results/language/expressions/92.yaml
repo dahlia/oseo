@@ -54,10 +54,14 @@ results:
       - async-iteration
       - dynamic-source
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/language/expressions/async-generator/eval-body-proto-realm.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/async-generator/eval-body-proto-realm.js:108:10:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
-    unsupportedFeatures:
-      - cross-realm
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
   - case:
       async: true
       features:

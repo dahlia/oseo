@@ -524,7 +524,7 @@ static OseoResult define_reflect_property(
 }
 
 OseoResult oseo_internal_reflect_intrinsic(OseoContext *context) {
-    OseoValue *slot = &context->intrinsics[OSEO_INTRINSIC_REFLECT];
+    OseoValue *slot = &context->realm->intrinsics[OSEO_INTRINSIC_REFLECT];
     if (is_object(*slot)) return normal(*slot);
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};

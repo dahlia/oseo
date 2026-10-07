@@ -455,7 +455,7 @@ OseoResult oseo_enumerate_get(
     OseoValue symbol_prototype = oseo_undefined();
     if (is_symbol(subject)) {
         symbol_prototype =
-            context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE];
+            context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE];
     }
     frame.slots[0] = is_object(subject) || is_string(subject)
         ? subject

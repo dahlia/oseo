@@ -413,10 +413,10 @@ static OseoResult regexp_iterator_property(
 OseoResult oseo_internal_regexp_string_iterator_prototype(
     OseoContext *context
 ) {
-    OseoValue *prototype_cache = &context->intrinsics[
+    OseoValue *prototype_cache = &context->realm->intrinsics[
         OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_PROTOTYPE
     ];
-    OseoValue *next_cache = &context->intrinsics[
+    OseoValue *next_cache = &context->realm->intrinsics[
         OSEO_INTRINSIC_REGEXP_STRING_ITERATOR_NEXT
     ];
     if (is_object(*prototype_cache) && is_function(*next_cache)) {

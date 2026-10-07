@@ -28,6 +28,52 @@ test("owns every intrinsic through one realm table", () => {
   assert.doesNotMatch(internalHeader, /OseoVirtualProperty/u);
 });
 
+test("keeps realm-owned state in collected realm records", () => {
+  const publicHeader = sources.get("oseo_runtime.h") ?? "";
+  const internalHeader = sources.get("runtime_internal.h") ?? "";
+  const memorySource = sources.get("runtime_memory.c") ?? "";
+  const functionSource = sources.get("runtime_function.c") ?? "";
+  const arraySource = sources.get("runtime_array.c") ?? "";
+  const promiseSource = sources.get("runtime_promise.c") ?? "";
+  const realmSource = sources.get("runtime_realm.c") ?? "";
+  const bindingSource = sources.get("runtime_binding.c") ?? "";
+
+  // The context embeds its initial realm and points at the running one;
+  // the well-known symbols and the registry stay shared by every realm.
+  assert.match(
+    publicHeader,
+    /OseoRealm initial_realm;\s*OseoRealm \*realm;\s*OseoValue realm_record;/u,
+  );
+  assert.match(publicHeader, /OSEO_INTRINSIC_EVAL = 270/u);
+  assert.match(internalHeader, /OSEO_HEAP_REALM = 40/u);
+  assert.match(internalHeader, /OseoValue realm;\n {4}\/\* BoundFunction/u);
+  // The collector traces the initial realm, the running realm's record,
+  // every realm record, and every function's and job's [[Realm]].
+  assert.match(memorySource, /mark_realm\(&context->initial_realm/u);
+  assert.match(memorySource, /mark_value\(context->realm_record/u);
+  assert.match(memorySource, /mark_value\(function->realm, worklist\)/u);
+  assert.match(memorySource, /mark_value\(job->realm, worklist\)/u);
+  assert.match(memorySource, /mark_value\(promise->realm, worklist\)/u);
+  assert.match(promiseSource, /promise_object\(capability\)->realm/u);
+  assert.match(memorySource, /oseo_internal_realm_release\(/u);
+  // A call enters the callee's realm; a bound function and a Proxy do not.
+  assert.match(
+    functionSource,
+    new RegExp(
+      String.raw`oseo_internal_realm_enter\(context, &scope, ` +
+        String.raw`function_object\(callee\)->realm\)`,
+      "u",
+    ),
+  );
+  assert.match(functionSource, /function->realm = context->realm_record;/u);
+  assert.match(promiseSource, /job_object\(frame\.slots\[0\]\)->realm/u);
+  assert.match(arraySource, /state->intrinsics\[OSEO_INTRINSIC_ARRAY\]/u);
+  assert.match(realmSource, /OSEO_HEAP_REALM/u);
+  assert.match(realmSource, /"OSEO1001",\n\s+"eval compiles source text/u);
+  assert.match(bindingSource, /"eval",\n {4}\};/u);
+  assert.doesNotMatch(internalHeader, /oseo_internal_validate_function_realm/u);
+});
+
 test("materializes ordinary roots instead of name-compared properties", () => {
   const functionSource = sources.get("runtime_function.c") ?? "";
   const objectSource = sources.get("runtime_object.c") ?? "";
@@ -1798,7 +1844,7 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
     header,
     /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
   );
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 270/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 271/u);
   for (const property of [
     "WeakMap",
     "WeakSet",
@@ -2611,7 +2657,7 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 270/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 271/u);
   assert.match(internalHeader, /OSEO_HEAP_ATOMICS_WAITER = 35/u);
   // A SharedArrayBuffer is the ArrayBuffer record with the shared brand,
   // so views, DataView, and the collector reach both kinds through one

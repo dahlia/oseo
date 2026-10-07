@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 140
+M5a is complete. The normative family records described below inventory 142
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -55,8 +55,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 21,341 reviewed cases: 18,273 passes, 1,560
-expected negatives, and 1,508 unsupported profile features. It records no
+The current manifest contains 21,383 reviewed cases: 18,386 passes, 1,560
+expected negatives, and 1,437 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -7784,6 +7784,108 @@ the ABI to `oseo-runtime-m5-122`. The graph's orchestration state remains
 coordinator-owned.
 
 
+Realms beyond the initial realm
+-------------------------------
+
+M5c node `cross-realm-host` admits realm creation beyond the initial realm and
+the `$262.createRealm` harness capability under
+[ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md). A Script built with
+the CLI's `--test262-host` option has a `$262` global whose `createRealm`
+creates a realm in the running agent and returns that realm's own host
+object, and whose `global` is the realm's global object. A created realm's
+host object is an object of that realm with its own `global` and
+`createRealm` and no `agent`. `createRealm` has `length` 0 and is not a
+constructor. In an ordinary program `$262` stays unresolvable.
+
+Each realm owns its intrinsic graph, its global object with every standard
+global this profile installs, its template and regular expression literal
+caches, and its Math.random state, seeded from its own realm ordinal so that
+no two realms draw one sequence. All realms of one agent share the heap, the
+collector, the job queues, the well-known symbols, and the
+GlobalSymbolRegistry, so `Symbol.iterator` and `Symbol.for` results are the
+same values in every realm. A created realm that nothing reaches is collected
+with its intrinsics.
+
+Every function records the realm that was running when it was created, and a
+call of an ordinary or built-in function makes that realm the running realm
+until the call returns or throws. Errors a built-in throws, objects it
+allocates, and functions it creates therefore belong to the built-in's realm:
+another realm's `String.prototype.toString` throws that realm's TypeError,
+and its `RegExp.prototype` flag getters compare with that realm's
+`%RegExp.prototype%`. A class constructor called without `new` throws a
+TypeError of the class's realm. A bound function and a Proxy have no realm of
+their own and never switch. A generator resumption runs in the generator
+function's realm, and a promise job runs in the realm of its handler or of a
+thenable's `then`, or in the realm that enqueued it when there is no function
+or GetFunctionRealm would throw.
+
+GetFunctionRealm walks bound targets and Proxy targets and throws a TypeError
+for a revoked Proxy. Every GetPrototypeFromConstructor fallback uses the named
+intrinsic of GetFunctionRealm of the new target, so constructing a built-in
+with another realm's bound `Object` as new target produces an object of that
+realm, and an ordinary [[Construct]] whose new target has a non-object
+`prototype` uses that realm's `%Object.prototype%`. ArraySpeciesCreate treats
+another realm's `%Array%` as undefined before it reads `Symbol.species`, so an
+array whose constructor is another realm's `Array` keeps producing arrays of
+the running realm.
+
+Generated code always runs in the initial realm, because no source text is
+compiled for a created realm; a created realm runs only its own built-in
+functions and returns to generated code through an ordinary call. Every realm
+has a `%eval%` intrinsic, installed as the global object's writable,
+non-enumerable, configurable `eval` property with `length` 1 and `name`
+`"eval"`. It returns a non-String argument unchanged, as PerformEval does
+without parsing, and reports `OSEO1001` “eval compiles source text at run time,
+which is outside the admitted profile.” for a String, the boundary of
+[ADR 0016](./adr/0016-dynamic-source-boundary.md); it never evaluates source.
+The compiler still rejects the bare `eval` identifier, which the
+`eval-intrinsic-value` node owns. `%Function%`'s [[Call]] and [[Construct]]
+report the same boundary as `OSEO1001`, as the generator and async function
+constructors do.
+
+Six fixed native differential fixtures run through Node.js and Deno, whose
+reference `$262.createRealm` creates a `node:vm` context, and through both
+native specialization policies with collection forced at every safepoint:
+intrinsic and symbol identity across realms, the errors other realms'
+built-ins throw and the errors that cross them, construction through bound
+and Proxy new targets of other realms, ArraySpeciesCreate across realms,
+promise jobs and awaits over other realms' promises, realms created and
+dropped while others stay reachable, and a property read whose shape guard
+misses on other realms' objects and reaches the compiled generic read. A C
+heap fixture creates and drops realms through the public runtime API under
+collection. The generated property suite at seed `0x60008300` builds one to
+three realms, directly or from another realm's host object, and up to eight
+constructions, species creations, throwing methods, crossing callback errors,
+symbol identities, and `%eval%` calls, and compares both references and both
+native policies against an independent realm model. Native-only checks pin
+the host objects' realm and shape, distinct Math.random sequences, the
+`OSEO1001` boundary of `%eval%` and `%Function%` in either realm, and the
+unresolvable `$262` of an ordinary build.
+
+The reviewed runner builds a case with the test262 host when it references
+`$262.agent`, `$262.createRealm`, or `$262.global`, or loads
+*atomicsHelper.js*; a case that reads any other `$262` member keeps the
+`host-binding` capability. `cross-realm` joins the supported features. Of the
+84 reviewed paths whose unadmitted feature was `cross-realm`, 43 move to
+`pass`. 40 reach the ADR 0016 boundary at run time, 30 through
+`new other.Function()` and 10 through `other.eval` with a source string, so
+they remain unsupported. The exclusion audit assigns the 5 that construct
+through another realm's source-compiling generator or async function
+constructor to `adr:0016-dynamic-source-boundary` and the other 35, which
+need dynamic source only to obtain a function of another realm or to observe
+its template registry, to `node:dynamic-source-coverage-remediation`. The
+remaining
+*test/built-ins/Iterator/proto-from-ctor-realm.js* also needs the unadmitted
+`iterator-helpers` feature and moves to `node:iterator-helpers`. The manifest
+keeps 21,383 paths and moves from 18,343 to 18,386 passes and from 1,480 to
+1,437 unsupported profile features with no semantic, harness, or
+infrastructure failures. The property ratchet moves from 166 to 167 domains and
+seeds and from 6,305 to 6,313 ordinary cases, and the evidence inventory moves
+from 141 to 142 families. The runtime ABI moves to `oseo-runtime-m5-127` with
+code range index 29 for `%eval%` and `createRealm`, the realm record heap kind,
+and the context's initial and running realm.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -7904,14 +8006,17 @@ complete. The remaining gaps retain their existing owners.
     admitted standard globals as replaceable properties of the same object,
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
     other unresolved global reference through it at run time. Three
-    boundaries remain. First, the realm still binds neither `eval` nor
-    `Float16Array`, the two clause 19 standard globals this profile has not
-    admitted as values, so a reference to either stays a source-located
-    rejection, and a Script top-level `var` declaration of either creates the
-    fresh undefined-initialized property GlobalDeclarationInstantiation
-    prescribes for an absent name; the window before its first assignment,
-    where a conforming realm would still expose the standard value, is part
-    of this gap. The runtime-owned call targets `console`, `setTimeout`, and
+    boundaries remain. First, a reference to `eval` or `Float16Array`, the
+    two clause 19 standard global names this profile has not admitted as
+    identifier references, stays a source-located rejection. Every realm's
+    global object holds the `%eval%` value of
+    [ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md), so a Script
+    top-level `var eval` keeps it; it does not bind `Float16Array`, so a
+    top-level `var` declaration of that name creates the fresh
+    undefined-initialized property GlobalDeclarationInstantiation prescribes
+    for an absent name, and the window before its first assignment, where a
+    conforming realm would still expose the standard value, is part of this
+    gap. The runtime-owned call targets `console`, `setTimeout`, and
     `clearTimeout` likewise keep hidden cells rather than global properties,
     so `typeof` and `delete` of them stay rejected. Second, an all-miss
     `with` chain admits a non-strict simple, compound, logical, or update
@@ -7973,14 +8078,15 @@ complete. The remaining gaps retain their existing owners.
     Reviewed cases that need them carry the `dynamic-source` dependency
     tag, and no release uses an unqualified conformance label while this
     boundary stands.
- -  Realm creation beyond the initial realm needs runtime and harness
-    capabilities that do not exist yet; affected tests name the missing
-    `$262` capability. Agent clusters, cross-agent shared memory, and the
-    `$262.agent` capability are admitted as recorded above, except that an
-    agent whose [[CanBlock]] is false stays unsupported with the
-    `non-blocking-agent` capability, and an agent source that no
-    ahead-of-time template describes stays behind the dynamic source
-    boundary.
+ -  Realms beyond the initial realm, agent clusters, cross-agent shared
+    memory, and the `$262.createRealm`, `$262.global`, and `$262.agent`
+    capabilities are admitted as recorded above, except that an agent whose
+    [[CanBlock]] is false stays unsupported with the `non-blocking-agent`
+    capability, an agent source that no ahead-of-time template describes
+    stays behind the dynamic source boundary, and a created realm runs no
+    source of its own, so a case that builds its cross-realm functions with
+    `$262.evalScript`, `eval`, or `Function` keeps the owner of that
+    capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *nans.js*, *nativeFunctionMatcher.js*, *promiseHelper.js*, and

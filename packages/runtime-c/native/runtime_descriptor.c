@@ -118,7 +118,7 @@ bool oseo_internal_virtual_string_iterator_descriptor(
 ) {
     if (!is_object(object_value) ||
         object_value !=
-            context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] ||
+            context->realm->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] ||
         key != context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR]) {
         return false;
     }
@@ -900,7 +900,7 @@ OseoResult oseo_object_delete(
     OseoOrdinaryObject *object = ordinary_object(object_value);
     bool string_iterator =
         object_value ==
-            context->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] &&
+            context->realm->intrinsics[OSEO_INTRINSIC_STRING_PROTOTYPE] &&
         key == context->well_known_symbols[OSEO_WELL_KNOWN_ITERATOR];
     size_t index = oseo_internal_own_property_index(object, key);
     if (index == SIZE_MAX) {

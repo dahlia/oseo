@@ -314,8 +314,16 @@ export function validateM5cExclusionAudit(
       ((detail.includes("Unknown binding 'eval'.") &&
         hasEvalCall(source, result.case.mode)) ||
         detail.includes("The Function constructor requires dynamic source") ||
-        ["AsyncGeneratorFunction", "AsyncFunction", "GeneratorFunction"].some(
-          (name) => detail.includes(`${name} compiles source text at run time`),
+        // The run-time boundary of each realm's source-compiling
+        // constructors and of %eval% called with a String (ADR 0027).
+        [
+          "AsyncGeneratorFunction",
+          "AsyncFunction",
+          "GeneratorFunction",
+          "Function",
+          "eval",
+        ].some((name) =>
+          detail.includes(`${name} compiles source text at run time`),
         ));
     const annexSurface =
       detail.includes("error[OSEO1001]:") &&

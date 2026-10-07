@@ -418,6 +418,7 @@ static OseoResult promise_allocate(
     promise->reaction_head = oseo_undefined();
     promise->reaction_tail = oseo_undefined();
     promise->unhandled_next = oseo_undefined();
+    promise->realm = context->realm_record;
     promise->rejection_source_id = context->source_id;
     promise->rejection_source_id_length = context->source_id_length;
     promise->rejection_line = context->line;
@@ -472,10 +473,11 @@ static OseoResult promise_create_from_constructor(
         }
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_validate_function_realm(context, slots[0]);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_promise_prototype(context);
-        }
+        result = oseo_internal_constructor_realm_default(
+            context,
+            slots[0],
+            OSEO_INTRINSIC_PROMISE_PROTOTYPE
+        );
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -516,7 +518,7 @@ OseoResult oseo_internal_promise_method_function(
     } else {
         return failure(context, "OSEO2001", "Unknown promise method.");
     }
-    OseoValue *cache = &context->intrinsics[intrinsic];
+    OseoValue *cache = &context->realm->intrinsics[intrinsic];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);
@@ -624,7 +626,8 @@ static OseoResult define_promise_property(
  * prototype identities across two concurrent attempts.
  */
 static OseoResult promise_intrinsic_build(OseoContext *context) {
-    OseoValue *marker = &context->intrinsics[OSEO_INTRINSIC_PROMISE_SPECIES];
+    OseoValue *marker =
+        &context->realm->intrinsics[OSEO_INTRINSIC_PROMISE_SPECIES];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -648,7 +651,7 @@ static OseoResult promise_intrinsic_build(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE] =
             frame.slots[1];
     }
     static const char *const method_names[] = {"then", "catch", "finally"};
@@ -682,7 +685,7 @@ static OseoResult promise_intrinsic_build(OseoContext *context) {
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_PROMISE] = frame.slots[2];
+        context->realm->intrinsics[OSEO_INTRINSIC_PROMISE] = frame.slots[2];
         OseoFunction *constructor = function_object(frame.slots[2]);
         constructor->prototype_object = frame.slots[1];
         constructor->prototype_writable = false;
@@ -760,7 +763,7 @@ static OseoResult promise_intrinsic_build(OseoContext *context) {
         );
         frame.slots[5] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[static_intrinsics[index]] = frame.slots[5];
+        context->realm->intrinsics[static_intrinsics[index]] = frame.slots[5];
         result = define_promise_property(
             context,
             frame.slots[2],
@@ -800,18 +803,18 @@ static OseoResult promise_intrinsic_build(OseoContext *context) {
         );
     }
     if (result.status != OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE] =
             oseo_undefined();
         for (size_t index = OSEO_INTRINSIC_PROMISE;
              index <= OSEO_INTRINSIC_PROMISE_SPECIES;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
     }
     OseoValue species = frame.slots[5];
-    context->intrinsics[OSEO_INTRINSIC_PROMISE_SPECIES] = species;
+    context->realm->intrinsics[OSEO_INTRINSIC_PROMISE_SPECIES] = species;
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
@@ -821,7 +824,7 @@ static OseoResult promise_intrinsic_build(OseoContext *context) {
 
 OseoResult oseo_internal_promise_prototype(OseoContext *context) {
     OseoValue *cache =
-        &context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE];
+        &context->realm->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoResult built = promise_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
@@ -831,7 +834,7 @@ OseoResult oseo_internal_promise_prototype(OseoContext *context) {
 OseoResult oseo_internal_promise_intrinsic(OseoContext *context) {
     OseoResult built = promise_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_PROMISE]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_PROMISE]);
 }
 
 OseoResult oseo_internal_install_promise_global(
@@ -901,6 +904,15 @@ static OseoResult enqueue_job(
     job->primary = primary;
     job->secondary = secondary;
     job->argument = argument;
+    if (kind == OSEO_JOB_THENABLE) {
+        job->realm = oseo_internal_callee_realm(context, secondary);
+    } else {
+        const OseoPromiseReaction *reaction = reaction_object(primary);
+        job->realm = oseo_internal_callee_realm(
+            context,
+            fulfilled ? reaction->on_fulfilled : reaction->on_rejected
+        );
+    }
     job->kind = kind;
     job->fulfilled = fulfilled;
     OseoResult published =
@@ -1209,9 +1221,20 @@ static OseoResult capability_settle(
     bool fulfilled
 ) {
     if (!is_foreign_capability(capability)) {
-        return fulfilled
+        /* The allocation-free capability stands for resolving functions
+         * of the promise's realm, so an error self-resolution creates
+         * belongs to that realm. */
+        OseoRealmScope scope;
+        oseo_internal_realm_enter(
+            context,
+            &scope,
+            promise_object(capability)->realm
+        );
+        OseoResult settled = fulfilled
             ? oseo_promise_resolve_into(context, capability, value)
             : oseo_promise_reject_into(context, capability, value);
+        oseo_internal_realm_leave(context, &scope);
+        return settled;
     }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
@@ -1249,7 +1272,7 @@ static OseoResult new_promise_capability(
     OseoValue constructor
 ) {
     if (is_function(constructor) &&
-        constructor == context->intrinsics[OSEO_INTRINSIC_PROMISE]) {
+        constructor == context->realm->intrinsics[OSEO_INTRINSIC_PROMISE]) {
         return oseo_internal_promise_create(context);
     }
     if (!function_is_constructible(constructor)) {
@@ -1299,7 +1322,11 @@ static OseoResult new_promise_capability(
         result = oseo_function_prototype(context, frame.slots[0]);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_constructor_receiver(context, result.value);
+        result = oseo_internal_function_receiver(
+            context,
+            frame.slots[0],
+            result.value
+        );
         frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -3091,9 +3118,16 @@ static OseoResult jobs_run_next(OseoContext *context) {
         if (tag_of(next) == OSEO_TAG_UNDEFINED) {
             context->microtask_tail = oseo_undefined();
         }
+        OseoRealmScope scope;
+        oseo_internal_realm_enter(
+            context,
+            &scope,
+            job_object(frame.slots[0])->realm
+        );
         result = job_object(frame.slots[0])->kind == OSEO_JOB_REACTION
             ? run_reaction_job(context, frame.slots[0])
             : run_thenable_job(context, frame.slots[0]);
+        oseo_internal_realm_leave(context, &scope);
     }
     oseo_roots_release(context, &frame);
     return result;

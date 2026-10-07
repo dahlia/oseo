@@ -382,7 +382,8 @@ typedef enum {
     OSEO_INTRINSIC_BOOLEAN = 267,
     OSEO_INTRINSIC_BOOLEAN_TO_STRING = 268,
     OSEO_INTRINSIC_BOOLEAN_VALUE_OF = 269,
-    OSEO_INTRINSIC_COUNT = 270,
+    OSEO_INTRINSIC_EVAL = 270,
+    OSEO_INTRINSIC_COUNT = 271,
 } OseoIntrinsic;
 
 typedef struct {
@@ -494,20 +495,17 @@ typedef struct {
 #define OSEO_CLOCK_RESTRICT_PRIMARY_WAKEUP ((unsigned)1u << 2u)
 #define OSEO_CLOCK_RESTRICT_PIPE_WAKEUP ((unsigned)1u << 3u)
 
-struct OseoContext {
-    OseoRootFrame *roots;
-    OseoHeapObject *objects;
-    OseoFunctionDispatcher function_dispatcher;
-    OseoGeneratorDispatcher generator_dispatcher;
-    OseoValue async_call_capability;
-    OseoValue microtask_head;
-    OseoValue microtask_tail;
-    OseoValue pending_rejections;
-    OseoValue pending_rejection_tail;
+/*
+ * The realm-owned state of one Realm Record (ADR 0027). A context starts
+ * with its initial realm and may create more; each realm has its own
+ * intrinsic graph, global object, literal caches, and Math.random state,
+ * while the context it belongs to keeps the agent's heap and queues.
+ * Generated code never reads these fields: it reaches them through the
+ * runtime entry points, which consult the running realm.
+ */
+typedef struct {
     /* The realm's single intrinsic graph, indexed by OseoIntrinsic. */
     OseoValue intrinsics[OSEO_INTRINSIC_COUNT];
-    /* The realm's well-known symbols are a separate edition-fixed table. */
-    OseoValue well_known_symbols[13];
     /*
      * The realm's global this value, which is the [[GlobalThisValue]] a
      * Global Environment Record binds. It is created on first use and
@@ -516,21 +514,9 @@ struct OseoContext {
      */
     OseoValue global_this;
     /*
-     * The realm's representatives of GlobalSymbolRegistry entries. The
-     * registry itself is process-wide; this open-addressed table, whose
-     * empty slots hold undefined, gives each entry one collector-rooted
-     * Symbol per realm, so `Symbol.for` returns the same heap value on
-     * every call. Identity is the entry, so two realms' representatives of
-     * one entry compare equal wherever a symbol identity rule applies.
-     * Registered symbols cannot be collected, which matches their
-     * unbounded observable lifetime.
-     */
-    OseoValue *registered_symbols;
-    size_t registered_symbol_count;
-    size_t registered_symbol_capacity;
-    /*
-     * Realm-local GetTemplateObject cache. The private entry layout stays
-     * behind this public generated-code boundary.
+     * Realm-local GetTemplateObject cache, which is the realm's
+     * [[TemplateMap]]. The private entry layout stays behind this public
+     * generated-code boundary.
      */
     void *template_cache;
     size_t template_cache_count;
@@ -544,6 +530,55 @@ struct OseoContext {
     void *regexp_literal_cache;
     size_t regexp_literal_cache_count;
     size_t regexp_literal_cache_capacity;
+    /*
+     * The realm's Math.random source. ECMA-262 leaves the strategy to
+     * the implementation but requires distinct realms to draw distinct
+     * sequences, and this runtime keeps every observable schedule
+     * reproducible, so the generator is a xorshift128+ state seeded from
+     * the realm's own initialization ordinal rather than host entropy.
+     */
+    uint64_t random_state[2];
+} OseoRealm;
+
+struct OseoContext {
+    OseoRootFrame *roots;
+    OseoHeapObject *objects;
+    OseoFunctionDispatcher function_dispatcher;
+    OseoGeneratorDispatcher generator_dispatcher;
+    OseoValue async_call_capability;
+    OseoValue microtask_head;
+    OseoValue microtask_tail;
+    OseoValue pending_rejections;
+    OseoValue pending_rejection_tail;
+    /*
+     * The initial realm, created with the context, and the running
+     * execution context's realm. `realm` points at `initial_realm` or at
+     * the record inside the realm heap object `realm_record` names;
+     * `realm_record` is undefined exactly while the initial realm runs.
+     * Every realm of one context shares its heap, collector, job queues,
+     * well-known symbols, and symbol registry (ADR 0027).
+     */
+    OseoRealm initial_realm;
+    OseoRealm *realm;
+    OseoValue realm_record;
+    /*
+     * The agent's well-known symbols are a separate edition-fixed table
+     * that every realm of the context shares.
+     */
+    OseoValue well_known_symbols[13];
+    /*
+     * The agent's representatives of GlobalSymbolRegistry entries. The
+     * registry itself is process-wide; this open-addressed table, whose
+     * empty slots hold undefined, gives each entry one collector-rooted
+     * Symbol per context, so `Symbol.for` returns the same heap value on
+     * every call in every realm of the context. Identity is the entry, so
+     * two contexts' representatives of one entry compare equal wherever a
+     * symbol identity rule applies. Registered symbols cannot be
+     * collected, which matches their unbounded observable lifetime.
+     */
+    OseoValue *registered_symbols;
+    size_t registered_symbol_count;
+    size_t registered_symbol_capacity;
     /* Private stack of active array stringification receivers. */
     void *array_string_stack;
     OseoValue timer_head;
@@ -596,14 +631,6 @@ struct OseoContext {
     size_t collections;
     size_t rejection_handled_count;
     size_t unhandled_rejection_count;
-    /*
-     * The realm's Math.random source. ECMA-262 leaves the strategy to
-     * the implementation but requires distinct realms to draw distinct
-     * sequences, and this runtime keeps every observable schedule
-     * reproducible, so the generator is a xorshift128+ state seeded from
-     * the realm's own initialization ordinal rather than host entropy.
-     */
-    uint64_t random_state[2];
     /*
      * The realm's clock adapter and its state, NULL until the first
      * clock use opens the platform adapter or an embedder installs one.

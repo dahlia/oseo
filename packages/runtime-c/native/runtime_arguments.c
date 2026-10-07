@@ -49,7 +49,7 @@ OseoResult oseo_internal_arguments_builtin_dispatch(
  */
 OseoResult oseo_internal_throw_type_error_function(OseoContext *context) {
     OseoValue *cache =
-        &context->intrinsics[OSEO_INTRINSIC_THROW_TYPE_ERROR];
+        &context->realm->intrinsics[OSEO_INTRINSIC_THROW_TYPE_ERROR];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) {
         return normal(*cache);
     }

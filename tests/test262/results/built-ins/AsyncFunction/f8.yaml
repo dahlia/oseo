@@ -21,8 +21,12 @@ results:
       - async-functions
       - dynamic-source
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/AsyncFunction/proto-from-ctor-realm.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/AsyncFunction/proto-from-ctor-realm.js:111:48:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
-    unsupportedFeatures:
-      - cross-realm
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
