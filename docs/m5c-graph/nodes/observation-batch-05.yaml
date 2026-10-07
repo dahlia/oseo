@@ -7,6 +7,7 @@ delivers: "Observes the 387 unreviewed paths that
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
+  - destructuring-binding-target-order
   - observation-batch-plan
 landed: false
-status: ready
+status: blocked

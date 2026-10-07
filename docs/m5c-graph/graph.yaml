@@ -18,9 +18,9 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 72
+  nodes: 73
   ready: 64
-  blocked: 8
+  blocked: 9
   parked: 0
   landed: 8
 serializationPoints:
@@ -94,6 +94,7 @@ collisions:
       - array-sort-stability
       - array-tolocalestring-arguments
       - cross-realm-host
+      - destructuring-binding-target-order
       - dynamic-import
       - dynamic-source-coverage-remediation
       - fn-global-object-harness
@@ -129,6 +130,7 @@ collisions:
       - annexb-proto-dependency-classification
       - array-sort-stability
       - array-tolocalestring-arguments
+      - destructuring-binding-target-order
       - dynamic-import
       - dynamic-source-coverage-remediation
       - dynamic-source-retagging
@@ -165,6 +167,7 @@ collisions:
       - array-sort-stability
       - array-tolocalestring-arguments
       - cross-realm-host
+      - destructuring-binding-target-order
       - dynamic-import
       - dynamic-source-coverage-remediation
       - fn-global-object-harness
@@ -199,6 +202,7 @@ collisions:
     nodes:
       - array-sort-stability
       - array-tolocalestring-arguments
+      - destructuring-binding-target-order
       - dynamic-import
       - dynamic-source-coverage-remediation
       - dynamic-source-retagging
