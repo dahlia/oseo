@@ -70,4 +70,8 @@ dependencies:
   - unhandled-rejection-observation
   - well-known-intrinsics-harness
 landed: false
-status: blocked
+status: parked
+reason: "Parked because it depends on the parked dynamic-import node and its
+  parked observation batches, which await the ADR 0016 decision requested on
+  2026-10-07. It was blocked before parking and becomes blocked again when
+  that decision unparks them."

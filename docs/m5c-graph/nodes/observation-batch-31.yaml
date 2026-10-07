@@ -11,4 +11,6 @@ dependencies:
   - import-attributes
   - observation-batch-plan
 landed: false
-status: blocked
+status: parked
+reason: "Parked because it depends on the parked dynamic-import node, which
+  awaits the ADR 0016 decision requested on 2026-10-07."

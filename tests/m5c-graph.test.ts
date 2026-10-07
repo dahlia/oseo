@@ -370,5 +370,5 @@ test("the checked-in M5c work graph is valid", () => {
   assert.equal(summary.nodes, 68);
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 2);
-  assert.equal(summary.parked, 0);
+  assert.equal(summary.parked, 5);
 });

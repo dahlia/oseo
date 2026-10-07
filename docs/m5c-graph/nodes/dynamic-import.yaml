@@ -8,4 +8,9 @@ delivers: "Admits the dynamic-import feature: import() in Script and Module
 dependencies:
   - observation-batch-plan
 landed: false
-status: ready
+status: parked
+reason: "Parked for a maintainer decision: as written it admits dynamic
+  import, but ADR 0016 keeps dynamic import rejected at parse time and ties
+  admission to a separate reviewed plan and an ADR 0016 update (alternative
+  3). Decision requested on 2026-10-07; answer in
+  decisions/dynamic-import.md."
