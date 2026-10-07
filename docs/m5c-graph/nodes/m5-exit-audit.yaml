@@ -12,6 +12,7 @@ dependencies:
   - cross-realm-host
   - dynamic-import
   - dynamic-source-coverage-remediation
+  - dynamic-source-retagging
   - eval-intrinsic-value
   - fn-global-object-harness
   - frontmatter-feature-tags

@@ -18,11 +18,11 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 67
-  ready: 60
-  blocked: 7
+  nodes: 68
+  ready: 63
+  blocked: 5
   parked: 0
-  landed: 5
+  landed: 6
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge
@@ -120,6 +120,7 @@ collisions:
       - array-tolocalestring-arguments
       - dynamic-import
       - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
       - eval-intrinsic-value
       - fn-global-object-harness
       - frontmatter-feature-tags

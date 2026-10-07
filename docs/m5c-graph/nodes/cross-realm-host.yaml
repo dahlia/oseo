@@ -19,5 +19,5 @@ delivers: "Implements realm creation beyond the initial realm and the
   and observed by observation-batch-01 rather than admitted by this node."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

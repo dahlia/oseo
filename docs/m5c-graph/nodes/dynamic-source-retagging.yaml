@@ -1,0 +1,15 @@
+version: 1
+id: dynamic-source-retagging
+title: Tag observed dynamic source dependencies
+delivers: "Adds the ADR 0013 dynamic-source dependency tag, alongside each
+  path's existing tags, to exactly the 154 reviewed paths whose record in
+  docs/m5c-closure/exclusion-audit.yaml has missingDynamicTag: true (120 from
+  authorized-exclusion-audit and 34 from cross-realm-host), as the maintainer
+  decided on 2026-10-07. Regenerates the manifest with the scoped update,
+  regenerates the ledger, sets every affected missingDynamicTag to false, and
+  changes no classification, owner, or observation."
+dependencies:
+  - authorized-exclusion-audit
+  - cross-realm-host
+landed: false
+status: ready
