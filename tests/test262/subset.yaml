@@ -15202,6 +15202,30 @@ tests:
   - path: test/built-ins/FinalizationRegistry/unnaffected-by-poisoned-cleanupCallback.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/Function/S15.3_A2_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/S15.3_A2_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/S15.3_A3_T1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/S15.3_A3_T2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/S15.3_A3_T3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/S15.3_A3_T4.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/S15.3_A3_T5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/S15.3_A3_T6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
   - path: test/built-ins/Function/internals/Call/class-ctor-realm.js
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
@@ -30409,6 +30433,9 @@ tests:
   - path: test/built-ins/Object/seal/seal-arraybuffer.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/Object/seal/seal-arrowfunction.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, object-properties]
   - path: test/built-ins/Object/seal/seal-asyncgeneratorfunction.js
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]

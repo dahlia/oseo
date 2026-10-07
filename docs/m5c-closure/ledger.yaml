@@ -13,8 +13,8 @@ states:
   infrastructure-failure: 0
   pass: 18386
   semantic-failure: 0
-  unreviewed: 19708
-  unsupported-profile-feature: 1437
+  unreviewed: 19699
+  unsupported-profile-feature: 1446
 owners:
   adr:0016-dynamic-source-boundary:
     note: ADR 0016 excludes "`eval` in call position, the `Function`
@@ -30,8 +30,11 @@ owners:
       replacement triggers remain in force. cross-realm-host adds 5
       paths whose subject is construction through another realm's
       GeneratorFunction, AsyncFunction, or AsyncGeneratorFunction, which
-      report the boundary at run time (ADR 0027); 61 paths.
-    paths: 61
+      report the boundary at run time (ADR 0027).
+      runtime-dynamic-source-classification adds 8 paths whose subject
+      is a function compiled by calling Function as a function, which
+      reports the boundary at run time; 69 paths.
+    paths: 69
   node:dynamic-source-coverage-remediation:
     note: "Authorized compile-stage rejection, unresolved in-claim subject
       coverage: 111 incidental-scaffolding paths, 5 template-site
@@ -39,12 +42,15 @@ owners:
       static/dynamic function tests, plus, from cross-realm-host, 34
       paths that construct another realm's Function or call its eval
       only to obtain a function of that realm and 1 cross-realm template
-      registry case (ADR 0027). No normative dependence on dynamic
-      source for non-source behavior is demonstrated; ADR 0019 reopening
-      and replacement evidence require the maintainer decision in
-      PLAN-M5C.md. See docs/m5c-closure/exclusion-audit.yaml for every
-      path and assessment."
-    paths: 156
+      registry case (ADR 0027), and, from
+      runtime-dynamic-source-classification, 1 Object.seal case that
+      constructs its function through %Function%. No normative
+      dependence on dynamic source for non-source behavior is
+      demonstrated; ADR 0019 reopening and replacement evidence require
+      the maintainer decision in PLAN-M5C.md. See
+      docs/m5c-closure/exclusion-audit.yaml for every path and
+      assessment."
+    paths: 157
   node:eval-intrinsic-value:
     note: Unknown binding 'eval' in cases that never call eval; ADR 0016
       excludes only eval in call position; 16 paths.
@@ -72,7 +78,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-01. The batch observes them; no
       classification is assumed before it does.
-    paths: 316
+    paths: 307
   node:observation-batch-02:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-02. The batch observes them; no
@@ -5531,14 +5537,14 @@ paths:
   test/built-ins/Function/S15.3.5_A3_T1.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/S15.3.5_A3_T2.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/S15.3_A1.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A2_T1.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A2_T2.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A3_T1.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A3_T2.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A3_T3.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A3_T4.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A3_T5.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/S15.3_A3_T6.js: [unreviewed, node:observation-batch-01]
+  test/built-ins/Function/S15.3_A2_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/S15.3_A2_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/S15.3_A3_T1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/S15.3_A3_T2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/S15.3_A3_T3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/S15.3_A3_T4.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/S15.3_A3_T5.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/S15.3_A3_T6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions]]
   test/built-ins/Function/StrictFunction_reservedwords_with.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/StrictFunction_restricted-properties.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/call-bind-this-realm-undef.js: [unreviewed, node:observation-batch-29]
@@ -10706,7 +10712,7 @@ paths:
   test/built-ins/Object/seal/proxy-with-defineProperty-handler.js: [pass, observation]
   test/built-ins/Object/seal/seal-aggregateerror.js: [pass, observation]
   test/built-ins/Object/seal/seal-arraybuffer.js: [pass, observation]
-  test/built-ins/Object/seal/seal-arrowfunction.js: [unreviewed, node:observation-batch-01]
+  test/built-ins/Object/seal/seal-arrowfunction.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, object-properties]]
   test/built-ins/Object/seal/seal-asyncarrowfunction.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Object/seal/seal-asyncfunction.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Object/seal/seal-asyncgeneratorfunction.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [object-properties]]

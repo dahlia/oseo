@@ -489,6 +489,102 @@ paths:
     section: sec-finalization-registry-target
     subject: Default [[Prototype]] value derived from realm of the newTarget
     assessment: fixture-construction
+  - path: test/built-ins/Function/S15.3_A2_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "735fbedd937a15c9c1596bcdc0e3076e5adf92fc5b60316c2a22f4fcd99b\
+      ae39"
+    observationDigest: "d7e1d9c10046eeedd2c41289d2d62bfefa7cc3baba3a22f593d3678\
+      bd787e33a"
+    missingDynamicTag: false
+    section: sec-createdynamicfunction
+    subject: Function.call(this, "var x / = 1;") throws SyntaxError for an
+      invalid function body
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/S15.3_A2_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "d935d717a74e8d5dd465b04bf22a471dd3543f0a0da88ab75478559d47a7\
+      f5ff"
+    observationDigest: "9c279a7fbd1454bf56167bb1ed5b452aafb73b0f8688d7c8aad10e5\
+      77c07608d"
+    missingDynamicTag: false
+    section: sec-createdynamicfunction
+    subject: 'Function.call(this, "var #x  = 1;") throws SyntaxError for an
+      invalid function body'
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/S15.3_A3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "296c979e5665dba8c8a8b31f39ac379e4c01d7792881737b175f13b0342d\
+      c1a9"
+    observationDigest: "29cc9b0c12109edd5e715a5b2631e5f2352f201b03360b508d789af\
+      494b91510"
+    missingDynamicTag: false
+    section: sec-function-p1-p2-pn-body
+    subject: Function.call ignores an object thisArg; the created function
+      runs with the global this
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/S15.3_A3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "6fc44e199cddcf36ec777292ef7af1baaf04654034d59f36b64f8f4395af\
+      72df"
+    observationDigest: "8b63d91df932642fdb00266438555eb651a34bc549ffab4d1a104f6\
+      e02f2722e"
+    missingDynamicTag: false
+    section: sec-function-p1-p2-pn-body
+    subject: Function.call ignores a string or null thisArg; the created
+      function runs with the global this
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/S15.3_A3_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "5a109f2bafd54e73725e5c36ab78955e93ecddf64fcc480f23394fed89cb\
+      d39a"
+    observationDigest: "2cd624f0a348d799f444fe5944bdea42912b29f8ff769aa259897d2\
+      cde9786eb"
+    missingDynamicTag: false
+    section: sec-function-p1-p2-pn-body
+    subject: A function created by Function.call(this, body) resolves free
+      names in the global environment, including later declarations
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/S15.3_A3_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "da24cf59d6ca4e437a40b779ce6bed12f6c87978d79c16abfde25598e8b8\
+      0290"
+    observationDigest: "f23f03a423ae4103c42b7cbd8fe256c396fe08408396773ca20f7da\
+      141f4b0d5"
+    missingDynamicTag: false
+    section: sec-function-p1-p2-pn-body
+    subject: A function created by Function.call(this, body) observes a
+      later global var declaration
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/S15.3_A3_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "48cae28618de54d1fa0361c1d279159c1d4b3c4207d37a27d32f00403ebf\
+      d62a"
+    observationDigest: "2aea39d3b5f5fed05d251932268b5e09976989fd24df8d7fec9426d\
+      ede96b8b3"
+    missingDynamicTag: false
+    section: sec-function-p1-p2-pn-body
+    subject: A function created by Function.call(this, body) reads this.name
+      from the global object, including later properties
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/S15.3_A3_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "1e77057c5b1ea5fd98172ccf07fcfd2a1c8b196f6eeacf111ec41fbdb3b1\
+      7093"
+    observationDigest: "1134ebdb43b712cdb7cf585fa425d7619532e69b00a3a39dd6d935d\
+      2387cc864"
+    missingDynamicTag: false
+    section: sec-function-p1-p2-pn-body
+    subject: A function created by Function.call(this, body) reads a later
+      global var through this
+    assessment: dynamic-construction
   - path: test/built-ins/Function/internals/Call/class-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1635,6 +1731,17 @@ paths:
     missingDynamicTag: true
     section: sec-object.prototype.tostring
     subject: has a [[Call]] internal method, let builtinTag be "Function".
+    assessment: fixture-construction
+  - path: test/built-ins/Object/seal/seal-arrowfunction.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4dd7bb817c696b6d66d9e2d6dcebcb978867ccc0fddbf48c0b628563d95d\
+      041b"
+    observationDigest: "d53ca21e9fdde927abb761f2779cafe1b26727380eb7b845d13aef0\
+      4b92af80e"
+    missingDynamicTag: false
+    section: sec-object.seal
+    subject: Object.seal ArrowFunction
     assessment: fixture-construction
   - path: test/built-ins/Object/seal/seal-asyncgeneratorfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
