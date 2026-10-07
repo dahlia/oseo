@@ -176,6 +176,40 @@ test("installs global declarations even without a this observation", () => {
   assert.doesNotMatch(emitted.source, /oseo_cell_set\(context/u);
 });
 
+test("script binding accesses charge temporaries apart from heap roots", () => {
+  for (const kind of [
+    "initialize",
+    "read",
+    "write",
+    "binding-reset",
+  ] as const) {
+    const program = globalObjectProgram(false);
+    const block = program.script.blocks[0];
+    assert.ok(block != null);
+    const operation = block.operations[1];
+    const constant = block.operations[0];
+    assert.ok(operation != null);
+    assert.ok(constant != null);
+    const emitted = cBackend.emit({
+      ...program,
+      script: {
+        ...program.script,
+        blocks: [
+          {
+            ...block,
+            operations: [constant, { ...operation, kind }],
+          },
+        ],
+      },
+    });
+    assert.match(
+      emitted.source,
+      /oseo_roots_allocate\(context, &frame, 32u\)/u,
+    );
+    assert.match(emitted.source, /oseo_frame_enter\(\s*&context, 34u\)/u);
+  }
+});
+
 test("checks global lexical names before creating object bindings", () => {
   const program = globalObjectProgram(false);
   const emitted = cBackend.emit({
@@ -1600,6 +1634,7 @@ test("annotation identities do not allocate native value slots", () => {
     emitted.source,
     /oseo_roots_allocate\(context, &frame, 2050u\)/u,
   );
+  assert.match(emitted.source, /oseo_frame_enter\(\s*&context, 2050u\)/u);
   assert.match(emitted.source, /roots\[2047\] = oseo_number\(2047/u);
   const reserved = cBackend.emit({
     ...program,

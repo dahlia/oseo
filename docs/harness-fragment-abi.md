@@ -261,6 +261,11 @@ reproduces every old hash; only emitted C source differs, with unchanged
 non-source metadata. Both whole-Script and fragment semantic comparisons
 pass, as do the existing native fixture families.
 
+The coordinator's script-entry stack review regenerates the records again:
+the separate binding-access charge changes whole-Script entry C.
+Replaying backend commit `6a6712d8` reproduces all 44 prior hashes;
+printed HIR/MIR and non-source metadata remain unchanged.
+
 
 Stage 2 interfaces and ownership
 --------------------------------

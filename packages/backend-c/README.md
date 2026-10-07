@@ -17,7 +17,9 @@ or abrupt result. Generated root slots and call-argument scratch slots use a
 heap-backed root frame instead of a variable-sized C stack array. The backend
 also charges each entry against the runtime's active root-slot budget before
 entering generated C, so a wide function cannot exhaust the process stack
-before an owned resource diagnostic is possible.
+before an owned resource diagnostic is possible. Script entries charge dense
+value slots plus binding-access calls separately from heap allocation;
+non-recursive generated expression temporaries can also exhaust C stack space.
 UTF-16 string-constant units use static read-only storage rather than automatic
 compound literals, so source literal size does not enlarge a generated stack
 frame.

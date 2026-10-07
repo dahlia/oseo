@@ -26,8 +26,11 @@ scope:
     costs about 80 CPU seconds per 2,048-element execution."
   - "Callable entries retain conservative logical frame charges
     separately from dense heap roots: unoptimized sanitizer expression
-    temporaries consume C stack space. Script entries cannot recurse and
-    charge their compact physical layout. The unchanged wide-recursion
+    temporaries consume C stack space. Script entries charge dense values
+    plus binding-access calls separately from heap storage, retaining
+    a native-stack bound even without recursion. The 25,000-declaration
+    script regression
+    reports OSEO2001 under both policies. The unchanged wide-recursion
     resource scenario and a 1,000-binding regression under both policies
     keep reporting OSEO2001 before C stack exhaustion."
 owners:
