@@ -192,9 +192,57 @@ exactly `No issues found.`.
 
 The coordinator's script-entry stack review requires a second refresh:
 the separate binding-access charge changes whole-Script entry C.
-Replaying backend commit `6a6712d8` reproduces all 44 prior hashes;
+Replaying backend commit `fb5d1cb0` reproduces all 44 prior hashes;
 printed HIR/MIR and non-source metadata remain unchanged.
 
 The standalone Zig ASan probes are existing TODO cases rather than gate
 failures. Two isolated runs exit successfully with UBSan passing and ASan
 TODOs; no toolchain code or expectation changes were needed.
+
+
+Script-entry review and current-main regeneration
+-------------------------------------------------
+
+After the coordinator's review, script binding accesses add two native
+charge units independently of dense heap roots. Fresh replays on an
+8 MiB stack reject the exact 25,000-declaration script with OSEO2001
+under both specialization policies. The unchanged upstream stability
+test passes strict and non-strict variants under both policies; wide
+recursion keeps OSEO2001, and the 4,096-element fixture passes both
+policies. All 24 backend tests pass.
+
+The fix was committed before rebasing onto `4032a770`. Reindexing the
+merged partitions and the complete 22,011-path regeneration then pass
+with 18,995 passes, 1,560 expected negatives, and 1,456 unsupported
+results in 2,882 seconds, with zero retries or classification changes.
+Current main has 22,010 reviewed paths and 18,994 passes; this lane adds
+only its owned stability path, leaving 19,080 inventory paths unreviewed.
+The derived ledger and observation batches are regenerated from that
+manifest, and the graph baseline follows it without changing node status
+or landing fields.
+
+The final Fable review found two obsolete pre-rebase commit references in
+the hash-refresh evidence. Both now name reachable commit `fb5d1cb0`;
+the follow-up round returned exactly `No issues found.`.
+
+The repository check passes after formatting the new evidence paragraph.
+The serial aggregate gate passes in 5,154 seconds: all 272 native fixtures
+agree with Node.js and Deno, and all 22,011 reviewed Test262 paths match
+the manifest. Node reports 1,539 tests with zero failures, five
+skips, and the two existing Zig ASan TODO cases. The extended gate passes
+in 3,469 seconds, including all 226 native tests with zero failures,
+cancellations, skips, or TODOs. Package properties pass under both hosts.
+
+The coordinator then requested a final rebase onto `813c95d6`, which adds
+macOS CI scheduling and a graph-only destructuring prerequisite. The
+rebase preserves the regenerated baseline together with main's new node,
+collision groups, and batch-05 dependency. Compiler, runtime, harness,
+and reviewed observations are unchanged by that rebase. The coordinator
+explicitly retained the full regeneration, ordinary, and extended gate
+results and requested only repository and focused graph/CI checks after
+rebasing. Remote CI and landing remain coordinator work.
+
+After the final rebase, the complete repository check, all 43 macOS-lane
+and M5c graph tests, and the graph, ledger, and observation-batch checks
+pass. The graph retains all 73 nodes, including main's new prerequisite,
+with its node status and landing fields unchanged by this lane.
