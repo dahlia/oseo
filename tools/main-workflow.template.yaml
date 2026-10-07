@@ -75,12 +75,6 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:${{ matrix.runtime }}
-        env:
-          # The ordinary own-key property budget was measured on
-          # ubuntu-latest; hosted macOS runs it at 70 to over 100 percent
-          # of that limit. This widens only the interrupt limit there.
-          OSEO_PROPERTY_TIME_SCALE: >-
-            ${{ runner.os == 'macOS' && '2' || '1' }}
 
   test_native:
     name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
