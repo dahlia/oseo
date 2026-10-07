@@ -7,6 +7,30 @@ results:
       flags: []
       includes: []
       mode: script
+      path: test/built-ins/Function/S15.3_A3_T6.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+    observation:
+      detail: 'test/built-ins/Function/S15.3_A3_T6.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/Function/S15.3_A3_T6.js:89:9:
+        error[OSEO1001]: Function compiles source text at run time,
+        which is outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
       path: test/built-ins/Function/prototype/bind/S15.3.4.5_A4.js
       strictness:
         - non-strict

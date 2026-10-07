@@ -4689,6 +4689,9 @@ partitions:
     key: f8
     path: results/built-ins/Function/f8.yaml
   - group: built-ins/Function
+    key: f9
+    path: results/built-ins/Function/f9.yaml
+  - group: built-ins/Function
     key: fa
     path: results/built-ins/Function/fa.yaml
   - group: built-ins/Function
@@ -17460,7 +17463,7 @@ summary:
   infrastructureFailures: 0
   passes: 18386
   semanticFailures: 0
-  unsupportedProfileFeatures: 1437
+  unsupportedProfileFeatures: 1446
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -17559,7 +17562,7 @@ summary:
       infrastructureFailures: 0
       passes: 6
       semanticFailures: 0
-      unsupportedProfileFeatures: 81
+      unsupportedProfileFeatures: 90
     - dependency: error-intrinsics
       expectedNegatives: 5
       harnessFailures: 0
@@ -17580,7 +17583,7 @@ summary:
       infrastructureFailures: 0
       passes: 4351
       semanticFailures: 0
-      unsupportedProfileFeatures: 668
+      unsupportedProfileFeatures: 676
     - dependency: generators
       expectedNegatives: 84
       harnessFailures: 0
@@ -17643,7 +17646,7 @@ summary:
       infrastructureFailures: 0
       passes: 10104
       semanticFailures: 0
-      unsupportedProfileFeatures: 175
+      unsupportedProfileFeatures: 176
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -17896,7 +17899,7 @@ summary:
       infrastructureFailures: 0
       passes: 246
       semanticFailures: 0
-      unsupportedProfileFeatures: 84
+      unsupportedProfileFeatures: 92
     - group: built-ins/GeneratorFunction
       expectedNegatives: 0
       harnessFailures: 0
@@ -17980,7 +17983,7 @@ summary:
       infrastructureFailures: 0
       passes: 3304
       semanticFailures: 0
-      unsupportedProfileFeatures: 19
+      unsupportedProfileFeatures: 20
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
