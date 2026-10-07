@@ -1,0 +1,27 @@
+version: 1
+id: annexb-proto-dependency-classification
+title: Classify an incidental Annex B prototype dependency
+delivers: "Closes exactly 1 newly observed path,
+  test/built-ins/TypedArrayConstructors/ctors/no-species.js, whose core
+  TypedArray buffer construction passes ordinary prototype and constructor
+  reflection but whose incidental Annex B __proto__ read fails semantically.
+  Make a path whose only failing dependency is that excluded accessor
+  observable as unsupported-profile-feature, with classification tests and
+  the full PLAN-M5.md evidence contract. Extend the Annex B surface predicate
+  in tools/m5c-exclusion-audit.ts to accept the accessor's owned OSEO1001
+  rejection, and let each Annex B assessment name its bounded remediation
+  owner instead of requiring the RegExp split owner. Add reviewed assessments
+  and checker tests while preserving unrelated failures. Assign this mixed
+  path to node:typed-array-proto-coverage-remediation after classification.
+  Apply the exclusion-audit rules:
+  ADR 0013 may own an exclusion only when Annex B is the test's subject;
+  mixed core and Annex B coverage requires a bounded remediation owner and
+  reviewed replacement evidence, as regexp-split-coverage-remediation does.
+  Do not admit Annex B or widen ADR 0013. Admit the path, regenerate the
+  complete manifest and ledger, and update the exclusion audit and applicable
+  normative profile records without treating a dependency tag as exclusion
+  authorization."
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready

@@ -1,0 +1,18 @@
+version: 1
+id: typed-array-proto-coverage-remediation
+title: Resolve mixed Annex B TypedArray prototype coverage
+delivers: "Resolves exactly
+  test/built-ins/TypedArrayConstructors/ctors/no-species.js after the Annex B
+  __proto__ dependency is classified. Own the still-unsupported mixed path
+  in the ledger, retain its original path and assertions, and preserve its
+  core no-species buffer construction, prototype, and constructor coverage
+  through an approved replacement observation. Follow the full PLAN-M5.md
+  evidence contract and obtain the maintainer accounting decision in
+  PLAN-M5C.md before assigning an exclusion. Update the exclusion audit,
+  ledger, and applicable normative profile records, and regenerate the
+  complete manifest if observation behavior changes. Do not admit Annex B,
+  widen ADR 0013, or change the RegExp split remediation scope."
+dependencies:
+  - annexb-proto-dependency-classification
+landed: false
+status: blocked
