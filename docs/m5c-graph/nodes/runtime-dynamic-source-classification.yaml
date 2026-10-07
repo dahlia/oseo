@@ -25,5 +25,5 @@ delivers: "Closes the classification gap for exactly 9 paths whose Function
   ledger. This node admits no dynamic source."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
