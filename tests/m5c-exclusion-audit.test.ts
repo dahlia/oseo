@@ -253,6 +253,29 @@ test("a snapshot cannot authorize a different unsupported surface", () => {
   );
 });
 
+test("the run-time Function and eval boundaries are record surfaces", () => {
+  // Another realm's %Function% and %eval% report the ADR 0016 boundary at
+  // run time rather than at compile time (ADR 0027).
+  for (const name of ["Function", "eval"]) {
+    const { audit, inputs } = fixture();
+    const runtime = {
+      ...observation,
+      detail:
+        `error[OSEO1001]: ${name} compiles source text at run time, ` +
+        "which is outside the admitted profile.",
+    };
+    audit.paths[0]!.observationDigest = exclusionObservationDigest(runtime);
+    assert.deepEqual(
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        results: [{ ...result, observation: runtime }],
+      }),
+      { exclusions: 1, remediation: 0, missingDynamicTags: 1 },
+      name,
+    );
+  }
+});
+
 test("promotion uses observation ownership and removes the exclusion", () => {
   const { audit, inputs } = fixture();
   const promoted: M5cExclusionAuditInputs = {

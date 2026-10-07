@@ -1,0 +1,85 @@
+version: 1
+id: cross-realm
+title: "Realms beyond the initial realm"
+scope:
+  - "The test262 host members $262.createRealm and $262.global of a Script
+    built with --test262-host: createRealm creates a realm with its own
+    intrinsic graph, global object, literal caches, and Math.random state
+    in the running agent and returns that realm's own host object, and
+    global is the realm's global object."
+  - "Realms of one agent share its heap, collector, job queues, well-known
+    symbols, and GlobalSymbolRegistry, and a created realm that nothing
+    reaches is collected with its intrinsics."
+  - "Every function's [[Realm]], the running realm a call enters and
+    leaves, the realm of a generator resumption and of each promise job,
+    and the realm-owned errors, objects, and functions a built-in creates."
+  - "GetFunctionRealm through bound functions and Proxies, the
+    realm-dependent defaults of GetPrototypeFromConstructor and of an
+    ordinary [[Construct]] receiver, and ArraySpeciesCreate's treatment of
+    another realm's %Array%."
+  - "The %eval% intrinsic of every realm as the global object's eval
+    property, returning a non-String argument unchanged and reporting the
+    ADR 0016 boundary for a String, and %Function%'s [[Call]] and
+    [[Construct]] reporting that boundary as OSEO1001."
+  - "Reviewed standards coverage is the 84 upstream paths whose unadmitted
+    frontmatter feature was cross-realm: 43 pass, 40 reach the ADR 0016
+    boundary through another realm's Function or eval, of which the
+    exclusion audit leaves 5 dynamic constructions with that record and 35
+    with dynamic-source coverage remediation, and one stays unsupported on
+    iterator-helpers."
+owners:
+  - PLAN-M5C.md
+  - docs/adr/0027-realms-beyond-the-initial-realm.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/cross-realm.ts
+      - tests/native/realm-reference.ts
+      - tests/property/m5-cross-realm.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/native/fixtures/cross-realm.ts
+      - tests/native.ts
+      - tests/native/scenarios/realms.ts
+      - tests/fixtures/runtime-heap.c
+      - tests/test262-runner.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/cross-realm.ts
+      - tests/fixtures/runtime-heap.c
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-cross-realm.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/cross-realm.ts
+      - tests/property/m5-cross-realm.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/cross-realm.ts
+      - tests/property/m5-cross-realm.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+      - tools/test262.ts
+      - tests/test262-runner.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/runtime-c/native/runtime_realm.c
+      - packages/runtime-c/native/runtime_function.c
+      - packages/runtime-c/native/runtime_memory.c
+      - packages/runtime-c/tests/builtin-code-registry.test.ts
+      - packages/runtime-c/tests/intrinsic-graph.test.ts

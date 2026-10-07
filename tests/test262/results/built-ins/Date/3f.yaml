@@ -50,10 +50,14 @@ results:
       - functions
       - reflect-namespace
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/Date/proto-from-ctor-realm-zero.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/built-ins/Date/proto-from-ctor-realm-zero.js:100:9:
+        error[OSEO1001]: Function compiles source text at run time,
+        which is outside the admitted profile.\n"'
       passed: false
-    unsupportedFeatures:
-      - cross-realm
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
   - case:
       async: false
       features:

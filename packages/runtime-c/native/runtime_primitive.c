@@ -681,15 +681,15 @@ static bool conversion_reaches_array_prototype(
     OseoValue current = value;
     while (is_object(current)) {
         if (current ==
-            context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE]) {
+            context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE]) {
             return true;
         }
         if (current ==
-                context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE] ||
+                context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE] ||
             current ==
-                context->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE] ||
+                context->realm->intrinsics[OSEO_INTRINSIC_PROMISE_PROTOTYPE] ||
             current ==
-                context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]) {
+                context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]) {
             return false;
         }
         current = ordinary_object(current)->prototype;
@@ -895,7 +895,11 @@ static OseoResult default_array_text(
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL &&
             is_callable(frame.slots[2])) {
+            /* The shortcut runs in the running realm, so another realm's
+             * `join` takes the ordinary call that enters its own. */
             if (is_function(frame.slots[2]) &&
+                function_object(frame.slots[2])->realm ==
+                    context->realm_record &&
                 function_object(frame.slots[2])->code_id ==
                     OSEO_ARRAY_JOIN_CODE_ID &&
                 oseo_internal_string_is_ascii(
@@ -920,7 +924,7 @@ static OseoResult default_array_text(
         } else if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_call_function(
                 context,
-                context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
+                context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
                 frame.slots[0],
                 0u,
                 NULL,
@@ -930,7 +934,7 @@ static OseoResult default_array_text(
     } else if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_call_function(
             context,
-            context->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
+            context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_TO_STRING],
             frame.slots[0],
             0u,
             NULL,
@@ -991,6 +995,7 @@ static OseoResult ordinary_to_primitive_value(
         if (!is_callable(frame.slots[2])) continue;
         if (trying_to_string &&
             is_function(frame.slots[2]) &&
+            function_object(frame.slots[2])->realm == context->realm_record &&
             conversion_reaches_array_prototype(context, frame.slots[0]) &&
             function_object(frame.slots[2])->code_id ==
                 OSEO_ARRAY_TO_STRING_CODE_ID &&

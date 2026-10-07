@@ -11,9 +11,9 @@ baseline:
   inventoryPaths: 41091
   reviewedPaths: 21383
   unreviewedPaths: 19708
-  passes: 18343
+  passes: 18386
   expectedNegatives: 1560
-  unsupportedProfileFeatures: 1480
+  unsupportedProfileFeatures: 1437
   semanticFailures: 0
   harnessFailures: 0
   infrastructureFailures: 0

@@ -1494,9 +1494,10 @@ static OseoResult create_host_function(
 
 /*
  * Installs `$262` on this realm's global object: an ordinary object whose
- * `agent` object holds the main or the agent function set. Both are
- * writable and configurable, so a harness include can replace a member as
- * the upstream atomicsHelper.js replaces `getReport`.
+ * `agent` object holds the main or the agent function set, and whose
+ * `createRealm` and `global` members come from the realm component. All
+ * are writable and configurable, so a harness include can replace a
+ * member as the upstream atomicsHelper.js replaces `getReport`.
  */
 static OseoResult install_host(OseoContext *context, bool main) {
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -1544,6 +1545,9 @@ static OseoResult install_host(OseoContext *context, bool main) {
             "agent",
             frame.slots[1]
         );
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = oseo_internal_realm_host_install(context, frame.slots[2]);
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = define_host_property(

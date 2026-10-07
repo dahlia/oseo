@@ -167,16 +167,11 @@ static OseoResult set_prototype_from_target(
     result = oseo_internal_constructor_prototype(context, frame.slots[0]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[0]
+            frame.slots[0],
+            OSEO_INTRINSIC_SET_PROTOTYPE
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_SET_PROTOTYPE
-            );
-        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];
@@ -1389,7 +1384,7 @@ static OseoResult define_set_ascii_property(
 }
 
 static OseoResult set_intrinsic_build(OseoContext *context) {
-    OseoValue *marker = &context->intrinsics[OSEO_INTRINSIC_SET_SPECIES];
+    OseoValue *marker = &context->realm->intrinsics[OSEO_INTRINSIC_SET_SPECIES];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -1413,7 +1408,8 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SET_PROTOTYPE] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_SET_PROTOTYPE] =
+            frame.slots[1];
         result = oseo_internal_intrinsic(
             context,
             OSEO_INTRINSIC_ITERATOR_PROTOTYPE
@@ -1425,7 +1421,7 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SET_ITERATOR_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_SET_ITERATOR_PROTOTYPE] =
             frame.slots[2];
         result = create_set_builtin(
             context,
@@ -1439,7 +1435,7 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
     }
     const OseoPropertyAttributes method = {true, false, true, false};
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SET] = frame.slots[3];
+        context->realm->intrinsics[OSEO_INTRINSIC_SET] = frame.slots[3];
         OseoFunction *constructor = function_object(frame.slots[3]);
         constructor->prototype_object = frame.slots[1];
         constructor->prototype_writable = false;
@@ -1484,7 +1480,7 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
         );
         frame.slots[4] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[method_intrinsics[index]] = frame.slots[4];
+        context->realm->intrinsics[method_intrinsics[index]] = frame.slots[4];
         result = define_set_ascii_property(
             context,
             frame.slots[1],
@@ -1546,7 +1542,7 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SET_SIZE] = frame.slots[4];
+        context->realm->intrinsics[OSEO_INTRINSIC_SET_SIZE] = frame.slots[4];
         result = oseo_internal_ascii_string(context, "size");
         frame.slots[5] = result.value;
     }
@@ -1574,7 +1570,7 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SET_VALUES] = frame.slots[4];
+        context->realm->intrinsics[OSEO_INTRINSIC_SET_VALUES] = frame.slots[4];
         result = define_set_ascii_property(
             context,
             frame.slots[1],
@@ -1640,7 +1636,8 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SET_ITERATOR_NEXT] = frame.slots[4];
+        context->realm->intrinsics[OSEO_INTRINSIC_SET_ITERATOR_NEXT] =
+            frame.slots[4];
         result = define_set_ascii_property(
             context,
             frame.slots[2],
@@ -1703,13 +1700,13 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_SET_PROTOTYPE;
              index <= OSEO_INTRINSIC_SET_SPECIES;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
     }
     OseoValue species = frame.slots[4];
-    context->intrinsics[OSEO_INTRINSIC_SET_SPECIES] = species;
+    context->realm->intrinsics[OSEO_INTRINSIC_SET_SPECIES] = species;
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
@@ -1720,7 +1717,7 @@ static OseoResult set_intrinsic_build(OseoContext *context) {
 OseoResult oseo_internal_set_intrinsic(OseoContext *context) {
     OseoResult built = set_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_SET]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_SET]);
 }
 
 OseoResult oseo_internal_install_set_global(

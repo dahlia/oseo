@@ -451,7 +451,7 @@ OseoResult oseo_internal_uri_intrinsic(
     OseoContext *context,
     OseoIntrinsic intrinsic
 ) {
-    OseoValue *slot = &context->intrinsics[intrinsic];
+    OseoValue *slot = &context->realm->intrinsics[intrinsic];
     if (is_object(*slot)) return normal(*slot);
     size_t operation = uri_operation(intrinsic);
     const OseoUriFunction *entry = &uri_functions[operation];

@@ -126,6 +126,72 @@ assessments:
       behavior. Keep remediation until replacement evidence or a
       maintainer accounting decision bounds these assertions.
 paths:
+  - path: test/built-ins/Array/from/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b1054cef4a0960a59c9c662eefa407950757478953b96c058106190f460b\
+      b275"
+    observationDigest: "26fa1e2221210115f613bfc890b6e4e049ec3def6500b12979fa4fd\
+      90fe51e5e"
+    missingDynamicTag: true
+    section: sec-array.from
+    subject: Default [[Prototype]] value derived from realm of the constructor
+    assessment: fixture-construction
+  - path: test/built-ins/Array/of/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8565e07dc9e6a9b5cd54f0ad4e929cdcc8acd04807f8469915f16adae31f\
+      0a16"
+    observationDigest: "f1fddd567ad65d8dad56d5cbecb68afced24340c3edd28566271a50\
+      020e862c7"
+    missingDynamicTag: true
+    section: sec-array.of
+    subject: Default [[Prototype]] value derived from realm of the constructor
+    assessment: fixture-construction
+  - path: test/built-ins/Array/proto-from-ctor-realm-one.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "5b3745f416fc75ff0df414bed3cbf75457cc4a80fbd928f8182393ddaa59\
+      05d2"
+    observationDigest: "4cc568fa561a8c7a6828ac3ed7b399fc4908ae46f86132363e398de\
+      9182a64a8"
+    missingDynamicTag: true
+    section: sec-array-len
+    subject: Default [[Prototype]] value derived from realm of the NewTarget.
+    assessment: fixture-construction
+  - path: test/built-ins/Array/proto-from-ctor-realm-two.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bb6aaac19cdb4285a16a380fc9ca39cf0d32fe31d1557eeb5a3e6cdbf094\
+      4c0d"
+    observationDigest: "c31f67705ffd2c52435301a1640a31465d1023ba6551b770c64a964\
+      0d518ad2a"
+    missingDynamicTag: true
+    section: sec-array-items
+    subject: Default [[Prototype]] value derived from realm of the NewTarget.
+    assessment: fixture-construction
+  - path: test/built-ins/Array/proto-from-ctor-realm-zero.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "23acf7cc40eb38d60a7f231acb8757b793788216a19532eb605c2a41214e\
+      7af2"
+    observationDigest: "f4cbbdaf7ac8b5a9b5bd58331f4137162b694ebcd32bc91b1ac9da7\
+      19deab141"
+    missingDynamicTag: true
+    section: sec-array-constructor-array
+    subject: Default [[Prototype]] value derived from realm of the NewTarget.
+    assessment: fixture-construction
+  - path: test/built-ins/ArrayBuffer/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "aab053550a22b9c9e789361d0c009f5debf9dbeefdfaf551eca79ca45311\
+      4f12"
+    observationDigest: "74aa7f296e96730dab1609cdcb54ff82d1e32d9b1b5b11cbd88f141\
+      f9c40fe7b"
+    missingDynamicTag: true
+    section: sec-arraybuffer-length
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
   - path: test/built-ins/AsyncFunction/AsyncFunction-construct.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -150,6 +216,17 @@ paths:
     subject: Async function instances are not constructors and do not have a
       [[Construct]] slot.
     assessment: mixed-static-functions
+  - path: test/built-ins/AsyncFunction/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "7711cd23e143c1fcb67694df92a48a5910877a25e70e578db9d132d804bc\
+      843b"
+    observationDigest: "2bf600478896690de1c4449f7d29d56f24619500335ebfadd3b1925\
+      7aa6c8bfd"
+    missingDynamicTag: false
+    section: sec-async-function-constructor-arguments
+    subject: Default [[Prototype]] value derived from realm of the NewTarget.
+    assessment: dynamic-construction
   - path: test/built-ins/AsyncGeneratorFunction/has-instance.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -287,6 +364,31 @@ paths:
       async generator whose body is the first argument evaluated as
       source code.
     assessment: dynamic-construction
+  - path: "test/built-ins/AsyncGeneratorFunction/proto-from-ctor-realm-prototyp\
+      e.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "e6683f728f47509694a48337919d8a52d96b3f3b0c500381d8f604990fbd\
+      75fa"
+    observationDigest: "f930026f1a24ac66de48ba191165583a577c349c0e8f67393455175\
+      6efa02ab6"
+    missingDynamicTag: false
+    section: sec-createdynamicfunction
+    subject: While default [[Prototype]] value derives from realm of the
+      newTarget, "prototype" object inherits from %Object.prototype% of
+      constructor's realm.
+    assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "9dc0ac477cd076a9e7c469528e3c1e028f1dc806496323c807c04dda82a3\
+      d2d7"
+    observationDigest: "bb47276dc1f772b75629a19c17106b11101b1a9ba51a21d988bb4d4\
+      66a425102"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: Default [[Prototype]] value derived from realm of the NewTarget.
+    assessment: dynamic-construction
   - path: test/built-ins/Boolean/S9.2_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -309,6 +411,121 @@ paths:
     missingDynamicTag: true
     section: sec-toboolean
     subject: Different objects convert to Boolean by explicit transformation
+    assessment: fixture-construction
+  - path: test/built-ins/Boolean/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2d5e313ce63ba5692310c6b4abcc8fbfc75ce177738328d0a5a460527faf\
+      c0a0"
+    observationDigest: "48ec5cb7bbcd747dc605bea64f71c614a278c892d2f0a7b0e3ad231\
+      ba3be2d2d"
+    missingDynamicTag: true
+    section: sec-boolean-constructor-boolean-value
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/DataView/proto-from-ctor-realm-sab.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "318af9c60629b59301a958a6c6d5b66ebe32ad510697acdbf085858c7a44\
+      00cb"
+    observationDigest: "737b74531375fb0779f7b72df22b9332a7e044a0bb69505c6a29442\
+      41ade00bb"
+    missingDynamicTag: true
+    section: sec-dataview-buffer-byteoffset-bytelength
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/DataView/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a65cad317700f02efb9455912618f966e8e82192152af0a96c02e9e7f909\
+      e368"
+    observationDigest: "38f4e700a548f59b5d209a88c7b075a57f5706e441cf3cf11709a99\
+      d2628fd7b"
+    missingDynamicTag: true
+    section: sec-dataview-buffer-byteoffset-bytelength
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/Date/proto-from-ctor-realm-one.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1bca68fbe0a1eb3f3d588f1e97ce9f02b7170393c177c658bf7edb0180be\
+      8985"
+    observationDigest: "da6f9666df14b8ea691d6a0ad0a17bad4876c0afb1c729d2054ad21\
+      21941686c"
+    missingDynamicTag: true
+    section: sec-date-value
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/Date/proto-from-ctor-realm-two.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "78ff6a547292807be61ab0c99466708dd1b376b24b33aace1e91f5496418\
+      daa1"
+    observationDigest: "2a3c5370b2c7b69ac2d363b3e83c8a0ce3881dd26945d49a5c0a286\
+      77d5d6b02"
+    missingDynamicTag: true
+    section: sec-date-year-month-date-hours-minutes-seconds-ms
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/Date/proto-from-ctor-realm-zero.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "508c839f8dc1a6fb7a9898bd652fd417c4fba00e03568772f1531176bb3b\
+      7dd8"
+    observationDigest: "5985df6ec83adcd203ef6d4f0b746aeca93d680e9cb73d363caaff2\
+      82363243a"
+    missingDynamicTag: true
+    section: sec-date-constructor-date
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/FinalizationRegistry/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "85e7f10d72cdd7655d3ebd974be5152da39330b22d2bb688e7cbc8ae0300\
+      2c10"
+    observationDigest: "77a64083f37e6ac5ddb14b9ccbf5f84493a4c65e149c25c72bd288a\
+      1bb70f596"
+    missingDynamicTag: true
+    section: sec-finalization-registry-target
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/Function/internals/Call/class-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c4c3528193adef8fa55841e19930d9dbdf897a52a58a913089f200571f87\
+      5732"
+    observationDigest: "28fcd8182ae5b807da49e20c65db2a206154752811203ae2dd5a486\
+      d2b4c2914"
+    missingDynamicTag: true
+    section: sec-ecmascript-function-objects-call-thisargument-argumentslist
+    subject: Error when invoking a default class constructor, honoring the Realm
+      that the class was defined in.
+    assessment: fixture-construction
+  - path: "test/built-ins/Function/internals/Construct/derived-return-val-realm\
+      .js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a05fb93539567867e979edc288a214d9e8582e1fa6724c50e54239043c04\
+      63d9"
+    observationDigest: "ac192fa8b0af925705a36e7377e3d994f732eb26488be458b193b2e\
+      e79d6fc7d"
+    missingDynamicTag: true
+    section: sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    subject: Error when derived constructor returns a non-undefined value
+      (honoring the Realm of the current execution context)
+    assessment: fixture-construction
+  - path: "test/built-ins/Function/internals/Construct/derived-this-uninitializ\
+      ed-realm.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "297dc701fdcb604fba0f218863528f7ea7ecbf04fbbf7e90cf9ed8d5d52d\
+      e1d8"
+    observationDigest: "4bca87a94b46acebc964ccbe0768fbef80bbf233d1a0558b077a71c\
+      6c1e7c65c"
+    missingDynamicTag: true
+    section: sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    subject: Error when derived constructor does not initialize the `this`
+      binding (honoring the Realm of the current execution context)
     assessment: fixture-construction
   - path: test/built-ins/Function/length/S15.3.5.1_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -771,6 +988,53 @@ paths:
     section: sec-function.prototype.apply
     subject: Checking if creating "new (Function("function
       f(){this.p1=1;};return f").apply())" fails
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/argarray-not-object-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "85f7092989b56d67c9c65831aefd6416f15c2f039db0298903b279bc926f\
+      8ebc"
+    observationDigest: "ab7551d0dfc1c1f47df9deadb284bc69658f31a5c21578af69e485d\
+      ea7f82460"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Throws a TypeError exception if argArray is not an object (honoring
+      the Realm of the current execution context)
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/bind/get-fn-realm-recursive.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4849d678a6977a5ea9e81a039757c6f77a7cfe072ae29f21646ca6d8702b\
+      6a84"
+    observationDigest: "17e01dfe59fb53d49bc48ee8278fbe491069917adc2f83fd316e0aa\
+      d04199a67"
+    missingDynamicTag: true
+    section: sec-getfunctionrealm
+    subject: The realm of a bound function exotic object is the realm of its
+      target function. GetFunctionRealm is called recursively.
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/bind/get-fn-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a2c9e94485bc3ac09059a41dd0281d1e95da26bd61b0041d7a40553ef0e7\
+      8452"
+    observationDigest: "b83b30a6b8aff8b34d7dee3540834e2f0c7defd8d1ce68294e81d94\
+      118bfe4e3"
+    missingDynamicTag: true
+    section: sec-getfunctionrealm
+    subject: The realm of a bound function exotic object is the realm of its
+      target function.
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/bind/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "930cc869d3fcee911f40ef73e52a8768f5c1bb8b98f6929bf934d70e3ecd\
+      8a76"
+    observationDigest: "0c48f7221b7401a7c6f57e792f4611134cd78875b5782bd32807c26\
+      5b7d4e645"
+    missingDynamicTag: true
+    section: sec-bound-function-exotic-objects-construct-argumentslist-newtarget
+    subject: Default [[Prototype]] value derived from realm of the constructor
     assessment: fixture-construction
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1267,6 +1531,52 @@ paths:
       generator whose body is the first argument evaluated as source
       code.
     assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/proto-from-ctor-realm-prototype.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "3d644a2e3ca3181445e4255e6a290c445190b828e9b528541e8c1c2cf308\
+      cb6c"
+    observationDigest: "0082d3fbda4535f7aa5ccf1c3527b336d2e12f382930c57dcb94978\
+      275ea9305"
+    missingDynamicTag: false
+    section: sec-createdynamicfunction
+    subject: While default [[Prototype]] value derives from realm of the
+      newTarget, "prototype" object inherits from %Object.prototype% of
+      constructor's realm.
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "0bf3df05dad6588fc43731d450a3b4038010a5f2eefea8727ba3f79c962f\
+      d145"
+    observationDigest: "5eaf7f2bee5cf949f46c8ea8fa0b08432266b4b63636666f2ae3ed2\
+      dd0b6a6c2"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: dynamic-construction
+  - path: test/built-ins/Map/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "fe52b50f21c78fd2975844a60b7a2e224bc08910a1cbc2aa31dddb12da10\
+      938d"
+    observationDigest: "c067ea7201ad8357850fdb88d5a5d140b153a59095be255be64a883\
+      872387be4"
+    missingDynamicTag: true
+    section: sec-map-iterable
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/Number/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b135e91b03bc08ca29a77450396e672423de4825e433ff027fc18aba2849\
+      ced7"
+    observationDigest: "ff14766e0ccf96f2baa15eb6f576c37e8f69a55571ee08472083733\
+      50c77bf4b"
+    missingDynamicTag: true
+    section: sec-number-constructor-number-value
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
   - path: test/built-ins/Object/entries/tamper-with-global-object.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1302,6 +1612,17 @@ paths:
     section: sec-object.getownpropertydescriptor
     subject: Object.getOwnPropertyDescriptor returns undefined for
       non-existent properties on built-ins (Function (instance).name)
+    assessment: fixture-construction
+  - path: test/built-ins/Object/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "81e52ec8c4ae04560b4588c0446fbe271ca936a98ff6bfaf74c8c3869caf\
+      8567"
+    observationDigest: "cba81b49f35e56980d6e165fa2b5a84088afcfcfb2fb6027b5fad5e\
+      2853b96aa"
+    missingDynamicTag: true
+    section: sec-object-value
+    subject: Default [[Prototype]] value derived from realm of the newTarget
     assessment: fixture-construction
   - path: "test/built-ins/Object/prototype/toString/Object.prototype.toString.c\
       all-function.js"
@@ -1360,6 +1681,17 @@ paths:
     subject: Object.values should not have its behavior impacted by
       modifications to the global property Object
     assessment: fixture-construction
+  - path: test/built-ins/Promise/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b40c2257d821f9fe417213ab3d9d60e0c6afa7a518e4ca70373855527030\
+      aa97"
+    observationDigest: "87848f194c4cd05b49ddb96f70c2889bf7baabb56781db9b4868788\
+      1734d1e98"
+    missingDynamicTag: true
+    section: sec-promise-executor
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
   - path: "test/built-ins/Reflect/apply/arguments-list-is-not-array-like-but-st\
       ill-valid.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1393,6 +1725,29 @@ paths:
     missingDynamicTag: true
     section: sec-regexp-pattern-flags
     subject: Checking by using eval, pattern is Math and flags is eval("\"g\"")
+    assessment: fixture-construction
+  - path: test/built-ins/RegExp/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bb79b04a67aee329fe68b6d98662c973e5523e23b12c098afd159ee0e7af\
+      38dc"
+    observationDigest: "72624d4ac8827b57c9a82e2d9dd6af0dbe30a43a5f3993ae009b746\
+      dce2815f4"
+    missingDynamicTag: true
+    section: sec-boolean-constructor-boolean-value
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: "test/built-ins/RegExp/prototype/Symbol.split/splitter-proto-from-cto\
+      r-realm.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ae7d54151fa4cf39b40139f8aed13f578e5bc4851546c6fafca5d2ab4693\
+      5148"
+    observationDigest: "7521e1605181c0b900449725c1d10c2d6f1edfc4696ed2c6d9bbe0c\
+      d6bd453f3"
+    missingDynamicTag: true
+    section: sec-regexp.prototype-@@split
+    subject: Default [[Prototype]] value derived from realm of the constructor
     assessment: fixture-construction
   - path: test/built-ins/RegExp/prototype/source/value-empty.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1457,6 +1812,28 @@ paths:
     section: sec-get-regexp.prototype.source
     subject: Return value can be used to create an equivalent RegExp
     assessment: regexp-roundtrip
+  - path: test/built-ins/Set/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "49287f1e3ba79b2874b17aca66daf4cefd744af71df7d807323f2a098a78\
+      1b94"
+    observationDigest: "48027df20b954520a0fa6c9d9b34b2e5f4cb54be0fbe0dd825b59ca\
+      6ecb16ab5"
+    missingDynamicTag: true
+    section: sec-set-iterable
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/SharedArrayBuffer/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "136c478538d6d8b148af9dd32c312ce897d594e2ac023ed54fbd6f25f70e\
+      792d"
+    observationDigest: "e76ed93f31a49bf1a82d5cb0c151bd3b3d0bc3b7582ef9bcd8d064d\
+      cd3970c54"
+    missingDynamicTag: true
+    section: sec-sharedarraybuffer-length
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
   - path: test/built-ins/String/S15.5.1.1_A1_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1479,6 +1856,17 @@ paths:
     section: sec-string-constructor
     subject: Undefined values is undefined, void 0 and eval("var x"). Use
       explicit transformation
+    assessment: fixture-construction
+  - path: test/built-ins/String/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "38a508dfbcb543d59ecff93e0bc804445687494e4c55ca00496bcea24340\
+      2bdd"
+    observationDigest: "9f58e627083047e62d385037106ce76e0c56521a14d8cfcb339b801\
+      9bac3f8d8"
+    missingDynamicTag: true
+    section: sec-string-constructor-string-value
+    subject: Default [[Prototype]] value derived from realm of the newTarget
     assessment: fixture-construction
   - path: test/built-ins/String/prototype/charAt/S15.5.4.4_A1.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1652,6 +2040,50 @@ paths:
     section: sec-string.prototype.touppercase
     subject: Checking by using eval
     assessment: fixture-construction
+  - path: test/built-ins/ThrowTypeError/distinct-cross-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "7a8c4f7ed4dd85e5fb8393cc1c8841999e1ed366f6311ce0f027fecc4bc3\
+      890e"
+    observationDigest: "fe8f0141877c7e7e90ed448d5bcfb1c0c0892ce7c6079925766a451\
+      d1d3a1327"
+    missingDynamicTag: true
+    section: sec-%throwtypeerror%
+    subject: "%ThrowTypeError% is defined once for each realm."
+    assessment: fixture-construction
+  - path: test/built-ins/WeakMap/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "daef9a270c4c2bf4c8b36be6b4f00d573bd9e41b87c2788704209cd3c622\
+      70fb"
+    observationDigest: "4a0b773dc9135594d1c1cb32449449d3fa838c29687cb3794820afd\
+      90a3b3cac"
+    missingDynamicTag: true
+    section: sec-weakmap-iterable
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/WeakRef/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9f2b33a354989cdac8382811db6480e3fe3a81b9ea2653f3a7173123f4a5\
+      53f2"
+    observationDigest: "fb01a7f1536a38a963b2b87d27da3defedb82b368e2ca36aa0096cd\
+      461cbca83"
+    missingDynamicTag: true
+    section: sec-weak-ref-target
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
+  - path: test/built-ins/WeakSet/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "5328c4fc9b5fe2d0d16985ea023987572c90559cf056b189611685b50dda\
+      22a0"
+    observationDigest: "a73395b7620108cef0bac364d0944a8e48f74a4e45709fe1bf09f8e\
+      618454dc8"
+    missingDynamicTag: true
+    section: sec-weakset-iterable
+    subject: Default [[Prototype]] value derived from realm of the newTarget
+    assessment: fixture-construction
   - path: test/built-ins/global/S10.2.3_A1.3_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1789,6 +2221,18 @@ paths:
     subject: AnnexB extension not honored in strict mode, Block statement in
       eval code containing a function declaration
     assessment: eval-semantics
+  - path: test/language/expressions/async-generator/eval-body-proto-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "4bc5871ceb209fd2f1593bf6120303196165a57c77a75a57b4a40b0568cb\
+      a97e"
+    observationDigest: "1fbab547dc2e1000428a5a9fb1ed3b6cea6f655fc748d864e203304\
+      b7d605a08"
+    missingDynamicTag: false
+    section: sec-asyncgenerator-definitions-evaluatebody
+    subject: Default [[Prototype]] value derived from realm of the async
+      generator function.
+    assessment: fixture-construction
   - path: test/language/expressions/async-generator/eval-var-scope-syntax-err.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -1979,6 +2423,17 @@ paths:
     section: sec-gettemplateobject
     subject: Template caching is by site, using identical expressions within
       `new Function`
+    assessment: template-sites
+  - path: test/language/expressions/tagged-template/cache-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "58da6b6a79dd1362b4973ee8306120c2c6aa84a0214e32b112892e4c5551\
+      54ad"
+    observationDigest: "73b7ddb2d5c13651d57123c5cef9b46779cdc0f02cda5eb174e605c\
+      f50511486"
+    missingDynamicTag: true
+    section: sec-template-literals
+    subject: Each realm has a distinct template registry
     assessment: template-sites
   - path: test/language/expressions/typeof/syntax.js
     proposedOwner: adr:0016-dynamic-source-boundary

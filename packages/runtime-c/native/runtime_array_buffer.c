@@ -355,13 +355,11 @@ static OseoResult array_buffer_prototype_from_target(
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[0]
+            frame.slots[0],
+            fallback
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(context, fallback);
-        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];
@@ -866,7 +864,11 @@ static OseoResult array_buffer_construct_species(
     frame.slots[1] = oseo_number(length);
     result = oseo_function_prototype(context, frame.slots[0]);
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_constructor_receiver(context, result.value);
+        result = oseo_internal_function_receiver(
+            context,
+            frame.slots[0],
+            result.value
+        );
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1251,7 +1253,7 @@ static OseoResult define_array_buffer_accessor(
  */
 static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_SPECIES];
+        &context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_SPECIES];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -1275,7 +1277,7 @@ static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
         frame.slots[0] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_PROTOTYPE] =
             frame.slots[0];
         result = create_array_buffer_builtin(
             context,
@@ -1289,7 +1291,8 @@ static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
     }
     const OseoPropertyAttributes method = {true, false, true, false};
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER] =
+            frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -1332,7 +1335,7 @@ static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[accessor_intrinsics[index]] = frame.slots[2];
+        context->realm->intrinsics[accessor_intrinsics[index]] = frame.slots[2];
         result = define_array_buffer_accessor(
             context,
             frame.slots[0],
@@ -1372,7 +1375,7 @@ static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[method_intrinsics[index]] = frame.slots[2];
+        context->realm->intrinsics[method_intrinsics[index]] = frame.slots[2];
         result = define_array_buffer_property(
             context,
             frame.slots[0],
@@ -1413,7 +1416,7 @@ static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_IS_VIEW] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_IS_VIEW] =
             frame.slots[2];
         result = define_array_buffer_property(
             context,
@@ -1457,13 +1460,13 @@ static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_ARRAY_BUFFER_PROTOTYPE;
              index <= OSEO_INTRINSIC_ARRAY_BUFFER_SPECIES;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
     }
     OseoValue species = frame.slots[2];
-    context->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_SPECIES] = species;
+    context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER_SPECIES] = species;
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
@@ -1474,7 +1477,7 @@ static OseoResult array_buffer_intrinsic_build(OseoContext *context) {
 OseoResult oseo_internal_array_buffer_intrinsic(OseoContext *context) {
     OseoResult built = array_buffer_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_BUFFER]);
 }
 
 OseoResult oseo_internal_install_array_buffer_global(
@@ -1509,7 +1512,7 @@ OseoResult oseo_internal_install_array_buffer_global(
  */
 static OseoResult shared_array_buffer_intrinsic_build(OseoContext *context) {
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES];
+        &context->realm->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -1533,7 +1536,8 @@ static OseoResult shared_array_buffer_intrinsic_build(OseoContext *context) {
         frame.slots[0] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE] =
+        OseoValue *intrinsics = context->realm->intrinsics;
+        intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE] =
             frame.slots[0];
         result = create_array_buffer_builtin(
             context,
@@ -1547,7 +1551,7 @@ static OseoResult shared_array_buffer_intrinsic_build(OseoContext *context) {
     }
     const OseoPropertyAttributes method = {true, false, true, false};
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER] =
+        context->realm->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER] =
             frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
@@ -1671,13 +1675,14 @@ static OseoResult shared_array_buffer_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE;
              index <= OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
     }
     OseoValue species = frame.slots[2];
-    context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES] = species;
+    context->realm->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES] =
+        species;
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
@@ -1688,7 +1693,8 @@ static OseoResult shared_array_buffer_intrinsic_build(OseoContext *context) {
 OseoResult oseo_internal_shared_array_buffer_intrinsic(OseoContext *context) {
     OseoResult built = shared_array_buffer_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER]);
+    const OseoValue *intrinsics = context->realm->intrinsics;
+    return normal(intrinsics[OSEO_INTRINSIC_SHARED_ARRAY_BUFFER]);
 }
 
 OseoResult oseo_internal_install_shared_array_buffer_global(

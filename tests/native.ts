@@ -29,6 +29,7 @@ import {
 
 import type { Fixture } from "./native/fixture.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
+import { realmReferencePrelude } from "./native/realm-reference.ts";
 import { arrayBufferFixtures } from "./native/fixtures/array-buffer.ts";
 import { asyncFixtures } from "./native/fixtures/async.ts";
 import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
@@ -61,6 +62,7 @@ import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
+import { crossRealmFixtures } from "./native/fixtures/cross-realm.ts";
 import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
 
 const { typedArrayIterativeFixtures } =
@@ -214,6 +216,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
   ...agentFixtures.atomicsAndSharedMemoryFixtures,
+  ...crossRealmFixtures,
   ...typedArrayIterativeFixtures,
   ...typedArraySearchAndJoinFixtures,
   ...typedArrayMutationFixtures,
@@ -630,7 +633,9 @@ async function references(fixture: Fixture): Promise<
     await host.writeTextFile(
       path,
       referencePrelude +
-        (fixture.test262Host === true ? agentReferencePrelude : "") +
+        (fixture.test262Host === true
+          ? agentReferencePrelude + realmReferencePrelude
+          : "") +
         source,
     );
     return [
@@ -1173,7 +1178,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "proxy-object-rest-collection" ||
     fixture.name === "json-stringify" ||
     fixture.name === "tagged-templates" ||
-    fixture.name === "template-literals"
+    fixture.name === "template-literals" ||
+    fixture.name.startsWith("cross-realm-")
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
@@ -1332,6 +1338,16 @@ for (const fixture of selectedFixtures) {
             assert.ok(native.counters.collections > 0);
             assert.match(native.emittedC, /oseo_test262_host_install/u);
             if (fixture.name === "agent-contention" && mode === "enabled") {
+              assert.ok(native.counters.guardHits > 0);
+              assert.ok(native.counters.guardMisses > 0);
+            }
+            // A property read specialized for the initial realm's object
+            // shape misses its guard on an object of another realm and
+            // reaches the compiled generic read.
+            if (
+              fixture.name === "cross-realm-property-guards" &&
+              mode === "enabled"
+            ) {
               assert.ok(native.counters.guardHits > 0);
               assert.ok(native.counters.guardMisses > 0);
             }
@@ -1541,9 +1557,10 @@ for (const fixture of selectedFixtures) {
             // builds. The eleven concrete TypedArray constructors add
             // eleven property-name allocations, SharedArrayBuffer and
             // Atomics add one each, WeakMap, WeakSet, WeakRef, and
-            // FinalizationRegistry add four more, and the global object's
-            // own `globalThis` property adds its name.
-            assert.equal(native.counters.allocations, 67);
+            // FinalizationRegistry add four more, the global object's own
+            // `globalThis` property adds its name, and so does `%eval%`'s
+            // global `eval` property (ADR 0027).
+            assert.equal(native.counters.allocations, 68);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

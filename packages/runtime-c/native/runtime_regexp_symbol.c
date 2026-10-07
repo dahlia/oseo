@@ -303,7 +303,11 @@ static OseoResult symbol_construct(
     frame.slots[2] = flags;
     result = oseo_function_prototype(context, frame.slots[0]);
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_constructor_receiver(context, result.value);
+        result = oseo_internal_function_receiver(
+            context,
+            frame.slots[0],
+            result.value
+        );
         frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {

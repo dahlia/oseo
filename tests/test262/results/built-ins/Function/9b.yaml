@@ -18,10 +18,14 @@ results:
     dependencies:
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/Function/internals/Construct/derived-return-val-realm.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Function/internals/Construct/derived-return-val-realm.js:94:9:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
-    unsupportedFeatures:
-      - cross-realm
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
   - case:
       async: false
       features: []

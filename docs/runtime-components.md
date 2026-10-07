@@ -46,8 +46,8 @@ The runtime input now lists forty-six reviewed assets in this order:
 *runtime\_regexp.c*, *runtime\_regexp\_matcher.c*,
 *runtime\_regexp\_symbol.c*, and
 *runtime\_math.c*, *runtime\_uri.c*, *runtime\_reflect.c*,
-*runtime\_proxy.c*, *runtime\_json.c*, *runtime\_atomics.c*, and
-*runtime\_agent.c*. The M5
+*runtime\_proxy.c*, *runtime\_json.c*, *runtime\_atomics.c*,
+*runtime\_agent.c*, and *runtime\_realm.c*. The M5
 named-error-intrinsics
 unit added *runtime\_error.c* as the first post-componentization
 component, and the symbol, iterator-protocol, generator,
@@ -57,7 +57,7 @@ RegExp-prototype-and-exec, Math-namespace,
 RegExp-symbol-methods, URI-handling-functions, Boolean-intrinsic,
 Reflect-namespace, Proxy-exotic-object, Date-family, JSON-parse,
 Set-intrinsic, TypedArray-constructor, single-agent Atomics,
-weak-collections, and agent-cluster units each
+weak-collections, agent-cluster, and cross-realm units each
 added one
 component the same
 way. The M5b
@@ -160,6 +160,11 @@ Ownership follows the plan's target layout:
     cluster WaiterList, broadcasts, reports, cluster liveness and stall
     detection, the ahead-of-time agent program table and its source
     matching, and the test262 host object `$262` with its `agent` functions;
+ -  *runtime\_realm.c*: realm records beyond the initial realm, the
+    running-realm scope a call enters and leaves, GetFunctionRealm, the
+    realm-dependent defaults of GetPrototypeFromConstructor and of an
+    ordinary [[Construct]] receiver, the `%eval%` intrinsic that reports the
+    ADR 0016 boundary, and the test262 host's `createRealm` and `global`;
  -  *runtime\_regexp.c*: the `RegExp` constructor, `IsRegExp`,
     `OrdinaryCreateFromConstructor` allocation, `lastIndex`, dynamic pattern
     and flag validation, immutable matcher artifact, `Symbol.species`,
@@ -625,6 +630,21 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_agent_idle`                          | *runtime\_agent.c*            |
 | `oseo_internal_agent_context_destroy`               | *runtime\_agent.c*            |
 | `oseo_internal_agent_builtin_dispatch`              | *runtime\_agent.c*            |
+| `oseo_internal_function_realm`                      | *runtime\_realm.c*            |
+| `oseo_internal_callee_realm`                        | *runtime\_realm.c*            |
+| `oseo_internal_realm_state`                         | *runtime\_realm.c*            |
+| `oseo_internal_realm_intrinsic`                     | *runtime\_realm.c*            |
+| `oseo_internal_constructor_realm_default`           | *runtime\_realm.c*            |
+| `oseo_internal_function_receiver`                   | *runtime\_realm.c*            |
+| `oseo_internal_realm_enter`                         | *runtime\_realm.c*            |
+| `oseo_internal_realm_leave`                         | *runtime\_realm.c*            |
+| `oseo_internal_realm_create`                        | *runtime\_realm.c*            |
+| `oseo_internal_realm_global`                        | *runtime\_realm.c*            |
+| `oseo_internal_realm_host_install`                  | *runtime\_realm.c*            |
+| `oseo_internal_eval_intrinsic`                      | *runtime\_realm.c*            |
+| `oseo_internal_realm_builtin_dispatch`              | *runtime\_realm.c*            |
+| `oseo_internal_realm_init`                          | *runtime\_core.c*             |
+| `oseo_internal_realm_release`                       | *runtime\_core.c*             |
 | `oseo_internal_typed_array_validate`                | *runtime\_typed\_array.c*     |
 | `oseo_internal_typed_array_out_of_bounds`           | *runtime\_typed\_array.c*     |
 | `oseo_internal_typed_array_element_size`            | *runtime\_typed\_array.c*     |
@@ -1649,6 +1669,31 @@ the Atomics waiter record gains its block and cluster entry, the runtime input
 gains one source, and *oseo\_runtime.h* gains the agent program table and two
 generated-code entry points, `oseo_test262_host_install` and
 `oseo_agent_hole`. The component moves `abiVersion` to `m5-123`.
+
+### Cross-realm evidence
+
+M5c node `cross-realm-host` adds *runtime\_realm.c* under
+[ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md). `OseoRealm` now
+holds the intrinsic table, the global this value, both literal caches, and
+the Math.random state; `OseoContext` embeds its initial realm, points at the
+running realm, and keeps the agent's heap, job queues, well-known symbols,
+and registered symbol representatives shared by every realm. Every runtime
+read of a realm-owned field goes through the running realm pointer. A created
+realm is a heap record of the new kind `OSEO_HEAP_REALM`, which the collector
+traces and whose caches it frees; a function's and a job's `realm` slot and
+the running realm's record keep it alive.
+
+`oseo_call_function` enters the callee's realm around every ordinary and
+built-in [[Call]] and [[Construct]] and roots the realm it leaves until the
+call returns. Generator resumptions and promise jobs enter their own realms,
+and the GetPrototypeFromConstructor sites of the Array, ArrayBuffer, Boolean,
+DataView, Date, Error, Iterator, Map, Number, Object, Promise, RegExp, Set,
+String, TypedArray, and weak-collection components materialize their default
+in GetFunctionRealm's realm. The component takes built-in code range index 29
+for `%eval%` and `createRealm`, the intrinsic table gains `%eval%`, the
+global object installs it, `%Function%`'s boundary diagnostic becomes
+`OSEO1001`, the runtime input gains one source, and `abiVersion` moves to
+`m5-127`.
 
 ### TypedArray iterative methods evidence
 

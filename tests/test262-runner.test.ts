@@ -1826,6 +1826,54 @@ test("builds a case that reads $262.agent with the test262 host", async () => {
   );
 });
 
+test("builds a realm case with the test262 host", async () => {
+  const cases = [
+    "/*---\nfeatures: [cross-realm]\n---*/\n$262.createRealm().global;\n",
+    '/*---\nfeatures: [cross-realm]\n---*/\n$262["createRealm"]();\n',
+    "/*---\nfeatures: [cross-realm]\n---*/\n$262.global.Array;\n",
+    "/*---\nfeatures: [cross-realm]\n---*/\n$262?.createRealm();\n",
+  ] as const;
+  await Promise.all(
+    cases.map(async (source) => {
+      const parsed = parseTest262Case(source, "test/realm-case.js", revision);
+      const hosts: (boolean | undefined)[] = [];
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set(["cross-realm"]),
+        harnesses,
+        {
+          async execute(request) {
+            hosts.push(request.test262Host);
+            return successfulResult();
+          },
+        },
+        ["functions"],
+      );
+      assert.equal(result.classification, "pass");
+      assert.ok(hosts.length > 0);
+      assert.ok(hosts.every((host) => host === true));
+    }),
+  );
+  // Without the admitted feature, the frontmatter still withholds the case.
+  const source = "/*---\nfeatures: [cross-realm]\n---*/\n$262.createRealm();\n";
+  const parsed = parseTest262Case(source, "test/realm-gap.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      async execute() {
+        return assert.fail("an unadmitted realm case must not execute");
+      },
+    },
+    ["functions"],
+  );
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.deepEqual(result.unsupportedFeatures, ["cross-realm"]);
+});
+
 test("records a deterministic scheduler outside the agent host", async () => {
   const cases = [
     ["/*---\nflags: [async]\n---*/\n$DONE();\n", "deterministic-logical-clock"],
@@ -1884,12 +1932,7 @@ test("builds a case that only names $262.agent in text plainly", async () => {
   const source =
     "/*---\nfeatures: [Atomics]\n---*/\n" +
     "// $262.agent is not read here.\n" +
-    'const label = "$262.agent";\n' +
-    "$262.agent = undefined;\n" +
-    "delete $262.agent;\n" +
-    "({ value: $262.agent } = { value: 1 });\n" +
-    "[$262.agent, ...$262.agent] = [1];\n" +
-    "for ($262.agent of []) {}\n";
+    'const label = "$262.agent";\n';
   const parsed = parseTest262Case(source, "test/agent-text.js", revision);
   let executions = 0;
   const result = await executeTest262Case(
@@ -1910,12 +1953,50 @@ test("builds a case that only names $262.agent in text plainly", async () => {
   assert.equal(result.classification, "pass");
 });
 
+test("builds a case that writes or deletes a host member", async () => {
+  // Each form evaluates `$262` before it writes or deletes the member, so
+  // the case needs the host that installs the binding.
+  const bodies = [
+    "$262.agent = undefined;\n",
+    "delete $262.agent;\n",
+    "({ value: $262.agent } = { value: 1 });\n",
+    "[$262.agent, ...$262.agent] = [1];\n",
+    "for ($262.agent of []) {}\n",
+    "$262.global = undefined;\n",
+    "delete $262.createRealm;\n",
+  ] as const;
+  await Promise.all(
+    bodies.map(async (body) => {
+      const source = `/*---\nfeatures: [Atomics]\n---*/\n${body}`;
+      const parsed = parseTest262Case(source, "test/host-write.js", revision);
+      const hosts: (boolean | undefined)[] = [];
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set(["Atomics"]),
+        harnesses,
+        {
+          async execute(request) {
+            hosts.push(request.test262Host);
+            return successfulResult();
+          },
+        },
+        ["atomics-single-agent"],
+      );
+      assert.equal(result.classification, "pass");
+      assert.ok(hosts.length > 0);
+      assert.ok(hosts.every((host) => host === true));
+    }),
+  );
+});
+
 test("withholds a case that references the $262 host binding", async () => {
   const cases = [
     "$262.evalScript('1;');\n",
     "assert.throws(ReferenceError, () => { $262.gc(); });\n",
     "const host = $262;\n",
     "$262.agent.start(''); $262.detachArrayBuffer;\n",
+    "$262.createRealm().global; $262.evalScript('1;');\n",
     // A declaration in another scope does not shadow the reference.
     "function local($262) {}\nassert.throws(Error, () => $262.gc());\n",
     "{ let $262; }\n$262.gc();\n",
@@ -1950,8 +2031,8 @@ test("withholds a case that references the $262 host binding", async () => {
         ["functions"],
       );
       assert.equal(result.classification, "unsupported-profile-feature");
-      // The native test262 host provides only `$262.agent`, so a case that
-      // also reads another member is withheld as well.
+      // The native test262 host provides only `agent`, `createRealm`, and
+      // `global`, so a case that also reads another member is withheld.
       assert.equal(result.observation.unsupportedCapability, "host-binding");
     }),
   );

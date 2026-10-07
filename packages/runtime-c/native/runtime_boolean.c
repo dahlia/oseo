@@ -43,13 +43,11 @@ static OseoResult boolean_construct(
     );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_validate_function_realm(context, slots[0]);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_BOOLEAN_PROTOTYPE
-            );
-        }
+        result = oseo_internal_constructor_realm_default(
+            context,
+            slots[0],
+            OSEO_INTRINSIC_BOOLEAN_PROTOTYPE
+        );
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -174,9 +172,9 @@ static OseoResult define_boolean_property(
 
 OseoResult oseo_internal_boolean_intrinsic(OseoContext *context) {
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_BOOLEAN_VALUE_OF];
+        &context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN_VALUE_OF];
     if (is_function(*marker)) {
-        return normal(context->intrinsics[OSEO_INTRINSIC_BOOLEAN]);
+        return normal(context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN]);
     }
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -196,7 +194,8 @@ OseoResult oseo_internal_boolean_intrinsic(OseoContext *context) {
         OseoOrdinaryObject *prototype = ordinary_object(frame.slots[0]);
         prototype->primitive_data = true;
         prototype->primitive_value = oseo_boolean(false);
-        context->intrinsics[OSEO_INTRINSIC_BOOLEAN_PROTOTYPE] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN_PROTOTYPE] =
+            frame.slots[0];
         result = create_boolean_function(
             context,
             OSEO_BOOLEAN_CONSTRUCTOR_CODE_ID,
@@ -207,7 +206,7 @@ OseoResult oseo_internal_boolean_intrinsic(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_BOOLEAN] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN] = frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -240,7 +239,7 @@ OseoResult oseo_internal_boolean_intrinsic(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[intrinsics[index]] = frame.slots[2];
+            context->realm->intrinsics[intrinsics[index]] = frame.slots[2];
             result = define_boolean_property(
                 context,
                 frame.slots[0],
@@ -257,17 +256,17 @@ OseoResult oseo_internal_boolean_intrinsic(OseoContext *context) {
             context->allocations = entry_allocations;
         }
     } else {
-        context->intrinsics[OSEO_INTRINSIC_BOOLEAN_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN_PROTOTYPE] =
             oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_BOOLEAN] = oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_BOOLEAN_TO_STRING] =
+        context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN] = oseo_undefined();
+        context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN_TO_STRING] =
             oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_BOOLEAN_VALUE_OF] =
+        context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN_VALUE_OF] =
             oseo_undefined();
     }
     oseo_roots_release(context, &frame);
     return result.status == OSEO_STATUS_NORMAL
-        ? normal(context->intrinsics[OSEO_INTRINSIC_BOOLEAN])
+        ? normal(context->realm->intrinsics[OSEO_INTRINSIC_BOOLEAN])
         : result;
 }
 

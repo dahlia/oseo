@@ -1003,6 +1003,18 @@
 #define OSEO_AGENT_REPORT_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 6u)
 #define OSEO_AGENT_LEAVING_CODE_ID (OSEO_AGENT_CODE_ID_RANGE_LAST - 7u)
 
+/*
+ * The realm component: %eval%, whose [[Call]] reports the ADR 0016
+ * boundary, and the test262 host's `$262.createRealm` (ADR 0027).
+ */
+#define OSEO_REALM_CODE_ID_RANGE_INDEX ((size_t)29u)
+#define OSEO_REALM_CODE_ID_RANGE_FIRST \
+    OSEO_BUILTIN_CODE_RANGE_FIRST(OSEO_REALM_CODE_ID_RANGE_INDEX)
+#define OSEO_REALM_CODE_ID_RANGE_LAST \
+    OSEO_BUILTIN_CODE_RANGE_LAST(OSEO_REALM_CODE_ID_RANGE_INDEX)
+#define OSEO_EVAL_CODE_ID OSEO_REALM_CODE_ID_RANGE_LAST
+#define OSEO_CREATE_REALM_CODE_ID (OSEO_REALM_CODE_ID_RANGE_LAST - 1u)
+
 /* Well-known symbol table indexes shared with the public context. */
 #define OSEO_WELL_KNOWN_ASYNC_ITERATOR ((size_t)0u)
 #define OSEO_WELL_KNOWN_HAS_INSTANCE ((size_t)1u)
@@ -1070,6 +1082,7 @@ typedef enum {
     OSEO_HEAP_WEAK_SET = 37,
     OSEO_HEAP_WEAK_REF = 38,
     OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT = 39,
+    OSEO_HEAP_REALM = 40,
 } OseoHeapKind;
 
 typedef struct {
@@ -1234,6 +1247,19 @@ typedef struct {
     OseoHeapObject header;
     OseoValue target;
 } OseoWeakReference;
+
+/*
+ * One realm created after the context's initial realm (ADR 0027). The
+ * record is internal and never a language value: a function's [[Realm]]
+ * slot, the context's running realm, and the host object that created
+ * it reach the record, and the collector frees it with its caches once
+ * none of them does. The initial realm lives in the context instead and
+ * is named by undefined wherever a realm value is stored.
+ */
+typedef struct {
+    OseoHeapObject header;
+    OseoRealm realm;
+} OseoRealmRecord;
 
 /*
  * Finalization cells stay in registration order under their registry.
@@ -1615,6 +1641,13 @@ typedef struct {
     OseoValue initial_name;
     /* Original source, or undefined for built-in and bound functions. */
     OseoValue source_text;
+    /*
+     * [[Realm]]: the realm record that was running when the function was
+     * created, or undefined for the context's initial realm. Calling the
+     * function enters this realm; a bound function keeps the value but
+     * never enters it, because only its target has a [[Realm]].
+     */
+    OseoValue realm;
     /* BoundFunction exotic state, undefined outside OSEO_FUNCTION_BOUND. */
     OseoValue bound_target;
     OseoValue bound_this;
@@ -1660,6 +1693,14 @@ typedef struct {
     OseoValue reaction_head;
     OseoValue reaction_tail;
     OseoValue unhandled_next;
+    /*
+     * The realm the promise was created in, undefined for the initial
+     * realm. A promise is created by the %Promise% of the running realm,
+     * which also creates its resolving functions, so settling the
+     * allocation-free capability enters this realm as calling those
+     * functions would.
+     */
+    OseoValue realm;
     const char *rejection_source_id;
     size_t rejection_source_id_length;
     size_t rejection_line;
@@ -2022,6 +2063,13 @@ typedef struct {
     OseoValue primary;
     OseoValue secondary;
     OseoValue argument;
+    /*
+     * The realm HostEnqueuePromiseJob receives: the realm of the
+     * reaction's handler or of the thenable's `then`, and the realm that
+     * enqueued the job when there is no such function or GetFunctionRealm
+     * would throw. The job runs with this realm as the running realm.
+     */
+    OseoValue realm;
     OseoJobKind kind;
     bool fulfilled;
 } OseoJob;
@@ -2548,6 +2596,13 @@ static inline bool is_weak_ref(OseoValue value) {
 static inline OseoWeakRef *weak_ref_object(OseoValue value) {
     return (OseoWeakRef *)heap_object(value);
 }
+static inline bool is_realm_record(OseoValue value) {
+    return tag_of(value) == OSEO_TAG_HEAP &&
+        heap_object(value)->kind == OSEO_HEAP_REALM;
+}
+static inline OseoRealmRecord *realm_record_object(OseoValue value) {
+    return (OseoRealmRecord *)heap_object(value);
+}
 static inline bool is_finalization_registry_object(OseoValue value) {
     return tag_of(value) == OSEO_TAG_HEAP &&
         heap_object(value)->kind == OSEO_HEAP_FINALIZATION_REGISTRY_OBJECT;
@@ -2609,6 +2664,29 @@ typedef OseoResult (*OseoBuiltinDispatcher)(
     const OseoValue *arguments,
     OseoValue new_target
 );
+OseoResult oseo_internal_realm_builtin_dispatch(
+    OseoContext *context,
+    size_t code_id,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+);
+/*
+ * Materializes the running realm's %eval%. Defined in runtime_realm.c.
+ */
+OseoResult oseo_internal_eval_intrinsic(OseoContext *context);
+/*
+ * Adds the realm members of the test262 host to `host`, the `$262` object
+ * of the running realm: `createRealm`, which creates a realm and returns
+ * that realm's own host object, and `global`, the running realm's global
+ * object. Defined in runtime_realm.c.
+ */
+OseoResult oseo_internal_realm_host_install(
+    OseoContext *context,
+    OseoValue host
+);
 OseoResult oseo_internal_function_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -2644,15 +2722,125 @@ OseoResult oseo_internal_constructor_prototype(
 );
 
 /*
- * GetFunctionRealm's bound-function and Proxy walk. Oseo currently has one
- * realm, so a successful result needs no realm identity; the observable part
- * is throwing when any Proxy reached by the walk has been revoked. Call this
- * only after GetPrototypeFromConstructor produced a non-object prototype.
- * Defined in runtime_function.c.
+ * The receiver an ordinary [[Construct]] allocates for `constructor`
+ * from the `prototype` value already read: that object, or the
+ * %Object.prototype% of GetFunctionRealm(constructor) for any other
+ * value. A Proxy constructor owns its receiver, so the running realm's
+ * default serves only as an unused placeholder there. Defined in
+ * runtime_function.c.
  */
-OseoResult oseo_internal_validate_function_realm(
+OseoResult oseo_internal_function_receiver(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoValue prototype
+);
+
+/*
+ * GetFunctionRealm. The result value is the realm record of the function
+ * the bound-function and Proxy walk reaches, undefined for the initial
+ * realm, and the running realm's record for any other object, as the
+ * clause's final step requires. Reaching a revoked Proxy throws a
+ * TypeError of the running realm. Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_function_realm(
     OseoContext *context,
     OseoValue constructor
+);
+
+/*
+ * The realm an execution of `function` that the runtime starts itself
+ * runs in: GetFunctionRealm of a callable, or the running realm for a
+ * non-callable value and wherever GetFunctionRealm would throw, as
+ * NewPromiseReactionJob and NewPromiseResolveThenableJob require. A
+ * generator resumption uses it for the generator function's realm. It
+ * never throws or allocates. Defined in runtime_realm.c.
+ */
+OseoValue oseo_internal_callee_realm(OseoContext *context, OseoValue function);
+
+/*
+ * The realm-owned state a realm value names: the initial realm for
+ * undefined and the record of a realm heap object otherwise. Defined in
+ * runtime_function.c.
+ */
+OseoRealm *oseo_internal_realm_state(
+    OseoContext *context,
+    OseoValue realm_value
+);
+
+/*
+ * One intrinsic of the realm `realm_value` names, materialized in that
+ * realm. Every function and object the materialization creates belongs
+ * to that realm, so the running realm is entered for its duration and
+ * restored before returning. Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_realm_intrinsic(
+    OseoContext *context,
+    OseoValue realm_value,
+    OseoIntrinsic intrinsic
+);
+
+/*
+ * The second half of GetPrototypeFromConstructor for a `prototype` read
+ * that produced a non-object: the named intrinsic default of
+ * GetFunctionRealm(constructor). Call this only after the observable
+ * `prototype` read, because a revoked Proxy throws here and nowhere
+ * else. Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_constructor_realm_default(
+    OseoContext *context,
+    OseoValue constructor,
+    OseoIntrinsic intrinsic
+);
+
+/*
+ * One saved running realm. Entering another realm roots the record it
+ * leaves, so a realm that only the running execution context named
+ * stays alive until the matching leave restores it.
+ */
+typedef struct {
+    OseoRealm *realm;
+    OseoValue record;
+    OseoRootFrame frame;
+    bool entered;
+} OseoRealmScope;
+
+/*
+ * Makes `realm_value` the running realm until the matching
+ * `oseo_internal_realm_leave`. Scopes nest strictly with the root stack,
+ * so a caller leaves before it pops any frame it pushed after entering.
+ * Entering the realm that already runs changes and roots nothing.
+ * Defined in runtime_function.c.
+ */
+void oseo_internal_realm_enter(
+    OseoContext *context,
+    OseoRealmScope *scope,
+    OseoValue realm_value
+);
+void oseo_internal_realm_leave(OseoContext *context, OseoRealmScope *scope);
+
+/*
+ * Prepares one realm's state and releases the caches it owns. Realm
+ * initialization takes the next process-wide realm ordinal, which seeds
+ * the realm's Math.random. Defined in runtime_core.c.
+ */
+void oseo_internal_realm_init(OseoRealm *realm);
+void oseo_internal_realm_release(OseoRealm *realm);
+
+/*
+ * CreateRealm followed by SetDefaultGlobalBindings: a new realm record
+ * whose global object holds every standard global this profile installs.
+ * The running realm is unchanged afterwards. Defined in
+ * runtime_binding.c.
+ */
+OseoResult oseo_internal_realm_create(OseoContext *context);
+
+/*
+ * The global object of the realm `realm_value` names, created on first
+ * use. Defined in runtime_binding.c.
+ */
+OseoResult oseo_internal_realm_global(
+    OseoContext *context,
+    OseoValue realm_value
 );
 
 /*

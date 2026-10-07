@@ -68,6 +68,7 @@ supportedFeatures:
   - coalesce-expression
   - computed-property-names
   - const
+  - cross-realm
   - default-parameters
   - destructuring-assignment
   - destructuring-binding
@@ -609,7 +610,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/length/define-own-prop-length-overflow-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/name.js
     expectedClassification: pass
@@ -867,10 +868,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-proto-from-ctor-realm-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-proto-from-ctor-realm-non-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/create-proxy.js
     expectedClassification: pass
@@ -2484,10 +2485,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-proto-from-ctor-realm-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-proto-from-ctor-realm-non-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/create-proxy.js
     expectedClassification: pass
@@ -5493,10 +5494,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-proto-from-ctor-realm-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-proto-from-ctor-realm-non-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/create-proxy.js
     expectedClassification: pass
@@ -7524,10 +7525,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-proto-from-ctor-realm-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-proto-from-ctor-realm-non-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-proxied-array-invalid-len.js
     expectedClassification: pass
@@ -8559,10 +8560,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-proto-from-ctor-realm-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-proto-from-ctor-realm-non-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/splice/create-proxy.js
     expectedClassification: pass
@@ -11424,7 +11425,7 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, bigint-primitive, object-literals]
   - path: test/built-ins/BigInt/prototype/valueOf/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, var-bindings]
   - path: test/built-ins/BigInt/prototype/valueOf/length.js
     expectedClassification: pass
@@ -15208,7 +15209,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/internals/Construct/base-ctor-revoked-proxy.js
     expectedClassification: pass
@@ -15478,7 +15479,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/apply/this-not-callable-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/apply/this-not-callable.js
     expectedClassification: pass
@@ -17914,7 +17915,7 @@ tests:
     expectedClassification: pass
     dependencies: [json-stringify]
   - path: test/built-ins/JSON/stringify/replacer-array-proxy-revoked-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [json-stringify, proxy-exotic-object]
   - path: test/built-ins/JSON/stringify/replacer-array-proxy-revoked.js
     expectedClassification: pass
@@ -17998,7 +17999,7 @@ tests:
     expectedClassification: pass
     dependencies: [json-stringify, proxy-exotic-object]
   - path: test/built-ins/JSON/stringify/value-bigint-cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [bigint-primitive, json-stringify]
   - path: test/built-ins/JSON/stringify/value-bigint-order.js
     expectedClassification: pass
@@ -34234,7 +34235,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/escape/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/escape/escaped-control-characters.js
     expectedClassification: pass
@@ -37042,7 +37043,7 @@ tests:
     expectedClassification: pass
     dependencies: [regular-expressions]
   - path: test/built-ins/RegExp/prototype/dotAll/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/dotAll/length.js
     expectedClassification: pass
@@ -37363,7 +37364,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/global/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/global/length.js
     expectedClassification: pass
@@ -37381,7 +37382,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/hasIndices/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/hasIndices/length.js
     expectedClassification: pass
@@ -37417,7 +37418,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/ignoreCase/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/ignoreCase/length.js
     expectedClassification: pass
@@ -37447,7 +37448,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/multiline/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/multiline/length.js
     expectedClassification: pass
@@ -37468,7 +37469,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/source/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/source/length.js
     expectedClassification: pass
@@ -37504,7 +37505,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/sticky/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/sticky/length.js
     expectedClassification: pass
@@ -37690,7 +37691,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/unicode/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/unicode/length.js
     expectedClassification: pass
@@ -37798,7 +37799,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [object-properties]
   - path: test/built-ins/RegExp/prototype/unicodeSets/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/prototype/unicodeSets/length.js
     expectedClassification: pass
@@ -43018,7 +43019,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/toString/non-generic-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/toString/non-generic.js
     expectedClassification: pass
@@ -43666,7 +43667,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/valueOf/non-generic-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/prototype/valueOf/non-generic.js
     expectedClassification: pass
@@ -43798,7 +43799,7 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, iterator-protocol, symbols]
   - path: test/built-ins/Symbol/asyncIterator/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [async-iteration, symbols]
   - path: test/built-ins/Symbol/asyncIterator/prop-desc.js
     expectedClassification: pass
@@ -43822,7 +43823,7 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/for/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/for/description.js
     expectedClassification: pass
@@ -43846,7 +43847,7 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/hasInstance/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/hasInstance/prop-desc.js
     expectedClassification: pass
@@ -43858,13 +43859,13 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/isConcatSpreadable/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/isConcatSpreadable/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/iterator/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/iterator/prop-desc.js
     expectedClassification: pass
@@ -43879,7 +43880,7 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/keyFor/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/keyFor/length.js
     expectedClassification: pass
@@ -43897,13 +43898,13 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/match/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/match/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/matchAll/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/matchAll/prop-desc.js
     expectedClassification: pass
@@ -44020,13 +44021,13 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/replace/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/replace/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/search/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/search/prop-desc.js
     expectedClassification: pass
@@ -44038,13 +44039,13 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties, symbols]
   - path: test/built-ins/Symbol/species/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/species/subclassing.js
     expectedClassification: pass
     dependencies: [classes, symbols]
   - path: test/built-ins/Symbol/split/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/split/prop-desc.js
     expectedClassification: pass
@@ -44053,13 +44054,13 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/toPrimitive/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/toPrimitive/prop-desc.js
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/toStringTag/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/toStringTag/prop-desc.js
     expectedClassification: pass
@@ -44068,7 +44069,7 @@ tests:
     expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/unscopables/cross-realm.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [symbols]
   - path: test/built-ins/Symbol/unscopables/prop-desc.js
     expectedClassification: pass

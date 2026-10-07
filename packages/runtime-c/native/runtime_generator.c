@@ -292,7 +292,7 @@ static OseoResult dynamic_source_constructor(
  */
 OseoResult oseo_internal_generator_prototype(OseoContext *context) {
     OseoValue cached =
-        context->intrinsics[OSEO_INTRINSIC_GENERATOR_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_GENERATOR_PROTOTYPE];
     if (tag_of(cached) != OSEO_TAG_UNDEFINED) return normal(cached);
     size_t entry_allocations = context->allocations;
     /* A built-in `constructor`, `prototype`, or `Symbol.toStringTag` is
@@ -305,7 +305,7 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_create(
             context,
-            context->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE]
+            context->realm->intrinsics[OSEO_INTRINSIC_ITERATOR_PROTOTYPE]
         );
         frame.slots[0] = result.value;
     }
@@ -399,12 +399,12 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_GENERATOR_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_GENERATOR_PROTOTYPE] =
             frame.slots[0];
-        context->intrinsics[
+        context->realm->intrinsics[
             OSEO_INTRINSIC_GENERATOR_FUNCTION_PROTOTYPE
         ] = frame.slots[2];
-        context->intrinsics[OSEO_INTRINSIC_GENERATOR_FUNCTION] =
+        context->realm->intrinsics[OSEO_INTRINSIC_GENERATOR_FUNCTION] =
             frame.slots[3];
         result.value = frame.slots[0];
         if (context->observe_specialization) {
@@ -418,7 +418,7 @@ OseoResult oseo_internal_generator_prototype(OseoContext *context) {
 OseoResult oseo_internal_generator_function_intrinsic(OseoContext *context) {
     OseoResult result = oseo_internal_generator_prototype(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->intrinsics[
+    return normal(context->realm->intrinsics[
         OSEO_INTRINSIC_GENERATOR_FUNCTION_PROTOTYPE
     ]);
 }
@@ -434,7 +434,7 @@ OseoResult oseo_internal_generator_function_intrinsic(OseoContext *context) {
  */
 OseoResult oseo_internal_async_function_intrinsic(OseoContext *context) {
     OseoValue cached =
-        context->intrinsics[OSEO_INTRINSIC_ASYNC_FUNCTION_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_ASYNC_FUNCTION_PROTOTYPE];
     if (tag_of(cached) != OSEO_TAG_UNDEFINED) return normal(cached);
     size_t entry_allocations = context->allocations;
     const OseoPropertyAttributes hidden = {true, false, false, false};
@@ -481,9 +481,9 @@ OseoResult oseo_internal_async_function_intrinsic(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ASYNC_FUNCTION_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ASYNC_FUNCTION_PROTOTYPE] =
             frame.slots[1];
-        context->intrinsics[OSEO_INTRINSIC_ASYNC_FUNCTION] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ASYNC_FUNCTION] =
             frame.slots[2];
         result.value = frame.slots[1];
         if (context->observe_specialization) {
@@ -523,7 +523,7 @@ OseoResult oseo_internal_async_function_intrinsic(OseoContext *context) {
  */
 static OseoResult async_generator_intrinsics(OseoContext *context) {
     OseoValue cached =
-        context->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE];
     if (tag_of(cached) != OSEO_TAG_UNDEFINED) {
         return normal(cached);
     }
@@ -654,14 +654,14 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ASYNC_ITERATOR_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ASYNC_ITERATOR_PROTOTYPE] =
             frame.slots[0];
-        context->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE] =
             frame.slots[1];
-        context->intrinsics[
+        context->realm->intrinsics[
             OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION_PROTOTYPE
         ] = frame.slots[2];
-        context->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION] =
             frame.slots[3];
         result.value = frame.slots[1];
         if (context->observe_specialization) {
@@ -675,7 +675,7 @@ static OseoResult async_generator_intrinsics(OseoContext *context) {
 OseoResult oseo_internal_async_generator_prototype(OseoContext *context) {
     OseoResult result = async_generator_intrinsics(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->intrinsics[
+    return normal(context->realm->intrinsics[
         OSEO_INTRINSIC_ASYNC_GENERATOR_PROTOTYPE
     ]);
 }
@@ -683,7 +683,7 @@ OseoResult oseo_internal_async_generator_prototype(OseoContext *context) {
 OseoResult oseo_internal_async_generator_intrinsic(OseoContext *context) {
     OseoResult result = async_generator_intrinsics(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->intrinsics[
+    return normal(context->realm->intrinsics[
         OSEO_INTRINSIC_ASYNC_GENERATOR_FUNCTION_PROTOTYPE
     ]);
 }
@@ -984,7 +984,17 @@ static OseoResult generator_resume(
         oseo_roots_release(context, &frame);
         return result;
     }
+    OseoRealmScope realm_scope;
+    oseo_internal_realm_enter(
+        context,
+        &realm_scope,
+        oseo_internal_callee_realm(
+            context,
+            generator_state(frame.slots[0])->callee
+        )
+    );
     result = context->generator_dispatcher(context, frame.slots[0]);
+    oseo_internal_realm_leave(context, &realm_scope);
     oseo_call_leave(context);
     state = generator_state(frame.slots[0]);
     state->sent = oseo_undefined();

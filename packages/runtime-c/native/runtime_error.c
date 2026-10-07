@@ -130,9 +130,9 @@ static OseoResult error_intrinsic_pair(
     OseoErrorKind kind
 ) {
     OseoValue *constructor_cache =
-        &context->intrinsics[error_constructor_intrinsics[kind]];
+        &context->realm->intrinsics[error_constructor_intrinsics[kind]];
     OseoValue *prototype_cache =
-        &context->intrinsics[error_prototype_intrinsics[kind]];
+        &context->realm->intrinsics[error_prototype_intrinsics[kind]];
     if (tag_of(*constructor_cache) != OSEO_TAG_UNDEFINED) {
         return normal(*constructor_cache);
     }
@@ -146,8 +146,8 @@ static OseoResult error_intrinsic_pair(
     OseoResult result = oseo_roots_allocate(context, &frame, 4u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     OseoValue parent = kind == OSEO_ERROR_ERROR
-        ? context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]
-        : context->intrinsics[OSEO_INTRINSIC_ERROR_PROTOTYPE];
+        ? context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE]
+        : context->realm->intrinsics[OSEO_INTRINSIC_ERROR_PROTOTYPE];
     if (kind == OSEO_ERROR_ERROR) {
         result = oseo_internal_intrinsic(
             context,
@@ -247,7 +247,7 @@ static OseoResult error_intrinsic_pair(
         constructor->prototype_writable = false;
         if (kind != OSEO_ERROR_ERROR) {
             constructor->ordinary.prototype =
-                context->intrinsics[OSEO_INTRINSIC_ERROR];
+                context->realm->intrinsics[OSEO_INTRINSIC_ERROR];
         }
         result = define_ascii_property(
             context,
@@ -282,7 +282,7 @@ OseoResult oseo_internal_error_prototype(
 ) {
     OseoResult result = error_intrinsic_pair(context, kind);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->intrinsics[error_prototype_intrinsics[kind]]);
+    return normal(context->realm->intrinsics[error_prototype_intrinsics[kind]]);
 }
 
 OseoResult oseo_internal_throw_error(
@@ -393,13 +393,11 @@ OseoResult oseo_internal_error_construct(
     result = oseo_internal_constructor_prototype(context, frame.slots[7]);
     frame.slots[4] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[4])) {
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[7]
+            frame.slots[7],
+            error_prototype_intrinsics[kind]
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_error_prototype(context, kind);
-        }
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -631,7 +629,7 @@ static size_t error_instance_kind(OseoContext *context, OseoValue thrown) {
     OseoValue current = thrown;
     while (is_object(current)) {
         for (size_t kind = 0u; kind < OSEO_ERROR_KIND_COUNT; kind += 1u) {
-            OseoValue prototype = context->intrinsics[
+            OseoValue prototype = context->realm->intrinsics[
                 error_prototype_intrinsics[kind]
             ];
             if (prototype == current) return kind;

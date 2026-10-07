@@ -123,7 +123,7 @@ OseoResult oseo_internal_async_generator_method(
         name_length = sizeof(symbol_units) / sizeof(*symbol_units);
         parameter_count = 0u;
     }
-    OseoValue *cache = &context->intrinsics[intrinsic];
+    OseoValue *cache = &context->realm->intrinsics[intrinsic];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 1u);
@@ -442,7 +442,17 @@ static OseoResult drain_queue(
             oseo_internal_generator_complete(frame.slots[0]);
             break;
         }
+        OseoRealmScope realm_scope;
+        oseo_internal_realm_enter(
+            context,
+            &realm_scope,
+            oseo_internal_callee_realm(
+                context,
+                generator_state(frame.slots[0])->callee
+            )
+        );
         result = context->generator_dispatcher(context, frame.slots[0]);
+        oseo_internal_realm_leave(context, &realm_scope);
         oseo_call_leave(context);
         state = generator_state(frame.slots[0]);
         state->sent = oseo_undefined();
@@ -709,7 +719,17 @@ resume_body:
     state->state = OSEO_GENERATOR_EXECUTING;
     result = oseo_call_enter(context);
     if (result.status == OSEO_STATUS_NORMAL) {
+        OseoRealmScope realm_scope;
+        oseo_internal_realm_enter(
+            context,
+            &realm_scope,
+            oseo_internal_callee_realm(
+                context,
+                generator_state(frame.slots[0])->callee
+            )
+        );
         result = context->generator_dispatcher(context, frame.slots[0]);
+        oseo_internal_realm_leave(context, &realm_scope);
         oseo_call_leave(context);
     }
     state = generator_state(frame.slots[0]);

@@ -1221,16 +1221,11 @@ static OseoResult regexp_prototype_from_target(
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[0]
+            frame.slots[0],
+            OSEO_INTRINSIC_REGEXP_PROTOTYPE
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_REGEXP_PROTOTYPE
-            );
-        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];
@@ -1565,10 +1560,10 @@ static size_t regexp_literal_slot(
  * finds.
  */
 static OseoResult regexp_literal_cache_reserve(OseoContext *context) {
-    OseoRegExpLiteralCacheEntry *cache = context->regexp_literal_cache;
-    size_t capacity = context->regexp_literal_cache_capacity;
-    if (cache != NULL && (context->regexp_literal_cache_count + 1u) * 2u <=
-        capacity) {
+    OseoRegExpLiteralCacheEntry *cache = context->realm->regexp_literal_cache;
+    size_t capacity = context->realm->regexp_literal_cache_capacity;
+    size_t count = context->realm->regexp_literal_cache_count;
+    if (cache != NULL && (count + 1u) * 2u <= capacity) {
         return normal(oseo_undefined());
     }
     size_t grown = capacity == 0u ? 8u : capacity * 2u;
@@ -1605,8 +1600,8 @@ static OseoResult regexp_literal_cache_reserve(OseoContext *context) {
             cache[index];
     }
     free(cache);
-    context->regexp_literal_cache = table;
-    context->regexp_literal_cache_capacity = grown;
+    context->realm->regexp_literal_cache = table;
+    context->realm->regexp_literal_cache_capacity = grown;
     return normal(oseo_undefined());
 }
 
@@ -1622,11 +1617,11 @@ static OseoResult regexp_literal_matcher(
     OseoContext *context,
     const OseoRegExpLiteral *literal
 ) {
-    OseoRegExpLiteralCacheEntry *cache = context->regexp_literal_cache;
+    OseoRegExpLiteralCacheEntry *cache = context->realm->regexp_literal_cache;
     if (cache != NULL) {
         size_t found = regexp_literal_slot(
             cache,
-            context->regexp_literal_cache_capacity,
+            context->realm->regexp_literal_cache_capacity,
             literal
         );
         if (cache[found].literal == literal) {
@@ -1686,15 +1681,15 @@ static OseoResult regexp_literal_matcher(
          * between it and here inserts, so this cannot fail or displace
          * another descriptor.
          */
-        cache = context->regexp_literal_cache;
+        cache = context->realm->regexp_literal_cache;
         size_t slot = regexp_literal_slot(
             cache,
-            context->regexp_literal_cache_capacity,
+            context->realm->regexp_literal_cache_capacity,
             literal
         );
         cache[slot].literal = literal;
         cache[slot].matcher = frame.slots[2];
-        context->regexp_literal_cache_count += 1u;
+        context->realm->regexp_literal_cache_count += 1u;
         result = normal(frame.slots[2]);
     }
     oseo_roots_release(context, &frame);
@@ -2987,7 +2982,7 @@ static OseoResult define_regexp_accessor(
 
 static OseoResult regexp_intrinsic_build(OseoContext *context) {
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_REGEXP_SPECIES];
+        &context->realm->intrinsics[OSEO_INTRINSIC_REGEXP_SPECIES];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -3011,7 +3006,8 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
         frame.slots[0] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_REGEXP_PROTOTYPE] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_REGEXP_PROTOTYPE] =
+            frame.slots[0];
         result = create_regexp_builtin(
             context,
             OSEO_REGEXP_CONSTRUCTOR_CODE_ID,
@@ -3024,7 +3020,7 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
     }
     const OseoPropertyAttributes method = {true, false, true, false};
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_REGEXP] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_REGEXP] = frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -3218,23 +3214,23 @@ static OseoResult regexp_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_REGEXP_PROTOTYPE;
              index <= OSEO_INTRINSIC_REGEXP_SPECIES;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
     }
-    context->intrinsics[OSEO_INTRINSIC_REGEXP_SPECIES] = frame.slots[2];
+    context->realm->intrinsics[OSEO_INTRINSIC_REGEXP_SPECIES] = frame.slots[2];
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
     oseo_roots_release(context, &frame);
-    return normal(context->intrinsics[OSEO_INTRINSIC_REGEXP]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_REGEXP]);
 }
 
 OseoResult oseo_internal_regexp_intrinsic(OseoContext *context) {
     OseoResult built = regexp_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_REGEXP]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_REGEXP]);
 }
 
 OseoResult oseo_internal_install_regexp_global(

@@ -614,7 +614,11 @@ static OseoResult construct_function(
     result = oseo_function_prototype(context, frame.slots[0]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_constructor_receiver(context, frame.slots[1]);
+        result = oseo_internal_function_receiver(
+            context,
+            frame.slots[0],
+            frame.slots[1]
+        );
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1679,13 +1683,11 @@ static OseoResult array_constructor_prototype(
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_validate_function_realm(context, slots[0]);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_ARRAY_PROTOTYPE
-            );
-        }
+        result = oseo_internal_constructor_realm_default(
+            context,
+            slots[0],
+            OSEO_INTRINSIC_ARRAY_PROTOTYPE
+        );
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = slots[1];
@@ -2269,9 +2271,9 @@ OseoResult oseo_template_object(
         cooked_defined == NULL || raw == NULL || raw_lengths == NULL) {
         return failure(context, "OSEO2001", "Invalid template object.");
     }
-    OseoTemplateCacheEntry *cache = context->template_cache;
+    OseoTemplateCacheEntry *cache = context->realm->template_cache;
     for (size_t index = 0u;
-         index < context->template_cache_count;
+         index < context->realm->template_cache_count;
          index += 1u) {
         if (cache[index].site == site) return normal(cache[index].object);
     }
@@ -2350,12 +2352,12 @@ OseoResult oseo_template_object(
         cooked_object->extensible = false;
         raw_object->length_writable = false;
         raw_object->extensible = false;
-        if (context->template_cache_count ==
-            context->template_cache_capacity) {
-            size_t capacity = context->template_cache_capacity == 0u
+        if (context->realm->template_cache_count ==
+            context->realm->template_cache_capacity) {
+            size_t capacity = context->realm->template_cache_capacity == 0u
                 ? 4u
-                : context->template_cache_capacity * 2u;
-            if (capacity < context->template_cache_capacity ||
+                : context->realm->template_cache_capacity * 2u;
+            if (capacity < context->realm->template_cache_capacity ||
                 capacity > SIZE_MAX / sizeof(*cache)) {
                 result = failure(
                     context, "OSEO2001", "Template cache is too large.");
@@ -2369,18 +2371,18 @@ OseoResult oseo_template_object(
                         "Template cache allocation failed."
                     );
                 } else {
-                    context->template_cache = grown;
-                    context->template_cache_capacity = capacity;
+                    context->realm->template_cache = grown;
+                    context->realm->template_cache_capacity = capacity;
                     cache = grown;
                 }
             }
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        size_t index = context->template_cache_count;
+        size_t index = context->realm->template_cache_count;
         cache[index].site = site;
         cache[index].object = frame.slots[0];
-        context->template_cache_count += 1u;
+        context->realm->template_cache_count += 1u;
         result.value = frame.slots[0];
     }
     oseo_roots_release(context, &frame);
@@ -2450,7 +2452,7 @@ OseoResult oseo_array_append_hole(
 }
 
 OseoResult oseo_internal_array_push_function(OseoContext *context) {
-    OseoValue *cache = &context->intrinsics[OSEO_INTRINSIC_ARRAY_PUSH];
+    OseoValue *cache = &context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_PUSH];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) {
         return normal(*cache);
     }
@@ -2523,19 +2525,19 @@ static OseoResult array_builtin_function(
 OseoResult oseo_internal_array_prototype(OseoContext *context) {
     OseoResult result = oseo_internal_array_intrinsic(context);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    return normal(context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE]);
 }
 
 OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
     OseoValue prototype =
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE];
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_ARRAY_SPECIES_GETTER];
+        &context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_SPECIES_GETTER];
     if (is_function(*marker)) {
-        return normal(context->intrinsics[OSEO_INTRINSIC_ARRAY]);
+        return normal(context->realm->intrinsics[OSEO_INTRINSIC_ARRAY]);
     }
     if (is_object(*marker)) {
-        return normal(context->intrinsics[OSEO_INTRINSIC_ARRAY]);
+        return normal(context->realm->intrinsics[OSEO_INTRINSIC_ARRAY]);
     }
     size_t entry_allocations = context->allocations;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -2560,7 +2562,8 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE] =
+            frame.slots[0];
         *marker = frame.slots[0];
         result = array_builtin_function(
             context,
@@ -2573,7 +2576,7 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_ARRAY] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY] = frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -2611,7 +2614,7 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
                 : OSEO_FUNCTION_NAME_PREFIX_NONE
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[intrinsics[index]] = result.value;
+            context->realm->intrinsics[intrinsics[index]] = result.value;
         }
     }
     static const OseoIntrinsic static_intrinsics[] = {
@@ -2631,7 +2634,7 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
                 context,
                 frame.slots[1],
                 frame.slots[3],
-                context->intrinsics[static_intrinsics[index]],
+                context->realm->intrinsics[static_intrinsics[index]],
                 method
             );
         }
@@ -2648,7 +2651,7 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             context,
             frame.slots[1],
             frame.slots[3],
-            context->intrinsics[OSEO_INTRINSIC_ARRAY_SPECIES_GETTER],
+            context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_SPECIES_GETTER],
             oseo_undefined(),
             true,
             false,
@@ -2764,7 +2767,7 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
         if (result.status == OSEO_STATUS_NORMAL &&
             copying_codes[index] == OSEO_ARRAY_TO_STRING_CODE_ID) {
             /* %TypedArray.prototype%.toString shares this identity. */
-            context->intrinsics[OSEO_INTRINSIC_ARRAY_TO_STRING] =
+            context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_TO_STRING] =
                 frame.slots[2];
         }
         if (result.status == OSEO_STATUS_NORMAL) {
@@ -3130,7 +3133,7 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         frame.slots[2] =
-            context->intrinsics[OSEO_INTRINSIC_ARRAY_VALUES];
+            context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_VALUES];
         result = oseo_internal_well_known_symbol(
             context,
             OSEO_WELL_KNOWN_ITERATOR
@@ -3211,15 +3214,16 @@ OseoResult oseo_internal_array_intrinsic(OseoContext *context) {
             context->allocations = entry_allocations;
         }
     } else {
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_PROTOTYPE] =
             oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_PUSH] = oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_ARRAY_TO_STRING] =
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_PUSH] =
+            oseo_undefined();
+        context->realm->intrinsics[OSEO_INTRINSIC_ARRAY_TO_STRING] =
             oseo_undefined();
         for (size_t index = OSEO_INTRINSIC_ARRAY;
              index <= OSEO_INTRINSIC_ARRAY_SPECIES_GETTER;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
     }
     oseo_roots_release(context, &frame);
@@ -4625,8 +4629,9 @@ static OseoResult array_predicate_search(
 
 /*
  * ArraySpeciesCreate reads `constructor` and `Symbol.species` only for an
- * actual Array. The one-realm M5 profile has no foreign intrinsic Array to
- * normalize before the species read.
+ * actual Array. A constructor that is another realm's %Array% counts as
+ * undefined before the species read, so an array that crossed realms
+ * keeps producing arrays of the running realm.
  */
 static OseoResult array_species_create(
     OseoContext *context,
@@ -4659,6 +4664,18 @@ static OseoResult array_species_create(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_get(context, frame.slots[0], frame.slots[1]);
         frame.slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL &&
+        function_is_constructible(frame.slots[1])) {
+        result = oseo_internal_function_realm(context, frame.slots[1]);
+        if (result.status == OSEO_STATUS_NORMAL &&
+            result.value != context->realm_record) {
+            OseoValue realm = result.value;
+            OseoRealm *state = oseo_internal_realm_state(context, realm);
+            if (frame.slots[1] == state->intrinsics[OSEO_INTRINSIC_ARRAY]) {
+                frame.slots[1] = oseo_undefined();
+            }
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL && is_object(frame.slots[1])) {
         result = oseo_internal_well_known_symbol(

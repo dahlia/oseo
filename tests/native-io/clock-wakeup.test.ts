@@ -35,7 +35,7 @@ import {
   runClockProbe,
   runClockScheduler,
 } from "../../tools/native-io/clock.ts";
-import { needsTest262Agent, parseTest262Case } from "../../tools/test262.ts";
+import { needsTest262Host, parseTest262Case } from "../../tools/test262.ts";
 import {
   parseReviewedManifest,
   reviewedManifestPartitionPaths,
@@ -667,7 +667,7 @@ test("no deterministic test262 execution schedules a timer", async () => {
     if (timerPattern.test(text)) timers.push(include);
   }
   assert.deepEqual(timers, []);
-  // An agent case never carries the deterministic value, whatever else it
+  // A host case never carries the deterministic value, whatever else it
   // schedules; the runner decides that from the same predicate.
   const subset = await readFile(join(resultsDirectory, "subset.yaml"), "utf8");
   const revision = /^suiteRevision: (\S+)$/mu.exec(subset)?.[1] ?? "";
@@ -675,7 +675,7 @@ test("no deterministic test262 execution schedules a timer", async () => {
     // eslint-disable-next-line no-await-in-loop -- Reads stay serial.
     const text = await readFile(join(upstream, result.case.path), "utf8");
     assert.ok(
-      !needsTest262Agent(
+      !needsTest262Host(
         text,
         parseTest262Case(text, result.case.path, revision),
       ),

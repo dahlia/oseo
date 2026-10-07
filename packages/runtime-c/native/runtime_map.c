@@ -171,7 +171,8 @@ static OseoResult map_allocate(
 }
 
 static OseoResult map_prototype_intrinsic(OseoContext *context) {
-    OseoValue *cache = &context->intrinsics[OSEO_INTRINSIC_MAP_PROTOTYPE];
+    OseoValue *cache =
+        &context->realm->intrinsics[OSEO_INTRINSIC_MAP_PROTOTYPE];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoResult built = map_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
@@ -208,10 +209,11 @@ static OseoResult map_create_from_constructor(
     );
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_validate_function_realm(context, slots[0]);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = map_prototype_intrinsic(context);
-        }
+        result = oseo_internal_constructor_realm_default(
+            context,
+            slots[0],
+            OSEO_INTRINSIC_MAP_PROTOTYPE
+        );
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -700,7 +702,7 @@ static OseoResult map_prototype_for_each(
 
 static OseoResult map_iterator_prototype_intrinsic(OseoContext *context) {
     OseoValue *cache =
-        &context->intrinsics[OSEO_INTRINSIC_MAP_ITERATOR_PROTOTYPE];
+        &context->realm->intrinsics[OSEO_INTRINSIC_MAP_ITERATOR_PROTOTYPE];
     if (tag_of(*cache) != OSEO_TAG_UNDEFINED) return normal(*cache);
     OseoResult built = map_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
@@ -925,7 +927,7 @@ static OseoResult define_map_property(
  * across two concurrent attempts.
  */
 static OseoResult map_intrinsic_build(OseoContext *context) {
-    OseoValue *marker = &context->intrinsics[OSEO_INTRINSIC_MAP_SPECIES];
+    OseoValue *marker = &context->realm->intrinsics[OSEO_INTRINSIC_MAP_SPECIES];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -951,7 +953,7 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_MAP_ITERATOR_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_MAP_ITERATOR_PROTOTYPE] =
             frame.slots[1];
         result = create_map_builtin(
             context,
@@ -964,7 +966,8 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_MAP_ITERATOR_NEXT] = frame.slots[2];
+        context->realm->intrinsics[OSEO_INTRINSIC_MAP_ITERATOR_NEXT] =
+            frame.slots[2];
         result = define_map_property(
             context,
             frame.slots[1],
@@ -1007,7 +1010,8 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_MAP_PROTOTYPE] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_MAP_PROTOTYPE] =
+            frame.slots[1];
     }
     static const OseoIntrinsic method_intrinsics[] = {
         OSEO_INTRINSIC_MAP_GET,
@@ -1047,7 +1051,7 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        context->intrinsics[method_intrinsics[index]] = frame.slots[2];
+        context->realm->intrinsics[method_intrinsics[index]] = frame.slots[2];
         result = define_map_property(
             context,
             frame.slots[1],
@@ -1069,7 +1073,7 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_MAP_ENTRIES] = frame.slots[2];
+        context->realm->intrinsics[OSEO_INTRINSIC_MAP_ENTRIES] = frame.slots[2];
         result = define_map_property(
             context,
             frame.slots[1],
@@ -1111,7 +1115,8 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_MAP_SIZE_GETTER] = frame.slots[2];
+        context->realm->intrinsics[OSEO_INTRINSIC_MAP_SIZE_GETTER] =
+            frame.slots[2];
         result = oseo_object_define_accessor(
             context,
             frame.slots[1],
@@ -1157,7 +1162,7 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_MAP] = frame.slots[2];
+        context->realm->intrinsics[OSEO_INTRINSIC_MAP] = frame.slots[2];
         OseoFunction *constructor = function_object(frame.slots[2]);
         constructor->prototype_object = frame.slots[1];
         constructor->prototype_writable = false;
@@ -1181,7 +1186,8 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         frame.slots[5] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_MAP_GROUP_BY] = frame.slots[5];
+        context->realm->intrinsics[OSEO_INTRINSIC_MAP_GROUP_BY] =
+            frame.slots[5];
         result = define_map_property(
             context,
             frame.slots[2],
@@ -1224,13 +1230,13 @@ static OseoResult map_intrinsic_build(OseoContext *context) {
         for (size_t index = OSEO_INTRINSIC_MAP_ITERATOR_PROTOTYPE;
              index <= OSEO_INTRINSIC_MAP_SPECIES;
              index += 1u) {
-            context->intrinsics[index] = oseo_undefined();
+            context->realm->intrinsics[index] = oseo_undefined();
         }
         oseo_roots_release(context, &frame);
         return result;
     }
     OseoValue species = frame.slots[5];
-    context->intrinsics[OSEO_INTRINSIC_MAP_SPECIES] = species;
+    context->realm->intrinsics[OSEO_INTRINSIC_MAP_SPECIES] = species;
     if (context->observe_specialization) {
         context->allocations = entry_allocations;
     }
@@ -1245,7 +1251,7 @@ OseoResult oseo_internal_map_prototype(OseoContext *context) {
 OseoResult oseo_internal_map_intrinsic(OseoContext *context) {
     OseoResult built = map_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_MAP]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_MAP]);
 }
 
 OseoResult oseo_internal_install_map_global(

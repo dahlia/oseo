@@ -86,6 +86,9 @@ export const m5cObservationPrerequisiteNodes: ReadonlyMap<string, string> =
     ["host:$262.createRealm", "cross-realm-host"],
   ]);
 
+/** The `$262` members the planning basis treats as installed. */
+const planningHostMembers: ReadonlySet<string> = new Set(["agent"]);
+
 /**
  * Global names whose unresolved reference marks a dynamic source surface.
  * They are recorded, not split out: ADR 0016 decides such a path by its
@@ -300,7 +303,14 @@ export function deriveM5cObservationFacts(
 ): M5cObservationFacts {
   const parsed = parseTest262Case(source, path, suiteRevision);
   const testCase = parsed.case;
-  const references = unresolvedReferenceNames(source, testCase.mode);
+  // The planning basis predates the realm members of ADR 0027, so only
+  // `$262.agent` counts as provided; a `$262.createRealm` read keeps its
+  // `host:` key, which the cross-realm-host node removes.
+  const references = unresolvedReferenceNames(
+    source,
+    testCase.mode,
+    planningHostMembers,
+  );
   const prerequisites: string[] = [];
   for (const feature of testCase.features) {
     if (!supportedFeatures.has(feature)) {

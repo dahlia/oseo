@@ -322,6 +322,30 @@ changing support or ownership. Leaving the tags as found avoids a manifest
 update but requires the separate diagnostic-based count in every coverage
 report. Adding the tags is recommended; this audit does not retag them.
 
+The `cross-realm-host` node then implemented realms beyond the initial realm
+and the `$262.createRealm` capability under
+[ADR 0027](./docs/adr/0027-realms-beyond-the-initial-realm.md). Of its 84
+paths, 43 pass. 40 now reach the ADR 0016 boundary at run time, 30 by
+constructing another realm's `Function` and 10 by calling another realm's
+`%eval%` with a source string, each before any realm assertion runs. The
+exclusion audit reviewed each of them in
+*docs/m5c-closure/exclusion-audit.yaml*: 5 construct through another realm's
+`GeneratorFunction`, `AsyncFunction`, or `AsyncGeneratorFunction`, so their
+subject is dynamic construction and `adr:0016-dynamic-source-boundary` owns
+them; 34 use `Function` or `eval` only to obtain a function of another realm
+and one observes the template registry across realms, so those 35 belong to
+`node:dynamic-source-coverage-remediation`. One,
+*test/built-ins/Iterator/proto-from-ctor-realm.js*, still needs the unadmitted
+`iterator-helpers` feature and moves to `node:iterator-helpers`. By the
+selector above, 6 of the 40 have source evaluation as their subject: the
+five under *test/built-ins/AsyncFunction/*,
+*test/built-ins/AsyncGeneratorFunction/*, and
+*test/built-ins/GeneratorFunction/*, and
+*test/language/expressions/async-generator/eval-body-proto-realm.js*; the
+last obtains its function through `eval` and is a fixture-construction case.
+The dynamic surface the audit recognizes now includes the run-time `Function`
+and `eval` diagnostics of ADR 0027.
+
 [GetTemplateObject]: https://262.ecma-international.org/16.0/#sec-gettemplateobject
 [EscapeRegExpPattern]: https://262.ecma-international.org/16.0/#sec-escaperegexppattern
 [CatchClauseEvaluation]: https://262.ecma-international.org/16.0/#sec-runtime-semantics-catchclauseevaluation
@@ -473,8 +497,10 @@ update as its conservative figure for both kinds of complete run and divides
 it by the 72,749 native variants that run executed: 0.0549 seconds per
 variant. Each unreviewed path adds two variants per strictness mode, counted
 as if its prerequisites had landed, unless it is a parse or resolution
-negative. The 19,708 paths add 63,556 variants, so one complete run over the
-41,091-path corpus costs about 7,489 seconds (124.8 minutes).
+negative. The 19,708 paths add 63,556 variants. The 43 paths that
+`cross-realm-host` moved to pass raised the current corpus to 72,921 executed
+variants, so one complete run over the 41,091-path corpus costs about 7,498
+seconds (125.0 minutes).
 
 The plan records, for each batch, the seconds of its scoped update and of the
 complete corpus when it lands in plan order. A landing costs their sum; the
@@ -483,13 +509,13 @@ the complete update instead of the scoped one:
 
 | Limits (paths, units) | Batches | Largest batch (paths, units) | Scoped hours | Complete-update hours |
 | --------------------- | ------: | ---------------------------: | -----------: | --------------------: |
-| 2,000, 300            |      51 |                   1,920, 300 |         82.6 |                 163.3 |
-| 3,000, 500 (chosen)   |      32 |                   2,408, 500 |         52.5 |                 103.1 |
-| 4,000, 600            |      27 |                   3,422, 600 |         45.4 |                  88.8 |
-| 8,000, 1,200          |      15 |                 4,045, 1,175 |         26.3 |                  50.6 |
+| 2,000, 300            |      51 |                   1,920, 300 |         82.7 |                 163.6 |
+| 3,000, 500 (chosen)   |      32 |                   2,408, 500 |         52.6 |                 103.3 |
+| 4,000, 600            |      27 |                   3,422, 600 |         45.5 |                  89.0 |
+| 8,000, 1,200          |      15 |                 4,045, 1,175 |         26.3 |                  50.7 |
 
 The scoped update halves each landing, but each additional batch still adds
-one complete gate of about 1.1 to 2.1 hours. The chosen limits accept 7.1 more
+one complete gate of about 1.1 to 2.1 hours. The chosen limits accept 7.2 more
 hours than the 600-unit alternative to keep each batch within one reviewer's
 inspection. The 1,200-unit batches would halve the schedule again, but at 20
 to 40 hours of inspection one reviewer could not check their applicability

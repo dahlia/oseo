@@ -57,10 +57,14 @@ OseoResult oseo_internal_function_builtin_dispatch(
     if (code_id == OSEO_FUNCTION_PROTOTYPE_CODE_ID) {
         return normal(oseo_undefined());
     }
+    /* ADR 0016 keeps every form that compiles source text at run time
+     * outside the profile, so reaching %Function%'s [[Call]] or
+     * [[Construct]] reports that boundary, as the other dynamic-source
+     * constructors do. */
     if (code_id == OSEO_FUNCTION_CONSTRUCTOR_CODE_ID) {
         return failure(
             context,
-            "OSEO2001",
+            "OSEO1001",
             "Function compiles source text at run time, which is outside "
             "the admitted profile."
         );
@@ -196,6 +200,9 @@ static const OseoBuiltinDispatchRange builtin_dispatch_ranges[] = {
     {OSEO_AGENT_CODE_ID_RANGE_FIRST,
      OSEO_AGENT_CODE_ID_RANGE_LAST,
      oseo_internal_agent_builtin_dispatch},
+    {OSEO_REALM_CODE_ID_RANGE_FIRST,
+     OSEO_REALM_CODE_ID_RANGE_LAST,
+     oseo_internal_realm_builtin_dispatch},
 };
 
 static OseoBuiltinDispatcher builtin_dispatcher(size_t code_id) {
@@ -781,9 +788,9 @@ static OseoResult accessor_function_name(
  */
 static OseoResult intrinsic_graph_root(OseoContext *context) {
     OseoValue object_prototype =
-        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
     OseoValue function_prototype =
-        context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE];
     if (is_object(object_prototype) && is_function(function_prototype)) {
         return normal(object_prototype);
     }
@@ -794,7 +801,8 @@ static OseoResult intrinsic_graph_root(OseoContext *context) {
     result = oseo_object_create(context, oseo_null());
     frame.slots[0] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE] =
+            frame.slots[0];
         /* %Object.prototype% is an immutable prototype exotic object
          * (10.4.7), so its [[SetPrototypeOf]] accepts only the null it
          * already has. */
@@ -814,14 +822,14 @@ static OseoResult intrinsic_graph_root(OseoContext *context) {
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE] =
             frame.slots[1];
         result = normal(frame.slots[0]);
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
         }
     } else {
-        context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE] =
             oseo_undefined();
     }
     oseo_roots_release(context, &frame);
@@ -868,9 +876,9 @@ static OseoResult create_function_builtin(
 
 static OseoResult function_prototype_intrinsic(OseoContext *context) {
     OseoValue prototype =
-        context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE];
+        context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE];
     OseoValue *marker =
-        &context->intrinsics[OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE];
+        &context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE];
     if (is_function(*marker)) return normal(prototype);
     if (is_object(*marker)) return normal(prototype);
     if (!is_function(prototype)) {
@@ -898,7 +906,7 @@ static OseoResult function_prototype_intrinsic(OseoContext *context) {
     );
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_FUNCTION] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION] = frame.slots[1];
         OseoFunction *constructor = function_object(frame.slots[1]);
         constructor->prototype_object = frame.slots[0];
         constructor->prototype_writable = false;
@@ -936,7 +944,7 @@ static OseoResult function_prototype_intrinsic(OseoContext *context) {
             OSEO_FUNCTION_INTERNAL
         );
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[intrinsics[index]] = result.value;
+            context->realm->intrinsics[intrinsics[index]] = result.value;
         }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
@@ -1001,7 +1009,7 @@ static OseoResult function_prototype_intrinsic(OseoContext *context) {
                 context,
                 frame.slots[0],
                 frame.slots[3],
-                context->intrinsics[properties[index]],
+                context->realm->intrinsics[properties[index]],
                 attributes
             );
         }
@@ -1024,7 +1032,7 @@ static OseoResult function_prototype_intrinsic(OseoContext *context) {
             context,
             frame.slots[0],
             frame.slots[3],
-            context->intrinsics[OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE],
+            context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION_HAS_INSTANCE],
             attributes
         );
     }
@@ -1181,6 +1189,8 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         OseoErrorKind kind =
             (OseoErrorKind)(intrinsic - OSEO_INTRINSIC_ERROR);
         materialized = oseo_error_intrinsic(context, kind);
+    } else if (intrinsic == OSEO_INTRINSIC_EVAL) {
+        materialized = oseo_internal_eval_intrinsic(context);
     } else if (intrinsic == OSEO_INTRINSIC_THROW_TYPE_ERROR) {
         materialized = oseo_internal_throw_type_error_function(context);
     } else if (intrinsic == OSEO_INTRINSIC_ARRAY_PUSH) {
@@ -1241,7 +1251,7 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
         return failure(context, "OSEO2001", "Unknown realm intrinsic.");
     }
     if (materialized.status != OSEO_STATUS_NORMAL) return materialized;
-    OseoValue value = context->intrinsics[intrinsic];
+    OseoValue value = context->realm->intrinsics[intrinsic];
     if (tag_of(value) == OSEO_TAG_UNDEFINED) {
         return failure(context, "OSEO2001", "Realm intrinsic is unavailable.");
     }
@@ -1269,7 +1279,7 @@ OseoResult oseo_function_create(
 ) {
     bool bootstrapping_function_prototype =
         code_id == OSEO_FUNCTION_PROTOTYPE_CODE_ID &&
-        tag_of(context->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE]) ==
+        tag_of(context->realm->intrinsics[OSEO_INTRINSIC_FUNCTION_PROTOTYPE]) ==
             OSEO_TAG_UNDEFINED;
     if (!bootstrapping_function_prototype && !is_environment(environment)) {
         return failure(context, "OSEO2001", "Invalid function environment.");
@@ -1295,7 +1305,7 @@ OseoResult oseo_function_create(
     frame.slots[5] = inferred_name;
     if (bootstrapping_function_prototype) {
         frame.slots[8] =
-            context->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
+            context->realm->intrinsics[OSEO_INTRINSIC_OBJECT_PROTOTYPE];
         frame.slots[9] = frame.slots[8];
     } else {
         result = oseo_internal_intrinsic(
@@ -1438,6 +1448,7 @@ OseoResult oseo_function_create(
     function->home_object = oseo_undefined();
     function->initial_name = oseo_undefined();
     function->source_text = oseo_undefined();
+    function->realm = context->realm_record;
     function->bound_target = oseo_undefined();
     function->bound_this = oseo_undefined();
     function->bound_arguments = oseo_undefined();
@@ -1765,32 +1776,6 @@ OseoResult oseo_internal_constructor_prototype(
     return result;
 }
 
-OseoResult oseo_internal_validate_function_realm(
-    OseoContext *context,
-    OseoValue constructor
-) {
-    OseoValue current = constructor;
-    while (true) {
-        if (is_proxy(current)) {
-            if (proxy_object(current)->revoked) {
-                return oseo_internal_throw_error(
-                    context,
-                    OSEO_ERROR_TYPE,
-                    "Cannot get the realm of a revoked Proxy."
-                );
-            }
-            current = proxy_object(current)->target;
-            continue;
-        }
-        if (is_function(current) &&
-            function_object(current)->function_kind == OSEO_FUNCTION_BOUND) {
-            current = function_object(current)->bound_target;
-            continue;
-        }
-        return normal(current);
-    }
-}
-
 /*
  * OrdinaryCreateFromConstructor on behalf of a caller that performs
  * `target.[[Construct]]`'s receiver allocation itself, which is what
@@ -1858,7 +1843,12 @@ OseoResult oseo_internal_construct_receiver(
      * lands in a rooted slot before the receiver allocation. */
     slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(slots[1])) {
-        result = oseo_internal_validate_function_realm(context, slots[0]);
+        result = oseo_internal_constructor_realm_default(
+            context,
+            slots[0],
+            OSEO_INTRINSIC_OBJECT_PROTOTYPE
+        );
+        slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_constructor_receiver(context, slots[1]);
@@ -2815,7 +2805,11 @@ static OseoResult call_bound_function(
     return result;
 }
 
-OseoResult oseo_call_function(
+/*
+ * The part of [[Call]] and [[Construct]] that runs once the callee's
+ * realm, if it has one, is the running realm.
+ */
+static OseoResult call_in_running_realm(
     OseoContext *context,
     OseoValue callee,
     OseoValue receiver,
@@ -2823,20 +2817,6 @@ OseoResult oseo_call_function(
     const OseoValue *arguments,
     OseoValue new_target
 ) {
-    if (is_proxy(callee)) {
-        OseoResult entered = oseo_call_enter(context);
-        if (entered.status != OSEO_STATUS_NORMAL) return entered;
-        OseoResult result = oseo_internal_proxy_call(
-            context,
-            callee,
-            receiver,
-            argument_count,
-            arguments,
-            new_target
-        );
-        oseo_call_leave(context);
-        return result;
-    }
     /* A class constructor has [[IsClassConstructor]] true, so [[Call]]
      * always throws; only [[Construct]], which supplies a new target,
      * reaches its body. */
@@ -2925,5 +2905,56 @@ OseoResult oseo_call_function(
         }
     }
     oseo_call_leave(context);
+    return result;
+}
+
+OseoResult oseo_call_function(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments,
+    OseoValue new_target
+) {
+    if (is_proxy(callee)) {
+        OseoResult entered = oseo_call_enter(context);
+        if (entered.status != OSEO_STATUS_NORMAL) return entered;
+        OseoResult result = oseo_internal_proxy_call(
+            context,
+            callee,
+            receiver,
+            argument_count,
+            arguments,
+            new_target
+        );
+        oseo_call_leave(context);
+        return result;
+    }
+    if (!is_function(callee) ||
+        function_object(callee)->function_kind == OSEO_FUNCTION_BOUND) {
+        return call_in_running_realm(
+            context,
+            callee,
+            receiver,
+            argument_count,
+            arguments,
+            new_target
+        );
+    }
+    /* PrepareForOrdinaryCall and a built-in function's [[Call]] both make
+     * the callee's [[Realm]] the running realm, and the caller's realm is
+     * restored when the callee returns or throws. A bound function or a
+     * Proxy has no realm of its own and never switches. */
+    OseoRealmScope scope;
+    oseo_internal_realm_enter(context, &scope, function_object(callee)->realm);
+    OseoResult result = call_in_running_realm(
+        context,
+        callee,
+        receiver,
+        argument_count,
+        arguments,
+        new_target
+    );
+    oseo_internal_realm_leave(context, &scope);
     return result;
 }

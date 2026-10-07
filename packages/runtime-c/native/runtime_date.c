@@ -1291,16 +1291,11 @@ static OseoResult date_prototype_from_target(
     result = oseo_internal_constructor_prototype(context, frame.slots[0]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL && !is_object(frame.slots[1])) {
-        result = oseo_internal_validate_function_realm(
+        result = oseo_internal_constructor_realm_default(
             context,
-            frame.slots[0]
+            frame.slots[0],
+            OSEO_INTRINSIC_DATE_PROTOTYPE
         );
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_intrinsic(
-                context,
-                OSEO_INTRINSIC_DATE_PROTOTYPE
-            );
-        }
         frame.slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) *prototype = frame.slots[1];
@@ -1737,7 +1732,7 @@ static OseoResult define_date_property(
  * and prototype identities across two attempts.
  */
 static OseoResult date_intrinsic_build(OseoContext *context) {
-    OseoValue *marker = &context->intrinsics[OSEO_INTRINSIC_DATE];
+    OseoValue *marker = &context->realm->intrinsics[OSEO_INTRINSIC_DATE];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -1761,7 +1756,8 @@ static OseoResult date_intrinsic_build(OseoContext *context) {
         frame.slots[0] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_DATE_PROTOTYPE] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_DATE_PROTOTYPE] =
+            frame.slots[0];
         result = create_date_builtin(
             context,
             OSEO_DATE_CONSTRUCTOR_CODE_ID,
@@ -1849,7 +1845,7 @@ static OseoResult date_intrinsic_build(OseoContext *context) {
         );
     }
     if (result.status != OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_DATE_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_DATE_PROTOTYPE] =
             oseo_undefined();
         *marker = oseo_undefined();
         oseo_roots_release(context, &frame);
@@ -1866,7 +1862,7 @@ static OseoResult date_intrinsic_build(OseoContext *context) {
 OseoResult oseo_internal_date_intrinsic(OseoContext *context) {
     OseoResult built = date_intrinsic_build(context);
     if (built.status != OSEO_STATUS_NORMAL) return built;
-    return normal(context->intrinsics[OSEO_INTRINSIC_DATE]);
+    return normal(context->realm->intrinsics[OSEO_INTRINSIC_DATE]);
 }
 
 OseoResult oseo_internal_install_date_global(

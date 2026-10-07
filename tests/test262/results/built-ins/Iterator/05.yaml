@@ -23,7 +23,6 @@ results:
       detail: "Not executed: the frontmatter needs an unsupported feature."
       passed: false
     unsupportedFeatures:
-      - cross-realm
       - iterator-helpers
   - case:
       async: false

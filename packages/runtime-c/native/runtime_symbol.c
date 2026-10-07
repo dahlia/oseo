@@ -704,7 +704,7 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         "Symbol.toStringTag",
         "Symbol.unscopables",
     };
-    OseoValue *marker = &context->intrinsics[
+    OseoValue *marker = &context->realm->intrinsics[
         OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER
     ];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
@@ -715,7 +715,7 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         );
     }
     if (tag_of(*marker) != OSEO_TAG_UNDEFINED) {
-        return normal(context->intrinsics[OSEO_INTRINSIC_SYMBOL]);
+        return normal(context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL]);
     }
     *marker = oseo_uninitialized();
     size_t entry_allocations = context->allocations;
@@ -779,8 +779,9 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         OseoFunction *constructor = function_object(frame.slots[0]);
         constructor->prototype_writable = false;
         frame.slots[1] = constructor->prototype_object;
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL] = frame.slots[0];
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] = frame.slots[1];
+        context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL] = frame.slots[0];
+        context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] =
+            frame.slots[1];
     }
     for (size_t index = 0u;
          result.status == OSEO_STATUS_NORMAL &&
@@ -816,7 +817,8 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[static_intrinsics[index]] = frame.slots[2];
+            context->realm->intrinsics[static_intrinsics[index]] =
+                frame.slots[2];
             result = define_symbol_property(
                 context,
                 frame.slots[0],
@@ -856,7 +858,8 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         );
         frame.slots[2] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
-            context->intrinsics[method_intrinsics[index]] = frame.slots[2];
+            context->realm->intrinsics[method_intrinsics[index]] =
+                frame.slots[2];
             result = define_symbol_property(
                 context,
                 frame.slots[1],
@@ -910,7 +913,7 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         frame.slots[4] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL_TO_PRIMITIVE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL_TO_PRIMITIVE] =
             frame.slots[4];
         frame.slots[3] =
             context->well_known_symbols[OSEO_WELL_KNOWN_TO_PRIMITIVE];
@@ -923,20 +926,20 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER] =
+        context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER] =
             frame.slots[2];
         result.value = frame.slots[0];
         if (context->observe_specialization) {
             context->allocations = entry_allocations;
         }
     } else {
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] =
+        context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE] =
             oseo_undefined();
-        context->intrinsics[OSEO_INTRINSIC_SYMBOL] = oseo_undefined();
+        context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL] = oseo_undefined();
         for (size_t intrinsic = OSEO_INTRINSIC_SYMBOL_FOR;
              intrinsic <= OSEO_INTRINSIC_SYMBOL_DESCRIPTION_GETTER;
              intrinsic += 1u) {
-            context->intrinsics[intrinsic] = oseo_undefined();
+            context->realm->intrinsics[intrinsic] = oseo_undefined();
         }
         /*
          * The well-known symbols stay. Creating the constructor
@@ -954,7 +957,7 @@ static OseoResult symbol_intrinsic_create(OseoContext *context) {
 }
 
 OseoResult oseo_symbol_intrinsic(OseoContext *context) {
-    OseoValue value = context->intrinsics[OSEO_INTRINSIC_SYMBOL];
+    OseoValue value = context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL];
     if (tag_of(value) != OSEO_TAG_UNDEFINED) {
         return normal(value);
     }

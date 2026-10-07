@@ -86,9 +86,9 @@ import type {
 } from "./test262-manifest.ts";
 import type { NativeToolchain } from "../packages/compiler/src/index.ts";
 import {
-  agentMemberRead,
   agentSyntaxNode,
   collectBoundNames,
+  hostMemberRead,
   includePropertiesWhen,
   parseHarnessDefinitions,
   parseReviewedSubset,
@@ -96,7 +96,6 @@ import {
   unresolvedReferenceNames,
 } from "./test262-source.ts";
 import type {
-  AgentSyntaxNode,
   ParsedTest262Case,
   ReviewedTest262Subset,
 } from "./test262-source.ts";
@@ -619,28 +618,31 @@ function unsupportedHostCapability(
 }
 
 /**
- * Whether the case needs the `$262.agent` multi-agent capability, so the
- * reviewed runner builds it with the native test262 host, whose agent
- * programs are compiled from the case's `$262.agent.start` templates. A
- * case that reads nothing of `$262` keeps an ordinary build, where the
- * name stays unresolvable. A case reads that capability through
- * the atomicsHelper.js include, which builds on it at load time, or as a
- * `$262.agent` property of its own. The property is found in the parsed
- * syntax rather than in the text, so the name inside a comment or a string
- * never withholds execution, and a body that does not parse, such as a
- * parse-negative case, reads nothing and executes as usual.
+ * Whether the case needs a member of the native test262 host object, so
+ * the reviewed runner builds it with that host. The host provides the
+ * `$262.agent` multi-agent capability of ADR 0026, whose agent programs
+ * are compiled from the case's `$262.agent.start` templates, and the
+ * `$262.createRealm` and `$262.global` realm members of ADR 0027. A case
+ * that reads nothing of `$262` keeps an ordinary build, where the name
+ * stays unresolvable. A case reads the agent capability through the
+ * atomicsHelper.js include, which builds on it at load time, or references
+ * one of those members itself, which reads `$262` even to write or delete
+ * the member. The member is found in the parsed syntax rather than in the
+ * text, so the name inside a comment or a string never withholds
+ * execution, and a body that does not parse, such as a parse-negative
+ * case, reads nothing and executes as usual.
  */
-export function needsTest262Agent(
+export function needsTest262Host(
   source: string,
   parsed: ParsedTest262Case,
 ): boolean {
   return (
     parsed.case.includes.includes("atomicsHelper.js") ||
-    readsAgentCapability(source, parsed.case.mode)
+    referencesHostMember(source, parsed.case.mode)
   );
 }
 
-function readsAgentCapability(
+function referencesHostMember(
   source: string,
   mode: Test262Case["mode"],
 ): boolean {
@@ -653,66 +655,22 @@ function readsAgentCapability(
   } catch {
     return false;
   }
-  const pending: {
-    readonly target: boolean;
-    readonly value: unknown;
-  }[] = [{ target: false, value: program }];
+  // Every member reference reads `$262` first, including the target of an
+  // assignment and the operand of `delete`, so each one needs the host
+  // that installs the binding.
+  const pending: unknown[] = [program];
   while (pending.length > 0) {
-    const entry = pending.pop();
-    if (entry == null) break;
-    if (Array.isArray(entry.value)) {
-      for (const value of entry.value) {
-        pending.push({ target: entry.target, value });
-      }
+    const value = pending.pop();
+    if (Array.isArray(value)) {
+      pending.push(...value);
       continue;
     }
-    const node = agentSyntaxNode(entry.value);
+    const node = agentSyntaxNode(value);
     if (node == null) continue;
-    if (!entry.target && agentMemberRead(node)) return true;
-    for (const [key, value] of Object.entries(node)) {
-      pending.push({
-        target: assignmentTarget(node, key, entry.target),
-        value,
-      });
-    }
+    if (hostMemberRead(node)) return true;
+    pending.push(...Object.values(node));
   }
   return false;
-}
-
-/*
- * Whether field `key` of `node` holds a reference that is only written or
- * deleted, never read: the target of a plain assignment, the head of a
- * `for-in` or `for-of` statement, the operand of `delete`, and every
- * binding position of a destructuring pattern in such a target. A
- * compound assignment reads its target first, and a computed key or a
- * default value inside a pattern is evaluated as an ordinary read.
- */
-function assignmentTarget(
-  node: AgentSyntaxNode,
-  key: string,
-  target: boolean,
-): boolean {
-  switch (node.type) {
-    case "AssignmentExpression":
-      return key === "left" && node.operator === "=";
-    case "ForInStatement":
-    case "ForOfStatement":
-      return key === "left";
-    case "UnaryExpression":
-      return key === "argument" && node.operator === "delete";
-    case "ObjectPattern":
-      return target && key === "properties";
-    case "ObjectProperty":
-      return target && key === "value";
-    case "ArrayPattern":
-      return target && key === "elements";
-    case "RestElement":
-      return target && key === "argument";
-    case "AssignmentPattern":
-      return target && key === "left";
-    default:
-      return false;
-  }
 }
 
 /**
@@ -725,8 +683,9 @@ function assignmentTarget(
  * withhold execution, and a body that does not parse reads nothing and
  * executes as usual.
  *
- * `$262` outside `$262.agent` names the host object this profile never
- * installs. A harness definition is one an upstream include lists in its
+ * `$262` outside the members the native test262 host installs, which are
+ * `agent`, `createRealm`, and `global`, names a host binding this profile
+ * never provides. A harness definition is one an upstream include lists in its
  * `defines` metadata while no reviewed harness the case loads declares
  * it. Each stays an explicit unsupported result naming the missing
  * capability, never a pass and never a silently dropped path.
@@ -1264,7 +1223,7 @@ async function executedResult(
   rootPath?: string,
 ): Promise<Test262Result> {
   const testCase = parsed.case;
-  const test262Host = needsTest262Agent(source, parsed);
+  const test262Host = needsTest262Host(source, parsed);
   /*
    * An ordinary module or asynchronous case runs under the deterministic
    * logical clock ADR 0013 records. A case built with the native test262

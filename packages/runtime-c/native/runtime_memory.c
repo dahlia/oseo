@@ -23,6 +23,29 @@ static bool mark_value(
     return true;
 }
 
+/*
+ * Marks everything one realm owns: its intrinsic graph, its global
+ * object, and the literal-cache entries that keep a site's object alive.
+ */
+static void mark_realm(const OseoRealm *realm, OseoHeapObject **worklist) {
+    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
+        mark_value(realm->intrinsics[index], worklist);
+    }
+    mark_value(realm->global_this, worklist);
+    const OseoTemplateCacheEntry *template_cache = realm->template_cache;
+    for (size_t index = 0u; index < realm->template_cache_count; index += 1u) {
+        mark_value(template_cache[index].object, worklist);
+    }
+    const OseoRegExpLiteralCacheEntry *regexp_cache =
+        realm->regexp_literal_cache;
+    for (size_t index = 0u;
+         index < realm->regexp_literal_cache_capacity;
+         index += 1u) {
+        if (regexp_cache[index].literal == NULL) continue;
+        mark_value(regexp_cache[index].matcher, worklist);
+    }
+}
+
 static void trace_object(
     OseoHeapObject *object,
     OseoHeapObject **worklist
@@ -30,6 +53,10 @@ static void trace_object(
     if (object->kind == OSEO_HEAP_BIGINT ||
         object->kind == OSEO_HEAP_STRING ||
         object->kind == OSEO_HEAP_PRIVATE_NAME) {
+        return;
+    }
+    if (object->kind == OSEO_HEAP_REALM) {
+        mark_realm(&((OseoRealmRecord *)object)->realm, worklist);
         return;
     }
     if (object->kind == OSEO_HEAP_REGEXP_MATCHER) {
@@ -172,6 +199,7 @@ static void trace_object(
             mark_value(function->home_object, worklist);
             mark_value(function->initial_name, worklist);
             mark_value(function->source_text, worklist);
+            mark_value(function->realm, worklist);
             mark_value(function->bound_target, worklist);
             mark_value(function->bound_this, worklist);
             mark_value(function->bound_arguments, worklist);
@@ -189,6 +217,7 @@ static void trace_object(
             mark_value(promise->reaction_head, worklist);
             mark_value(promise->reaction_tail, worklist);
             mark_value(promise->unhandled_next, worklist);
+            mark_value(promise->realm, worklist);
         } else if (object->kind == OSEO_HEAP_MAP) {
             OseoMap *map = (OseoMap *)object;
             for (size_t index = 0u; index < map->entry_count; index += 1u) {
@@ -260,6 +289,7 @@ static void trace_object(
         mark_value(job->primary, worklist);
         mark_value(job->secondary, worklist);
         mark_value(job->argument, worklist);
+        mark_value(job->realm, worklist);
     } else if (object->kind == OSEO_HEAP_PROMISE_AGGREGATE) {
         OseoPromiseAggregate *aggregate = (OseoPromiseAggregate *)object;
         mark_value(aggregate->capability, worklist);
@@ -564,6 +594,8 @@ static void destroy_heap_object(OseoHeapObject *object) {
         } else if (object->kind == OSEO_HEAP_SET) {
             free(((OseoSet *)object)->elements);
         }
+    } else if (object->kind == OSEO_HEAP_REALM) {
+        oseo_internal_realm_release(&((OseoRealmRecord *)object)->realm);
     } else if (object->kind == OSEO_HEAP_ARGUMENT_LIST) {
         free(((OseoArgumentList *)object)->values);
     } else if (object->kind == OSEO_HEAP_EPHEMERON_TABLE) {
@@ -613,32 +645,17 @@ void oseo_collect(OseoContext *context) {
     mark_value(context->microtask_tail, &worklist);
     mark_value(context->pending_rejections, &worklist);
     mark_value(context->pending_rejection_tail, &worklist);
-    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
-        mark_value(context->intrinsics[index], &worklist);
-    }
+    mark_realm(&context->initial_realm, &worklist);
+    mark_value(context->realm_record, &worklist);
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
         mark_value(context->well_known_symbols[index], &worklist);
     }
-    mark_value(context->global_this, &worklist);
     for (size_t index = 0u;
          index < context->registered_symbol_capacity;
          index += 1u) {
         mark_value(context->registered_symbols[index], &worklist);
-    }
-    OseoTemplateCacheEntry *template_cache = context->template_cache;
-    for (size_t index = 0u;
-         index < context->template_cache_count;
-         index += 1u) {
-        mark_value(template_cache[index].object, &worklist);
-    }
-    OseoRegExpLiteralCacheEntry *regexp_cache = context->regexp_literal_cache;
-    for (size_t index = 0u;
-         index < context->regexp_literal_cache_capacity;
-         index += 1u) {
-        if (regexp_cache[index].literal == NULL) continue;
-        mark_value(regexp_cache[index].matcher, &worklist);
     }
     mark_value(context->timer_head, &worklist);
     mark_value(context->atomics_waiter_head, &worklist);

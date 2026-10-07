@@ -41,6 +41,49 @@ static uint64_t seed_word(uint64_t *state) {
     return word ^ (word >> 31u);
 }
 
+void oseo_internal_realm_init(OseoRealm *realm) {
+    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
+        realm->intrinsics[index] = oseo_undefined();
+    }
+    realm->global_this = oseo_undefined();
+    realm->template_cache = NULL;
+    realm->template_cache_count = 0u;
+    realm->template_cache_capacity = 0u;
+    realm->regexp_literal_cache = NULL;
+    realm->regexp_literal_cache_count = 0u;
+    realm->regexp_literal_cache_capacity = 0u;
+    /*
+     * The realm's Math.random state, mixed from the realm's own
+     * initialization ordinal rather than from host entropy, so distinct
+     * realms start from distinct states and draw distinct sequences that
+     * are uniform and the same on every run and every target. The low
+     * bit of the second word is set because a xorshift128+ state must
+     * never be all zero.
+     */
+    uint64_t seed = atomic_fetch_add_explicit(
+        &realm_ordinal,
+        UINT64_C(1),
+        memory_order_relaxed
+    );
+    realm->random_state[0] = seed_word(&seed);
+    realm->random_state[1] = seed_word(&seed) | UINT64_C(1);
+}
+
+void oseo_internal_realm_release(OseoRealm *realm) {
+    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
+        realm->intrinsics[index] = oseo_undefined();
+    }
+    realm->global_this = oseo_undefined();
+    free(realm->template_cache);
+    realm->template_cache = NULL;
+    realm->template_cache_count = 0u;
+    realm->template_cache_capacity = 0u;
+    free(realm->regexp_literal_cache);
+    realm->regexp_literal_cache = NULL;
+    realm->regexp_literal_cache_count = 0u;
+    realm->regexp_literal_cache_capacity = 0u;
+}
+
 void oseo_context_init(
     OseoContext *context,
     const char *source_id,
@@ -55,24 +98,17 @@ void oseo_context_init(
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
     context->pending_rejection_tail = oseo_undefined();
-    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
-        context->intrinsics[index] = oseo_undefined();
-    }
+    oseo_internal_realm_init(&context->initial_realm);
+    context->realm = &context->initial_realm;
+    context->realm_record = oseo_undefined();
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
         context->well_known_symbols[index] = oseo_undefined();
     }
-    context->global_this = oseo_undefined();
     context->registered_symbols = NULL;
     context->registered_symbol_count = 0u;
     context->registered_symbol_capacity = 0u;
-    context->template_cache = NULL;
-    context->template_cache_count = 0u;
-    context->template_cache_capacity = 0u;
-    context->regexp_literal_cache = NULL;
-    context->regexp_literal_cache_count = 0u;
-    context->regexp_literal_cache_capacity = 0u;
     context->array_string_stack = NULL;
     context->timer_head = oseo_undefined();
     context->atomics_waiter_head = oseo_undefined();
@@ -103,21 +139,6 @@ void oseo_context_init(
     context->collections = 0u;
     context->rejection_handled_count = 0u;
     context->unhandled_rejection_count = 0u;
-    /*
-     * The realm's Math.random state, mixed from the realm's own
-     * initialization ordinal rather than from host entropy, so distinct
-     * realms start from distinct states and draw distinct sequences that
-     * are uniform and the same on every run and every target. The low
-     * bit of the second word is set because a xorshift128+ state must
-     * never be all zero.
-     */
-    uint64_t seed = atomic_fetch_add_explicit(
-        &realm_ordinal,
-        UINT64_C(1),
-        memory_order_relaxed
-    );
-    context->random_state[0] = seed_word(&seed);
-    context->random_state[1] = seed_word(&seed) | UINT64_C(1);
     context->clock_adapter = NULL;
     context->clock_state = NULL;
     context->clock_origin = 0u;
@@ -165,27 +186,22 @@ void oseo_context_destroy(OseoContext *context) {
     context->microtask_tail = oseo_undefined();
     context->pending_rejections = oseo_undefined();
     context->pending_rejection_tail = oseo_undefined();
-    for (size_t index = 0u; index < OSEO_INTRINSIC_COUNT; index += 1u) {
-        context->intrinsics[index] = oseo_undefined();
-    }
+    /*
+     * Every created realm is a heap object, so the final collection
+     * below frees each one; only the initial realm is released here.
+     */
+    context->realm = &context->initial_realm;
+    context->realm_record = oseo_undefined();
+    oseo_internal_realm_release(&context->initial_realm);
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
         context->well_known_symbols[index] = oseo_undefined();
     }
-    context->global_this = oseo_undefined();
     free(context->registered_symbols);
     context->registered_symbols = NULL;
     context->registered_symbol_count = 0u;
     context->registered_symbol_capacity = 0u;
-    free(context->template_cache);
-    context->template_cache = NULL;
-    context->template_cache_count = 0u;
-    context->template_cache_capacity = 0u;
-    free(context->regexp_literal_cache);
-    context->regexp_literal_cache = NULL;
-    context->regexp_literal_cache_count = 0u;
-    context->regexp_literal_cache_capacity = 0u;
     context->array_string_stack = NULL;
     context->timer_head = oseo_undefined();
     context->atomics_waiter_head = oseo_undefined();

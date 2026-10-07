@@ -212,9 +212,10 @@ Consequences
  -  Native agent observations are deterministic up to the operating system's
     timing of deadlines, while the references run agents in parallel, so a
     differential fixture prints only what every interleaving produces.
- -  The harness has no `$262` members beyond `agent`; cases that need
-    `createRealm`, `detachArrayBuffer`, `evalScript`, or `gc` keep their
-    existing classifications.
+ -  The harness had no `$262` members beyond `agent`.
+    [ADR 0027](./0027-realms-beyond-the-initial-realm.md) later adds
+    `createRealm` and `global`; cases that need `detachArrayBuffer`,
+    `evalScript`, or `gc` keep their existing classifications.
 
 
 Failure modes and replacement triggers

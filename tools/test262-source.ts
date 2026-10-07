@@ -243,8 +243,25 @@ export function agentSyntaxNode<Candidate>(
   return value as AgentSyntaxNode;
 }
 
-/** Whether a parsed node is `$262.agent` or `$262["agent"]`. */
-export function agentMemberRead(node: AgentSyntaxNode): boolean {
+/**
+ * The `$262` members the native test262 host installs: `agent` (ADR 0026)
+ * and `createRealm` and `global` (ADR 0027). Any other member, such as
+ * `evalScript` or `detachArrayBuffer`, stays a missing host binding.
+ */
+export const test262HostMembers: ReadonlySet<string> = new Set([
+  "agent",
+  "createRealm",
+  "global",
+]);
+
+/**
+ * Whether a parsed node references one of `members` of `$262`, as
+ * `$262.agent` or `$262["agent"]` does.
+ */
+export function hostMemberRead(
+  node: AgentSyntaxNode,
+  members: ReadonlySet<string> = test262HostMembers,
+): boolean {
   if (
     node.type !== "MemberExpression" &&
     node.type !== "OptionalMemberExpression"
@@ -254,9 +271,12 @@ export function agentMemberRead(node: AgentSyntaxNode): boolean {
   const object = agentSyntaxNode(node.object);
   const property = agentSyntaxNode(node.property);
   if (object?.type !== "Identifier" || object.name !== "$262") return false;
-  return node.computed === true
-    ? property?.type === "StringLiteral" && property.value === "agent"
-    : property?.type === "Identifier" && property.name === "agent";
+  if (node.computed === true) {
+    return (
+      property?.type === "StringLiteral" && members.has(String(property.value))
+    );
+  }
+  return property?.type === "Identifier" && members.has(String(property.name));
 }
 
 export function collectBoundNames(
@@ -336,11 +356,14 @@ const syntaxMetadataKeys = new Set([
  * each block, `switch`, `for` head, `catch` clause, and class name. A
  * `typeof` operand is left out, because `typeof` answers an unresolvable
  * reference without needing its binding, and so is every reference inside
- * a `with` body, because the object may provide the binding.
+ * a `with` body, because the object may provide the binding. A reference
+ * to one of `hostMembers` of `$262` does not count as a reference to
+ * `$262`, because the host that installs those members provides it.
  */
 export function unresolvedReferenceNames(
   source: string,
   mode: Test262Case["mode"],
+  hostMembers: ReadonlySet<string> = test262HostMembers,
 ): ReadonlySet<string> {
   let program: unknown;
   try {
@@ -384,7 +407,7 @@ export function unresolvedReferenceNames(
       if (syntaxMetadataKeys.has(key)) continue;
       const declared = scoped?.(key) ?? [];
       pending.push({
-        mode: referenceMode(node, key, entry.mode),
+        mode: referenceMode(node, key, entry.mode, hostMembers),
         scopes:
           declared.length === 0 ? entry.scopes : [...entry.scopes, ...declared],
         value,
@@ -591,6 +614,7 @@ function referenceMode(
   node: AgentSyntaxNode,
   key: string,
   mode: ReferenceMode,
+  hostMembers: ReadonlySet<string>,
 ): ReferenceMode {
   const nonComputedKey = node.computed === true ? "reference" : "skip";
   if (mode === "binding") {
@@ -638,8 +662,10 @@ function referenceMode(
     case "MemberExpression":
     case "OptionalMemberExpression":
       if (key === "property") return nonComputedKey;
-      // `$262.agent` is the separate multi-agent capability.
-      return key === "object" && agentMemberRead(node) ? "skip" : "reference";
+      // An installed host member is the native test262 host's capability.
+      return key === "object" && hostMemberRead(node, hostMembers)
+        ? "skip"
+        : "reference";
     case "ObjectProperty":
     case "ClassProperty":
     case "ClassAccessorProperty":
