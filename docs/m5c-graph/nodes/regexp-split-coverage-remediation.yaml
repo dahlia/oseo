@@ -10,4 +10,4 @@ delivers: "Resolves the one reviewed String/prototype/split/separator-regexp.js
 dependencies:
   - authorized-exclusion-audit
 landed: false
-status: blocked
+status: ready

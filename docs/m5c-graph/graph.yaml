@@ -19,10 +19,10 @@ baseline:
   infrastructureFailures: 0
 summary:
   nodes: 67
-  ready: 58
-  blocked: 9
+  ready: 60
+  blocked: 7
   parked: 0
-  landed: 4
+  landed: 5
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge

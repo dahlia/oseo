@@ -6,5 +6,5 @@ delivers: "Proves that every proposed M5 exclusion cites an accepted record,
   dynamic source remains owned only by ADR 0016 and ADR 0019."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

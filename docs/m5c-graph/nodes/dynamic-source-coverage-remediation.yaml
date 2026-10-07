@@ -12,4 +12,4 @@ delivers: "Resolves the 121 reviewed paths whose eval or source constructor
 dependencies:
   - authorized-exclusion-audit
 landed: false
-status: blocked
+status: ready
