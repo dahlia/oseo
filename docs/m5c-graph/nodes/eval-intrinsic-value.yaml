@@ -17,7 +17,15 @@ delivers: "Owns the 25 reviewed paths rejected with Unknown binding 'eval'
   read as a value, admitting those reads or obtaining an accepted record that
   bounds their exclusion. Its admission-or-exclusion decision covers identifier
   reads; the global value installation belongs to cross-realm-host. ADR 0016
-  excludes eval in call position rather than the binding."
+  excludes eval in call position rather than the binding. This node also
+  covers the eval identifier read through a with object environment that
+  falls back to the global binding in
+  test/language/eval-code/direct/global-env-rec-with.js. That read currently
+  fails at run time with OSEO2001 ReferenceError: Binding is read before
+  initialization. Resolve it to the global %eval% value so a String call
+  reaches the existing OSEO1001 eval compiles source text at run time boundary,
+  classified as unsupported and owned through the exclusion audit. This
+  repairs identifier lookup without admitting direct eval source evaluation."
 dependencies:
   - cross-realm-host
   - unsupported-ownership-audit
