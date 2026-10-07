@@ -2191,6 +2191,17 @@ paths:
     section: sec-weakset-iterable
     subject: Default [[Prototype]] value derived from realm of the newTarget
     assessment: fixture-construction
+  - path: test/built-ins/eval/private-identifiers-not-empty.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "c1ef5660f228ae115976c7281d12899c25795d422a53d152fe610b\
+      92cf84a2a1"
+    observationDigest: "d55b00b0f2875dbe0eb61853dec9930c6743a745d7e44bd3b7f71c\
+      d98db4bc77"
+    missingDynamicTag: false
+    section: sec-evaldeclarationinstantiation
+    subject: Invalid private identifiers parsed in eval source
+    assessment: eval-semantics
   - path: test/built-ins/global/S10.2.3_A1.3_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

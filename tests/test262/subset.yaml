@@ -49832,6 +49832,2602 @@ tests:
   - path: test/built-ins/TypedArrayConstructors/ctors-bigint/object-arg/bigint-tobiguint64.js
     expectedClassification: pass
     dependencies: [typed-array-constructors]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/desc-value-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/detached-buffer-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-greater-than-last-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-lower-than-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-not-numeric-index-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-accessor-desc-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-accessor-desc.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-desc-configurable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-desc-not-configurable-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-desc-not-enumerable-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-desc-not-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-desc-not-writable-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex-desc-not-writable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-numericindex.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/non-extensible-new-key.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/non-extensible-redefine-key.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/set-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/this-is-not-extensible.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/tonumber-value-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/conversion-operation-consistent-nan.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/conversion-operation.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/desc-value-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/detached-buffer-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-greater-than-last-index.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-lower-than-zero.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-not-numeric-index-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-accessor-desc-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-accessor-desc.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-desc-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-desc-not-configurable-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-desc-not-enumerable-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-desc-not-enumerable.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-desc-not-writable-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex-desc-not-writable.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-numericindex.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/non-extensible-new-key.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/non-extensible-redefine-key.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/set-value.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/this-is-not-extensible.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/tonumber-value-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/detached-buffer-key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [array-buffer, functions, lexical-bindings, symbols, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/indexed-value-ab-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/indexed-value-ab-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/indexed-value-sab-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        atomics-single-agent,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/indexed-value-sab-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        atomics-single-agent,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/infinity-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-not-canonical-index-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-not-canonical-index-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-not-minus-zero-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-not-minus-zero-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-not-numeric-index-get-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-not-numeric-index-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-not-numeric-index-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-out-of-bounds-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-out-of-bounds-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/BigInt/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/detached-buffer-key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies: [array-buffer, functions, lexical-bindings, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [array-buffer, functions, lexical-bindings, symbols, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer, functions, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/indexed-value-ab-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/indexed-value-ab-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/indexed-value-sab-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        atomics-single-agent,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/indexed-value-sab-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        atomics-single-agent,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/infinity-detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer, functions, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-canonical-index-non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-canonical-index-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-minus-zero-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-minus-zero-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-numeric-index-get-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-numeric-index-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [functions, lexical-bindings, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-not-numeric-index-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-out-of-bounds-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-out-of-bounds-strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Delete/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/detached-buffer-key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/indexed-value-sab.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        atomics-single-agent,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/indexed-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/infinity-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/key-is-not-minus-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/key-is-not-numeric-index-get-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/key-is-out-of-bounds.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/BigInt/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/detached-buffer-key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies: [array-buffer, functions, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [array-buffer, functions, symbols, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer, functions, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/indexed-value-sab.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        atomics-single-agent,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/indexed-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/infinity-detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer, functions, lexical-bindings, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/key-is-not-minus-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/key-is-not-numeric-index-get-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/key-is-out-of-bounds.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Get/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, symbols, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/detached-buffer-key-is-not-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        object-properties,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/enumerate-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        property-enumeration,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/index-prop-desc.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/key-is-out-of-bounds.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/BigInt/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/detached-buffer-key-is-not-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        object-properties,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/enumerate-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        lexical-bindings,
+        property-enumeration,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/index-prop-desc.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/key-is-out-of-bounds.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/GetOwnProperty/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, symbols, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/abrupt-from-ordinary-has-parent-hasproperty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/detached-buffer-key-is-not-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/indexed-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/infinity-with-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/inherited-property.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-greater-than-last-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-lower-than-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/abrupt-from-ordinary-has-parent-hasproperty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/detached-buffer-key-is-not-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/indexed-value.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/infinity-with-detached-buffer.js
+    expectedClassification: pass
+    dependencies: [array-buffer, functions, lexical-bindings, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/inherited-property.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-greater-than-last-index.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-lower-than-zero.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/HasProperty/resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/BigInt/integer-indexes-and-string-and-symbol-keys-.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/BigInt/integer-indexes-and-string-keys.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/BigInt/integer-indexes.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/BigInt/not-enumerable-keys.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/integer-indexes-and-string-and-symbol-keys-.js
+    expectedClassification: pass
+    dependencies:
+      [functions, reflect-namespace, symbols, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/integer-indexes-and-string-keys.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/integer-indexes-resizable-array-buffer-auto.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/integer-indexes-resizable-array-buffer-fixed.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/integer-indexes.js
+    expectedClassification: pass
+    dependencies: [functions, reflect-namespace, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/not-enumerable-keys.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/bigint-tobigint64.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/bigint-tobiguint64.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/boolean-tobigint.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, functions, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/detached-buffer-key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/indexed-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-canonical-invalid-index-prototype-chain-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-canonical-invalid-index-reflect-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-not-numeric-index-set-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-out-of-bounds.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-valid-index-prototype-chain-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-valid-index-reflect-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/null-tobigint.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/number-tobigint.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/string-nan-tobigint.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/string-tobigint.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/symbol-tobigint.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/tonumber-value-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        reflect-namespace,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/tonumber-value-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        lexical-bindings,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/undefined-tobigint.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/bigint-tonumber.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/conversion-operation-consistent-nan.js
+    expectedClassification: pass
+    dependencies: [functions, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/conversion-operation.js
+    expectedClassification: pass
+    dependencies: [functions, typed-array-core, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/detached-buffer-key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/detached-buffer-key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        lexical-bindings,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        array-buffer,
+        functions,
+        lexical-bindings,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/indexed-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        lexical-bindings,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-canonical-invalid-index-prototype-chain-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-canonical-invalid-index-reflect-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-in-bounds-receiver-is-not-typed-array.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, reflect-namespace, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-minus-zero.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-not-canonical-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-not-integer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-not-numeric-index-set-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-not-numeric-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-out-of-bounds-receiver-is-not-object.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, reflect-namespace, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-out-of-bounds-receiver-is-not-typed-array.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, reflect-namespace, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-out-of-bounds-receiver-is-proto.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, object-properties, reflect-namespace, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-out-of-bounds.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        reflect-namespace,
+        symbols,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-valid-index-prototype-chain-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/key-is-valid-index-reflect-set.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        reflect-namespace,
+        typed-array-core,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/resized-out-of-bounds-to-in-bounds-index.js
+    expectedClassification: pass
+    dependencies: [array-buffer, lexical-bindings, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/tonumber-value-detached-buffer.js
+    expectedClassification: pass
+    dependencies:
+      [
+        array-buffer,
+        functions,
+        lexical-bindings,
+        reflect-namespace,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/internals/Set/tonumber-value-throws.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, lexical-bindings, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/argument-is-symbol-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        symbols,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/argument-number-value-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/custom-ctor-does-not-instantiate-ta-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/custom-ctor-returns-other-instance.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/custom-ctor-returns-smaller-instance-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/custom-ctor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-statics]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/invoked-as-func.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/new-instance-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/new-instance-using-custom-ctor.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/new-instance.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/BigInt/this-is-not-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        functions,
+        typed-array-statics,
+        var-bindings,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/of/argument-is-symbol-throws.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, symbols, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/argument-number-value-throws.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/custom-ctor-does-not-instantiate-ta-throws.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/custom-ctor-returns-other-instance.js
+    expectedClassification: pass
+    dependencies: [functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/custom-ctor-returns-smaller-instance-throws.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/custom-ctor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-statics]
+  - path: test/built-ins/TypedArrayConstructors/of/invoked-as-func.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/nan-conversion.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/new-instance-empty.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/new-instance-from-zero.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/new-instance-using-custom-ctor.js
+    expectedClassification: pass
+    dependencies: [functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/new-instance.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/of/this-is-not-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, typed-array-statics, var-bindings]
+  - path: test/built-ins/TypedArrayConstructors/prototype/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/Symbol.toStringTag/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        symbols,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/Symbol.toStringTag/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, symbols, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/bigint-Symbol.iterator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        typed-array-core,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/buffer/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/buffer/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/byteLength/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/byteLength/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/byteOffset/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/byteOffset/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/copyWithin/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-mutation,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/copyWithin/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-mutation]
+  - path: test/built-ins/TypedArrayConstructors/prototype/entries/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/entries/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/every/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-iterative,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/every/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-iterative]
+  - path: test/built-ins/TypedArrayConstructors/prototype/fill/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-mutation,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/fill/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-mutation]
+  - path: test/built-ins/TypedArrayConstructors/prototype/filter/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-iterative,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/filter/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-iterative]
+  - path: test/built-ins/TypedArrayConstructors/prototype/find/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/find/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/findIndex/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/findIndex/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/forEach/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-iterative,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/forEach/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-iterative]
+  - path: test/built-ins/TypedArrayConstructors/prototype/indexOf/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/indexOf/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/join/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/join/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/keys/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/keys/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/lastIndexOf/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/lastIndexOf/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/length/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/length/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/map/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-iterative,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/map/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-iterative]
+  - path: test/built-ins/TypedArrayConstructors/prototype/reduce/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-iterative,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/reduce/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-iterative]
+  - path: test/built-ins/TypedArrayConstructors/prototype/reduceRight/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-iterative,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/reduceRight/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-iterative]
+  - path: test/built-ins/TypedArrayConstructors/prototype/reverse/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-mutation,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/reverse/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-mutation]
+  - path: test/built-ins/TypedArrayConstructors/prototype/set/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/set/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/slice/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-mutation,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/slice/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-mutation]
+  - path: test/built-ins/TypedArrayConstructors/prototype/some/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-iterative,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/some/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-iterative]
+  - path: test/built-ins/TypedArrayConstructors/prototype/sort/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-sort,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/sort/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, typed-array-core, typed-array-sort]
+  - path: test/built-ins/TypedArrayConstructors/prototype/subarray/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/subarray/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/toLocaleString/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/toLocaleString/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/toString/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/toString/inherited.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        typed-array-core,
+        typed-array-search-and-join,
+      ]
+  - path: test/built-ins/TypedArrayConstructors/prototype/values/bigint-inherited.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, functions, object-properties, typed-array-core]
+  - path: test/built-ins/TypedArrayConstructors/prototype/values/inherited.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, typed-array-core]
   - path: test/built-ins/WeakMap/constructor.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -49862,6 +52458,27 @@ tests:
   - path: test/built-ins/WeakMap/iterator-item-second-entry-returns-abrupt.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/iterator-items-are-not-object-close-iterator.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        symbols,
+        var-bindings,
+        weak-collections,
+      ]
+  - path: test/built-ins/WeakMap/iterator-items-keys-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        symbols,
+        weak-collections,
+      ]
   - path: test/built-ins/WeakMap/iterator-next-failure.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -49934,6 +52551,9 @@ tests:
   - path: test/built-ins/WeakMap/prototype/delete/not-a-constructor.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/delete/returns-false-if-key-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies: [symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakMap/prototype/delete/returns-false-when-object-key-not-present.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -49979,6 +52599,9 @@ tests:
   - path: test/built-ins/WeakMap/prototype/get/not-a-constructor.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/get/returns-undefined-if-key-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies: [symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakMap/prototype/get/returns-undefined-with-object-key.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -50021,6 +52644,9 @@ tests:
   - path: test/built-ins/WeakMap/prototype/has/not-a-constructor.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/has/returns-false-when-key-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies: [symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakMap/prototype/has/returns-false-when-object-key-not-present.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -50111,6 +52737,10 @@ tests:
   - path: test/built-ins/WeakMap/prototype/set/this-not-object-throw-undefined.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakMap/prototype/set/throw-if-key-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakMap/set-not-callable-throws.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -50198,6 +52828,10 @@ tests:
   - path: test/built-ins/WeakRef/returns-new-object-from-constructor-with-symbol-target.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakRef/throws-when-target-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakRef/undefined-newtarget-throws.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -50318,6 +52952,10 @@ tests:
   - path: test/built-ins/WeakSet/prototype/add/this-not-object-throw-undefined.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/add/throw-when-value-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakSet/prototype/constructor/weakset-prototype-constructor-intrinsic.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -50363,6 +53001,9 @@ tests:
   - path: test/built-ins/WeakSet/prototype/delete/returns-false-when-delete-is-noop.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/delete/returns-false-when-value-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies: [symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakSet/prototype/delete/this-not-object-throw-boolean.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -50414,6 +53055,9 @@ tests:
   - path: test/built-ins/WeakSet/prototype/has/returns-false-when-symbol-value-not-present.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/WeakSet/prototype/has/returns-false-when-value-cannot-be-held-weakly.js
+    expectedClassification: pass
+    dependencies: [symbols, var-bindings, weak-collections]
   - path: test/built-ins/WeakSet/prototype/has/returns-true-when-object-value-present.js
     expectedClassification: pass
     dependencies: [weak-collections]
@@ -50966,6 +53610,54 @@ tests:
   - path: test/built-ins/encodeURIComponent/prop-desc.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/eval/length-enumerable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        dynamic-source,
+        functions,
+        object-properties,
+        property-enumeration,
+        var-bindings,
+      ]
+  - path: test/built-ins/eval/length-non-configurable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [abrupt-completion, dynamic-source, functions, object-properties]
+  - path: test/built-ins/eval/length-non-writable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        dynamic-source,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/built-ins/eval/length-value.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, dynamic-source, functions]
+  - path: test/built-ins/eval/name.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties]
+  - path: test/built-ins/eval/no-construct.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, dynamic-source, functions]
+  - path: test/built-ins/eval/no-proto.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, dynamic-source, functions]
+  - path: test/built-ins/eval/not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [abrupt-completion, dynamic-source, functions, reflect-namespace]
+  - path: test/built-ins/eval/private-identifiers-not-empty.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [abrupt-completion, dynamic-source, functions, lexical-bindings]
+  - path: test/built-ins/eval/prop-desc.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/built-ins/global/10.2.1.1.3-4-16-s.js
     expectedClassification: pass
     dependencies: [abrupt-completion, object-properties]

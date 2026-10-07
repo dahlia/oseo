@@ -34,4 +34,164 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Reflect
+        - Symbol
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/this-is-not-extensible.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - functions
+      - object-properties
+      - reflect-namespace
+      - symbols
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Reflect
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/non-extensible-new-key.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - reflect-namespace
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Reflect
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/HasProperty/key-is-not-integer.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - reflect-namespace
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Reflect
+        - Symbol
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+        - compareArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/OwnPropertyKeys/BigInt/integer-indexes-and-string-and-symbol-keys-.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - functions
+      - reflect-namespace
+      - symbols
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

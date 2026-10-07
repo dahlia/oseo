@@ -1,0 +1,32 @@
+group: built-ins/eval
+key: "57"
+results:
+  - case:
+      async: false
+      features:
+        - Reflect.construct
+        - arrow-function
+      flags: []
+      includes:
+        - isConstructor.js
+      mode: script
+      path: test/built-ins/eval/not-a-constructor.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - functions
+      - reflect-namespace
+    observation:
+      detail: "test/built-ins/eval/not-a-constructor.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/built-ins/eval/not-a-constructor.js:122:32:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

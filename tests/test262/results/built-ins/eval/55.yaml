@@ -1,0 +1,31 @@
+group: built-ins/eval
+key: "55"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/eval/length-enumerable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - functions
+      - object-properties
+      - property-enumeration
+      - var-bindings
+    observation:
+      detail: "test/built-ins/eval/length-enumerable.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/built-ins/eval/length-enumerable.js:86:5:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

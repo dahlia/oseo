@@ -34,4 +34,114 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Reflect
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/HasProperty/BigInt/key-is-not-canonical-index.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - functions
+      - object-properties
+      - reflect-namespace
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+        - resizable-arraybuffer
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/Set/resized-out-of-bounds-to-in-bounds-index.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - array-buffer
+      - lexical-bindings
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/of/custom-ctor-returns-smaller-instance-throws.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - functions
+      - typed-array-statics
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

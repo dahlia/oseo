@@ -1,0 +1,30 @@
+group: built-ins/eval
+key: cf
+results:
+  - case:
+      async: false
+      features:
+        - class-fields-private
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/eval/private-identifiers-not-empty.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/built-ins/eval/private-identifiers-not-empty.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/built-ins/eval/private-identifiers-not-empty.js:9\
+        7:3: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

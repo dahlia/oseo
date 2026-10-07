@@ -34,4 +34,194 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Reflect
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/non-extensible-new-key.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - functions
+      - object-properties
+      - reflect-namespace
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - align-detached-buffer-semantics-with-web-reality
+        - TypedArray
+      flags:
+        - onlyStrict
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/Delete/indexed-value-ab-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - functions
+      - lexical-bindings
+      - object-properties
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - TypedArray
+        - Reflect
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/internals/Set/BigInt/key-is-valid-index-reflect-set.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - bigint-primitive
+      - functions
+      - object-properties
+      - reflect-namespace
+      - typed-array-core
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/of/BigInt/inherited.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - functions
+      - object-properties
+      - typed-array-statics
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/prototype/find/bigint-inherited.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - functions
+      - object-properties
+      - typed-array-core
+      - typed-array-search-and-join
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
