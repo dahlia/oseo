@@ -1,0 +1,29 @@
+version: 1
+id: runtime-dynamic-source-classification
+title: Classify runtime dynamic source rejections
+delivers: "Closes the classification gap for exactly 9 paths whose Function
+  source-compilation rejection currently reports runtime OSEO2001:
+  test/built-ins/Function/S15.3_A2_T1.js,
+  test/built-ins/Function/S15.3_A2_T2.js,
+  test/built-ins/Function/S15.3_A3_T1.js,
+  test/built-ins/Function/S15.3_A3_T2.js,
+  test/built-ins/Function/S15.3_A3_T3.js,
+  test/built-ins/Function/S15.3_A3_T4.js,
+  test/built-ins/Function/S15.3_A3_T5.js,
+  test/built-ins/Function/S15.3_A3_T6.js, and
+  test/built-ins/Object/seal/seal-arrowfunction.js. These reach Function
+  through call or a prototype constructor and currently report semantic
+  failure. Make the owned Function rejection report OSEO1001 consistently
+  with ADR 0016 and the sibling source constructors, so the runner classifies
+  it as unsupported-profile-feature. Extend the dynamic surface predicate in
+  tools/m5c-exclusion-audit.ts to accept that exact Function runtime rejection,
+  preserving unrelated runtime failures and the ADR 0016 boundary. Review each
+  test's subject; record an assessment in docs/m5c-closure/exclusion-audit.yaml
+  for every new ADR owner, and assign incidental scaffolding to remediation
+  with per-path accounting. Admit the observations, regenerate the complete
+  reviewed manifest because runtime and tools changed, and regenerate the
+  ledger. This node admits no dynamic source."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

@@ -18,9 +18,9 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 64
-  ready: 57
-  blocked: 7
+  nodes: 67
+  ready: 58
+  blocked: 9
   parked: 0
   landed: 4
 serializationPoints:
@@ -45,6 +45,22 @@ serializationPoints:
     note: "Semantic remediation updates the normative profile and its family
       evidence records in the same change."
 collisions:
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - authorized-exclusion-audit
+      - cross-realm-host
+      - runtime-dynamic-source-classification
+    note: "The initial audit, realm-owned eval, and runtime rejection
+      classification may revise independent boundary assessments; serialize
+      their audit edits."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - cross-realm-host
+      - dynamic-source-coverage-remediation
+      - runtime-dynamic-source-classification
+    note: "Realm-owned eval, dynamic source accounting, and runtime rejection
+      classification may revise reviewed boundary assessments; serialize their
+      audit edits."
   - path: docs/m5c-closure/ledger.yaml
     nodes:
       - observation-batch-plan
@@ -66,7 +82,42 @@ collisions:
       serialize their ledger edits."
   - path: tests/test262/results.yaml
     nodes:
+      - array-sort-stability
+      - array-tolocalestring-arguments
       - cross-realm-host
+      - dynamic-import
+      - dynamic-source-coverage-remediation
+      - fn-global-object-harness
+      - frontmatter-feature-tags
+      - function-caller-restrictions
+      - hashbang-comments
+      - import-attributes
+      - import-meta
+      - iterator-helpers
+      - minor-feature-tag-admission
+      - module-export-forms
+      - non-blocking-agent
+      - primitive-wrapper-objects
+      - promise-feature-admission
+      - proper-tail-calls
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - resizable-array-buffer-harness
+      - runtime-dynamic-source-classification
+      - test262-host-script-bindings
+      - typed-array-feature-admission
+      - unhandled-rejection-observation
+      - well-known-intrinsics-harness
+    note: "Each remediation node from unsupported-ownership-audit and each
+      prerequisite node from observation-batch-plan admits behavior or
+      harness capabilities, regenerates the reviewed manifest, and moves
+      its paths in the closure ledger, so their landings serialize at the
+      manifest and ledger."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-sort-stability
+      - array-tolocalestring-arguments
       - dynamic-import
       - dynamic-source-coverage-remediation
       - eval-intrinsic-value
@@ -87,15 +138,15 @@ collisions:
       - regexp-property-escape-harness
       - regexp-split-coverage-remediation
       - resizable-array-buffer-harness
+      - runtime-dynamic-source-classification
       - test262-host-script-bindings
       - typed-array-feature-admission
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
-    note: "Each remediation node from unsupported-ownership-audit and each
-      prerequisite node from observation-batch-plan admits behavior or
-      harness capabilities, regenerates the reviewed manifest, and moves
-      its paths in the closure ledger, so their landings serialize at the
-      manifest and ledger."
+    note: "Bare eval identifier observation follows cross-realm-host and shares
+      manifest writes with the other independent remediation nodes. Separate
+      collision groups retain those conflicts without treating ordered realm
+      installation and identifier observation as concurrent work."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-01

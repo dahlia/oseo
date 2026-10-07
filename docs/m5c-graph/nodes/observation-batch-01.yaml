@@ -7,6 +7,10 @@ delivers: "Observes the 316 unreviewed paths that
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
+  - array-sort-stability
+  - array-tolocalestring-arguments
+  - cross-realm-host
   - observation-batch-plan
+  - runtime-dynamic-source-classification
 landed: false
-status: ready
+status: blocked

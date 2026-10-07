@@ -367,7 +367,7 @@ test("M5c baseline rejects mismatched suite revisions", () => {
 
 test("the checked-in M5c work graph is valid", () => {
   const summary = validateCurrentM5cWorkGraph();
-  assert.equal(summary.nodes, 64);
+  assert.equal(summary.nodes, 67);
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 2);
   assert.equal(summary.parked, 0);
