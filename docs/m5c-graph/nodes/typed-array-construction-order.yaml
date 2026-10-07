@@ -1,0 +1,17 @@
+version: 1
+id: typed-array-construction-order
+title: Order TypedArray argument conversion before allocation
+delivers: "Closes exactly 1 newly observed path:
+  throw-type-error-before-custom-proto-access.js under
+  test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/. It receives
+  Test262Error from a bound newTarget prototype getter instead
+  of TypeError from converting a Symbol argument. Repair the already-admitted
+  TypedArray construction order so argument conversion precedes the prototype
+  lookup where ECMA-262 requires it. Follow the full PLAN-M5.md evidence
+  contract, update the normative family record and profile, admit the path,
+  and regenerate the complete reviewed manifest and ledger. Already-reviewed
+  paths affected by the repair may move only toward pass."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

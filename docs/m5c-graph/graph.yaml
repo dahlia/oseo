@@ -18,9 +18,9 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 69
-  ready: 63
-  blocked: 6
+  nodes: 72
+  ready: 64
+  blocked: 8
   parked: 0
   landed: 8
 serializationPoints:
@@ -47,6 +47,13 @@ serializationPoints:
 collisions:
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
+      - dynamic-source-coverage-remediation
+      - typed-array-proto-coverage-remediation
+    note: "Mixed-coverage accounting updates independent assessments in the
+      exclusion audit; serialize these edits. The TypedArray owner follows
+      its classification prerequisite, which stays outside this group."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
       - authorized-exclusion-audit
       - cross-realm-host
       - runtime-dynamic-source-classification
@@ -55,6 +62,7 @@ collisions:
       their audit edits."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
+      - annexb-proto-dependency-classification
       - cross-realm-host
       - dynamic-source-coverage-remediation
       - runtime-dynamic-source-classification
@@ -82,6 +90,7 @@ collisions:
       serialize their ledger edits."
   - path: tests/test262/results.yaml
     nodes:
+      - annexb-proto-dependency-classification
       - array-sort-stability
       - array-tolocalestring-arguments
       - cross-realm-host
@@ -106,6 +115,7 @@ collisions:
       - resizable-array-buffer-harness
       - runtime-dynamic-source-classification
       - test262-host-script-bindings
+      - typed-array-construction-order
       - typed-array-feature-admission
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
@@ -114,6 +124,77 @@ collisions:
       harness capabilities, regenerates the reviewed manifest, and moves
       its paths in the closure ledger, so their landings serialize at the
       manifest and ledger."
+  - path: tests/test262/results.yaml
+    nodes:
+      - annexb-proto-dependency-classification
+      - array-sort-stability
+      - array-tolocalestring-arguments
+      - dynamic-import
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - fn-global-object-harness
+      - frontmatter-feature-tags
+      - function-caller-restrictions
+      - hashbang-comments
+      - import-attributes
+      - import-meta
+      - iterator-helpers
+      - minor-feature-tag-admission
+      - module-export-forms
+      - non-blocking-agent
+      - primitive-wrapper-objects
+      - promise-feature-admission
+      - proper-tail-calls
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - resizable-array-buffer-harness
+      - runtime-dynamic-source-classification
+      - test262-host-script-bindings
+      - typed-array-construction-order
+      - typed-array-feature-admission
+      - unhandled-rejection-observation
+      - well-known-intrinsics-harness
+    note: "Bare eval identifier observation follows cross-realm-host and shares
+      manifest writes with the other independent remediation nodes. Separate
+      collision groups retain those conflicts without treating ordered realm
+      installation and identifier observation as concurrent work."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-sort-stability
+      - array-tolocalestring-arguments
+      - cross-realm-host
+      - dynamic-import
+      - dynamic-source-coverage-remediation
+      - fn-global-object-harness
+      - frontmatter-feature-tags
+      - function-caller-restrictions
+      - hashbang-comments
+      - import-attributes
+      - import-meta
+      - iterator-helpers
+      - minor-feature-tag-admission
+      - module-export-forms
+      - non-blocking-agent
+      - primitive-wrapper-objects
+      - promise-feature-admission
+      - proper-tail-calls
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - resizable-array-buffer-harness
+      - runtime-dynamic-source-classification
+      - test262-host-script-bindings
+      - typed-array-construction-order
+      - typed-array-feature-admission
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+      - well-known-intrinsics-harness
+    note: TypedArray mixed Annex B coverage follows classification and shares
+      manifest writes with these independent remediation nodes. Keep its own
+      prerequisite outside this group and preserve existing ordering between
+      realm installation and identifier observation.
   - path: tests/test262/results.yaml
     nodes:
       - array-sort-stability
@@ -141,13 +222,15 @@ collisions:
       - resizable-array-buffer-harness
       - runtime-dynamic-source-classification
       - test262-host-script-bindings
+      - typed-array-construction-order
       - typed-array-feature-admission
+      - typed-array-proto-coverage-remediation
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
-    note: "Bare eval identifier observation follows cross-realm-host and shares
-      manifest writes with the other independent remediation nodes. Separate
-      collision groups retain those conflicts without treating ordered realm
-      installation and identifier observation as concurrent work."
+    note: TypedArray mixed Annex B coverage follows classification and shares
+      manifest writes with these independent remediation nodes. Keep its own
+      prerequisite outside this group and preserve existing ordering between
+      realm installation and identifier observation.
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-01
