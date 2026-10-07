@@ -156,6 +156,11 @@ export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
  * original limit because their duration record pins it and
  * `check:property-case-durations` compares the records' sum with that
  * limit; test262 and native fixture jobs run no fast-check property.
+ *
+ * Since U29 a busy lane queues its jobs on the runner instead of falling
+ * back, so the scale applies only when the lane's runner is offline,
+ * disabled, ambiguous, or wedged, or the probe failed; a queued job runs
+ * on the Mac with scale 1 however long it waited.
  */
 export const hostedFallbackTimeScale = 4;
 

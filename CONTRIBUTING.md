@@ -407,8 +407,10 @@ Replay an ordinary or extended suite by setting `OSEO_PROPERTY_SEED` and
 only to change the reviewed case budget and size. `OSEO_PROPERTY_TIME_SCALE`
 multiplies only the interrupt time limit. It exists for lanes that run every
 case slower than the runner a limit was budgeted on: the host C compiler
-sanitizer lane, a generated Mac-lane `native support` job whose readiness
-probe fell back to a hosted runner, and the hosted macOS `test` job. It never
+sanitizer lane and a generated Mac-lane `native support` job whose readiness
+probe fell back to a hosted runner. A job-level value is visible to every
+test in the job, including the `packages/testkit` tests that assert the
+unscaled limit, so the always-hosted `test` jobs carry none. It never
 changes the case budget, so an interrupted run still fails. Minimize
 a failure and retain it as an ordinary regression fixture before fixing the
 implementation.

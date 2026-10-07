@@ -34,7 +34,15 @@ import {
 } from "../tools/generate-macos-lanes.ts";
 import { macosLaneReport, parseAttempt } from "../tools/macos-lane-report.ts";
 import { ownKeyCaseContract } from "../tools/check-property-case-durations.ts";
-import { runnerSelections } from "../tools/selfhosted-mac/availability.ts";
+import type {
+  ApiFetch,
+  LaneObservation,
+} from "../tools/selfhosted-mac/availability.ts";
+import {
+  defaultRecheckDelayMilliseconds,
+  runnerSelections,
+  wedged,
+} from "../tools/selfhosted-mac/availability.ts";
 import { configuredSelfHostedLanes } from "../tools/macos-lane-config.ts";
 import {
   hostedFallbackTimeScale,
@@ -541,6 +549,12 @@ test("one extra lane retains every job and aggregate dependency", () => {
   assert.deepEqual(aggregate.needs, after.jobs.native!.needs);
   const readiness = workflow.jobs.mac_ready!;
   assert.equal(readiness["timeout-minutes"], 5);
+  // Two observations and the delay between them fit the job timeout.
+  assert.ok(2 * defaultRecheckDelayMilliseconds + 60_000 <= 5 * 60_000);
+  assert.deepEqual(readiness.permissions, {
+    contents: "read",
+    actions: "read",
+  });
   const miseStep = readiness.steps.find(
     (step) => step.uses === "jdx/mise-action@v4",
   );
@@ -560,6 +574,12 @@ test("one extra lane retains every job and aggregate dependency", () => {
   ]) {
     assert.ok(condition.includes(required));
   }
+  const probeEnv = parsedMapping(probe.env, "Probe environment");
+  assert.equal(probeEnv.OSEO_WORKFLOW_TOKEN, "${{ github.token }}");
+  assert.equal(
+    probeEnv.OSEO_RUNNER_STATUS_TOKEN,
+    "${{ secrets.OSEO_RUNNER_STATUS_TOKEN }}",
+  );
   for (let index = 5; index < 6; index++) {
     for (const job of lanes[index]!) {
       const actual = workflow.jobs[job.id]!;
@@ -581,21 +601,78 @@ async function unavailableRunnerApi(): Promise<never> {
   throw new Error("offline");
 }
 
-async function oneAvailableRunner() {
-  return {
-    ok: true,
-    json: async () => ({
-      runners: [
-        {
-          name: "oseo-mac-1",
-          status: "online",
-          busy: false,
-          labels: [{ name: "oseo-mac-1" }],
-        },
-      ],
-    }),
+interface FakeJob {
+  readonly id: number;
+  readonly status: string;
+  readonly labels: readonly string[];
+}
+
+interface FakeRun {
+  readonly id: number;
+  readonly status: "queued" | "in_progress";
+  readonly jobs: readonly FakeJob[];
+}
+
+interface FakeActions {
+  readonly runners: readonly FakeRunner[];
+  readonly runs?: readonly FakeRun[];
+}
+
+/**
+ * Serve the probe's runner, run, and job requests from one state, or from
+ * a state per observation when given a function. Runner requests must
+ * carry the administration token and workflow requests the workflow
+ * token; `calls` records every request URL.
+ */
+function fakeActionsApi(
+  state: (observation: number) => FakeActions,
+  calls: string[] = [],
+): ApiFetch {
+  let observation = -1;
+  return async (url, init) => {
+    calls.push(url);
+    assert.ok(init.signal instanceof AbortSignal);
+    const runners = url.includes("/actions/runners?");
+    if (runners) observation++;
+    const current = state(Math.max(observation, 0));
+    assert.equal(
+      init.headers.Authorization,
+      runners ? "Bearer test-token" : "Bearer workflow-token",
+      url,
+    );
+    const runs = current.runs ?? [];
+    const listed = /\/actions\/runs\?status=(\w+)&/.exec(url);
+    const jobs = /\/actions\/runs\/(\d+)\/jobs\?/.exec(url);
+    const body = runners
+      ? { runners: current.runners }
+      : listed != null
+        ? {
+            workflow_runs: runs
+              .filter((run) => run.status === listed[1])
+              .map((run) => ({ id: run.id })),
+          }
+        : jobs != null
+          ? { jobs: runs.find((run) => run.id === Number(jobs[1]))!.jobs }
+          : assert.fail(`Unexpected probe request: ${url}`);
+    // The real boundary hands the probe parsed JSON; do the same here.
+    return { ok: true, json: async () => JSON.parse(JSON.stringify(body)) };
   };
 }
+
+const idleRunner = {
+  name: "oseo-mac-1",
+  status: "online",
+  busy: false,
+  labels: [{ name: "oseo-mac-1" }],
+};
+
+const oneAvailableRunner = fakeActionsApi(() => ({ runners: [idleRunner] }));
+
+/** A probe that must not wait: a second observation would be a bug. */
+const noSleep = {
+  recheckDelayMilliseconds: 0,
+  sleep: async () => assert.fail("The probe waited without a wedge sign"),
+};
 
 test("availability fails to hosted without skipping a lane", async () => {
   const eligible = {
@@ -605,6 +682,7 @@ test("availability fails to hosted without skipping a lane", async () => {
     OSEO_REPOSITORY: "dahlia/oseo",
     OSEO_REF: "refs/heads/main",
     OSEO_RUNNER_STATUS_TOKEN: "test-token",
+    OSEO_WORKFLOW_TOKEN: "workflow-token",
   };
   const hosted = ['"macos-15"'];
   assert.deepEqual(
@@ -644,6 +722,7 @@ test("availability fails to hosted without skipping a lane", async () => {
   const rejectedContexts = [
     { OSEO_REPOSITORY: "someone/oseo" },
     { OSEO_RUNNER_STATUS_TOKEN: "" },
+    { OSEO_WORKFLOW_TOKEN: "" },
   ];
   for (const result of await Promise.all(
     rejectedContexts.map((changes) =>
@@ -652,6 +731,30 @@ test("availability fails to hosted without skipping a lane", async () => {
   )) {
     assert.deepEqual(result, hosted);
   }
+  // A busy runner is a usable lane: its jobs queue on the runner label.
+  assert.deepEqual(
+    await runnerSelections(
+      eligible,
+      fakeActionsApi(() => ({
+        runners: [{ ...idleRunner, busy: true }],
+        runs: [
+          {
+            id: 1,
+            status: "queued",
+            jobs: [
+              {
+                id: 11,
+                status: "in_progress",
+                labels: ["self-hosted", "macOS", "ARM64", "oseo-mac-1"],
+              },
+            ],
+          },
+        ],
+      })),
+      noSleep,
+    ),
+    ['["self-hosted","macOS","ARM64","oseo-mac-1"]'],
+  );
   const rejectedRunners = [
     {
       name: "oseo-mac-1",
@@ -659,10 +762,16 @@ test("availability fails to hosted without skipping a lane", async () => {
       busy: false,
       labels: [{ name: "oseo-mac-1" }],
     },
+    // A runner without a Boolean busy state is a malformed response.
     {
       name: "oseo-mac-1",
       status: "online",
-      busy: true,
+      labels: [{ name: "oseo-mac-1" }],
+    },
+    {
+      name: "oseo-mac-1",
+      status: "online",
+      busy: "false",
       labels: [{ name: "oseo-mac-1" }],
     },
     {
@@ -686,10 +795,10 @@ test("availability fails to hosted without skipping a lane", async () => {
   ];
   for (const result of await Promise.all(
     rejectedRunners.map((runner) =>
-      runnerSelections(eligible, async () => ({
-        ok: true,
-        json: async () => ({ runners: [runner] }),
-      })),
+      runnerSelections(
+        eligible,
+        fakeActionsApi(() => ({ runners: [runner] })),
+      ),
     ),
   )) {
     assert.deepEqual(result, hosted);
@@ -701,6 +810,21 @@ test("availability fails to hosted without skipping a lane", async () => {
   for (const result of await Promise.all(
     rejectedResponses.map((response) =>
       runnerSelections(eligible, async () => response),
+    ),
+  )) {
+    assert.deepEqual(result, hosted);
+  }
+  // A usable runner whose queue cannot be read is a hosted decision too.
+  for (const result of await Promise.all(
+    ["/actions/runs?status=", "/jobs?"].map((failing) =>
+      runnerSelections(eligible, async (url, init) => {
+        if (url.includes(failing)) return { ok: false, json: async () => ({}) };
+        const upstream = fakeActionsApi(() => ({
+          runners: [idleRunner],
+          runs: [{ id: 1, status: "in_progress", jobs: [] }],
+        }));
+        return upstream(url, init);
+      }),
     ),
   )) {
     assert.deepEqual(result, hosted);
@@ -777,36 +901,41 @@ test("availability finds the one runner after a full page", async () => {
     labels: [{ name: "other" }],
   }));
   const pages: string[] = [];
-  const selected = await runnerSelections(env, async (url, init) => {
-    pages.push(url);
-    assert.ok(init.signal instanceof AbortSignal);
-    return {
-      ok: true,
-      json: async () => ({
-        runners: url.endsWith("&page=1")
-          ? filler
-          : [
-              {
-                name: "oseo-mac-1",
-                status: "online",
-                busy: false,
-                labels: [{ name: "oseo-mac-1" }],
-              },
-            ],
-      }),
-    };
-  });
+  const selected = await runnerSelections(
+    { ...env, OSEO_WORKFLOW_TOKEN: "workflow-token" },
+    async (url, init) => {
+      if (!url.includes("/actions/runners?")) {
+        return fakeActionsApi(() => ({ runners: [] }))(url, init);
+      }
+      pages.push(url);
+      assert.ok(init.signal instanceof AbortSignal);
+      return {
+        ok: true,
+        json: async () => ({
+          runners: url.endsWith("&page=1") ? filler : [idleRunner],
+        }),
+      };
+    },
+  );
   assert.deepEqual(selected, ['["self-hosted","macOS","ARM64","oseo-mac-1"]']);
   assert.equal(pages.length, 2);
   let calls = 0;
   assert.deepEqual(
-    await runnerSelections(env, async () => {
-      calls++;
-      return { ok: true, json: async () => ({ runners: filler }) };
-    }),
+    await runnerSelections(
+      { ...env, OSEO_WORKFLOW_TOKEN: "workflow-token" },
+      async () => {
+        calls++;
+        return { ok: true, json: async () => ({ runners: filler }) };
+      },
+    ),
     ['"macos-15"'],
   );
   assert.equal(calls, 10);
+  // Without the workflow token the probe asks nothing and stays hosted.
+  assert.deepEqual(
+    await runnerSelections(env, async () => assert.fail("unexpected call")),
+    ['"macos-15"'],
+  );
 });
 
 test("two Mac lanes route each label with its own hosted fallback", () => {
@@ -1028,7 +1157,8 @@ test("two Mac lanes shorten the derived makespan in every attempt", () => {
 interface FakeRunner {
   readonly name: string;
   readonly status: string;
-  readonly busy: boolean;
+  /** A string or a missing value stands in for a malformed API body. */
+  readonly busy?: boolean | string;
   readonly labels: readonly { readonly name: string }[];
 }
 
@@ -1047,25 +1177,30 @@ const twoRunners: readonly FakeRunner[] = [
   },
 ];
 
+const twoLaneEnv = {
+  OSEO_SELFHOSTED_LANES: "2",
+  OSEO_SELFHOSTED_ENABLED: "true",
+  OSEO_EVENT: "push",
+  OSEO_REPOSITORY: "dahlia/oseo",
+  OSEO_RUNNER_STATUS_TOKEN: "test-token",
+  OSEO_WORKFLOW_TOKEN: "workflow-token",
+};
+const hostedSelection = '"macos-15"';
+const mac1 = '["self-hosted","macOS","ARM64","oseo-mac-1"]';
+const mac2 = '["self-hosted","macOS","ARM64","oseo-mac-2"]';
+
 test("availability decides each Mac lane independently", async () => {
-  const env = {
-    OSEO_SELFHOSTED_LANES: "2",
-    OSEO_SELFHOSTED_ENABLED: "true",
-    OSEO_EVENT: "push",
-    OSEO_REPOSITORY: "dahlia/oseo",
-    OSEO_RUNNER_STATUS_TOKEN: "test-token",
-  };
-  const hosted = '"macos-15"';
-  const mac1 = '["self-hosted","macOS","ARM64","oseo-mac-1"]';
-  const mac2 = '["self-hosted","macOS","ARM64","oseo-mac-2"]';
+  const env = twoLaneEnv;
+  const hosted = hostedSelection;
   const select = (
     runners: readonly FakeRunner[],
     changes: Readonly<Record<string, string>> = {},
   ) =>
-    runnerSelections({ ...env, ...changes }, async () => ({
-      ok: true,
-      json: async () => ({ runners }),
-    }));
+    runnerSelections(
+      { ...env, ...changes },
+      fakeActionsApi(() => ({ runners })),
+      noSleep,
+    );
   assert.deepEqual(await select(twoRunners), [mac1, mac2]);
   assert.deepEqual(await select(twoRunners, { OSEO_SELFHOSTED_LANES: "1" }), [
     mac1,
@@ -1075,10 +1210,27 @@ test("availability decides each Mac lane independently", async () => {
     mac1,
     hosted,
   ]);
-  assert.deepEqual(await select([{ ...first!, busy: true }, second!]), [
-    hosted,
-    mac2,
-  ]);
+  // A busy lane with its job running queues the new run's jobs behind it.
+  assert.deepEqual(
+    await runnerSelections(
+      env,
+      fakeActionsApi(() => ({
+        runners: [{ ...first!, busy: true }, second!],
+        runs: [
+          {
+            id: 7,
+            status: "in_progress",
+            jobs: [
+              { id: 70, status: "in_progress", labels: ["oseo-mac-1"] },
+              { id: 71, status: "queued", labels: ["oseo-mac-1"] },
+            ],
+          },
+        ],
+      })),
+      noSleep,
+    ),
+    [mac1, mac2],
+  );
   assert.deepEqual(await select([first!]), [mac1, hosted]);
   // A second carrier of a label makes that lane's routing ambiguous.
   assert.deepEqual(
@@ -1117,6 +1269,234 @@ test("availability decides each Mac lane independently", async () => {
         /one or two/,
       ),
     ),
+  );
+});
+
+function queuedLaneJob(id: number, status: string, lane: number): FakeJob {
+  return {
+    id,
+    status,
+    labels: ["self-hosted", "macOS", "ARM64", `oseo-mac-${lane}`],
+  };
+}
+
+/** One probe observation of a usable lane, for the wedge rule alone. */
+function laneObservation(
+  busy: boolean,
+  queued: readonly number[],
+  running: readonly number[],
+): LaneObservation {
+  return {
+    usable: true,
+    busy,
+    queued: new Set(queued),
+    running: new Set(running),
+  };
+}
+
+test("a wedged lane goes hosted while a busy lane queues", async () => {
+  const [first, second] = twoRunners;
+  const stale = queuedLaneJob(100, "queued", 1);
+  // An idle runner beside a job queued for its label, in both observations
+  // two minutes apart, is not taking work: that lane goes hosted alone.
+  let waited: number[] = [];
+  const options = {
+    recheckDelayMilliseconds: 120_000,
+    sleep: async (milliseconds: number) => {
+      waited.push(milliseconds);
+    },
+  };
+  const calls: string[] = [];
+  assert.deepEqual(
+    await runnerSelections(
+      twoLaneEnv,
+      fakeActionsApi(
+        () => ({
+          runners: twoRunners,
+          runs: [{ id: 1, status: "queued", jobs: [stale] }],
+        }),
+        calls,
+      ),
+      options,
+    ),
+    [hostedSelection, mac2],
+  );
+  assert.deepEqual(waited, [120_000]);
+  // Runs listed as queued and as in progress are both scanned, and the
+  // second observation reads runners and jobs again.
+  assert.equal(
+    calls.filter((url) => url.includes("/actions/runners?")).length,
+    2,
+  );
+  for (const status of ["queued", "in_progress"]) {
+    assert.equal(
+      calls.filter((url) => url.includes(`/actions/runs?status=${status}&`))
+        .length,
+      2,
+    );
+  }
+  assert.equal(calls.filter((url) => url.includes("/runs/1/jobs?")).length, 2);
+  // A handover: the job the first observation saw queued is running by the
+  // second, so the lane is working and keeps its jobs.
+  waited = [];
+  assert.deepEqual(
+    await runnerSelections(
+      twoLaneEnv,
+      fakeActionsApi((observation) => ({
+        runners:
+          observation === 0 ? twoRunners : [{ ...first!, busy: true }, second!],
+        runs: [
+          {
+            id: 1,
+            status: "in_progress",
+            jobs: [
+              observation === 0 ? stale : { ...stale, status: "in_progress" },
+            ],
+          },
+        ],
+      })),
+      options,
+    ),
+    [mac1, mac2],
+  );
+  assert.deepEqual(waited, [120_000]);
+  // A different job queued by the second observation is not the same wait.
+  assert.deepEqual(
+    await runnerSelections(
+      twoLaneEnv,
+      fakeActionsApi((observation) => ({
+        runners: twoRunners,
+        runs: [
+          {
+            id: 1,
+            status: "in_progress",
+            jobs: [observation === 0 ? stale : queuedLaneJob(101, "queued", 1)],
+          },
+        ],
+      })),
+      options,
+    ),
+    [mac1, mac2],
+  );
+  // A runner busy in both observations with no running job of its label
+  // holds its queue as well; one such observation is only a handover.
+  waited = [];
+  assert.deepEqual(
+    await runnerSelections(
+      twoLaneEnv,
+      fakeActionsApi(() => ({
+        runners: [first!, { ...second!, busy: true }],
+        runs: [
+          {
+            id: 2,
+            status: "in_progress",
+            jobs: [queuedLaneJob(200, "queued", 2)],
+          },
+        ],
+      })),
+      options,
+    ),
+    [mac1, hostedSelection],
+  );
+  assert.deepEqual(waited, [120_000]);
+  assert.deepEqual(
+    await runnerSelections(
+      twoLaneEnv,
+      fakeActionsApi((observation) => ({
+        runners: [first!, { ...second!, busy: true }],
+        runs: [
+          {
+            id: 2,
+            status: "in_progress",
+            jobs: [
+              queuedLaneJob(
+                200,
+                observation === 0 ? "queued" : "in_progress",
+                2,
+              ),
+            ],
+          },
+        ],
+      })),
+      options,
+    ),
+    [mac1, mac2],
+  );
+  // Jobs of the other lane's label never count against this lane.
+  assert.deepEqual(
+    await runnerSelections(
+      twoLaneEnv,
+      fakeActionsApi(() => ({
+        runners: [first!, { ...second!, busy: true }],
+        runs: [
+          {
+            id: 3,
+            status: "in_progress",
+            jobs: [
+              queuedLaneJob(300, "in_progress", 2),
+              queuedLaneJob(301, "queued", 2),
+            ],
+          },
+        ],
+      })),
+      noSleep,
+    ),
+    [mac1, mac2],
+  );
+  // A lane that went offline between observations is hosted regardless.
+  assert.deepEqual(
+    await runnerSelections(
+      twoLaneEnv,
+      fakeActionsApi((observation) => ({
+        runners: [
+          observation === 0 ? first! : { ...first!, status: "offline" },
+          second!,
+        ],
+        runs: [{ id: 1, status: "queued", jobs: [stale] }],
+      })),
+      options,
+    ),
+    [hostedSelection, mac2],
+  );
+  assert.equal(
+    wedged(laneObservation(false, [1], []), laneObservation(false, [1], [])),
+    true,
+  );
+  assert.equal(
+    wedged(laneObservation(false, [1], []), laneObservation(false, [2], [])),
+    false,
+  );
+  // A queue that lost a job between the observations advanced.
+  assert.equal(
+    wedged(laneObservation(false, [1, 2], []), laneObservation(false, [2], [])),
+    false,
+  );
+  assert.equal(
+    wedged(
+      laneObservation(false, [1, 2], []),
+      laneObservation(false, [1, 2, 3], []),
+    ),
+    true,
+  );
+  assert.equal(
+    wedged(laneObservation(false, [], []), laneObservation(false, [], [])),
+    false,
+  );
+  assert.equal(
+    wedged(laneObservation(true, [1], []), laneObservation(true, [1], [])),
+    true,
+  );
+  assert.equal(
+    wedged(laneObservation(true, [1], []), laneObservation(true, [1], [1])),
+    false,
+  );
+  assert.equal(
+    wedged(laneObservation(false, [1], []), laneObservation(true, [], [1])),
+    false,
+  );
+  assert.equal(
+    wedged(laneObservation(true, [1], []), laneObservation(false, [1], [])),
+    false,
   );
 });
 

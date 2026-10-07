@@ -1,0 +1,148 @@
+# Derive, from the jobs-API rows beside this script, how each run's 19
+# Mac-lane jobs fared on the runner class the readiness probe gave them,
+# and what queueing them on the Mac runners would have cost instead.
+# Run from the repository root:
+#   python3 -I docs/evidence/u29/wait.py.txt
+import csv
+from datetime import datetime
+
+LANE_LABELS = ("oseo-mac-1", "oseo-mac-2")
+LANE_JOBS = {
+    "oseo-mac-1": (
+        "own-key cases (macos-aarch64, 2/3)",
+        "own-key cases (macos-aarch64, 3/3)",
+        "own-key cases (macos-aarch64, 1/3)",
+        "native support (macos-aarch64, 4/12)",
+        "native support (macos-aarch64, 3/12)",
+        "test262 (macos-aarch64, 1/12)",
+        "native support (macos-aarch64, 8/12)",
+        "native support (macos-aarch64, 6/12)",
+        "test262 (macos-aarch64, 3/12)",
+        "native (macos-aarch64, 1/3)",
+    ),
+    "oseo-mac-2": (
+        "native support (macos-aarch64, 1/12)",
+        "test262 (macos-aarch64, 9/12)",
+        "test262 (macos-aarch64, 5/12)",
+        "native support (macos-aarch64, 7/12)",
+        "native support (macos-aarch64, 9/12)",
+        "native support (macos-aarch64, 12/12)",
+        "native support (macos-aarch64, 10/12)",
+        "test262 (macos-aarch64, 12/12)",
+        "native support (macos-aarch64, 2/12)",
+    ),
+}
+# Run id, attempt, run_started_at, and the previous main push's start.
+ATTEMPTS = (
+    ("37499455406", 1, "2026-10-06T16:55:03Z", "2026-10-06T11:02:31Z"),
+    ("37506307446", 1, "2026-10-06T17:47:49Z", "2026-10-06T16:55:03Z"),
+    ("37575037950", 1, "2026-10-07T05:10:46Z", "2026-10-07T05:04:14Z"),
+    ("37581978950", 1, "2026-10-07T06:31:35Z", "2026-10-07T05:10:46Z"),
+    ("37606214007", 1, "2026-10-07T10:15:43Z", "2026-10-07T09:45:06Z"),
+)
+
+
+def when(text):
+    return datetime.strptime(text, "%Y-%m-%dT%H:%M:%SZ")
+
+
+def minutes(start, end):
+    return (when(end) - when(start)).total_seconds() / 60
+
+
+def rows_of(run, attempt):
+    path = f"docs/evidence/u29/jobs-{run}-{attempt}.tsv"
+    with open(path, encoding="utf-8") as source:
+        return list(csv.DictReader(source, delimiter="\t"))
+
+
+def summarize(label, rows, start):
+    if not rows:
+        return
+    walls = sorted(minutes(r["started_at"], r["completed_at"]) for r in rows)
+    waits = sorted(minutes(r["created_at"], r["started_at"]) for r in rows)
+    first = min(minutes(start, r["started_at"]) for r in rows)
+    last = max(minutes(start, r["completed_at"]) for r in rows)
+    failed = [r["name"] for r in rows if r["conclusion"] != "success"]
+    print(
+        f"  {label}: {len(rows)} jobs; walls sum {sum(walls):.1f} min,"
+        f" median {walls[len(walls) // 2]:.1f}, max {walls[-1]:.1f};"
+        f" queue wait median {waits[len(waits) // 2]:.1f},"
+        f" max {waits[-1]:.1f}; first start +{first:.1f};"
+        f" last end +{last:.1f}" + (f"; failed {failed}" if failed else "")
+    )
+
+
+all_lane = {name for names in LANE_JOBS.values() for name in names}
+mac_work = {label: [] for label in LANE_LABELS}
+mac_end = {label: [] for label in LANE_LABELS}
+hosted_end = []
+for run, attempt, start, previous in ATTEMPTS:
+    rows = rows_of(run, attempt)
+    lane = [r for r in rows if r["name"] in all_lane]
+    hosted_lane = [
+        r
+        for r in rows
+        if r["name"] not in all_lane
+        and r["name"] != "macOS self-hosted availability"
+    ]
+    on_mac = [r for r in lane if r["runner_name"].startswith("oseo-mac")]
+    fallen = [r for r in lane if not r["runner_name"].startswith("oseo-mac")]
+    gap = minutes(previous, start)
+    print(
+        f"{run} attempt {attempt}: started {start},"
+        f" {gap:.1f} min after the previous main push"
+    )
+    summarize("lane jobs on a Mac runner", on_mac, start)
+    for label in LANE_LABELS:
+        mine = [r for r in on_mac if r["runner_name"] == label]
+        if mine:
+            work = sum(minutes(r["started_at"], r["completed_at"]) for r in mine)
+            end = max(minutes(start, r["completed_at"]) for r in mine)
+            mac_work[label].append(work)
+            mac_end[label].append(end)
+            print(f"    {label}: {len(mine)} jobs, work {work:.1f} min, end +{end:.1f}")
+    summarize("lane jobs sent to hosted macos-15", fallen, start)
+    if fallen:
+        hosted_end.append(max(minutes(start, r["completed_at"]) for r in fallen))
+    summarize("hosted-lane macOS jobs", hosted_lane, start)
+    print()
+
+print("Derived queue model, minutes")
+for label in LANE_LABELS:
+    print(
+        f"  {label}: measured work per run {min(mac_work[label]):.1f} to"
+        f" {max(mac_work[label]):.1f}; measured lane end"
+        f" +{min(mac_end[label]):.1f} to +{max(mac_end[label]):.1f}"
+    )
+work = max(max(values) for values in mac_work.values())
+end = max(max(values) for values in mac_end.values())
+print(
+    f"  A push G minutes after a run that holds the lanes waits"
+    f" max(0, {end:.1f} - G) for its first lane job and ends its lane work"
+    f" about {end:.1f} + {work:.1f} - G = {end + work:.1f} - G minutes"
+    f" after its start (G below {end:.1f}); the measured hosted fallbacks"
+    f" ended their lane jobs at +{min(hosted_end):.1f} to +{max(hosted_end):.1f}."
+)
+for run, attempt, start, previous in ATTEMPTS:
+    gap = minutes(previous, start)
+    rows = rows_of(run, attempt)
+    fallen = [
+        r
+        for r in rows
+        if r["name"] in all_lane and not r["runner_name"].startswith("oseo-mac")
+    ]
+    if not fallen:
+        continue
+    queued = max(end + work - gap, work)
+    actual = max(minutes(start, r["completed_at"]) for r in fallen)
+    print(
+        f"  {run}: G = {gap:.1f}; queued lane end about +{queued:.1f}"
+        f" against the measured hosted +{actual:.1f}"
+    )
+loses = (end + work - min(hosted_end), 2 * end + work - max(hosted_end))
+print(
+    f"  Queueing loses when G is below {loses[0]:.1f} against the best"
+    f" measured fallback, and whenever two or more runs of lane work are"
+    f" ahead: the third push then ends at about +{2 * end + work:.1f}."
+)

@@ -1,0 +1,32 @@
+37499455406 attempt 1: started 2026-10-06T16:55:03Z, 352.5 min after the previous main push
+  lane jobs on a Mac runner: 19 jobs; walls sum 151.5 min, median 8.7, max 14.9; queue wait median 32.5, max 74.4; first start +0.5; last end +80.8
+    oseo-mac-1: 10 jobs, work 79.7 min, end +80.8
+    oseo-mac-2: 9 jobs, work 71.8 min, end +72.7
+  hosted-lane macOS jobs: 15 jobs; walls sum 374.5 min, median 23.0, max 52.0; queue wait median 0.1, max 130.1; first start +0.1; last end +205.0
+
+37506307446 attempt 1: started 2026-10-06T17:47:49Z, 52.8 min after the previous main push
+  lane jobs sent to hosted macos-15: 19 jobs; walls sum 475.5 min, median 21.6, max 87.2; queue wait median 75.2, max 116.6; first start +28.7; last end +197.5; failed ['native support (macos-aarch64, 9/12)']
+  hosted-lane macOS jobs: 15 jobs; walls sum 362.0 min, median 21.3, max 56.7; queue wait median 24.2, max 111.3; first start +3.0; last end +270.8; failed ['test (macos-latest, node)']
+
+37575037950 attempt 1: started 2026-10-07T05:10:46Z, 6.5 min after the previous main push
+  lane jobs sent to hosted macos-15: 19 jobs; walls sum 393.2 min, median 21.4, max 29.8; queue wait median 71.2, max 137.6; first start +39.1; last end +168.5
+  hosted-lane macOS jobs: 15 jobs; walls sum 365.4 min, median 22.9, max 56.3; queue wait median 103.5, max 131.2; first start +16.5; last end +320.6; failed ['test (macos-latest, node)', 'test (macos-latest, deno)']
+
+37581978950 attempt 1: started 2026-10-07T06:31:35Z, 80.8 min after the previous main push
+  lane jobs on a Mac runner: 19 jobs; walls sum 152.2 min, median 7.6, max 14.8; queue wait median 35.9, max 75.0; first start +0.3; last end +81.4
+    oseo-mac-1: 10 jobs, work 80.6 min, end +81.4
+    oseo-mac-2: 9 jobs, work 71.5 min, end +72.3
+  hosted-lane macOS jobs: 15 jobs; walls sum 361.3 min, median 22.2, max 46.0; queue wait median 110.9, max 146.1; first start +2.1; last end +403.0
+
+37606214007 attempt 1: started 2026-10-07T10:15:43Z, 30.6 min after the previous main push
+  lane jobs sent to hosted macos-15: 19 jobs; walls sum 411.3 min, median 21.4, max 34.6; queue wait median 89.5, max 135.0; first start +41.6; last end +159.0
+  hosted-lane macOS jobs: 15 jobs; walls sum 382.2 min, median 22.5, max 51.0; queue wait median 35.7, max 117.1; first start +17.9; last end +212.7
+
+Derived queue model, minutes
+  oseo-mac-1: measured work per run 79.7 to 80.6; measured lane end +80.8 to +81.4
+  oseo-mac-2: measured work per run 71.5 to 71.8; measured lane end +72.3 to +72.7
+  A push G minutes after a run that holds the lanes waits max(0, 81.4 - G) for its first lane job and ends its lane work about 81.4 + 80.6 - G = 162.0 - G minutes after its start (G below 81.4); the measured hosted fallbacks ended their lane jobs at +159.0 to +197.5.
+  37506307446: G = 52.8; queued lane end about +109.3 against the measured hosted +197.5
+  37575037950: G = 6.5; queued lane end about +155.5 against the measured hosted +168.5
+  37606214007: G = 30.6; queued lane end about +131.4 against the measured hosted +159.0
+  Queueing loses when G is below 3.0 against the best measured fallback, and whenever two or more runs of lane work are ahead: the third push then ends at about +243.5.

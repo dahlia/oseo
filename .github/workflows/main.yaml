@@ -388,6 +388,7 @@ jobs:
     timeout-minutes: 5
     permissions:
       contents: read
+      actions: read
     outputs:
       r1: ${{ steps.probe.outputs.r1 }}
       r2: ${{ steps.probe.outputs.r2 }}
@@ -409,6 +410,7 @@ jobs:
           OSEO_REPOSITORY: ${{ github.repository }}
           OSEO_RUNNER_STATUS_TOKEN: >-
             ${{ secrets.OSEO_RUNNER_STATUS_TOKEN }}
+          OSEO_WORKFLOW_TOKEN: ${{ github.token }}
         run: node tools/selfhosted-mac/availability.ts
 
   # macOS lane 1, longest jobs first.

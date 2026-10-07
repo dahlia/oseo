@@ -5,11 +5,11 @@ Status: configured for two persistent runners on one Mac mini, `oseo-mac-1`
 and `oseo-mac-2`, disabled by the repository variable
 `OSEO_SELFHOSTED_MAC_ENABLED`. The Mac mini adds two lanes to the five hosted
 macOS lanes, one per runner. Both runners are registered: `oseo-mac-1`
-earlier and `oseo-mac-2` on 2026-10-06. A lane whose runner is offline or
-busy falls back to hosted. Branch run `37398055382` measured both lanes;
-see *PLAN-GATE.md*. The coordinator owns
-registration, repository variables, secrets, and branch pushes. The operator
-checklist is outside the repository.
+earlier and `oseo-mac-2` on 2026-10-06. A lane whose runner is offline,
+disabled, or wedged falls back to hosted; a busy lane queues its jobs on the
+runner. Branch run `37398055382` measured both lanes; see *PLAN-GATE.md*. The
+coordinator owns registration, repository variables, secrets, and branch
+pushes. The operator checklist is outside the repository.
 
 
 Scheduling
@@ -63,20 +63,36 @@ property. The derivation and the fallback run that motivated it are in
 
 An Ubuntu job uses `OSEO_RUNNER_STATUS_TOKEN` with repository
 Administration: read to check, once per lane, whether that lane's runner is
-online and idle. Lane `oseo-mac-N` selects the runner only when exactly one
-runner carries that label, its name is the label, and it carries no other
-lane's label; each lane decides independently. The repository variable must
-equal `true`, the event must be a push to `dahlia/oseo` (any branch or tag),
-and the secret must exist. Only collaborators with write access can push there.
-Otherwise the job emits hosted `macos-15`. Pull requests, including fork PRs,
-always fall back. An API failure falls back for both lanes; a busy, offline,
-unregistered, or ambiguously labeled runner falls back for its own lane only. A
-machine that goes offline after selection can leave a job queued; the operator
-must disable the switch and rerun the workflow, preserving the complete gate
-verdict. Two overlapping pushes can both observe a runner idle before either
-starts its first job. Their selected jobs then queue on the same runner. The
-probe is an availability observation, not a reservation; watch the queue and
-keep the switch off during concurrent CI runs.
+usable: exactly one runner carries the lane label, its name is the label, it
+carries no other lane's label, and it is online. Busy is not a reason to
+fall back. A usable lane is selected while its runner works for the previous
+run, and GitHub queues the new run's jobs on the label until the runner
+frees up, so a busy lane delays only its own jobs instead of moving them to
+slower hosted runners. The repository variable must equal `true`, the event
+must be a push to `dahlia/oseo` (any branch or tag), and both the secret and
+the workflow token must exist. Only collaborators with write access can push
+there. Otherwise the job emits hosted `macos-15`. Pull requests, including
+fork PRs, always fall back. An API failure falls back for both lanes; an
+offline, unregistered, or ambiguously labeled runner falls back for its own
+lane only. Each lane decides independently.
+
+A runner that GitHub lists as online but that is not taking work would hold
+its queued jobs, because `timeout-minutes` starts only when a job starts.
+The probe therefore also reads the repository's queued and running jobs with
+the workflow token (`actions: read`) and compares two observations two
+minutes apart. A lane is wedged, and falls back to hosted, when its runner
+was idle both times while every job that waited for its label the first
+time was still waiting the second time, or busy both times while no job of
+its label was running either time. One
+observation would misread a handover: U23 measured 2 to 3 seconds between
+jobs, during which a runner is idle beside jobs queued long ago. The second
+observation happens only when the first shows one of those signatures, so
+an ordinary probe makes one pass. What the check does not cover: a runner
+that wedges after the probe selected it, and a wedge that the two-minute
+window misses. Jobs already queued behind such a runner wait until the
+operator disables the switch and reruns the workflow, or until GitHub
+cancels a job queued for 24 hours, which fails the run rather than
+skipping it. The probe is an observation, not a reservation.
 
 Two concurrent jobs on the same Mac were measured in [U25 evidence] over
 SSH, without a second runner. Memory pressure stayed normal and swap did
@@ -384,11 +400,16 @@ ran 10 jobs and `oseo-mac-2` 9 in each attempt, as generated. The
 coordinator measured 115 GiB free on the Mac after the runs. *PLAN-GATE.md*
 records the lane ends, pair slowdowns, own-key durations, and projection.
 
-While `oseo-mac-2` is offline or busy, its lane's nine jobs fall back to
-hosted `macos-15` without a predecessor chain and compete with the five
-hosted lanes for the five hosted slots. That fallback schedule is not
-modeled, and it is expected to be slower than the one-lane assignment. The
-lane's native support jobs then run with the fallback time scale above.
+While `oseo-mac-2` is offline, disabled, or wedged, its lane's nine jobs
+fall back to hosted `macos-15` without a predecessor chain and compete with
+the five hosted lanes for the five hosted slots. That fallback schedule is
+not modeled; the three measured fallbacks in [U29 evidence] ended their
+lane jobs 159.0 to 197.5 min after the run started, against 72.3 to 81.4
+min on the lanes. The lane's native support jobs then run with the
+fallback time scale above. While `oseo-mac-2` is merely busy, its jobs
+queue behind the previous run's: *PLAN-GATE.md* (U29) derives the wait.
+
+[U29 evidence]: ./evidence/u29/README.md
 
 
 Security and activation

@@ -1761,6 +1761,145 @@ larger changes were considered and left to the maintainer:
     current design avoids. The own-key shards also need one runner class
     for their duration sum, which a per-job decision would have to keep.
 
+U29 below takes the second option in its per-lane form: the per-run
+decision stays, but a busy lane is selected and its jobs queue on the
+runner label, with hosted fallback kept for lanes that cannot take work.
+
+#### Queue on a busy lane instead of falling back (U29)
+
+The U28 probe selected a lane only while its runner was idle at the
+instant of the probe. Because the orchestrator lands commits back to
+back, the next run usually probed while the previous run still held the
+lanes, and all 19 lane jobs went to hosted `macos-15`, where they competed
+with the 15 hosted-lane jobs for five slots. Three such runs are measured
+in [*U29 evidence*](./docs/evidence/u29/), beside two runs that held the
+lanes. G is the measured gap after the previous main push; lane job
+minutes are summed job walls; ends are minutes after `run_started_at`:
+
+| Run, attempt   |     G | Lane jobs ran on | Lane job min |                      Lane jobs' last end | Hosted-lane last end | Wall to last job |
+| -------------- | ----: | ---------------- | -----------: | ---------------------------------------: | -------------------: | ---------------: |
+| 37499455406, 1 | 352.5 | both Mac runners |        151.5 | 80.8 (`oseo-mac-1`), 72.7 (`oseo-mac-2`) |                205.0 |            205.3 |
+| 37506307446, 1 |  52.8 | hosted           |        475.5 |                                    197.5 |                270.8 |   270.9, failure |
+| 37575037950, 1 |   6.5 | hosted           |        393.2 |                                    168.5 |                320.6 |   321.1, failure |
+| 37581978950, 1 |  80.8 | both Mac runners |        152.2 | 81.4 (`oseo-mac-1`), 72.3 (`oseo-mac-2`) |                403.0 |            403.5 |
+| 37606214007, 1 |  30.6 | hosted           |        411.3 |                                    159.0 |                212.7 |            213.1 |
+
+On the Mac, `oseo-mac-1` did a measured 79.7 and 80.6 min of work and
+ended at 80.8 and 81.4 min; `oseo-mac-2` did 71.8 and 71.5 min and ended
+at 72.7 and 72.3 min, inside the 70 to 80 min that U27 measured (78.5 to
+79.3). Hosted, the same 19 jobs took a measured 393 to 476 min of runner
+time, 2.6 to 3.1 times the Mac sum, and their median queue wait was 71 to
+90 min because the five hosted slots were already carrying the hosted
+lanes. The congestion also reached the runs that held the lanes: the
+hosted-lane jobs of `37499455406` and `37581978950` ended at 205.0 and
+403.0 min with queue waits up to a measured 130.1 and 146.1 min, against
+72.7 and 77.8 min in the uncongested two-lane attempts of U27. The
+fallback of `37606214007` was decided at 10:15:47Z while both runners ran
+jobs of main run `37602749736`; that run was cancelled, its two Mac jobs
+ended at 10:16:14Z and 10:17:14Z, and the lanes then sat idle through the
+159 min of hosted lane work. The probe of `37575037950` at 05:20:07Z found
+both runners on test262 shards of `37574505205`, pushed 6.5 min earlier.
+
+A live check on 2026-10-07 at 14:57Z observed the same shape: the probe
+of run `37636486388` ran from 14:26:06Z to 14:26:22Z while `oseo-mac-2`
+was on a job of the cancelled run `37631945458` that ended at 14:26:21Z,
+so its nine `r2` jobs went hosted and its ten `r1` jobs queued on the
+idle `oseo-mac-1`. At 14:57Z `oseo-mac-2` reported `busy: false` and seven
+of the nine hosted jobs were still queued. The runner API
+reports only `busy`, `status`, `labels`, `name`, `os`, `id`, and
+`version`; the GitHub run status was `queued` with nine jobs running, so
+a probe that lists active runs must ask for both `queued` and
+`in_progress`.
+
+The change makes the probe ask whether a lane is usable, not whether it
+is idle. *tools/selfhosted-mac/availability.ts* selects lane `i` when
+exactly one runner carries `oseo-mac-i`, is named so, carries no other
+lane label, and is online; the repository variable, the push event, the
+repository, and both tokens are still required, and any API failure
+still emits hosted for every lane. A busy usable runner is selected, so
+its jobs queue on `["self-hosted","macOS","ARM64","oseo-mac-i"]` and
+GitHub starts them when the runner frees up. `runs-on`, the required
+check names, commands, timeouts, shard totals, seeds, case budgets, the
+reviewed manifest, and the native aggregate are unchanged. The job-level
+`OSEO_PROPERTY_TIME_SCALE` of a lane's `native support` jobs still reads
+the lane output: 1 on the runner, however long the job waited, and 4 on
+a hosted fallback. Its readers are
+*packages/testkit/tests/property-support.ts* (the interrupt limit and the
+limit written to a duration record), the `test:sanitizer:property` tasks
+in *mise.toml* (their own default of 3 when unset), and the tests that
+assert the unscaled limit in *packages/testkit/tests/*; none runs in a
+lane job, and the `test` matrix jobs still carry no scale.
+
+Derived from the measured lane ends and work above, a push G minutes
+after a run that holds the lanes waits `max(0, 81.4 - G)` for its first
+`oseo-mac-1` job and ends its lane work about `162.0 - G` minutes after
+it starts, when G is below 81.4 (the shorter `oseo-mac-2` lane ends
+earlier). Against the measured hosted ends of the three fallback runs:
+`37506307446` would have ended its lane work at about 109 min instead of
+197.5, `37575037950` at about 156 instead of 168.5, and `37606214007` at
+about 83 instead of 159, because the jobs ahead of it were cancelled 27
+and 87 seconds after the probe. Hosted-lane jobs then keep the five hosted
+slots, which U27 measured at 72.7 to 77.8 min without fallback traffic.
+Queueing loses in two cases. A push within a derived 3.0 min of the previous
+one ends at about 159 to 162 min, level with the best measured fallback; and
+two or more runs of lane work ahead in the queue put the third push at about
+243 min, a derived `2 × 81.4 + 80.6`, behind every measured fallback. The
+measured gaps between consecutive main pushes that were not cancelled, from
+2026-10-06T16:55Z to 2026-10-07T14:25Z, were 52.8, 250.9, 162.1, 163.0, 100.5,
+6.5, 80.8, 224.1, and 249.2 min, with cancelled pushes between some of them
+holding the lanes for minutes, so one run of lane work ahead is common and two
+have not been observed.
+
+The risk the busy signal used to mask is a runner that GitHub lists as
+online but that takes no work: its queued jobs would wait, because
+`timeout-minutes` begins when a job starts. GitHub cancels a job queued
+for 24 hours, which fails the run, and the operator can disable
+`OSEO_SELFHOSTED_MAC_ENABLED` and rerun at any time; both keep the gate
+verdict and give up no coverage. The probe bounds the common case
+earlier. With the workflow token and `actions: read`, it reads the
+queued and running jobs of every active run and compares two
+observations two minutes apart. A lane is wedged when its runner was
+idle both times while every job that waited for its label the first time
+was still waiting the second time, or busy both times while no job of its
+label was running either time; such a lane falls back to hosted with the
+U28 scale. One observation would misread a handover, which U23 measured
+at 2 to 3 seconds between jobs, and a queue that lost a job between the
+observations has advanced whatever instants they caught, so the second
+pass runs only when the first shows one of those signatures; an ordinary
+probe makes one pass of one runner call, two run-list calls, and one job
+call per active run, and finishes in seconds. Two minutes is below the
+five-minute readiness timeout with the second pass included, and a runner stays
+`busy` through its job-completed hook, so a prune the length of the one-off
+measured 5.5 min in `37360463788` could still show the busy signature and send
+one run's lane to hosted; that is the previous behavior, not a lost job. Not
+covered: a runner that wedges after the probe selected it, a wedge shorter than
+two minutes, and the 24-hour GitHub bound itself, which this change neither
+shortens nor lengthens.
+
+Two questions were examined and left unchanged. First, the Mac-lane
+jobs have never been chained: each needs only `mac_ready`, GitHub picks
+the next queued job in an order it does not document, and U24 observed
+the pickup order varying. On one serial runner the lane end is the sum
+of its jobs whatever the order; order moves only the overlap between the
+two lanes, which `node tools/macos-lane-report.ts` bounds at a derived
+76.3 to 78.3 min across orders for the current costs, and once jobs of
+two runs share a queue no chain inside one run could order them. The
+“longest jobs first” comment in the generated workflow therefore names
+the generator's assignment order, not an execution order. Second,
+`selfHostedLaneEnds` models one run starting on idle lanes after the
+60-second probe allowance, and `selfHostedPairSlowdowns` is indexed by
+family, so a partner job from the previous run slows a job as the same
+family from the same run would. The own-key case shards still share
+`oseo-mac-1`'s single decision, so one run's three duration records
+still come from one runner class, which `check:property-case-durations`
+requires; their two-lane sum of a measured 1,422.9 to 1,486.4 s against
+the 3,600 s limit already includes a busy partner lane. No weight in
+*tools/macos-job-costs.ts* assumes a whole run on one class: hosted
+medians place hosted lanes, Mac medians and ratios place Mac lanes, and
+the fallback schedule was unmodeled before this change as well. The
+derived makespan of 77.2 min remains the isolated-run value; a queued
+run's lane end is that value plus the previous run's remaining lane work.
+
 ### macOS static capacity lanes (U16)
 
 The workflow now generates five macOS job chains from measured whole-job

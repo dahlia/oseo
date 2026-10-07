@@ -485,6 +485,49 @@ values.
 [37499455406]: https://github.com/dahlia/oseo/actions/runs/37499455406
 [37506307446]: https://github.com/dahlia/oseo/actions/runs/37506307446
 
+### Lane queue versus hosted fallback (U29)
+
+Five main runs of 2026-10-06 and 2026-10-07 measure what the U28 fallback
+cost when the orchestrator's next push probed while the previous run held
+the Mac lanes, and what the lanes did when they were free. The table uses
+the U23 definitions: walls are `started_at` to `completed_at`, ends are
+minutes after `run_started_at`, and the 19 lane jobs are those the
+generator places on `oseo-mac-1` and `oseo-mac-2`. G is the measured gap
+after the previous main push. All values are measured and rounded to 0.1
+min; [*evidence/u29/*](./evidence/u29/) holds the job rows and the script.
+
+| Source run, attempt |     G | Lane jobs ran on | Lane job min | Lane jobs' last end                      | Hosted-lane job min | Hosted-lane last end | Wall to last job |
+| ------------------- | ----: | ---------------- | -----------: | ---------------------------------------- | ------------------: | -------------------: | ---------------: |
+| [37499455406], 1    | 352.5 | both Mac runners |        151.5 | 80.8 (`oseo-mac-1`), 72.7 (`oseo-mac-2`) |               374.5 |                205.0 |            205.3 |
+| [37506307446], 1    |  52.8 | hosted           |        475.5 | 197.5                                    |               362.0 |                270.8 |   270.9, failure |
+| [37575037950], 1    |   6.5 | hosted           |        393.2 | 168.5                                    |               365.4 |                320.6 |   321.1, failure |
+| [37581978950], 1    |  80.8 | both Mac runners |        152.2 | 81.4 (`oseo-mac-1`), 72.3 (`oseo-mac-2`) |               361.3 |                403.0 |            403.5 |
+| [37606214007], 1    |  30.6 | hosted           |        411.3 | 159.0                                    |               382.2 |                212.7 |            213.1 |
+
+The hosted lane jobs' median queue wait was a measured 71.2 to 89.5 min and
+their maximum 116.6 to 137.6 min; on the Mac the first lane job started 0.3
+to 0.5 min after the run and the last queue wait was the runner's own
+serial backlog, 74.4 and 75.0 min. The hosted-lane jobs of the two lane
+runs waited up to a measured 130.1 and 146.1 min for hosted slots that the
+neighboring fallback runs were holding, against the 72.7 and 77.8 min
+hosted-lane ends of the uncongested two-lane attempts in U27. The failures
+of `37506307446` and `37575037950` were property interrupts on hosted
+runners, recorded in U28 and in the revert `4322c657`; `37606214007` and
+the two lane runs passed.
+
+Derived from the two lane runs, `oseo-mac-1` carries 79.7 to 80.6 min of
+work per run and ends at 80.8 to 81.4 min. A push G minutes after a run that
+holds the lanes, with lane jobs queued on the runner label as U29 does, ends
+its lane work at about `162.0 - G` min for G below 81.4: about 109, 156, and
+83 min for the three fallback runs above (the jobs ahead of the third were
+cancelled 27 and 87 s after its probe), against their measured 197.5,
+168.5, and 159.0. [*PLAN-GATE.md*](../PLAN-GATE.md) records the losing cases
+and the wedged-runner bound.
+
+[37575037950]: https://github.com/dahlia/oseo/actions/runs/37575037950
+[37581978950]: https://github.com/dahlia/oseo/actions/runs/37581978950
+[37606214007]: https://github.com/dahlia/oseo/actions/runs/37606214007
+
 ### U16 static macOS lane branch observations
 
 GitHub Actions run and job timestamps provide one measured observation at

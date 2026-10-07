@@ -532,7 +532,13 @@ export function generateMacosWorkflow(
   );
 }
 
-/** The readiness job emits a hosted fallback for each configured Mac lane. */
+/**
+ * The readiness job emits one runner decision per configured Mac lane: the
+ * lane's runner labels when the lane is usable, hosted `macos-15` otherwise.
+ * The probe reads runner state with the administration token and the
+ * repository's queued and running jobs with the workflow token, which
+ * needs `actions: read`, to tell a wedged runner from a busy one.
+ */
 function selfHostedAvailabilityJob(count: number): string {
   const outputs = Array.from({ length: count }, (_, index) => {
     const key = `r${index + 1}`;
@@ -545,6 +551,7 @@ function selfHostedAvailabilityJob(count: number): string {
     "    timeout-minutes: 5",
     "    permissions:",
     "      contents: read",
+    "      actions: read",
     "    outputs:",
     outputs,
     "    steps:",
@@ -565,6 +572,7 @@ function selfHostedAvailabilityJob(count: number): string {
     "          OSEO_REPOSITORY: ${{ github.repository }}",
     "          OSEO_RUNNER_STATUS_TOKEN: >-",
     "            ${{ secrets.OSEO_RUNNER_STATUS_TOKEN }}",
+    "          OSEO_WORKFLOW_TOKEN: ${{ github.token }}",
     "        run: node tools/selfhosted-mac/availability.ts",
     "",
   ].join("\n");
