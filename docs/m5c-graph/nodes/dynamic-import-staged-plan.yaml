@@ -1,0 +1,15 @@
+version: 1
+id: dynamic-import-staged-plan
+title: Plan build-time-resolvable dynamic import
+delivers: "Implements option B of the maintainer decision of 2026-10-07 as a
+  plan only: writes a reviewed plan for ADR 0016 alternative 3 (admit only
+  dynamic import whose specifier is resolvable while linking) that meets the
+  PLAN-DYN.md entry criteria for promise identity, failure timing, and
+  manifest evidence, and proposes the corresponding ADR 0016 update for
+  maintainer acceptance. Implements no runtime, compiler, or manifest change,
+  admits no paths, and leaves ADR 0016's current decision in force until the
+  maintainer accepts the update."
+dependencies:
+  - dynamic-import
+landed: false
+status: blocked

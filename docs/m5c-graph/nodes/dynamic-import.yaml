@@ -1,16 +1,18 @@
 version: 1
 id: dynamic-import
-title: Admit dynamic import
-delivers: "Admits the dynamic-import feature: import() in Script and Module
-  code with host module loading, its promise and namespace results, and its
-  early errors, so the observation batches that list it can observe the 629
-  unreviewed paths whose frontmatter needs it."
+title: Account dynamic import as unsupported
+delivers: "Implements the maintainer decision of 2026-10-07 (option C, interim
+  A): dynamic import is NOT admitted and ADR 0016 is unchanged. Makes the 629
+  unreviewed paths whose frontmatter needs dynamic-import observable as
+  reviewed unsupported-profile-feature results through the existing parse-time
+  OSEO1001 rejection: extends the dynamicSurface predicate in
+  tools/m5c-exclusion-audit.ts to accept that exact dynamic import rejection
+  with tests, and records the ownership rule the observation batches apply
+  (adr:0016-dynamic-source-boundary only when import() itself is the test's
+  subject, node:dynamic-source-coverage-remediation when it is incidental,
+  each with an exclusion-audit record). Admits no paths itself;
+  observation-batch-30, -31, and -32 observe them."
 dependencies:
   - observation-batch-plan
 landed: false
-status: parked
-reason: "Parked for a maintainer decision: as written it admits dynamic
-  import, but ADR 0016 keeps dynamic import rejected at parse time and ties
-  admission to a separate reviewed plan and an ADR 0016 update (alternative
-  3). Decision requested on 2026-10-07; answer in
-  decisions/dynamic-import.md."
+status: ready
