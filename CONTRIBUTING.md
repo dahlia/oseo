@@ -405,9 +405,11 @@ Failures report `fast-check` version, seed, replay path, profile, and domain.
 Replay an ordinary or extended suite by setting `OSEO_PROPERTY_SEED` and
 `OSEO_PROPERTY_PATH`; use `OSEO_PROPERTY_RUN_SCALE` and `OSEO_PROPERTY_SIZE`
 only to change the reviewed case budget and size. `OSEO_PROPERTY_TIME_SCALE`
-multiplies only the interrupt time limit. It exists for lanes whose
-instrumentation slows every case, such as the host C compiler sanitizer lane,
-and never changes the case budget, so an interrupted run still fails. Minimize
+multiplies only the interrupt time limit. It exists for lanes that run every
+case slower than the runner a limit was budgeted on: the host C compiler
+sanitizer lane, a generated Mac-lane `native support` job whose readiness
+probe fell back to a hosted runner, and the hosted macOS `test` job. It never
+changes the case budget, so an interrupted run still fails. Minimize
 a failure and retain it as an ordinary regression fixture before fixing the
 implementation.
 

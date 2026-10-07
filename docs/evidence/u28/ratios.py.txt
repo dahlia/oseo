@@ -1,0 +1,63 @@
+# Derive pooled and per-property hosted/Mac duration ratios and the
+# extrapolated hosted need of every interrupted property from
+# native-support-properties.tsv. Run from the repository root:
+#   python3 -I docs/evidence/u28/ratios.py.txt
+import csv
+import re
+
+rows = list(
+    csv.DictReader(
+        open("docs/evidence/u28/native-support-properties.tsv", encoding="utf-8"),
+        delimiter="\t",
+    )
+)
+
+
+def budget(path):
+    text = open(path, encoding="utf-8").read()
+    limits = {
+        int(value.replace("_", ""))
+        for value in re.findall(r"timeLimitMilliseconds:\s*([\d_]+)", text)
+    }
+    runs = {
+        int(value.replace("_", ""))
+        for value in re.findall(r"numRuns:\s*([\d_]+)", text)
+    }
+    # Only single-property files report a budget; others print "-".
+    # Extended budgets: OSEO_PROPERTY_RUN_SCALE=10 scales both values.
+    return (
+        limits.pop() * 10 / 1000 if len(limits) == 1 else None,
+        runs.pop() * 10 if len(runs) == 1 else None,
+    )
+
+
+for shard in ["1/12", "7/12", "9/12", "10/12"]:
+    mac = hosted = 0.0
+    ratios = []
+    print(f"shard {shard}")
+    for row in rows:
+        if row["shard"] != shard:
+            continue
+        m = float(row["mac_ms"]) / 1000
+        h = float(row["hosted_ms"]) / 1000
+        limit, runs = budget(row["file"])
+        if row["hosted_status"] == "pass":
+            mac += m
+            hosted += h
+            ratios.append(h / m)
+            use = f"{h / limit:5.2f}" if limit else "    -"
+            print(f"  pass  {h / m:5.2f}x mac={m:7.1f}s hosted={h:7.1f}s " f"hosted/limit={use} {row['test'][:60]}")
+        else:
+            done = int(row["hosted_cases_done"])
+            need = h * runs / done
+            print(
+                f"  INTR  {h / m:5.2f}x mac={m:7.1f}s hosted>{h:7.1f}s "
+                f"cases={done}/{runs} extrapolated={need:7.0f}s "
+                f"({need / m:4.1f}x Mac, {need / limit:4.2f}x limit) "
+                f"{row['test'][:50]}"
+            )
+    if mac:
+        print(
+            f"  pooled passing hosted/mac={hosted / mac:.3f} "
+            f"n={len(ratios)} min={min(ratios):.2f} max={max(ratios):.2f}"
+        )

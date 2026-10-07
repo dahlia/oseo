@@ -37,6 +37,7 @@ import { ownKeyCaseContract } from "../tools/check-property-case-durations.ts";
 import { runnerSelections } from "../tools/selfhosted-mac/availability.ts";
 import { configuredSelfHostedLanes } from "../tools/macos-lane-config.ts";
 import {
+  hostedFallbackTimeScale,
   macosFixedSetupSeconds,
   selfHostedFamilySpeedRatios,
   selfHostedJobSeconds,
@@ -865,6 +866,96 @@ test("two Mac lanes route each label with its own hosted fallback", () => {
       );
       assert.deepEqual(actual.needs, ["mac_ready"]);
       assert.equal(actual.if, "${{ !cancelled() }}");
+    }
+  }
+});
+
+/** The job-level scale a Mac-lane property job carries, by lane output. */
+function fallbackEnvironment(runnerOutput: string) {
+  return {
+    OSEO_PROPERTY_TIME_SCALE:
+      `\${{ contains(needs.mac_ready.outputs.${runnerOutput},` +
+      ` 'self-hosted') && '1' || '${hostedFallbackTimeScale}' }}`,
+  };
+}
+
+test("hosted fallback widens only Mac-lane property deadlines", () => {
+  // The scale restores the margin a Mac lane gives the fixed budgets, so
+  // it must cover the family ratio the lane model converts walls with.
+  assert.ok(Number.isSafeInteger(hostedFallbackTimeScale));
+  assert.ok(hostedFallbackTimeScale >= 1);
+  assert.ok(
+    hostedFallbackTimeScale >= selfHostedFamilySpeedRatios["native support"]!,
+  );
+  const rendered = readFileSync(".github/workflows/main.yaml", "utf8");
+  // SAFETY: actionlint validates this generated workflow schema.
+  const workflow = parse(rendered) as Workflow;
+  const lanes = macosLanes(configuredSelfHostedLanes);
+  let scaled = 0;
+  for (const [index, lane] of lanes.entries()) {
+    for (const job of lane) {
+      const actual = workflow.jobs[job.id]!;
+      if (index >= 5 && job.family === "native support") {
+        assert.deepEqual(actual.env, fallbackEnvironment(`r${index - 4}`));
+        scaled++;
+        continue;
+      }
+      assert.deepEqual(actual.env, before.jobs[job.sourceId]!.env, job.id);
+      // Own-key duration records pin the original limit for the aggregate
+      // deadline check, and test262 and native fixtures run no property.
+      if (["own-key cases", "test262", "native"].includes(job.family)) {
+        assert.ok(
+          !JSON.stringify(actual).includes("OSEO_PROPERTY_TIME_SCALE"),
+          job.id,
+        );
+      }
+    }
+  }
+  assert.ok(scaled > 0);
+  assert.equal(
+    scaled,
+    lanes
+      .slice(5)
+      .flat()
+      .filter((job) => job.family === "native support").length,
+  );
+  // Without a Mac lane every job is hosted by design and keeps its limit.
+  assert.ok(!generated.includes("OSEO_PROPERTY_TIME_SCALE: >-\n        $"));
+  for (const job of macosJobs()) {
+    assert.deepEqual(
+      after.jobs[job.id]!.env,
+      before.jobs[job.sourceId]!.env,
+      job.id,
+    );
+  }
+  // SAFETY: actionlint validates this generated workflow schema.
+  const one = parse(generateMacosWorkflow(template, 1)) as Workflow;
+  for (const job of macosLanes(1)[5]!) {
+    assert.deepEqual(
+      one.jobs[job.id]!.env,
+      job.family === "native support"
+        ? fallbackEnvironment("r1")
+        : before.jobs[job.sourceId]!.env,
+      job.id,
+    );
+  }
+  // The always-hosted macOS test job widens the ordinary own-key limit by
+  // a fixed factor; the same expression yields 1 on Linux and Windows.
+  const hostedScale = {
+    OSEO_PROPERTY_TIME_SCALE: "${{ runner.os == 'macOS' && '2' || '1' }}",
+  };
+  for (const [id, run] of [
+    ["test_macos_node", "mise run test:node"],
+    ["test_macos_deno", "mise run test:deno"],
+    ["test", "mise run test:${{ matrix.runtime }}"],
+  ] as const) {
+    const step = workflow.jobs[id]!.steps.find((entry) => entry.run === run);
+    assert.ok(step, id);
+    assert.deepEqual(step.env, hostedScale, id);
+  }
+  for (const line of rendered.split("\n")) {
+    if (line.includes("OSEO_PROPERTY_TIME_SCALE") || line.includes("'1' ||")) {
+      assert.ok(line.length <= 80, line);
     }
   }
 });

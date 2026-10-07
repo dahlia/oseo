@@ -1663,6 +1663,101 @@ observations. They keep the measured interference per second of test262
 work, although longer Mac test262 jobs would change which jobs overlap, and
 they omit hosted job waits and the fallback schedule.
 
+#### Hosted fallback property deadlines (U28)
+
+Main run `37506307446` at `12394d8a` started while main run `37499455406`
+at `45af71ff` still held both Mac lanes. The readiness probe observed both
+runners busy and emitted hosted `macos-15` for `r1` and `r2`, so all 19
+Mac-lane jobs ran hosted beside the 15 hosted-lane jobs. Attempt 1 failed
+in two jobs, both with `markInterruptAsFailure`:
+`native support (macos-aarch64, 9/12)` interrupted six properties at their
+1,800,000 ms extended limit after a measured 87.2 min, and
+`test (macos-latest, node)` interrupted the ordinary own-key property at its
+360,000 ms limit after 15 of 16 cases. A `--failed` rerun passed both. Because
+the orchestrator lands commits back to back, a push commonly probes while the
+previous run's lanes are busy, so this is the fallback schedule's ordinary
+state, not a rare one. [*U28 evidence*](./docs/evidence/u28/) keeps the job
+rows, the per-property durations, and the own-key records of both runs.
+
+The two runs ran the same four native support shards on `oseo-mac-2` and
+on hosted runners. For the passing properties, the pooled hosted/Mac
+duration ratio (sum of hosted seconds over sum of two-lane Mac seconds)
+was a derived 2.64 in shard 1/12 (6 properties), 1.06 in 7/12 (12), 1.75
+in 9/12 (10), and 1.84 in 10/12 (12); the largest single ratio of a
+property longer than ten seconds was 3.16, and a seven-second property
+reached 8.23. The matched job walls of the nine passing Mac-lane native
+support jobs pooled to a derived 2.86, or 3.12 after the 60-second setup
+share, against the 3.2 family ratio of *tools/macos-job-costs.ts* and the
+3.55 and 3.60 that U24 measured. Those Mac walls are two-lane walls that
+U27 measured at 1.18 to 1.30 times one-lane walls. On the hosted runner the
+passing extended properties used a derived 6 to 45 percent of their
+limits; on the Mac lane 5 to 25 percent.
+
+The six interrupted properties of shard 9/12 are outside that range. From
+the measured cases completed at the interrupt, their hosted need
+extrapolates to a derived 2,383, 2,455, and 2,572 s for the three that ran
+together first (7.5 to 9.0 times their Mac durations, 1.3 to 1.4 times
+their limit) and 5,635, 5,833, and 6,006 s for the three that followed
+(31 to 33 times their Mac durations, 3.1 to 3.3 times their limit). The
+same runner had completed the shard's first ten properties at 1.2 to 3.2
+times their Mac durations, so the job degraded during its last hour. Even
+an interrupt limit that let all six finish would have ended the job after
+its 90-minute timeout, at a derived 167 min, so that attempt is a rerun
+under any deadline. The ordinary own-key property of
+`test (macos-latest, node)` measured 299.9 s in `37499455406`, 251.8 s in
+attempt 2 of `37506307446`, and over 360.0 s at 15 of 16 cases in attempt
+1, a derived 384 s need; the budget's comment extrapolated 295 s on
+ubuntu-latest, which measured 286.7 s in `37499455406`.
+
+The change makes the interrupt limits follow the runner while every budget
+stays fixed, through the existing `OSEO_PROPERTY_TIME_SCALE`:
+
+ -  A Mac-lane `native support` job carries a job-level
+    `OSEO_PROPERTY_TIME_SCALE` read from its lane's readiness output: 1
+    when the output names the self-hosted runner, and
+    `hostedFallbackTimeScale`, 4, when it is hosted or empty. Four is the
+    derived ceiling of the 3.2 family ratio and covers every pooled ratio
+    above, including the 3.12 matched job-wall ratio and U24's 3.60; it does
+    not cover the degraded shard, which no limit under the job timeout covers.
+    With zero configured lanes every job is hosted by design and carries no
+    scale.
+ -  The `test` matrix step sets `OSEO_PROPERTY_TIME_SCALE` to 2 when
+    `runner.os` is macOS and 1 elsewhere. That job is always hosted, so the
+    scale is not a Mac ratio: it gives the macOS runner the margin the
+    360,000 ms budget was written with, since the measured 252 to 384 s
+    need sits at 70 to 107 percent of the limit. The Deno job on macOS
+    receives the same factor on package properties with 5 and 10 s limits.
+ -  Own-key case shards keep the original 3,600,000 ms limit on either
+    runner class. Their duration record stores the effective limit, and
+    `check:property-case-durations` requires it to equal the original and
+    compares the recorded sum with it; the macOS sums measured 2,343 to
+    2,878 s in the three runs whose own-key shards ran hosted, a derived 65
+    to 80 percent of the aggregate deadline, against 1,486 s on the
+    two-lane Mac.
+    Test262 and native fixture jobs run no fast-check property, and the
+    host C sanitizer jobs keep their existing 3 and 6.
+ -  No `timeout-minutes` changes. A passing job is not lengthened by a
+    wider interrupt limit, and the only job that needed more than 90 min
+    was the degraded shard above.
+
+Case counts, `numRuns`, seeds, sizes, shard totals, targets, the required
+check names, and the failure of an interrupted run are unchanged. Two
+larger changes were considered and left to the maintainer:
+
+ -  The probe could wait for a lane instead of falling back. A busy lane
+    is the orchestrator's previous run, whose Mac work ends a measured
+    70 to 80 min after it starts, so the wait would often be shorter than
+    the hosted fallback's own slowdown; but a `mac_ready` job that waits
+    holds a Linux runner, delays every lane job behind it, and still
+    cannot reserve the runner against a third push. A bounded wait with a
+    hosted fallback at expiry would need its own measured runs.
+ -  The decision could be per job rather than per run, with each job
+    probing before it starts or letting GitHub queue it on the runner
+    label. Per-job probing needs the token in every job or a probe job per
+    lane job, and queuing on the label with no fallback is what the
+    current design avoids. The own-key shards also need one runner class
+    for their duration sum, which a per-job decision would have to keep.
+
 ### macOS static capacity lanes (U16)
 
 The workflow now generates five macOS job chains from measured whole-job
