@@ -919,6 +919,33 @@ throw boom;
   assert.equal(wideRecursion.stdout, "");
   assert.match(wideRecursion.stderr, /error\[OSEO2001\].*frame budget/u);
 
+  // Dense heap roots must not reduce the native-stack charge for callable
+  // frames: unoptimized sanitizer builds retain C expression temporaries.
+  const compactBindings = Array.from(
+    { length: 1_000 },
+    (_, index) => `const compact${index} = ${index};`,
+  ).join("\n");
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [
+          ...(specialization === "disabled" ? ["--no-specialization"] : []),
+          "compact-frame-recursion.ts",
+        ],
+        source:
+          `function recurse(depth) {\n${compactBindings}\n` +
+          "if (depth === 0) return 0; return recurse(depth - 1);\n}\n" +
+          "console.log(recurse(100));\n",
+        sourceId: "compact-frame-recursion.ts",
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "");
+    assert.match(observed.stderr, /error\[OSEO2001\].*frame budget/u);
+  }
+
   const rootAllocationFailureHost = {
     ...host,
     async readTextFile(path: string | URL): Promise<string> {

@@ -8388,6 +8388,9 @@ tests:
   - path: test/built-ins/Array/prototype/sort/stability-11-elements.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/sort/stability-2048-elements.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/sort/stability-5-elements.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
