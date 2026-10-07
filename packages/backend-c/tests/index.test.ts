@@ -425,10 +425,10 @@ test("emits rooted iterator protocol operations", () => {
   );
   assert.ok(
     emitted.source.includes(
-      "oseo_iterator_next(context, roots[1], roots[2], &roots[5],",
+      "oseo_iterator_next(context, roots[1], roots[2], &roots[4],",
     ),
   );
-  assert.ok(emitted.source.includes("bool fast_4 = !iterator_done_4;"));
+  assert.ok(emitted.source.includes("bool fast_3 = !iterator_done_3;"));
   assert.ok(
     emitted.source.includes(
       "oseo_iterator_close(context, roots[1], completion[0u].kind == 2)",
@@ -966,12 +966,12 @@ test("emits GC-rooted dynamic argument lists", () => {
   );
   assert.ok(
     emitted.source.includes(
-      "oseo_argument_list_view(context, roots[0], &argument_count_4,",
+      "oseo_argument_list_view(context, roots[0], &argument_count_3,",
     ),
   );
   assert.ok(
     emitted.source.includes(
-      "oseo_console_log(context, argument_count_4, argument_values_4)",
+      "oseo_console_log(context, argument_count_3, argument_values_3)",
     ),
   );
 });
@@ -1537,4 +1537,132 @@ test("keeps a generator body's iterator done state in its root slots", () => {
   );
   assert.ok(body.includes("roots[3] = oseo_boolean(iterator_step_done_5);"));
   assert.ok(body.includes("if (oseo_to_boolean(roots[3])) {"));
+});
+
+test("annotation identities do not allocate native value slots", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    start: { column: 1, line: 1 },
+  };
+  const operations = Array.from({ length: 2048 }, (_, index) => [
+    {
+      arguments: [],
+      constant: { kind: "number" as const, value: index },
+      detail: "literal element",
+      id: index * 46,
+      kind: "constant" as const,
+      range,
+    },
+    {
+      arguments: [index * 46],
+      detail: "live element",
+      id: index * 46 + 1,
+      kind: "root-store" as const,
+      range,
+    },
+    {
+      arguments: [index * 46],
+      detail: "allocation point",
+      id: index * 46 + 2,
+      kind: "safepoint" as const,
+      range,
+    },
+  ]).flat();
+  const script = {
+    blocks: [
+      {
+        id: 0,
+        operations,
+        terminator: { kind: "return" as const, value: 2047 * 46 },
+      },
+    ],
+    id: -1,
+    kind: "mir-function" as const,
+    name: "<script>",
+    functionLength: 0,
+    parameterCount: 0,
+    parameters: [],
+    range,
+    rootSlotCount: 2047 * 46 + 5,
+  };
+  const program: MirProgram = {
+    functions: [],
+    globalBindings: [],
+    globalObjectBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script,
+    sourceId: "large-annotated-literal.ts",
+    specialization: "disabled",
+  };
+  const emitted = cBackend.emit(program);
+  assert.match(
+    emitted.source,
+    /oseo_roots_allocate\(context, &frame, 2050u\)/u,
+  );
+  assert.match(emitted.source, /roots\[2047\] = oseo_number\(2047/u);
+  const reserved = cBackend.emit({
+    ...program,
+    script: { ...script, rootSlotCount: script.rootSlotCount + 12 },
+  });
+  assert.match(
+    reserved.source,
+    /oseo_roots_allocate\(context, &frame, 2062u\)/u,
+  );
+  const edges = cBackend.emit({
+    ...program,
+    script: {
+      ...script,
+      rootSlotCount: 100_001,
+      blocks: [
+        {
+          id: 0,
+          operations,
+          terminator: {
+            kind: "jump",
+            target: 1,
+            values: [2047 * 46],
+          },
+        },
+        {
+          id: 1,
+          operations: [],
+          parameters: [100_000],
+          terminator: { kind: "return", value: 100_000 },
+        },
+      ],
+    },
+  });
+  assert.match(edges.source, /roots\[2048\] = roots\[2047\]/u);
+  const callable = cBackend.emit({
+    ...program,
+    functions: [{ ...script, id: 0, name: "wide" }],
+    script: {
+      ...script,
+      rootSlotCount: 1,
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "call wide",
+              id: 0,
+              kind: "call",
+              range,
+              target: { kind: "function", functionId: 0 },
+            },
+          ],
+          terminator: { kind: "return", value: 0 },
+        },
+      ],
+    },
+  });
+  assert.match(
+    callable.source,
+    /oseo_roots_allocate\(context, &frame, 2050u\)/u,
+  );
+  assert.match(callable.source, /oseo_frame_enter\(context, 94167u\)/u);
+  assert.equal(script.rootSlotCount, 2047 * 46 + 5);
+  assert.equal(script.blocks[0]?.operations.at(-3)?.id, 2047 * 46);
 });
