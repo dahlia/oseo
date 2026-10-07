@@ -3559,6 +3559,31 @@ function rootCount(functionValue: MirFunction): number {
   );
 }
 
+/**
+ * Keep a script's native-stack charge separate from its heap root layout.
+ * Binding operations emit two result-returning calls, for cell lookup or
+ * creation and the binding access. Retain two extra units per access for their
+ * C expression temporaries, restoring the logical declaration charge without
+ * charging array-literal annotations or sparse SSA gaps as native storage.
+ */
+function scriptFrameCost(functionValue: MirFunction): number {
+  const compact = compactRootIds(functionValue);
+  let bindingAccesses = 0;
+  for (const block of reachableBlocks(functionValue)) {
+    for (const operation of block.operations) {
+      if (
+        operation.kind === "initialize" ||
+        operation.kind === "read" ||
+        operation.kind === "write" ||
+        operation.kind === "binding-reset"
+      ) {
+        bindingAccesses += 1;
+      }
+    }
+  }
+  return rootCount(compact) + 2 * bindingAccesses;
+}
+
 function reachableBlocksFrom(
   functionValue: MirFunction,
   start: number,
@@ -4529,13 +4554,11 @@ export const cBackend: NativeBackend = {
     const functions = [...declaredFunctions, script];
     const globalLexicalNames = input.globalLexicalNames ?? [];
     const globalObjectBindings = input.globalObjectBindings;
-    // Keep conservative logical native-stack charges for callable
-    // functions. Unoptimized sanitizer builds can spend much more C stack
-    // on expression temporaries than on the separately allocated roots.
-    // Only the non-recursive script entry uses its compact physical layout.
+    // Native-stack charges remain separate from dense heap root layouts.
+    // Non-recursive scripts also retain expression temporaries on the stack.
     const functionFrameCosts = new Map([
       ...originalFunctions.map((fn) => [fn.id, rootCount(fn)] as const),
-      [input.script.id, rootCount(script)],
+      [input.script.id, scriptFrameCost(input.script)],
     ]);
     const scriptRootCount = functionFrameCosts.get(input.script.id);
     if (scriptRootCount == null) {
@@ -4743,7 +4766,7 @@ function emitFragmentUnit(
   const entries = phases.map((phase, index) => {
     const name = index === 0 ? "instantiate" : "evaluate";
     const script = compactRootIds(phase.script);
-    const count = rootCount(script);
+    const count = scriptFrameCost(phase.script);
     const phaseCounts = new Map([...counts, [-1, count]]);
     return (
       emitFunction(

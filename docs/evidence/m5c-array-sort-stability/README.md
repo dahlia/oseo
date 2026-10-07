@@ -48,7 +48,20 @@ slots but Zig's unoptimized UBSan object reserves 1,033,856 C stack bytes;
 charging only compact roots allowed a segmentation fault before OSEO2001.
 The unchanged wide-recursion scenario now retains its budget diagnostic,
 and a 1,000-binding regression checks both specialization policies. Script
-entries cannot recurse and charge their compact physical layout.
+entries also need a native-stack bound: the 25,000-declaration script from
+the coordinator's review exhausted an 8 MiB stack with a 50,006-slot
+compact charge. Script charges now include two units for each binding access
+in addition to dense value slots. These account for cell-lookup or creation
+and binding-access result-returning calls, without charging sparse SSA gaps or
+array-literal annotations. Heap root allocation stays compact. Both
+whole-script and fragment entries use this separate charge, and the
+25,000-declaration regression checks OSEO2001 under both policies.
+The exact source declares `const v0=0;` through `const v24999=24999;`,
+then calls `console.log(v24999)`. Before the fix it terminates with SIGSEGV
+under disabled specialization on Linux x86-64 with an 8 MiB stack. After
+the fix both policies report the owned frame-budget diagnostic before
+entry, with the same 50,006-slot heap allocation and a separate 100,008-slot
+charge. Neither the 65,536-slot ceiling nor any case budget changes.
 
 
 Evidence
@@ -176,6 +189,11 @@ and fragment semantic comparisons and native fixtures passed before the
 baseline refresh. The coordinator authorized this derived-data refresh
 and requested a focused supplemental Fable review, which returned
 exactly `No issues found.`.
+
+The coordinator's script-entry stack review requires a second refresh:
+the separate binding-access charge changes whole-Script entry C.
+Replaying backend commit `6a6712d8` reproduces all 44 prior hashes;
+printed HIR/MIR and non-source metadata remain unchanged.
 
 The standalone Zig ASan probes are existing TODO cases rather than gate
 failures. Two isolated runs exit successfully with UBSan passing and ASan
