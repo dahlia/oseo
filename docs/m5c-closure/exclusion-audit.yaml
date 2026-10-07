@@ -1,0 +1,2218 @@
+version: 1
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+records:
+  0013-m5-edition-and-manifest:
+    digest: 323e83e1a84e1b87363505324ebac5420af8a3566aabcccaa1c7cc3fb9eb7070
+    authorization:
+      - Annex B legacy web semantics are excluded from the claim.
+      - Annex B behavior is reported as unsupported when a test inside
+        the boundary depends on it.
+    reopening:
+      - Evidence that a claimed-excluded section is required by a
+        dependency inside the boundary reopens the optional-section
+        policy.
+  0016-dynamic-source-boundary:
+    digest: 2a3437aeff09377c85c3c5a5d2e41bf1caefeb196acfe0fd33b0eec2b57706b9
+    authorization:
+      - "`eval` in call position, the `Function` constructor, `new
+        Function`, and every constructor that compiles source text stay
+        outside the M5 language profile."
+      - Affected test262 cases are classified
+        `unsupported-profile-feature` through the existing compile-stage
+        rejection, and reviewed subset entries name the gap with the
+        `dynamic-source` dependency tag so coverage summaries can total
+        it.
+    reopening:
+      - the compatibility laboratory shows that packages Oseo targets
+        cannot run without `eval`, `Function`, or unrestricted dynamic
+        import;
+      - a probe demonstrates staged compilation with acceptable code
+        lifetime, rooting, and target coverage; or
+      - the WinterTC profile targeted by M6 makes one of these features
+        a conformance requirement that documented server-runtime
+        deviations cannot cover.
+  0019-m5-claim-closure:
+    digest: dc1a9429af215b1a91f50ee5097da706f5e2089bf46c4184cf830b27f2b0e5d7
+    authorization:
+      - every result inside it is a pass, an expected negative, or an
+        unsupported result covered by an accepted record that explicitly
+        authorizes an M5 exclusion and bounds its surface.
+      - ADR 0016 is such a record for the dynamic source family.
+    reopening:
+      - Evidence that a normative section inside the claim depends on
+        the excluded dynamic source family for behavior other than
+        source evaluation reopens the boundary rather than this record.
+assessments:
+  dynamic-construction:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The assertion covers construction from parameter/body strings or
+      the resulting dynamic function instance, including its source
+      representation; ADR 0016 excludes that construction and its
+      results, not corresponding properties of statically declared
+      functions.
+  eval-semantics:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The assertion requires eval source parsing, eval-specific early
+      errors, direct/indirect evaluation, or binding and super lookup
+      from eval code. This is source evaluation itself, within ADR 0016;
+      ordinary static scope and super semantics stay inside the claim.
+  fixture-construction:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The test uses a rejected eval call or source-compiling
+      constructor to obtain an input or callable. Its normative subject
+      stays inside the claim; a test dependency alone does not show that
+      the normative algorithm requires dynamic source. ADR 0019
+      reopening is not proved, but unrelated coverage cannot be closed
+      without reviewed replacement evidence or a maintainer accounting
+      decision.
+  regexp-roundtrip:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: EscapeRegExpPattern requires a parsable RegularExpressionLiteral
+      with equivalent behavior, not a runtime eval call. The test uses
+      eval to observe that round trip; the required escaping and
+      equivalence contract stays inside the claim. Replacement
+      parser/native evidence or a maintainer accounting decision is
+      needed, not an assertion that regexp source is excluded.
+  completion-observation:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: Statement evaluation defines Completion Records without
+      requiring eval. The test uses eval to expose their values to
+      assertions, so it leaves completion-value coverage unresolved.
+      This is an observation gap, not demonstrated normative dependence
+      on dynamic source; replacing eval by a function return would not
+      preserve the contract.
+  template-sites:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: GetTemplateObject requires caching by Parse Node identity,
+      including sites created by repeated source evaluation. The
+      rejection is within ADR 0016, but template identity is behavior
+      other than source evaluation. This review cannot close that
+      in-claim interaction without replacement identity evidence or a
+      maintainer boundary decision; ADR 0019 reopening remains a
+      concrete question.
+  variable-environment:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The test uses eval var declarations to distinguish the variable
+      environment retained by a for-in head or catch parameter. The
+      rejected call is authorized, but environment retention is inside
+      the claim. Replacing eval with assignment does not distinguish
+      those environments; retain remediation until independent evidence
+      or a maintainer decision bounds the gap.
+  annex-b-pattern:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The observed rejection is the Annex B-only /\k<x>/ pattern,
+      which ADR 0013 excludes. The same original path has many core
+      String and RegExp split assertions that are not excluded and do
+      not require that legacy pattern normatively. Rejection is
+      authorized but whole-path closure is unresolved, so retain a
+      separate RegExp split coverage remediation owner until replacement
+      evidence or a maintainer accounting decision bounds the core
+      assertions.
+  mixed-static-functions:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The source includes assertions on a statically declared async
+      function or declaration/expression-syntax generators before
+      dynamic construction. The rejected constructor call does not
+      authorize excluding static constructibility or instanceof
+      behavior. Keep remediation until replacement evidence or a
+      maintainer accounting decision bounds these assertions.
+paths:
+  - path: test/built-ins/AsyncFunction/AsyncFunction-construct.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "05d58bcd1a04544754f589990620fa1193d754b3b5e50d27953d897f0b3d\
+      9ca2"
+    observationDigest: "c003519ec69e8e71746a01f0101d59db7745d273fdba33277d09656\
+      59fa3232b"
+    missingDynamicTag: false
+    section: sec-async-function-constructor
+    subject: "%AsyncFunction% creates functions with or without new and
+      handles arguments similarly to functions."
+    assessment: dynamic-construction
+  - path: test/built-ins/AsyncFunction/instance-construct-throws.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "161800399dce7892436558c37e5c0e9ea4356d7247f0e3ad0bb1040768ec\
+      aea5"
+    observationDigest: "cd26064a730d37386fe22481a008054ea1c617b527be7c67046042d\
+      7a1ac5c5e"
+    missingDynamicTag: false
+    section: sec-async-function-instances
+    subject: Async function instances are not constructors and do not have a
+      [[Construct]] slot.
+    assessment: mixed-static-functions
+  - path: test/built-ins/AsyncGeneratorFunction/has-instance.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "7d0a2d536b91f821332392fa7b5112fade01604cd1c6936abac5b11a6a42\
+      1027"
+    observationDigest: "a9706ab9eb66f491cc3f65f13f1e26d16798269ff1688117632feb1\
+      6995365e0"
+    missingDynamicTag: false
+    section: sec-properties-of-asyncgeneratorfunction
+    subject: AsyncGenerator function instances are correctly reported as
+      instances of the AsyncGeneratorFunction intrinsic.
+    assessment: mixed-static-functions
+  - path: test/built-ins/AsyncGeneratorFunction/instance-await-expr-in-param.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "0a0d24739f3e58da73bab468ad2f7fc91fcbbf3dbfcc6a3486472adb9927\
+      2e24"
+    observationDigest: "167449e2f42f09b1b793e810cfe49c546f9115d9a3ad0f27ca9e89f\
+      02f85b1c9"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: Definition of instance `length` property
+    assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/instance-construct-throws.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "f6c5fc9eaa518a88f432e0bbf08fd03dd5d8b07f75cbf45c9ddd08531701\
+      39c1"
+    observationDigest: "5e2baa3ddf45bc1b468618eb1ab7edc0515158871c5c8c59b3656d5\
+      c8df6b309"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: The instance created by AsyncGeneratorFunction is not a constructor
+    assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/instance-length.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "9497f960d342a32e13fdfb0e11a23ec81beb15c0275ac899c0fcf671a3c0\
+      eef9"
+    observationDigest: "a5c3e4447383416b54cd02f09d7fa7dce86ab1a72603fa34474dc37\
+      8c192d5b7"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: Definition of instance `length` property
+    assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/instance-name.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "00af88d1569a3c805880aac172d74c14d136efe223e8d3863b22c23cf6e3\
+      6d67"
+    observationDigest: "b30d4707d294084d7dd481ebc65d9b562834accd7bf3d32c3090734\
+      73a728e78"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: Assignment of function `name` attribute
+    assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/instance-prototype.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "3bf5c4b3fd196fdaf543b1e7cdeda8eb58330a36c0fc38325d8bf21ca0e8\
+      cf1b"
+    observationDigest: "36b9022143139a56b07d65602bf7cb7933975a3beace0322440e9a5\
+      90f154964"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: Definition of instance `prototype` property
+    assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/instance-yield-expr-in-param.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "7cce9fece5a8f0a99baa33582607800adb561d3168fe5d6c35419cd4757f\
+      e7dd"
+    observationDigest: "f2dcb5c09b7e2c25150a8c162a6cbd6f56adcf1fdbf84ba2c0cddb2\
+      e92281ab1"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: Definition of instance `length` property
+    assessment: dynamic-construction
+  - path: "test/built-ins/AsyncGeneratorFunction/invoked-as-constructor-no-argu\
+      ments.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "a37cb1696eb9bb69c60ab105edcdf5fb732848f3603822f0238b4a8d85b1\
+      1c29"
+    observationDigest: "98343fe54cb7c95eca58eb823c652859b245d4dac3c811b046d962f\
+      a76296806"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: When invoked via the constructor invocation pattern without
+      arguments, the GeneratorFunction intrinsic returns a valid async
+      generator with an empty body.
+    assessment: dynamic-construction
+  - path: "test/built-ins/AsyncGeneratorFunction/invoked-as-function-multiple-a\
+      rguments.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "b2af758dbe176b42f26c6235a967edb0e74f02f5518fefc351c134ed9ab9\
+      428c"
+    observationDigest: "0628584a301688179a70b40f50fd2fb672c0adae68a6f9b1711d99c\
+      7a5a1f868"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: When invoked via the function invocation pattern with multiple
+      arguments, the AsyncGeneratorFunction intrinsic creates a valid
+      generator whose body is the last argument evaluated as source code
+      and whose formal parameters are defined by the preceding
+      arguments.
+    assessment: dynamic-construction
+  - path: "test/built-ins/AsyncGeneratorFunction/invoked-as-function-no-argumen\
+      ts.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "77cfd3a20f5b4b21f104f5ebf92795b46d08d95dee74b9b6df5fa070f748\
+      7606"
+    observationDigest: "11b9b847323f2b8c89a21a741f0ae241fbeb321f71ced3b75f995c9\
+      5748400ca"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: When invoked via the function invocation pattern without
+      arguments, the AsyncGeneratorFunction intrinsic returns a valid
+      generator with an empty body.
+    assessment: dynamic-construction
+  - path: "test/built-ins/AsyncGeneratorFunction/invoked-as-function-single-arg\
+      ument.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "54d74652e790f17d002ce16223b651913225bcbb56189ec18e74ac920755\
+      1cc4"
+    observationDigest: "b2656811b6c54ff5b7ca4809c8ca29e1f940095c30ec8e82b2e7a8b\
+      7c42be697"
+    missingDynamicTag: false
+    section: sec-asyncgeneratorfunction
+    subject: When invoked via the function invocation pattern with a single
+      argument, the AsyncGeneratorFunction intrinsic creates a valid
+      async generator whose body is the first argument evaluated as
+      source code.
+    assessment: dynamic-construction
+  - path: test/built-ins/Boolean/S9.2_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bf3acb6e16632329e5f37ea8d6577a28ec8b433fe74d6b711048ba515acb\
+      40dc"
+    observationDigest: "5a7d684f87df09ad74f35c1670f529a17f9b21cef55513e449413c0\
+      302362395"
+    missingDynamicTag: true
+    section: sec-toboolean
+    subject: Undefined, void and others are converted to Boolean by explicit
+      transformation
+    assessment: fixture-construction
+  - path: test/built-ins/Boolean/S9.2_A6_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0f1e2596ef3893db668950d5d831dff4ad64baa72f6aaaadf946fff820e9\
+      2088"
+    observationDigest: "f62fd28df3493ec8a845fbd3f087bfe6ddea3aaadccc680f930cf42\
+      12324ef0c"
+    missingDynamicTag: true
+    section: sec-toboolean
+    subject: Different objects convert to Boolean by explicit transformation
+    assessment: fixture-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "173facc6342c10c557a7d7afccc31281bb9af84276796e044f1c9d1488ce\
+      864e"
+    observationDigest: "c6dca99e9dc795e14c2adda50cb5eeb7c68f073a820336927b1abe3\
+      3a4a94ecf"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking length property of Function("arg1,arg2,arg3", null)
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A1_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "a1756700c2764e44dbdcccb2011702fec5b41300a83fa31ced2ad98e6035\
+      263f"
+    observationDigest: "a5435ef443a7371cb109d76ee25040d737f2c935f6b1dbc9b0aac25\
+      9553af432"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking length property of
+      Function("arg1,arg2,arg3","arg4,arg5", null)
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A1_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "1b0211595c7d5031fbcb51f1bfeb3270238e4664b18c36df8852fbf945ea\
+      9e17"
+    observationDigest: "7f64139d31e9ca3735a104aed95c678a700dd6af439e83c58f5889b\
+      b9755fd3f"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking length property of
+      Function("arg1,arg2,arg3","arg1,arg2","arg3", null)
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A2_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "7de2a7ff0ad908afbddd61189670f3c1510e35d59c3c935ee285928711c0\
+      0a69"
+    observationDigest: "26dd5e27d39146e9d8851d6da222ade2363b45ccb834b6bfc22bef4\
+      f23f7a65e"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if deleting the length property of
+      Function("arg1,arg2,arg3", null) succeeds
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A2_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "ef5cab0258b5221e7d55bf98c0e9557fb4ea0c2ba4fb9588a1e2fc2eadf3\
+      0d76"
+    observationDigest: "84daa7fb90dd6df3dea0bc5cb50297f9446495e04db5ab79c11fd87\
+      17ca9208a"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if deleting the length property of
+      Function("arg1,arg2,arg3","arg4,arg5", null) succeeds
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A2_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "b4a61450c0491859af88f6c81b3c87ccf25b3fa5f805d0bbab73f38dbedf\
+      1e2b"
+    observationDigest: "695fcf76b889936e132d701d2ff6b867fa9768ec3b827f44d01c79f\
+      aa97a897f"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if deleting the length property of
+      Function("arg1,arg2,arg3","arg1,arg2","arg3", null) succeeds
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "14c9da769e0ddbee03492878997c4789d9c734f890a36d62b1d00b4893a1\
+      1a0c"
+    observationDigest: "240edadc0eae166f0190568c382540a5f63e3d859491f7721edb8d5\
+      6b2fa7950"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if varying the length property of
+      Function("arg1,arg2,arg3","arg4,arg5", null) fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "6660cd775b6137849666a78e76aabbc863716eaef29f044e13e4ecaddee1\
+      5e8e"
+    observationDigest: "af11f6fe4d5f2e1e0c1a1dee6e3d0dc722ade9f015c3abf35fa023e\
+      e05c5ad8a"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if varying the length property of
+      Function("arg1,arg2,arg3", null) fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A3_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "1a7ebb1bc801f002cb80a2147edd251184ace70d65dc7dd1400ac3db0375\
+      0afe"
+    observationDigest: "d17e8b51fe81fd18bffeba23b3bfd9234b5482ef9f53c939b151f89\
+      1b8f4b2fe"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if varying the length property of
+      Function("arg1,arg2,arg3","arg1,arg2","arg3", null) fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A4_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "6604f534be4e75677e19abc7d18163b1d18389df100008e2d6645270a45d\
+      0d2d"
+    observationDigest: "5bf6e5023d2a740fa79e74bb1ffdf3f302128689e1ddf975c5e6b29\
+      0ea48b73b"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if enumerating the length property of
+      Function("arg1,arg2,arg3", null) fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A4_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "fd54df2e454877a6824aec0b5df01dc7343621ff3c7c5fdebececdabc941\
+      b220"
+    observationDigest: "7912988a1ea4508418f8af8febf36b23d4978292f03a07dc4bf357e\
+      587475c94"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if enumerating the length property of
+      Function("arg1,arg2,arg3","arg4,arg5", null) fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/length/S15.3.5.1_A4_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "171be55eb6d47767bb9cca4912936cd691372c4e529bd7a815024124ccc1\
+      20e0"
+    observationDigest: "136e6fa301691a582f2ff72abe618ea9a6315e725bfd8e58ff7698a\
+      c97029d63"
+    missingDynamicTag: true
+    section: sec-function-instances-length
+    subject: Checking if enumerating the length property of
+      Function("arg1,arg2,arg3","arg1,arg2","arg3", null) fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "839078feb52b108b88db26b9665389bcd3a5ce16d1c839d6cb98c67ba05b\
+      da53"
+    observationDigest: "bdacbd3a862d4d8b978c987fd7b88da45a646968b91ed1f31fd2f63\
+      89c35cd2c"
+    missingDynamicTag: true
+    section: sec-function-instances-prototype
+    subject: Checking if deleting the prototype property of Function("",
+      null) fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "c58d9f9577d2c7ffb0e80dd10819098b45a511b7641e2559364f2b1bf0d0\
+      3b19"
+    observationDigest: "bedabc03951dfbb4e7a5696360c2b81ca6d0acf798278b7c6c4be51\
+      d5a9724af"
+    missingDynamicTag: true
+    section: sec-function-instances-prototype
+    subject: Checking if deleting the prototype property of Function(void 0,
+      "") fails
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4ab4a3aed7d78970648ee19bfa3422424204c53f615da8cf0edd2c04d812\
+      7b61"
+    observationDigest: "6716ce843f1690240dfbc7b7fd5e010f07bdd0c42a163c7b171bea2\
+      29f63270c"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Calling "apply" method of the object that does not have a
+      [[Call]] property. Prototype of the object is Function()
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "776d67a8003622de65f6477161ba74ea3e362b445c415e1a3755b0bf33fa\
+      a36a"
+    observationDigest: "1ff111160ce436de520b1cc001fccebc06d45240158510618119599\
+      f97474c25"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Not any arguments at apply function
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T10.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "6dffd45b707d1e6e1d61be0535a1b9ad78d6440b2914b87d1f7a84addea4\
+      90a3"
+    observationDigest: "4b0bb0c1dcf34c5049cef5292b818e83090ad06547a28f27ad970f6\
+      6b70f13d2"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Checking by using eval, no any arguments at apply function
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "57bae3fa6dd342c53c5b0650e0be6c1f256d361218b164f63a1e5c29ea5c\
+      7503"
+    observationDigest: "b4663bb4b9401218cae0421c42db498806c0f06e451467d63f9f447\
+      dcefc4fae"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Argument at apply function is null
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "812972e98d88aebcf6ca4f0eaa089e730382d5a3fe61048cb6cf298a97dd\
+      a8d7"
+    observationDigest: "42db8a61084eae9abc2d9ad7f9fcb1fc1372945f2898911ccf224be\
+      4b8101a1d"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Argument at apply function is void 0
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "83ceec7fb8e2b8cb6e17187f34b240146ffb28f466fa3488910a55570de4\
+      feca"
+    observationDigest: "31127ebc7d98a4e4ebfd799976fbbb0ae3e337ae9ef4fafcc966c9f\
+      4d7e03a80"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Argument at apply function is undefined
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1c16a53fad060e9d99d583e001ad4b37ed0bb1457b90b4ef94c2a8b6ce81\
+      a352"
+    observationDigest: "822803618baf58db5a4b52ecbc6d2d2c888b4103a7025537a8649b8\
+      4d9287bc6"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: No any arguments at apply function and it called inside
+      function declaration
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "95cd7b2618d234e0aba0444c84fbcc0c9b9cbeb73b4e9306f66509dd1c01\
+      096a"
+    observationDigest: "88cc9f8808dc0f7ac29b5e875e990bd12befb9f6a0fddf91fb3c7dc\
+      faf9eaa6b"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Argument at apply function is void 0 and it called inside
+      function declaration
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T9.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4ec0d33fbde13c1846f1dd7c6fd2d5b35217423561c324ae09b26792a353\
+      0815"
+    observationDigest: "b54052d8bf5f7713f54786cac9d570790eb4b9793de1a626e1994e3\
+      8aa6e0381"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Checking by using eval, argument at apply function is void 0
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b33e0b10e98c855806019c44fb30ca9cecab1673010f6d4ed244fd7155b7\
+      902e"
+    observationDigest: "40d6fbfc7d4b150e906f77c6bb2db66f24d04363da133d7dd500bc4\
+      4de007f33"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: thisArg is number
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "40f6f1e41ab83a32eb05e00abb701cf4293f01ced502e7d5753f23ad8c4c\
+      d05d"
+    observationDigest: "2f51279c4c44a38a92cc2c6873c6fe477e0bd01be55689e852a1a78\
+      c06ea723c"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: thisArg is boolean true
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "91ed913331e73ab4b97abd67b9a256cde59f62620542223e80ca44701aa1\
+      3e14"
+    observationDigest: "ed8083d6f1718f8a616d34bb705d43c2b600fb46054ad006c1abb51\
+      ccc10289a"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: thisArg is new Number()
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T8.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "91e035032e2b8f9be41320f49983402e07e976e10bec9e96b400a96e4e0e\
+      86bf"
+    observationDigest: "e1ae4538258f759ceb2e79e602acfd4a8bfa2875e1ce611060310ae\
+      e9a262667"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: thisArg is Function()
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "549b8bf6dea414bad2307134461d42734ef16647a8c9ebecf40c77ef53fc\
+      9ec8"
+    observationDigest: "4cdbe2f561bda283d3269f29c7db612423a530a65bf576d872a39f7\
+      4734c796b"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (null,[1])
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T10.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "388c4ec179176b25da8420191c26a05984c21b33e820781c5f61a0458744\
+      00c7"
+    observationDigest: "3a10ad06b54da5f1b7defc0a841c37c477974819ba469adb5da65f5\
+      bae7e1ee1"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (empty object, arguments), inside function call
+      without declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "5d914d18c37bde60b2aaa234a2262d7c49d681f359c6fb3cba4a5c720ff9\
+      ab37"
+    observationDigest: "6c6a9dbad5ab8e6136a93136579fe6b34de5b79ace081344af1ccaa\
+      5bce237e8"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (null,[1,2,3])
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1394a5f25be4a891437a6751f962c2d1f092fec1a8e0db7bc2155ffa03b4\
+      915d"
+    observationDigest: "bc126da7bad19d3d3a94bf60860d08e6a8c5bc9a0d0f843208054bf\
+      d8df5c392"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (empty object, new Array("nine","inch","nails"))
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "543a199eb3c386cf03f264d4080d90a0c2df9f6d010b864d3c3db8b459e6\
+      39f1"
+    observationDigest: "224a2476fac10133c6a04271a720c6fa8c64941f8e12bed057750ec\
+      da0c99c60"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (empty object, ( function(){return arguments;})
+      ("a","b","c"))
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2619b7381ecff51cde122c41e85059bd9bb3d98b6612d116598da3c919ab\
+      27f3"
+    observationDigest: "f5080ead99baf7e8b2294d146c129b85014be294021bb2731986895\
+      511d9f6f8"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (null, arguments), inside function declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "78a2659fd5dee0ecf1654262853cb2a6be791519913903f709fce5688ff9\
+      cbff"
+    observationDigest: "4cf310d2146a5a8f8c7a4a1caaff91efc6922ecf68dec938423d9f6\
+      58958a83a"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (this, arguments), inside function declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "6770c8084716e57b760f763637941879231f17abd3a4391114375bb9e51f\
+      d744"
+    observationDigest: "f4c4fba10fde1756a6f9949cf3fd8dbb9013cdfca422e222aba43ed\
+      f60f76938"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (null, arguments), inside function call without
+      declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T8.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "70477ab163963e53379e96b99ea8da531693c7326c4061e9deb90d3e7b79\
+      6b30"
+    observationDigest: "698778b5c3bef9c5d3479e09d42dfd1643e7aa65b80f05f0c68e8cb\
+      594e673da"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (this, arguments), inside function call without
+      declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T9.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4d6e20adaa9e62749ed8897e43ecf62d39ffa8a33cd19c1f1a38170dfc1e\
+      5be8"
+    observationDigest: "6ccba0b368a7a5297c17f137c182db0eac0f8178a7b72951485ae18\
+      4cd6f69a6"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: argArray is (empty object, arguments), inside function
+      declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9912dae15825f62b48faeb9f5848142226c46337af7554210fb70ebcdf67\
+      aee8"
+    observationDigest: "3ab68119a22b66c952e84f70b81996f769129445aa504f2616e86c4\
+      07d8d0cb8"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Checking if creating "new (Function("this.p1=1").apply)" fails
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "74f9f4abe9156584f7e7dd3fed8017b95d384d0d021ee6610a2a117f8156\
+      b4b7"
+    observationDigest: "ee3fcc8f8870c72e5cff1dab229267f32063f7a9fd7a79cca9f3ee3\
+      f730d9621"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Checking if creating "new Function("this.p1=1").apply" fails
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "fe47348d97a0604338f0a58beb85473f65c32e95524345d7d474bcd8742c\
+      7a3e"
+    observationDigest: "3beafa508dc3c5a20ad505574291d458e396a2abca83a6b44bdb443\
+      554a4b802"
+    missingDynamicTag: true
+    section: sec-function.prototype.apply
+    subject: Checking if creating "new (Function("function
+      f(){this.p1=1;};return f").apply())" fails
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4196d1c4de8ddd4673aefd1cdbb5ade6920f034ec96e491ba873c3a3deec\
+      7c81"
+    observationDigest: "f8a520062fed4b25cb454dfda51f2bbe1802dbe044041d7cb96feda\
+      c0b726a50"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Call "call" method of the object that does not have a [[Call]]
+      property. Prototype of the object is Function()
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A2_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ccf4e7f728bdfebd441aee0e67543133a463af0c2f28ca26a1fbc5ba1b18\
+      5614"
+    observationDigest: "72c8a90c02192ca7ea8a33eb07d3d713713826928e6af2bfca9a57a\
+      9c09bebfc"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Checking f.call.length, where f is new Function
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1182a257013346365b4d72ef96b995fadcdb3fd50d91e9967422db9682a0\
+      385b"
+    observationDigest: "99d28df649a7f1e1451c5b0bc053080dee211637ffdb2ed522501bc\
+      352eb1c76"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Not any arguments at call function
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T10.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d52e78afd708837f251cf4766ef57a2736291729f8ffc9bc8f5eb28df9d4\
+      d31e"
+    observationDigest: "27148c9eca7ff7bf09585685b68fcb0b8e2f16980162f8d1e6ad629\
+      2d3602354"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Checking by using eval, no any arguments at call function
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1fc9514f6ae930da4dc8ed4ab31f9822b64c48d8eb3768e46423ae209bea\
+      8865"
+    observationDigest: "c64fcf30f82bb426ee5a45357b841356fc40ec0ba2e71ddc5c24b90\
+      b60818dc0"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argument at call function is null
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8094db7e55ea93d836e4744ba6830f09ee01f839d14a490157f84ce94f4b\
+      59f3"
+    observationDigest: "c43cbc62d466ff60d0c6100fe8e441153caeb07ff6e06f7a08eccec\
+      aaae4fff9"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argument at call function is void 0
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "56d94b4149f9aceb570586ea89ae57ee7f922eadb472ee35e90ccfd2eacb\
+      e562"
+    observationDigest: "29cda33568a307fa5d53464c4bf3c0734c40381c3475bea20214d5d\
+      02243c0ba"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argument at call function is undefined
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "7c4ee263314f53b519f8450eefcec58070f8e66a8ca392f16a3b38d7c3d8\
+      8ca6"
+    observationDigest: "bfe1a26bdedc54cd148422319e0107dd5131e9225ead9cd3839b311\
+      60f7e6704"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: No any arguments at call function and it called inside function
+      declaration
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "74b3500371f37975f15a6734b7bb98416f45ea1b25005ecc6a1732fed8b5\
+      f5ea"
+    observationDigest: "da46bac24e1eedef354274cba62643b887be7d7676629ec84e60375\
+      3df0a94fa"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argument at call function is void 0 and it called inside
+      function declaration
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "97341c73146ccd8336b7e5c8824cf2915812b0cc4fff36cc730defc0e244\
+      fb58"
+    observationDigest: "66e0aa8eca252a2c1ea479cb37ed1ff4b198754b8b1b6fbf2bd2be5\
+      d9ecff48a"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Checking by using eval, argument at call function is void 0
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "f7d7fb0530302ea19b7bfe07f2553692bb13309539fe234248deccbc105d\
+      21cf"
+    observationDigest: "9a0f599bd92cd55c3774abce3101aba501f771968a4740d994cbf4c\
+      af5c49c3d"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: thisArg is number
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b6c306352b2f9a4559c74698a095b0883e7b4609e5d7d9fe0aa48cd51fea\
+      3db6"
+    observationDigest: "cea975526c630fc6bdb5b99c75093e33869dd6a0582b38076bf584e\
+      a8d817ab7"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: thisArg is boolean true
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "96c8fbaa72d2f82787bf8dfcc35398d446dff28d9795c5b5a130d93fbd17\
+      a863"
+    observationDigest: "94fbafd25f2e7ff6dbca108f6c548a4f1794708c748d8c383479e1e\
+      d149a4897"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: thisArg is new Number()
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T8.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8bc737f7d4a407ff299e1354f8f9883a017a9ae350abd93ed261e8d2e973\
+      33cf"
+    observationDigest: "2ff67fc0c23a74a1acf9c807f97b280b23ba6b48f42e5339aa6f6f5\
+      2a3c25a2c"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: thisArg is Function()
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "dc35c13be9a19f49d5cecfaab850cd3fd79ac3320d2ac1628f8b10b82b09\
+      b14a"
+    observationDigest: "624ac0ab91f2df56840d0e2caceb5b053100c70feb26a9323ed6be8\
+      7f35211de"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (null,[1])
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T10.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "99e7776da5d6f3f71d773160353fb96790b1efde1de353c84b57ed4d5069\
+      6615"
+    observationDigest: "b932f0e849d6c060a629afcd8ce9a88cdb7fb34c32e08a62578d804\
+      7fe1e8c03"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (empty object, "", arguments,2),
+      inside function call without declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "157de2fbd12faf92e3b8dff04a4e9a9a857e3f78cfe36980b50e07f111fc\
+      e45b"
+    observationDigest: "c80fb0bec2ef7ae10ea8ca7243bccfc1777b45733491ab63b49772e\
+      1a2650523"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (null,[3,2,1])
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "33c133fd6b03fc78e30c8e6399b32056f120baf208c7b534052d41563fe3\
+      302f"
+    observationDigest: "be634dd4265a52bc738bebc525ca71f693cb60d82add4cb9a4cc659\
+      ab9eea820"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (empty object, new
+      Array("nine","inch","nails"))
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "857e28787d2cdff3a2c2b83fa2b6f50660276045e5a4855eaf45c1ae2f5c\
+      ee9f"
+    observationDigest: "f5705f6641775b2abd110d052ce75d53dad9fa27a51be7401e06208\
+      c41586a90"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (empty object, (
+      function(){return arguments;})("a","b","c","d"),"",2)
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "15638acc8b2a5a801d24ed1632948ff2093618a91081bc59cc4c33b0f438\
+      78dc"
+    observationDigest: "24cf6c73a7d99e9bc3ef1bb8c5aa16599b79939dc202bbbde46f0e6\
+      4a6bcd5e5"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (null, arguments,"",2), inside
+      function declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "70109b0d692a40958c28533009acc3ee195c4e047baa24d337c31effcf33\
+      4e46"
+    observationDigest: "7f9b915e1eae1653db2fe80df9a6c7826cd55ada89c5f8651a662da\
+      59d3e71c5"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (this, arguments,"",2), inside
+      function declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "614be4b8d216edd6d7b24b1f9b352d9a7769c3d36a1c566d2a2280d0dba5\
+      8407"
+    observationDigest: "acf5979a453abdafa72bc775481030256c431366659e241be174450\
+      c09e1e48f"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (null, arguments,"",2), inside
+      function call without declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T8.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a0ad84650f974985d05ad271a3393f4c37ea4dbb817a30c629b05ec8cae4\
+      d9ec"
+    observationDigest: "4d4aaf2510625aa4ef2435e27d23b8c9811a55e022bc07a620b2035\
+      8b6fa2dcb"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (this, arguments,"",2), inside
+      function call without declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T9.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d2e730f24592f97520815e1891f52ce7ea143e585f7730bcf4fbc30033b5\
+      1223"
+    observationDigest: "8ee4a88993578ac81d53aba142baa563fc05e5c90e9e0812237e14e\
+      cc2802d9f"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Argunemts of call function is (empty object, "", arguments,2),
+      inside function declaration used
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "de7d1e744da94020dfb105b91c3b60d927fba66666422b600ecd764c1f7b\
+      4545"
+    observationDigest: "8490144080d488d347c1913db6f62ea52790f028faeb3afcbc006a3\
+      ee111ef4b"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Checking if creating "new (Function("this.p1=1").call)" fails
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d460d2cc47e11217b1c3f08823309f2a10026240eec608d9e6c2f5b2b7f2\
+      6e4b"
+    observationDigest: "19bd6252e371416bb8cf23df6b92c761a9bf381662f7af909bb8ec4\
+      a4bd1081d"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Checking if creating "new Function("this.p1=1").call" fails
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "e9e37a56417b4a7ee93d286f4de701f8a6c4043e7dc38fe437bfb65dd0dd\
+      48c9"
+    observationDigest: "9fbdc2c2e9bc5a10d126e6d688f631eb066eeaa2a424522ddf96f4d\
+      16a3f5ab2"
+    missingDynamicTag: true
+    section: sec-function.prototype.call
+    subject: Checking if creating "new (Function("function
+      f(){this.p1=1;};return f").call())" fails
+    assessment: fixture-construction
+  - path: test/built-ins/Function/prototype/toString/AsyncFunction.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "83e82a4155139fb8ae806fafba3b6080aa1fe230d3da7f0a35b39fa1050d\
+      15d2"
+    observationDigest: "c30326f8dc58d78e2a71dd8237d6679006181f12a9a0d1f31e364c5\
+      e9bf8ec23"
+    missingDynamicTag: true
+    section: sec-function.prototype.tostring
+    subject: Function.prototype.toString on an async function created with
+      the AsyncFunction constructor.
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/prototype/toString/AsyncGenerator.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "2d0c6fca5f6b28cd42e75829986174166aa1ac060dfaa5af11bb251ff2de\
+      e101"
+    observationDigest: "bcf2e2c25b9b9b31cc9f8ff6b9ec3e99bf256ac168b36be94cae365\
+      6429bfbc7"
+    missingDynamicTag: true
+    section: sec-function.prototype.tostring
+    subject: Function.prototype.toString on an async generator created with
+      the AsyncGenerator constructor.
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/prototype/toString/Function.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "a3b9ee9d0ef3b4cdba7baae887b546421d0932bf74618cbe7df10297a828\
+      931e"
+    observationDigest: "390e6884a2cf1dbc892eed19fc0d791c32193febc3e88ad796f5a69\
+      90871dfde"
+    missingDynamicTag: true
+    section: sec-createdynamicfunction
+    subject: Function.prototype.toString on a function created with the
+      Function constructor
+    assessment: dynamic-construction
+  - path: test/built-ins/Function/prototype/toString/GeneratorFunction.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "fc07757e1e4d74147c01366dab2a9b2496cd65422b31463892515532798a\
+      6d5a"
+    observationDigest: "a6a125b1ada296081c3a62386d73a33caf484300f7ebefe880093b9\
+      c09ee1701"
+    missingDynamicTag: true
+    section: sec-createdynamicfunction
+    subject: Function.prototype.toString on a generator function created
+      with the GeneratorFunction constructor
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/has-instance.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "f0f63b507d06b4fdae876fefb9143173b24a753a337d950f3d8cd6e3f3b7\
+      27d5"
+    observationDigest: "0a83c6a643b7c2017962b4f18ebee5ea6c0fb0972d85f56341af684\
+      a2cc60016"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: Generator function instances are correctly reported as
+      instances of the GeneratorFunction intrinsic.
+    assessment: mixed-static-functions
+  - path: test/built-ins/GeneratorFunction/instance-construct-throws.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "0dbd57ed02b96faaaf4522a0d5db59cdd108b3af95b23d09c97ddfcaeb4a\
+      134f"
+    observationDigest: "966916f350a3c1406996409fdf64c36c374c7354ae082356bca9479\
+      61dfd0d03"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: The instance created by GeneratorFunction is not a constructor
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/instance-length.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "daf4decc72b049e1c5c54af7dd32d918e0e77a821c980a7339b69c95bdd3\
+      1e5b"
+    observationDigest: "a2a7ce873ebb11f13d869ef58e68b85729441ddc4ef8a3a003fe474\
+      c4851fdf6"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: Definition of instance `length` property
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/instance-name.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "8f1aa62f637d50cd66ab01773614a2062b1d10b393d57cf555379cba244f\
+      0823"
+    observationDigest: "63357400fe634b6a9944d165cff6d83fd54fec52aca747ca780e365\
+      10d81f98b"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: Assignment of function `name` attribute
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/instance-prototype.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "ec55ee8e6c1433e926fe42b73a9758ac073c2e1feb8ae8386f151dbd140c\
+      458c"
+    observationDigest: "68ab316642ad774cc6dc3366348f90b533f1e42eb0b55449c22615d\
+      5689c3968"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: Definition of instance `prototype` property
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/instance-restricted-properties.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "8316e50910fd06fd1b1d31b2d2fc28e703f3be531d89bcf1f0e9f388d359\
+      bc03"
+    observationDigest: "99d51b0d747aa3981f14b1765fd07f503e344aacc553b5aa9f97c35\
+      d68cb6b1f"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: Functions created using GeneratorFunction intrinsic function do
+      not have own properties "caller" or "arguments", but inherit them
+      from %FunctionPrototype%.
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/instance-yield-expr-in-param.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "d85bb72eb98c02bc8cb2ac618d7ea8cdaec79df640e6d24daf5a254b0dfb\
+      5f5b"
+    observationDigest: "5a661a33caa21cee80fea877c7b8ddc594cf82d3c63c2adadf670cb\
+      0dc2b8223"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: Definition of instance `length` property
+    assessment: dynamic-construction
+  - path: "test/built-ins/GeneratorFunction/invoked-as-constructor-no-arguments\
+      .js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "a256f77307bf3995fbdd33bd9b1a4b60af7415187356314a42d8c56535f3\
+      994d"
+    observationDigest: "62b84f149c7487247fd96719916ecdd44eba7c408dd0c3263c885b6\
+      ab0146c96"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: When invoked via the constructor invocation pattern without
+      arguments, the GeneratorFunction intrinsic returns a valid
+      generator with an empty body.
+    assessment: dynamic-construction
+  - path: "test/built-ins/GeneratorFunction/invoked-as-function-multiple-argume\
+      nts.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "7f8f5f02419bd81ffc74c95932fffde5892af137992bdd57183f5ab1e566\
+      0792"
+    observationDigest: "457d9c409e3a3162b702c0d66a69bfcbf7dd9ebaca4c3d8792bd106\
+      81d76fa0d"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: When invoked via the function invocation pattern with multiple
+      arguments, the GeneratorFunction intrinsic creates a valid
+      generator whose body is the last argument evaluated as source code
+      and whose formal parameters are defined by the preceding
+      arguments.
+    assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/invoked-as-function-no-arguments.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "92d5c9797e0434136cd7b1a95006e5efb77acba417dc8f5f45efcd06c7c7\
+      51e7"
+    observationDigest: "c16569ec3c771d850801fd5f01dc00684c80f96e94b4b24a0b55aeb\
+      7b0913f3a"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: When invoked via the function invocation pattern without
+      arguments, the GeneratorFunction intrinsic returns a valid
+      generator with an empty body.
+    assessment: dynamic-construction
+  - path: "test/built-ins/GeneratorFunction/invoked-as-function-single-argument\
+      .js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "b2a9ecc95269bb2103c1b9622350e3be16225e23f4715437176af4fedf00\
+      39b3"
+    observationDigest: "a6316d912f1babe2668e96c7e80fa80285b31ccbd61831256e20505\
+      e6d6544d9"
+    missingDynamicTag: false
+    section: sec-generatorfunction
+    subject: When invoked via the function invocation pattern with a single
+      argument, the GeneratorFunction intrinsic creates a valid
+      generator whose body is the first argument evaluated as source
+      code.
+    assessment: dynamic-construction
+  - path: test/built-ins/Object/entries/tamper-with-global-object.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4f0a9bd02c8733a08a30d313aff90d98a20c78a52c19976b22b0b86892ff\
+      dd31"
+    observationDigest: "89c7e674b0034e8f9da34bd31b22a79710370c7397b46b93084e534\
+      f915f58f4"
+    missingDynamicTag: true
+    section: sec-object.entries
+    subject: Object.entries should not have its behavior impacted by
+      modifications to the global property Object
+    assessment: fixture-construction
+  - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-187.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4460ef42b4eddcb4a64ca4c6d8a4ee5ecadbf45e50478c7bddd91cb3809b\
+      7e66"
+    observationDigest: "c7139165b292f7cc84c4b76c2814750288fa14fc03c12a8d4e6acd9\
+      7cc0453d2"
+    missingDynamicTag: true
+    section: sec-object.getownpropertydescriptor
+    subject: Object.getOwnPropertyDescriptor returns data desc for
+      properties on built-ins (Function (instance).length)
+    assessment: fixture-construction
+  - path: test/built-ins/Object/getOwnPropertyDescriptor/15.2.3.3-4-188.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b359b6bd65f15bb8f45bd8f063668c1b9798e3ad80f4231f5444ddbe7b27\
+      ef3c"
+    observationDigest: "2df841ffd44acaa4d9901d0850fdaf4941ad97b96518a7fc1e8b7e0\
+      7f94ecf0e"
+    missingDynamicTag: true
+    section: sec-object.getownpropertydescriptor
+    subject: Object.getOwnPropertyDescriptor returns undefined for
+      non-existent properties on built-ins (Function (instance).name)
+    assessment: fixture-construction
+  - path: "test/built-ins/Object/prototype/toString/Object.prototype.toString.c\
+      all-function.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "f1e500628a06e4c034f0891a188746ae89f2df19211fbc82de582a0c8899\
+      e3eb"
+    observationDigest: "f2b80552053e564a41d0d25d3589db5facd8cfb8942014531ab00b3\
+      9beec7921"
+    missingDynamicTag: true
+    section: sec-object.prototype.tostring
+    subject: has a [[Call]] internal method, let builtinTag be "Function".
+    assessment: fixture-construction
+  - path: test/built-ins/Object/seal/seal-asyncgeneratorfunction.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1cc1943dbab77f7620b62253343b46d26f7464094d200b6cb9a1abcca791\
+      a9c2"
+    observationDigest: "19108860f2f671201315adb4f277c2644eea3878b9b8627095d6bfe\
+      3dad5c735"
+    missingDynamicTag: true
+    section: sec-object.seal
+    subject: Object.seal AsyncGeneratorFunction
+    assessment: fixture-construction
+  - path: test/built-ins/Object/seal/seal-function.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ed3208f9066908c64f2966f3da996965499e4915c4d21790555c596de679\
+      33b1"
+    observationDigest: "4e6a03d353d0c04c47b3a7098dcb04523759361347981f4a20b4f03\
+      38d3d1256"
+    missingDynamicTag: true
+    section: sec-object.seal
+    subject: Object.seal Function
+    assessment: fixture-construction
+  - path: test/built-ins/Object/seal/seal-generatorfunction.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "90a89f92c865fb8b50ce1d8ca7b81806324ca7302d02452ed07b346dea57\
+      7cec"
+    observationDigest: "239fc3e7c30ff6bc1f74fd4b9b95046c41e3e68676a9dde00b49a2a\
+      00bcbfb36"
+    missingDynamicTag: true
+    section: sec-object.seal
+    subject: Object.seal GeneratorFunction
+    assessment: fixture-construction
+  - path: test/built-ins/Object/values/tamper-with-global-object.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "f6ba4fe0aa65d7e7eccd05aa36bbe029e85dc6331387d9dbcf1da425dd14\
+      6d03"
+    observationDigest: "eec0b5b2c5f5b9bdbe65eeb73dd0f34abb1c35d45b481b2f843c331\
+      5e321597e"
+    missingDynamicTag: true
+    section: sec-object.values
+    subject: Object.values should not have its behavior impacted by
+      modifications to the global property Object
+    assessment: fixture-construction
+  - path: "test/built-ins/Reflect/apply/arguments-list-is-not-array-like-but-st\
+      ill-valid.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0031010c707d0d91e5836c0b903dbd3a2e2b52eb37cafd952f02e989d03c\
+      7d43"
+    observationDigest: "c5a2b108cfc0eba8740b1c92f26a897a3fd784d9588ecdee48a3e62\
+      63b4dd256"
+    missingDynamicTag: true
+    section: sec-reflect.apply
+    subject: Return abrupt if argumentsList is not an ArrayLike object.
+    assessment: fixture-construction
+  - path: test/built-ins/RegExp/S15.10.4.1_A5_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "27aa5356ec57605be4c1aca45a089f83f9527dfc9f3a01fbe59df684dc7b\
+      369e"
+    observationDigest: "5c9a49393ff19ab75682ba0dfea42acce9254d6ff99e50b5e711743\
+      07e134045"
+    missingDynamicTag: true
+    section: sec-regexp-pattern-flags
+    subject: Checking by using eval, try to use eval("\"migr\"") as F
+    assessment: fixture-construction
+  - path: test/built-ins/RegExp/S15.10.4.1_A8_T11.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c58da73ed4e9a237b19ddf8e0de9cf462e2128ad83fed642317bda14d550\
+      2d71"
+    observationDigest: "fb09e4b32905b5c560ec0681f05d94459a67a1efa36d4160b2cd179\
+      334fcbe70"
+    missingDynamicTag: true
+    section: sec-regexp-pattern-flags
+    subject: Checking by using eval, pattern is Math and flags is eval("\"g\"")
+    assessment: fixture-construction
+  - path: test/built-ins/RegExp/prototype/source/value-empty.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "be08753476e6744bbb4466afdabd551d752a0c44394c94d60999ab8ebe8e\
+      6248"
+    observationDigest: "53b3962cd74d89845074f5fc9ff22bbded7b63cd950f7bde4ed4f92\
+      2717010ae"
+    missingDynamicTag: true
+    section: sec-get-regexp.prototype.source
+    subject: 'Return value can be used to create an equivalent RegExp when
+      the [[OriginalSource]] internal slot is the empty string
+      21.2.3.2.4 Runtime Semantics: EscapeRegExpPattern [...] the
+      internal procedure that would result from evaluating S as a
+      Pattern[~U] (Pattern[+U] if F contains "u") must behave
+      identically to the internal procedure given by the constructed
+      object''s [[RegExpMatcher]] internal slot.'
+    assessment: regexp-roundtrip
+  - path: test/built-ins/RegExp/prototype/source/value-line-terminator.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "20b2d7f8d16f6b9c6b4f2cabf33e9697ee50abb7de02a762d6d4b4227f93\
+      a1f3"
+    observationDigest: "a2ed94e24ea311a88b0d5b268538f655b8753cec90cdbd0dfbe9c78\
+      b5827c3a5"
+    missingDynamicTag: true
+    section: sec-get-regexp.prototype.source
+    subject: Return value can be used to create an equivalent RegExp when
+      the [[OriginalSource]] internal slot contains a LineTerminator
+    assessment: regexp-roundtrip
+  - path: test/built-ins/RegExp/prototype/source/value-slash.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "72dcd9a8381f22942f9a297d04cf1a2986d8e64e6d6609c1dfe183787762\
+      83f7"
+    observationDigest: "9e440856bb6307a51c27a4ec00ef2f21fc63bae74d2e916bfbf6fec\
+      fdaaef0c3"
+    missingDynamicTag: true
+    section: sec-get-regexp.prototype.source
+    subject: Return value can be used to create an equivalent RegExp
+    assessment: regexp-roundtrip
+  - path: test/built-ins/RegExp/prototype/source/value-u.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "609fd7f0aecaed08412649ff96e566763df26199ff8b617b5731d8293c02\
+      33ac"
+    observationDigest: "87ac70bd4e22dd21ce7cf946564e2f992eac262452cc5d30db4fb45\
+      ea178587e"
+    missingDynamicTag: true
+    section: sec-get-regexp.prototype.source
+    subject: Return value can be used to create an equivalent RegExp when
+      the [[OriginalFlags]] internal slot contains the `u` flag
+    assessment: regexp-roundtrip
+  - path: test/built-ins/RegExp/prototype/source/value.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2bd0e7814243dd8fab3dfc608bbb0a4bfabcef1a16a822e526db64420046\
+      a41e"
+    observationDigest: "be47fdf2040f66b89a615baa00a66d720f74287c9fbb984e744779c\
+      e0057d98a"
+    missingDynamicTag: true
+    section: sec-get-regexp.prototype.source
+    subject: Return value can be used to create an equivalent RegExp
+    assessment: regexp-roundtrip
+  - path: test/built-ins/String/S15.5.1.1_A1_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9600bad0eb4cb7909d7ebf6b60d18d99a7a3696a1d3d2d18825ff8d8e7f4\
+      f959"
+    observationDigest: "21620c64428b6faa13bdd519c2a5e9491cc335781daaec346f502b8\
+      61abc38b5"
+    missingDynamicTag: true
+    section: sec-string-constructor
+    subject: Checking by using eval, Call String(eval());
+    assessment: fixture-construction
+  - path: test/built-ins/String/S9.8_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0a7e5b2d8b394fdb0543de20e3cf5808135cae80a5d786cc239e6db88026\
+      cd17"
+    observationDigest: "0da718880f6bb6befcafd626023ce0f2e10f2890903d5f7759c6b1d\
+      bf9b9de49"
+    missingDynamicTag: true
+    section: sec-string-constructor
+    subject: Undefined values is undefined, void 0 and eval("var x"). Use
+      explicit transformation
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/charAt/S15.5.4.4_A1.1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "6ec0285b1d3d0a09a69c90071b7ad0730cd4732d32d71cebf11aab85afc9\
+      4ceb"
+    observationDigest: "236b4fe8c83e3f982a4fa38d3abc404c495161d2fd32dc4cbb77c3e\
+      f8a26f92a"
+    missingDynamicTag: true
+    section: sec-string.prototype.charat
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/charCodeAt/S15.5.4.5_A1.1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "f7d11626996387c73cbbfdaaec24516772da9fd72cf958918cc8ec592acb\
+      a2b3"
+    observationDigest: "abacbbadbd0b4bc7fb8a2214a0c955f28123b21c5bcf42422211184\
+      244bf6e04"
+    missingDynamicTag: true
+    section: sec-string.prototype.charcodeat
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/indexOf/S15.5.4.7_A3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "7955ee22a7af2545d2917c11e5fe7a8e97d77b00c9d479c8366d572a4989\
+      a1d4"
+    observationDigest: "1bdadb4cdd6ad0d2fc6db6c6f1bd9296720e5a959dfd3dd592ad47e\
+      bde9f7fc5"
+    missingDynamicTag: true
+    section: sec-string.prototype.indexof
+    subject: Call "$$abcdabcd".indexOf("ab",eval("\"-99\"")) and check result
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/match/S15.5.4.10_A1_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "e9d6fc2985ff3da6cc1d6305b75c3948646652ee02c8054fd8fd2a2eb3f9\
+      d6eb"
+    observationDigest: "120779989cbe1f522bee96035187cb065baa2ff3639a7a2dba931df\
+      1c4b2e960"
+    missingDynamicTag: true
+    section: sec-string.prototype.match
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "798477ee8ee0dbcb281feb018260e6c8f94eb8f196274cb9e30037f2c44b\
+      541d"
+    observationDigest: "e299c69e75b46f017b52d59daa40b1d8847989aea1df849ca896c93\
+      f91c37599"
+    missingDynamicTag: true
+    section: sec-string.prototype.replace
+    subject: Call replace (searchValue, replaceValue) function with null and
+      Function() arguments of function object
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/replace/S15.5.4.11_A1_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "da753c2f4b7fc41b1cda322cfea889ae3f8d0d6301e485d853337282a7b3\
+      adf1"
+    observationDigest: "4f41ed0cee8608a1b7408fb2915091b6eef5beccb07ed7fc4c28b2c\
+      7a04b0693"
+    missingDynamicTag: true
+    section: sec-string.prototype.replace
+    subject: Call replace (searchValue, replaceValue) function with x and
+      Function("return arguments[1]+42;") arguments of new String
+      object. x is undefined variable
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/slice/S15.5.4.13_A1_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "88c5cd7873892684e25279cdd836e80df26d8239c2bcdafb0bd6f46b9746\
+      3460"
+    observationDigest: "bb6886a8f19640eb431f0170eefcfffb34f9be3b519e3f01a7395bb\
+      0022b535d"
+    missingDynamicTag: true
+    section: sec-string.prototype.slice
+    subject: Arguments are null and call other slice(start, end), and
+      instance is function object, that have overrided valueOf and
+      toString functions
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/split/checking-by-using-eval.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "dcc5c2fa6cc8c382fa298298528ee4ca62cc0940f882bf429165177e6bb7\
+      489d"
+    observationDigest: "f985f66d8ae6052091ab3b81dad2e63a90f5e1ef7cea6f9b7876855\
+      df6324d58"
+    missingDynamicTag: true
+    section: sec-string.prototype.split
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: "test/built-ins/String/prototype/split/separator-regexp-limit-string-\
+      via-eval.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "18cd3723a660bf1356ba8d94c91f99a2c6c5e63bed6e5c156dcf10c06aa0\
+      24cb"
+    observationDigest: "ec45419983224d25d3c0f27ffdd81426c856796c887e421eb1a3e6f\
+      c74295104"
+    missingDynamicTag: true
+    section: sec-string.prototype.split
+    subject: Separator regexp, limit string via eval
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/split/separator-regexp.js
+    proposedOwner: adr:0013-m5-edition-and-manifest
+    priorCohort: annex-b
+    sourceDigest: "8835e363f5baf77034f1efde6dacc892da19ba3e950c5fec413455506dc8\
+      c444"
+    observationDigest: "2a08d1fb9b956fdc0b5cdc6cb1659c57ede184bf8c8aa2565d9ff58\
+      d79ad1052"
+    missingDynamicTag: false
+    section: sec-string.prototype.split
+    subject: Separator is a regexp
+    assessment: annex-b-pattern
+  - path: test/built-ins/String/prototype/substring/S15.5.4.15_A1_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "767ea009dd9b382eecc480a2b557a4768054c87e777beb0e6c77614757e2\
+      7d9f"
+    observationDigest: "141178fbf9e83643f9856b4ed3224887c065ff47901f125bd08d6ca\
+      2311a4303"
+    missingDynamicTag: true
+    section: sec-string.prototype.substring
+    subject: Arguments are null and Function(), and instance is function
+      object, that have overrided valueOf function
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "da9d01ada111dff73f5c05171c02aa8bc41da362dc8af5d4bcfdc9b916bf\
+      81c8"
+    observationDigest: "aa0722eaaecdaa8426cdf58d6b25cac09f3d812dd2ac6c37d2fedea\
+      8ff5b9393"
+    missingDynamicTag: true
+    section: sec-string.prototype.tolocalelowercase
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bcb8ad159ac00a9cfbcc7ae45f03c0753e075efccdc8e58dbca3a1da4d78\
+      285b"
+    observationDigest: "7ec569daa539feffbe3f3a828456bdbfa2daafb2715dcd192df9e14\
+      19d2b7c22"
+    missingDynamicTag: true
+    section: sec-string.prototype.tolocaleuppercase
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d929870b199d26c07af201701a001f2205bf1b779f7d5f88c91df8983985\
+      3169"
+    observationDigest: "b39607112e314d1948370ce3d7f33001bd82d2587bb3e4c09935d9a\
+      f43e3e164"
+    missingDynamicTag: true
+    section: sec-string.prototype.tolowercase
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "26abe8512fcc98912c9979c8035e5b8850c4fb7489e0cd9e1ca676b20059\
+      d9a7"
+    observationDigest: "6e43b0702a7ac5649005b392aa8b35fc76276bad4217e7be4e70000\
+      b2dfefa26"
+    missingDynamicTag: true
+    section: sec-string.prototype.touppercase
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A1.3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "898208d8ecee5cf809cf971c91b22ca73ed1dc4bedfc1d66218e2da4f9f6\
+      d085"
+    observationDigest: "24f38bb7b4210fa897d8d01f269b951f250594de7d1f385f94b672d\
+      d3b348239"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Eval execution context - Value Properties
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A1.3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4ff342742b7cdfde4c0506c872194144d7b7073cc3e36bfbdaa66cc4c2c7\
+      a0f1"
+    observationDigest: "faa6ea6b54357ff68db672f80629e1bab1f2897d2e58817eea88d1a\
+      d71d92ba9"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Eval execution context - Function Properties
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A1.3_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2e9e38fcba549fa08313f6f9be856725664cd9c2c6d9c866fdd4b824e8f3\
+      3dd9"
+    observationDigest: "ffbf552792a80771f5d335544ceaf4d7df1868587f6e1b793b0979a\
+      c82180434"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Eval execution context - Constructor Properties
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A1.3_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c2fcc0eae1b6a568bcd6fab02a91d32bec43e17e9301e42316a4f6f66ed2\
+      57c1"
+    observationDigest: "416265e50b2e01d61f353e86061d302939cc2cdf6e9cc415c899c3e\
+      be827344e"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Eval execution context - Other Properties
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A2.3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d7668e49e790f3b132cbc5410ce1259624cb5fee521dc555421b66d7a029\
+      ef3b"
+    observationDigest: "e0e42cf24e0f8a2376e95742b918a18b33739e76c55128dba660ca8\
+      04a3bb70f"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Global execution context - Value Properties
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A2.3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a2d338f0a0915beaa0ecb8f318fc98643cd94b54f25a67b8e098a3cc553a\
+      ba8c"
+    observationDigest: "2ffe72ec741c90e29df260d0b00107bda9cfb728988fc0a8bc66ab2\
+      9102b0e12"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Global execution context - Function Properties
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A2.3_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "88c6286cbb583c6596b77606c67c705c638dd6f446e3d2826fa96f62bfdc\
+      91c8"
+    observationDigest: "5de8dd005252403a8ee494396cf576085cbf5d342009637400d1fdf\
+      347d3ceb2"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Global execution context - Constructor Properties
+    assessment: fixture-construction
+  - path: test/built-ins/global/S10.2.3_A2.3_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "05ae2e44f0f2b77640e0d10fb0ee3d2acc5725fb399e2112f8f6be919bb7\
+      3924"
+    observationDigest: "30d7a3d78c279cd53afe75c7808fecf74ac20c6b41cc625cb481d05\
+      5216c91ff"
+    missingDynamicTag: false
+    section: sec-global-object
+    subject: Global execution context - Other Properties
+    assessment: fixture-construction
+  - path: test/built-ins/undefined/S15.1.1.3_A1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "10263e5bb50ff2090f7328e1c13da9561426f21b27c8ab213a495a658367\
+      1586"
+    observationDigest: "92df5d6d25c74fb699c85369b958d7e755acbce9176dc53ec4b29da\
+      1c8328f68"
+    missingDynamicTag: false
+    section: sec-undefined
+    subject: Use typeof, isNaN, isFinite
+    assessment: fixture-construction
+  - path: "test/language/eval-code/direct/block-decl-eval-source-is-strict-nost\
+      rict.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "987be62b9b5923c4025bbce9d505797f2d1a0fb90f40c8aada9992b98ded\
+      def6"
+    observationDigest: "7abbe6c33d3d960bc7cb6567eb0abe5b9d7b4a51101cc1fdf0fdf78\
+      6e4eed177"
+    missingDynamicTag: false
+    section: sec-web-compat-evaldeclarationinstantiation
+    subject: AnnexB extension not honored in strict mode, Block statement in
+      eval code containing a function declaration
+    assessment: eval-semantics
+  - path: "test/language/eval-code/direct/block-decl-eval-source-is-strict-only\
+      strict.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "a575a4e2a4a831af1cf00812a6afadcb5e60db7f6335be1f22f69f6f9e50\
+      7ca1"
+    observationDigest: "1620b7a8f08bc3055f396f0ff68e0f7a53b20000c9287ba9a6c23d9\
+      027a02c5a"
+    missingDynamicTag: false
+    section: sec-web-compat-evaldeclarationinstantiation
+    subject: AnnexB extension not honored in strict mode, Block statement in
+      eval code containing a function declaration
+    assessment: eval-semantics
+  - path: test/language/eval-code/direct/block-decl-onlystrict.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "e591466c90df74df00af5b42885cda9a6abe773bb1317a784093b6625222\
+      5a0b"
+    observationDigest: "d72944a7b8e3fdc06adb543851efce9fc358bd8a404c0bd079464c9\
+      a713f2d5e"
+    missingDynamicTag: false
+    section: sec-web-compat-evaldeclarationinstantiation
+    subject: AnnexB extension not honored in strict mode, Block statement in
+      eval code containing a function declaration
+    assessment: eval-semantics
+  - path: test/language/expressions/async-generator/eval-var-scope-syntax-err.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "9d95bcadf68b12b14085ae8daa5e02b3272d07bd64dba9a266a12ac0e4f1\
+      d5e9"
+    observationDigest: "cbe7ce65c36df3e35dec768009483f0120c224ceb7dfd62ecd87e3d\
+      85b2dfbd2"
+    missingDynamicTag: false
+    section: sec-asyncgenerator-definitions-evaluation
+    subject: sloppy direct eval in params introduces var (async generator
+      function expression in sloppy code)
+    assessment: eval-semantics
+  - path: "test/language/expressions/async-generator/named-eval-var-scope-synta\
+      x-err.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "f11b43abe42ba34c7d1ff1b528d006137f40d4196ec9220a2a21fb53609c\
+      c866"
+    observationDigest: "de0af48631ff0b8f64984dec9bbb7977bfd919a8e7d9100aea7ef5b\
+      e3ec86343"
+    missingDynamicTag: true
+    section: sec-asyncgenerator-definitions-evaluation
+    subject: sloppy direct eval in params introduces var (async generator
+      named function expression in sloppy code)
+    assessment: eval-semantics
+  - path: "test/language/expressions/class/elements/derived-cls-direct-eval-err\
+      -contains-supercall.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "e1cdec04ab72a6422ad8de6fea4c3bdd186065b73392d82032420219b343\
+      49e0"
+    observationDigest: "8a078da3f4940af6dbcebc7695d461211e72d861a9edaf4884184d3\
+      4f0b7e1ba"
+    missingDynamicTag: true
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: error if `super()` in StatementList of eval (direct eval)
+    assessment: eval-semantics
+  - path: "test/language/expressions/class/elements/derived-cls-indirect-eval-c\
+      ontains-superproperty-1.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "9095a44552167aaf7b6d6ac9012224303e4a0ef97b4033428f9605cc7c9d\
+      c605"
+    observationDigest: "2438939eced526e10d5113f01120fb9f71010eb02b1ae762489af30\
+      9fb2cb8eb"
+    missingDynamicTag: true
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: super.x in StatementList of eval (indirect eval)
+    assessment: eval-semantics
+  - path: "test/language/expressions/class/elements/direct-eval-err-contains-ar\
+      guments.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "369cb861e7b7fe860700d3a5fe9991b5059e5cc1bc7b9c30b01df1d4c3ce\
+      6c77"
+    observationDigest: "3d10531fb5f76883f28aef92f198720a13555ee73d86b8f61e0a459\
+      d8482d40b"
+    missingDynamicTag: true
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: error if `arguments` in StatementList of eval (direct eval)
+    assessment: eval-semantics
+  - path: test/language/expressions/equals/S11.9.1_A1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "21983615ef843115362113720d092b6a3ce80597635b706bb8d4f5dd01e2\
+      b505"
+    observationDigest: "cc750a366db355fc06e9e7b72574cb42998d2f89d63c516563f5186\
+      5cf23c1b3"
+    missingDynamicTag: false
+    section: sec-equality-operators
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/language/expressions/optional-chaining/eval-optional-call.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "8ee86992e92b85c7155b8adf6c84d6923099693407792ca0100c81d8cc62\
+      6f39"
+    observationDigest: "7d152c924ca1194ed85247c42d8bf3c758419e8dd5b65579538bcdb\
+      c7fe70daa"
+    missingDynamicTag: false
+    section: sec-optional-chaining-chain-evaluation
+    subject: optional call invoked on eval function should be indirect eval.
+    assessment: eval-semantics
+  - path: test/language/expressions/super/prop-dot-cls-val-from-eval.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "2b5092ad4a5555c7839aa6902e0a2edc4f0d09de154f57f0080fce009671\
+      53fe"
+    observationDigest: "8ee2a798ab4021870579bea912b9b4a91c306e41d246c2ee830d8ef\
+      2dcba240b"
+    missingDynamicTag: true
+    section: sec-super-keyword
+    subject: Value of reference returned by SuperProperty (from eval code)
+    assessment: eval-semantics
+  - path: test/language/expressions/super/prop-dot-obj-val-from-eval.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "a938096aaa0da4e08f50fe5ba1bd6b3dba4129139bf775ad7bce8d3ef1f5\
+      cd6f"
+    observationDigest: "62ce2b32c826f8868d2b8e84984d4c371efc43e3c6531d650f1b59d\
+      be2caa134"
+    missingDynamicTag: true
+    section: sec-super-keyword
+    subject: Value of reference returned by SuperProperty (from eval code)
+    assessment: eval-semantics
+  - path: test/language/expressions/super/prop-expr-cls-val-from-eval.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "454eeb5b99fa69c25e5294e70e511e370046f6eaee0c69f11f6a5e751313\
+      15cb"
+    observationDigest: "976484428769bd9485e30923f97e5a2e8753dc7b208e92839a7819b\
+      d273731b9"
+    missingDynamicTag: true
+    section: sec-super-keyword
+    subject: Value of reference returned by SuperProperty (from eval code)
+    assessment: eval-semantics
+  - path: test/language/expressions/super/prop-expr-obj-val-from-eval.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "253dcbdfe8d05827e5f6ae13297f80feb53f813534a01138d49e5a033844\
+      34c5"
+    observationDigest: "0e2c8e5e26ca2ff987b8545013addad4efe02acf22f32dea130da3b\
+      cea6a33af"
+    missingDynamicTag: true
+    section: sec-super-keyword
+    subject: Value of reference returned by SuperProperty (from eval code)
+    assessment: eval-semantics
+  - path: "test/language/expressions/tagged-template/cache-differing-expression\
+      s-eval.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "943f004c1a54e3d481076fa8a033d18deb85ab121a63f92c9f801597881c\
+      8f66"
+    observationDigest: "f0a2907a6b8b24b4cc32f1f37760713b046b8f48f18d89085211f2e\
+      e8341cb5a"
+    missingDynamicTag: false
+    section: sec-gettemplateobject
+    subject: Template caching using distinct expressions within `eval`
+    assessment: template-sites
+  - path: "test/language/expressions/tagged-template/cache-differing-expression\
+      s-new-function.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "e4b24504bbd389f7c14d1228892a4d50adb35beb6fc62b065032d31fc0cf\
+      2610"
+    observationDigest: "2875f71969addc34f787f494d8a728e068c0db4796bcd69deeb0b5f\
+      6c0e02e2b"
+    missingDynamicTag: false
+    section: sec-gettemplateobject
+    subject: Template caching using distinct expressions within `new Function`
+    assessment: template-sites
+  - path: test/language/expressions/tagged-template/cache-eval-inner-function.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "16925bb7e47b1fcdca0e7f66bd7175756f39e3cc452da19bd3d454bb6b1d\
+      b949"
+    observationDigest: "2b01751e6c99404410a67f6d3aa22e8e78e7b444846edbbe35b9731\
+      1fe9b8433"
+    missingDynamicTag: false
+    section: sec-gettemplateobject
+    subject: Templates are cached by source location inside a function
+    assessment: template-sites
+  - path: "test/language/expressions/tagged-template/cache-identical-source-eva\
+      l.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "08a530bc5122b3172f624a1132d2ced94f78056df1111ac4b755c663c4b3\
+      163e"
+    observationDigest: "2e7386e145e860def705c2a88df2e54de9f7e45bc4dcdbc82e9eb77\
+      1a03c08cb"
+    missingDynamicTag: false
+    section: sec-gettemplateobject
+    subject: Templates are cached by site, even using identical expressions
+      within `eval`
+    assessment: template-sites
+  - path: "test/language/expressions/tagged-template/cache-identical-source-new\
+      -function.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "254f85741af71fab6706e7f904b46ce6b9fc23fb35dd1146043adf72d132\
+      2ec2"
+    observationDigest: "c92885dab26e7958115d229c26f66890ff806692733382e8a9c2186\
+      3f4cc3211"
+    missingDynamicTag: false
+    section: sec-gettemplateobject
+    subject: Template caching is by site, using identical expressions within
+      `new Function`
+    assessment: template-sites
+  - path: test/language/expressions/typeof/syntax.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9ff2b4cec522780ce92e0a6ed2f67b1b0ed5fa76b3414a582a5fad1e2317\
+      51e4"
+    observationDigest: "2b071b5625248a7602c36f6297ff1c909474c76e955fc6191aa1064\
+      72e9c334c"
+    missingDynamicTag: false
+    section: sec-typeof-operator
+    subject: Checking by using eval
+    assessment: fixture-construction
+  - path: test/language/statements/async-generator/eval-var-scope-syntax-err.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "313142a9d1d12bf4155928aaf6e5ef7771a7a39b0070caf4903f44d31d3b\
+      9599"
+    observationDigest: "1897cbf01ff93c4d6d85456381d36fee658ef9258a00fe7ebecad05\
+      10e6a27c0"
+    missingDynamicTag: false
+    section: sec-asyncgenerator-definitions-instantiatefunctionobject
+    subject: sloppy direct eval in params introduces var (async generator
+      function declaration in sloppy code)
+    assessment: eval-semantics
+  - path: "test/language/statements/class/elements/derived-cls-direct-eval-err-\
+      contains-supercall.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "12edcd31eeb6ab23189424056d035e64da79842e9e119c34aafa2542aeac\
+      134e"
+    observationDigest: "82a4e97f78705a77131ade5c7bc8699a7999b1f3e17d1d605906236\
+      6e3b5a4b8"
+    missingDynamicTag: true
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: error if `super()` in StatementList of eval (direct eval)
+    assessment: eval-semantics
+  - path: "test/language/statements/class/elements/derived-cls-indirect-eval-co\
+      ntains-superproperty-1.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "e1187384a3c619c6af4fa23631712ad34ef261b1c26784984f6394101597\
+      0d59"
+    observationDigest: "b5bc944dcd9a64753355aa7d286e93f436e55410fdb7ba59e14c6d9\
+      654967f70"
+    missingDynamicTag: true
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: super.x in StatementList of eval (indirect eval)
+    assessment: eval-semantics
+  - path: "test/language/statements/class/elements/direct-eval-err-contains-arg\
+      uments.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "3021888b0c7a5af33a3b1e38185fe6dbaa677ade35405a7316b3ad20e547\
+      2550"
+    observationDigest: "941a2b862025ad27e5b9404db9f6e043c1e61fa8197c7ed6986a049\
+      b3e4cc1ac"
+    missingDynamicTag: true
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: error if `arguments` in StatementList of eval (direct eval)
+    assessment: eval-semantics
+  - path: test/language/statements/do-while/cptn-normal.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a74c95e5a73361a3477be572cf62b289f2a510aecc32c522d424677b58a5\
+      e5ba"
+    observationDigest: "80ee3cf2eb29945aa319ebd9c7cb0b7040895e89794270d1cddf3b4\
+      13b3fb00a"
+    missingDynamicTag: false
+    section: sec-do-while-statement
+    subject: Completion value when iteration completes due to expression value
+    assessment: completion-observation
+  - path: test/language/statements/for-in/S12.6.4_A3.1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9dc1d6884305ed269cbdbc95f8af34531b28ace5b76456af65415425c080\
+      2298"
+    observationDigest: "0a4c02e0ba18ac478f6bebeb5026d1167801a4a810fe2de750d5944\
+      8ad710c0c"
+    missingDynamicTag: true
+    section: sec-for-in-and-for-of-statements
+    subject: Using an array as an Expression is appropriate. Here Expression
+      is an array of numbers
+    assessment: completion-observation
+  - path: test/language/statements/for-in/S12.6.4_A3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "42ae0699f17bfce9d79605bc636d7ccc14c1bce8b17b2f007cd73514e8c7\
+      d5c3"
+    observationDigest: "7cfa6f52d351e78a91a31819e8fd7efcca58e04d393f9a372d1b61f\
+      300b8d700"
+    missingDynamicTag: true
+    section: sec-for-in-and-for-of-statements
+    subject: Using an array as an Expression is appropriate. Here Expression
+      is an array of numbers. Eval is used
+    assessment: completion-observation
+  - path: test/language/statements/for-in/S12.6.4_A4.1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0160b5c165dac9ddc3ee81d33310b873bea445055c72df5939dd163ceeb3\
+      479c"
+    observationDigest: "9180a09315fedb3aff0453c41c64a64ef75086667c972c47c111664\
+      481717b05"
+    missingDynamicTag: true
+    section: sec-for-in-and-for-of-statements
+    subject: Using Object as an Expression is appropriate. Eval is used
+    assessment: completion-observation
+  - path: test/language/statements/for-in/S12.6.4_A4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9d55447437d7ca96fbf1af2957ef02d49d1774710e9ac172592c76246a0c\
+      cfe9"
+    observationDigest: "d8b16c46d0e0deec04c10b20ecb078a4ac36dbe7b09506fa05b4b09\
+      e71f05c18"
+    missingDynamicTag: true
+    section: sec-for-in-and-for-of-statements
+    subject: Using Object as an Expression is appropriate. Eval is used
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-decl-abrupt-empty.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "6ca89e72d36f46574399662e52830505c0a66642c01dcb7967d1fa52a2e6\
+      1a7f"
+    observationDigest: "851d7756d95bc27cf6cbfe5f7e2d8262cd43bc1903693217c7d07e9\
+      0873c1d1d"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has a declaration and iteration is
+      cancelled
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-decl-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0cb658d01c5b47d5b4fba3e7e01ff6d6930d91589dbb325b47c193c9207e\
+      ea6b"
+    observationDigest: "a0632b050e65a71fcc1e8bf8913ea159b478abd5159c20dd4f23107\
+      4ef8f7d3a"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has a declaration and iteration occurs
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-decl-skip-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4edf040bcacb2fb225229e7e2fd6d1fea096a317a4adac425361b77ee3a5\
+      5a96"
+    observationDigest: "a24ae52d6562c2905a3eeb68d59147a388167e430a6a7749e9fa212\
+      e78097348"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has a declaration and iteration is
+      skipped
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-decl-zero-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "f3bc25b7cb260078a8ee982e8ca7b223e22b9a73a02346036e96659cba1b\
+      fc73"
+    observationDigest: "28a2e5bb6f12de45b2d25f3824ae42eddb109467696ca3a8aa79fc4\
+      baa22a676"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has a declaration and no iteration
+      occurs
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-expr-abrupt-empty.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "345aaf256474e019d9905e8584f2086b4172a7108ddf131542c25a789f8e\
+      343d"
+    observationDigest: "8b48df33543fbad60782ffd72521612641470a37e1005826d0b9e30\
+      876207439"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has no declaration and iteration is
+      cancelled
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-expr-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "5ed41dde44c1d59f02c3b89ed77e579fd22a2648162b3f6acf15ced11ca4\
+      c793"
+    observationDigest: "553323050e2424939640b98fb7a6eeb98de96d57a183de3bbb9dd03\
+      780706c15"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has no declaration and iteration occurs
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-expr-skip-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ecc991564d53e6ebd66792df1a30512b3f1bd56c27b9b84cecab85894ec1\
+      0569"
+    observationDigest: "7e8de3cabd41bb159738f2e4a9025790d03d8d42d9e20a00d51ecaf\
+      5621f8822"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has no declaration and iteration is
+      skipped
+    assessment: completion-observation
+  - path: test/language/statements/for-in/cptn-expr-zero-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8028322fd7e0505f92a742d3664b35919128210cd4869006fb57140199cd\
+      45c1"
+    observationDigest: "c9d2a15bb10968bc5a95d7fe7d99f6ae9c4ddf27e6c06be50d6f425\
+      13e27a857"
+    missingDynamicTag: false
+    section: sec-for-in-and-for-of-statements
+    subject: Completion value when head has no declaration and no iteration
+      occurs
+    assessment: completion-observation
+  - path: test/language/statements/for-in/scope-head-var-none.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "c961bd8c9b7b84752c2d07e3baf3ffaa4cf84e2dd21cf6b18a7a7a4aa9b5\
+      9e43"
+    observationDigest: "109481fb949560d45535891683dd06c927c5e0765f10eca5ff8124f\
+      0dad94600"
+    missingDynamicTag: false
+    section: "sec-for-in-and-for-of-statements-runtime-semantics-labelledevalua\
+      tion"
+    subject: No variable environment is created for the statement "head"
+    assessment: variable-environment
+  - path: test/language/statements/try/scope-catch-param-var-none.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "72dd10a432cdc5ce43e143fd48022efcd43d912926c572901ed6a3769168\
+      0c2b"
+    observationDigest: "85df2cd7a70bb19c39aa2eaf84825f1405a50e96da2768b80450b42\
+      d118e64f6"
+    missingDynamicTag: false
+    section: sec-runtime-semantics-catchclauseevaluation
+    subject: Retainment of existing variable environment for `catch` parameter
+    assessment: variable-environment

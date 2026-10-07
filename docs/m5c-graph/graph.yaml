@@ -18,9 +18,9 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 62
+  nodes: 64
   ready: 57
-  blocked: 5
+  blocked: 7
   parked: 0
   landed: 4
 serializationPoints:
@@ -31,6 +31,10 @@ serializationPoints:
     note: "The closure ledger will assign one state and one owner to every
       applicable inventory path. Ownership audits and batch planning may both
       need to extend it."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    note: "Boundary assessments bind accepted records, upstream sources, and
+      normalized rejection observations. A changed diagnostic or source needs
+      a reviewed assessment update alongside its manifest and ledger owners."
   - path: tests/test262/subset.yaml
     note: "Every newly reviewed path enters the reviewed subset before its
       observation can appear in the result manifest."
@@ -45,12 +49,26 @@ collisions:
     nodes:
       - observation-batch-plan
       - unsupported-ownership-audit
-    note: "Both nodes classify paths after the ledger lands. Run their
-      analysis concurrently if useful, but serialize their ledger edits."
+    note: "These ownership nodes classify paths after the ledger lands. Run
+      their analysis concurrently if useful, but serialize their ledger edits."
+  - path: docs/m5c-closure/ledger.yaml
+    nodes:
+      - authorized-exclusion-audit
+      - observation-batch-plan
+    note: "The exclusion audit and batch plan may revise independent owners;
+      serialize their ledger edits."
+  - path: docs/m5c-closure/ledger.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - observation-batch-plan
+      - regexp-split-coverage-remediation
+    note: "Coverage remediation and batch planning have independent path sets;
+      serialize their ledger edits."
   - path: tests/test262/results.yaml
     nodes:
       - cross-realm-host
       - dynamic-import
+      - dynamic-source-coverage-remediation
       - eval-intrinsic-value
       - fn-global-object-harness
       - frontmatter-feature-tags
@@ -67,6 +85,7 @@ collisions:
       - proper-tail-calls
       - regexp-pattern-extensions
       - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
       - resizable-array-buffer-harness
       - test262-host-script-bindings
       - typed-array-feature-admission

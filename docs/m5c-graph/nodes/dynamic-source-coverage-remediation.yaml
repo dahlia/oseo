@@ -1,0 +1,15 @@
+version: 1
+id: dynamic-source-coverage-remediation
+title: Resolve dynamic source coverage gaps
+delivers: "Resolves the 121 reviewed paths whose eval or source constructor
+  rejection is authorized but whose non-source subject coverage is unresolved:
+  111 incidental-scaffolding paths, 5 template-site identity paths, and 2
+  variable-environment probes, plus 3 mixed static/dynamic function tests.
+  Obtain the maintainer accounting decision in
+  PLAN-M5C.md, then review equivalent ahead-of-time observation or replacement
+  evidence per original path; preserve all paths and assertions, never emulate
+  runtime eval or widen ADR 0016, and keep unresolved rows under remediation."
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: blocked

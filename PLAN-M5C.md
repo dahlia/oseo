@@ -132,9 +132,10 @@ The checker accepts an `adr:` owner only for an unsupported path, only when
 the paragraph under the record's Status heading begins with `Accepted`, and
 only with an owner note. The note quotes the text that authorizes and bounds
 the exclusion and states the path selector. A failure can never cite a
-record. The checker proves that the record exists and is accepted, not that
-its text covers each path; `authorized-exclusion-audit` verifies that bound
-and the record's reopening trigger.
+record. `mise run check:m5c-exclusion-audit` additionally binds each human
+boundary assessment to the accepted record text, pinned source, and observed
+rejection. It verifies quoted authorization and reopening text and rejects
+an ADR owner when non-source subject coverage remains unresolved.
 
 Regeneration keeps an owner while its path keeps the same state and resets it
 to the default for the new state otherwise: `observation`, `unassigned`, or
@@ -143,58 +144,188 @@ unsupported for a different reason reassigns that path in the same change.
 
 ### Unsupported ownership
 
-The `unsupported-ownership-audit` node assigned every one of the 1,480
+The `unsupported-ownership-audit` node initially assigned all 1,480
 reviewed unsupported paths from its observed reason, not from its dependency
 tags. The observed reason is the unsupported frontmatter feature, the named
 unsupported capability, or the `OSEO1001` diagnostic recorded in the
 manifest.
 
-| Owner                                  | Paths | Observed reason                                         |
-| -------------------------------------- | ----: | ------------------------------------------------------- |
-| `node:regexp-property-escape-harness`  |   453 | *regExpUtils.js* omits `buildString`                    |
-| `node:iterator-helpers`                |   392 | only `iterator-helpers` is unadmitted                   |
-| `adr:0016-dynamic-source-boundary`     |   177 | dynamic source rejection                                |
-| `node:resizable-array-buffer-harness`  |   168 | *resizableArrayBufferUtils.js* include                  |
-| `node:cross-realm-host`                |    84 | `cross-realm` is unadmitted                             |
-| `node:typed-array-feature-admission`   |    42 | concrete TypedArray tags or `typeof Float16Array`       |
-| `node:primitive-wrapper-objects`       |    36 | `primitive-wrapper`                                     |
-| `node:promise-feature-admission`       |    30 | `Promise` or `Promise.prototype.finally` is unadmitted  |
-| `node:module-export-forms`             |    28 | unadmitted export forms                                 |
-| `node:unhandled-rejection-observation` |    19 | `unhandled-rejection-policy`                            |
-| `node:eval-intrinsic-value`            |    16 | `eval` read only as a value                             |
-| `node:test262-host-script-bindings`    |    14 | `$262.evalScript` or `print`                            |
-| `node:well-known-intrinsics-harness`   |     6 | *wellKnownIntrinsicObjects.js* include                  |
-| `node:regexp-pattern-extensions`       |     5 | `regexp-pattern-extension`                              |
-| `node:frontmatter-feature-tags`        |     5 | `super` or `dynamic-import` tag the source does not use |
-| `node:non-blocking-agent`              |     2 | `non-blocking-agent`                                    |
-| `node:proper-tail-calls`               |     2 | `tail-call-optimization` is unadmitted                  |
-| `adr:0013-m5-edition-and-manifest`     |     1 | Annex B named backreference                             |
+| Owner                                      | Paths | Observed reason                                               |
+| ------------------------------------------ | ----: | ------------------------------------------------------------- |
+| `node:regexp-property-escape-harness`      |   453 | *regExpUtils.js* omits `buildString`                          |
+| `node:iterator-helpers`                    |   392 | only `iterator-helpers` is unadmitted                         |
+| `adr:0016-dynamic-source-boundary`         |    56 | bounded source evaluation or construction                     |
+| `node:dynamic-source-coverage-remediation` |   121 | unresolved non-source coverage behind an authorized rejection |
+| `node:resizable-array-buffer-harness`      |   168 | *resizableArrayBufferUtils.js* include                        |
+| `node:cross-realm-host`                    |    84 | `cross-realm` is unadmitted                                   |
+| `node:typed-array-feature-admission`       |    42 | concrete TypedArray tags or `typeof Float16Array`             |
+| `node:primitive-wrapper-objects`           |    36 | `primitive-wrapper`                                           |
+| `node:promise-feature-admission`           |    30 | `Promise` or `Promise.prototype.finally` is unadmitted        |
+| `node:module-export-forms`                 |    28 | unadmitted export forms                                       |
+| `node:unhandled-rejection-observation`     |    19 | `unhandled-rejection-policy`                                  |
+| `node:eval-intrinsic-value`                |    16 | `eval` read only as a value                                   |
+| `node:test262-host-script-bindings`        |    14 | `$262.evalScript` or `print`                                  |
+| `node:well-known-intrinsics-harness`       |     6 | *wellKnownIntrinsicObjects.js* include                        |
+| `node:regexp-pattern-extensions`           |     5 | `regexp-pattern-extension`                                    |
+| `node:frontmatter-feature-tags`            |     5 | `super` or `dynamic-import` tag the source does not use       |
+| `node:non-blocking-agent`                  |     2 | `non-blocking-agent`                                          |
+| `node:proper-tail-calls`                   |     2 | `tail-call-optimization` is unadmitted                        |
+| `node:regexp-split-coverage-remediation`   |     1 | mixed Annex B/core split coverage                             |
 
-Two accepted records authorize exclusions, and the 178 paths they own are
-proposed for `authorized-exclusion-audit`. ADR 0016 owns a path only when its
+Two accepted records initially owned 178 proposed exclusions. ADR 0016 owned
+a path only when its
 observed `OSEO1001` diagnostic rejects the `Function` constructor, a
 constructor that compiles source text, or a call of `eval`, including
-`eval?.()` and `(0, eval)()`. ADR 0013 owns the one path whose diagnostic
-names an Annex B-only pattern. Every realm, agent, shared memory, host
+`eval?.()` and `(0, eval)()`. ADR 0013 initially owned the one path whose
+diagnostic names an Annex B-only pattern; the audit below moves it to
+remediation. Every realm, agent, shared memory, host
 binding, and harness capability path has a remediation owner. So do `eval`
 read as a value, `$262.evalScript`, and proper tail calls, because no
 accepted record excludes them.
 
-The reviewed subset gives 120 of the 177 ADR 0016 paths no `dynamic-source`
-tag. Their owner rests on the observed diagnostic, and their ledger entries
-show the missing tag; retagging them is a separate manifest change.
+The reviewed subset gives 120 of the 177 proposed ADR 0016 paths no
+`dynamic-source` tag. Their owner rests on the observed diagnostic, and their
+ledger entries show the missing tag; retagging them is a separate manifest
+change.
 
-A path has source evaluation as its subject when it lies under
+The initial audit selected a source-subject cohort when a path lay under
 *test/built-ins/AsyncFunction/*, *test/built-ins/AsyncGeneratorFunction/*,
 *test/built-ins/GeneratorFunction/*, *test/built-ins/Function/length/*,
 *test/built-ins/Function/prototype/toString/*, or *test/language/eval-code/*;
 when it is an `S15.3.5.2_*` case under *test/built-ins/Function/prototype/*;
 when its file name contains `eval` or `new-function` outside
 *test/built-ins/String/*; or when it is one of the two `scope-*-var-none.js`
-cases. That selects 66 paths. The other 111 use `eval` or `Function` only as
-scaffolding for another subject, so `authorized-exclusion-audit` checks them
-against the ADR 0019 trigger for a normative section that depends on dynamic
-source for behavior other than source evaluation.
+cases. That selects 66 paths. The other 111 use `eval` or `Function` as
+scaffolding for another subject. This selector is an audit cohort, not proof
+of normative dependence or an exclusion authorization.
+
+### Authorized exclusion audit
+
+The audit retains 56 of the 178 proposed exclusions, all under ADR 0016.
+It moves 121 paths to `node:dynamic-source-coverage-remediation` and the
+mixed Annex B/core split path to `node:regexp-split-coverage-remediation`,
+both on the `m5-exit-audit` dependency path. No observation, dependency tag,
+inventory entry, or ADR changes. The reviewed totals remain 21,383 paths,
+18,343 passes, 1,560 expected negatives, and 1,480 unsupported results against
+41,091 applicable paths. The ledger's `closedPaths` remains 19,903 because it
+counts only passes and expected negatives; authorized exclusions are reported
+separately.
+
+[*docs/m5c-closure/exclusion-audit.yaml*](./docs/m5c-closure/exclusion-audit.yaml)
+records every proposed path's normalized observation digest, source digest,
+normative section, subject, prior cohort, and boundary assessment. Shared
+assessments explain the same contract for each listed member. The record
+entries quote the authorization and applicable reopening triggers from accepted
+ADRs 0013, 0016, and 0019. ADR 0020 fixes the denominator and authorizes no new
+exclusion; ADR 0026 demonstrates ahead-of-time host adaptation without
+authorizing exclusions of other harness capabilities.
+
+`mise run check:m5c-exclusion-audit`, included by `mise run check`, rejects
+missing assessments for ADR owners, unaccepted or changed records, stale
+sources or rejection observations, absent quotes, unrelated diagnostics,
+value-only eval reads, and owners
+that differ from the assessment. A promotion to pass or expected negative
+uses the observation owner. New proposed exclusions require reviewed entries;
+the tool never assigns them from a directory or dependency tag. It checks
+the freshness and consistency of human judgments, not their normative truth.
+The eval check parses actual call syntax, including optional and indirect
+calls; reference resolution and correspondence to the rejected identifier
+remain part of the human source assessment. Numeric locations in the outer
+stderr diagnostic are normalized because harness composition can move them.
+A changed message, capability, or source still needs a reviewed path update;
+use the exported `exclusionAuditDigest` and `exclusionObservationDigest`
+helpers in *tools/m5c-exclusion-audit.ts* to compute its snapshots after
+review, without regenerating observations merely to refresh the audit.
+
+| Assessment                                                 | Paths | Disposition |
+| ---------------------------------------------------------- | ----: | ----------- |
+| Dynamic construction and its resulting instance            |    39 | ADR 0016    |
+| Eval parsing, early errors, and eval-code binding behavior |    17 | ADR 0016    |
+| Ordinary input or callable construction                    |    93 | Remediation |
+| RegExp source escaping and literal round trips             |     5 | Remediation |
+| Statement completion-value observation                     |    13 | Remediation |
+| Template-site identity across dynamic parses               |     5 | Remediation |
+| Variable-environment retention probes                      |     2 | Remediation |
+| Mixed static/dynamic function assertions                   |     3 | Remediation |
+| Mixed Annex B/core split assertions                        |     1 | Remediation |
+
+For each of the 111 incidental-scaffolding paths, the observed call lies
+inside ADR 0016's rejected surface, but the normative subject is not excluded.
+The test's use of `eval` or `Function` does not itself prove that a normative
+algorithm requires dynamic source for behavior other than source evaluation.
+The audit therefore does not assert that ADR 0019's reopening trigger has
+been met. It also cannot authorize excluding the unobserved in-claim subject
+without replacement evidence or a maintainer coverage-accounting decision.
+All 111 keep remediation ownership while that distinction is unresolved.
+
+The 16th-edition algorithms for
+[GetTemplateObject],
+[EscapeRegExpPattern],
+[CatchClauseEvaluation],
+and [Function.prototype.apply]
+define their own caching, escaping, environment, and call contracts without
+requiring an eval call. Their chosen test observers do use dynamic source.
+The audit maps six legacy initializer-rule frontmatter identifiers to
+`sec-performeval`, preserving the upstream identifier separately.
+
+Ten paths from the earlier 66-path source-subject cohort join them. Five
+_tagged-template/cache-\*.js_ cases observe template-site identity under
+dynamic parsing; two _scope-\*-var-none.js_ cases use eval-created `var`
+bindings to distinguish retained variable environments. Three constructor
+family cases also assert on statically declared functions:
+*AsyncFunction/instance-construct-throws.js*,
+*AsyncGeneratorFunction/has-instance.js*, and
+*GeneratorFunction/has-instance.js*. Their rejections are authorized, but
+template identity and environment retention remain in the claim. These are
+possible reopening evidence, not a decision to reopen or widen ADR 0016.
+Likewise, the five RegExp round trips need equivalent literal parsing and
+matching evidence, and the 13 completion probes need evidence of Completion
+Record values, not substitutions that merely return a function value. The Annex
+B split path likewise contains many core split assertions whose coverage cannot
+be excluded with the legacy pattern. ADR 0013's reopening trigger is not proved
+by a chosen optional input alone. The same conservative rule therefore retains
+this path under its separate remediation node. This node produces no
+replacement semantic evidence.
+
+The audit preserves the 120 paths without the `dynamic-source` dependency
+tag and names each in its path record. This is a reporting debt under ADR
+0016, not evidence that the rejection is unauthorized. The check reports
+their count separately so dependency-indexed summaries cannot silently stand
+in for the observed dynamic-source gap.
+Of these 120 paths, 29 retain exclusions and 91 move to remediation.
+
+#### Maintainer decision requested
+
+Choose how the 121 dynamic-source remediation paths, including all 111
+incidental paths, and the one mixed Annex B/core split path
+may close. The recommended option keeps their remediation owners until
+reviewed equivalent ahead-of-time observation or existing replacement
+evidence proves each non-source contract. This preserves the bounded
+exclusion, costs follow-up evidence or harness work, and reports 56 authorized
+exclusions plus 1,424 unsupported remediation paths, including these 122.
+The original upstream paths and assertions remain visible; replacement
+evidence alone does not turn a recorded unsupported result into a pass.
+
+Alternatively, explicitly accept the original 178 paths as bounded
+compile-rejection exclusions, while continuing to report the 122 non-source
+coverage gaps separately. That avoids adapting source-evaluating tests, but
+does not substantiate their normative subjects and risks overstating closure
+unless the reporting contract names those gaps. It would report 178
+exclusions and 1,302 unsupported remediation paths, with unchanged manifest
+classifications and percentage. This worker does not make that accounting
+decision or accept a new exclusion.
+
+Separately, authorize a follow-up to add `dynamic-source` alongside the
+existing tags on all 120 paths and regenerate the manifest. This makes the
+dependency-indexed dynamic-source totals match the observed gap without
+changing support or ownership. Leaving the tags as found avoids a manifest
+update but requires the separate diagnostic-based count in every coverage
+report. Adding the tags is recommended; this audit does not retag them.
+
+[GetTemplateObject]: https://262.ecma-international.org/16.0/#sec-gettemplateobject
+[EscapeRegExpPattern]: https://262.ecma-international.org/16.0/#sec-escaperegexppattern
+[CatchClauseEvaluation]: https://262.ecma-international.org/16.0/#sec-runtime-semantics-catchclauseevaluation
+[Function.prototype.apply]: https://262.ecma-international.org/16.0/#sec-function.prototype.apply
 
 
 Work graph construction
