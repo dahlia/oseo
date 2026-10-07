@@ -1721,12 +1721,15 @@ stays fixed, through the existing `OSEO_PROPERTY_TIME_SCALE`:
     not cover the degraded shard, which no limit under the job timeout covers.
     With zero configured lanes every job is hosted by design and carries no
     scale.
- -  The `test` matrix step sets `OSEO_PROPERTY_TIME_SCALE` to 2 when
-    `runner.os` is macOS and 1 elsewhere. That job is always hosted, so the
-    scale is not a Mac ratio: it gives the macOS runner the margin the
-    360,000 ms budget was written with, since the measured 252 to 384 s
-    need sits at 70 to 107 percent of the limit. The Deno job on macOS
-    receives the same factor on package properties with 5 and 10 s limits.
+ -  The `test` matrix step carries no scale. A job-level factor there was
+    landed and reverted in the same session: `packages/testkit` reads the
+    ambient `OSEO_PROPERTY_TIME_SCALE` when it records a case shard's
+    effective limit, so a job-wide value made
+    `property-case-shard.test.ts` observe 6,200 where it asserts 3,100 and
+    failed the job it was meant to protect. Giving the always-hosted macOS
+    job the margin its 360,000 ms budget was written with, against a
+    measured 252 to 384 s need, therefore waits on isolating that reader
+    from the environment.
  -  Own-key case shards keep the original 3,600,000 ms limit on either
     runner class. Their duration record stores the effective limit, and
     `check:property-case-durations` requires it to equal the original and

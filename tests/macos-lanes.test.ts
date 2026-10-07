@@ -939,20 +939,6 @@ test("hosted fallback widens only Mac-lane property deadlines", () => {
       job.id,
     );
   }
-  // The always-hosted macOS test job widens the ordinary own-key limit by
-  // a fixed factor; the same expression yields 1 on Linux and Windows.
-  const hostedScale = {
-    OSEO_PROPERTY_TIME_SCALE: "${{ runner.os == 'macOS' && '2' || '1' }}",
-  };
-  for (const [id, run] of [
-    ["test_macos_node", "mise run test:node"],
-    ["test_macos_deno", "mise run test:deno"],
-    ["test", "mise run test:${{ matrix.runtime }}"],
-  ] as const) {
-    const step = workflow.jobs[id]!.steps.find((entry) => entry.run === run);
-    assert.ok(step, id);
-    assert.deepEqual(step.env, hostedScale, id);
-  }
   for (const line of rendered.split("\n")) {
     if (line.includes("OSEO_PROPERTY_TIME_SCALE") || line.includes("'1' ||")) {
       assert.ok(line.length <= 80, line);
