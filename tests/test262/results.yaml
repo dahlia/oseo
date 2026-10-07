@@ -8981,6 +8981,531 @@ partitions:
   - group: built-ins/Promise
     key: ff
     path: results/built-ins/Promise/ff.yaml
+  - group: built-ins/Proxy
+    key: "01"
+    path: results/built-ins/Proxy/01.yaml
+  - group: built-ins/Proxy
+    key: "02"
+    path: results/built-ins/Proxy/02.yaml
+  - group: built-ins/Proxy
+    key: "05"
+    path: results/built-ins/Proxy/05.yaml
+  - group: built-ins/Proxy
+    key: "06"
+    path: results/built-ins/Proxy/06.yaml
+  - group: built-ins/Proxy
+    key: "07"
+    path: results/built-ins/Proxy/07.yaml
+  - group: built-ins/Proxy
+    key: "08"
+    path: results/built-ins/Proxy/08.yaml
+  - group: built-ins/Proxy
+    key: "09"
+    path: results/built-ins/Proxy/09.yaml
+  - group: built-ins/Proxy
+    key: 0b
+    path: results/built-ins/Proxy/0b.yaml
+  - group: built-ins/Proxy
+    key: 0c
+    path: results/built-ins/Proxy/0c.yaml
+  - group: built-ins/Proxy
+    key: 0d
+    path: results/built-ins/Proxy/0d.yaml
+  - group: built-ins/Proxy
+    key: "10"
+    path: results/built-ins/Proxy/10.yaml
+  - group: built-ins/Proxy
+    key: "11"
+    path: results/built-ins/Proxy/11.yaml
+  - group: built-ins/Proxy
+    key: "13"
+    path: results/built-ins/Proxy/13.yaml
+  - group: built-ins/Proxy
+    key: "14"
+    path: results/built-ins/Proxy/14.yaml
+  - group: built-ins/Proxy
+    key: "15"
+    path: results/built-ins/Proxy/15.yaml
+  - group: built-ins/Proxy
+    key: "16"
+    path: results/built-ins/Proxy/16.yaml
+  - group: built-ins/Proxy
+    key: "18"
+    path: results/built-ins/Proxy/18.yaml
+  - group: built-ins/Proxy
+    key: 1c
+    path: results/built-ins/Proxy/1c.yaml
+  - group: built-ins/Proxy
+    key: 1d
+    path: results/built-ins/Proxy/1d.yaml
+  - group: built-ins/Proxy
+    key: 1e
+    path: results/built-ins/Proxy/1e.yaml
+  - group: built-ins/Proxy
+    key: 1f
+    path: results/built-ins/Proxy/1f.yaml
+  - group: built-ins/Proxy
+    key: "20"
+    path: results/built-ins/Proxy/20.yaml
+  - group: built-ins/Proxy
+    key: "21"
+    path: results/built-ins/Proxy/21.yaml
+  - group: built-ins/Proxy
+    key: "22"
+    path: results/built-ins/Proxy/22.yaml
+  - group: built-ins/Proxy
+    key: "23"
+    path: results/built-ins/Proxy/23.yaml
+  - group: built-ins/Proxy
+    key: "24"
+    path: results/built-ins/Proxy/24.yaml
+  - group: built-ins/Proxy
+    key: "25"
+    path: results/built-ins/Proxy/25.yaml
+  - group: built-ins/Proxy
+    key: "26"
+    path: results/built-ins/Proxy/26.yaml
+  - group: built-ins/Proxy
+    key: "28"
+    path: results/built-ins/Proxy/28.yaml
+  - group: built-ins/Proxy
+    key: "29"
+    path: results/built-ins/Proxy/29.yaml
+  - group: built-ins/Proxy
+    key: 2a
+    path: results/built-ins/Proxy/2a.yaml
+  - group: built-ins/Proxy
+    key: 2b
+    path: results/built-ins/Proxy/2b.yaml
+  - group: built-ins/Proxy
+    key: 2c
+    path: results/built-ins/Proxy/2c.yaml
+  - group: built-ins/Proxy
+    key: 2d
+    path: results/built-ins/Proxy/2d.yaml
+  - group: built-ins/Proxy
+    key: 2f
+    path: results/built-ins/Proxy/2f.yaml
+  - group: built-ins/Proxy
+    key: "30"
+    path: results/built-ins/Proxy/30.yaml
+  - group: built-ins/Proxy
+    key: "32"
+    path: results/built-ins/Proxy/32.yaml
+  - group: built-ins/Proxy
+    key: "33"
+    path: results/built-ins/Proxy/33.yaml
+  - group: built-ins/Proxy
+    key: "34"
+    path: results/built-ins/Proxy/34.yaml
+  - group: built-ins/Proxy
+    key: "35"
+    path: results/built-ins/Proxy/35.yaml
+  - group: built-ins/Proxy
+    key: "36"
+    path: results/built-ins/Proxy/36.yaml
+  - group: built-ins/Proxy
+    key: "37"
+    path: results/built-ins/Proxy/37.yaml
+  - group: built-ins/Proxy
+    key: "38"
+    path: results/built-ins/Proxy/38.yaml
+  - group: built-ins/Proxy
+    key: "39"
+    path: results/built-ins/Proxy/39.yaml
+  - group: built-ins/Proxy
+    key: 3c
+    path: results/built-ins/Proxy/3c.yaml
+  - group: built-ins/Proxy
+    key: 3d
+    path: results/built-ins/Proxy/3d.yaml
+  - group: built-ins/Proxy
+    key: "40"
+    path: results/built-ins/Proxy/40.yaml
+  - group: built-ins/Proxy
+    key: "41"
+    path: results/built-ins/Proxy/41.yaml
+  - group: built-ins/Proxy
+    key: "42"
+    path: results/built-ins/Proxy/42.yaml
+  - group: built-ins/Proxy
+    key: "44"
+    path: results/built-ins/Proxy/44.yaml
+  - group: built-ins/Proxy
+    key: "45"
+    path: results/built-ins/Proxy/45.yaml
+  - group: built-ins/Proxy
+    key: "46"
+    path: results/built-ins/Proxy/46.yaml
+  - group: built-ins/Proxy
+    key: "47"
+    path: results/built-ins/Proxy/47.yaml
+  - group: built-ins/Proxy
+    key: "48"
+    path: results/built-ins/Proxy/48.yaml
+  - group: built-ins/Proxy
+    key: 4b
+    path: results/built-ins/Proxy/4b.yaml
+  - group: built-ins/Proxy
+    key: 4d
+    path: results/built-ins/Proxy/4d.yaml
+  - group: built-ins/Proxy
+    key: 4e
+    path: results/built-ins/Proxy/4e.yaml
+  - group: built-ins/Proxy
+    key: 4f
+    path: results/built-ins/Proxy/4f.yaml
+  - group: built-ins/Proxy
+    key: "50"
+    path: results/built-ins/Proxy/50.yaml
+  - group: built-ins/Proxy
+    key: "52"
+    path: results/built-ins/Proxy/52.yaml
+  - group: built-ins/Proxy
+    key: "53"
+    path: results/built-ins/Proxy/53.yaml
+  - group: built-ins/Proxy
+    key: "55"
+    path: results/built-ins/Proxy/55.yaml
+  - group: built-ins/Proxy
+    key: "56"
+    path: results/built-ins/Proxy/56.yaml
+  - group: built-ins/Proxy
+    key: 5b
+    path: results/built-ins/Proxy/5b.yaml
+  - group: built-ins/Proxy
+    key: 5c
+    path: results/built-ins/Proxy/5c.yaml
+  - group: built-ins/Proxy
+    key: 5e
+    path: results/built-ins/Proxy/5e.yaml
+  - group: built-ins/Proxy
+    key: 5f
+    path: results/built-ins/Proxy/5f.yaml
+  - group: built-ins/Proxy
+    key: "61"
+    path: results/built-ins/Proxy/61.yaml
+  - group: built-ins/Proxy
+    key: "62"
+    path: results/built-ins/Proxy/62.yaml
+  - group: built-ins/Proxy
+    key: "63"
+    path: results/built-ins/Proxy/63.yaml
+  - group: built-ins/Proxy
+    key: "65"
+    path: results/built-ins/Proxy/65.yaml
+  - group: built-ins/Proxy
+    key: "67"
+    path: results/built-ins/Proxy/67.yaml
+  - group: built-ins/Proxy
+    key: "68"
+    path: results/built-ins/Proxy/68.yaml
+  - group: built-ins/Proxy
+    key: "69"
+    path: results/built-ins/Proxy/69.yaml
+  - group: built-ins/Proxy
+    key: 6a
+    path: results/built-ins/Proxy/6a.yaml
+  - group: built-ins/Proxy
+    key: 6b
+    path: results/built-ins/Proxy/6b.yaml
+  - group: built-ins/Proxy
+    key: 6c
+    path: results/built-ins/Proxy/6c.yaml
+  - group: built-ins/Proxy
+    key: 6d
+    path: results/built-ins/Proxy/6d.yaml
+  - group: built-ins/Proxy
+    key: 6e
+    path: results/built-ins/Proxy/6e.yaml
+  - group: built-ins/Proxy
+    key: "74"
+    path: results/built-ins/Proxy/74.yaml
+  - group: built-ins/Proxy
+    key: "75"
+    path: results/built-ins/Proxy/75.yaml
+  - group: built-ins/Proxy
+    key: "76"
+    path: results/built-ins/Proxy/76.yaml
+  - group: built-ins/Proxy
+    key: "77"
+    path: results/built-ins/Proxy/77.yaml
+  - group: built-ins/Proxy
+    key: "79"
+    path: results/built-ins/Proxy/79.yaml
+  - group: built-ins/Proxy
+    key: 7b
+    path: results/built-ins/Proxy/7b.yaml
+  - group: built-ins/Proxy
+    key: 7c
+    path: results/built-ins/Proxy/7c.yaml
+  - group: built-ins/Proxy
+    key: 7e
+    path: results/built-ins/Proxy/7e.yaml
+  - group: built-ins/Proxy
+    key: 7f
+    path: results/built-ins/Proxy/7f.yaml
+  - group: built-ins/Proxy
+    key: "80"
+    path: results/built-ins/Proxy/80.yaml
+  - group: built-ins/Proxy
+    key: "81"
+    path: results/built-ins/Proxy/81.yaml
+  - group: built-ins/Proxy
+    key: "83"
+    path: results/built-ins/Proxy/83.yaml
+  - group: built-ins/Proxy
+    key: "85"
+    path: results/built-ins/Proxy/85.yaml
+  - group: built-ins/Proxy
+    key: "86"
+    path: results/built-ins/Proxy/86.yaml
+  - group: built-ins/Proxy
+    key: "88"
+    path: results/built-ins/Proxy/88.yaml
+  - group: built-ins/Proxy
+    key: 8a
+    path: results/built-ins/Proxy/8a.yaml
+  - group: built-ins/Proxy
+    key: 8b
+    path: results/built-ins/Proxy/8b.yaml
+  - group: built-ins/Proxy
+    key: 8c
+    path: results/built-ins/Proxy/8c.yaml
+  - group: built-ins/Proxy
+    key: 8f
+    path: results/built-ins/Proxy/8f.yaml
+  - group: built-ins/Proxy
+    key: "92"
+    path: results/built-ins/Proxy/92.yaml
+  - group: built-ins/Proxy
+    key: "93"
+    path: results/built-ins/Proxy/93.yaml
+  - group: built-ins/Proxy
+    key: "94"
+    path: results/built-ins/Proxy/94.yaml
+  - group: built-ins/Proxy
+    key: "97"
+    path: results/built-ins/Proxy/97.yaml
+  - group: built-ins/Proxy
+    key: "98"
+    path: results/built-ins/Proxy/98.yaml
+  - group: built-ins/Proxy
+    key: "99"
+    path: results/built-ins/Proxy/99.yaml
+  - group: built-ins/Proxy
+    key: 9a
+    path: results/built-ins/Proxy/9a.yaml
+  - group: built-ins/Proxy
+    key: 9b
+    path: results/built-ins/Proxy/9b.yaml
+  - group: built-ins/Proxy
+    key: 9c
+    path: results/built-ins/Proxy/9c.yaml
+  - group: built-ins/Proxy
+    key: 9d
+    path: results/built-ins/Proxy/9d.yaml
+  - group: built-ins/Proxy
+    key: 9f
+    path: results/built-ins/Proxy/9f.yaml
+  - group: built-ins/Proxy
+    key: a0
+    path: results/built-ins/Proxy/a0.yaml
+  - group: built-ins/Proxy
+    key: a2
+    path: results/built-ins/Proxy/a2.yaml
+  - group: built-ins/Proxy
+    key: a3
+    path: results/built-ins/Proxy/a3.yaml
+  - group: built-ins/Proxy
+    key: a6
+    path: results/built-ins/Proxy/a6.yaml
+  - group: built-ins/Proxy
+    key: a7
+    path: results/built-ins/Proxy/a7.yaml
+  - group: built-ins/Proxy
+    key: a8
+    path: results/built-ins/Proxy/a8.yaml
+  - group: built-ins/Proxy
+    key: ab
+    path: results/built-ins/Proxy/ab.yaml
+  - group: built-ins/Proxy
+    key: ad
+    path: results/built-ins/Proxy/ad.yaml
+  - group: built-ins/Proxy
+    key: ae
+    path: results/built-ins/Proxy/ae.yaml
+  - group: built-ins/Proxy
+    key: b0
+    path: results/built-ins/Proxy/b0.yaml
+  - group: built-ins/Proxy
+    key: b2
+    path: results/built-ins/Proxy/b2.yaml
+  - group: built-ins/Proxy
+    key: b3
+    path: results/built-ins/Proxy/b3.yaml
+  - group: built-ins/Proxy
+    key: b4
+    path: results/built-ins/Proxy/b4.yaml
+  - group: built-ins/Proxy
+    key: b5
+    path: results/built-ins/Proxy/b5.yaml
+  - group: built-ins/Proxy
+    key: b6
+    path: results/built-ins/Proxy/b6.yaml
+  - group: built-ins/Proxy
+    key: b7
+    path: results/built-ins/Proxy/b7.yaml
+  - group: built-ins/Proxy
+    key: b9
+    path: results/built-ins/Proxy/b9.yaml
+  - group: built-ins/Proxy
+    key: bb
+    path: results/built-ins/Proxy/bb.yaml
+  - group: built-ins/Proxy
+    key: bc
+    path: results/built-ins/Proxy/bc.yaml
+  - group: built-ins/Proxy
+    key: bd
+    path: results/built-ins/Proxy/bd.yaml
+  - group: built-ins/Proxy
+    key: c0
+    path: results/built-ins/Proxy/c0.yaml
+  - group: built-ins/Proxy
+    key: c1
+    path: results/built-ins/Proxy/c1.yaml
+  - group: built-ins/Proxy
+    key: c2
+    path: results/built-ins/Proxy/c2.yaml
+  - group: built-ins/Proxy
+    key: c3
+    path: results/built-ins/Proxy/c3.yaml
+  - group: built-ins/Proxy
+    key: c4
+    path: results/built-ins/Proxy/c4.yaml
+  - group: built-ins/Proxy
+    key: c5
+    path: results/built-ins/Proxy/c5.yaml
+  - group: built-ins/Proxy
+    key: c7
+    path: results/built-ins/Proxy/c7.yaml
+  - group: built-ins/Proxy
+    key: c9
+    path: results/built-ins/Proxy/c9.yaml
+  - group: built-ins/Proxy
+    key: ca
+    path: results/built-ins/Proxy/ca.yaml
+  - group: built-ins/Proxy
+    key: cb
+    path: results/built-ins/Proxy/cb.yaml
+  - group: built-ins/Proxy
+    key: cc
+    path: results/built-ins/Proxy/cc.yaml
+  - group: built-ins/Proxy
+    key: ce
+    path: results/built-ins/Proxy/ce.yaml
+  - group: built-ins/Proxy
+    key: cf
+    path: results/built-ins/Proxy/cf.yaml
+  - group: built-ins/Proxy
+    key: d0
+    path: results/built-ins/Proxy/d0.yaml
+  - group: built-ins/Proxy
+    key: d2
+    path: results/built-ins/Proxy/d2.yaml
+  - group: built-ins/Proxy
+    key: d3
+    path: results/built-ins/Proxy/d3.yaml
+  - group: built-ins/Proxy
+    key: d4
+    path: results/built-ins/Proxy/d4.yaml
+  - group: built-ins/Proxy
+    key: d6
+    path: results/built-ins/Proxy/d6.yaml
+  - group: built-ins/Proxy
+    key: d7
+    path: results/built-ins/Proxy/d7.yaml
+  - group: built-ins/Proxy
+    key: d9
+    path: results/built-ins/Proxy/d9.yaml
+  - group: built-ins/Proxy
+    key: da
+    path: results/built-ins/Proxy/da.yaml
+  - group: built-ins/Proxy
+    key: dc
+    path: results/built-ins/Proxy/dc.yaml
+  - group: built-ins/Proxy
+    key: dd
+    path: results/built-ins/Proxy/dd.yaml
+  - group: built-ins/Proxy
+    key: de
+    path: results/built-ins/Proxy/de.yaml
+  - group: built-ins/Proxy
+    key: df
+    path: results/built-ins/Proxy/df.yaml
+  - group: built-ins/Proxy
+    key: e0
+    path: results/built-ins/Proxy/e0.yaml
+  - group: built-ins/Proxy
+    key: e1
+    path: results/built-ins/Proxy/e1.yaml
+  - group: built-ins/Proxy
+    key: e2
+    path: results/built-ins/Proxy/e2.yaml
+  - group: built-ins/Proxy
+    key: e3
+    path: results/built-ins/Proxy/e3.yaml
+  - group: built-ins/Proxy
+    key: e5
+    path: results/built-ins/Proxy/e5.yaml
+  - group: built-ins/Proxy
+    key: e7
+    path: results/built-ins/Proxy/e7.yaml
+  - group: built-ins/Proxy
+    key: e8
+    path: results/built-ins/Proxy/e8.yaml
+  - group: built-ins/Proxy
+    key: e9
+    path: results/built-ins/Proxy/e9.yaml
+  - group: built-ins/Proxy
+    key: ea
+    path: results/built-ins/Proxy/ea.yaml
+  - group: built-ins/Proxy
+    key: eb
+    path: results/built-ins/Proxy/eb.yaml
+  - group: built-ins/Proxy
+    key: ec
+    path: results/built-ins/Proxy/ec.yaml
+  - group: built-ins/Proxy
+    key: ee
+    path: results/built-ins/Proxy/ee.yaml
+  - group: built-ins/Proxy
+    key: ef
+    path: results/built-ins/Proxy/ef.yaml
+  - group: built-ins/Proxy
+    key: f0
+    path: results/built-ins/Proxy/f0.yaml
+  - group: built-ins/Proxy
+    key: f2
+    path: results/built-ins/Proxy/f2.yaml
+  - group: built-ins/Proxy
+    key: f4
+    path: results/built-ins/Proxy/f4.yaml
+  - group: built-ins/Proxy
+    key: f6
+    path: results/built-ins/Proxy/f6.yaml
+  - group: built-ins/Proxy
+    key: f7
+    path: results/built-ins/Proxy/f7.yaml
+  - group: built-ins/Proxy
+    key: f8
+    path: results/built-ins/Proxy/f8.yaml
+  - group: built-ins/Proxy
+    key: fa
+    path: results/built-ins/Proxy/fa.yaml
+  - group: built-ins/Proxy
+    key: fc
+    path: results/built-ins/Proxy/fc.yaml
   - group: built-ins/Reflect
     key: "02"
     path: results/built-ins/Reflect/02.yaml
@@ -10248,6 +10773,9 @@ partitions:
     key: "25"
     path: results/built-ins/Set/25.yaml
   - group: built-ins/Set
+    key: "26"
+    path: results/built-ins/Set/26.yaml
+  - group: built-ins/Set
     key: "27"
     path: results/built-ins/Set/27.yaml
   - group: built-ins/Set
@@ -10505,6 +11033,9 @@ partitions:
   - group: built-ins/Set
     key: "95"
     path: results/built-ins/Set/95.yaml
+  - group: built-ins/Set
+    key: "98"
+    path: results/built-ins/Set/98.yaml
   - group: built-ins/Set
     key: "99"
     path: results/built-ins/Set/99.yaml
@@ -17461,15 +17992,15 @@ summary:
   expectedNegatives: 1560
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 18386
+  passes: 18669
   semanticFailures: 0
-  unsupportedProfileFeatures: 1446
+  unsupportedProfileFeatures: 1447
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 165
+      passes: 201
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: array-buffer
@@ -17518,7 +18049,7 @@ summary:
       expectedNegatives: 580
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 914
+      passes: 917
       semanticFailures: 0
       unsupportedProfileFeatures: 14
     - dependency: control-flow
@@ -17562,7 +18093,7 @@ summary:
       infrastructureFailures: 0
       passes: 6
       semanticFailures: 0
-      unsupportedProfileFeatures: 90
+      unsupportedProfileFeatures: 91
     - dependency: error-intrinsics
       expectedNegatives: 5
       harnessFailures: 0
@@ -17581,21 +18112,21 @@ summary:
       expectedNegatives: 290
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4351
+      passes: 4634
       semanticFailures: 0
-      unsupportedProfileFeatures: 676
+      unsupportedProfileFeatures: 677
     - dependency: generators
       expectedNegatives: 84
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 335
+      passes: 336
       semanticFailures: 0
       unsupportedProfileFeatures: 15
     - dependency: iterator-protocol
       expectedNegatives: 91
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1154
+      passes: 1157
       semanticFailures: 0
       unsupportedProfileFeatures: 402
     - dependency: json-parse
@@ -17623,30 +18154,30 @@ summary:
       expectedNegatives: 168
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 33
+      passes: 34
       semanticFailures: 0
       unsupportedProfileFeatures: 29
     - dependency: object-literals
       expectedNegatives: 12
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 416
+      passes: 417
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: object-own-keys
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 295
+      passes: 321
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: object-properties
       expectedNegatives: 571
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 10104
+      passes: 10387
       semanticFailures: 0
-      unsupportedProfileFeatures: 176
+      unsupportedProfileFeatures: 177
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -17658,28 +18189,28 @@ summary:
       expectedNegatives: 67
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 55
+      passes: 56
       semanticFailures: 0
       unsupportedProfileFeatures: 18
     - dependency: proxy-exotic-object
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 19
+      passes: 288
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - dependency: reflect-namespace
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 156
+      passes: 210
       semanticFailures: 0
-      unsupportedProfileFeatures: 4
+      unsupportedProfileFeatures: 5
     - dependency: regular-expressions
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 501
+      passes: 509
       semanticFailures: 0
       unsupportedProfileFeatures: 6
     - dependency: rest-parameters
@@ -17700,14 +18231,14 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 201
+      passes: 208
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: symbols
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 786
+      passes: 803
       semanticFailures: 0
       unsupportedProfileFeatures: 17
     - dependency: top-level-await
@@ -17770,7 +18301,7 @@ summary:
       expectedNegatives: 69
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 215
+      passes: 224
       semanticFailures: 0
       unsupportedProfileFeatures: 7
     - dependency: weak-collections
@@ -17991,18 +18522,25 @@ summary:
       passes: 564
       semanticFailures: 0
       unsupportedProfileFeatures: 56
+    - group: built-ins/Proxy
+      expectedNegatives: 0
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 269
+      semanticFailures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/Reflect
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 151
+      passes: 152
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - group: built-ins/RegExp
       expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1219
+      passes: 1220
       semanticFailures: 0
       unsupportedProfileFeatures: 467
     - group: built-ins/RegExpStringIteratorPrototype
@@ -18016,7 +18554,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 375
+      passes: 382
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - group: built-ins/SetIteratorPrototype
@@ -18037,7 +18575,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1199
+      passes: 1204
       semanticFailures: 0
       unsupportedProfileFeatures: 19
     - group: built-ins/StringIteratorPrototype

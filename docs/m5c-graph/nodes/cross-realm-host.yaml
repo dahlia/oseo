@@ -7,9 +7,11 @@ delivers: "Implements realm creation beyond the initial realm and the
   cross-realm are observed. One of them also needs iterator-helpers. Six
   carry the dynamic-source tag; a realm observation that then reaches the
   ADR 0016 boundary is reassigned in the landing change, not claimed. Also
-  installs the global eval value and descriptor in every realm; calling the
-  value reports the ADR 0016 boundary with the owned OSEO1001 diagnostic, as
-  the sibling source constructors do, without admitting source evaluation.
+  installs the global eval value and descriptor in every realm. Calling the
+  value follows PerformEval for non-string input: no argument returns
+  undefined, and a non-string argument is returned unchanged without
+  compiling source. Only a String argument reports the ADR 0016 boundary
+  with the owned OSEO1001 diagnostic, without admitting source evaluation.
   Add the exact eval runtime rejection message to the dynamic surface
   predicate in tools/m5c-exclusion-audit.ts in the same landing; preserve
   unrelated runtime failures and reviewed per-path boundary assessments.

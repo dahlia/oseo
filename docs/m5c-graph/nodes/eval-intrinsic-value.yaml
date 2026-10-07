@@ -1,9 +1,12 @@
 version: 1
 id: eval-intrinsic-value
 title: Decide the eval function value
-delivers: "Owns the 16 reviewed paths rejected with Unknown binding 'eval'
-  that read %eval% only as a value and never call it: 8 Promise
-  ctx-non-ctor, 6 Array callback or element, and 2 global property cases.
+delivers: "Owns the 17 reviewed paths rejected with Unknown binding 'eval'
+  that read %eval% as a value: 8 Promise
+  ctx-non-ctor, 6 Array callback or element, 2 global property cases, and
+  test/built-ins/Proxy/create-target-is-not-a-constructor.js. The Proxy case
+  wraps eval and calls the proxy with no arguments, so it evaluates no source
+  and observes callable/nonconstructible target behavior.
   Cross-realm-host installs the eval value and global descriptor in every
   realm. This node resolves the compiler's handling of the bare eval identifier
   read as a value, admitting those reads or obtaining an accepted record that
