@@ -10,5 +10,5 @@ delivers: "Observes the 284 unreviewed paths that
   eval-intrinsic-value; no expected negatives."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
