@@ -1,0 +1,24 @@
+version: 1
+id: destructuring-binding-target-order
+title: Resolve keyed binding targets before source reads
+delivers: "Closes exactly 1 newly observed path,
+  test/language/destructuring/binding/\
+  keyed-destructuring-property-reference-target-evaluation-order-with-\
+  bindings.js. The var target ResolveBinding
+  currently runs after the source property Get and the default initializer;
+  ECMA-262 KeyedBindingInitialization requires it before both. Repair this
+  already-admitted static destructuring behavior, including observable with
+  environment lookup order. Follow the full PLAN-M5.md evidence contract:
+  focused examples, a generated property or an extension of the existing
+  destructuring property, forced-collection evidence, both specialization
+  policies, and the normative family record and profile. Add a guard-miss
+  test reaching the compiled generic fallback if the repair touches a
+  specialized path or guard; otherwise retain object-binding.yaml's
+  guard-fallback omission and its named replacement evidence. Update that
+  record if the repair adds a specialized path or guard. Admit the exact
+  path and regenerate the complete reviewed manifest and closure ledger.
+  Already-reviewed paths affected by the repair may move only toward pass."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: ready
