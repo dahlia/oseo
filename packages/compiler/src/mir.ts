@@ -483,6 +483,11 @@ export interface MirFunction extends LocatedSyntax {
   /** Number of positional parameters consumed by the generated function. */
   readonly parameterCount: number;
   readonly parameters: readonly MirParameter[];
+  /**
+   * Logical root identity capacity, including reserved slots above the
+   * value and operation identity range. A backend may compact annotation
+   * identities that store no value while preserving reserved capacity.
+   */
   readonly rootSlotCount: number;
   readonly selfBindingId?: number;
   readonly specialization?: MirSpecialization;

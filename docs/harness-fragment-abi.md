@@ -253,6 +253,19 @@ same 32 records when a global-object name's read began evaluating the
 global object and key once for those tests and joining every outcome in one
 block.
 
+M5c node `array-sort-stability` regenerates all 44 records because dense
+private backend storage changes emitted C root indices, auxiliary storage
+identities, allocation sizes, and annotation padding in frame accounting.
+Replaying the pre-change backend against the current printed HIR and MIR
+reproduces every old hash; only emitted C source differs, with unchanged
+non-source metadata. Both whole-Script and fragment semantic comparisons
+pass, as do the existing native fixture families.
+
+The coordinator's script-entry stack review regenerates the records again:
+the separate binding-access charge changes whole-Script entry C.
+Replaying backend commit `fb5d1cb0` reproduces all 44 prior hashes;
+printed HIR/MIR and non-source metadata remain unchanged.
+
 
 Stage 2 interfaces and ownership
 --------------------------------
