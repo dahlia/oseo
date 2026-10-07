@@ -48,6 +48,19 @@ readiness decision. Their duration sum therefore comes from one Mac class,
 either the selected `oseo-mac-1` or hosted `macos-15`, and keeps the original
 hard limit.
 
+A lane's `native support` jobs carry a job-level `OSEO_PROPERTY_TIME_SCALE`
+read from the same readiness output: 1 on the selected runner, and
+`hostedFallbackTimeScale` from *tools/macos-job-costs.ts*, 4, when the lane
+fell back to hosted `macos-15` or the probe was skipped. The property budgets
+were measured on hosted runners before the lanes existed, and a Mac lane
+runs them with two to three times the margin; a fallback job widens only its
+interrupt limit back to a comparable margin. Case counts, seeds, sizes, shard
+totals, and the failure of an interrupted run do not change. Own-key shards
+keep the original limit because their duration record pins it for
+`check:property-case-durations`, and test262 and native fixture jobs run no
+property. The derivation and the fallback run that motivated it are in
+*PLAN-GATE.md* (U28) and [U28 evidence].
+
 An Ubuntu job uses `OSEO_RUNNER_STATUS_TOKEN` with repository
 Administration: read to check, once per lane, whether that lane's runner is
 online and idle. Lane `oseo-mac-N` selects the runner only when exactly one
@@ -79,6 +92,7 @@ or root, because the hooks cap only the invoking account's cache. The
 maintainer registered `oseo-mac-2` on 2026-10-06 with the steps below.
 
 [U21 evidence]: ./evidence/u21/README.md
+[U28 evidence]: ./evidence/u28/README.md
 [U25 evidence]: ./evidence/u25/README.md
 [U26 evidence]: ./evidence/u26/README.md
 
@@ -373,7 +387,8 @@ records the lane ends, pair slowdowns, own-key durations, and projection.
 While `oseo-mac-2` is offline or busy, its lane's nine jobs fall back to
 hosted `macos-15` without a predecessor chain and compete with the five
 hosted lanes for the five hosted slots. That fallback schedule is not
-modeled, and it is expected to be slower than the one-lane assignment.
+modeled, and it is expected to be slower than the one-lane assignment. The
+lane's native support jobs then run with the fallback time scale above.
 
 
 Security and activation

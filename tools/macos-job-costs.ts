@@ -130,6 +130,36 @@ export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
 };
 
 /**
+ * `OSEO_PROPERTY_TIME_SCALE` for a Mac-lane job whose readiness probe fell
+ * back to hosted `macos-15`. The ordinary and extended interrupt limits
+ * were budgeted on hosted runners before the Mac lanes existed, and the
+ * lanes now give the same properties two to three times the margin, so a
+ * fallback job widens only its interrupt limit back to a comparable
+ * margin. Every case budget, seed, size, and shard total stays fixed, and
+ * an interrupted run still fails.
+ *
+ * The value is the derived ceiling of the 3.2 native support family ratio
+ * above, which pools 26 Mac observations of job walls after the setup
+ * share; U24 measured 3.55 and 3.60 for native support jobs converted from
+ * hosted medians. Per property, main run 37499455406 (both Mac lanes) and
+ * attempt 1 of main run 37506307446 (both lanes hosted) ran the same four
+ * native support shards: the pooled hosted/Mac duration ratios of their
+ * passing properties were a derived 2.64, 1.06, 1.75, and 1.84, with a
+ * 3.16 maximum, against two-lane Mac walls that U27 measured at 1.18 to
+ * 1.30 times one-lane walls. Four covers every one of those ratios. It
+ * does not cover the six properties that attempt 1 interrupted in shard
+ * 9/12, whose extrapolated hosted need was a derived 7.5 to 33 times
+ * their Mac duration, and no interrupt limit under the 90-minute job
+ * timeout would have; see *docs/evidence/u28/*.
+ *
+ * Only `native support` jobs carry the scale. Own-key case shards keep the
+ * original limit because their duration record pins it and
+ * `check:property-case-durations` compares the records' sum with that
+ * limit; test262 and native fixture jobs run no fast-check property.
+ */
+export const hostedFallbackTimeScale = 4;
+
+/**
  * Lane-level allowance for the readiness probe and serial job handover.
  * In branch run 37194069657 attempts 1 and 2 and main run 37206614757, the
  * `mac_ready` job started a measured 3 to 5 seconds after the run attempt

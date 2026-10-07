@@ -75,6 +75,12 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:${{ matrix.runtime }}
+        env:
+          # The ordinary own-key property budget was measured on
+          # ubuntu-latest; hosted macOS runs it at 70 to over 100 percent
+          # of that limit. This widens only the interrupt limit there.
+          OSEO_PROPERTY_TIME_SCALE: >-
+            ${{ runner.os == 'macOS' && '2' || '1' }}
 
   test_native:
     name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
@@ -426,6 +432,12 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:node
+        env:
+          # The ordinary own-key property budget was measured on
+          # ubuntu-latest; hosted macOS runs it at 70 to over 100 percent
+          # of that limit. This widens only the interrupt limit there.
+          OSEO_PROPERTY_TIME_SCALE: >-
+            ${{ runner.os == 'macOS' && '2' || '1' }}
 
   test_test262_macos_2:
     name: test262 (macos-aarch64, 2/12)
@@ -473,6 +485,12 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         if: runner.os != 'Windows'
       - run: mise run test:deno
+        env:
+          # The ordinary own-key property budget was measured on
+          # ubuntu-latest; hosted macOS runs it at 70 to over 100 percent
+          # of that limit. This widens only the interrupt limit there.
+          OSEO_PROPERTY_TIME_SCALE: >-
+            ${{ runner.os == 'macOS' && '2' || '1' }}
 
   # macOS lane 2, longest jobs first.
   test_sanitizer_macos_macos_native:
@@ -978,6 +996,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1012,6 +1034,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1078,6 +1104,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1112,6 +1142,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1204,6 +1238,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1303,6 +1341,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1337,6 +1379,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1371,6 +1417,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1405,6 +1455,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version
@@ -1471,6 +1525,10 @@ jobs:
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
+        && '1' || '4' }}
     timeout-minutes: 90
     steps:
       - name: Record macOS host version

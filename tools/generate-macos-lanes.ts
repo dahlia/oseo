@@ -6,6 +6,7 @@ import { parsedMapping } from "./structured-data.ts";
 import { isNumber, isString } from "./value-kinds.ts";
 import { configuredSelfHostedLanes } from "./macos-lane-config.ts";
 import {
+  hostedFallbackTimeScale,
   macosJobCosts,
   macosFixedSetupSeconds,
   selfHostedFamilySpeedRatios,
@@ -129,6 +130,36 @@ function selfHostedEligible(job: MacosLaneJob): boolean {
 
 /** Hosted lanes precede the optional Mac lanes in lane order. */
 const hostedLaneCount = 5;
+
+/**
+ * Mac-lane families whose jobs run fast-check properties under the
+ * ordinary interrupt limits and therefore widen those limits when their
+ * lane falls back to hosted. Own-key case shards are excluded on purpose:
+ * their duration record pins the original limit, which
+ * `check:property-case-durations` requires. Test262 and native fixture
+ * jobs run no property.
+ */
+const hostedFallbackFamilies: ReadonlySet<string> = new Set(["native support"]);
+
+/**
+ * Job-level environment that widens only the interrupt limit of a Mac-lane
+ * property job that the readiness probe sent to hosted `macos-15`. The
+ * probe output is a JSON runner label array on a selected Mac lane and the
+ * hosted JSON string, or empty when the probe was skipped, otherwise.
+ */
+function hostedFallbackEnvironment(
+  job: MacosLaneJob,
+  runnerOutput: string,
+): string {
+  if (!hostedFallbackFamilies.has(job.family)) return "";
+  return (
+    "    env:\n" +
+    "      OSEO_PROPERTY_TIME_SCALE: >-\n" +
+    `        \${{ contains(needs.mac_ready.outputs.${runnerOutput},` +
+    " 'self-hosted')\n" +
+    `        && '1' || '${hostedFallbackTimeScale}' }}\n`
+  );
+}
 
 /** Mac lanes share one machine; concurrency beyond two was not measured. */
 const maxSelfHostedLanes = 2;
@@ -484,7 +515,8 @@ export function generateMacosWorkflow(
         (line) =>
           `${line}    if: \${{ !cancelled() }}\n` +
           (selfHosted
-            ? "    needs:\n      - mac_ready\n"
+            ? "    needs:\n      - mac_ready\n" +
+              hostedFallbackEnvironment(job, runnerOutput)
             : predecessor == null
               ? ""
               : `    needs: ${predecessor.id}\n`),

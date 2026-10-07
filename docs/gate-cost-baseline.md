@@ -413,6 +413,78 @@ rerun.
 [37332256715]: https://github.com/dahlia/oseo/actions/runs/37332256715
 [37398055382]: https://github.com/dahlia/oseo/actions/runs/37398055382
 
+### Hosted fallback run (U28)
+
+Main run [37506307446] at `12394d8a` probed while main run [37499455406] at
+`45af71ff` held both Mac lanes, so its 19 Mac-lane jobs ran hosted. The
+table matches every job that `37499455406` ran on a Mac runner with its
+hosted attempt-1 wall in `37506307446`. Walls are measured `started_at` to
+`completed_at` seconds; the median is the hosted median weight in
+*tools/macos-job-costs.ts*; the ratio is derived. `37499455406` had one
+attempt. [*evidence/u28/*](./evidence/u28/) holds both runs' job rows.
+
+| Job                                     | Mac runner   | Mac wall | Hosted wall | Hosted median | Derived hosted/Mac |
+| --------------------------------------- | ------------ | -------: | ----------: | ------------: | -----------------: |
+| `native (macos-aarch64, 1/3)`           | `oseo-mac-1` |      405 |         927 |           886 |               2.29 |
+| `native support (macos-aarch64, 1/12)`  | `oseo-mac-2` |      895 |       2,136 |         1,940 |               2.39 |
+| `native support (macos-aarch64, 2/12)`  | `oseo-mac-2` |      603 |       1,388 |         1,117 |               2.30 |
+| `native support (macos-aarch64, 3/12)`  | `oseo-mac-1` |      519 |       1,478 |         1,323 |               2.85 |
+| `native support (macos-aarch64, 4/12)`  | `oseo-mac-1` |      415 |       1,133 |         1,363 |               2.73 |
+| `native support (macos-aarch64, 6/12)`  | `oseo-mac-1` |      355 |       1,115 |         1,182 |               3.14 |
+| `native support (macos-aarch64, 7/12)`  | `oseo-mac-2` |      566 |       1,516 |         1,367 |               2.68 |
+| `native support (macos-aarch64, 8/12)`  | `oseo-mac-1` |      522 |       1,277 |         1,194 |               2.45 |
+| `native support (macos-aarch64, 9/12)`  | `oseo-mac-2` |      520 |       5,229 |         1,330 | 10.06, interrupted |
+| `native support (macos-aarch64, 10/12)` | `oseo-mac-2` |      324 |       1,556 |         1,270 |               4.80 |
+| `native support (macos-aarch64, 12/12)` | `oseo-mac-2` |      305 |       1,301 |         1,294 |               4.27 |
+| `own-key cases (macos-aarch64, 1/3)`    | `oseo-mac-1` |      590 |       1,014 |           810 |               1.72 |
+| `own-key cases (macos-aarch64, 2/3)`    | `oseo-mac-1` |      614 |       1,147 |           995 |               1.87 |
+| `own-key cases (macos-aarch64, 3/3)`    | `oseo-mac-1` |      528 |         910 |           854 |               1.72 |
+| `test262 (macos-aarch64, 1/12)`         | `oseo-mac-1` |      429 |       1,557 |         1,288 |               3.63 |
+| `test262 (macos-aarch64, 3/12)`         | `oseo-mac-1` |      405 |         993 |         1,110 |               2.45 |
+| `test262 (macos-aarch64, 5/12)`         | `oseo-mac-2` |      526 |       1,293 |         1,398 |               2.46 |
+| `test262 (macos-aarch64, 9/12)`         | `oseo-mac-2` |      285 |       1,383 |         1,456 |               4.85 |
+| `test262 (macos-aarch64, 12/12)`        | `oseo-mac-2` |      285 |       1,176 |         1,190 |               4.13 |
+
+Pooled over the passing jobs, the derived hosted/Mac wall ratios are 2.86
+for the nine native support jobs (3.12 after the 60-second setup share), 3.32
+for the five test262 jobs (3.74), 1.77 for the three own-key shards (1.86),
+and 2.29 for the one native fixture job. The Mac walls are two-lane walls.
+
+Four native support shards ran the same properties on `oseo-mac-2` and on
+a hosted runner; the per-property durations are Node test-runner
+`duration_ms` values from both job logs, measured, in
+[*evidence/u28/native-support-properties.tsv*](./evidence/u28/native-support-properties.tsv).
+Pooled over the passing properties of each shard, the derived hosted/Mac
+duration ratio was 2.64 for 1/12 (6 properties, 2.01 to 2.78), 1.06 for 7/12
+(12, 0.62 to 1.46), 1.75 for 9/12 (10, 1.20 to 8.23, the 8.23 on a 7-second
+property), and 1.84 for 10/12 (12, 1.49 to 2.19). Hosted passing extended
+properties used a derived 6 to 45 percent of their interrupt limits; the same
+properties on the Mac used 5 to 25 percent. In shard 9/12 the hosted runner
+interrupted its last six properties at 1,800 s after a measured 91, 88, and 84
+of 120 cases and 32, 31, and 30 of 100 cases. Their extrapolated hosted need is
+a derived 2,383 to 2,572 s and 5,635 to 6,006 s, 7.5 to 33 times their Mac
+durations of 170 to 319 s.
+[*evidence/u28/ratios.txt*](./evidence/u28/ratios.txt) is the derived output of
+the script beside it.
+
+The own-key duration records of these two runs and the two all-hosted runs
+are measured in
+[*evidence/u28/own-key-durations.tsv*](./evidence/u28/own-key-durations.tsv).
+The macOS sums were a derived 2,638.9 s in [37121778924], 2,343.2 s in
+[37167895777], 1,486.4 s on the two-lane `oseo-mac-1` in `37499455406`, and
+2,878.1 s hosted in `37506307446`, against the 3,600 s aggregate deadline.
+The ordinary own-key property of `test (macos-latest, node)` measured
+299,906.5 ms in `37499455406`, 360,023.6 ms interrupted at 15 of 16 cases in
+attempt 1 of `37506307446`, and 251,814.7 ms in its attempt 2, against the
+360,000 ms limit; `test (ubuntu-latest, node)` measured 286,721.1 ms in
+`37499455406`
+([*evidence/u28/macos-node-own-key.tsv*](./evidence/u28/macos-node-own-key.tsv)).
+[*PLAN-GATE.md*](../PLAN-GATE.md) derives the fallback time scale from these
+values.
+
+[37499455406]: https://github.com/dahlia/oseo/actions/runs/37499455406
+[37506307446]: https://github.com/dahlia/oseo/actions/runs/37506307446
+
 ### U16 static macOS lane branch observations
 
 GitHub Actions run and job timestamps provide one measured observation at

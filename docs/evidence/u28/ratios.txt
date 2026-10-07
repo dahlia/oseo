@@ -1,0 +1,54 @@
+shard 1/12
+  pass   2.74x mac=  443.1s hosted= 1214.6s hosted/limit=    - generated Reflect reflection matches the M5 model
+  pass   2.40x mac=  217.7s hosted=  522.9s hosted/limit=    - generated module namespace writes keep the exotic refusal
+  pass   2.01x mac=  159.7s hosted=  321.8s hosted/limit=    - generated built-in new targets read prototype where the clau
+  pass   2.78x mac=  481.6s hosted= 1339.2s hosted/limit=    - generated Proxy traps preserve target invariants
+  pass   2.75x mac=   48.5s hosted=  133.3s hosted/limit=    - generated missing Proxy descriptors observe required target 
+  pass   2.73x mac=  410.9s hosted= 1121.2s hosted/limit= 0.37 generated Math operations and global identity match the M5 m
+  pooled passing hosted/mac=2.641 n=6 min=2.01 max=2.78
+shard 7/12
+  pass   1.36x mac=  437.5s hosted=  594.9s hosted/limit= 0.33 generated Number.prototype formatting matches the M5 model
+  pass   1.32x mac=  448.5s hosted=  590.8s hosted/limit= 0.33 generated Object integrity levels match the M5 model
+  pass   1.46x mac=  482.9s hosted=  706.9s hosted/limit= 0.24 generated URI encoding, decoding, and rejection match the M5
+  pass   1.03x mac=  349.8s hosted=  358.6s hosted/limit= 0.20 generated Set composition observations match the specificati
+  pass   1.01x mac=  352.7s hosted=  354.6s hosted/limit= 0.15 generated Object.defineProperties operations match the M5 mo
+  pass   1.08x mac=  387.5s hosted=  418.4s hosted/limit= 0.17 generated Symbol prototype and registry behavior matches the
+  pass   0.86x mac=  317.7s hosted=  274.2s hosted/limit= 0.15 generated Array copying methods match the M5 model
+  pass   0.88x mac=  313.0s hosted=  275.6s hosted/limit= 0.09 generated JSON texts and reviver walks match the M5 model
+  pass   0.76x mac=  295.6s hosted=  224.7s hosted/limit= 0.07 generated JSON stringify cases match the independent M5 mode
+  pass   0.65x mac=  181.4s hosted=  118.3s hosted/limit= 0.07 generated optional catch bindings match the M5 property mode
+  pass   0.67x mac=  173.3s hosted=  115.6s hosted/limit= 0.06 generated parameter bindings match the M5 property model
+  pass   0.62x mac=  191.2s hosted=  118.8s hosted/limit= 0.07 generated tagged templates match the M5 property model
+  pooled passing hosted/mac=1.056 n=12 min=0.62 max=1.46
+shard 9/12
+  pass   1.22x mac=  203.3s hosted=  247.3s hosted/limit=    - generated built-in execution matches the generic matcher and
+  pass   1.20x mac=  138.6s hosted=  165.7s hosted/limit=    - generated prototype accessors and stringification match an o
+  pass   2.22x mac=   71.4s hosted=  158.3s hosted/limit=    - duplicate named alternatives preserve the participating capt
+  pass   8.23x mac=    7.2s hosted=   59.5s hosted/limit=    - generated ignore-case boundaries report one located diagnost
+  pass   1.35x mac=  419.3s hosted=  566.8s hosted/limit= 0.31 generated ArrayBuffer observations match the M5 model
+  pass   1.25x mac=  406.9s hosted=  510.2s hosted/limit= 0.28 generated BigInt intrinsic operations match the independent 
+  pass   2.24x mac=  360.3s hosted=  805.7s hosted/limit= 0.45 generated pattern await positions preserve the modeled order
+  pass   1.86x mac=  226.9s hosted=  422.5s hosted/limit=    - generated literals match the artifact, the constructor, and 
+  pass   3.16x mac=  120.9s hosted=  381.6s hosted/limit=    - every evaluation of one literal owns its object and lastInde
+  pass   2.08x mac=  305.1s hosted=  633.4s hosted/limit= 0.35 generated Array change-by-copy methods match the M5 model
+  INTR   5.66x mac=  319.4s hosted> 1807.2s cases=91/120 extrapolated=   2383s ( 7.5x Mac, 1.32x limit) generated Array predicate search methods match the
+  INTR   6.05x mac=  297.7s hosted> 1800.4s cases=88/120 extrapolated=   2455s ( 8.2x Mac, 1.36x limit) generated Object.defineProperty operations match t
+  INTR   6.33x mac=  284.3s hosted> 1800.4s cases=84/120 extrapolated=   2572s ( 9.0x Mac, 1.43x limit) generated String iterators match the M5 model
+  INTR  10.59x mac=  170.3s hosted> 1803.2s cases=32/100 extrapolated=   5635s (33.1x Mac, 3.13x limit) generated for-of bindings match the M5 property mo
+  INTR   9.69x mac=  186.5s hosted> 1808.3s cases=31/100 extrapolated=   5833s (31.3x Mac, 3.24x limit) generated for-of assignments match the M5 property
+  INTR   9.99x mac=  180.3s hosted> 1801.8s cases=30/100 extrapolated=   6006s (33.3x Mac, 3.34x limit) generated argument spread cases match the M5 dynam
+  pooled passing hosted/mac=1.748 n=10 min=1.20 max=8.23
+shard 10/12
+  pass   2.19x mac=  258.5s hosted=  566.2s hosted/limit= 0.31 generated TypedArray construction matches the M5 model
+  pass   2.15x mac=  234.0s hosted=  504.0s hosted/limit= 0.28 generated Array species mapping matches the M5 model
+  pass   2.19x mac=  260.1s hosted=  570.6s hosted/limit= 0.32 generated DataView accesses match the independent byte-level
+  pass   1.75x mac=  218.9s hosted=  383.0s hosted/limit= 0.21 generated weak collection observations match the identity mo
+  pass   1.70x mac=  205.2s hosted=  349.3s hosted/limit= 0.19 generated Array prototype iteration matches the M5 model
+  pass   1.75x mac=  229.4s hosted=  401.6s hosted/limit= 0.17 generated functions expose the realm function intrinsic chai
+  pass   1.70x mac=  190.9s hosted=  324.1s hosted/limit= 0.18 generated generators match the M5 property model
+  pass   1.65x mac=  158.9s hosted=  261.9s hosted/limit= 0.15 generated Object.prototype methods match the M5 property mod
+  pass   1.66x mac=  198.9s hosted=  330.5s hosted/limit= 0.18 generated TypedArray statics match the M5 model
+  pass   1.53x mac=  115.4s hosted=  177.0s hosted/limit= 0.10 generated synchronous iterator consumers match the M5 model
+  pass   1.49x mac=   88.8s hosted=  132.6s hosted/limit= 0.07 generated default parameters match Node.js and Deno
+  pass   1.54x mac=  119.7s hosted=  184.2s hosted/limit= 0.08 generated generator parameters match the M5 property model
+  pooled passing hosted/mac=1.837 n=12 min=1.49 max=2.19
