@@ -1,0 +1,106 @@
+group: built-ins/Proxy
+key: "85"
+results:
+  - case:
+      async: false
+      features:
+        - Proxy
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Proxy/apply/null-handler.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - proxy-exotic-object
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Proxy
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Proxy/create-target-not-object-throw-undefined.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - proxy-exotic-object
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Proxy
+        - Reflect
+        - Reflect.setPrototypeOf
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Proxy/setPrototypeOf/not-extensible-target-not-same-target-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - proxy-exotic-object
+      - reflect-namespace
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

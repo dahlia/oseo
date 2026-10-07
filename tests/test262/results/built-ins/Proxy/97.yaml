@@ -1,0 +1,42 @@
+group: built-ins/Proxy
+key: "97"
+results:
+  - case:
+      async: false
+      features:
+        - Proxy
+        - Reflect
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/built-ins/Proxy/preventExtensions/trap-is-undefined-target-is-proxy.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+      - object-properties
+      - proxy-exotic-object
+      - reflect-namespace
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/built-ins/Proxy/preventExtensions/trap-is-undefined-target-is-proxy.js
+          id: test/built-ins/Proxy/preventExtensions/trap-is-undefined-target-is-proxy.js
+          sourceHash: fnv1a64:ffafede25303973f
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

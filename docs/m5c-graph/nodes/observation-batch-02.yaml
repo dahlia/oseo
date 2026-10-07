@@ -5,7 +5,9 @@ delivers: "Observes the 284 unreviewed paths that
   docs/m5c-closure/observation-batches.yaml selects for observation-batch-02
   (284 review units): admits them to the reviewed subset with dependency tags,
   regenerates the manifest and the ledger, and assigns every unsupported
-  result an owner."
+  result an owner. Reobserved after ADR 0027 on main 1fd8b0cb: 283 pass
+  and 1 remains unsupported for the bare eval identifier, owned by
+  eval-intrinsic-value; no expected negatives."
 dependencies:
   - observation-batch-plan
 landed: false

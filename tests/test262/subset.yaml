@@ -32536,6 +32536,1088 @@ tests:
   - path: test/built-ins/Promise/withResolvers/result.js
     expectedClassification: pass
     dependencies: [promise-settlement]
+  - path: test/built-ins/Proxy/apply/call-parameters.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/call-result.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/return-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/apply/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/trap-is-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/trap-is-undefined-no-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/apply/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/apply/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/call-parameters-new-target.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/construct/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/call-result.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/return-not-object-throws-boolean.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/return-not-object-throws-null.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/return-not-object-throws-number.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/return-not-object-throws-string.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/return-not-object-throws-symbol.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/construct/return-not-object-throws-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/construct/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/construct/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/construct/trap-is-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/construct/trap-is-undefined-no-property.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/construct/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/construct/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/constructor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-handler-is-revoked-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-handler-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-handler-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-handler-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-handler-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-handler-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object, symbols]
+  - path: test/built-ins/Proxy/create-handler-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-is-not-a-constructor.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/create-target-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-is-revoked-function-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-is-revoked-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-not-object-throw-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-not-object-throw-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-not-object-throw-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-not-object-throw-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/create-target-not-object-throw-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object, symbols]
+  - path: test/built-ins/Proxy/create-target-not-object-throw-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/call-parameters.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/return-boolean-and-define-target.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/defineProperty/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/targetdesc-configurable-desc-not-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/targetdesc-not-compatible-descriptor-not-configurable-target.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/targetdesc-not-compatible-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/targetdesc-undefined-not-configurable-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/targetdesc-undefined-target-is-not-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/defineProperty/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        regular-expressions,
+      ]
+  - path: test/built-ins/Proxy/defineProperty/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/defineProperty/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/defineProperty/trap-return-is-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/deleteProperty/boolean-trap-result-boolean-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/deleteProperty/boolean-trap-result-boolean-true.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/deleteProperty/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/return-false-not-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/return-false-strict.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/deleteProperty/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/targetdesc-is-not-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/targetdesc-is-undefined-return-true.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/deleteProperty/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        regular-expressions,
+      ]
+  - path: test/built-ins/Proxy/deleteProperty/trap-is-undefined-not-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/deleteProperty/trap-is-undefined-strict.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/deleteProperty/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/enumerate/removed-does-not-trigger.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-properties,
+        property-enumeration,
+        proxy-exotic-object,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/function-prototype.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/accessor-get-is-undefined-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/not-same-value-configurable-false-writable-false-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/return-trap-result-accessor-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/return-trap-result-configurable-false-writable-true.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/return-trap-result-configurable-true-assessor-get-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/return-trap-result-configurable-true-writable-false.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/return-trap-result-same-value-configurable-false-writable-false.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/return-trap-result.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        regular-expressions,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/get/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object, symbols]
+  - path: test/built-ins/Proxy/get/trap-is-undefined-no-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/trap-is-undefined-receiver.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/get/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/result-is-undefined-target-is-not-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/result-is-undefined-targetdesc-is-not-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/result-is-undefined-targetdesc-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/result-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/result-type-is-not-object-nor-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object, symbols]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/resultdesc-is-invalid-descriptor.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/resultdesc-is-not-configurable-targetdesc-is-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/resultdesc-is-not-configurable-targetdesc-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/resultdesc-return-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/resultdesc-return-not-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, regular-expressions]
+  - path: test/built-ins/Proxy/getOwnPropertyDescriptor/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/extensible-target-return-handlerproto.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/instanceof-custom-return-accepted.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/instanceof-target-not-extensible-not-same-proto-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/not-extensible-not-same-proto-throws.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/not-extensible-same-proto.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-result-neither-object-nor-null-throws-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-result-neither-object-nor-null-throws-number.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-result-neither-object-nor-null-throws-string.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-result-neither-object-nor-null-throws-symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object, symbols]
+  - path: test/built-ins/Proxy/getPrototypeOf/trap-result-neither-object-nor-null-throws-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/call-in-prototype-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/call-in-prototype.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/call-in.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/call-object-create.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/call-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/null-handler-using-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/return-false-target-not-extensible-using-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/return-false-target-not-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/return-false-target-prop-exists-using-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/return-false-target-prop-exists.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/return-false-targetdesc-not-configurable-using-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/return-false-targetdesc-not-configurable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/return-is-abrupt-in.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/return-is-abrupt-with.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        var-bindings,
+      ]
+  - path: test/built-ins/Proxy/has/return-true-target-prop-exists-using-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/return-true-target-prop-exists.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/return-true-without-same-target-prop.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        regular-expressions,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/has/trap-is-not-callable-using-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/has/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/has/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/has/trap-is-undefined-using-with.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, var-bindings]
+  - path: test/built-ins/Proxy/has/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/return-is-boolean.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/return-is-different-from-target.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/return-same-result-from-target.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, regular-expressions]
+  - path: test/built-ins/Proxy/isExtensible/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/isExtensible/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/call-parameters-object-getownpropertynames.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/call-parameters-object-getownpropertysymbols.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-own-keys,
+        object-properties,
+        proxy-exotic-object,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/ownKeys/call-parameters-object-keys.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/extensible-return-trap-result-absent-not-configurable-keys.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/extensible-return-trap-result.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/not-extensible-missing-keys-throws.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/not-extensible-new-keys-throws.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/not-extensible-return-keys.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/null-handler.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-all-non-configurable-keys.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-duplicate-entries-throws.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-duplicate-symbol-entries-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-own-keys,
+        object-properties,
+        proxy-exotic-object,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/ownKeys/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-own-keys,
+        object-properties,
+        proxy-exotic-object,
+      ]
+  - path: test/built-ins/Proxy/ownKeys/return-not-list-object-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-own-keys,
+        object-properties,
+        proxy-exotic-object,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/ownKeys/return-type-throws-array.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-type-throws-boolean.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-type-throws-null.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-type-throws-number.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-type-throws-object.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/return-type-throws-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/ownKeys/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/ownKeys/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/ownKeys/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/return-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/preventExtensions/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/return-true-target-is-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/return-true-target-is-not-extensible.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/preventExtensions/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/preventExtensions/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+      ]
+  - path: test/built-ins/Proxy/preventExtensions/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/property-order.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/proxy-newtarget.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/proxy-no-prototype.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/proxy-undefined-newtarget.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/builtin.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/revocable/handler-is-revoked-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/revocable/proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revocation-function-extensible.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revocation-function-length.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revocation-function-name.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revocation-function-not-a-constructor.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/revocable/revocation-function-property-order.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-own-keys, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revocation-function-prototype.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revoke-consecutive-call-returns-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revoke-returns-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/revoke.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/target-is-revoked-function-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/revocable/target-is-revoked-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/boolean-trap-result-is-false-boolean-return-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/boolean-trap-result-is-false-null-return-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/boolean-trap-result-is-false-number-return-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/boolean-trap-result-is-false-string-return-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/boolean-trap-result-is-false-undefined-return-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/call-parameters-prototype-index.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/call-parameters-prototype.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/return-is-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/return-true-target-property-accessor-is-configurable-set-is-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/return-true-target-property-accessor-is-not-configurable.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/return-true-target-property-is-not-configurable.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/return-true-target-property-is-not-writable.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/target-property-is-accessor-not-configurable-set-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/target-property-is-not-configurable-not-writable-not-equal-to-v.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/trap-is-missing-receiver-multiple-calls-index.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/trap-is-missing-receiver-multiple-calls.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        regular-expressions,
+      ]
+  - path: test/built-ins/Proxy/set/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/trap-is-null-receiver.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/trap-is-undefined-no-property.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/set/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/set/trap-is-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/call-parameters.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/internals-call-order.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/setPrototypeOf/not-extensible-target-not-same-target-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/setPrototypeOf/not-extensible-target-same-target-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/setPrototypeOf/null-handler.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/return-abrupt-from-get-trap.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/return-abrupt-from-isextensible-target.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/return-abrupt-from-target-getprototypeof.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/return-abrupt-from-trap.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/toboolean-trap-result-false.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/setPrototypeOf/toboolean-trap-result-true-target-is-extensible.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        object-properties,
+        proxy-exotic-object,
+        reflect-namespace,
+        symbols,
+      ]
+  - path: test/built-ins/Proxy/setPrototypeOf/trap-is-missing-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/trap-is-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [functions, object-properties, proxy-exotic-object, reflect-namespace]
+  - path: test/built-ins/Proxy/setPrototypeOf/trap-is-null-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/trap-is-undefined-or-null.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
+  - path: test/built-ins/Proxy/setPrototypeOf/trap-is-undefined-target-is-proxy.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, proxy-exotic-object]
   - path: test/built-ins/Reflect/Symbol.toStringTag.js
     expectedClassification: pass
     dependencies: [reflect-namespace]
@@ -32854,6 +33936,16 @@ tests:
   - path: test/built-ins/Reflect/ownKeys/return-non-enumerable-keys.js
     expectedClassification: pass
     dependencies: [reflect-namespace]
+  - path: test/built-ins/Reflect/ownKeys/return-on-corresponding-order-large-index.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-properties,
+        reflect-namespace,
+        symbols,
+      ]
   - path: test/built-ins/Reflect/ownKeys/return-on-corresponding-order.js
     expectedClassification: pass
     dependencies: [reflect-namespace]
@@ -34270,6 +35362,10 @@ tests:
   - path: test/built-ins/RegExp/escape/escaped-lineterminator.js
     expectedClassification: pass
     dependencies: [regular-expressions]
+  - path: test/built-ins/RegExp/escape/escaped-otherpunctuators.js
+    expectedClassification: pass
+    dependencies:
+      [functions, iterator-protocol, object-properties, regular-expressions]
   - path: test/built-ins/RegExp/escape/escaped-solidus-character-mixed.js
     expectedClassification: pass
     dependencies: [regular-expressions]
@@ -38752,6 +39848,9 @@ tests:
   - path: test/built-ins/Set/prototype/add/not-a-constructor.js
     expectedClassification: pass
     dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/add/preserves-insertion-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, set-intrinsic]
   - path: test/built-ins/Set/prototype/add/returns-this-when-ignoring-duplicate.js
     expectedClassification: pass
     dependencies: [set-intrinsic]
@@ -39079,6 +40178,24 @@ tests:
   - path: test/built-ins/Set/prototype/forEach/forEach.js
     expectedClassification: pass
     dependencies: [set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/iterates-in-insertion-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/iterates-in-iterable-entry-order.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/iterates-values-added-after-foreach-begins.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/iterates-values-deleted-then-readded.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/iterates-values-not-deleted.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, set-intrinsic]
+  - path: test/built-ins/Set/prototype/forEach/iterates-values-revisits-after-delete-re-add.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, set-intrinsic]
   - path: test/built-ins/Set/prototype/forEach/length.js
     expectedClassification: pass
     dependencies: [set-intrinsic]
@@ -40420,6 +41537,15 @@ tests:
   - path: test/built-ins/String/fromCharCode/S15.5.3.2_A4.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/String/fromCharCode/S9.7_A1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, object-properties]
+  - path: test/built-ins/String/fromCharCode/S9.7_A2.1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, object-properties]
+  - path: test/built-ins/String/fromCharCode/S9.7_A2.2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, object-properties]
   - path: test/built-ins/String/fromCharCode/S9.7_A3.1_T1.js
     expectedClassification: pass
     dependencies: [object-properties]
@@ -40429,6 +41555,12 @@ tests:
   - path: test/built-ins/String/fromCharCode/S9.7_A3.1_T3.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/built-ins/String/fromCharCode/S9.7_A3.1_T4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, object-properties]
+  - path: test/built-ins/String/fromCharCode/S9.7_A3.2_T1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, object-properties]
   - path: test/built-ins/String/fromCharCode/name.js
     expectedClassification: pass
     dependencies: [object-properties]
