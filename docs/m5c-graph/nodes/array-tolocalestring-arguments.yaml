@@ -1,0 +1,16 @@
+version: 1
+id: array-tolocalestring-arguments
+title: Repair array locale method arguments
+delivers: "Closes exactly 1 path,
+  test/built-ins/Array/prototype/toLocaleString/invoke-element-tolocalestring.js
+  whose observation fails the assertion that an element's toLocaleString
+  receives no arguments when the array method receives no arguments. Repair
+  the already-admitted Array behavior against the ADR 0013 ECMA-262 edition
+  and ECMA-402 boundary, follow the full PLAN-M5.md evidence contract, and
+  update the normative record and the profile's current two-undefined-argument
+  forwarding account. Admit the path and regenerate the complete reviewed
+  manifest and ledger."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

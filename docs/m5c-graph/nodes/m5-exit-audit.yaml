@@ -6,6 +6,8 @@ delivers: "Verifies that the manifest covers all 41,091 applicable paths, that
   exclusions are bounded, and that the reproducible coverage report and all
   required gates pass without claiming unqualified ECMA-262 conformance."
 dependencies:
+  - array-sort-stability
+  - array-tolocalestring-arguments
   - authorized-exclusion-audit
   - cross-realm-host
   - dynamic-import
@@ -61,6 +63,7 @@ dependencies:
   - regexp-split-coverage-remediation
   - remediation-work-graph
   - resizable-array-buffer-harness
+  - runtime-dynamic-source-classification
   - test262-host-script-bindings
   - typed-array-feature-admission
   - unhandled-rejection-observation
