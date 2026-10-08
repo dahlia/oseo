@@ -7,6 +7,9 @@ delivers: "Observes the 467 unreviewed paths that
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
+  - iterator-next-callability
   - observation-batch-plan
+  - parenthesized-assignment-function-name
+  - with-strict-assignment-fallback
 landed: false
-status: ready
+status: blocked

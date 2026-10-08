@@ -24,6 +24,7 @@ dependencies:
   - import-attributes
   - import-meta
   - iterator-helpers
+  - iterator-next-callability
   - minor-feature-tag-admission
   - module-export-forms
   - non-blocking-agent
@@ -59,6 +60,7 @@ dependencies:
   - observation-batch-30
   - observation-batch-31
   - observation-batch-32
+  - parenthesized-assignment-function-name
   - primitive-wrapper-objects
   - promise-feature-admission
   - proper-tail-calls
@@ -74,6 +76,7 @@ dependencies:
   - typed-array-proto-coverage-remediation
   - unhandled-rejection-observation
   - well-known-intrinsics-harness
+  - with-strict-assignment-fallback
 landed: false
 reason: "Depends on array-sort-stability, which is parked after its revert in
   e561fd2e."
