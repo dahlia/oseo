@@ -351,6 +351,61 @@ and `eval` diagnostics of ADR 0027.
 [CatchClauseEvaluation]: https://262.ecma-international.org/16.0/#sec-runtime-semantics-catchclauseevaluation
 [Function.prototype.apply]: https://262.ecma-international.org/16.0/#sec-function.prototype.apply
 
+### Dynamic import observation ownership
+
+The maintainer decision of 2026-10-07 selects option C with interim A: dynamic
+import remains unsupported, and ADR 0016 is unchanged. The fixed inventory
+contains 630 paths whose frontmatter lists `dynamic-import`; 629 were
+unreviewed when this accounting node verified the batch-plan cohort. The
+`dynamic-import` node admits no new paths. Its runner uses an explicit
+observe-only set containing only `dynamic-import`, leaving the supported
+feature list unchanged. A case with any other unadmitted feature is still
+blocked before compilation; otherwise its classification follows the actual
+observation, including a pass when the tag names syntax the source does not
+use. Already-reviewed paths are re-observed by a full manifest update.
+Observation
+batches 30, 31, and 32 review them using the existing parse-time diagnostic
+`error[OSEO1001]: ImportExpression is outside the M1 profile.` The audit
+accepts exactly this message, not another `OSEO1001` rejection.
+
+If a feature-tagged source has no `import()` call, or observation reports a
+different rejection, retain its actual classification and identify the owner
+of that separate gap. Do not force it into either dynamic-source owner or
+invent an exclusion-audit record outside the accepted diagnostic surface.
+
+The full re-observation changed only
+*test/language/module-code/top-level-await/syntax/catch-parameter.js*: its
+frontmatter gate became `OSEO1001`, with the message “Await inside a module
+top-level binding or assignment pattern is unsupported.” It remains
+unsupported and has no `import()` call. The
+`module-top-level-await-patterns` node now owns that separate gap, while
+`frontmatter-feature-tags` retains the four `super` parse negatives. No
+classification total changed, and this path has no dynamic-source exclusion
+audit record.
+
+Use `adr:0016-dynamic-source-boundary` only when `import()` itself is the
+normative subject and the reviewed assessment bounds the assertions to source
+evaluation. The *test/language/expressions/dynamic-import/* directory or an
+`esid` naming ImportCall, EvaluateImportCall, or ContinueDynamicImport
+identifies a source-subject candidate; review the description, normative
+section, and assertions to confirm it. A filename or feature tag alone is
+insufficient. If `import()` supplies scaffolding for another subject, or
+non-source coverage remains unresolved, use
+`node:dynamic-source-coverage-remediation`. Module evaluation order,
+top-level-await behavior, and JSON module identity remain remediation subjects
+unless the assessment demonstrates only the bounded source-evaluation contract.
+Each owner requires a reviewed exclusion-audit record with fresh source and
+observation digests; an ADR owner without that record closes nothing under ADR
+0019.
+
+Reviewed entries carry the existing ADR 0013 `dynamic-source` dependency tag
+alongside any other prerequisites. The audit's `missingDynamicTag` must be
+false when that tag is present and true when absent; tag debt never authorizes
+an exclusion. The batches follow
+[*docs/m5c-closure/exclusion-audit.md*](./docs/m5c-closure/exclusion-audit.md)
+for the record procedure. The separate `dynamic-import-staged-plan` node plans
+ADR 0016 alternative 3; it does not alter this interim ownership rule.
+
 
 Work graph construction
 -----------------------

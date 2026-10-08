@@ -27,6 +27,7 @@ dependencies:
   - iterator-next-callability
   - minor-feature-tag-admission
   - module-export-forms
+  - module-top-level-await-patterns
   - non-blocking-agent
   - observation-batch-01
   - observation-batch-02

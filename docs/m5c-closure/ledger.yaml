@@ -68,9 +68,12 @@ owners:
       prototype absence, and nonconstructibility.
     paths: 25
   node:frontmatter-feature-tags:
-    note: Gated only by the super (4) or dynamic-import (1) frontmatter tag;
-      the sources need neither.
-    paths: 5
+    note: The 4 test/language/global-code/super-*.js parse negatives are
+      gated only by the super frontmatter tag, which their sources do
+      not need. The catch-parameter case moved to
+      node:module-top-level-await-patterns after the dynamic-import
+      observe-only change exposed its actual rejection.
+    paths: 4
   node:iterator-helpers:
     note: Only unsupported frontmatter feature is iterator-helpers (392), or
       iterator-helpers once cross-realm was admitted, in
@@ -83,6 +86,12 @@ owners:
       export-star-as-namespace-from-module (7), or This export is
       unsupported (6).
     paths: 28
+  node:module-top-level-await-patterns:
+    note: "Observed OSEO1001: Await inside a module top-level binding or
+      assignment pattern is unsupported. The dynamic-import observe-only
+      change exposed this gap in catch-parameter.js, whose source has no
+      import() call; it is not an ADR 0016 exclusion."
+    paths: 1
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
     paths: 2
@@ -31721,7 +31730,7 @@ paths:
   test/language/module-code/top-level-await/syntax/block-await-expr-regexp.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/top-level-await/syntax/block-await-expr-template-literal.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/top-level-await/syntax/block-await-expr-this.js: [unreviewed, node:observation-batch-20]
-  test/language/module-code/top-level-await/syntax/catch-parameter.js: [unsupported-profile-feature, node:frontmatter-feature-tags, [module-linking, top-level-await]]
+  test/language/module-code/top-level-await/syntax/catch-parameter.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [module-linking, top-level-await]]
   test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-body.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-params.js: [expected-negative, observation]
   test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-body.js: [unreviewed, node:observation-batch-20]

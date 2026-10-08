@@ -18,8 +18,8 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 76
-  ready: 64
+  nodes: 77
+  ready: 65
   blocked: 9
   parked: 3
   landed: 9
@@ -107,6 +107,7 @@ collisions:
       - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
+      - module-top-level-await-patterns
       - non-blocking-agent
       - parenthesized-assignment-function-name
       - primitive-wrapper-objects
@@ -148,6 +149,7 @@ collisions:
       - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
+      - module-top-level-await-patterns
       - non-blocking-agent
       - parenthesized-assignment-function-name
       - primitive-wrapper-objects
@@ -186,6 +188,7 @@ collisions:
       - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
+      - module-top-level-await-patterns
       - non-blocking-agent
       - parenthesized-assignment-function-name
       - primitive-wrapper-objects
@@ -226,6 +229,7 @@ collisions:
       - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
+      - module-top-level-await-patterns
       - non-blocking-agent
       - parenthesized-assignment-function-name
       - primitive-wrapper-objects

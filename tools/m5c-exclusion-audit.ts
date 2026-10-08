@@ -30,6 +30,11 @@ const dynamicOwner = "adr:0016-dynamic-source-boundary";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
 const annexRemediationOwner = "node:regexp-split-coverage-remediation";
+const dynamicImportRejection = new RegExp(
+  "error\\[OSEO1001\\]: ImportExpression is outside the M1 profile\\." +
+    "(?=$|\\r?\\n|\\\\n)",
+  "u",
+);
 const recordStems = [
   "0013-m5-edition-and-manifest",
   "0016-dynamic-source-boundary",
@@ -313,6 +318,7 @@ export function validateM5cExclusionAudit(
       detail.includes("error[OSEO1001]:") &&
       ((detail.includes("Unknown binding 'eval'.") &&
         hasEvalCall(source, result.case.mode)) ||
+        dynamicImportRejection.test(detail) ||
         detail.includes("The Function constructor requires dynamic source") ||
         // The run-time boundary of each realm's source-compiling
         // constructors and of %eval% called with a String (ADR 0027).
