@@ -18448,20 +18448,20 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 1560
+  expectedNegatives: 1648
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 18994
+  passes: 19308
   semanticFailures: 0
-  unsupportedProfileFeatures: 1456
+  unsupportedProfileFeatures: 1467
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 300
+      passes: 380
       semanticFailures: 0
-      unsupportedProfileFeatures: 9
+      unsupportedProfileFeatures: 10
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -18501,23 +18501,23 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 430
+      passes: 432
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: classes
       expectedNegatives: 580
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 917
+      passes: 921
       semanticFailures: 0
       unsupportedProfileFeatures: 14
     - dependency: control-flow
       expectedNegatives: 229
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 511
+      passes: 558
       semanticFailures: 0
-      unsupportedProfileFeatures: 15
+      unsupportedProfileFeatures: 16
     - dependency: data-view
       expectedNegatives: 0
       harnessFailures: 0
@@ -18533,61 +18533,61 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: default-parameters
-      expectedNegatives: 22
+      expectedNegatives: 33
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 64
+      passes: 158
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 4
     - dependency: destructuring-bindings
-      expectedNegatives: 166
+      expectedNegatives: 234
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1112
+      passes: 1287
       semanticFailures: 0
-      unsupportedProfileFeatures: 1
+      unsupportedProfileFeatures: 3
     - dependency: dynamic-source
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 6
       semanticFailures: 0
-      unsupportedProfileFeatures: 100
+      unsupportedProfileFeatures: 111
     - dependency: error-intrinsics
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 133
+      passes: 196
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 5
     - dependency: expression-operators
       expectedNegatives: 64
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 294
+      passes: 539
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 19
     - dependency: functions
-      expectedNegatives: 290
+      expectedNegatives: 378
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4947
+      passes: 5221
       semanticFailures: 0
-      unsupportedProfileFeatures: 686
+      unsupportedProfileFeatures: 696
     - dependency: generators
-      expectedNegatives: 84
+      expectedNegatives: 85
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 336
+      passes: 366
       semanticFailures: 0
       unsupportedProfileFeatures: 15
     - dependency: iterator-protocol
-      expectedNegatives: 91
+      expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1161
+      passes: 1294
       semanticFailures: 0
-      unsupportedProfileFeatures: 402
+      unsupportedProfileFeatures: 404
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -18606,9 +18606,9 @@ summary:
       expectedNegatives: 152
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 419
+      passes: 437
       semanticFailures: 0
-      unsupportedProfileFeatures: 11
+      unsupportedProfileFeatures: 12
     - dependency: module-linking
       expectedNegatives: 168
       harnessFailures: 0
@@ -18620,7 +18620,7 @@ summary:
       expectedNegatives: 12
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 417
+      passes: 550
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: object-own-keys
@@ -18631,12 +18631,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: object-properties
-      expectedNegatives: 571
+      expectedNegatives: 577
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 10590
+      passes: 10882
       semanticFailures: 0
-      unsupportedProfileFeatures: 181
+      unsupportedProfileFeatures: 191
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -18673,12 +18673,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 6
     - dependency: rest-parameters
-      expectedNegatives: 12
+      expectedNegatives: 18
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7
+      passes: 10
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 2
     - dependency: set-composition-methods
       expectedNegatives: 0
       harnessFailures: 0
@@ -18697,7 +18697,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 848
+      passes: 886
       semanticFailures: 0
       unsupportedProfileFeatures: 17
     - dependency: top-level-await
@@ -18757,12 +18757,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 5
     - dependency: var-bindings
-      expectedNegatives: 69
+      expectedNegatives: 87
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 438
+      passes: 709
       semanticFailures: 0
-      unsupportedProfileFeatures: 9
+      unsupportedProfileFeatures: 16
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
@@ -19206,12 +19206,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - group: language/expressions
-      expectedNegatives: 504
+      expectedNegatives: 592
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1568
+      passes: 1882
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 34
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0

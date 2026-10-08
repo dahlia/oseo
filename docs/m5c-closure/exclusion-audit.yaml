@@ -2339,6 +2339,140 @@ paths:
     subject: AnnexB extension not honored in strict mode, Block statement in
       eval code containing a function declaration
     assessment: eval-semantics
+  - path: "test/language/expressions/addition/S11.6.1_A1.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "e19b6800a638faf54237a41ab7b772d65176ed29b5d9284fcb6f0bfc3\
+      8b1dd92"
+    observationDigest: "a627d14e17cbf36fff326e248914949f364553e9024b535ccf4e\
+      16f154461d42"
+    missingDynamicTag: false
+    section: sec-addition-operator-plus
+    subject: Whitespace and line terminators around the addition operator
+    assessment: fixture-construction
+  - path: "test/language/expressions/arrow-function/arrow/binding-tests-1.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b699ee7a6f6459c7\
+      5c659db"
+    observationDigest: "11f1fef15707572239e42c5b90f0d6e37daaf3ec13f93bc962f9\
+      7dbb7b181030"
+    missingDynamicTag: false
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow lexical this capture
+    assessment: fixture-construction
+  - path: "test/language/expressions/arrow-function/arrow/binding-tests-2.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b699ee7a6f6459c7\
+      5c659db"
+    observationDigest: "790e3704bf50098da8a99467a147c41bfb6f1f061e717b5d2b69\
+      1a1b53588617"
+    missingDynamicTag: false
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow lexical this capture
+    assessment: fixture-construction
+  - path: "test/language/expressions/arrow-function/arrow/binding-tests-3.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "f863b06da48490f5769bb5e18f0e4e4e592da108ed511ecf8f6460e8c\
+      8d7602d"
+    observationDigest: "d538b70b7690d9e1d6e4c256c8ecccaad5af78b87134d537c20d\
+      d5e3b36e5688"
+    missingDynamicTag: false
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow lexical this capture
+    assessment: fixture-construction
+  - path:
+      "test/language/expressions/arrow-function/arrow/capturing-closure-varia\
+      bles-1.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ab105605b61012ae8ba88cc2d0e69d2c6227f1ce4835a883056646032\
+      b89d551"
+    observationDigest: "238c279a3ad002ddca4019dd9fbec8357996cdcc4565862d9356\
+      910658f9171f"
+    missingDynamicTag: false
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow closure capture of an outer variable
+    assessment: fixture-construction
+  - path: "test/language/expressions/arrow-function/eval-var-scope-syntax-er\
+      r.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "40e934786842de3b50e12eb0d0e9c82e07127836a3842497c081eed7d\
+      54e533e"
+    observationDigest: "09d8edb341ffcb37178e415f3454884f2b30c861b22977e7dc27\
+      4a7d26ac74ba"
+    missingDynamicTag: false
+    section: sec-functiondeclarationinstantiation
+    subject: Sloppy direct eval introducing a var conflicting with a parameter
+    assessment: eval-semantics
+  - path: "test/language/expressions/arrow-function/scope-body-lex-distinct.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4caadce9aa5ee74eb151a3c9a1cc918fb244409c2b548cebf053a4718\
+      225da5f"
+    observationDigest: "c2a2eb790c9c4f5f96acf0a22334a593527c2353f0033fa4d694\
+      b7d8273d2bc0"
+    missingDynamicTag: false
+    section: sec-functiondeclarationinstantiation
+    subject: Direct eval var declaration conflicts with a lexical binding
+    assessment: eval-semantics
+  - path: "test/language/expressions/arrow-function/scope-param-elem-var-clo\
+      se.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "abdfa0064c25ca3e05021a675194c036ab87cbc9aaa7dad49becdf7ed\
+      c909445"
+    observationDigest: "2f7df4bd1a7d63790d27fa1d22cbc4786da82971e1c67e4b9aa4\
+      6168a9937849"
+    missingDynamicTag: false
+    section: sec-functiondeclarationinstantiation
+    subject: Variable environments created by sloppy direct eval in arrow
+      parameters
+    assessment: eval-semantics
+  - path: "test/language/expressions/arrow-function/scope-param-elem-var-ope\
+      n.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2fc70310c7f0c5a45dcb3ef5fb9d315d4c612eaaa539e6c2088949e1b\
+      fecc9e6"
+    observationDigest: "9b36b3766d777aa03dd188d2c0c8cd539d8edd8b8512404b2a3a\
+      3efbba9d0e85"
+    missingDynamicTag: false
+    section: sec-functiondeclarationinstantiation
+    subject: Variable environments created by sloppy direct eval in arrow
+      parameters
+    assessment: eval-semantics
+  - path:
+      "test/language/expressions/arrow-function/scope-param-rest-elem-var-clo\
+      se.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8694d7578a9aede24be68d7cc0422055e1b2e99515e80eab421b000a1\
+      592aee6"
+    observationDigest: "1b0036636c06e3596a88d39a5f00cf52351f2a4720f1a5c83e19\
+      81a7711a827f"
+    missingDynamicTag: false
+    section: sec-functiondeclarationinstantiation
+    subject: Variable environments created by sloppy direct eval in arrow
+      parameters
+    assessment: eval-semantics
+  - path:
+      "test/language/expressions/arrow-function/scope-param-rest-elem-var-ope\
+      n.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "059aa15baa59952c681ab376c4520bafb48521ef4dbfa86796786d0fb\
+      ed2510d"
+    observationDigest: "2ab076cfa91d8e58257760c23157dd5407587916b43bc4927abb\
+      31d692813dd3"
+    missingDynamicTag: false
+    section: sec-functiondeclarationinstantiation
+    subject: Variable environments created by sloppy direct eval in arrow
+      parameters
+    assessment: eval-semantics
   - path: test/language/expressions/async-generator/eval-body-proto-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject

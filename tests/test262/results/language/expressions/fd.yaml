@@ -3,6 +3,61 @@ key: fd
 results:
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - arrow-function
+        - destructuring-assignment
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-enum-escaped.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - destructuring-bindings
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/arrow-function/scope-param-rest-elem-var-close.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - destructuring-bindings
+      - dynamic-source
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - object-properties
+      - rest-parameters
+      - var-bindings
+    observation:
+      detail: "test/language/expressions/arrow-function/scope-param-rest-elem\
+        -var-close.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/arrow-function/scope-param-r\
+        est-elem-var-close.js:97:14: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags:
         - noStrict
