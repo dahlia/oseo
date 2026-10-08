@@ -2473,6 +2473,73 @@ paths:
     subject: Variable environments created by sloppy direct eval in arrow
       parameters
     assessment: eval-semantics
+  - path: "test/language/expressions/async-arrow-function/eval-var-scope-sy\
+      ntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "aac0e7ff33d8e98ae4d24a24876c92b477aa07e704246580080f3af5f1\
+      43c3c8"
+    observationDigest: "81f0824157c3541ee4fefe408b848306ca24e9e21f287a232eff2\
+      3ff82e2eb94"
+    missingDynamicTag: false
+    section: "sec-async-arrow-function-definitions"
+    subject: "sloppy direct eval in params introduces var (async arrow
+      function expression in sloppy code)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/async-function/named-eval-var-scope-sy\
+      ntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b29ee610b6c6742f7a3800d62e0bb80a760b69d2b7d5fab432390259f8\
+      8949ef"
+    observationDigest: "797e384032b2fb1a1bd6aee3d8340d72ad1f63329f405f2117740\
+      3cf7d387f0a"
+    missingDynamicTag: false
+    section: "sec-async-function-definitions"
+    subject: "sloppy direct eval in params introduces var (async function
+      named expression in sloppy code)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/async-function/named-reassign-fn-name-\
+      in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8c172e3d95288d69374ccd94e2290ef2df70d6e321ce443a8b72710dbb\
+      54e5b3"
+    observationDigest: "96e9e4c776eacc9a643794e7c4513656fbef011a97d386673d2bc\
+      61dda400c6d"
+    missingDynamicTag: false
+    section: "sec-async-function-definitions"
+    subject: "Reassignment of function name is silently ignored in
+      non-strict mode code. (async function named expression in
+      non-strict mode code)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/async-function/named-strict-error-reas\
+      sign-fn-name-in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "870d8f132c3cb4419fa47e26464f9457d8fb8b5b210a557c8704862d93\
+      fbeff5"
+    observationDigest: "22e23f2e5be4a26a45f501ae4164ddd5aa9ec99eb9f36ad87c763\
+      d95566ec10b"
+    missingDynamicTag: false
+    section: "sec-async-function-definitions"
+    subject: "Reassignment of function name is silently ignored in
+      non-strict mode code. (async function named expression in strict
+      mode code)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/async-function/nameless-eval-var-scope\
+      -syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "a3c941c4e4ea9d8cd05d6560ca2b95429a63f4b0f4834466da97d71d29\
+      b6e446"
+    observationDigest: "3db8ebd2739e34edbf153a0e411c008c760700f9ed01f1b158fc8\
+      e17d9dbb068"
+    missingDynamicTag: false
+    section: "sec-async-function-definitions"
+    subject: "sloppy direct eval in params introduces var (async function
+      nameless expression in sloppy code)"
+    assessment: "eval-semantics"
   - path: test/language/expressions/async-generator/eval-body-proto-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -2510,6 +2577,201 @@ paths:
     subject: sloppy direct eval in params introduces var (async generator
       named function expression in sloppy code)
     assessment: eval-semantics
+  - path: "test/language/expressions/async-generator/named-no-strict-reassi\
+      gn-fn-name-in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3f8458140c36e6c8157a562350eb0228fe25cb94e7887d8468d05fce95\
+      fcfc73"
+    observationDigest: "2f7c836fd1dc1050808f626743f20dad8e85a4a226948a7b3bd35\
+      bee50734c4c"
+    missingDynamicTag: false
+    section: "sec-asyncgenerator-definitions-evaluation"
+    subject: "Reassignment of function name is silently ignored in
+      non-strict mode code. (async generator named function expression
+      in non-strict mode code)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/async-generator/named-strict-error-rea\
+      ssign-fn-name-in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "536039fab1840579e26f9e9f362ebd4b57489d7afccf21492922ca7e1e\
+      67e43c"
+    observationDigest: "2d6e5bf9c82b8b7f1856ab51ca981be0e146a48a54ff807b9929a\
+      3d21fafd17c"
+    missingDynamicTag: false
+    section: "sec-asyncgenerator-definitions-evaluation"
+    subject: "Reassignment of function name is silently ignored in
+      non-strict mode code. (async generator named function expression
+      in strict mode code)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/bitwise-and/S11.10.1_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c664c561c6de4def3595d0d266ee006176e5a9764ca4a2ada1dc7498a1\
+      a48f54"
+    observationDigest: "f091d021a1eac2fc8f40eba9621a53d3eaf1a86afb75ac093d59c\
+      0960e24dd94"
+    missingDynamicTag: false
+    section: "sec-binary-bitwise-operators"
+    subject: "Checking uses eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/bitwise-not/S11.4.8_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a1558bb750ce64ea94717ab5543c93ccfa4af0d5028683289920a7d5b0\
+      1b0127"
+    observationDigest: "486646e74450aa5c7a6bae14c7188d50275bdec9ef67ae3556d68\
+      4e62e05caf0"
+    missingDynamicTag: false
+    section: "sec-bitwise-not-operator"
+    subject: "Checking by using eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/bitwise-or/S11.10.3_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "435457f39546913413cc3ec06c6256ce4cdedea1981038a687a319c6a2\
+      d3a2d2"
+    observationDigest: "c2709441e1fffc75df288f9e005f8d9523863856fe13bb149a9e9\
+      6893071e620"
+    missingDynamicTag: false
+    section: "sec-binary-bitwise-operators"
+    subject: "Checking by using eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/bitwise-xor/S11.10.2_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "960ceeb656d8ec05815c94f2ec38efee280d4966d6438cade1ca2ec5e4\
+      be06f4"
+    observationDigest: "44c3c54592d65cfcf6ed91e49853fa6a2e515eace55674515ae26\
+      c596e867526"
+    missingDynamicTag: false
+    section: "sec-binary-bitwise-operators"
+    subject: "The check uses eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/11.2.3-3_5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4fd4a8c69a5b5074740ee5f60a0f29c679a583fc56a78834c7819fa6de\
+      653508"
+    observationDigest: "b470122d5fb1d737b775d494fc2fd030da4df95ef843f6c0b9148\
+      294d5ceac0d"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Call arguments are evaluated before the check is made to see
+      if the object is actually callable (eval'ed)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/S11.2.3_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dcd7260633f6a9fcaf95553b077ff15455dbc1d29df5f797537203144c\
+      691f16"
+    observationDigest: "25ced7c06d63fc7cce45da25542e1af66cf496d58c8c91a9118e8\
+      a3e906ac85c"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Checking by using eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-err-args.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "18b6654d706e02ecd0f680010e3323c2158894c769165411e8855289d6\
+      983634"
+    observationDigest: "3edffb5aa21549085a972224993a11a513d83d6c55eb7cc727b19\
+      f7778150923"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Error evaluating arguments list for direct eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-first-arg.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "a643cb2ead4f102ce95472d69db5ccaa61a8fbedf4c95a26c46ece483a\
+      5042fa"
+    observationDigest: "83b7e6919f503e9aebe9c9e35659f9281a4e12f5e738976e537a2\
+      58744dd8a40"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: 'eval("x = 1", "x = 2"), x equal 1, not 2'
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/call/eval-no-args.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "125fce4f6333708484486d6718827dde9352fdb46b428d88d6d7a57732\
+      28e976"
+    observationDigest: "7dc61b77be5e4e13434d188915664c22a2497c37ce5eef04c4193\
+      7368b1c29dc"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Error evaluating arguments list for direct eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-spread-empty-leading.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cf5223e3010a7abea82fe7f0b24c8b2746fce1bcabdd27b1777382fd5a\
+      fd8b38"
+    observationDigest: "be592f03eef655216ef11bd0ba8eb9fb375fd35ed4c638c5156a9\
+      0108840890a"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Direct eval call with empty leading spread."
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-spread-empty-trailing.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2b450001e579ddec3ce1a038c0616895b08946a48a515bde58ac1e4208\
+      ebc4d0"
+    observationDigest: "7e2a9097c6856df27da0b026643d29071304a002520a9bd7c59ea\
+      98501195be9"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Direct eval call with empty trailing spread."
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-spread-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9579caf22073a998b319be2aca4398330e6b13cfd807f89318f84c0690\
+      5a9294"
+    observationDigest: "5b000dcb5dd656ee8b248b5fcb8a6a423d22da0a9c5bea7488703\
+      c7931e86731"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Direct eval call with empty spread."
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-spread.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "00323d72969c804b8093dbe36a8772af23c57d881ca9621f639edf1584\
+      9af028"
+    observationDigest: "09d2452d0fc4a914d10f2d0a2709964b7d59a6908ceefd11c0877\
+      8c1a74bd148"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Direct eval call with spread."
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-strictness-inherit-non-stric\
+      t.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "63b5239cd80d095dcf86b080b1db5db3f02d81a9e74a3a8fa44419e590\
+      4218ae"
+    observationDigest: "3c72d1e725e0c4a7de5b1e1a0f3f69bc029f6956d6af9ed9b17fc\
+      4eccee56b35"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Evaluated code honors the strictness of the calling context"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/call/eval-strictness-inherit-strict.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3e1871cc9932837097d14d3e8e0e0c9faad89e096587c6138dbce3a4dc\
+      5d7f93"
+    observationDigest: "b755a4ffcb6598837137a40deec028383697606b83ed4925a6cc6\
+      95d38257a8d"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "Evaluated code honors the strictness of the calling context"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/class/elements/derived-cls-direct-eval-err\
       -contains-supercall.js"
     proposedOwner: adr:0016-dynamic-source-boundary

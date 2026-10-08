@@ -59103,30 +59103,1319 @@ tests:
   - path: test/language/expressions/assignment/target-super-identifier-reference-null.js
     expectedClassification: pass
     dependencies: [classes, error-intrinsics, object-properties]
+  - path: test/language/expressions/assignmenttargettype/direct-additiveexpression-minus-multiplicativeexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-additiveexpression-minus-multiplicativeexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-additiveexpression-minus-multiplicativeexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-additiveexpression-plus-multiplicativeexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-additiveexpression-plus-multiplicativeexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-additiveexpression-plus-multiplicativeexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-arrowfunction-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-arrowfunction-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-arrowfunction-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-arrowfunction-3.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-arrowfunction-4.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-arrowfunction-5.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-arrowfunction-6.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-asyncarrowfunction-0.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-asyncarrowfunction-1.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-asyncarrowfunction-2.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-asyncarrowfunction-3.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-asyncarrowfunction-4.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-asyncarrowfunction-5.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-asyncarrowfunction-6.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwiseandexpression-bitwise-and-equalityexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwiseandexpression-bitwise-and-equalityexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwiseandexpression-bitwise-and-equalityexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwiseorexpression-bitwise-or-bitwisexorexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwiseorexpression-bitwise-or-bitwisexorexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwiseorexpression-bitwise-or-bitwisexorexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwisexorexpression-bitwise-xor-bitwiseandexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwisexorexpression-bitwise-xor-bitwiseandexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-bitwisexorexpression-bitwise-xor-bitwiseandexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression-as-for-in-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression-as-for-of-lhs.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression-in-compound-assignment.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression-in-logical-assignment.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression-in-postfix-update.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression-in-prefix-update.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression-templateliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-callexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-coalesceexpressionhead-coalesce-bitwiseorexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-coalesceexpressionhead-coalesce-bitwiseorexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-coalesceexpressionhead-coalesce-bitwiseorexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-abstract-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-abstract-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-abstract-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-abstract-not-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-abstract-not-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-abstract-not-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-strict-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-strict-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-strict-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-strict-not-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-strict-not-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-equalityexpression-strict-not-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-expression-comma-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-expression-comma-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-expression-comma-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/assignmenttargettype/direct-identifierreference-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignmenttargettype/direct-identifierreference-eval-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-import.meta.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-importcall.js
+    expectedClassification: expected-negative
+    dependencies: [dynamic-source, expression-operators, module-linking]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-coalesce-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-coalesce-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-coalesce-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-logical-and-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-logical-and-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-logical-and-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-logical-or-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-logical-or-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-logical-or-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-minus-minus.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-lefthandsideexpression-plus-plus.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-logicalandexpression-logical-and-bitwiseorexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-logicalandexpression-logical-and-bitwiseorexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-logicalandexpression-logical-and-bitwiseorexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-logicalorexpression-logical-or-logicalandexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-logicalorexpression-logical-or-logicalandexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-logicalorexpression-logical-or-logicalandexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-memberexpression-templateliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-minus-minus-unaryexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-3.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-4.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-5.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/assignmenttargettype/direct-new-memberexpression-arguments.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignmenttargettype/direct-new-newexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-optionalexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-plus-plus-unaryexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-asyncfunctionexpression.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-asyncgeneratorexpression.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-classexpression.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-functionexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-generatorexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, generators]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-literal-boolean.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-literal-null.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-literal-numeric.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-literal-string.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-objectliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, object-literals]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-regularexpressionliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, regular-expressions]
+  - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-templateliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/assignmenttargettype/direct-primaryexpression-this.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-greater-than-or-equal-to-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-greater-than-or-equal-to-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-greater-than-or-equal-to-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-greater-than-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-greater-than-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-greater-than-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-in-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-in-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-in-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-instanceof-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-instanceof-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-instanceof-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-less-than-or-equal-to-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-less-than-or-equal-to-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-less-than-or-equal-to-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-less-than-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-less-than-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-relationalexpression-less-than-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-bitwise-left-additiveexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-bitwise-left-additiveexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-bitwise-left-additiveexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-bitwise-right-additiveexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-bitwise-right-additiveexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-bitwise-right-additiveexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-unsigned-bitwise-right-additiveexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-unsigned-bitwise-right-additiveexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shiftexpression-unsigned-bitwise-right-additiveexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shortcircuitexpression-question-assignmentexpression-else-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shortcircuitexpression-question-assignmentexpression-else-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-shortcircuitexpression-question-assignmentexpression-else-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-delete-unaryexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-exclamation-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-exclamation-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-exclamation-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-minus-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-minus-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-minus-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-plus-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-plus-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-plus-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-tilde-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-tilde-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-tilde-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-typeof-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-typeof-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-typeof-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-void-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-void-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-unaryexpression-void-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-updateexpression-star-star-exponentiationexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-updateexpression-star-star-exponentiationexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-updateexpression-star-star-exponentiationexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-yieldexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/direct-yieldexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-additiveexpression-minus-multiplicativeexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-additiveexpression-minus-multiplicativeexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-additiveexpression-minus-multiplicativeexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-additiveexpression-plus-multiplicativeexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-additiveexpression-plus-multiplicativeexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-additiveexpression-plus-multiplicativeexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-arrowfunction-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-arrowfunction-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-arrowfunction-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-arrowfunction-3.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-arrowfunction-4.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-arrowfunction-5.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-arrowfunction-6.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-asyncarrowfunction-0.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-asyncarrowfunction-1.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-asyncarrowfunction-2.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-asyncarrowfunction-3.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-asyncarrowfunction-4.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-asyncarrowfunction-5.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-asyncarrowfunction-6.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwiseandexpression-bitwise-and-equalityexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwiseandexpression-bitwise-and-equalityexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwiseandexpression-bitwise-and-equalityexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwiseorexpression-bitwise-or-bitwisexorexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwiseorexpression-bitwise-or-bitwisexorexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwiseorexpression-bitwise-or-bitwisexorexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwisexorexpression-bitwise-xor-bitwiseandexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwisexorexpression-bitwise-xor-bitwiseandexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-bitwisexorexpression-bitwise-xor-bitwiseandexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-callexpression-in-compound-assignment.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-callexpression-in-logical-assignment.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-callexpression-templateliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-callexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-coalesceexpressionhead-coalesce-bitwiseorexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-coalesceexpressionhead-coalesce-bitwiseorexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-coalesceexpressionhead-coalesce-bitwiseorexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-abstract-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-abstract-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-abstract-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-abstract-not-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-abstract-not-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-abstract-not-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-strict-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-strict-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-strict-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-strict-not-equal-relationalexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-strict-not-equal-relationalexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-equalityexpression-strict-not-equal-relationalexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-expression-comma-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-expression-comma-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-expression-comma-assignmentexpression-2.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/assignmenttargettype/parenthesized-identifierreference-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-identifierreference-eval-strict.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-import.meta.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-importcall.js
+    expectedClassification: expected-negative
+    dependencies: [dynamic-source, expression-operators, module-linking]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-coalesce-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-coalesce-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-coalesce-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-logical-and-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-logical-and-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-logical-and-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-logical-or-assignment-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-logical-or-assignment-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-logical-or-assignment-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-minus-minus.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-lefthandsideexpression-plus-plus.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-logicalandexpression-logical-and-bitwiseorexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-logicalandexpression-logical-and-bitwiseorexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-logicalandexpression-logical-and-bitwiseorexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-logicalorexpression-logical-or-logicalandexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-logicalorexpression-logical-or-logicalandexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-logicalorexpression-logical-or-logicalandexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-memberexpression-templateliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-minus-minus-unaryexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-3.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-4.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-multiplicativeexpression-multiplicativeoperator-exponentiationexpression-5.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/assignmenttargettype/parenthesized-new-memberexpression-arguments.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-new-newexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-optionalexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-plus-plus-unaryexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-asyncfunctionexpression.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-asyncgeneratorexpression.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-classexpression.js
+    expectedClassification: expected-negative
+    dependencies: [classes, expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-functionexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-generatorexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, functions, generators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-literal-boolean.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-literal-null.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-literal-numeric.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-literal-string.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-objectliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, object-literals]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-regularexpressionliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, regular-expressions]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-templateliteral.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
   - path: test/language/expressions/assignmenttargettype/parenthesized-primaryexpression-this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-greater-than-or-equal-to-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-greater-than-or-equal-to-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-greater-than-or-equal-to-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-greater-than-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-greater-than-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-greater-than-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-in-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-in-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-in-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-instanceof-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-instanceof-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-instanceof-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-less-than-or-equal-to-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-less-than-or-equal-to-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-less-than-or-equal-to-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-less-than-shiftexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-less-than-shiftexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-relationalexpression-less-than-shiftexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-bitwise-left-additiveexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-bitwise-left-additiveexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-bitwise-left-additiveexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-bitwise-right-additiveexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-bitwise-right-additiveexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-bitwise-right-additiveexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-unsigned-bitwise-right-additiveexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-unsigned-bitwise-right-additiveexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shiftexpression-unsigned-bitwise-right-additiveexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shortcircuitexpression-question-assignmentexpression-else-assignmentexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shortcircuitexpression-question-assignmentexpression-else-assignmentexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-shortcircuitexpression-question-assignmentexpression-else-assignmentexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-delete-unaryexpression.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-exclamation-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-exclamation-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-exclamation-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-minus-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-minus-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-minus-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-plus-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-plus-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-plus-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-tilde-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-tilde-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-tilde-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-typeof-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-typeof-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-typeof-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-void-unaryexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-void-unaryexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-void-unaryexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-updateexpression-star-star-exponentiationexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-updateexpression-star-star-exponentiationexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-updateexpression-star-star-exponentiationexpression-2.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-yieldexpression-0.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/parenthesized-yieldexpression-1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/simple-basic-identifierreference-arguments.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/simple-basic-identifierreference-await.js
+    expectedClassification: pass
+    dependencies: [expression-operators, var-bindings]
+  - path: test/language/expressions/assignmenttargettype/simple-basic-identifierreference-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/assignmenttargettype/simple-basic-identifierreference-yield.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/assignmenttargettype/simple-complex-callexpression-expression.js
+    expectedClassification: pass
+    dependencies: [expression-operators, functions, lexical-bindings]
+  - path: test/language/expressions/assignmenttargettype/simple-complex-callexpression.identifiername.js
+    expectedClassification: pass
+    dependencies: [expression-operators, functions, lexical-bindings]
+  - path: test/language/expressions/assignmenttargettype/simple-complex-memberexpression-expression.js
+    expectedClassification: pass
+    dependencies: [expression-operators, functions, lexical-bindings]
+  - path: test/language/expressions/assignmenttargettype/simple-complex-memberexpression.identifiername.js
+    expectedClassification: pass
+    dependencies: [expression-operators, functions, lexical-bindings]
+  - path: test/language/expressions/async-arrow-function/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings, functions]
+  - path: test/language/expressions/async-arrow-function/arrow-returns-promise.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-arrow-function/async-lineterminator-identifier-throws.js
+    expectedClassification: pass
+    dependencies: [async-functions, error-intrinsics, functions]
+  - path: test/language/expressions/async-arrow-function/await-as-binding-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, var-bindings]
+  - path: test/language/expressions/async-arrow-function/await-as-binding-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, var-bindings]
+  - path: test/language/expressions/async-arrow-function/await-as-identifier-reference-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/await-as-identifier-reference.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/await-as-label-identifier-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/await-as-label-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/await-as-param-ident-nested-arrow-parameter-position.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
   - path: test/language/expressions/async-arrow-function/await-as-param-nested-arrow-body-position.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-arrow-function/await-as-param-nested-arrow-parameter-position.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/await-as-param-rest-nested-arrow-parameter-position.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, rest-parameters]
+  - path: test/language/expressions/async-arrow-function/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, default-parameters, functions]
+  - path: test/language/expressions/async-arrow-function/dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, default-parameters, functions, rest-parameters]
+  - path: test/language/expressions/async-arrow-function/dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-NSPL-with-USD.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
   - path: test/language/expressions/async-arrow-function/early-errors-arrow-arguments-in-formal-parameters.js
     expectedClassification: expected-negative
     dependencies: [async-functions, functions, object-properties]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-await-in-formals-default.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-await-in-formals.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-body-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-body-contains-super-property.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-duplicate-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-eval-in-formal-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-formals-body-duplicate.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-formals-contains-super-call.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-formals-contains-super-property.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/early-errors-arrow-formals-lineterminator.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/escaped-async-line-terminator.js
+    expectedClassification: pass
+    dependencies: [async-functions, error-intrinsics, functions]
+  - path: test/language/expressions/async-arrow-function/escaped-async.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/eval-var-scope-syntax-err.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/forbidden-ext/b1/async-arrow-function-forbidden-ext-direct-access-prop-arguments.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-arrow-function/forbidden-ext/b1/async-arrow-function-forbidden-ext-direct-access-prop-caller.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-arrow-function/forbidden-ext/b2/async-arrow-function-forbidden-ext-indirect-access-own-prop-caller-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/forbidden-ext/b2/async-arrow-function-forbidden-ext-indirect-access-own-prop-caller-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/forbidden-ext/b2/async-arrow-function-forbidden-ext-indirect-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/name.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions]
+  - path: test/language/expressions/async-arrow-function/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, destructuring-bindings, functions]
+  - path: test/language/expressions/async-arrow-function/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-arrow-function/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-arrow-function/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, rest-parameters]
+  - path: test/language/expressions/async-arrow-function/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, rest-parameters]
+  - path: test/language/expressions/async-arrow-function/try-reject-finally-reject.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-reject-finally-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-reject-finally-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-return-finally-reject.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-return-finally-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-return-finally-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-throw-finally-reject.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-throw-finally-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/try-throw-finally-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/unscopables-with-in-nested-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-arrow-function/unscopables-with.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/await-as-binding-identifier-escaped.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
@@ -59178,6 +60467,99 @@ tests:
   - path: test/language/expressions/async-function/escaped-async.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-function/expression-returns-promise.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/forbidden-ext/b1/async-func-expr-named-forbidden-ext-direct-access-prop-arguments.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/forbidden-ext/b1/async-func-expr-named-forbidden-ext-direct-access-prop-caller.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/forbidden-ext/b1/async-func-expr-nameless-forbidden-ext-direct-access-prop-arguments.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/forbidden-ext/b1/async-func-expr-nameless-forbidden-ext-direct-access-prop-caller.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/forbidden-ext/b2/async-func-expr-named-forbidden-ext-indirect-access-own-prop-caller-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/forbidden-ext/b2/async-func-expr-named-forbidden-ext-indirect-access-own-prop-caller-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/forbidden-ext/b2/async-func-expr-named-forbidden-ext-indirect-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/forbidden-ext/b2/async-func-expr-nameless-forbidden-ext-indirect-access-own-prop-caller-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/forbidden-ext/b2/async-func-expr-nameless-forbidden-ext-indirect-access-own-prop-caller-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/forbidden-ext/b2/async-func-expr-nameless-forbidden-ext-indirect-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/name.js
     expectedClassification: pass
     dependencies: [async-functions, functions]
@@ -59202,18 +60584,111 @@ tests:
   - path: test/language/expressions/async-function/named-await-as-label-identifier.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-function/named-dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/named-dflt-params-arg-val-undefined.js
     expectedClassification: pass
     dependencies: [async-functions, default-parameters]
   - path: test/language/expressions/async-function/named-dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
+  - path: test/language/expressions/async-function/named-dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-dflt-params-ref-prior.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/named-dflt-params-rest.js
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
+  - path: test/language/expressions/async-function/named-dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-eval-var-scope-syntax-err.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/named-object-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, destructuring-bindings]
+  - path: test/language/expressions/async-function/named-params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/named-params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/named-reassign-fn-name-in-body-in-arrow.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/expressions/async-function/named-reassign-fn-name-in-body-in-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [async-functions, dynamic-source, functions, lexical-bindings]
+  - path: test/language/expressions/async-function/named-reassign-fn-name-in-body.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, lexical-bindings]
   - path: test/language/expressions/async-function/named-rest-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, rest-parameters]
@@ -59223,33 +60698,326 @@ tests:
   - path: test/language/expressions/async-function/named-returns-async-arrow-returns-arguments-from-parent-function.js
     expectedClassification: pass
     dependencies: [async-functions, functions, object-properties]
+  - path: test/language/expressions/async-function/named-returns-async-arrow-returns-newtarget.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-returns-async-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/named-returns-async-function-returns-arguments-from-own-function.js
     expectedClassification: pass
     dependencies: [async-functions, functions, object-properties]
+  - path: test/language/expressions/async-function/named-returns-async-function-returns-newtarget.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-returns-async-function.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-strict-error-reassign-fn-name-in-body-in-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-strict-error-reassign-fn-name-in-body-in-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-strict-error-reassign-fn-name-in-body.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-unscopables-with-in-nested-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/named-unscopables-with.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/nameless-array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, destructuring-bindings]
+  - path: test/language/expressions/async-function/nameless-dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/nameless-dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/nameless-dflt-params-arg-val-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/nameless-dflt-params-duplicates.js
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
+  - path: test/language/expressions/async-function/nameless-dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/nameless-dflt-params-ref-prior.js
     expectedClassification: pass
     dependencies: [async-functions, default-parameters]
+  - path: test/language/expressions/async-function/nameless-dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/nameless-dflt-params-rest.js
     expectedClassification: expected-negative
     dependencies: [async-functions, default-parameters]
+  - path: test/language/expressions/async-function/nameless-dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        default-parameters,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/nameless-eval-var-scope-syntax-err.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        default-parameters,
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/nameless-object-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, destructuring-bindings]
+  - path: test/language/expressions/async-function/nameless-params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
+  - path: test/language/expressions/async-function/nameless-params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, promise-settlement, var-bindings]
   - path: test/language/expressions/async-function/nameless-rest-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, rest-parameters]
   - path: test/language/expressions/async-function/nameless-rest-params-trailing-comma-early-error.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/async-function/nameless-unscopables-with-in-nested-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/nameless-unscopables-with.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        control-flow,
+        functions,
+        lexical-bindings,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-function/syntax-expression-is-PrimaryExpression.js
     expectedClassification: pass
     dependencies: [async-functions]
+  - path: test/language/expressions/async-function/try-reject-finally-reject.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-reject-finally-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-reject-finally-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-return-finally-reject.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-return-finally-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-return-finally-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-throw-finally-reject.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-throw-finally-return.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-function/try-throw-finally-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-generator/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
@@ -60510,6 +62278,140 @@ tests:
   - path: test/language/expressions/async-generator/expression-yield-star-before-newline.js
     expectedClassification: pass
     dependencies: [async-iteration, iterator-protocol]
+  - path: test/language/expressions/async-generator/forbidden-ext/b1/async-gen-func-expr-forbidden-ext-direct-access-prop-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b1/async-gen-func-expr-forbidden-ext-direct-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b1/async-gen-named-func-expr-forbidden-ext-direct-access-prop-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b1/async-gen-named-func-expr-forbidden-ext-direct-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        promise-settlement,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b2/async-gen-func-expr-forbidden-ext-indirect-access-own-prop-caller-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b2/async-gen-func-expr-forbidden-ext-indirect-access-own-prop-caller-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b2/async-gen-func-expr-forbidden-ext-indirect-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b2/async-gen-named-func-expr-forbidden-ext-indirect-access-own-prop-caller-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b2/async-gen-named-func-expr-forbidden-ext-indirect-access-own-prop-caller-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/async-generator/forbidden-ext/b2/async-gen-named-func-expr-forbidden-ext-indirect-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        object-properties,
+        promise-settlement,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/async-generator/generator-created-after-decl-inst.js
     expectedClassification: pass
     dependencies: [async-iteration]
@@ -60567,6 +62469,37 @@ tests:
   - path: test/language/expressions/async-generator/named-eval-var-scope-syntax-err.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-iteration]
+  - path: test/language/expressions/async-generator/named-no-strict-reassign-fn-name-in-body-in-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/async-generator/named-no-strict-reassign-fn-name-in-body-in-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        dynamic-source,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/async-generator/named-no-strict-reassign-fn-name-in-body.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
   - path: test/language/expressions/async-generator/named-object-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
@@ -60582,6 +62515,43 @@ tests:
   - path: test/language/expressions/async-generator/named-rest-params-trailing-comma-early-error.js
     expectedClassification: expected-negative
     dependencies: [async-iteration]
+  - path: test/language/expressions/async-generator/named-strict-error-reassign-fn-name-in-body-in-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        async-iteration,
+        error-intrinsics,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/async-generator/named-strict-error-reassign-fn-name-in-body-in-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        async-iteration,
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
+  - path: test/language/expressions/async-generator/named-strict-error-reassign-fn-name-in-body.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        async-iteration,
+        error-intrinsics,
+        functions,
+        generators,
+        lexical-bindings,
+      ]
   - path: test/language/expressions/async-generator/named-unscopables-with-in-nested-fn.js
     expectedClassification: pass
     dependencies: [async-iteration]
@@ -61071,24 +63041,258 @@ tests:
   - path: test/language/expressions/async-generator/yield-thenable-create-resolving-functions-resolve.js
     expectedClassification: pass
     dependencies: [async-iteration]
+  - path: test/language/expressions/await/async-await-interleaved.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, functions, lexical-bindings, promise-settlement]
+  - path: test/language/expressions/await/async-generator-interleaved.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        promise-settlement,
+      ]
   - path: test/language/expressions/await/await-BindingIdentifier-in-global.js
     expectedClassification: pass
     dependencies: [async-functions]
   - path: test/language/expressions/await/await-BindingIdentifier-nested.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/await/await-awaits-thenable-not-callable.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, var-bindings]
+  - path: test/language/expressions/await/await-awaits-thenables-that-throw.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, async-functions, functions, var-bindings]
+  - path: test/language/expressions/await/await-awaits-thenables.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, var-bindings]
   - path: test/language/expressions/await/await-in-function.js
     expectedClassification: pass
     dependencies: [async-functions]
+  - path: test/language/expressions/await/await-in-generator.js
+    expectedClassification: pass
+    dependencies: [functions, generators]
+  - path: test/language/expressions/await/await-in-global.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/language/expressions/await/await-in-nested-function.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, var-bindings]
+  - path: test/language/expressions/await/await-in-nested-generator.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, generators, var-bindings]
+  - path: test/language/expressions/await/await-monkey-patched-promise.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        promise-settlement,
+      ]
   - path: test/language/expressions/await/await-non-promise-thenable.js
     expectedClassification: pass
     dependencies: [async-functions]
+  - path: test/language/expressions/await/await-non-promise.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, functions, lexical-bindings, promise-settlement]
+  - path: test/language/expressions/await/await-throws-rejections.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        async-functions,
+        functions,
+        promise-settlement,
+        var-bindings,
+      ]
   - path: test/language/expressions/await/early-errors-await-not-simple-assignment-target.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/await/for-await-of-interleaved.js
+    expectedClassification: pass
+    dependencies:
+      [
+        async-functions,
+        async-iteration,
+        control-flow,
+        functions,
+        generators,
+        lexical-bindings,
+        promise-settlement,
+      ]
   - path: test/language/expressions/await/no-operand.js
     expectedClassification: expected-negative
     dependencies: [async-functions]
+  - path: test/language/expressions/await/syntax-await-has-UnaryExpression-with-MultiplicativeExpression.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, functions, lexical-bindings, promise-settlement]
+  - path: test/language/expressions/await/syntax-await-has-UnaryExpression.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/expressions/await/syntax-await-in-ConditionalExpression.js
+    expectedClassification: pass
+    dependencies:
+      [async-functions, functions, lexical-bindings, promise-settlement]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        dynamic-source,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.1_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.1_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.1_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.2_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.3_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.4_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.4_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A2.4_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T1.1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T1.2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T1.3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T1.4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T1.5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.6.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.7.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.8.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/S11.10.1_A3_T2.9.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-and/bigint-and-number.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, error-intrinsics, expression-operators, functions]
   - path: test/language/expressions/bitwise-and/bigint-errors.js
     expectedClassification: pass
     dependencies:
@@ -61097,6 +63301,16 @@ tests:
         error-intrinsics,
         expression-operators,
         object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-and/bigint-non-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        expression-operators,
+        functions,
         symbols,
       ]
   - path: test/language/expressions/bitwise-and/bigint-toprimitive.js
@@ -61109,12 +63323,274 @@ tests:
         object-properties,
         symbols,
       ]
+  - path: test/language/expressions/bitwise-and/bigint-wrapped-values.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, functions, symbols]
   - path: test/language/expressions/bitwise-and/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/bitwise-and/order-of-evaluation.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        dynamic-source,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A2.1_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A2.1_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A2.2_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A3_T1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A3_T2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A3_T3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A3_T4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S11.4.8_A3_T5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S9.5_A2.1_T2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S9.5_A2.2_T2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S9.5_A2.3_T2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/S9.5_A3.1_T4.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-not/S9.5_A3.2_T2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-not/bigint-non-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        expression-operators,
+        functions,
+        symbols,
+      ]
   - path: test/language/expressions/bitwise-not/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        dynamic-source,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.1_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.1_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.1_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.2_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.3_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.4_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.4_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A2.4_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T1.1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T1.2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T1.3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T1.4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T1.5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.6.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.7.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.8.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.9.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-or/bigint-and-number.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, error-intrinsics, expression-operators, functions]
   - path: test/language/expressions/bitwise-or/bigint-errors.js
     expectedClassification: pass
     dependencies:
@@ -61123,6 +63599,16 @@ tests:
         error-intrinsics,
         expression-operators,
         object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-or/bigint-non-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        expression-operators,
+        functions,
         symbols,
       ]
   - path: test/language/expressions/bitwise-or/bigint-toprimitive.js
@@ -61135,9 +63621,173 @@ tests:
         object-properties,
         symbols,
       ]
+  - path: test/language/expressions/bitwise-or/bigint-wrapped-values.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, functions, symbols]
   - path: test/language/expressions/bitwise-or/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/bitwise-or/order-of-evaluation.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        dynamic-source,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.1_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.1_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.1_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.2_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.3_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.4_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.4_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A2.4_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T1.1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T1.2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T1.3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T1.4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T1.5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.6.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.7.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.8.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A3_T2.9.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
+  - path: test/language/expressions/bitwise-xor/bigint-and-number.js
+    expectedClassification: pass
+    dependencies:
+      [bigint-primitive, error-intrinsics, expression-operators, functions]
   - path: test/language/expressions/bitwise-xor/bigint-errors.js
     expectedClassification: pass
     dependencies:
@@ -61146,6 +63796,16 @@ tests:
         error-intrinsics,
         expression-operators,
         object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/bitwise-xor/bigint-non-primitive.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        bigint-primitive,
+        expression-operators,
+        functions,
         symbols,
       ]
   - path: test/language/expressions/bitwise-xor/bigint-toprimitive.js
@@ -61158,24 +63818,348 @@ tests:
         object-properties,
         symbols,
       ]
+  - path: test/language/expressions/bitwise-xor/bigint-wrapped-values.js
+    expectedClassification: pass
+    dependencies: [bigint-primitive, expression-operators, functions, symbols]
   - path: test/language/expressions/bitwise-xor/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/bitwise-xor/order-of-evaluation.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/11.2.3-3_1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions, var-bindings]
+  - path: test/language/expressions/call/11.2.3-3_2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions, var-bindings]
+  - path: test/language/expressions/call/11.2.3-3_3.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions, var-bindings]
+  - path: test/language/expressions/call/11.2.3-3_4.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/11.2.3-3_5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/11.2.3-3_6.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/11.2.3-3_7.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/11.2.3-3_8.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, error-intrinsics, functions, var-bindings]
+  - path: test/language/expressions/call/S11.2.3_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [abrupt-completion, control-flow, dynamic-source, functions]
+  - path: test/language/expressions/call/S11.2.3_A2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, error-intrinsics, functions]
+  - path: test/language/expressions/call/S11.2.3_A3_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A3_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A3_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A3_T4.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A3_T5.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A4_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A4_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A4_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/S11.2.3_A4_T4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, error-intrinsics, functions]
+  - path: test/language/expressions/call/S11.2.3_A4_T5.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, error-intrinsics, functions]
+  - path: test/language/expressions/call/S11.2.4_A1.1_T1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, functions]
+  - path: test/language/expressions/call/S11.2.4_A1.1_T2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, functions]
+  - path: test/language/expressions/call/S11.2.4_A1.2_T1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, functions, var-bindings]
+  - path: test/language/expressions/call/S11.2.4_A1.2_T2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, functions, var-bindings]
+  - path: test/language/expressions/call/S11.2.4_A1.3_T1.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/expressions/call/S11.2.4_A1.4_T1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/call/S11.2.4_A1.4_T2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, error-intrinsics, functions]
+  - path: test/language/expressions/call/S11.2.4_A1.4_T3.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, functions]
+  - path: test/language/expressions/call/S11.2.4_A1.4_T4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, functions, var-bindings]
+  - path: test/language/expressions/call/eval-err-args.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, functions]
+  - path: test/language/expressions/call/eval-first-arg.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [abrupt-completion, control-flow, dynamic-source, functions, var-bindings]
+  - path: test/language/expressions/call/eval-no-args.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/language/expressions/call/eval-spread-empty-leading.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [dynamic-source, functions, iterator-protocol, symbols, var-bindings]
+  - path: test/language/expressions/call/eval-spread-empty-trailing.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [dynamic-source, functions, iterator-protocol, symbols, var-bindings]
+  - path: test/language/expressions/call/eval-spread-empty.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [dynamic-source, functions, iterator-protocol, symbols, var-bindings]
+  - path: test/language/expressions/call/eval-spread.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        control-flow,
+        dynamic-source,
+        functions,
+        iterator-protocol,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/eval-strictness-inherit-non-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
+  - path: test/language/expressions/call/eval-strictness-inherit-strict.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [control-flow, dynamic-source, error-intrinsics, functions, var-bindings]
+  - path: test/language/expressions/call/scope-lex-close.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/expressions/call/scope-lex-open.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/expressions/call/scope-var-close.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/call/scope-var-open.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/call/spread-err-mult-err-expr-throws.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, generators, iterator-protocol]
+  - path: test/language/expressions/call/spread-err-mult-err-iter-get-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/call/spread-err-mult-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-err-mult-err-itr-get-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/call/spread-err-mult-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-err-mult-err-itr-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/spread-err-mult-err-obj-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, functions, object-literals, object-properties]
+  - path: test/language/expressions/call/spread-err-mult-err-unresolvable.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, iterator-protocol]
+  - path: test/language/expressions/call/spread-err-sngl-err-expr-throws.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, generators, iterator-protocol]
   - path: test/language/expressions/call/spread-err-sngl-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-err-sngl-err-itr-get-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/call/spread-err-sngl-err-itr-get-value.js
     expectedClassification: pass
     dependencies: [error-intrinsics, iterator-protocol]
   - path: test/language/expressions/call/spread-err-sngl-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/call/spread-err-sngl-err-itr-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/spread-err-sngl-err-obj-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, functions, object-literals, object-properties]
+  - path: test/language/expressions/call/spread-err-sngl-err-unresolvable.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, iterator-protocol]
+  - path: test/language/expressions/call/spread-mult-empty.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/language/expressions/call/spread-mult-expr.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/language/expressions/call/spread-mult-iter.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, symbols, var-bindings]
+  - path: test/language/expressions/call/spread-mult-literal.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
   - path: test/language/expressions/call/spread-mult-obj-ident.js
     expectedClassification: pass
     dependencies: [iterator-protocol, object-literals, object-properties]
@@ -61191,6 +64175,16 @@ tests:
   - path: test/language/expressions/call/spread-obj-getter-init.js
     expectedClassification: pass
     dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-manipulate-outter-obj-in-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/call/spread-obj-mult-spread-getter.js
     expectedClassification: pass
     dependencies: [iterator-protocol, object-literals]
@@ -61206,12 +64200,76 @@ tests:
   - path: test/language/expressions/call/spread-obj-overrides-prev-properties.js
     expectedClassification: pass
     dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/spread-obj-spread-order.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/spread-obj-symbol-property.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/call/spread-obj-undefined.js
     expectedClassification: pass
     dependencies: [iterator-protocol, object-literals]
+  - path: test/language/expressions/call/spread-obj-with-overrides.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/call/spread-sngl-empty.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/language/expressions/call/spread-sngl-expr.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
+  - path: test/language/expressions/call/spread-sngl-iter.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, symbols, var-bindings]
+  - path: test/language/expressions/call/spread-sngl-literal.js
+    expectedClassification: pass
+    dependencies: [functions, iterator-protocol, var-bindings]
   - path: test/language/expressions/call/spread-sngl-obj-ident.js
     expectedClassification: pass
     dependencies: [iterator-protocol, object-literals, object-properties]
+  - path: test/language/expressions/call/trailing-comma.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/call/with-base-obj.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, object-properties, var-bindings]
   - path: test/language/expressions/class/accessor-name-inst-computed-in.js
     expectedClassification: pass
     dependencies: [classes, object-properties]

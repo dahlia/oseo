@@ -97,6 +97,32 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/call/eval-strictness-inherit-non-strict.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - functions
+      - var-bindings
+    observation:
+      detail: "test/language/expressions/call/eval-strictness-inherit-non-str\
+        ict.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/call/eval-strictness-inherit\
+        -non-strict.js:95:1: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
