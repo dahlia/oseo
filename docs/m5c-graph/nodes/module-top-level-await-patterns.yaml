@@ -1,0 +1,15 @@
+version: 1
+id: module-top-level-await-patterns
+title: Admit await in module top-level patterns
+delivers:
+  "Owns test/language/module-code/top-level-await/syntax/catch-parameter.js,
+  now observed as OSEO1001: Await inside a module top-level binding or
+  assignment pattern is unsupported. Admits await expressions inside module
+  top-level binding and assignment patterns, such as a catch parameter
+  default, under the full PLAN-M5.md evidence contract, or reports that the
+  gap needs a maintainer decision. Already-reviewed paths it affects may
+  move only toward pass."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

@@ -1624,6 +1624,13 @@ export interface Test262CaseLocation {
   readonly sourcePath: string;
 }
 
+/**
+ * ADR 0016 and the 2026-10-07 maintainer decision require observations of
+ * dynamic import's existing rejection, without admitting the feature.
+ * Only these frontmatter gaps may reach the compiler for observation.
+ */
+const observeOnlyFeatures: ReadonlySet<string> = new Set(["dynamic-import"]);
+
 /** Execute and classify one parsed upstream case. */
 export async function executeTest262Case(
   source: string,
@@ -1636,11 +1643,20 @@ export async function executeTest262Case(
 ): Promise<Test262Result> {
   const evidence: Test262Evidence = { dependencies };
   const unsupported = parsed.case.features.some(
-    (feature) => !supportedFeatures.has(feature),
+    (feature) =>
+      !supportedFeatures.has(feature) && !observeOnlyFeatures.has(feature),
   );
   if (unsupported) {
     return unsupportedResult(parsed.case, supportedFeatures, evidence);
   }
+  // Classification follows the observation for this bounded cohort. The
+  // checked-in supportedFeatures list stays unchanged; a tagged case without
+  // import() can pass, while an actual import rejection stays unsupported.
+  const observedFeatures = parsed.case.features.some((feature) =>
+    observeOnlyFeatures.has(feature),
+  )
+    ? new Set([...supportedFeatures, ...observeOnlyFeatures])
+    : supportedFeatures;
   const hostCapability = unsupportedHostCapability(parsed);
   if (hostCapability != null) {
     return classifyTest262(
@@ -1650,7 +1666,7 @@ export async function executeTest262Case(
         passed: false,
         unsupportedCapability: hostCapability.capability,
       },
-      supportedFeatures,
+      observedFeatures,
       evidence,
     );
   }
@@ -1669,7 +1685,7 @@ export async function executeTest262Case(
         passed: false,
         unsupportedCapability: "harness-include",
       },
-      supportedFeatures,
+      observedFeatures,
       evidence,
     );
   }
@@ -1686,7 +1702,7 @@ export async function executeTest262Case(
         passed: false,
         unsupportedCapability: structuralCapability.capability,
       },
-      supportedFeatures,
+      observedFeatures,
       evidence,
     );
   }
@@ -1699,7 +1715,7 @@ export async function executeTest262Case(
           failureKind: "harness",
           passed: false,
         },
-        supportedFeatures,
+        observedFeatures,
         evidence,
       );
     }
@@ -1710,7 +1726,7 @@ export async function executeTest262Case(
       return await moduleNegativeResult(
         source,
         parsed,
-        supportedFeatures,
+        observedFeatures,
         evidence,
         harnesses,
         location.sourcePath,
@@ -1720,7 +1736,7 @@ export async function executeTest262Case(
     return await executedResult(
       source,
       parsed,
-      supportedFeatures,
+      observedFeatures,
       harnesses,
       executor,
       dependencies,
@@ -1729,17 +1745,12 @@ export async function executeTest262Case(
     );
   }
   if (parsed.case.expectedFailurePhase === "parse") {
-    return parseNegativeResult(
-      source,
-      parsed.case,
-      supportedFeatures,
-      evidence,
-    );
+    return parseNegativeResult(source, parsed.case, observedFeatures, evidence);
   }
   return await executedResult(
     source,
     parsed,
-    supportedFeatures,
+    observedFeatures,
     harnesses,
     executor,
     dependencies,

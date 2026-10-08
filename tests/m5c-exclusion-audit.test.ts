@@ -54,7 +54,11 @@ const records = new Map(
   ]),
 );
 
-function fixture(remediation = false) {
+function fixture(
+  remediation = false,
+  sourceText = source,
+  observed = observation,
+) {
   const recordsEvidence = Object.fromEntries(
     [...records].map(([stem, text]) => [
       stem,
@@ -103,8 +107,8 @@ function fixture(remediation = false) {
         path,
         proposedOwner: owner,
         priorCohort: "source-subject",
-        sourceDigest: exclusionAuditDigest(source),
-        observationDigest: exclusionObservationDigest(observation),
+        sourceDigest: exclusionAuditDigest(sourceText),
+        observationDigest: exclusionObservationDigest(observed),
         missingDynamicTag: true,
         section: "sec-performeval",
         subject: "Direct source evaluation",
@@ -125,9 +129,9 @@ function fixture(remediation = false) {
       ownerNotes: new Map(),
       suiteRevision: revision,
     },
-    results: [result],
+    results: [{ ...result, observation: observed }],
     records,
-    sources: new Map([[path, source]]),
+    sources: new Map([[path, sourceText]]),
   };
   return { audit, inputs };
 }
@@ -139,6 +143,88 @@ test("accepted bounded rejection and tag debt are counted separately", () => {
     remediation: 0,
     missingDynamicTags: 1,
   });
+});
+
+test("exact parse-time dynamic import rejection accepts either owner", () => {
+  for (const remediation of [false, true]) {
+    for (const mode of ["script", "module"] as const) {
+      const { audit, inputs } = fixture(remediation, 'import("x");', {
+        ...observation,
+        detail:
+          'failed (1): stdout="" stderr="test/example.js:1:1: ' +
+          'error[OSEO1001]: ImportExpression is outside the M1 profile.\\n"',
+      });
+      assert.deepEqual(
+        validateM5cExclusionAudit(stringifyYaml(audit), {
+          ...inputs,
+          results: [
+            {
+              ...inputs.results[0]!,
+              case: {
+                ...result.case,
+                mode,
+                features: ["dynamic-import"],
+              },
+            },
+          ],
+        }),
+        {
+          exclusions: remediation ? 0 : 1,
+          remediation: remediation ? 1 : 0,
+          missingDynamicTags: 1,
+        },
+      );
+    }
+  }
+});
+
+test("near-miss dynamic import diagnostics remain outside the surface", () => {
+  for (const detail of [
+    "error[OSEO1001]: ImportDeclaration is outside the M1 profile.",
+    "error[OSEO1001]: ImportExpression is outside the M4 profile.",
+    "error[OSEO1001]: ImportExpression is outside the M1 profile. Extra text.",
+    "error[OSEO2001]: ImportExpression is outside the M1 profile.",
+  ]) {
+    const { audit, inputs } = fixture(false, 'import("x");', {
+      ...observation,
+      detail,
+    });
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+      /outside the record surface/u,
+      detail,
+    );
+  }
+});
+
+test("dynamic import tag debt must match the reviewed dependencies", () => {
+  const { audit, inputs } = fixture(false, 'import("x");', {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  });
+  const tagged: M5cExclusionAuditInputs = {
+    ...inputs,
+    results: [
+      {
+        ...inputs.results[0]!,
+        dependencies: [...result.dependencies, "dynamic-source"],
+      },
+    ],
+  };
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), tagged),
+    /dependency-tag debt changed/u,
+  );
+  audit.paths[0]!.missingDynamicTag = false;
+  assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), tagged), {
+    exclusions: 1,
+    remediation: 0,
+    missingDynamicTags: 0,
+  });
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+    /dependency-tag debt changed/u,
+  );
 });
 
 test("unresolved non-source coverage requires remediation ownership", () => {

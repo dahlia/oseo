@@ -3,11 +3,14 @@ id: dynamic-import
 title: Account dynamic import as unsupported
 delivers: "Implements the maintainer decision of 2026-10-07 (option C, interim
   A): dynamic import is NOT admitted and ADR 0016 is unchanged. Makes the 629
-  unreviewed paths whose frontmatter needs dynamic-import observable as
-  reviewed unsupported-profile-feature results through the existing parse-time
-  OSEO1001 rejection: extends the dynamicSurface predicate in
+  unreviewed paths whose frontmatter needs dynamic-import observable with
+  their actual classifications; dynamic import calls remain unsupported
+  through the existing parse-time OSEO1001 rejection. Extends the
+  dynamicSurface predicate in
   tools/m5c-exclusion-audit.ts to accept that exact dynamic import rejection
-  with tests, and records the ownership rule the observation batches apply
+  with tests, executes frontmatter dynamic-import cases through an explicit
+  observe-only runner set without adding supportedFeatures, and records the
+  ownership rule the observation batches apply
   (adr:0016-dynamic-source-boundary only when import() itself is the test's
   subject, node:dynamic-source-coverage-remediation when it is incidental,
   each with an exclusion-audit record). Admits no paths itself;
