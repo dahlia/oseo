@@ -43,6 +43,50 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/assignmenttargettype/direct-relationalexpression-in-shiftexpression-2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/async-arrow-function/early-errors-arrow-formals-contains-super-property.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
       async: true
       features:
         - async-iteration
@@ -76,6 +120,101 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/bitwise-or/S11.10.3_A3_T2.5.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Symbol.toPrimitive
+        - computed-property-names
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/bitwise-or/bigint-wrapped-values.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - bigint-primitive
+      - expression-operators
+      - functions
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/bitwise-xor/S11.10.2_A1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - dynamic-source
+      - expression-operators
+      - functions
+    observation:
+      detail: "test/language/expressions/bitwise-xor/S11.10.2_A1.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/bitwise-xor/S11.10.2_A1.js:8\
+        8:6: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false

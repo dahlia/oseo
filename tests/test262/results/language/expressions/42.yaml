@@ -99,6 +99,74 @@ results:
       async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/assignmenttargettype/parenthesized-unaryexpression-minus-unaryexpression-0.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - async-functions
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/async-arrow-function/await-as-param-rest-nested-arrow-parameter-position.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - functions
+      - rest-parameters
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/async-arrow-function/early-errors-arrow-NSPL-with-USD.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
       features:
         - async-iteration
       flags: []
