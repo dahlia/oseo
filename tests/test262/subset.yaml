@@ -55388,6 +55388,189 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [dynamic-source, error-intrinsics, functions, lexical-bindings]
+  - path: test/language/expressions/addition/S11.6.1_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [abrupt-completion, control-flow, dynamic-source, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A2.1_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/S11.6.1_A2.1_T2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, error-intrinsics, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A2.1_T3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, error-intrinsics, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A2.2_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+      ]
+  - path: test/language/expressions/addition/S11.6.1_A2.2_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/S11.6.1_A2.2_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+      ]
+  - path: test/language/expressions/addition/S11.6.1_A2.3_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/S11.6.1_A2.4_T1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
+  - path: test/language/expressions/addition/S11.6.1_A2.4_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/S11.6.1_A2.4_T3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, error-intrinsics, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A2.4_T4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T1.1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T1.2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T1.3.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T2.1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T2.2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T2.3.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T2.4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.1_T2.5.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.2_T1.1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.2_T1.2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+      ]
+  - path: test/language/expressions/addition/S11.6.1_A3.2_T2.1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.2_T2.2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.2_T2.3.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A3.2_T2.4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/addition/S11.6.1_A4_T1.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T2.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T3.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T4.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T5.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T6.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T7.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T8.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/S11.6.1_A4_T9.js
+    expectedClassification: pass
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
+  - path: test/language/expressions/addition/bigint-and-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+      ]
   - path: test/language/expressions/addition/bigint-arithmetic.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
@@ -55411,31 +55594,3028 @@ tests:
         object-properties,
         symbols,
       ]
+  - path: test/language/expressions/addition/bigint-wrapped-values.js
+    expectedClassification: pass
+    dependencies:
+      [
+        bigint-primitive,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
   - path: test/language/expressions/addition/coerce-bigint-to-string.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/addition/coerce-symbol-to-prim-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/coerce-symbol-to-prim-invocation.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/coerce-symbol-to-prim-return-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/coerce-symbol-to-prim-return-prim.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/get-symbol-to-prim-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/order-of-evaluation.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/addition/symbol-to-string.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/11.1.4-0.js
+    expectedClassification: pass
+    dependencies: [object-properties, var-bindings]
+  - path: test/language/expressions/array/11.1.4_4-5-1.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/language/expressions/array/11.1.4_5-6-1.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, var-bindings]
+  - path: test/language/expressions/array/S11.1.4_A1.1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/S11.1.4_A1.2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/S11.1.4_A1.3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/S11.1.4_A1.4.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/S11.1.4_A1.5.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/S11.1.4_A1.6.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/S11.1.4_A1.7.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/S11.1.4_A2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-err-mult-err-expr-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
+  - path: test/language/expressions/array/spread-err-mult-err-iter-get-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/array/spread-err-mult-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/array/spread-err-mult-err-itr-get-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/array/spread-err-mult-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/array/spread-err-mult-err-itr-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-err-mult-err-obj-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, functions, object-literals, object-properties]
+  - path: test/language/expressions/array/spread-err-mult-err-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, functions, iterator-protocol, object-properties]
+  - path: test/language/expressions/array/spread-err-sngl-err-expr-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+      ]
   - path: test/language/expressions/array/spread-err-sngl-err-itr-get-call.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/array/spread-err-sngl-err-itr-get-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/array/spread-err-sngl-err-itr-get-value.js
     expectedClassification: pass
     dependencies: [error-intrinsics, iterator-protocol]
   - path: test/language/expressions/array/spread-err-sngl-err-itr-step.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
+  - path: test/language/expressions/array/spread-err-sngl-err-itr-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-err-sngl-err-obj-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, functions, object-literals, object-properties]
+  - path: test/language/expressions/array/spread-err-sngl-err-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [error-intrinsics, functions, iterator-protocol, object-properties]
+  - path: test/language/expressions/array/spread-mult-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-mult-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-mult-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-mult-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-mult-obj-ident.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-mult-obj-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-mult-obj-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-getter-descriptor.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-getter-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-manipulate-outter-obj-in-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-mult-spread-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-mult-spread.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-override-immutable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-overrides-prev-properties.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-spread-order.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-symbol-property.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-obj-with-overrides.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-sngl-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-sngl-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-sngl-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-sngl-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/array/spread-sngl-obj-ident.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/ArrowFunction_restricted-properties.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/array-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties]
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties]
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-3.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties]
+  - path: test/language/expressions/arrow-function/arrow/capturing-closure-variables-1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/arrow/capturing-closure-variables-2.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/arrow/concisebody-lookahead-assignmentexpression-1.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/arrow/concisebody-lookahead-assignmentexpression-2.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/cannot-override-this-with-thisArg.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dflt-params-abrupt.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dflt-params-arg-val-not-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/arrow-function/dflt-params-arg-val-undefined.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/dflt-params-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, functions]
+  - path: test/language/expressions/arrow-function/dflt-params-ref-later.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/arrow-function/dflt-params-ref-prior.js
     expectedClassification: pass
     dependencies:
       [default-parameters, expression-operators, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/dflt-params-ref-self.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dflt-params-rest.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, functions]
+  - path: test/language/expressions/arrow-function/dflt-params-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-init-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-init-iter-get-err-array-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-init-iter-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-init-iter-no-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-elision-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-elision-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-empty-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-empty-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-rest-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-rest-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-ary-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-init-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-iter-complete.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-iter-val-array-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-obj-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-obj-prop-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-obj-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-obj-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elem-obj-val-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elision-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elision-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-ary-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-ary-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-ary-rest.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-id-direct.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-id-elision-next-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-id-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-id-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/ary-ptrn-rest-obj-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-init-iter-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-init-iter-get-err-array-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-init-iter-get-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-init-iter-no-close.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-name-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-elem-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-elem-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-elision-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-elision-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-empty-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-empty-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-rest-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-rest-iter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-ary-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-hole.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-init-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-iter-complete.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-iter-done.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-iter-val-array-prototype.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-id-iter-val.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-obj-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-obj-prop-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-obj-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-obj-val-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elem-obj-val-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elision-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elision-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-ary-elem.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-ary-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-ary-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-ary-rest.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-id-direct.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-id-elision-next-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-id-elision.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-id-exhausted.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-id-iter-step-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-id-iter-val-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-init-ary.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-init-id.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-init-obj.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-not-final-ary.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-not-final-id.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-not-final-obj.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-obj-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-ary-ptrn-rest-obj-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-init-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-init-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-init-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-list-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-ary-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-ary-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-ary-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-ary.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-eval-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        default-parameters,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-id-init-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-obj-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-obj-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-obj-value-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-prop-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-rest-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/dflt-obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-init-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-init-undefined.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-empty.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-fn-name-arrow.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-fn-name-class.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-fn-name-cover.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-fn-name-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-fn-name-gen.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-init-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-list-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-ary-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-ary-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-ary-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-ary.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-eval-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-id-get-value-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-id-init-skipped.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-id-init-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        destructuring-bindings,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-id-init-unresolvable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-id-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-id-trailing-comma.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-id.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-obj-init.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-obj-value-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-obj-value-undef.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-prop-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-rest-getter.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-rest-skip-non-enumerable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/obj-ptrn-rest-val-obj.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-break-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-case-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-catch-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-class-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-const-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-continue-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-debugger-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-default-escaped-ext.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-default-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-default.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-delete-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-do-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-else-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-enum-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-export-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-extends-escaped-ext.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-extends-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-extends.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-finally-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-for-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-function-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-if-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-implements-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-import-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-in-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-instanceof-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-interface-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-let-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-new-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-package-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-private-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-protected-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-public-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-return-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-static-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-super-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-switch-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-this-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-throw-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-try-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-typeof-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-var-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-void-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-while-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/dstr/syntax-error-ident-ref-with-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/empty-function-body-returns-undefined.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/eval-var-scope-syntax-err.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        default-parameters,
+        dynamic-source,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/expression-body-implicit-return.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/extensibility.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/forbidden-ext/b1/arrow-function-forbidden-ext-direct-access-prop-arguments.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/forbidden-ext/b1/arrow-function-forbidden-ext-direct-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/forbidden-ext/b2/arrow-function-forbidden-ext-indirect-access-own-prop-caller-get.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/forbidden-ext/b2/arrow-function-forbidden-ext-indirect-access-own-prop-caller-value.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/forbidden-ext/b2/arrow-function-forbidden-ext-indirect-access-prop-caller.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/arrow-function/length-dflt.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, object-properties]
@@ -55463,36 +58643,381 @@ tests:
   - path: test/language/expressions/arrow-function/lexical-supercall-from-immediately-invoked-arrow.js
     expectedClassification: pass
     dependencies: [classes, functions, object-properties]
+  - path: test/language/expressions/arrow-function/lexical-this.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/low-precedence-expression-body-no-parens.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/name.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/expressions/arrow-function/non-strict.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/object-destructuring-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/expressions/arrow-function/object-literal-return-requires-body-parens.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/param-dflt-yield-expr.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, functions, generators]
+  - path: test/language/expressions/arrow-function/param-dflt-yield-id-non-strict.js
+    expectedClassification: pass
+    dependencies:
+      [default-parameters, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/param-dflt-yield-id-strict.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, functions]
   - path: test/language/expressions/arrow-function/params-duplicate.js
     expectedClassification: expected-negative
     dependencies: [functions]
+  - path: test/language/expressions/arrow-function/params-trailing-comma-multiple.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/params-trailing-comma-single.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
   - path: test/language/expressions/arrow-function/prototype-rules.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/rest-param-strict-body.js
+    expectedClassification: expected-negative
+    dependencies: [functions, rest-parameters]
+  - path: test/language/expressions/arrow-function/rest-params-trailing-comma-early-error.js
+    expectedClassification: expected-negative
+    dependencies: [functions, rest-parameters]
+  - path: test/language/expressions/arrow-function/scope-body-lex-distinct.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/scope-param-elem-var-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        default-parameters,
+        dynamic-source,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/scope-param-elem-var-open.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        default-parameters,
+        dynamic-source,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/scope-param-rest-elem-var-close.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        dynamic-source,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        rest-parameters,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/scope-param-rest-elem-var-open.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        dynamic-source,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        object-properties,
+        rest-parameters,
+        var-bindings,
+      ]
   - path: test/language/expressions/arrow-function/scope-paramsbody-var-close.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
   - path: test/language/expressions/arrow-function/scope-paramsbody-var-open.js
     expectedClassification: pass
     dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/statement-body-requires-braces-must-return-explicitly-missing.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/statement-body-requires-braces-must-return-explicitly.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
   - path: test/language/expressions/arrow-function/static-init-await-binding.js
     expectedClassification: expected-negative
     dependencies: [classes, functions]
   - path: test/language/expressions/arrow-function/static-init-await-reference.js
     expectedClassification: expected-negative
     dependencies: [classes, functions]
+  - path: test/language/expressions/arrow-function/strict.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-arguments.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-concisebody-assignmentexpression.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-concisebody-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-eval.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-lineterminator-concisebody-assignmentexpression.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-lineterminator-concisebody-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-bindingidentifier-yield.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-concisebody-assignmentexpression.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-concisebody-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
   - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameters-arguments.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameters-eval.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-formalparameters-yield.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-includes-rest-concisebody-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-properties,
+        rest-parameters,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-initialize-1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        default-parameters,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-initialize-2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-lineterminator-concisebody-assignmentexpression.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-lineterminator-concisebody-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-rest-concisebody-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-properties,
+        rest-parameters,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/arrowparameters-cover-rest-lineterminator-concisebody-functionbody.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-properties,
+        rest-parameters,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-identifier-futurereservedword.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-identifier-strict-futurereservedword.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-identifier.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-no-arguments.js
     expectedClassification: expected-negative
     dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-no-eval.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-no-yield.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-bindingidentifier-rest.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
   - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-arguments.js
     expectedClassification: expected-negative
     dependencies: [functions, object-properties]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-array-1.js
+    expectedClassification: expected-negative
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-array-2.js
+    expectedClassification: expected-negative
+    dependencies:
+      [destructuring-bindings, functions, iterator-protocol, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-array-3.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        destructuring-bindings,
+        functions,
+        iterator-protocol,
+        rest-parameters,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-1.js
+    expectedClassification: expected-negative
+    dependencies:
+      [destructuring-bindings, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-2.js
+    expectedClassification: expected-negative
+    dependencies:
+      [destructuring-bindings, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-3.js
+    expectedClassification: expected-negative
+    dependencies:
+      [destructuring-bindings, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-4.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        destructuring-bindings,
+        functions,
+        object-properties,
+        rest-parameters,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-5.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        destructuring-bindings,
+        functions,
+        object-properties,
+        rest-parameters,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-binding-object-6.js
+    expectedClassification: expected-negative
+    dependencies:
+      [destructuring-bindings, functions, object-properties, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates-rest.js
+    expectedClassification: expected-negative
+    dependencies: [functions, rest-parameters, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-duplicates.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-eval.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/arrowparameters-cover-no-yield.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters-expression-body.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid-parenless-parameters.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/asi-restriction-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [functions]
+  - path: test/language/expressions/arrow-function/syntax/early-errors/use-strict-with-non-simple-param.js
+    expectedClassification: expected-negative
+    dependencies: [default-parameters, functions, var-bindings]
+  - path: test/language/expressions/arrow-function/syntax/variations.js
+    expectedClassification: pass
+    dependencies: [expression-operators, functions, object-properties]
+  - path: test/language/expressions/arrow-function/throw-new.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, object-properties]
+  - path: test/language/expressions/arrow-function/unscopables-with-in-nested-fn.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/arrow-function/unscopables-with.js
+    expectedClassification: pass
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/assignment/dstr/array-elem-nested-array.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
