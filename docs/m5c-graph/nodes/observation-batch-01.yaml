@@ -12,4 +12,6 @@ dependencies:
   - cross-realm-host
   - observation-batch-plan
 landed: false
-status: blocked
+reason: "Depends on array-sort-stability, which is parked after its revert in
+  e561fd2e."
+status: parked

@@ -13,4 +13,11 @@ delivers: "Closes exactly 1 path,
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: ready
+reason: "Reverted on 2026-10-08 in e561fd2e: the merged fix broke both host C
+  sanitizer lanes in CI run 37685350484. Clang ASan builds of the 16,000-
+  and 25,000-declaration wide-script scenarios exhaust runner memory on
+  Linux (13.8 GiB of compiler memory measured locally), and the
+  compact-frame scenario overflows the C stack under ASan on macOS instead
+  of reporting OSEO2001. Branch m5c-array-sort-stability keeps the work; a
+  fix must bound sanitizer-build frame size and compile cost."
+status: parked
