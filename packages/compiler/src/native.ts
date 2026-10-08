@@ -32,9 +32,18 @@ export interface TargetDescription {
 }
 
 /** Deterministic source emitted by a replaceable native backend. */
-export interface EmittedNativeSource {
+export interface NativeSourceFile {
   readonly source: string;
   readonly sourceName: string;
+}
+
+/** Source display plus optional bounded units used for native compilation. */
+export interface EmittedNativeSource extends NativeSourceFile {
+  /**
+   * Compile these files instead of the standalone source when present.
+   * Stage the standalone source beside them under sourceName for includes.
+   */
+  readonly compilationUnits?: readonly NativeSourceFile[];
 }
 
 /** Backend boundary that never performs process execution. */

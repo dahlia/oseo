@@ -306,10 +306,11 @@ including host C sanitizers. It remains an M5 exit dependency, and the graph
 serializes its manifest regeneration with independent remediation nodes.
 
 
-Measured compiler and frame usage
----------------------------------
+Earlier compiler and frame measurements
+---------------------------------------
 
-On Linux x86-64, Clang 22.1.8 compiled the affected programs at its default
+Before accepted-body outlining, Clang 22.1.8 compiled these programs on Linux
+x86-64 at its default
 `-O0` with ASan, UBSan, debug information, and frame pointers through the
 selected `host-cc` toolchain. `/usr/bin/time -v` wrapped each generated-program
 compile and link. Builds ran serially, began with at least 20 GiB available,
@@ -327,7 +328,7 @@ from the dispatch's pre-revert reproduction; that unsafe build was not rerun.
 | 25,000-var declaration script   | Disabled | 122,768                 | 0.26          | OSEO2001 before entry   |
 | 25,000-var declaration script   | Enabled  | 122,736                 | 0.26          | OSEO2001 before entry   |
 
-The revised probes peak at 2.32 GiB, and the unchanged rejection probes peak
+Those probes peak at 2.32 GiB, and the unchanged rejection probes peak
 at 120 MiB. Both callable probes print `compact admitted` before their
 budget diagnostic; neither an immediate rejection nor a sanitizer crash
 satisfies that observation.
@@ -352,8 +353,8 @@ Raw measurements and disassembly are retained under
 */data/array-sort-sanitizer-task\_09aaf50a4a8f/*.
 
 
-Final local gates after the repair
-----------------------------------
+Earlier local gates after the frame repair
+------------------------------------------
 
 Every gate used */data/zig-cache/m5c-array-sort-stability/* and ran serially
 with `MISE_JOBS=1`.
@@ -372,3 +373,82 @@ two existing ignored tests. Extended native tests report no failures,
 skips, or todos. The twenty-case large-literal property completed in
 1,389 seconds within its unchanged 1,800-second deadline. No case count,
 seed, size limit, timeout, shard total, or frame ceiling was lowered.
+
+
+Accepted-body compiler bounds
+-----------------------------
+
+The earlier repair removed bodies that cannot enter, but left accepted bodies
+large enough to exhaust the sanitizer compiler. Its 4,096-element object
+literal emitted 10,200,891 bytes of C in 185,854 lines, and the supplemental
+host C build exceeded a 7.5 GiB safety watchdog. That censored probe has no
+complete peak RSS. Even the successful 4,096-declaration companion peaked
+above 2 GiB, as the historical table records.
+
+Large bodies now run through native C helpers with an iterative continuation
+owner. Helpers share the compact root frame, completion records, result, and
+scalar state. A spread argument view remains in shared state, and an object
+rest scratch array stays in the scope of its consuming call. Static data
+keeps one identity across helpers. Return and throw release the owner's root
+frame exactly once; helper transfers add no language calls or recursive
+native dispatch. The existing frame charge and 65,536-unit ceiling remain
+unchanged.
+
+A helper-only prototype preserved the exact 4,096-element observation under
+both policies, but Clang still peaked at 4,298,556 and 4,301,344 KiB because
+it retained the whole translation unit. The backend therefore groups helper
+definitions into compiler units and supplies their wrapper sources to native
+composition. The existing multi-source toolchain contract compiles these
+units without cross-unit LTO. Standalone C emission retains the full program
+for inspection.
+
+The bounded-unit 4,096-element fixture passes with exact output and counters
+under both policies. Serial Clang 22.1.8 ASan/UBSan builds, measured with
+`/usr/bin/time -v`, peak at 320,336 KiB with specialization disabled and
+320,636 KiB with it enabled. The 4,096-declaration companion peaks at 254,336
+and 254,376 KiB and prints 4095. The 1,000-binding callable still admits its
+base case and then reports OSEO2001; its builds peak at 220,460 and 219,932
+KiB. The unchanged 25,000-const and 25,000-var rejection builds peak at
+119,192 and 118,972 KiB, and 130,068 and 129,920 KiB, respectively.
+
+*packages/backend-c/tests/bounded-body.test.ts* covers shared scalar and
+spread-pointer lifetime, continuation edges, static identity, literal-safe
+rewrites, bounded compiler grouping, and separate generator helper namespaces
+for main and agent sources. The native
+`array-sort-outlined-generator-control` fixture combines sorting, spreads,
+object rest, generator suspension, catch, and finally across helper calls.
+Node.js and Deno both observe `511 false`, `3 false`, `7 false`, and
+`512 true`. Both generated specialization policies match that output under
+ASan/UBSan, peaking at 206,872 and 207,764 KiB.
+
+The largest generated property inputs, 4,096 elements with seven keys and
+cyclic offset two, pass both methods and both specialization policies.
+Their compiler peaks are 320,220 and 320,924 KiB for `sort`, and 320,072
+and 321,192 KiB for `toSorted`. The 2,048-element fixture peaks at 259,612
+and 260,016 KiB. These are serial `/usr/bin/time -v` observations under
+the host compiler's ASan/UBSan configuration.
+
+The complete sanitizer-native gate passes 273/273 fixtures. Every one of
+its 1,356 compiler invocations has a resource receipt; the maximum peak
+is 321,356 KiB, below the 2 GiB acceptance limit. No build triggered the
+7.5 GiB watchdog. Full regeneration passes 23,043 reviewed paths with
+19,571 passes, 1,982 expected negatives, 1,490 unsupported results, and
+zero promotions or failures. Static checks and the complete ordinary and
+extended gates pass. Ordinary Node.js reports 1,551 passes, five existing
+skips, and two existing todos; Deno reports 769 passes and two expected
+ignores. Native execution passes 273 fixtures and 274 AArch64 Linux
+cross builds. Extended native properties pass 226 tests; the twenty-case
+large-literal property completes in 300 seconds against its unchanged
+1,800-second deadline.
+
+The final fifth paired reviews return `No issues found.` from both
+`gpt-6-astra` and `claude-opus-5-5`, with unchanged protected snapshots.
+Earlier findings corrected shared spread pointers, generator symbol
+namespaces, object-rest scratch scope, and documentation. The first
+ordinary gate exposed an existing collision diagnostic contract, which
+was restored and tested before the successful complete rerun. No test
+budget, seed, size limit, timeout, shard total, or frame ceiling changed.
+
+This dispatch's raw probes, failed intermediate attempts, reviews, and gate
+receipts are retained under
+*/data/array-sort-bounded-task\_430cd5d8efa7/*.

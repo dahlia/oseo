@@ -40,6 +40,11 @@ scope:
     sanitizer IR construction. Both 25,000-declaration rejection cases remain
     under both policies, with a 4,096-declaration admitted companion. The
     1,000-binding callable first verifies that its base case can enter."
+  - "Accepted bodies use iterative native helpers sharing roots, completion
+    records, and scalar state, with bounded compilation units to limit
+    sanitizer compiler memory. The outlined generator fixture combines
+    sorting, spread calls, object rest, suspension, catch, and finally
+    across helper boundaries without changing the logical frame charge."
 owners:
   - PLAN-M5.md
 evidence:
@@ -89,6 +94,8 @@ evidence:
     references:
       - packages/backend-c/src/index.ts
       - packages/backend-c/tests/index.test.ts
+      - packages/backend-c/src/bounded-body.ts
+      - packages/backend-c/tests/bounded-body.test.ts
       - packages/runtime-c/native/runtime_array.c
       - packages/runtime-c/native/runtime_internal.h
       - packages/runtime-c/tests/intrinsic-graph.test.ts

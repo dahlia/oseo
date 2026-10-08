@@ -20,6 +20,12 @@ import { lowerFragmentPhases, scriptFragmentAbi } from "@oseo/compiler";
 
 import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
 import { encodeRegExpProgram } from "./regexp-program.ts";
+import {
+  boundBody,
+  BodyUnits,
+  bodyUnit,
+  replaceSyntax,
+} from "./bounded-body.ts";
 
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
@@ -1766,6 +1772,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
       ),
     );
   } else if (operation.kind === "object-rest") {
+    line(state, "{");
     const object = operationArgument(operation, 0);
     const excluded = operation.arguments.slice(1);
     const excludedName = renderC(
@@ -1797,6 +1804,7 @@ function emitObjectOperation(state: EmitState, operation: MirOperation): void {
           ? renderC(emittedC.objectOperation.nullStatement)
           : renderC(emittedC.common.callSuffix, excludedName)),
     );
+    line(state, "}");
   } else if (operation.kind === "object-spread") {
     const object = operationArgument(operation, 0);
     const source = operationArgument(operation, 1);
@@ -4215,6 +4223,7 @@ function emitGeneratorBody(
   completionSlots: number,
   base: Omit<EmitState, "generator" | "lines">,
   frameCost: string,
+  units?: BodyUnits,
 ): string {
   const state: EmitState = {
     ...base,
@@ -4242,7 +4251,17 @@ function emitGeneratorBody(
     line(state, renderC(emittedC.common.abruptLabel));
     line(state, renderC(emittedC.common.returnResult));
   }
-  return (
+  const ownerUnit = units?.assign(4096) ?? 0;
+  const bounded = boundBody(
+    state.lines,
+    generatorBodyName(functionValue),
+    frameCost,
+    true,
+    state.usesCompletion,
+    units,
+    ownerUnit,
+  );
+  const body =
     renderC(
       emittedC.generatorBody.staticOseoResultLine,
       generatorBodyName(functionValue),
@@ -4261,10 +4280,13 @@ function emitGeneratorBody(
     renderC(emittedC.common.voidReceiverLine) +
     renderC(
       emittedC.common.valueThenNewline,
-      state.lines.join(renderC(emittedC.common.newline)),
+      bounded?.execution ?? state.lines.join(renderC(emittedC.common.newline)),
     ) +
     "#endif\n" +
-    renderC(emittedC.common.closeBlockLine)
+    renderC(emittedC.common.closeBlockLine);
+  return (
+    (bounded?.declarations ?? "") +
+    (units == null ? body : bodyUnit(body, ownerUnit))
   );
 }
 
@@ -4278,6 +4300,7 @@ function emitFunction(
   globalObjectBindings: readonly MirGlobalObjectBinding[],
   fragmentUnit?: "harness" | "case",
   scriptName = "script",
+  units?: BodyUnits,
 ): string {
   if (functionValue.blocks.length === 0) {
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
@@ -4421,7 +4444,17 @@ function emitFunction(
     "arguments",
     "new_target",
   ]);
-  const entry =
+  const ownerUnit = units?.assign(4096) ?? 0;
+  const bounded = boundBody(
+    state.lines,
+    `oseo_body_${id}`,
+    frameCost,
+    false,
+    state.usesCompletion,
+    units,
+    ownerUnit,
+  );
+  const entrySource =
     renderC(emittedC.function.staticOseoResultOseoFunctionLine, id) +
     renderC(emittedC.common.oseoContextPointerContextLine) +
     renderC(emittedC.function.oseoValueCalleeLine) +
@@ -4449,10 +4482,13 @@ function emitFunction(
     renderC(emittedC.function.rootsAssignFrameSlotsLine) +
     renderC(
       emittedC.common.valueThenNewline,
-      state.lines.join(renderC(emittedC.common.newline)),
+      bounded?.execution ?? state.lines.join(renderC(emittedC.common.newline)),
     ) +
     "#endif\n" +
     renderC(emittedC.common.closeBlockLine);
+  const entry =
+    (bounded?.declarations ?? "") +
+    (units == null ? entrySource : bodyUnit(entrySource, ownerUnit));
   if (!generator) return entry;
   return renderC(
     emittedC.function.newline,
@@ -4463,6 +4499,7 @@ function emitFunction(
       completionSlots,
       base,
       frameCost,
+      units,
     ),
   );
 }
@@ -4584,12 +4621,56 @@ function emitAgentTables(agents: readonly MirAgentTemplate[]): string {
   return text;
 }
 
+/** Keep standalone C emission while selecting bounded native build units. */
+function nativeSource(
+  source: string,
+  sourceName: string,
+  units?: BodyUnits,
+): EmittedNativeSource {
+  if (units == null) return { source, sourceName };
+  source = replaceSyntax(
+    source,
+    /\bstatic\s+(?=OseoResult\s+oseo_(?:function|generator_body)_)/gu,
+    () => "",
+  );
+  const prefix = sourceName.replace(/[^a-zA-Z0-9]/gu, "_");
+  source = replaceSyntax(
+    source,
+    new RegExp(
+      "\\b(oseo_(?:function_(?:\\d+|script|instantiate|evaluate)|" +
+        "generator_body_\\d+[a-zA-Z0-9_]*|body_[a-zA-Z0-9_]+))\\b",
+      "gu",
+    ),
+    (identifier) => `${prefix}_${identifier}`,
+  );
+  source =
+    source.replace(
+      /\n(int main\(void\)|OseoResult oseo_agent_program_\d+\()/u,
+      "\n#if !defined(OSEO_C_BODY_UNIT) || OSEO_C_BODY_UNIT == 0\n$1",
+    ) + "\n#endif\n";
+  const compilationUnits = Array.from(
+    { length: units.count + 1 },
+    (_, unit) => ({
+      source: `#define OSEO_C_BODY_UNIT ${unit}\n#include "${sourceName}"\n`,
+      sourceName: `${sourceName.slice(0, -2)}-unit-${unit}.c`,
+    }),
+  );
+  return { source, sourceName, compilationUnits };
+}
+
 export const cBackend: NativeBackend = {
   emit(input) {
     const originalFunctions = reachableFunctions(input);
     const declaredFunctions = originalFunctions.map(compactRootIds);
     const script = compactRootIds(input.script);
     const functions = [...declaredFunctions, script];
+    const operationCount = functions.reduce(
+      (count, fn) =>
+        count +
+        fn.blocks.reduce((sum, block) => sum + block.operations.length, 0),
+      0,
+    );
+    const units = operationCount > 2048 ? new BodyUnits() : undefined;
     const globalLexicalNames = input.globalLexicalNames ?? [];
     const globalObjectBindings = input.globalObjectBindings;
     // Native-stack charges remain separate from dense heap root layouts.
@@ -4643,10 +4724,12 @@ export const cBackend: NativeBackend = {
     const declarations = functions
       .map(prototype)
       .join(renderC(emittedC.common.newline));
-    const dispatcher = emitFunctionDispatcher(
+    const dispatcherSource = emitFunctionDispatcher(
       declaredFunctions,
       functionFrameCosts,
     );
+    const dispatcher =
+      units == null ? dispatcherSource : bodyUnit(dispatcherSource, 0);
     const generatorDispatcher = emitGeneratorDispatcher(declaredFunctions);
     const functionReferences = declaredFunctions
       .map((functionValue) =>
@@ -4663,6 +4746,9 @@ export const cBackend: NativeBackend = {
           unresolvableGlobals,
           globalLexicalNames,
           globalObjectBindings,
+          undefined,
+          "script",
+          units,
         ),
       )
       .join(renderC(emittedC.common.newline));
@@ -4677,7 +4763,12 @@ export const cBackend: NativeBackend = {
     const generatorDispatcherSection =
       generatorDispatcher == null
         ? empty
-        : renderC(emittedC.common.valueThenBlankLine, generatorDispatcher);
+        : renderC(
+            emittedC.common.valueThenBlankLine,
+            units == null
+              ? generatorDispatcher
+              : bodyUnit(generatorDispatcher, 0),
+          );
     const generatorRegistration =
       generatorDispatcher == null
         ? empty
@@ -4696,8 +4787,8 @@ export const cBackend: NativeBackend = {
         generatorDispatcher == null
           ? empty
           : renderC(emittedC.agent.generatorRegistrationLine);
-      return {
-        source: renderC(
+      return nativeSource(
+        renderC(
           emittedC.agent.source,
           functionEntryType,
           declarations,
@@ -4713,8 +4804,9 @@ export const cBackend: NativeBackend = {
           scriptRootCount,
           scriptRootCount,
         ),
-        sourceName: `agent-${input.agentProgram}.c`,
-      };
+        `agent-${input.agentProgram}.c`,
+        units,
+      );
     }
     const host = input.test262Host;
     const hostTables = host == null ? empty : emitAgentTables(host.agents);
@@ -4728,14 +4820,14 @@ export const cBackend: NativeBackend = {
               : renderC(emittedC.agent.programsValue),
             host.agents.length,
           );
-    return {
-      source: renderC(
+    return nativeSource(
+      renderC(
         emittedC.program.source,
         functionEntryType,
         declarations,
         dispatcher,
         generatorDispatcherSection,
-        definitions + hostTables,
+        definitions + (units == null ? hostTables : bodyUnit(hostTables, 0)),
         functionReferences,
         functionReferences === empty ? empty : renderC(emittedC.common.newline),
         sourceId,
@@ -4746,8 +4838,9 @@ export const cBackend: NativeBackend = {
         scriptRootCount,
         observations,
       ),
-      sourceName: "generated.c",
-    };
+      "generated.c",
+      units,
+    );
   },
 };
 

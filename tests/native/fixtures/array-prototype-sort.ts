@@ -52,6 +52,10 @@ while (turn < 3) {
 `;
 }
 
+const outlinedValues = Array.from({ length: 512 }, (_, id) => 511 - id).join(
+  ",",
+);
+
 export const arrayPrototypeSortFixtures: readonly Fixture[] = [
   {
     globalScriptReference: true,
@@ -62,6 +66,29 @@ export const arrayPrototypeSortFixtures: readonly Fixture[] = [
     globalScriptReference: true,
     name: "array-sort-large-literal-4096",
     source: largeArraySortSource(4096, 7, 3, "toSorted"),
+  },
+  {
+    globalScriptReference: true,
+    name: "array-sort-outlined-generator-control",
+    source: `
+function sum(first, ...tail) { return first + tail.length; }
+function* sorted(...received) {
+  const values = [${outlinedValues}];
+  const copied = [...values];
+  copied.sort((left, right) => left - right);
+  const { kept, ...rest } = { kept: 1, extra: 2 };
+  yield sum(...copied);
+  try { throw rest.extra; }
+  catch (error) { yield error + kept; }
+  finally { yield received[0]; }
+  return values.length;
+}
+const iterator = sorted(7);
+for (let index = 0; index < 4; index = index + 1) {
+  const step = iterator.next();
+  console.log(step.value, step.done);
+}
+`,
   },
   {
     globalScriptReference: true,

@@ -23,6 +23,20 @@ non-recursive generated expression temporaries can also exhaust C stack space.
 UTF-16 string-constant units use static read-only storage rather than automatic
 compound literals, so source literal size does not enlarge a generated stack
 frame.
+Large bodies run through bounded native helpers that return continuation
+indices to an iterative owner. The owner retains roots, completion records,
+and scalar state across helper calls. Static data keeps one identity, and
+normal or abrupt completion releases the owner's root frame exactly once.
+This preserves the existing logical frame charge and 65,536-unit ceiling.
+
+The backend also supplies optional compilation units for large programs.
+Each wrapper selects a bounded group of definitions from the standalone C
+source. Native composition stages and compiles these wrappers through the
+toolchain's existing multiple-source contract, without cross-unit LTO.
+This bounds compiler IR retention as well as individual execution bodies;
+splitting functions inside one translation unit alone is insufficient for
+unoptimized sanitizer builds. The standalone source remains available for
+inspection and direct C emission.
 Function creation passes MIR-owned UTF-16 names and plain parameter counts to
 the runtime, without consulting HIR or source syntax.
 
