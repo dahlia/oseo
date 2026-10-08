@@ -1,0 +1,23 @@
+version: 1
+id: with-strict-assignment-fallback
+title: Admit strict assignment after deleting a with binding
+delivers: "Owns exactly 1 newly observed path,
+  test/language/expressions/assignment/\
+  assignment-operator-calls-putvalue-lref--rval-.js. It currently reports
+  OSEO1001: Assigning global-object name 'x' through a with fallback is
+  outside the admitted global-object profile. Admit strict-mode PutValue
+  through a with object environment whose binding was deleted during right
+  operand evaluation, reporting ReferenceError, or report that this needs a
+  maintainer decision. Follow the full PLAN-M5.md evidence contract:
+  focused examples, generated properties or an extension of existing with
+  environment properties, forced-collection evidence, both specialization
+  policies, and the normative family record and profile. Add a guard-miss
+  test reaching a compiled generic fallback if the repair touches a
+  specialized path or guard; otherwise retain the applicable guard-fallback
+  omission and its named replacement evidence. Admit the exact path and
+  regenerate the complete reviewed manifest and closure ledger.
+  Already-reviewed paths may move only toward pass."
+dependencies:
+  - observation-batch-plan
+landed: false
+status: ready

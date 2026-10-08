@@ -18,9 +18,9 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 73
-  ready: 62
-  blocked: 8
+  nodes: 76
+  ready: 64
+  blocked: 9
   parked: 3
   landed: 9
 serializationPoints:
@@ -104,9 +104,11 @@ collisions:
       - import-attributes
       - import-meta
       - iterator-helpers
+      - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
       - non-blocking-agent
+      - parenthesized-assignment-function-name
       - primitive-wrapper-objects
       - promise-feature-admission
       - proper-tail-calls
@@ -120,6 +122,7 @@ collisions:
       - typed-array-feature-admission
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
+      - with-strict-assignment-fallback
     note: "Each remediation node from unsupported-ownership-audit and each
       prerequisite node from observation-batch-plan admits behavior or
       harness capabilities, regenerates the reviewed manifest, and moves
@@ -142,9 +145,11 @@ collisions:
       - import-attributes
       - import-meta
       - iterator-helpers
+      - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
       - non-blocking-agent
+      - parenthesized-assignment-function-name
       - primitive-wrapper-objects
       - promise-feature-admission
       - proper-tail-calls
@@ -158,6 +163,7 @@ collisions:
       - typed-array-feature-admission
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
+      - with-strict-assignment-fallback
     note: "Bare eval identifier observation follows cross-realm-host and shares
       manifest writes with the other independent remediation nodes. Separate
       collision groups retain those conflicts without treating ordered realm
@@ -177,9 +183,11 @@ collisions:
       - import-attributes
       - import-meta
       - iterator-helpers
+      - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
       - non-blocking-agent
+      - parenthesized-assignment-function-name
       - primitive-wrapper-objects
       - promise-feature-admission
       - proper-tail-calls
@@ -194,6 +202,7 @@ collisions:
       - typed-array-proto-coverage-remediation
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
+      - with-strict-assignment-fallback
     note: TypedArray mixed Annex B coverage follows classification and shares
       manifest writes with these independent remediation nodes. Keep its own
       prerequisite outside this group and preserve existing ordering between
@@ -214,9 +223,11 @@ collisions:
       - import-attributes
       - import-meta
       - iterator-helpers
+      - iterator-next-callability
       - minor-feature-tag-admission
       - module-export-forms
       - non-blocking-agent
+      - parenthesized-assignment-function-name
       - primitive-wrapper-objects
       - promise-feature-admission
       - proper-tail-calls
@@ -231,6 +242,7 @@ collisions:
       - typed-array-proto-coverage-remediation
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
+      - with-strict-assignment-fallback
     note: TypedArray mixed Annex B coverage follows classification and shares
       manifest writes with these independent remediation nodes. Keep its own
       prerequisite outside this group and preserve existing ordering between
