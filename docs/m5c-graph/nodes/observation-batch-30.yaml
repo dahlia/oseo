@@ -10,4 +10,4 @@ dependencies:
   - dynamic-import
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

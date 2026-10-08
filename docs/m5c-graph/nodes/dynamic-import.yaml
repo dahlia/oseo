@@ -17,5 +17,5 @@ delivers: "Implements the maintainer decision of 2026-10-07 (option C, interim
   observation-batch-30, -31, and -32 observe them."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
