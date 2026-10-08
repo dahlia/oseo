@@ -1,12 +1,13 @@
 version: 1
 id: observation-batch-01
 title: Observe built-ins/AggregateError/ and 11 more
-delivers: "Observes the 306 unreviewed paths that
+delivers: "Observes the 307 unreviewed paths that
   docs/m5c-closure/observation-batches.yaml selects for observation-batch-01
-  (306 review units): admits them to the reviewed subset with dependency tags,
+  (307 review units): admits them to the reviewed subset with dependency tags,
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
+  - array-sort-stability
   - array-tolocalestring-arguments
   - cross-realm-host
   - observation-batch-plan

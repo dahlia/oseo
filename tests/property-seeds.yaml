@@ -528,7 +528,3 @@ families:
     owner: tests/property/m5-cross-realm.property.test.ts
     start: 0x60008300
     end: 0x600083ff
-  - family: m5-array-sort-stability
-    owner: tests/property/m5-array-sort-stability.property.test.ts
-    start: 0x60008400
-    end: 0x600084ff

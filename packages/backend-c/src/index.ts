@@ -100,7 +100,7 @@ interface EmitState {
   readonly completionSlotStart: number;
   readonly derivedThisBindingId?: number;
   readonly functionId: number;
-  readonly functionFrameCosts: ReadonlyMap<number, number>;
+  readonly functionRootCounts: ReadonlyMap<number, number>;
   readonly lines: string[];
   readonly environmentSlot: number;
   /**
@@ -1655,7 +1655,7 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     line(state, renderC(emittedC.common.closeBlock));
     line(state, renderC(emittedC.common.closeBlock));
   } else {
-    const targetRootCount = state.functionFrameCosts.get(target.functionId);
+    const targetRootCount = state.functionRootCounts.get(target.functionId);
     if (targetRootCount == null) {
       throw new Error(
         `MIR call %${operation.id} targets unknown function ` +
@@ -3362,134 +3362,57 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
   }
 }
 
-/** MIR annotations describe roots and checks but do not produce values. */
-function producesRootValue(operation: MirOperation): boolean {
-  return (
-    operation.kind !== "safepoint" &&
-    operation.kind !== "root-store" &&
-    operation.kind !== "check-status"
-  );
-}
-
-const auxiliaryValueFields = [
-  "argumentListId",
-  "checkedResult",
-  "iteratorNextMethodResult",
-  "iteratorDoneState",
-  "iteratorCloseResultMode",
-  "iteratorValueResult",
-  "iteratorValueOnlyResult",
-  "enumerateRecordResult",
-  "enumerateKeyResult",
-] as const;
-
-/** Values requiring storage, including hidden iterator and suspension state. */
-function rootValues(block: MirBlock): readonly number[] {
-  const values = [...(block.parameters ?? [])];
-  for (const operation of block.operations) {
-    if (producesRootValue(operation)) values.push(operation.id);
-    for (const argument of operation.arguments) values.push(argument);
-    for (const field of auxiliaryValueFields) {
-      const value = operation[field];
-      if (value != null) values.push(value);
-    }
-  }
-  const terminator = block.terminator;
-  if (terminator.kind === "return") values.push(terminator.value);
-  if (terminator.kind === "branch") values.push(terminator.test);
-  if (terminator.kind === "jump") {
-    for (const value of terminator.values ?? []) values.push(value);
-  }
-  if (terminator.kind === "generator-yield") {
-    values.push(terminator.sent, terminator.value);
-  }
-  return values;
-}
-
-/**
- * Assign dense C storage identities without changing the public SSA MIR.
- * Each value still owns a distinct slot for the entire frame lifetime;
- * only annotation IDs cease to consume storage. In particular, this does
- * not reuse live roots or change iterator state across a suspension.
- */
-function compactRootIds(functionValue: MirFunction): MirFunction {
-  const blocks = reachableBlocks(functionValue);
-  const values = [...new Set(blocks.flatMap(rootValues))].toSorted(
-    (left, right) => left - right,
-  );
-  const slots = new Map(values.map((value, slot) => [value, slot]));
-  const slot = (value: number): number => {
-    const result = slots.get(value);
-    if (result == null)
-      throw new Error(`MIR value %${value} has no root slot.`);
-    return result;
-  };
-  // Preserve explicitly reserved capacity above the original identity range.
-  let originalMaximum = values.at(-1) ?? -1;
-  for (const block of blocks) {
-    for (const operation of block.operations) {
-      originalMaximum = Math.max(originalMaximum, operation.id);
-    }
-  }
-  const originalCount = originalMaximum + 1;
-  const reserved = Math.max(0, functionValue.rootSlotCount - originalCount);
-  return {
-    ...functionValue,
-    rootSlotCount: values.length + reserved,
-    // eslint-disable-next-line oxc/no-map-spread -- Copy immutable SSA nodes.
-    blocks: blocks.map((block) => {
-      const terminator = block.terminator;
-      let mappedTerminator = terminator;
-      if (terminator.kind === "return") {
-        mappedTerminator = { ...terminator, value: slot(terminator.value) };
-      } else if (terminator.kind === "branch") {
-        mappedTerminator = { ...terminator, test: slot(terminator.test) };
-      } else if (terminator.kind === "jump" && terminator.values != null) {
-        mappedTerminator = {
-          ...terminator,
-          values: terminator.values.map(slot),
-        };
-      } else if (terminator.kind === "generator-yield") {
-        mappedTerminator = {
-          ...terminator,
-          sent: slot(terminator.sent),
-          value: slot(terminator.value),
-        };
-      }
-      return {
-        ...block,
-        ...includePropertiesWhen(() =>
-          block.parameters == null
-            ? undefined
-            : { parameters: block.parameters.map(slot) },
-        ),
-        terminator: mappedTerminator,
-        operations: block.operations.map((operation) => {
-          const auxiliary: Partial<
-            Record<(typeof auxiliaryValueFields)[number], number>
-          > = {};
-          for (const field of auxiliaryValueFields) {
-            const value = operation[field];
-            if (value != null) auxiliary[field] = slot(value);
-          }
-          return {
-            ...operation,
-            ...auxiliary,
-            id: producesRootValue(operation)
-              ? slot(operation.id)
-              : operation.id,
-            arguments: operation.arguments.map(slot),
-          };
-        }),
-      };
-    }),
-  };
-}
-
 function maximumValueId(blocks: readonly MirBlock[]): number {
   let maximum = -1;
   for (const block of blocks) {
-    for (const value of rootValues(block)) maximum = Math.max(maximum, value);
+    for (const parameter of block.parameters ?? []) {
+      maximum = Math.max(maximum, parameter);
+    }
+    for (const operation of block.operations) {
+      maximum = Math.max(maximum, operation.id);
+      if (operation.checkedResult != null) {
+        maximum = Math.max(maximum, operation.checkedResult);
+      }
+      if (operation.iteratorNextMethodResult != null) {
+        maximum = Math.max(maximum, operation.iteratorNextMethodResult);
+      }
+      // A generator body keeps its iterator done flags in root slots, so the
+      // flag state survives a suspension taken mid-iteration.
+      if (operation.iteratorDoneState != null) {
+        maximum = Math.max(maximum, operation.iteratorDoneState);
+      }
+      if (operation.iteratorCloseResultMode != null) {
+        maximum = Math.max(maximum, operation.iteratorCloseResultMode);
+      }
+      if (operation.iteratorValueResult != null) {
+        maximum = Math.max(maximum, operation.iteratorValueResult);
+      }
+      if (operation.iteratorValueOnlyResult != null) {
+        maximum = Math.max(maximum, operation.iteratorValueOnlyResult);
+      }
+      if (operation.enumerateRecordResult != null) {
+        maximum = Math.max(maximum, operation.enumerateRecordResult);
+      }
+      if (operation.enumerateKeyResult != null) {
+        maximum = Math.max(maximum, operation.enumerateKeyResult);
+      }
+      for (const argument of operation.arguments) {
+        maximum = Math.max(maximum, argument);
+      }
+    }
+    const terminator = block.terminator;
+    if (terminator.kind === "return")
+      maximum = Math.max(maximum, terminator.value);
+    if (terminator.kind === "branch")
+      maximum = Math.max(maximum, terminator.test);
+    if (terminator.kind === "jump") {
+      for (const value of terminator.values ?? []) {
+        maximum = Math.max(maximum, value);
+      }
+    }
+    if (terminator.kind === "generator-yield") {
+      maximum = Math.max(maximum, terminator.sent, terminator.value);
+    }
   }
   return maximum;
 }
@@ -3557,31 +3480,6 @@ function rootCount(functionValue: MirFunction): number {
   return (
     baseRootCount + maximumArgumentCount(blocks) + completionSlotCount(blocks)
   );
-}
-
-/**
- * Keep a script's native-stack charge separate from its heap root layout.
- * Binding operations emit two result-returning calls, for cell lookup or
- * creation and the binding access. Retain two extra units per access for their
- * C expression temporaries, restoring the logical declaration charge without
- * charging array-literal annotations or sparse SSA gaps as native storage.
- */
-function scriptFrameCost(functionValue: MirFunction): number {
-  const compact = compactRootIds(functionValue);
-  let bindingAccesses = 0;
-  for (const block of reachableBlocks(functionValue)) {
-    for (const operation of block.operations) {
-      if (
-        operation.kind === "initialize" ||
-        operation.kind === "read" ||
-        operation.kind === "write" ||
-        operation.kind === "binding-reset"
-      ) {
-        bindingAccesses += 1;
-      }
-    }
-  }
-  return rootCount(compact) + 2 * bindingAccesses;
 }
 
 function reachableBlocksFrom(
@@ -4252,7 +4150,7 @@ function emitGeneratorBody(
 
 function emitFunction(
   functionValue: MirFunction,
-  functionFrameCosts: ReadonlyMap<number, number>,
+  functionRootCounts: ReadonlyMap<number, number>,
   totalBindingCount: number,
   observeSpecialization: boolean,
   unresolvableGlobals: ReadonlyMap<number, string>,
@@ -4278,8 +4176,8 @@ function emitFunction(
     32,
   );
   const argumentSlots = maximumArgumentCount(blocks);
-  const functionRootCount = rootCount(functionValue);
-  if (!functionFrameCosts.has(functionValue.id)) {
+  const functionRootCount = functionRootCounts.get(functionValue.id);
+  if (functionRootCount == null) {
     throw new Error(
       `MIR function '${functionValue.name}' has no root frame layout.`,
     );
@@ -4307,7 +4205,7 @@ function emitFunction(
       if (functionValue.derivedThisBindingId == null) return undefined;
       return { derivedThisBindingId: functionValue.derivedThisBindingId };
     }),
-    functionFrameCosts,
+    functionRootCounts,
     environmentSlot,
     globalObjectBindingIds: new Set(
       globalObjectBindings.map((binding) => binding.id),
@@ -4469,11 +4367,11 @@ function emitGeneratorDispatcher(
 
 function emitFunctionDispatcher(
   functions: readonly MirFunction[],
-  functionFrameCosts: ReadonlyMap<number, number>,
+  functionRootCounts: ReadonlyMap<number, number>,
 ): string {
   const cases: string[] = [];
   for (const functionValue of functions) {
-    const count = functionFrameCosts.get(functionValue.id);
+    const count = functionRootCounts.get(functionValue.id);
     if (count == null) {
       throw new Error(
         `MIR function '${functionValue.name}' has no root frame layout.`,
@@ -4548,19 +4446,17 @@ function emitAgentTables(agents: readonly MirAgentTemplate[]): string {
 
 export const cBackend: NativeBackend = {
   emit(input) {
-    const originalFunctions = reachableFunctions(input);
-    const declaredFunctions = originalFunctions.map(compactRootIds);
-    const script = compactRootIds(input.script);
-    const functions = [...declaredFunctions, script];
+    const declaredFunctions = reachableFunctions(input);
+    const functions = [...declaredFunctions, input.script];
     const globalLexicalNames = input.globalLexicalNames ?? [];
     const globalObjectBindings = input.globalObjectBindings;
-    // Native-stack charges remain separate from dense heap root layouts.
-    // Non-recursive scripts also retain expression temporaries on the stack.
-    const functionFrameCosts = new Map([
-      ...originalFunctions.map((fn) => [fn.id, rootCount(fn)] as const),
-      [input.script.id, scriptFrameCost(input.script)],
-    ]);
-    const scriptRootCount = functionFrameCosts.get(input.script.id);
+    const functionRootCounts = new Map(
+      functions.map((functionValue) => [
+        functionValue.id,
+        rootCount(functionValue),
+      ]),
+    );
+    const scriptRootCount = functionRootCounts.get(input.script.id);
     if (scriptRootCount == null) {
       throw new Error("MIR script has no root frame layout.");
     }
@@ -4607,7 +4503,7 @@ export const cBackend: NativeBackend = {
       .join(renderC(emittedC.common.newline));
     const dispatcher = emitFunctionDispatcher(
       declaredFunctions,
-      functionFrameCosts,
+      functionRootCounts,
     );
     const generatorDispatcher = emitGeneratorDispatcher(declaredFunctions);
     const functionReferences = declaredFunctions
@@ -4619,7 +4515,7 @@ export const cBackend: NativeBackend = {
       .map((functionValue) =>
         emitFunction(
           functionValue,
-          functionFrameCosts,
+          functionRootCounts,
           totalBindingCount,
           input.observeSpecialization === true,
           unresolvableGlobals,
@@ -4747,10 +4643,8 @@ function emitFragmentUnit(
   globalObjects: readonly MirGlobalObjectBinding[],
 ): string {
   const phases = lowerFragmentPhases(fragment);
-  const functions = fragment.mir.functions.map(compactRootIds);
-  const counts = new Map(
-    fragment.mir.functions.map((fn) => [fn.id, rootCount(fn)]),
-  );
+  const functions = fragment.mir.functions;
+  const counts = new Map(functions.map((fn) => [fn.id, rootCount(fn)]));
   const definitions = functions.map((fn) =>
     emitFunction(
       fn,
@@ -4765,12 +4659,11 @@ function emitFragmentUnit(
   );
   const entries = phases.map((phase, index) => {
     const name = index === 0 ? "instantiate" : "evaluate";
-    const script = compactRootIds(phase.script);
-    const count = scriptFrameCost(phase.script);
+    const count = rootCount(phase.script);
     const phaseCounts = new Map([...counts, [-1, count]]);
     return (
       emitFunction(
-        script,
+        phase.script,
         phaseCounts,
         fragment.nextBindingId,
         fragment.mir.observeSpecialization,

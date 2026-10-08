@@ -4,7 +4,7 @@
 # Selectors change only through `mise run m5c:observation-batches:plan`.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 19080
+unreviewedPaths: 19081
 basis:
   supportedFeatures:
     - AggregateError
@@ -164,7 +164,7 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 75277
+  currentExecutedVariants: 75273
   currentSeconds: 4136
   finalExecutedVariants: 136401
   finalSeconds: 7494
@@ -196,7 +196,7 @@ regeneration:
       fullUpdateScheduleHours: 86.6
     - batches: 13
       largestPaths: 4045
-      largestReviewUnits: 1198
+      largestReviewUnits: 1199
       limits:
         paths: 8000
         reviewUnits: 1200
@@ -222,8 +222,8 @@ batches:
         - test/built-ins/Promise/
     dependsOn:
       - observation-batch-plan
-    paths: 306
-    reviewUnits: 306
+    paths: 307
+    reviewUnits: 307
     generatedPaths: 0
     prerequisites: {}
     dynamicSource:
@@ -262,6 +262,7 @@ batches:
       error-cause: 2
       exponentiation: 2
       resizable-arraybuffer: 3
+      stable-array-sort: 1
     negatives: {}
     partitions:
       groups:
@@ -277,10 +278,10 @@ batches:
         - built-ins/NativeErrors
         - built-ins/Object
         - built-ins/Promise
-      files: 259
+      files: 260
       newFiles: 120
     regeneration:
-      executableVariants: 1048
+      executableVariants: 1052
       scopedUpdateSeconds: 58
       fullCorpusSeconds: 4193
   - id: observation-batch-03

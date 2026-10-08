@@ -1,68 +1,6 @@
 import type { Fixture } from "../fixture.ts";
 
-/** Large literal construction followed by a complete stable identity check. */
-export function largeArraySortSource(
-  length: number,
-  groups: number,
-  offset: number,
-  method: "sort" | "toSorted",
-): string {
-  const entries = Array.from(
-    { length },
-    (_, tag) => `{ key: ${(tag + offset) % groups}, tag: ${tag} }`,
-  ).join(",\n");
-  return `
-const subject = [${entries}];
-const original = subject.slice();
-let comparisons = 0;
-const result = subject.${method}((left, right) => {
-  comparisons = comparisons + 1;
-  return left.key - right.key;
-});
-let stable = true;
-let identity = true;
-let cursor = 0;
-for (let key = 0; key < ${groups}; key = key + 1) {
-  for (let tag = (key - ${offset} + ${groups}) % ${groups};
-       tag < ${length}; tag = tag + ${groups}) {
-    stable = stable && result[cursor].key === key && result[cursor].tag === tag;
-    identity = identity && result[cursor] === original[tag];
-    cursor = cursor + 1;
-  }
-}
-console.log("stable", stable, cursor === ${length}, result.length);
-console.log("identity", identity, comparisons > 0, result === subject);
-if ("${method}" === "toSorted") {
-  let unchanged = true;
-  for (let index = 0; index < ${length}; index = index + 1) {
-    unchanged = unchanged && subject[index] === original[index];
-  }
-  console.log("unchanged", unchanged);
-}
-/** @param {string} value */
-function hinted(value) { return value.charAt(0); }
-console.log("hint", hinted("hit"));
-console.log("false hint", hinted(new String("miss")));
-let turn = 0;
-while (turn < 3) {
-  console.log("guard", hinted("guard"));
-  if (turn === 1) String.prototype.largeSortingMarker = 1;
-  turn = turn + 1;
-}
-`;
-}
-
 export const arrayPrototypeSortFixtures: readonly Fixture[] = [
-  {
-    globalScriptReference: true,
-    name: "array-sort-large-literal-2048",
-    source: largeArraySortSource(2048, 4, 1, "sort"),
-  },
-  {
-    globalScriptReference: true,
-    name: "array-sort-large-literal-4096",
-    source: largeArraySortSource(4096, 7, 3, "toSorted"),
-  },
   {
     globalScriptReference: true,
     name: "array-prototype-sort",

@@ -526,3 +526,54 @@ overrides:
     transition:
       from: 1592590355
       to: absent
+  - invariant: subset-path
+    path: test/built-ins/Array/prototype/sort/stability-2048-elements.js
+    reason: Reverts array-sort-stability (merge d2829a9b). In CI run
+      37685350484 its wide-script scenario exhausted runner memory under clang
+      ASan on Linux, and its compact-frame scenario overflowed the C stack
+      under ASan on macOS instead of reporting OSEO2001.
+    transition:
+      from: present
+      to: absent
+  - invariant: pass-classification
+    path: test/built-ins/Array/prototype/sort/stability-2048-elements.js
+    reason: Reverts array-sort-stability (merge d2829a9b). In CI run
+      37685350484 its wide-script scenario exhausted runner memory under clang
+      ASan on Linux, and its compact-frame scenario overflowed the C stack
+      under ASan on macOS instead of reporting OSEO2001.
+    transition:
+      from: pass
+      to: absent
+  - invariant: pass-count
+    path: tests/test262/results.yaml
+    reason: Reverts array-sort-stability (merge d2829a9b). In CI run
+      37685350484 its wide-script scenario exhausted runner memory under clang
+      ASan on Linux, and its compact-frame scenario overflowed the C stack
+      under ASan on macOS instead of reporting OSEO2001.
+    transition:
+      from: 18995
+      to: 18994
+  - invariant: property-seed
+    domain: large object array literals, three to seven duplicated keys,
+      cyclic key offsets, sort and toSorted, complete independent bucket
+      ordering and identity checks, false hints and a deliberate shape guard
+      miss
+    reason: Reverts array-sort-stability (merge d2829a9b). In CI run
+      37685350484 its wide-script scenario exhausted runner memory under clang
+      ASan on Linux, and its compact-frame scenario overflowed the C stack
+      under ASan on macOS instead of reporting OSEO2001.
+    transition:
+      from: 1610646528
+      to: absent
+  - invariant: property-case-budget
+    domain: large object array literals, three to seven duplicated keys,
+      cyclic key offsets, sort and toSorted, complete independent bucket
+      ordering and identity checks, false hints and a deliberate shape guard
+      miss
+    reason: Reverts array-sort-stability (merge d2829a9b). In CI run
+      37685350484 its wide-script scenario exhausted runner memory under clang
+      ASan on Linux, and its compact-frame scenario overflowed the C stack
+      under ASan on macOS instead of reporting OSEO2001.
+    transition:
+      from: 2
+      to: absent
