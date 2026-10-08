@@ -79,6 +79,4 @@ dependencies:
   - well-known-intrinsics-harness
   - with-strict-assignment-fallback
 landed: false
-reason: "Depends on array-sort-stability, which is parked after its revert in
-  e561fd2e."
-status: parked
+status: blocked
