@@ -385,3 +385,8 @@ Line offsets count all ECMAScript line separators, including CRLF as one
 separator and lone CR, LF, U+2028, and U+2029. Counting only LF would preserve
 ordinary harness inputs but misreport body errors after other separators;
 runner regression tests compare those locations with whole-Script execution.
+
+The post-revert sanitizer repair guards function bodies with the shared
+runtime frame ceiling and applies the explicit host C callable-frame charge
+in both direct and dispatched calls. All 44 whole-Script digest records are
+regenerated for these C-only changes; HIR and MIR are unchanged.

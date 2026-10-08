@@ -594,8 +594,8 @@ export const emittedC = {
       ["result = oseo_call_enter(context);"],
     ],
     resultAssignOseoFrameEnterContextU: [
-      ["    result = oseo_frame_enter(context, "],
-      ["u);"],
+      ["    result = oseo_frame_enter(context, OSEO_CALLABLE_FRAME_COST("],
+      ["u));"],
     ],
     ifResultStatusEqualOseoStatusNormalOpen: [
       ["    if (result.status == OSEO_STATUS_NORMAL) {"],
@@ -605,8 +605,8 @@ export const emittedC = {
       ["(context, oseo_undefined(), oseo_undefined(), "],
     ],
     oseoFrameLeaveContextUStatement: [
-      ["        oseo_frame_leave(context, "],
-      ["u);"],
+      ["        oseo_frame_leave(context, OSEO_CALLABLE_FRAME_COST("],
+      ["u));"],
     ],
     oseoCallLeaveContextStatement: [["    oseo_call_leave(context);"]],
   },
@@ -1279,17 +1279,21 @@ export const emittedC = {
     ],
     caseClause: [
       ["    case "],
-      ["u:\n        result = oseo_frame_enter(context, "],
       [
-        "u);\n        if (result.status == OSEO_STATUS_NOR",
+        "u:\n        result = oseo_frame_enter(context, ",
+        "OSEO_CALLABLE_FRAME_COST(",
+      ],
+      [
+        "u));\n        if (result.status == OSEO_STATUS_NOR",
         "MAL) {\n            result = oseo_function_",
       ],
       [
         "(\n                context, callee, receiver, arg",
         "ument_count,\n                arguments, new_targ",
         "et);\n            oseo_frame_leave(context, ",
+        "OSEO_CALLABLE_FRAME_COST(",
       ],
-      ["u);\n        }\n        return result;"],
+      ["u));\n        }\n        return result;"],
     ],
   },
   agent: {

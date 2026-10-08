@@ -246,3 +246,129 @@ After the final rebase, the complete repository check, all 43 macOS-lane
 and M5c graph tests, and the graph, ledger, and observation-batch checks
 pass. The graph retains all 73 nodes, including main's new prerequisite,
 with its node status and landing fields unchanged by this lane.
+
+
+Sanitizer repair after the revert
+---------------------------------
+
+CI run 37685350484 exposed two failures after the first landing: clang's
+unoptimized sanitizer IR for a wide script used 13.8 GiB of peak compiler
+memory locally, and the 1,000-binding recursion overflowed the macOS ASan stack
+before its logical charge exhausted the frame ceiling.
+
+The runtime exposes its unchanged 65,536-slot ceiling to generated C. A
+preprocessor guard replaces any function body whose entry charge always exceeds
+that ceiling with a small diagnostic stub. The outer entry still requests its
+original charge before running any source operation. Both 25,000-declaration
+cases remain in the native scenario, under both specialization policies, so
+their rejection contract is still exercised under every selected toolchain.
+Their bodies never enter sanitizer IR.
+
+The successful script companion uses 4,096 declarations. It proves ordinary
+non-recursive script execution without retaining the former 16,000-declaration
+admitted build, whose clang -O0 IR was itself a compiler memory stressor. The
+rejected cases still reach the original frame boundary; this companion does not
+substitute for them. The large-literal fixtures and backend charge assertions
+retain independent admission and layout evidence.
+
+The host C toolchain explicitly supplies `OSEO_CALLABLE_FRAME_MULTIPLIER=8u` to
+generated and harness C. Generated callers charge and release the same
+logical count through `OSEO_CALLABLE_FRAME_COST`, preserving the 32-slot
+fixed overhead and multiplying only the additional slots. The ordinary
+toolchain defaults to one. The multiplier applies only to callable frames,
+which can accumulate through recursion; script admission still accounts for
+compact roots plus binding accesses. The 1,000-binding recursion first proves
+its base case can enter, then requires OSEO2001 at depth 100. Runtime ABI
+`m5-128` records this new generated-code contract without changing a structure
+or function signature.
+
+Measurements below passed, and the Linux host C sanitizer gate matched all
+272 native fixtures in 1,363 seconds. Full manifest regeneration matched
+all 22,424 paths in 3,126 seconds with 19,309 passes, 1,648 expected negatives,
+and 1,467 unsupported paths; no other classification moved. Ledger,
+observation batches, and graph baseline were regenerated. The static,
+ordinary, and extended gates passed with the lane Zig cache. Both
+independent reviewers were clean in round four. macOS native execution is
+unavailable here.
+
+
+Tracked continuation-dispatch boundary
+--------------------------------------
+
+Astra's second review found an existing gap outside this repair: resumed
+generator and async bodies have no aggregate native-frame charge. A wide
+generator recursively calling another generator's `next()` can accumulate
+C frames after each construction charge has been released. This change
+retains the existing dispatcher behavior. At the coordinator's direction,
+*docs/m5c-graph/nodes/generator-dispatch-stack-charge.yaml* records a bounded
+follow-up with nested generator and async evidence across every toolchain,
+including host C sanitizers. It remains an M5 exit dependency, and the graph
+serializes its manifest regeneration with independent remediation nodes.
+
+
+Measured compiler and frame usage
+---------------------------------
+
+On Linux x86-64, Clang 22.1.8 compiled the affected programs at its default
+`-O0` with ASan, UBSan, debug information, and frame pointers through the
+selected `host-cc` toolchain. `/usr/bin/time -v` wrapped each generated-program
+compile and link. Builds ran serially, began with at least 20 GiB available,
+and stayed below the 8 GiB stop threshold. The historical 13.8 GiB peak comes
+from the dispatch's pre-revert reproduction; that unsafe build was not rerun.
+
+| Probe                           | Policy   | Peak compiler RSS (KiB) | Build seconds | Result                  |
+| ------------------------------- | -------- | ----------------------- | ------------- | ----------------------- |
+| 1,000-binding callable          | Disabled | 418,400                 | 2.63          | Admitted, then OSEO2001 |
+| 1,000-binding callable          | Enabled  | 418,992                 | 2.02          | Admitted, then OSEO2001 |
+| 4,096-declaration script        | Disabled | 2,436,080               | 11.57         | Prints 4095             |
+| 4,096-declaration script        | Enabled  | 2,435,920               | 12.40         | Prints 4095             |
+| 25,000-const declaration script | Disabled | 112,524                 | 0.23          | OSEO2001 before entry   |
+| 25,000-const declaration script | Enabled  | 112,160                 | 0.23          | OSEO2001 before entry   |
+| 25,000-var declaration script   | Disabled | 122,768                 | 0.26          | OSEO2001 before entry   |
+| 25,000-var declaration script   | Enabled  | 122,736                 | 0.26          | OSEO2001 before entry   |
+
+The revised probes peak at 2.32 GiB, and the unchanged rejection probes peak
+at 120 MiB. Both callable probes print `compact admitted` before their
+budget diagnostic; neither an immediate rejection nor a sanitizer crash
+satisfies that observation.
+
+The same 1,000-binding callable was compiled, without linking, for Linux x64
+and macOS AArch64 with `-fstack-usage` and both sanitizers. Freestanding
+compilation uses the runtime header and Clang's target integer types, omitting
+only unused system math and allocation includes. Both specialization policies
+report 345,912 stack bytes on Linux and 547,072 on macOS. The macOS prologue
+subtracts `0x85000 + 0x8e0`, saves 32 bytes, and aligns to 32 bytes, giving a
+547,103-byte upper bound for this generated frame, including alignment slack.
+
+Its original 4,038-slot charge admits sixteen simultaneous callable frames,
+whose macOS generated frames alone exceed 8 MiB. The explicit host C charge
+is now `32 + (4038 - 32) * 8 = 32080`. Only two such frames fit below the
+unchanged 65,536-slot ceiling, so their generated macOS stack use is bounded
+by 1,094,206 bytes before the third entry reports OSEO2001. This is compiler
+layout and Linux execution evidence, not a macOS native semantic pass; Apple
+Clang and macOS execution remain CI evidence.
+
+Raw measurements and disassembly are retained under
+*/data/array-sort-sanitizer-task\_09aaf50a4a8f/*.
+
+
+Final local gates after the repair
+----------------------------------
+
+Every gate used */data/zig-cache/m5c-array-sort-stability/* and ran serially
+with `MISE_JOBS=1`.
+
+| Gate                                             | Result                                                      | Seconds |
+| ------------------------------------------------ | ----------------------------------------------------------- | ------- |
+| `mise run check`                                 | Pass, zero compatibility overrides                          | 96      |
+| `mise run test`                                  | Pass, including 22,424 corpus paths and 272 native fixtures | 5,364   |
+| `mise run test:property:extended`                | Pass, 226 native tests and package properties               | 5,909   |
+| `mise run test:sanitizer:native`                 | Pass, 272 native fixtures                                   | 1,363   |
+| `mise run test262:update -- --accept-promotions` | Pass, all partitions unchanged                              | 3,126   |
+
+The ordinary Node gate reports 1,541 passes, zero failures, five existing
+skips, and two existing todos. Deno reports 759 passes, zero failures, and
+two existing ignored tests. Extended native tests report no failures,
+skips, or todos. The twenty-case large-literal property completed in
+1,389 seconds within its unchanged 1,800-second deadline. No case count,
+seed, size limit, timeout, shard total, or frame ceiling was lowered.

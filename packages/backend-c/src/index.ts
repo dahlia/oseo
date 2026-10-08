@@ -4194,11 +4194,27 @@ function generatorBodyName(functionValue: MirFunction): string {
   );
 }
 
+/** Discard impossible bodies before unoptimized sanitizer IR construction. */
+function nativeFrameGuard(
+  frameCost: string,
+  unusedParameters: readonly string[],
+): string {
+  const unused = unusedParameters
+    .map((name) => `    (void)${name};`)
+    .join("\n");
+  return `#if ${frameCost} > OSEO_MAX_ACTIVE_FRAME_SLOTS
+${unused}
+    return oseo_frame_enter(context, OSEO_MAX_ACTIVE_FRAME_SLOTS + 1u);
+#else
+`;
+}
+
 function emitGeneratorBody(
   functionValue: MirFunction,
   blocks: readonly MirBlock[],
   completionSlots: number,
   base: Omit<EmitState, "generator" | "lines">,
+  frameCost: string,
 ): string {
   const state: EmitState = {
     ...base,
@@ -4234,6 +4250,7 @@ function emitGeneratorBody(
     renderC(emittedC.common.oseoContextPointerContextLine) +
     renderC(emittedC.generatorBody.oseoValueGeneratorLine) +
     renderC(emittedC.common.functionBodyOpenLine) +
+    nativeFrameGuard(frameCost, ["generator"]) +
     renderC(emittedC.generatorBody.oseoValuePointerRootsAssignOseoGenerator) +
     renderC(emittedC.generatorBody.oseoValueCalleeAssignOseoGeneratorCallee) +
     renderC(emittedC.generatorBody.oseoValueReceiverAssignOseoGenerator) +
@@ -4246,6 +4263,7 @@ function emitGeneratorBody(
       emittedC.common.valueThenNewline,
       state.lines.join(renderC(emittedC.common.newline)),
     ) +
+    "#endif\n" +
     renderC(emittedC.common.closeBlockLine)
   );
 }
@@ -4391,6 +4409,18 @@ function emitFunction(
     line(state, renderC(emittedC.common.returnResult));
   }
   const id = functionValue.id < 0 ? scriptName : String(functionValue.id);
+  const charge = functionFrameCosts.get(functionValue.id)!;
+  const frameCost =
+    functionValue.id < 0
+      ? `${charge}u`
+      : `OSEO_CALLABLE_FRAME_COST(${charge}u)`;
+  const frameGuard = nativeFrameGuard(frameCost, [
+    "callee",
+    "receiver",
+    "argument_count",
+    "arguments",
+    "new_target",
+  ]);
   const entry =
     renderC(emittedC.function.staticOseoResultOseoFunctionLine, id) +
     renderC(emittedC.common.oseoContextPointerContextLine) +
@@ -4400,6 +4430,7 @@ function emitFunction(
     renderC(emittedC.function.constOseoValuePointerArgumentsLine) +
     renderC(emittedC.function.oseoValueNewTargetLine) +
     renderC(emittedC.common.functionBodyOpenLine) +
+    frameGuard +
     renderC(emittedC.function.oseoRootFrameFrameAssignNullNullULine) +
     renderC(emittedC.function.oseoValuePointerRootsLine) +
     renderC(emittedC.common.oseoResultResultLine) +
@@ -4420,12 +4451,19 @@ function emitFunction(
       emittedC.common.valueThenNewline,
       state.lines.join(renderC(emittedC.common.newline)),
     ) +
+    "#endif\n" +
     renderC(emittedC.common.closeBlockLine);
   if (!generator) return entry;
   return renderC(
     emittedC.function.newline,
     entry,
-    emitGeneratorBody(functionValue, bodyBlocks, completionSlots, base),
+    emitGeneratorBody(
+      functionValue,
+      bodyBlocks,
+      completionSlots,
+      base,
+      frameCost,
+    ),
   );
 }
 

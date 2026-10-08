@@ -47,6 +47,8 @@ test(
     ]) {
       assert(request != null);
       assert(request.args.includes("-fsanitize=address,undefined"));
+      assert(request.args.includes("-DOSEO_CALLABLE_FRAME_MULTIPLIER=8u"));
+      assert(request.args.includes("-DOSEO_CALLABLE_FRAME_BASE_SLOTS=32u"));
       assert(request.args.includes("-fno-sanitize-recover=all"));
     }
     assert.deepEqual(plan.requests[2]?.args, [

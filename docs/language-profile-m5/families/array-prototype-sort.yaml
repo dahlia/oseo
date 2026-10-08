@@ -32,7 +32,14 @@ scope:
     script regression
     reports OSEO2001 under both policies. The unchanged wide-recursion
     resource scenario and a 1,000-binding regression under both policies
-    keep reporting OSEO2001 before C stack exhaustion."
+    keep reporting OSEO2001 before C stack exhaustion. The host C toolchain
+    supplies an eight-unit multiplier above the fixed 32-slot callable
+    overhead for unoptimized ASan/UBSan temporaries and redzones; direct and
+    dispatched calls share it.
+    Guaranteed-rejected bodies are preprocessed into diagnostic stubs before
+    sanitizer IR construction. Both 25,000-declaration rejection cases remain
+    under both policies, with a 4,096-declaration admitted companion. The
+    1,000-binding callable first verifies that its base case can enter."
 owners:
   - PLAN-M5.md
 evidence:

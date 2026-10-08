@@ -4224,7 +4224,14 @@ slots but Zig's unoptimized UBSan object reserves 1,033,856 C stack bytes;
 charging only compact roots allowed a segmentation fault before OSEO2001.
 The unchanged wide-recursion scenario now retains its budget diagnostic,
 and a 1,000-binding regression checks both specialization policies. Script
-entries cannot recurse and charge their compact physical layout.
+entries charge compact roots and two extra units per binding access.
+The host C sanitizer toolchain applies an explicit eight-unit multiplier
+to callable logical slots above the fixed 32-slot overhead, covering
+expression temporaries and ASan redzones without changing the 65,536-unit
+ceiling. Generated function
+bodies that cannot enter that ceiling are preprocessed into rejection
+stubs, so clang does not build sanitizer IR for an unenterable wide script.
+The runtime ABI is `oseo-runtime-m5-128`.
 The unchanged upstream path is admitted, and fixed 2,048- and
 4,096-element literals plus generated independent bucket orderings at seed
 `0x60008400` check every element's order and identity, copy preservation,

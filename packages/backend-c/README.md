@@ -95,3 +95,8 @@ code-identity dispatcher used by dynamic calls, promise executors, reactions,
 and asynchronous continuations. Promise, timer, and top-level await MIR targets
 remain runtime calls, so generated C does not own job queues or scheduler
 policy.
+
+Guaranteed-rejected frames use a C preprocessor branch to omit their bodies
+before sanitizer IR construction. Entry points retain their runtime charge.
+Callable charges use `OSEO_CALLABLE_FRAME_COST`, whose multiplier is supplied
+by the toolchain; scripts retain their compact-root and binding-access charge.

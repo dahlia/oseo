@@ -18,8 +18,8 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 77
-  ready: 68
+  nodes: 78
+  ready: 69
   blocked: 9
   parked: 0
   landed: 12
@@ -100,6 +100,7 @@ collisions:
       - fn-global-object-harness
       - frontmatter-feature-tags
       - function-caller-restrictions
+      - generator-dispatch-stack-charge
       - hashbang-comments
       - import-attributes
       - import-meta
@@ -142,6 +143,7 @@ collisions:
       - fn-global-object-harness
       - frontmatter-feature-tags
       - function-caller-restrictions
+      - generator-dispatch-stack-charge
       - hashbang-comments
       - import-attributes
       - import-meta
@@ -181,6 +183,7 @@ collisions:
       - fn-global-object-harness
       - frontmatter-feature-tags
       - function-caller-restrictions
+      - generator-dispatch-stack-charge
       - hashbang-comments
       - import-attributes
       - import-meta
@@ -222,6 +225,7 @@ collisions:
       - fn-global-object-harness
       - frontmatter-feature-tags
       - function-caller-restrictions
+      - generator-dispatch-stack-charge
       - hashbang-comments
       - import-attributes
       - import-meta

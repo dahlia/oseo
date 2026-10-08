@@ -1697,7 +1697,71 @@ test("annotation identities do not allocate native value slots", () => {
     callable.source,
     /oseo_roots_allocate\(context, &frame, 2050u\)/u,
   );
-  assert.match(callable.source, /oseo_frame_enter\(context, 94167u\)/u);
+  assert.match(
+    callable.source,
+    /oseo_frame_enter\(context, OSEO_CALLABLE_FRAME_COST\(94167u\)\)/u,
+  );
   assert.equal(script.rootSlotCount, 2047 * 46 + 5);
   assert.equal(script.blocks[0]?.operations.at(-3)?.id, 2047 * 46);
+});
+
+test("unenterable frames have a preprocessor rejection stub", () => {
+  const program = globalObjectProgram(false);
+  const emitted = cBackend.emit({
+    ...program,
+    script: { ...program.script, rootSlotCount: 100_008 },
+  });
+  assert.match(emitted.source, /#if 100010u > OSEO_MAX_ACTIVE_FRAME_SLOTS/u);
+  assert.match(
+    emitted.source,
+    /return oseo_frame_enter\(context, OSEO_MAX_ACTIVE_FRAME_SLOTS \+ 1u\);/u,
+  );
+  // The outer entry keeps the same charge and rejects before any body runs.
+  assert.match(emitted.source, /oseo_frame_enter\(\s*&context, 100010u\)/u);
+});
+
+test("unenterable generator and async continuations are guarded", () => {
+  const program = globalObjectProgram(false);
+  const range = program.script.range;
+  for (const flags of [
+    { generator: true as const },
+    { generator: true as const, asyncFunction: true as const },
+    { generator: true as const, asyncGenerator: true as const },
+  ]) {
+    const emitted = cBackend.emit({
+      ...program,
+      functions: [
+        {
+          ...program.script,
+          ...flags,
+          id: 0,
+          rootSlotCount: 100_008,
+        },
+      ],
+      script: {
+        ...program.script,
+        blocks: [
+          {
+            id: 0,
+            operations: [
+              {
+                arguments: [],
+                detail: "call",
+                id: 0,
+                kind: "call",
+                range,
+                target: { kind: "function", functionId: 0 },
+              },
+            ],
+            terminator: { kind: "return", value: 0 },
+          },
+        ],
+      },
+    });
+    const body = emitted.source.slice(
+      emitted.source.indexOf("static OseoResult oseo_generator_body_0(\n"),
+    );
+    assert.match(body, /#if OSEO_CALLABLE_FRAME_COST\(100008u\)/u);
+    assert.match(body, /\(void\)generator;/u);
+  }
 });

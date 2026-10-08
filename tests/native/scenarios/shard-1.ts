@@ -935,6 +935,8 @@ throw boom;
         source:
           `function recurse(depth) {\n${compactBindings}\n` +
           "if (depth === 0) return 0; return recurse(depth - 1);\n}\n" +
+          'if (recurse(0) !== 0) throw "compact frame admission";\n' +
+          'console.log("compact admitted");\n' +
           "console.log(recurse(100));\n",
         sourceId: "compact-frame-recursion.ts",
         version: "0.1.0",
@@ -942,14 +944,16 @@ throw boom;
       host,
     );
     assert.equal(observed.exitStatus, 1);
-    assert.equal(observed.stdout, "");
+    assert.equal(observed.stdout, "compact admitted\n");
     assert.match(observed.stderr, /error\[OSEO2001\].*frame budget/u);
   }
 
   // Script entries need a native-stack bound even without recursion.
-  // Pin an admitted script near the bound as well as the rejected review case.
+  // Keep the 25,000-binding boundary probes. The admitted 4,096-binding
+  // companion avoids building a near-ceiling C function under clang -O0;
+  // structural backend tests retain the exact charge at the wider boundary.
   for (const [count, declaration] of [
-    [16_000, "const"],
+    [4_096, "const"],
     [25_000, "const"],
     [25_000, "var"],
   ] as const) {
@@ -970,9 +974,9 @@ throw boom;
         },
         host,
       );
-      if (count === 16_000) {
+      if (count === 4_096) {
         assert.equal(observed.exitStatus, 0, observed.stderr);
-        assert.equal(observed.stdout, "15999\n");
+        assert.equal(observed.stdout, "4095\n");
         assert.equal(observed.stderr, "");
       } else {
         assert.equal(observed.exitStatus, 1);

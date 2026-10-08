@@ -20,6 +20,18 @@ export interface HostCcOptions {
   readonly target: TargetDescription;
 }
 
+/**
+ * Unoptimized ASan/UBSan callable frames retain result temporaries and
+ * redzones.
+ * Keep the 32-slot fixed frame charge, then charge eight units per additional
+ * slot without changing the runtime ceiling or the small-frame depth limit.
+ * The same description applies to Linux x64 and macOS arm64 host compilers.
+ */
+export const hostCcCallableFrameMultiplier = 8;
+
+/** Fixed callable overhead already covered by the logical frame floor. */
+export const hostCcCallableFrameBaseSlots = 32;
+
 /** Build environment allowlist: no ambient include or sanitizer options. */
 export const hostCcEnvironment: ProcessEnvironmentPolicy = {
   inherit: ["PATH", "HOME", "TMPDIR"],
@@ -42,6 +54,8 @@ export function createHostCcToolchain(options: HostCcOptions): NativeToolchain {
   const libraries = ["-lm", "-lpthread"];
   const flags = [
     "-std=c11",
+    `-DOSEO_CALLABLE_FRAME_MULTIPLIER=${hostCcCallableFrameMultiplier}u`,
+    `-DOSEO_CALLABLE_FRAME_BASE_SLOTS=${hostCcCallableFrameBaseSlots}u`,
     "-Wall",
     "-Wextra",
     "-Werror",
