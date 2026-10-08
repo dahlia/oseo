@@ -412,24 +412,34 @@ export async function withNativeFixture<T>(
           `generated source name: ${emitted.sourceName}.`,
       );
     }
-    const generatedSourcePath = join(directory, emitted.sourceName);
-    await options.host.writeTextFile(generatedSourcePath, emitted.source);
-    const additionalGeneratedSourcePaths: string[] = [];
-    for (const agent of options.agents ?? []) {
-      const unit = options.backend.emit(agent);
-      if (
-        assetNames.has(unit.sourceName.toLowerCase()) ||
-        unit.sourceName === emitted.sourceName
-      ) {
+    const emittedUnits = [
+      emitted,
+      ...(options.agents ?? []).map((agent) => options.backend.emit(agent)),
+    ];
+    const buildUnits = emittedUnits.flatMap(
+      (unit) => unit.compilationUnits ?? [unit],
+    );
+    const names = new Set(assetNames);
+    for (const unit of emittedUnits.flatMap((source) =>
+      [source].concat(source.compilationUnits ?? []),
+    )) {
+      const folded = unit.sourceName.toLowerCase();
+      if (!isPortableAssetName(unit.sourceName) || names.has(folded)) {
         throw new Error(
-          `An agent unit collides with another source: ${unit.sourceName}.`,
+          `Invalid or colliding native source: ${unit.sourceName}.`,
         );
       }
-      const path = join(directory, unit.sourceName);
+      names.add(folded);
       // eslint-disable-next-line no-await-in-loop -- Ordered unit staging.
-      await options.host.writeTextFile(path, unit.source);
-      additionalGeneratedSourcePaths.push(path);
+      await options.host.writeTextFile(
+        join(directory, unit.sourceName),
+        unit.source,
+      );
     }
+    const generatedSourcePath = join(directory, buildUnits[0]!.sourceName);
+    const additionalGeneratedSourcePaths = buildUnits
+      .slice(1)
+      .map((unit) => join(directory, unit.sourceName));
 
     const loadedAssets = await Promise.all(
       runtimeInput.assets.map(async (asset) => ({

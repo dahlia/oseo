@@ -5,6 +5,26 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/* Shared frame ceiling, also used to omit bodies that cannot be entered. */
+#define OSEO_MAX_ACTIVE_FRAME_SLOTS 65536u
+
+/* Toolchains describe callable C temporaries independently of heap roots. */
+#ifndef OSEO_CALLABLE_FRAME_MULTIPLIER
+#define OSEO_CALLABLE_FRAME_MULTIPLIER 1u
+#endif
+#ifndef OSEO_CALLABLE_FRAME_BASE_SLOTS
+#define OSEO_CALLABLE_FRAME_BASE_SLOTS 32u
+#endif
+#define OSEO_CALLABLE_FRAME_COST(slots) \
+    ((slots) <= OSEO_CALLABLE_FRAME_BASE_SLOTS ? (slots) : \
+        (slots) > OSEO_CALLABLE_FRAME_BASE_SLOTS + \
+            (OSEO_MAX_ACTIVE_FRAME_SLOTS - OSEO_CALLABLE_FRAME_BASE_SLOTS) / \
+                OSEO_CALLABLE_FRAME_MULTIPLIER ? \
+            OSEO_MAX_ACTIVE_FRAME_SLOTS + 1u : \
+            OSEO_CALLABLE_FRAME_BASE_SLOTS + \
+                ((slots) - OSEO_CALLABLE_FRAME_BASE_SLOTS) * \
+                    OSEO_CALLABLE_FRAME_MULTIPLIER)
+
 typedef uint64_t OseoValue;
 
 typedef enum {

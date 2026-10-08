@@ -646,6 +646,87 @@ test("rejects runtime asset names that are not leaf names", async () => {
   assert.deepEqual(state.temporaryDirectoryRequests, []);
 });
 
+test("stages standalone source while compiling bounded units", async () => {
+  const state = memoryHost([]);
+  const options = fixtureOptions(state.host, []);
+  let built = false;
+  await withNativeFixture(
+    {
+      ...options,
+      operation: "compile",
+      backend: {
+        emit() {
+          return {
+            source: "standalone C",
+            sourceName: "generated.c",
+            compilationUnits: [
+              { source: "unit zero", sourceName: "unit-0.c" },
+              { source: "unit one", sourceName: "unit-1.c" },
+            ],
+          };
+        },
+      },
+      toolchain: {
+        createBuildPlan(input) {
+          built = true;
+          assert.equal(
+            input.generatedSourcePath,
+            "/tmp/oseo-native-test/unit-0.c",
+          );
+          assert.deepEqual(input.additionalGeneratedSourcePaths, [
+            "/tmp/oseo-native-test/unit-1.c",
+          ]);
+          assert.equal(
+            state.files.get("/tmp/oseo-native-test/generated.c"),
+            "standalone C",
+          );
+          assert.equal(
+            state.files.get("/tmp/oseo-native-test/unit-0.c"),
+            "unit zero",
+          );
+          assert.equal(
+            state.files.get("/tmp/oseo-native-test/unit-1.c"),
+            "unit one",
+          );
+          return options.toolchain.createBuildPlan(input);
+        },
+      },
+    },
+    () => {},
+  );
+  assert.equal(built, true);
+});
+
+test("rejects bounded units colliding with runtime assets", async () => {
+  const state = memoryHost([]);
+  const options = fixtureOptions(state.host, []);
+  await assert.rejects(
+    withNativeFixture(
+      {
+        ...options,
+        backend: {
+          emit() {
+            return {
+              source: "standalone C",
+              sourceName: "generated.c",
+              compilationUnits: [
+                { source: "collision", sourceName: "runtime.c" },
+              ],
+            };
+          },
+        },
+      },
+      () => assert.fail("A colliding unit must not reach the build."),
+    ),
+    (cause: unknown) => {
+      assert.ok(cause instanceof Error);
+      assert.ok(cause.cause instanceof Error);
+      assert.match(cause.cause.message, /colliding native source: runtime\.c/u);
+      return true;
+    },
+  );
+});
+
 test("rejects assets that collide with the generated name", async () => {
   const state = memoryHost([]);
   const options = fixtureOptions(state.host, []);

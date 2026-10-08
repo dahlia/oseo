@@ -856,6 +856,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-predicate-search" ||
     fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
+    fixture.name === "array-sort-large-literal-2048" ||
+    fixture.name === "array-sort-large-literal-4096" ||
     fixture.name === "array-prototype-species-mapping" ||
     fixture.name === "bigint-intrinsic" ||
     fixture.name === "boolean-intrinsic" ||
@@ -1138,6 +1140,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "array-prototype-predicate-search" ||
     fixture.name === "array-prototype-reduction" ||
     fixture.name === "array-prototype-sort" ||
+    fixture.name === "array-sort-large-literal-2048" ||
     fixture.name === "string-prototype-search-and-slice" ||
     fixture.name === "string-prototype-match-and-split" ||
     fixture.name === "string-prototype-replace" ||
@@ -1233,6 +1236,17 @@ for (const fixture of selectedFixtures) {
             assert.ok(native.counters.allocations > 0);
             assert.ok(native.counters.collections > 0);
           }
+          if (fixture.name === "array-sort-large-literal-2048") {
+            assert.ok(native.counters.collections > 2048);
+          }
+          if (fixture.name === "array-sort-large-literal-4096") {
+            assert.ok(native.counters.allocations > 4096);
+            assert.equal(native.counters.collections, 0);
+            if (mode === "enabled") {
+              assert.ok(native.counters.guardHits > 0);
+              assert.ok(native.counters.guardMisses > 0);
+            }
+          }
           if (fixture.name === "delete-non-strict") {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1250,6 +1264,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "array-prototype-predicate-search" ||
             fixture.name === "array-prototype-reduction" ||
             fixture.name === "array-prototype-sort" ||
+            fixture.name === "array-sort-large-literal-2048" ||
             fixture.name === "array-prototype-species-mapping" ||
             fixture.name === "bigint-intrinsic" ||
             fixture.name === "boolean-intrinsic" ||
@@ -1315,6 +1330,7 @@ for (const fixture of selectedFixtures) {
                 fixture.name === "array-prototype-predicate-search" ||
                 fixture.name === "array-prototype-reduction" ||
                 fixture.name === "array-prototype-sort" ||
+                fixture.name === "array-sort-large-literal-2048" ||
                 fixture.name === "generic-string-coercion" ||
                 fixture.name === "string-iterator" ||
                 fixture.name === "iterator-helpers-eager" ||

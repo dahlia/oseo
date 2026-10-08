@@ -152,6 +152,7 @@ export type { TargetName } from "./native.ts";
 export type { ExecutionHostDescription } from "./native.ts";
 export type { TargetDescription } from "./native.ts";
 export type { EmittedNativeSource } from "./native.ts";
+export type { NativeSourceFile } from "./native.ts";
 export type { NativeBackend } from "./native.ts";
 export type { RuntimeAsset } from "./native.ts";
 export type { RuntimeArchiveAsset } from "./native.ts";

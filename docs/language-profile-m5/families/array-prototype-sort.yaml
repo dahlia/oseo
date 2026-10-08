@@ -8,17 +8,43 @@ scope:
     coercion, stability, abrupt completion order, mutation observability,
     write-back and trailing deletion, and the plain-Array copy toSorted
     allocates without consulting Symbol.species."
-  - "Reviewed standards coverage is 74 of the 75 upstream paths under
-    test/built-ins/Array/prototype/sort/ and
-    test/built-ins/Array/prototype/toSorted/. The omitted path,
-    test/built-ins/Array/prototype/sort/stability-2048-elements.js, builds a
-    2,048-element array literal that exceeds the documented 32,768 root-slot
-    native frame budget before any sorting runs, so it observes a resource
-    boundary rather than a sorting contract. Its stability contract is
-    covered instead by the eleven-element duplicated-key orderings in
-    tests/native/fixtures/array-prototype-sort.ts and by the generated
-    orderings across both merge shapes in
-    tests/property/m5-array-prototype-sort.property.test.ts."
+  - "All 75 upstream sorting paths are reviewed, including the unchanged
+    test/built-ins/Array/prototype/sort/stability-2048-elements.js.
+    Dense backend storage identities exclude non-value safepoint, status,
+    and root annotations from the native frame allocation. The existing
+    65,536-slot active frame budget remains unchanged; values keep separate
+    rooted slots throughout the frame. Fixed 2,048- and 4,096-element
+    literal fixtures and generated 2,048-to-4,096-element bucket orderings
+    verify complete stable order and element identity under both policies,
+    deliberate guard fallback, and forced collection."
+  - "Generated large literals use normal collection in the unchanged
+    two-case, 180-second ordinary property budget. Forced collection at
+    every safepoint during 2,048-element construction and sorting is pinned
+    in tests/native.ts under both policies; the 4,096-element fixture uses
+    normal collection. The pinned runner has no per-fixture timeout; the
+    sanitizer native CI job has a 75-minute limit. Forced instrumentation
+    costs about 80 CPU seconds per 2,048-element execution."
+  - "Callable entries retain conservative logical frame charges
+    separately from dense heap roots: unoptimized sanitizer expression
+    temporaries consume C stack space. Script entries charge dense values
+    plus binding-access calls separately from heap storage, retaining
+    a native-stack bound even without recursion. The 25,000-declaration
+    script regression
+    reports OSEO2001 under both policies. The unchanged wide-recursion
+    resource scenario and a 1,000-binding regression under both policies
+    keep reporting OSEO2001 before C stack exhaustion. The host C toolchain
+    supplies an eight-unit multiplier above the fixed 32-slot callable
+    overhead for unoptimized ASan/UBSan temporaries and redzones; direct and
+    dispatched calls share it.
+    Guaranteed-rejected bodies are preprocessed into diagnostic stubs before
+    sanitizer IR construction. Both 25,000-declaration rejection cases remain
+    under both policies, with a 4,096-declaration admitted companion. The
+    1,000-binding callable first verifies that its base case can enter."
+  - "Accepted bodies use iterative native helpers sharing roots, completion
+    records, and scalar state, with bounded compilation units to limit
+    sanitizer compiler memory. The outlined generator fixture combines
+    sorting, spread calls, object rest, suspension, catch, and finally
+    across helper boundaries without changing the logical frame charge."
 owners:
   - PLAN-M5.md
 evidence:
@@ -27,6 +53,7 @@ evidence:
     references:
       - tests/native/fixtures/array-prototype-sort.ts
       - tests/property/m5-array-prototype-sort.property.test.ts
+      - tests/property/m5-array-sort-stability.property.test.ts
   fixed:
     status: covered
     references:
@@ -42,18 +69,21 @@ evidence:
     references:
       - tests/property-seeds.yaml
       - tests/property/m5-array-prototype-sort.property.test.ts
+      - tests/property/m5-array-sort-stability.property.test.ts
   guard-fallback:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/array-prototype-sort.ts
       - tests/property/m5-array-prototype-sort.property.test.ts
+      - tests/property/m5-array-sort-stability.property.test.ts
   specialization:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/array-prototype-sort.ts
       - tests/property/m5-array-prototype-sort.property.test.ts
+      - tests/property/m5-array-sort-stability.property.test.ts
   standards:
     status: covered
     references:
@@ -62,6 +92,10 @@ evidence:
   structural:
     status: covered
     references:
+      - packages/backend-c/src/index.ts
+      - packages/backend-c/tests/index.test.ts
+      - packages/backend-c/src/bounded-body.ts
+      - packages/backend-c/tests/bounded-body.test.ts
       - packages/runtime-c/native/runtime_array.c
       - packages/runtime-c/native/runtime_internal.h
       - packages/runtime-c/tests/intrinsic-graph.test.ts

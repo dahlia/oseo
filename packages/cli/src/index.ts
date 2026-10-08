@@ -1107,20 +1107,26 @@ async function executeNativeWorkflow(
       : defaultComponents.backend.emit(input);
   if (emitted == null) throw new Error("No native source units supplied.");
   const extra = units?.sources.slice(1) ?? [];
+  const emittedUnits = [emitted, ...extra];
+  const buildUnits = emittedUnits.flatMap(
+    (unit) => unit.compilationUnits ?? [unit],
+  );
+  const stagedUnits = emittedUnits.flatMap((unit) =>
+    [unit].concat(unit.compilationUnits ?? []),
+  );
   const sourceNames = new Set<string>();
-  for (const unit of [emitted, ...extra]) {
+  for (const unit of stagedUnits) {
     const name = unit.sourceName.toLowerCase();
     if (!isPortableAssetName(unit.sourceName) || sourceNames.has(name)) {
       throw new Error("Invalid or duplicate native source unit name.");
     }
     sourceNames.add(name);
   }
-  for (const unit of extra) {
+  for (const unit of stagedUnits) {
     // eslint-disable-next-line no-await-in-loop -- Ordered unit staging.
     await host.writeTextFile(join(directory, unit.sourceName), unit.source);
   }
-  const generatedSourcePath = join(directory, emitted.sourceName);
-  await host.writeTextFile(generatedSourcePath, emitted.source);
+  const generatedSourcePath = join(directory, buildUnits[0]!.sourceName);
   const runtime = defaultComponents.runtime.getRuntimeInput();
   const assetNames = new Set<string>();
   for (const asset of runtime.assets) {
@@ -1313,12 +1319,12 @@ async function executeNativeWorkflow(
       }),
       generatedSourcePath,
       ...includePropertiesWhen(() => {
-        if (units == null) return undefined;
+        if (units == null && buildUnits.length === 1) return undefined;
         return {
-          additionalGeneratedSourcePaths: extra.map((unit) =>
-            join(directory, unit.sourceName),
-          ),
-          prebuiltObjectPaths: units.prebuiltObjectPaths,
+          additionalGeneratedSourcePaths: buildUnits
+            .slice(1)
+            .map((unit) => join(directory, unit.sourceName)),
+          prebuiltObjectPaths: units?.prebuiltObjectPaths ?? [],
         };
       }),
       ...includePropertiesWhen(() => {

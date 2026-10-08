@@ -4205,6 +4205,44 @@ omitted path builds a 2,048-element array literal, which exceeds the
 documented 32,768 root-slot native frame budget before any sorting runs; the
 fixed suite replaces its stability observation with an eleven-element ordering
 over duplicated keys. No path outside the roots changes classification.
+
+M5c node `array-sort-stability` supersedes the omitted-path boundary.
+The minimized 2,048-object literal requests 94,237 MIR identities without
+calling `sort`; 69,652 identities belong to non-value safepoint, status,
+and root annotations. The C backend now assigns dense storage identities
+to actual values, block parameters, and auxiliary iterator or suspension
+state, preserving separately reserved capacity. Every value keeps its own
+slot throughout the frame, so no lifetime reuse or comparison ordering
+changes. The active 65,536-slot ceiling remains unchanged. Literal
+construction still has a finite boundary proportional to actual values,
+and recursive calls still consume the shared active frame budget.
+Callable entries retain conservative logical frame charges
+separately from compact heap-root allocation. Unoptimized sanitizer code
+keeps C expression temporaries on the stack, so compacting heap roots must
+not admit deeper wide recursion. A 3,000-binding frame uses 6,017 heap-root
+slots but Zig's unoptimized UBSan object reserves 1,033,856 C stack bytes;
+charging only compact roots allowed a segmentation fault before OSEO2001.
+The unchanged wide-recursion scenario now retains its budget diagnostic,
+and a 1,000-binding regression checks both specialization policies. Script
+entries charge compact roots and two extra units per binding access.
+The host C sanitizer toolchain applies an explicit eight-unit multiplier
+to callable logical slots above the fixed 32-slot overhead, covering
+expression temporaries and ASan redzones without changing the 65,536-unit
+ceiling. Generated function
+bodies that cannot enter that ceiling are preprocessed into rejection
+stubs, so clang does not build sanitizer IR for an unenterable wide script.
+The runtime ABI is `oseo-runtime-m5-128`.
+The unchanged upstream path is admitted, and fixed 2,048- and
+4,096-element literals plus generated independent bucket orderings at seed
+`0x60008400` check every element's order and identity, copy preservation,
+both policies and deliberate shape-guard fallback. The pinned 2,048-element
+fixture forces collection at every safepoint throughout construction and
+sorting under both policies; the 4,096-element fixture uses normal
+collection. The sanitizer native CI job has a 75-minute limit, and these
+fixtures have no individual execution timeout. Generated large literals
+use normal collection inside the unchanged two-case, 180-second property
+budget. The normative sorting family now includes all 75 upstream paths.
+
 `stable-array-sort` and `change-array-by-copy` join the reviewed
 supported-feature list because this node admits both, and no already-reviewed
 path carries either flag. The manifest reaches 13,182 cases: 9,153 passes,

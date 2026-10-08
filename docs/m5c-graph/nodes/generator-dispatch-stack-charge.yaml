@@ -1,0 +1,14 @@
+version: 1
+id: generator-dispatch-stack-charge
+title: Charge native stack for resumed generators
+delivers: "emitGeneratorDispatcher calls resumed generator and async bodies
+  directly, so recursive resumption, such as a 1,000-binding generator
+  calling g(depth - 1).next(), accumulates native frames without a charge
+  and can overflow the C stack instead of reporting OSEO2001. Charge
+  continuation dispatch with the same model as callable frames, with nested
+  generator and async regression evidence under every toolchain lane,
+  including host-cc sanitizers, without lowering any budget."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

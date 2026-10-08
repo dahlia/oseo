@@ -919,6 +919,73 @@ throw boom;
   assert.equal(wideRecursion.stdout, "");
   assert.match(wideRecursion.stderr, /error\[OSEO2001\].*frame budget/u);
 
+  // Dense heap roots must not reduce the native-stack charge for callable
+  // frames: unoptimized sanitizer builds retain C expression temporaries.
+  const compactBindings = Array.from(
+    { length: 1_000 },
+    (_, index) => `const compact${index} = ${index};`,
+  ).join("\n");
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const observed = await runNativeCli(
+      {
+        args: [
+          ...(specialization === "disabled" ? ["--no-specialization"] : []),
+          "compact-frame-recursion.ts",
+        ],
+        source:
+          `function recurse(depth) {\n${compactBindings}\n` +
+          "if (depth === 0) return 0; return recurse(depth - 1);\n}\n" +
+          'if (recurse(0) !== 0) throw "compact frame admission";\n' +
+          'console.log("compact admitted");\n' +
+          "console.log(recurse(100));\n",
+        sourceId: "compact-frame-recursion.ts",
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(observed.exitStatus, 1);
+    assert.equal(observed.stdout, "compact admitted\n");
+    assert.match(observed.stderr, /error\[OSEO2001\].*frame budget/u);
+  }
+
+  // Script entries need a native-stack bound even without recursion.
+  // Keep the 25,000-binding boundary probes. The admitted 4,096-binding
+  // companion avoids building a near-ceiling C function under clang -O0;
+  // structural backend tests retain the exact charge at the wider boundary.
+  for (const [count, declaration] of [
+    [4_096, "const"],
+    [25_000, "const"],
+    [25_000, "var"],
+  ] as const) {
+    const scriptBindings = Array.from(
+      { length: count },
+      (_, index) => `${declaration} v${index}=${index};`,
+    ).join("\n");
+    for (const specialization of ["disabled", "enabled"] as const) {
+      const observed = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            "wide-script-entry.js",
+          ],
+          source: `${scriptBindings}\nconsole.log(v${count - 1});`,
+          sourceId: "wide-script-entry.js",
+          version: "0.1.0",
+        },
+        host,
+      );
+      if (count === 4_096) {
+        assert.equal(observed.exitStatus, 0, observed.stderr);
+        assert.equal(observed.stdout, "4095\n");
+        assert.equal(observed.stderr, "");
+      } else {
+        assert.equal(observed.exitStatus, 1);
+        assert.equal(observed.stdout, "");
+        assert.match(observed.stderr, /error\[OSEO2001\].*frame budget/u);
+      }
+    }
+  }
+
   const rootAllocationFailureHost = {
     ...host,
     async readTextFile(path: string | URL): Promise<string> {

@@ -17,10 +17,26 @@ or abrupt result. Generated root slots and call-argument scratch slots use a
 heap-backed root frame instead of a variable-sized C stack array. The backend
 also charges each entry against the runtime's active root-slot budget before
 entering generated C, so a wide function cannot exhaust the process stack
-before an owned resource diagnostic is possible.
+before an owned resource diagnostic is possible. Script entries charge dense
+value slots plus binding-access calls separately from heap allocation;
+non-recursive generated expression temporaries can also exhaust C stack space.
 UTF-16 string-constant units use static read-only storage rather than automatic
 compound literals, so source literal size does not enlarge a generated stack
 frame.
+Large bodies run through bounded native helpers that return continuation
+indices to an iterative owner. The owner retains roots, completion records,
+and scalar state across helper calls. Static data keeps one identity, and
+normal or abrupt completion releases the owner's root frame exactly once.
+This preserves the existing logical frame charge and 65,536-unit ceiling.
+
+The backend also supplies optional compilation units for large programs.
+Each wrapper selects a bounded group of definitions from the standalone C
+source. Native composition stages and compiles these wrappers through the
+toolchain's existing multiple-source contract, without cross-unit LTO.
+This bounds compiler IR retention as well as individual execution bodies;
+splitting functions inside one translation unit alone is insufficient for
+unoptimized sanitizer builds. The standalone source remains available for
+inspection and direct C emission.
 Function creation passes MIR-owned UTF-16 names and plain parameter counts to
 the runtime, without consulting HIR or source syntax.
 
@@ -93,3 +109,8 @@ code-identity dispatcher used by dynamic calls, promise executors, reactions,
 and asynchronous continuations. Promise, timer, and top-level await MIR targets
 remain runtime calls, so generated C does not own job queues or scheduler
 policy.
+
+Guaranteed-rejected frames use a C preprocessor branch to omit their bodies
+before sanitizer IR construction. Entry points retain their runtime charge.
+Callable charges use `OSEO_CALLABLE_FRAME_COST`, whose multiplier is supplied
+by the toolchain; scripts retain their compact-root and binding-access charge.
