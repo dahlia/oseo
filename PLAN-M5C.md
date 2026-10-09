@@ -423,10 +423,13 @@ these steps:
     nodes.
 6.  Run the terminal M5 exit audit after every generated terminal node lands.
 
-The remediation graph is an intended expansion point, not a placeholder for a
-single 19,708-path session. Its landing change adds the measured nodes and
-makes every terminal node a dependency of `m5-exit-audit`. The graph validator
-rejects a node that is not on the exit-audit dependency path.
+The remediation graph is an expansion point for measured gaps. The
+[*remediation audit*](./docs/m5c-graph/remediation-audit.md) verifies that the
+existing 78 nodes already bound the remaining tail at its named baseline. This
+audit adds no semantic node: current batches, unsupported owners, and later
+observed prerequisites already cover that work. Future observations can still
+justify a bounded node, whose terminal result must reach `m5-exit-audit`. The
+graph validator rejects any node outside that path.
 
 Observation batches are deterministic and small enough for one reviewer to
 inspect their applicability and classifications. A batch records its path

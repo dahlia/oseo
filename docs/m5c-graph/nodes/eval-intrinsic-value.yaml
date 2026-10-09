@@ -1,11 +1,16 @@
 version: 1
 id: eval-intrinsic-value
 title: Decide the eval function value
-delivers: "Owns the 25 reviewed paths rejected with Unknown binding 'eval'
+delivers: "Owns the 26 reviewed unsupported paths assigned to
+  node:eval-intrinsic-value in the derived closure ledger, rejected with
+  Unknown binding 'eval'. These include 25 paths
   that read %eval% as a value: 8 Promise
   ctx-non-ctor, 6 Array callback or element, 2 global property cases, and
   test/built-ins/Proxy/create-target-is-not-a-constructor.js, and 8 eval
-  intrinsic cases admitted by observation-batch-04. The eval cases observe
+  intrinsic cases admitted by observation-batch-04, plus
+  test/language/expressions/assignment/simple-basic-identifierreference-eval.js
+  from observation-batch-09, which assigns the bare identifier without source
+  evaluation. The eval cases observe
   length, name, prototype absence, and nonconstructibility without source
   evaluation. The Proxy case
   wraps eval and calls the proxy with no arguments, so it evaluates no source

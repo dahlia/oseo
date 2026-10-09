@@ -1,10 +1,13 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 121 reviewed paths whose eval or source constructor
-  rejection is authorized but whose non-source subject coverage is unresolved:
-  111 incidental-scaffolding paths, 5 template-site identity paths, and 2
-  variable-environment probes, plus 3 mixed static/dynamic function tests.
+delivers: "Resolves the 178 reviewed unsupported paths assigned to
+  node:dynamic-source-coverage-remediation in the derived closure ledger.
+  Select exactly those owners and their exclusion-audit path assessments:
+  the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
+  source classification, 5 from observation-batch-07, and 16 from batch 09.
+  Their eval or source constructor rejection is authorized, but non-source
+  subject coverage remains unresolved.
   Obtain the maintainer accounting decision in
   PLAN-M5C.md, then review equivalent ahead-of-time observation or replacement
   evidence per original path; preserve all paths and assertions, never emulate
