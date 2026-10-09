@@ -30,4 +30,6 @@ dependencies:
   - typed-array-feature-admission
   - well-known-intrinsics-harness
 landed: false
-status: blocked
+status: parked
+reason: "Depends on import-attributes, which awaits permission for additional
+  review cycles. This dependency hold records no failure of this batch."

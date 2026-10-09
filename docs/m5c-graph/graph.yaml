@@ -20,9 +20,9 @@ baseline:
   infrastructureFailures: 0
 summary:
   nodes: 78
-  ready: 70
-  blocked: 8
-  parked: 0
+  ready: 69
+  blocked: 5
+  parked: 4
   landed: 16
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
