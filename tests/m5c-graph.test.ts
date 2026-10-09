@@ -381,7 +381,7 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 15);
+  assert.ok(summary.landed >= 16);
   assert.equal(summary.parked, 0);
 });
 
@@ -422,7 +422,7 @@ test("independent M5c manifest publishers declare their collisions", () => {
   const collisions = graph.collisions.filter(
     (group) => group.path === "tests/test262/results.yaml",
   );
-  // These three unlanded contracts inspect or propose work without
+  // These source-only contracts inspect or propose work without
   // publishing observations. New source-only nodes need a bounded exemption.
   const sourceOnly = new Set([
     "dynamic-import-staged-plan",

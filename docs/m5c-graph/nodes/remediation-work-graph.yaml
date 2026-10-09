@@ -10,5 +10,5 @@ delivers: "Replaces the measured unknown tail with bounded implementation,
 dependencies:
   - observation-batch-plan
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
