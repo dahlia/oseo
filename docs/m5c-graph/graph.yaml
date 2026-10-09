@@ -9,11 +9,11 @@ usage: "Take a node whose status is ready and whose landed field is false.
 baseline:
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
   inventoryPaths: 41091
-  reviewedPaths: 25347
-  unreviewedPaths: 15744
+  reviewedPaths: 25348
+  unreviewedPaths: 15743
   passes: 21667
   expectedNegatives: 2190
-  unsupportedProfileFeatures: 1490
+  unsupportedProfileFeatures: 1491
   semanticFailures: 0
   harnessFailures: 0
   infrastructureFailures: 0

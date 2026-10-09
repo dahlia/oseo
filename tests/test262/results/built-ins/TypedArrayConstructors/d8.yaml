@@ -4,6 +4,34 @@ results:
   - case:
       async: false
       features:
+        - TypedArray
+        - ArrayBuffer
+        - Symbol.species
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - array-buffer
+      - object-properties
+      - typed-array-constructors
+    observation:
+      detail: 'test/built-ins/TypedArrayConstructors/ctors/no-species.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/TypedArrayConstructors/ctors/no-species.js:104:18:
+        error[OSEO1001]: The Object.prototype.__proto__ accessor is
+        excluded by Annex B.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - BigInt
         - TypedArray
       flags: []

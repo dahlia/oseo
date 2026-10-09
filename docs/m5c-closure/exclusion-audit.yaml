@@ -106,6 +106,7 @@ assessments:
       those environments; retain remediation until independent evidence
       or a maintainer decision bounds the gap.
   annex-b-pattern:
+    remediationOwner: node:regexp-split-coverage-remediation
     disposition: remediation
     normativeDependency: not-demonstrated
     reason: The observed rejection is the Annex B-only /\k<x>/ pattern,
@@ -125,6 +126,26 @@ assessments:
       authorize excluding static constructibility or instanceof
       behavior. Keep remediation until replacement evidence or a
       maintainer accounting decision bounds these assertions.
+  annex-b-typed-array-prototype:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    remediationOwner: node:typed-array-proto-coverage-remediation
+    replacementEvidence:
+      tests/native/fixtures/typed-array-constructors.ts: "\
+        44b36f7a8e551ea63ba572d843a34ddfac51812f2f7e75c6f5af86dbea4d15ef"
+      tests/property/m5-typed-array-constructors.property.test.ts: "\
+        a001303e4df1a760981ff310a7928e9aaefbab6666200e2d930d8736f6ae318b"
+    reason: The only observed failure is the excluded Annex B __proto__
+      read. The source also requires TypedArray-to-TypedArray cloning to
+      ignore an ArrayBuffer subclass constructor and species, and checks
+      the fresh buffer prototype and constructor. The
+      typed-array-buffer-without-species-core native fixture retains the
+      subclass, throwing constructor and species getter, clone, and both
+      core assertions using Object.getPrototypeOf for prototype
+      reflection. Existing constructor properties supply generated clone
+      and buffer evidence. These core algorithms do not normatively
+      require Annex B; retain bounded remediation until the maintainer
+      accounting decision, without authorizing a whole-path exclusion.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2158,6 +2179,18 @@ paths:
     section: sec-%throwtypeerror%
     subject: "%ThrowTypeError% is defined once for each realm."
     assessment: fixture-construction
+  - path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
+    proposedOwner: adr:0013-m5-edition-and-manifest
+    priorCohort: annex-b
+    sourceDigest: "33b9d901601b21e6ecac87492732e4096e64509ff95a58ea\
+      be013c1cae6c2085"
+    observationDigest: "ef01bf04a4de580f7d2acd8d6b74463e55e9b965c1a895e8\
+      07be39c0a886125f"
+    missingDynamicTag: false
+    section: sec-initializetypedarrayfromtypedarray
+    subject: TypedArray cloning without ArrayBuffer subclass
+      species construction
+    assessment: annex-b-typed-array-prototype
   - path: test/built-ins/WeakMap/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

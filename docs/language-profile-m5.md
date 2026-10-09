@@ -27,6 +27,28 @@ M5a is complete. The normative family records described below inventory 142
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
+M5c node `annexb-proto-dependency-classification` makes only a missing
+`__proto__` lookup reaching an intrinsic `Object.prototype` observable as
+`OSEO1001`. The existing immutable-prototype brand identifies that intrinsic
+across realms. Core properties named `__proto__`, null prototypes, proxy
+traps, and unrelated abrupt completions retain their behavior. No Annex B
+accessor is installed. The existing indexed Object prototype family records
+this rejection boundary and its generated ordinary-property evidence.
+
+The exact reviewed admission is
+*test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
+observation remains owned by `node:typed-array-proto-coverage-remediation`;
+ADR 0013 excludes the accessor but does not close mixed core coverage. The
+fixed `typed-array-buffer-without-species-core` fixture preserves the original
+ArrayBuffer subclass, throwing constructor and species getter, TypedArray
+clone, and fresh buffer's intrinsic prototype and constructor. Core reflection
+replaces only the incidental accessor observation. Bounded ordinary-property
+generation uses seed `0x60008500`, absent, truthful, and false hints, both
+specialization policies, deliberate shape-guard misses, generic fallback, and
+collection at every safepoint. Native diagnostic tests pin direct, computed,
+Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI is
+`oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary stay unchanged.
+
 
 Claim boundary
 --------------
@@ -55,8 +77,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 21,383 reviewed cases: 18,386 passes, 1,560
-expected negatives, and 1,437 unsupported profile features. It records no
+The current manifest contains 25,348 reviewed cases: 21,667 passes, 2,190
+expected negatives, and 1,491 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 

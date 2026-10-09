@@ -1,6 +1,14 @@
 @oseo/runtime-c
 ===============
 
+A missing property read that reaches an intrinsic `Object.prototype` reports
+`OSEO1001` for the excluded Annex B `__proto__` accessor. The diagnostic
+applies after ordinary descriptors and proxy dispatch, including another
+realm's prototype. Own and inherited user properties named `__proto__`, null
+prototype objects, and nullish receiver errors retain their core behavior.
+No legacy accessor is installed, and writes and reflection retain their
+existing contracts.
+
 Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
 provide ASan coverage. The separate Linux host C sanitizer lane now verifies
 instrumentation; its measured scope is recorded in the [activity audit]. This

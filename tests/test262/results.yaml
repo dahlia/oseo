@@ -18453,7 +18453,7 @@ summary:
   infrastructureFailures: 0
   passes: 21667
   semanticFailures: 0
-  unsupportedProfileFeatures: 1490
+  unsupportedProfileFeatures: 1491
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 5
@@ -18468,7 +18468,7 @@ summary:
       infrastructureFailures: 0
       passes: 757
       semanticFailures: 0
-      unsupportedProfileFeatures: 36
+      unsupportedProfileFeatures: 37
     - dependency: async-functions
       expectedNegatives: 231
       harnessFailures: 0
@@ -18636,7 +18636,7 @@ summary:
       infrastructureFailures: 0
       passes: 13010
       semanticFailures: 0
-      unsupportedProfileFeatures: 191
+      unsupportedProfileFeatures: 192
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -18713,7 +18713,7 @@ summary:
       infrastructureFailures: 0
       passes: 81
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - dependency: typed-array-core
       expectedNegatives: 0
       harnessFailures: 0
@@ -19071,7 +19071,7 @@ summary:
       infrastructureFailures: 0
       passes: 395
       semanticFailures: 0
-      unsupportedProfileFeatures: 0
+      unsupportedProfileFeatures: 1
     - group: built-ins/WeakMap
       expectedNegatives: 0
       harnessFailures: 0

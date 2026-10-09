@@ -21,6 +21,7 @@ const owner = "adr:0016-dynamic-source-boundary";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const annexRemediationOwner = "node:regexp-split-coverage-remediation";
+const protoRemediationOwner = "node:typed-array-proto-coverage-remediation";
 const source = 'eval("1");';
 const observation = {
   passed: false,
@@ -100,6 +101,11 @@ function fixture(
           ? "not-demonstrated"
           : "source-evaluation-only",
         reason: "The source and diagnostic were reviewed for this contract.",
+        remediationOwner: annexRemediationOwner,
+        replacementEvidence: {
+          "tests/native/fixtures/typed-array-constructors.ts":
+            exclusionAuditDigest("reviewed core fixture"),
+        },
       },
     },
     paths: [
@@ -132,6 +138,12 @@ function fixture(
     results: [{ ...result, observation: observed }],
     records,
     sources: new Map([[path, sourceText]]),
+    replacementEvidence: new Map([
+      [
+        "tests/native/fixtures/typed-array-constructors.ts",
+        "reviewed core fixture",
+      ],
+    ]),
   };
   return { audit, inputs };
 }
@@ -400,7 +412,9 @@ test("checked-in audit counts match ledger owners after promotions", () => {
   );
   const remediation = ledger.entries.filter(
     (entry) =>
-      entry.owner === remediationOwner || entry.owner === annexRemediationOwner,
+      entry.owner === remediationOwner ||
+      entry.owner === annexRemediationOwner ||
+      entry.owner === protoRemediationOwner,
   );
   assert.deepEqual(validateCurrentM5cExclusionAudit(), {
     exclusions: exclusions.length,
@@ -409,6 +423,7 @@ test("checked-in audit counts match ledger owners after promotions", () => {
       (entry) =>
         entry.owner !== annexOwner &&
         entry.owner !== annexRemediationOwner &&
+        entry.owner !== protoRemediationOwner &&
         !entry.prerequisites.includes("dynamic-source"),
     ).length,
   });
@@ -499,6 +514,95 @@ test("mixed Annex B/core coverage needs its own remediation owner", () => {
     () => validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
     /bounded surface differs from record/u,
   );
+});
+
+test("the exact Annex B accessor rejection uses its assessed owner", () => {
+  const detail =
+    "error[OSEO1001]: The Object.prototype.__proto__ accessor " +
+    "is excluded by Annex B.";
+  for (const rejection of [
+    detail,
+    `${detail}\n`,
+    `${detail}\\n`,
+    `failed (1): stdout="" stderr="test/case.js:1:1: ${detail}\\n"`,
+  ]) {
+    const { audit, inputs } = fixture(true);
+    audit.paths[0]!.proposedOwner = annexOwner;
+    audit.paths[0]!.missingDynamicTag = false;
+    audit.assessments.reviewed.remediationOwner = protoRemediationOwner;
+    const observed = { ...observation, detail: rejection };
+    audit.paths[0]!.observationDigest = exclusionObservationDigest(observed);
+    const annexInputs: M5cExclusionAuditInputs = {
+      ...inputs,
+      results: [{ ...result, observation: observed }],
+      ledger: {
+        ...inputs.ledger,
+        entries: inputs.ledger.entries.map((entry) =>
+          Object.assign({}, entry, { owner: protoRemediationOwner }),
+        ),
+      },
+    };
+    assert.equal(
+      validateM5cExclusionAudit(stringifyYaml(audit), annexInputs).remediation,
+      1,
+    );
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(stringifyYaml(audit), {
+          ...annexInputs,
+          replacementEvidence: new Map(),
+        }),
+      /replacement evidence changed/u,
+    );
+    audit.assessments.reviewed.remediationOwner = annexRemediationOwner;
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
+      /requires owner node:regexp-split-coverage-remediation/u,
+    );
+    audit.assessments.reviewed.remediationOwner = "node:observation-batch-03";
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
+      /bounded Annex B remediation owner/u,
+    );
+    audit.paths = [];
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), annexInputs),
+      /no reviewed exclusion audit/u,
+    );
+  }
+});
+
+test("near-miss accessor diagnostics preserve unrelated failures", () => {
+  for (const detail of [
+    "error[OSEO2001]: The Object.prototype.__proto__ accessor " +
+      "is excluded by Annex B.",
+    "error[OSEO1001]: The Object.prototype.__proto__ setter " +
+      "is excluded by Annex B.",
+    "error[OSEO1001]: The Object.prototype.__proto__ accessor " +
+      "is excluded by Annex B. Extra text.",
+    "error[OSEO1001]: Unknown binding '__proto__'.",
+    'failed (1): stdout="error[OSEO1001]: The Object.prototype.' +
+      '__proto__ accessor is excluded by Annex B.\\n" ' +
+      "stderr=\"case.js:1:1: error[OSEO1001]: Unknown binding 'other'.\\n\"",
+    'failed (1): stdout="" stderr="error[OSEO1001]: The Object.prototype.' +
+      "__proto__ accessor is excluded by Annex B.\\n" +
+      "case.js:1:1: error[OSEO1001]: Unknown binding 'other'.\\n\"",
+  ]) {
+    const { audit, inputs } = fixture(true);
+    audit.paths[0]!.proposedOwner = annexOwner;
+    audit.paths[0]!.missingDynamicTag = false;
+    const observed = { ...observation, detail };
+    audit.paths[0]!.observationDigest = exclusionObservationDigest(observed);
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(stringifyYaml(audit), {
+          ...inputs,
+          results: [{ ...result, observation: observed }],
+        }),
+      /outside the record surface/u,
+      detail,
+    );
+  }
 });
 
 test("revision, cohort, record keys, and order must be valid", () => {

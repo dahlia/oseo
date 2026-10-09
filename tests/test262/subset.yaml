@@ -49835,6 +49835,9 @@ tests:
   - path: test/built-ins/TypedArrayConstructors/ctors-bigint/object-arg/bigint-tobiguint64.js
     expectedClassification: pass
     dependencies: [typed-array-constructors]
+  - path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [array-buffer, object-properties, typed-array-constructors]
   - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/desc-value-throws.js
     expectedClassification: pass
     dependencies:

@@ -2,6 +2,45 @@ import type { Fixture } from "../fixture.ts";
 
 export const typedArrayConstructorFixtures: readonly Fixture[] = [
   {
+    name: "typed-array-buffer-without-species-core",
+    source: `
+let forbiddenConstruction = false;
+class GrossBuffer extends ArrayBuffer {
+  constructor() {
+    super(...arguments);
+    if (forbiddenConstruction) throw new Error("buffer constructor read");
+  }
+  static get [Symbol.species]() { throw new Error("buffer species read"); }
+}
+const grossBuffer = new GrossBuffer(1024);
+forbiddenConstruction = true;
+const grossView = new Uint8Array(grossBuffer);
+const mysteryView = new Int8Array(grossView);
+console.log(
+  "original core",
+  Object.getPrototypeOf(mysteryView.buffer) === ArrayBuffer.prototype,
+  mysteryView.buffer.constructor === ArrayBuffer,
+  mysteryView.length,
+);
+for (const Constructor of [
+  Int8Array, Uint8Array, Uint8ClampedArray, Int16Array, Uint16Array,
+  Int32Array, Uint32Array, Float32Array, Float64Array,
+  BigInt64Array, BigUint64Array,
+]) {
+  const source = new Constructor(grossBuffer);
+  const clone = new Constructor(source);
+  console.log(
+    Constructor.name,
+    Object.getPrototypeOf(clone.buffer) === ArrayBuffer.prototype,
+    clone.buffer.constructor === ArrayBuffer,
+    Object.getPrototypeOf(clone) === Constructor.prototype,
+    clone.buffer !== grossBuffer,
+    clone.length === source.length,
+  );
+}
+`,
+  },
+  {
     globalScriptReference: true,
     name: "typed-array-constructors",
     source: `
