@@ -532,3 +532,7 @@ families:
     owner: tests/property/m5-array-sort-stability.property.test.ts
     start: 0x60008400
     end: 0x600084ff
+  - family: m5-annexb-proto-boundary
+    owner: tests/property/m5-annexb-proto-boundary.property.test.ts
+    start: 0x60008500
+    end: 0x600085ff

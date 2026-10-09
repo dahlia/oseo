@@ -4,7 +4,7 @@
 # Selectors change only through `mise run m5c:observation-batches:plan`.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 15744
+unreviewedPaths: 15743
 basis:
   supportedFeatures:
     - AggregateError
@@ -166,7 +166,7 @@ regeneration:
   secondsPerVariant: 0.0549
   currentExecutedVariants: 85789
   currentSeconds: 4713
-  finalExecutedVariants: 136303
+  finalExecutedVariants: 136299
   finalSeconds: 7489
   plan:
     batches: 27
@@ -175,7 +175,7 @@ regeneration:
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 46.98
+    scheduleHours: 46.97
     fullUpdateScheduleHours: 92.41
   alternatives:
     - batches: 43
@@ -185,7 +185,7 @@ regeneration:
         paths: 2000
         reviewUnits: 300
       scheduleHours: 73.77
-      fullUpdateScheduleHours: 146
+      fullUpdateScheduleHours: 145.99
     - batches: 24
       largestPaths: 2408
       largestReviewUnits: 595
@@ -193,14 +193,14 @@ regeneration:
         paths: 4000
         reviewUnits: 600
       scheduleHours: 42.18
-      fullUpdateScheduleHours: 82.82
+      fullUpdateScheduleHours: 82.81
     - batches: 12
       largestPaths: 4330
-      largestReviewUnits: 1198
+      largestReviewUnits: 1197
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 22.55
+      scheduleHours: 22.54
       fullUpdateScheduleHours: 43.55
 batches:
   - id: observation-batch-01
@@ -304,8 +304,8 @@ batches:
         - test/built-ins/TypedArrayConstructors/from/
     dependsOn:
       - observation-batch-plan
-    paths: 315
-    reviewUnits: 315
+    paths: 314
+    reviewUnits: 314
     generatedPaths: 0
     prerequisites: {}
     dynamicSource: {}
@@ -321,16 +321,15 @@ batches:
       testTypedArray.js: 294
     features:
       Array.prototype.values: 3
-      ArrayBuffer: 1
       BigInt: 141
       Reflect: 24
       Reflect.construct: 11
       SharedArrayBuffer: 48
       Symbol: 20
       Symbol.iterator: 19
-      Symbol.species: 7
+      Symbol.species: 6
       Symbol.toPrimitive: 4
-      TypedArray: 312
+      TypedArray: 311
       generators: 1
       resizable-arraybuffer: 1
     negatives: {}
@@ -340,7 +339,7 @@ batches:
       files: 185
       newFiles: 34
     regeneration:
-      executableVariants: 1252
+      executableVariants: 1248
       scopedUpdateSeconds: 69
       fullCorpusSeconds: 4840
   - id: observation-batch-05
@@ -714,7 +713,7 @@ batches:
     regeneration:
       executableVariants: 1350
       scopedUpdateSeconds: 74
-      fullCorpusSeconds: 5550
+      fullCorpusSeconds: 5549
   - id: observation-batch-15
     selector:
       prerequisiteSets:
@@ -1398,7 +1397,7 @@ batches:
     regeneration:
       executableVariants: 3444
       scopedUpdateSeconds: 189
-      fullCorpusSeconds: 7199
+      fullCorpusSeconds: 7198
   - id: observation-batch-27
     selector:
       prerequisiteSets:

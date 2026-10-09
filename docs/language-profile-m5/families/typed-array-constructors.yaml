@@ -15,8 +15,12 @@ scope:
     accessors and methods, static from and of methods, and species behavior
     are omitted here, retain their later M5b graph owners, and have explicit
     runtime lookup boundaries."
+  - "TypedArray-to-TypedArray cloning ignores an ArrayBuffer subclass
+    constructor and species; the fresh buffer has the intrinsic ArrayBuffer
+    prototype and constructor, observed through core reflection."
 owners:
   - PLAN-M5.md
+  - PLAN-M5C.md
 evidence:
   differential:
     status: covered

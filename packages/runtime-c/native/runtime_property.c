@@ -175,6 +175,20 @@ static OseoResult object_get(
             }
             return normal(value);
         }
+        /* Only a missing lookup at %Object.prototype% reaches the excluded
+         * Annex B accessor. Own/inherited user properties, proxies, null
+         * prototypes, and nullish receiver errors keep their ordinary path.
+         * The immutable-prototype brand also identifies another realm's
+         * %Object.prototype%; module namespaces are a separate exotic. */
+        if (object->immutable_prototype && !object->module_namespace &&
+            oseo_internal_string_is_ascii(key, "__proto__")) {
+            return failure(
+                context,
+                "OSEO1001",
+                "The Object.prototype.__proto__ accessor is excluded "
+                "by Annex B."
+            );
+        }
         current = object->prototype;
     }
     return normal(oseo_undefined());

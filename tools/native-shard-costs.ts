@@ -9,6 +9,9 @@
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
     "tests/property/m4-async.property.test.ts": 465,
+    // New boundary suite uses the adjacent prototype family's estimate
+    // until both native CI hosts supply concurrent-duration measurements.
+    "tests/property/m5-annexb-proto-boundary.property.test.ts": 321,
     "tests/property/m5-aggregate-error.property.test.ts": 274,
     "tests/property/m5-arguments-object.property.test.ts": 464,
     "tests/property/m5-array-binding.property.test.ts": 242,
@@ -141,6 +144,9 @@ export const nativeShardCosts = {
   },
   "macos-aarch64": {
     "tests/property/m4-async.property.test.ts": 283,
+    // New boundary suite uses the adjacent prototype family's estimate
+    // until both native CI hosts supply concurrent-duration measurements.
+    "tests/property/m5-annexb-proto-boundary.property.test.ts": 292,
     "tests/property/m5-aggregate-error.property.test.ts": 251,
     "tests/property/m5-arguments-object.property.test.ts": 645,
     "tests/property/m5-array-binding.property.test.ts": 212,

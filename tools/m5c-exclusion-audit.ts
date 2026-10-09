@@ -29,7 +29,15 @@ const auditPath = "docs/m5c-closure/exclusion-audit.yaml";
 const dynamicOwner = "adr:0016-dynamic-source-boundary";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
-const annexRemediationOwner = "node:regexp-split-coverage-remediation";
+const annexRemediationOwners = new Set([
+  "node:regexp-split-coverage-remediation",
+  "node:typed-array-proto-coverage-remediation",
+]);
+const annexProtoRejection = new RegExp(
+  "error\\[OSEO1001\\]: The Object\\.prototype\\.__proto__ accessor " +
+    "is excluded by Annex B\\.$",
+  "u",
+);
 const dynamicImportRejection = new RegExp(
   "error\\[OSEO1001\\]: ImportExpression is outside the M1 profile\\." +
     "(?=$|\\r?\\n|\\\\n)",
@@ -134,6 +142,8 @@ export interface M5cExclusionAuditInputs {
   readonly results: readonly Test262Result[];
   readonly records: ReadonlyMap<string, string>;
   readonly sources: ReadonlyMap<string, string>;
+  /** Reviewed replacement sources, when a mixed assessment binds them. */
+  readonly replacementEvidence?: ReadonlyMap<string, string>;
 }
 
 /** Counts distinguish authorized rejection from unresolved subject coverage. */
@@ -314,6 +324,18 @@ export function validateM5cExclusionAudit(
       throw new Error(`Audit observation changed: ${path}.`);
     }
     const detail = result.observation.detail ?? "";
+    // Process observations quote stderr separately. Text printed to stdout
+    // cannot authorize the new accessor surface. Direct diagnostic fixtures
+    // and non-process rejections have no such wrapper.
+    const stderrStart = detail.lastIndexOf('stderr="');
+    const accessorDetail = (
+      stderrStart < 0
+        ? detail
+        : detail.slice(
+            stderrStart + 'stderr="'.length,
+            detail.endsWith('"') ? -1 : undefined,
+          )
+    ).replace(/(?:\r?\n|\\n)+$/u, "");
     const dynamicSurface =
       detail.includes("error[OSEO1001]:") &&
       ((detail.includes("Unknown binding 'eval'.") &&
@@ -332,11 +354,12 @@ export function validateM5cExclusionAudit(
           detail.includes(`${name} compiles source text at run time`),
         ));
     const annexSurface =
-      detail.includes("error[OSEO1001]:") &&
-      detail.includes(
-        "A named backreference in a pattern that declares no group name " +
-          "is admitted only by Annex B",
-      );
+      (detail.includes("error[OSEO1001]:") &&
+        detail.includes(
+          "A named backreference in a pattern that declares no group name " +
+            "is admitted only by Annex B",
+        )) ||
+      annexProtoRejection.test(accessorDetail);
     if (proposedOwner === dynamicOwner ? !dynamicSurface : !annexSurface) {
       throw new Error(
         `Audit rejection is outside the record surface: ${path}.`,
@@ -349,6 +372,39 @@ export function validateM5cExclusionAudit(
       throw new Error(`Audit dependency-tag debt changed: ${path}.`);
     }
     if (missingTag) missingDynamicTags += 1;
+    const annexRemediationOwner = assessment.remediationOwner;
+    if (
+      !excluded &&
+      proposedOwner === annexOwner &&
+      (!isString(annexRemediationOwner) ||
+        !annexRemediationOwners.has(annexRemediationOwner))
+    ) {
+      throw new Error(
+        `Audit needs a bounded Annex B remediation owner: ${path}.`,
+      );
+    }
+    if (
+      annexRemediationOwner === "node:typed-array-proto-coverage-remediation"
+    ) {
+      const replacements = parsedObject(
+        assessment.replacementEvidence,
+        `${path} replacement evidence`,
+      );
+      if (Object.keys(replacements).length === 0) {
+        throw new Error(
+          `Audit needs reviewed core replacement evidence: ${path}.`,
+        );
+      }
+      for (const [reference, digest] of Object.entries(replacements)) {
+        const replacement = inputs.replacementEvidence?.get(reference);
+        if (
+          replacement == null ||
+          digest !== exclusionAuditDigest(replacement)
+        ) {
+          throw new Error(`Audit replacement evidence changed: ${reference}.`);
+        }
+      }
+    }
     const owner = excluded
       ? proposedOwner
       : proposedOwner === annexOwner
@@ -364,7 +420,7 @@ export function validateM5cExclusionAudit(
     if (
       (entry.owner.startsWith("adr:") ||
         entry.owner === remediationOwner ||
-        entry.owner === annexRemediationOwner) &&
+        annexRemediationOwners.has(entry.owner)) &&
       !seen.has(entry.path)
     ) {
       throw new Error(
@@ -390,6 +446,31 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
     fileURLToPath(import.meta.resolve("test262/package.json")),
   );
   const sources = new Map<string, string>();
+  const replacementEvidence = new Map<string, string>();
+  const assessments = parsedObject(audit.assessments, "audit assessments");
+  for (const value of Object.values(assessments)) {
+    const assessment = parsedObject(value, "audit assessment");
+    if (assessment.replacementEvidence == null) continue;
+    for (const path of Object.keys(
+      parsedObject(
+        assessment.replacementEvidence,
+        "audit replacement evidence",
+      ),
+    )) {
+      if (
+        !/^(?:tests|packages|docs)\/[A-Za-z0-9_./-]+$/u.test(path) ||
+        path.split("/").includes("..")
+      ) {
+        throw new Error(
+          `Audit replacement is not repository evidence: ${path}.`,
+        );
+      }
+      replacementEvidence.set(
+        path,
+        readFileSync(join(repositoryRoot, path), "utf8"),
+      );
+    }
+  }
   if (!Array.isArray(audit.paths))
     throw new Error("Audit paths must be an array.");
   for (const value of audit.paths) {
@@ -410,6 +491,7 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
     results: readCurrentM5cManifest().results,
     records: recordSources,
     sources,
+    replacementEvidence,
   });
 }
 

@@ -6,40 +6,51 @@ scope:
     prototype."
   - "hasOwnProperty, isPrototypeOf, propertyIsEnumerable, toString,
     toLocaleString, valueOf, and constructor."
+  - "A missing __proto__ read reaching an intrinsic Object.prototype
+    reports OSEO1001 for the excluded Annex B accessor; ordinary properties
+    with that name, null prototypes, and proxy traps retain core behavior."
 owners:
   - PLAN-M5.md
+  - PLAN-M5C.md
 evidence:
   differential:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
       - tests/property/m5-object-prototype.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
+      - tests/annexb-proto-boundary.test.ts
+      - tests/m5c-exclusion-audit.test.ts
   forced-collection:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/property/m5-object-prototype.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   generated:
     status: covered
     references:
       - tests/property/m5-object-prototype.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   guard-fallback:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/property/m5-object-prototype.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   specialization:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/property/m5-object-prototype.property.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   standards:
     status: covered
     references:

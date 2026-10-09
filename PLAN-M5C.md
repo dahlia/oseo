@@ -643,3 +643,32 @@ expand after new observations.
 
 The completion report describes Oseo's measured M5 profile. It does not call
 the result unqualified ECMA-262 conformance while ADR 0016 remains accepted.
+
+
+Incidental Annex B prototype dependency
+---------------------------------------
+
+The `annexb-proto-dependency-classification` node admits exactly
+*test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Core
+TypedArray cloning already ignores the ArrayBuffer subclass constructor
+and species. A missing `__proto__` read that reaches the intrinsic
+`Object.prototype` now reports its owned `OSEO1001` rejection. Own or
+inherited user properties, proxy traps, null prototypes, and unrelated
+abrupt completions retain their ordinary behavior; no Annex B accessor
+is installed. Runtime ABI `m5-129` records this diagnostic boundary.
+
+The reviewed path mixes core TypedArray assertions with an incidental
+Annex B read. Its ledger owner remains
+`node:typed-array-proto-coverage-remediation`, supported by the reviewed
+`typed-array-buffer-without-species-core` native fixture and existing
+constructor properties. The exclusion audit records their source digests
+and requires each mixed Annex B assessment to name its bounded owner.
+ADR 0013 accepts no new exclusion; a maintainer accounting decision is
+still required for that remediation.
+
+Complete regeneration observes 25,348 paths: 21,667 passes, 2,190 expected
+negatives, and 1,491 unsupported profile features, with no semantic,
+harness, or infrastructure failures. The sole added record is the owned
+path, and every previously reviewed observation is unchanged. The graph
+baseline, closure ledger, and observation batches follow those canonical
+records. The node remains `landed: false` and `status: ready` until merged.

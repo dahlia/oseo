@@ -13,8 +13,8 @@ states:
   infrastructure-failure: 0
   pass: 21667
   semantic-failure: 0
-  unreviewed: 15744
-  unsupported-profile-feature: 1490
+  unreviewed: 15743
+  unsupported-profile-feature: 1491
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -115,7 +115,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-03. The batch observes them; no
       classification is assumed before it does.
-    paths: 315
+    paths: 314
   node:observation-batch-05:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-05. The batch observes them; no
@@ -279,6 +279,8 @@ owners:
       constructors (40), or typeof Float16Array is outside the
       global-object profile (2).
     paths: 42
+  node:typed-array-proto-coverage-remediation:
+    paths: 1
   node:unhandled-rejection-observation:
     note: Runtime capability unhandled-rejection-policy; 19 paths.
     paths: 19
@@ -17383,7 +17385,7 @@ paths:
   test/built-ins/TypedArrayConstructors/ctors/no-args/undefined-newtarget-throws.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/no-args/use-custom-proto-if-object.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/no-args/use-default-proto-if-custom-proto-is-not-object.js: [unreviewed, node:observation-batch-03]
-  test/built-ins/TypedArrayConstructors/ctors/no-species.js: [unreviewed, node:observation-batch-03]
+  test/built-ins/TypedArrayConstructors/ctors/no-species.js: [unsupported-profile-feature, node:typed-array-proto-coverage-remediation, [array-buffer, object-properties, typed-array-constructors]]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/as-array-returns.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/as-generator-iterable-returns.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/object-arg/conversion-operation-consistent-nan.js: [unreviewed, node:observation-batch-03]

@@ -81,3 +81,40 @@ debt neither authorizes exclusion nor changes the observed classification.
 The separate `dynamic-import-staged-plan` node plans ADR 0016 alternative 3 for
 build-time-resolvable imports. Until a maintainer accepts a later decision, it
 supplies no admission or changed exclusion authority.
+
+
+Incidental Annex B TypedArray prototype lookup
+----------------------------------------------
+
+The classification node owns exactly
+*test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its final
+prototype assertion reads the excluded Annex B accessor; the required
+TypedArray clone behavior does not depend normatively on that accessor.
+The exact owned rejection is:
+
+~~~~ text
+error[OSEO1001]: The Object.prototype.__proto__ accessor is excluded by Annex B.
+~~~~
+
+A different diagnostic code, accessor name, or message is outside this
+bounded addition. Ordinary properties named `__proto__`, null prototype
+objects, and proxy traps are not Annex B accessors.
+
+The mixed assessment names
+`remediationOwner: node:typed-array-proto-coverage-remediation` and keeps
+`disposition: remediation` with `normativeDependency: not-demonstrated`.
+ADR 0013 authorizes the accessor rejection, not exclusion of the whole path.
+The RegExp split assessment separately names its existing remediation owner.
+The checker accepts only these bounded Annex B owners and requires each
+ledger owner to have a reviewed assessment.
+
+The new assessment binds the replacement source digest in
+`replacementEvidence`. The `typed-array-buffer-without-species-core` fixture
+in *../../tests/native/fixtures/typed-array-constructors.ts* preserves the
+original subclass, throwing constructor and species getter, TypedArray clone,
+and fresh-buffer prototype and constructor assertions. It observes the
+prototype through `Object.getPrototypeOf` instead of the excluded accessor
+and retains the original upstream path unchanged. Existing constructor
+properties supply generated constructor, clone, and buffer coverage.
+Replacement evidence supports the core contract; assigning an exclusion still
+requires the remediation node's maintainer accounting decision.
