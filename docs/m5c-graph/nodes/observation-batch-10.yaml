@@ -8,5 +8,5 @@ delivers: "Observes the 2304 unreviewed paths that
   result an owner."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
