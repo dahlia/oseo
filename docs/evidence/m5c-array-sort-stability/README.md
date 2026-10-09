@@ -452,3 +452,55 @@ budget, seed, size limit, timeout, shard total, or frame ceiling changed.
 This dispatch's raw probes, failed intermediate attempts, reviews, and gate
 receipts are retained under
 */data/array-sort-bounded-task\_430cd5d8efa7/*.
+
+
+Hosted-runner interrupt budget
+------------------------------
+
+The landed 180-second ordinary budget, which the extended tier scales to
+1,800 seconds for 20 cases, held on every 16-core host and failed on hosted
+Linux. Main runs [37867645790] at `e30aafca` and [37884543813] at `af4770eb`
+each failed `native support (linux-x86_64-gnu, 5/5)` twice and passed on the
+third attempt, so each landing cost two reruns. Both failures are the same
+observation: `large Array sorting preserves every identity` interrupted at
+1,800,006 milliseconds after 17 of 20 cases, with no counterexample.
+
+Measured extended durations for the same 20 cases:
+
+| Host                                    | Cores |                 Duration |
+| --------------------------------------- | ----: | -----------------------: |
+| Development Linux host                  |    16 |                  301.2 s |
+| Self-hosted macOS lane, run 37884543813 |    16 |                  384.0 s |
+| Hosted Linux, run 37884543813 attempt 3 |     4 |                1,187.0 s |
+| Hosted Linux, run 37884543813 attempt 2 |     4 | over 1,800 s at 17 cases |
+
+Every extended case builds, links, and runs a 2,048 to 4,096 object literal
+twice, once per specialization policy. A four-core hosted runner therefore
+spends about seven times the per-case time of a 16-core host, and its
+observed spread of 59 to over 106 seconds per case straddles the deadline.
+Earlier local measurements in this document, 300, 837, and 1,389 seconds,
+show that the margin was already thin where the budget was derived.
+
+The budget is now 300 ordinary seconds, which the extended tier scales to
+3,000 seconds. That is 1.42 times the 2,118-second extrapolation of the
+interrupted run and 2.5 times the hosted run that passed. The deadline still
+fails an interrupted run, so a hang or a runaway generator is still caught.
+
+Nothing else changed. The case count stays at two ordinary and 20 extended
+cases, the seed stays at `0x60008400`, the size limits stay at 2,048 to
+2,056 ordinary and 4,096 extended, and no classification moves. The two
+scheduling weights for this file in *tools/native-shard-costs.ts* were
+estimates, because the file postdates the weight-source runs; they are now
+the measured 1,187 seconds for hosted Linux and 384 seconds for the macOS
+lane, so the shard packer stops placing the file among heavy neighbors.
+*docs/evidence/u6/README.md* records that provenance.
+
+Case sharding was rejected. `mise run check:property-case-durations` requires
+the shard durations to sum below the original deadline, and this corpus sums
+to about 2,118 hosted seconds against 1,800, so sharding would move the same
+failure into the aggregate. Raising `OSEO_PROPERTY_TIME_SCALE` for the whole
+hosted Linux lane was rejected as well, because it would relax every other
+property's deadline in that lane.
+
+[37867645790]: https://github.com/dahlia/oseo/actions/runs/37867645790
+[37884543813]: https://github.com/dahlia/oseo/actions/runs/37884543813
