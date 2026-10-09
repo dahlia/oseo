@@ -15,4 +15,4 @@ delivers: "Resolves exactly
 dependencies:
   - annexb-proto-dependency-classification
 landed: false
-status: blocked
+status: ready

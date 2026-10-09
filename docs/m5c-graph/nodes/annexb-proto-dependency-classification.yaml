@@ -23,5 +23,5 @@ delivers: "Closes exactly 1 newly observed path,
   authorization."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready
