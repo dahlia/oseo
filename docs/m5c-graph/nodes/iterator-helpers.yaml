@@ -1,10 +1,14 @@
 version: 1
 id: iterator-helpers
 title: Admit iterator helpers
-delivers: "Admits the ES2025 iterator helpers so the 392 reviewed unsupported
-  paths whose only unsupported frontmatter feature is iterator-helpers are
-  observed as passes or expected negatives; the one path that also needs
-  cross-realm stays with cross-realm-host."
+delivers: "Admits the ES2025 iterator helpers for the 393 reviewed unsupported
+  paths assigned to node:iterator-helpers in the derived closure ledger:
+  392 originally gated paths and
+  test/built-ins/Iterator/proto-from-ctor-realm.js, reassigned after
+  cross-realm-host landed. Observe actual classifications, including the
+  latter path's remaining source-constructor rejection. Apply the reviewed
+  exclusion-audit procedure and assign every still-unsupported path its
+  bounded remediation or authorized exclusion owner; do not predict passes."
 dependencies:
   - unsupported-ownership-audit
 landed: false

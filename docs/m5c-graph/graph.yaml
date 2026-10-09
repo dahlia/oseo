@@ -1,10 +1,11 @@
 version: 1
 checkpoint: M5c
 usage: "Take a node whose status is ready and whose landed field is false.
-  The graph begins with measurement and ownership work, not one node for all
-  19,708 unreviewed paths. The remediation-work-graph node replaces that
-  unknown tail with bounded semantic, harness, or evidence nodes and adds each
-  new terminal prerequisite to m5-exit-audit. Update baseline whenever the
+  The measured tail is already partitioned into bounded observation batches
+  and remediation owners. The remediation-work-graph audit records exact
+  coverage and missing collisions in docs/m5c-graph/remediation-audit.md.
+  Add genuinely new work only from observations and put every new terminal
+  prerequisite on the m5-exit-audit path. Update baseline whenever the
   checked-in reviewed manifest changes; check:m5c-graph rejects stale counts."
 baseline:
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
@@ -44,6 +45,12 @@ serializationPoints:
   - path: docs/language-profile-m5.md
     note: "Semantic remediation updates the normative profile and its family
       evidence records in the same change."
+  - path: docs/m5c-closure/observation-batches.yaml
+    note: "Batch landings refresh fixed selectors and measured counts; serialize
+      the derived update with ledger and manifest publication."
+  - path: tests/test262/target-parity.yaml
+    note: "Every manifest update publishes its index, partitions, and parity
+      digest together; never merge a digest from another observation set."
 collisions:
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
@@ -293,3 +300,321 @@ collisions:
       updates the manifest index and its partitions and the ledger, and runs
       the complete test:test262 gate, so batch landings serialize with each
       other and with the prerequisite nodes they do not depend on."
+  - path: tests/test262/results.yaml
+    nodes:
+      - annexb-proto-dependency-classification
+      - observation-batch-01
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - typed-array-construction-order
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-tolocalestring-arguments
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - destructuring-binding-target-order
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - generator-dispatch-stack-charge
+      - iterator-helpers
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - primitive-wrapper-objects
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - test262-host-script-bindings
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - eval-intrinsic-value
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-08
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - fn-global-object-harness
+      - frontmatter-feature-tags
+      - function-caller-restrictions
+      - hashbang-comments
+      - import-meta
+      - minor-feature-tag-admission
+      - module-export-forms
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - promise-feature-admission
+      - proper-tail-calls
+      - resizable-array-buffer-harness
+      - typed-array-feature-admission
+      - well-known-intrinsics-harness
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-next-callability
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - parenthesized-assignment-function-name
+      - with-strict-assignment-fallback
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - annexb-proto-dependency-classification
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+    note: "Retagging refreshes debt flags while coverage and identifier
+      remediation can add or revise path assessments. Serialize these edits
+      with the independent Annex B owner; keep its ordered prerequisite in
+      a separate group."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - typed-array-proto-coverage-remediation
+    note: "Retagging refreshes debt flags while coverage and identifier
+      remediation can add or revise path assessments. Serialize these edits
+      with the independent Annex B owner; keep its ordered prerequisite in
+      a separate group."

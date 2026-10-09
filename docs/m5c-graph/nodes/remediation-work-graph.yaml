@@ -4,7 +4,9 @@ title: Expand the measured remediation graph
 delivers: "Replaces the measured unknown tail with bounded implementation,
   harness, review, or evidence nodes, records their collisions and
   serialization points, and makes every terminal node a prerequisite of the
-  M5 exit audit."
+  M5 exit audit. The current measured audit is recorded in
+  docs/m5c-graph/remediation-audit.md; reuse existing bounded owners and
+  batches where they already satisfy expansion rather than inventing nodes."
 dependencies:
   - observation-batch-plan
   - unsupported-ownership-audit

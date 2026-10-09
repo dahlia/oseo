@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
+
+import { parse as parseYaml } from "yaml";
 
 import type { Test262Summary } from "../packages/testkit/src/index.ts";
 import {
   deriveM5cBaseline,
   m5cWorkGraphNodeDirectory,
+  m5cWorkGraphPath,
   validateCurrentM5cWorkGraph,
   validateM5cWorkGraph,
 } from "../tools/m5c-graph.ts";
@@ -367,8 +371,95 @@ test("M5c baseline rejects mismatched suite revisions", () => {
 
 test("the checked-in M5c work graph is valid", () => {
   const summary = validateCurrentM5cWorkGraph();
-  assert.equal(summary.nodes, 78);
+  const nodeDirectory = new URL(
+    `../${m5cWorkGraphNodeDirectory}/`,
+    import.meta.url,
+  );
+  assert.equal(
+    summary.nodes,
+    readdirSync(nodeDirectory).filter((path) => path.endsWith(".yaml")).length,
+  );
+  assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 15);
   assert.equal(summary.parked, 0);
+});
+
+interface PublicationNode {
+  readonly id: string;
+  readonly dependencies: readonly string[];
+  readonly landed: boolean;
+}
+
+interface PublicationGraph {
+  readonly collisions: readonly {
+    readonly path: string;
+    readonly nodes: readonly string[];
+  }[];
+}
+
+test("independent M5c manifest publishers declare their collisions", () => {
+  // Validate shapes and acyclicity before this independent pair audit.
+  validateCurrentM5cWorkGraph();
+  const nodeDirectory = new URL(
+    `../${m5cWorkGraphNodeDirectory}/`,
+    import.meta.url,
+  );
+  const nodes = readdirSync(nodeDirectory)
+    .filter((path) => path.endsWith(".yaml"))
+    .map(
+      (path) =>
+        // SAFETY: validateCurrentM5cWorkGraph() checked each node's shape.
+        parseYaml(
+          readFileSync(new URL(path, nodeDirectory), "utf8"),
+        ) as PublicationNode,
+    );
+  const byId = new Map(nodes.map((node) => [node.id, node]));
+  // SAFETY: validateCurrentM5cWorkGraph() checked collision shapes.
+  const graph = parseYaml(
+    readFileSync(new URL(`../${m5cWorkGraphPath}`, import.meta.url), "utf8"),
+  ) as PublicationGraph;
+  const collisions = graph.collisions.filter(
+    (group) => group.path === "tests/test262/results.yaml",
+  );
+  // These three unlanded contracts inspect or propose work without
+  // publishing observations. New source-only nodes need a bounded exemption.
+  const sourceOnly = new Set([
+    "dynamic-import-staged-plan",
+    "m5-exit-audit",
+    "remediation-work-graph",
+  ]);
+  const publishers = nodes.filter(
+    (node) => !node.landed && !sourceOnly.has(node.id),
+  );
+  const ancestors = new Map<string, ReadonlySet<string>>();
+  for (const node of publishers) {
+    const seen = new Set<string>();
+    const pending = [...node.dependencies];
+    for (const dependency of pending) {
+      if (seen.has(dependency)) continue;
+      seen.add(dependency);
+      const target = byId.get(dependency);
+      assert.ok(target, `missing dependency ${dependency}`);
+      pending.push(...target.dependencies);
+    }
+    ancestors.set(node.id, seen);
+  }
+  for (const [index, left] of publishers.entries()) {
+    for (const right of publishers.slice(index + 1)) {
+      if (
+        ancestors.get(left.id)?.has(right.id) ||
+        ancestors.get(right.id)?.has(left.id)
+      ) {
+        continue;
+      }
+      assert.ok(
+        collisions.some(
+          (group) =>
+            group.nodes.includes(left.id) && group.nodes.includes(right.id),
+        ),
+        `missing manifest collision: ${left.id}, ${right.id}`,
+      );
+    }
+  }
 });
