@@ -463,3 +463,56 @@ test("independent M5c manifest publishers declare their collisions", () => {
     }
   }
 });
+
+interface Batch11PrerequisiteNode extends PublicationNode {
+  readonly delivers: string;
+  readonly status: "blocked" | "parked" | "ready";
+}
+
+/** Extract the exact upstream selectors from a bounded node contract. */
+function deliveredPaths(node: Batch11PrerequisiteNode): readonly string[] {
+  return [...new Set(node.delivers.match(/test\/[^\s,]+\.js/gu))].toSorted();
+}
+
+test("batch11 prerequisites retain their three-path contracts", () => {
+  validateCurrentM5cWorkGraph();
+  const readNode = (id: string): Batch11PrerequisiteNode =>
+    // SAFETY: graph validation checked each parsed node's shape.
+    parseYaml(
+      readFileSync(
+        new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
+        "utf8",
+      ),
+    ) as Batch11PrerequisiteNode;
+  const classifierId = "annexb-legacy-lookup-dependency-classification";
+  const coverageId = "class-private-accessor-lookup-coverage-remediation";
+  const earlyErrorId = "class-duplicate-constructor-early-error";
+  const classifier = readNode(classifierId);
+  const coverage = readNode(coverageId);
+  const earlyError = readNode(earlyErrorId);
+  const accessorPaths = [
+    "test/language/expressions/class/elements/" +
+      "private-getter-is-not-a-own-property.js",
+    "test/language/expressions/class/elements/" +
+      "private-setter-is-not-a-own-property.js",
+  ];
+  assert.deepEqual(deliveredPaths(classifier), accessorPaths);
+  assert.deepEqual(deliveredPaths(coverage), accessorPaths);
+  assert.deepEqual(deliveredPaths(earlyError), [
+    "test/language/expressions/class/elements/syntax/early-errors/" +
+      "grammar-class-body-ctor-duplicate.js",
+  ]);
+  assert.deepEqual(classifier.dependencies, ["authorized-exclusion-audit"]);
+  assert.deepEqual(coverage.dependencies, [classifierId]);
+  assert.deepEqual(earlyError.dependencies, []);
+  assert.equal(coverage.status, classifier.landed ? "ready" : "blocked");
+  assert.deepEqual(readNode("observation-batch-11").dependencies, [
+    classifierId,
+    earlyErrorId,
+    "observation-batch-plan",
+  ]);
+  const exitDependencies = readNode("m5-exit-audit").dependencies;
+  assert.ok(exitDependencies.includes(coverageId));
+  assert.ok(exitDependencies.includes(earlyErrorId));
+  // The existing pair audit includes all three publishers without exemption.
+});

@@ -1,0 +1,29 @@
+version: 1
+id: class-private-accessor-lookup-coverage-remediation
+title: Resolve mixed private accessor lookup coverage
+delivers: "Resolves exactly 2 mixed-coverage batch11 paths,
+  test/language/expressions/class/elements/\
+  private-getter-is-not-a-own-property.js
+  and
+  test/language/expressions/class/elements/\
+  private-setter-is-not-a-own-property.js,
+  after their incidental legacy lookup dependencies are correctly classified.
+  Retain original source/assertions, path identities, actual unsupported
+  observations, and active remediation ownership. Supply reviewed equivalent
+  replacement evidence for private getter/setter absence as public own
+  properties, absence under public-name membership, private getter access,
+  and private setter effects without depending on legacy lookup. Distinguish
+  the optional observer from the in-claim private accessor subject. Follow
+  the full applicable PLAN-M5.md evidence contract and update normative
+  evidence, exclusion assessments, and derived ledger. Obtain the separate
+  PLAN-M5C.md maintainer coverage-accounting decision before terminal closure;
+  ownership alone and replacement fixtures alone cannot authorize an
+  exclusion. Do not exclude private accessor semantics, delete upstream
+  assertions, count replacements as upstream passes, implement Annex B, or
+  widen ADR 0013 or the landed __proto__ node. Regenerate the complete reviewed
+  manifest if implementation or observation behavior changes. Preserve
+  batch11's exact 1199-path reservation and first admission authority."
+dependencies:
+  - annexb-legacy-lookup-dependency-classification
+landed: false
+status: blocked

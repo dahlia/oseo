@@ -1,0 +1,32 @@
+version: 1
+id: annexb-legacy-lookup-dependency-classification
+title: Classify incidental legacy accessor lookup dependencies
+delivers: "Classifies exactly 2 batch11 paths,
+  test/language/expressions/class/elements/\
+  private-getter-is-not-a-own-property.js
+  and
+  test/language/expressions/class/elements/\
+  private-setter-is-not-a-own-property.js,
+  whose incidental __lookupGetter__ or __lookupSetter__ call fails before
+  their core private accessor assertions complete. Provide bounded,
+  source-located unsupported-profile-feature rejection for these optional
+  Annex B lookup dependencies under the existing ADR 0013 boundary and
+  approved exclusion-audit policy. Preserve unrelated called-value TypeErrors,
+  private accessor failures, and other semantic failures. Preserve same-name
+  user-defined methods; reject only recognized optional intrinsic dependencies.
+  Add classification
+  controls and source/observation-bound assessments; assign actually observed
+  unsupported mixed paths to
+  node:class-private-accessor-lookup-coverage-remediation.
+  Their core subjects remain mixed coverage debt, not authorized whole-path
+  exclusions. Do not implement Annex B, widen the landed __proto__ node,
+  change classification vocabulary, or treat a dependency tag as authority.
+  Follow the full applicable PLAN-M5.md evidence contract, update relevant
+  normative evidence and exclusion-audit controls, and regenerate the complete
+  existing reviewed manifest and derived ledger when observation behavior
+  changes. Preserve original source/assertions and batch11's exact 1199-path
+  reservation; batch11 owns first canonical admission of these 2 paths."
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready

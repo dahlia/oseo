@@ -19,9 +19,9 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
 summary:
-  nodes: 78
-  ready: 69
-  blocked: 5
+  nodes: 81
+  ready: 70
+  blocked: 7
   parked: 4
   landed: 16
 serializationPoints:
@@ -618,3 +618,287 @@ collisions:
       remediation can add or revise path assessments. Serialize these edits
       with the independent Annex B owner; keep its ordered prerequisite in
       a separate group."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - generator-dispatch-stack-charge
+      - iterator-helpers
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-11
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - primitive-wrapper-objects
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - test262-host-script-bindings
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-duplicate-constructor-early-error
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - generator-dispatch-stack-charge
+      - iterator-helpers
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - primitive-wrapper-objects
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - test262-host-script-bindings
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - annexb-legacy-lookup-dependency-classification
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - generator-dispatch-stack-charge
+      - iterator-helpers
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-12
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - primitive-wrapper-objects
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - test262-host-script-bindings
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-tolocalestring-arguments
+      - class-private-accessor-lookup-coverage-remediation
+      - destructuring-binding-target-order
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - fn-global-object-harness
+      - frontmatter-feature-tags
+      - function-caller-restrictions
+      - generator-dispatch-stack-charge
+      - hashbang-comments
+      - import-attributes
+      - import-meta
+      - iterator-helpers
+      - iterator-next-callability
+      - minor-feature-tag-admission
+      - module-export-forms
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - parenthesized-assignment-function-name
+      - primitive-wrapper-objects
+      - promise-feature-admission
+      - proper-tail-calls
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - resizable-array-buffer-harness
+      - test262-host-script-bindings
+      - typed-array-construction-order
+      - typed-array-feature-admission
+      - unhandled-rejection-observation
+      - well-known-intrinsics-harness
+      - with-strict-assignment-fallback
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-tolocalestring-arguments
+      - class-duplicate-constructor-early-error
+      - destructuring-binding-target-order
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - fn-global-object-harness
+      - frontmatter-feature-tags
+      - function-caller-restrictions
+      - generator-dispatch-stack-charge
+      - hashbang-comments
+      - import-attributes
+      - import-meta
+      - iterator-helpers
+      - iterator-next-callability
+      - minor-feature-tag-admission
+      - module-export-forms
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - parenthesized-assignment-function-name
+      - primitive-wrapper-objects
+      - promise-feature-admission
+      - proper-tail-calls
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - resizable-array-buffer-harness
+      - test262-host-script-bindings
+      - typed-array-construction-order
+      - typed-array-feature-admission
+      - unhandled-rejection-observation
+      - well-known-intrinsics-harness
+      - with-strict-assignment-fallback
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - annexb-legacy-lookup-dependency-classification
+      - array-tolocalestring-arguments
+      - destructuring-binding-target-order
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - fn-global-object-harness
+      - frontmatter-feature-tags
+      - function-caller-restrictions
+      - generator-dispatch-stack-charge
+      - hashbang-comments
+      - import-attributes
+      - import-meta
+      - iterator-helpers
+      - iterator-next-callability
+      - minor-feature-tag-admission
+      - module-export-forms
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - parenthesized-assignment-function-name
+      - primitive-wrapper-objects
+      - promise-feature-admission
+      - proper-tail-calls
+      - regexp-pattern-extensions
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - resizable-array-buffer-harness
+      - test262-host-script-bindings
+      - typed-array-construction-order
+      - typed-array-feature-admission
+      - unhandled-rejection-observation
+      - well-known-intrinsics-harness
+      - with-strict-assignment-fallback
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - annexb-legacy-lookup-dependency-classification
+      - class-duplicate-constructor-early-error
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-duplicate-constructor-early-error
+      - class-private-accessor-lookup-coverage-remediation
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - annexb-legacy-lookup-dependency-classification
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - typed-array-proto-coverage-remediation
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - typed-array-proto-coverage-remediation
+    note: "The bounded batch11 prerequisite and these independent lanes
+      share canonical publication inputs; serialize their edits. Ordered
+      prerequisites are excluded because their dependencies serialize them."

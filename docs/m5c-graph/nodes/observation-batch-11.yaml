@@ -7,6 +7,8 @@ delivers: "Observes the 1199 unreviewed paths that
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
+  - annexb-legacy-lookup-dependency-classification
+  - class-duplicate-constructor-early-error
   - observation-batch-plan
 landed: false
-status: ready
+status: blocked

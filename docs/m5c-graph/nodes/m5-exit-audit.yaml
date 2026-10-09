@@ -10,6 +10,8 @@ dependencies:
   - array-sort-stability
   - array-tolocalestring-arguments
   - authorized-exclusion-audit
+  - class-duplicate-constructor-early-error
+  - class-private-accessor-lookup-coverage-remediation
   - cross-realm-host
   - destructuring-binding-target-order
   - dynamic-import

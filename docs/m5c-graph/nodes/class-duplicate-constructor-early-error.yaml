@@ -1,0 +1,24 @@
+version: 1
+id: class-duplicate-constructor-early-error
+title: Restore duplicate constructor parse errors
+delivers: "Repairs the core duplicate-constructor parse error exposed by exactly
+  test/language/expressions/class/elements/syntax/early-errors/\
+  grammar-class-body-ctor-duplicate.js.
+  Restore source-located OSEO0001 parse-phase SyntaxError through the unchanged
+  canonical reader in strict and non-strict modes. Correct the frontend
+  early-error contract; do not weaken the reader, map all OSEO1001 errors to
+  parse negatives, change classification vocabulary or the source expectation,
+  admit new syntax, or authorize an exclusion. Add bounded class-expression
+  and class-declaration duplicate-constructor controls, valid single
+  constructors, and permitted non-constructor method/accessor/property-name
+  controls; preserve unrelated unsupported diagnostics. Follow the full
+  applicable PLAN-M5.md evidence contract, including frontend, differential,
+  invalid-generator and normative early-error evidence as applicable. Retain
+  complete fresh observations and source locations. Regenerate the complete
+  existing reviewed manifest and derived ledger for the frontend change.
+  Preserve original source/assertions and batch11's exact 1199-path
+  reservation; batch11 owns this path's first canonical admission as an
+  actually observed expected-negative."
+dependencies: []
+landed: false
+status: ready
