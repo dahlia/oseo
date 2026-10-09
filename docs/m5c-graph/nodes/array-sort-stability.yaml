@@ -12,5 +12,5 @@ delivers: "Closes exactly 1 path,
   admit the path, and regenerate the complete reviewed manifest and ledger."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
