@@ -2,6 +2,9 @@
  * Derived seconds from summed measured case durations in CI runs
  * 36243816479 and 36261458909. Each entry keeps the larger observation.
  * See docs/evidence/u6/README.md; these weights are not job wall times.
+ * The m5-array-sort-stability entries come from run 37884543813 instead,
+ * because the file postdates both weight-source runs and its first
+ * checked-in values were estimates.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -21,7 +24,7 @@ export const nativeShardCosts = {
     "tests/property/m5-array-prototype-reduction.property.test.ts": 408,
     "tests/property/m5-array-prototype-sort.property.test.ts": 277,
     "tests/property/m5-array-prototype-species-mapping.property.test.ts": 586,
-    "tests/property/m5-array-sort-stability.property.test.ts": 600,
+    "tests/property/m5-array-sort-stability.property.test.ts": 1187,
     "tests/property/m5-array-spread.property.test.ts": 253,
     "tests/property/m5-async-await.property.test.ts": 290,
     "tests/property/m5-async-generator.property.test.ts": 177,
@@ -153,7 +156,7 @@ export const nativeShardCosts = {
     "tests/property/m5-array-prototype-reduction.property.test.ts": 358,
     "tests/property/m5-array-prototype-sort.property.test.ts": 308,
     "tests/property/m5-array-prototype-species-mapping.property.test.ts": 461,
-    "tests/property/m5-array-sort-stability.property.test.ts": 600,
+    "tests/property/m5-array-sort-stability.property.test.ts": 384,
     "tests/property/m5-array-spread.property.test.ts": 251,
     "tests/property/m5-async-await.property.test.ts": 239,
     "tests/property/m5-async-generator.property.test.ts": 248,

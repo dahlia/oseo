@@ -64,6 +64,18 @@ local Linux native-execution sums for three detached-buffer paths are retained
 in *docs/evidence/u10/new-metrics.json.txt*; they are neither CI path wall times
 nor measured macOS weights, so U6 does not extrapolate them into a path table.
 
+One entry no longer comes from the two weight-source runs.
+*tests/property/m5-array-sort-stability.property.test.ts* landed after both,
+so its first checked-in weight of 600 seconds for each host was an estimate.
+Main run [37884543813] measured the file's single property at 384,038
+milliseconds on the self-hosted macOS lane and 1,186,962 milliseconds on the
+hosted Linux runner that passed, which replace that estimate as 384 and 1,187
+seconds. The same corpus interrupted at 1,800,006 milliseconds after 17 of 20
+cases on a different hosted Linux runner in the two earlier attempts of that
+run, so the hosted observation is a lower bound on the worst case rather than
+a stable cost. Refreshing the whole table from one newer run would mix Node.js
+and Deno pins, so only this file changed.
+
 The newer main run [36312192623] at `af9bb68c` is retained as the closest
 before-run comparison.
 `git diff af9bb68c 86228614 -- packages tests tools .github mise.toml` is empty
@@ -103,6 +115,7 @@ these runner summaries, and no cache hit is credited as an improvement.
 [36243816479]: https://github.com/dahlia/oseo/actions/runs/36243816479
 [36261458909]: https://github.com/dahlia/oseo/actions/runs/36261458909
 [36312192623]: https://github.com/dahlia/oseo/actions/runs/36312192623
+[37884543813]: https://github.com/dahlia/oseo/actions/runs/37884543813
 
 
 Model and decision

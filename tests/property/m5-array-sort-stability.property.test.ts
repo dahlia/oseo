@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop -- Native observations are isolated. */
 /**
  * Generated large literals use normal collection within their two-case,
- * 180-second ordinary budget. The pinned 2,048-element fixture forces
+ * 300-second ordinary budget. The pinned 2,048-element fixture forces
  * collection at every safepoint under both policies; the 4,096-element
  * fixture uses normal collection. Instrumentation costs about 80 CPU seconds
  * per 2,048-element execution. Pinned fixtures have no individual timeout;
@@ -140,7 +140,17 @@ test(
         sizeLimit: large
           ? "2048 to 4096 literal objects"
           : "2048 to 2056 literal objects",
-        timeLimitMilliseconds: 180_000,
+        // Budgeted from the slowest runner that executes this file, not
+        // from a development host. One extended case builds, links, and
+        // runs a 2,048 to 4,096 object literal twice, once per
+        // specialization policy, so a four-core hosted Linux runner needs
+        // about seven times the per-case time of a sixteen-core host.
+        // Measured extended durations for the 20 cases: 384 s on the
+        // self-hosted macOS lane and 1,187 s on a hosted Linux runner that
+        // passed, against the same corpus interrupting at 1,800 s after 17
+        // cases on another hosted runner, which extrapolates to about
+        // 2,118 s. See docs/evidence/m5c-array-sort-stability/README.md.
+        timeLimitMilliseconds: 300_000,
       },
     );
   },
