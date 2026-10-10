@@ -24,6 +24,13 @@ This plan is governed by [*WHITEPAPER.md*](./WHITEPAPER.md),
 accepted records under *docs/adr/*. Evidence that changes one of those
 contracts updates the affected document in the same change.
 
+The M5c [build-time-resolvable proposal]
+bounds a first string-literal subset and its implementation and evidence
+gates. It proposes an ADR 0016 amendment for maintainer acceptance; the
+accepted rejection remains in force.
+
+[build-time-resolvable proposal]: ./docs/dynamic-import-staged-plan.md
+
 
 Goal
 ----
