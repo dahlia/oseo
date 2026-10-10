@@ -109,7 +109,9 @@ jobs:
   test_sanitizer:
     name: host C sanitizers (Linux)
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # Run 37999730012 measured 56 minutes native plus 5.55 runtime.
+    # About 62 minutes with preflights/setup; 90 leaves cold-cache margin.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -125,11 +127,34 @@ jobs:
           OSEO_HOST_CC: gcc
       - run: mise run test:sanitizer:runtime
       - run: mise run test:sanitizer:native
-      - run: mise run test:sanitizer:property
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
           name: host-cc-sanitizer-failures
+          path: /tmp/oseo-native-*
+          if-no-files-found: warn
+
+  test_sanitizer_property:
+    name: host C sanitizers (Linux, property)
+    runs-on: ubuntu-latest
+    # Run 37999730012 measured 45.52 minutes for properties.
+    # 75 minutes leaves room for preflight, setup, and cold caches.
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v7
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+        with:
+          toolchain: host-cc
+      # Each suite retains its own instrumentation preflight.
+      - run: mise run test:sanitizer:self
+      - run: mise run test:sanitizer:property
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: host-cc-sanitizer-property-failures
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 

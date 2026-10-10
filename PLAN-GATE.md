@@ -1242,6 +1242,49 @@ Main run `37251028948`, the first main run with the U24 assignment, measured
 attempts, more than either group's own spread of 4.4 and 0.7 min; the U27
 section below compares them with the derived prediction.
 
+#### Linux sanitizer job split (2026-10-10)
+
+Main run [37999730012] at `24183386` measured 107.80 minutes from
+`run_started_at` to the last job's `completed_at`, within the two-hour
+goal. `host C sanitizers (Linux)` measured 107.75 minutes and set the
+critical path. Its steps measured 56.02 minutes for
+`test:sanitizer:native`, 45.52 for `test:sanitizer:property`, and 5.55
+for `test:sanitizer:runtime`; every other step was under one minute.
+The next longest job, `native support (linux-x86_64-gnu, 2/5)`, measured
+66.63 minutes. The 35 macOS jobs summed to a derived 560.18 minutes.
+The per-step evidence is in
+[*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md#linux-sanitizer-job-split-2026-10-10).
+
+Split the Linux sanitizer job the same way as macOS. `test_sanitizer`
+keeps its existing name, instrumentation preflight, GCC verification,
+runtime fixtures, and native suite. `test_sanitizer_property`, named
+`host C sanitizers (Linux, property)`, runs its own instrumentation
+preflight and the complete property suite. Both jobs run checkout,
+mise setup, and the host C runtime archive cache, and upload distinct
+failure artifacts.
+Only the GCC verification step sets `OSEO_HOST_CC: gcc`.
+
+The projected sanitizer lane critical path is about 62 minutes,
+with about 46 minutes in the parallel property job. Set the native job
+timeout to 90 minutes and the property job timeout to 75 minutes for
+setup, cold caches, and runner variation. The proposed whole-run
+projection of about 66 to 70 minutes uses the next longest individual
+job, but misses the observed macOS lane completion schedule.
+`test262 (macos-aarch64, 4/12)` finished 92.52 minutes after run start,
+and the `native` aggregate, the latest completion other than the Linux
+sanitizer job, finished at 92.83 minutes. Holding other
+completion times fixed therefore projects about 93 minutes for the run.
+Reaching 66 to 70 minutes would also require shorter macOS lane
+completion times; the split alone supplies no evidence for that.
+These projections are not measurements of a split run. No workflow
+dependency references the Linux sanitizer job, and GitHub reported main
+as unprotected on 2026-10-10, so no aggregate or required-check list
+needs to change.
+
+This is a job split only. It changes no test budget, case count, seed,
+size limit, suite timeout, or shard total. The sanitizer property task
+keeps its *mise.toml* `OSEO_PROPERTY_TIME_SCALE` default of `3`.
+
 #### Projection at 41,091 paths
 
 This projection is derived. It uses the same split as the projection above:
@@ -1899,6 +1942,8 @@ medians place hosted lanes, Mac medians and ratios place Mac lanes, and
 the fallback schedule was unmodeled before this change as well. The
 derived makespan of 77.2 min remains the isolated-run value; a queued
 run's lane end is that value plus the previous run's remaining lane work.
+
+[37999730012]: https://github.com/dahlia/oseo/actions/runs/37999730012
 
 ### macOS static capacity lanes (U16)
 

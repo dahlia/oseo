@@ -45,6 +45,69 @@ and the separately measured property bottleneck.
 [36243816479]: https://github.com/dahlia/oseo/actions/runs/36243816479
 [36261458909]: https://github.com/dahlia/oseo/actions/runs/36261458909
 
+### Linux sanitizer job split (2026-10-10)
+
+Main run [37999730012] at `24183386` succeeded. GitHub API timestamps
+measure a 107.80-minute run wall from the run's `run_started_at` to
+the last job's `completed_at`, within the two-hour goal, and a
+107.75-minute `host C sanitizers (Linux)` job wall. This single job
+sets the run's critical path. Its measured step walls are:
+
+| Step                             | Minutes |
+| -------------------------------- | ------: |
+| `test:sanitizer:native`          |   56.02 |
+| `test:sanitizer:property`        |   45.52 |
+| `test:sanitizer:runtime`         |    5.55 |
+| Instrumentation preflight        |    0.10 |
+| GCC instrumentation verification |    0.07 |
+| Checkout                         |    0.05 |
+| mise setup                       |    0.23 |
+| Runtime archive cache            |    0.13 |
+
+Every remaining step was under one minute. The next longest job,
+`native support (linux-x86_64-gnu, 2/5)`, measured 66.63 minutes;
+the next job walls were 57.83, 54.42, 52.68, 46.23, and 46.00 minutes.
+The 35 macOS jobs summed to a derived 560.18 minutes. These values
+describe this run, not a runner-variance estimate.
+
+Move the property suite into `host C sanitizers (Linux, property)`
+with its own `test:sanitizer:self` preflight. The existing job retains
+the instrumentation preflight, GCC instrumentation verification,
+runtime fixtures, and the native suite.
+Each job runs checkout, mise setup, the runtime archive cache, and a
+failure-artifact upload with a distinct name. The derived remaining
+job wall is 62.23 minutes after subtracting the property step; the
+new property job is expected to take about 46 minutes with its
+preflight and setup.
+Use 90 minutes for the native job and 75 for property, leaving roughly
+28 to 29 minutes of margin for cold caches and slower runners.
+
+The projected sanitizer lane critical path is about 62 minutes.
+The proposed whole-run projection of about 66 to 70 minutes follows
+the next longest individual job, but does not include the observed
+macOS lane schedule. `test262 (macos-aarch64, 4/12)` finished at
+`2026-10-10T00:04:32Z`, 92.52 minutes after run start, and the
+`native` aggregate, the latest completion other than the Linux
+sanitizer job, finished at `2026-10-10T00:04:51Z`, or 92.83 minutes.
+Holding other completion times fixed projects about 93 minutes for
+the run after the split. A 66-to-70-minute run would also need shorter
+macOS lane completion times, which this split does not establish.
+These projections are not measurements of a split run.
+This job split changes no test budget, case count,
+seed, size limit, suite timeout, or shard total. The property task's
+*mise.toml* `OSEO_PROPERTY_TIME_SCALE` default stays `3`.
+[*PLAN-GATE.md*](../PLAN-GATE.md#linux-sanitizer-job-split-2026-10-10)
+records the scheduling decision.
+
+Reproduce the timestamp observations without triggering a run:
+
+~~~~ sh
+gh api repos/dahlia/oseo/actions/runs/37999730012
+gh api --paginate repos/dahlia/oseo/actions/runs/37999730012/jobs
+~~~~
+
+[37999730012]: https://github.com/dahlia/oseo/actions/runs/37999730012
+
 ### U21 dedicated Mac mini day-one measurements
 
 The new dedicated Mac mini is an Apple M6 with 12 logical CPUs and 16 GiB
