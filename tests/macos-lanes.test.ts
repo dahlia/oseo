@@ -226,8 +226,14 @@ test("every check name and concurrency policy is preserved", () => {
   const existingNames = names(after).filter(
     (name) => !name.startsWith("own-key cases ("),
   );
-  assert.deepEqual(existingNames, nameBaseline.checkNamesObserved.toSorted());
-  assert.equal(names(after).length, 64);
+  assert.deepEqual(
+    existingNames,
+    [
+      ...nameBaseline.checkNamesObserved,
+      "host C sanitizers (Linux, property)",
+    ].toSorted(),
+  );
+  assert.equal(names(after).length, 65);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -362,6 +368,7 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
     "test",
     "test_native",
     "test_sanitizer",
+    "test_sanitizer_property",
     "test_test262",
     "test_native_support",
     "test_property_case",
@@ -378,6 +385,61 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
       ),
     );
   }
+});
+
+test("Linux sanitizer split retains every suite and its preflight", () => {
+  const native = after.jobs.test_sanitizer!;
+  const property = after.jobs.test_sanitizer_property!;
+  assert.equal(native.name, "host C sanitizers (Linux)");
+  assert.equal(property.name, "host C sanitizers (Linux, property)");
+  assert.equal(native["timeout-minutes"], 90);
+  assert.equal(property["timeout-minutes"], 75);
+  assert.deepEqual(
+    native.steps.filter((step) => step.run).map((step) => step.run),
+    [
+      "mise run test:sanitizer:self",
+      "mise run test:sanitizer:self",
+      "mise run test:sanitizer:runtime",
+      "mise run test:sanitizer:native",
+    ],
+  );
+  assert.deepEqual(
+    property.steps.filter((step) => step.run).map((step) => step.run),
+    ["mise run test:sanitizer:self", "mise run test:sanitizer:property"],
+  );
+  assert.deepEqual(native.steps.slice(0, 3), property.steps.slice(0, 3));
+  assert.equal(native["runs-on"], "ubuntu-latest");
+  assert.equal(property["runs-on"], "ubuntu-latest");
+  assert.equal(native.env, undefined);
+  assert.equal(property.env, undefined);
+  for (const job of [native, property]) {
+    for (const step of job.steps) {
+      assert.deepEqual(
+        step.env,
+        step.name === "Verify GCC sanitizer instrumentation"
+          ? { OSEO_HOST_CC: "gcc" }
+          : undefined,
+      );
+    }
+  }
+  const nativeUpload = native.steps.at(-1)!;
+  const propertyUpload = property.steps.at(-1)!;
+  assert.deepEqual(nativeUpload, {
+    if: "failure() || cancelled()",
+    uses: "actions/upload-artifact@v7",
+    with: {
+      name: "host-cc-sanitizer-failures",
+      path: "/tmp/oseo-native-*",
+      "if-no-files-found": "warn",
+    },
+  });
+  assert.deepEqual(propertyUpload, {
+    ...nativeUpload,
+    with: {
+      ...parsedMapping(nativeUpload.with, "Native sanitizer artifact"),
+      name: "host-cc-sanitizer-property-failures",
+    },
+  });
 });
 
 test("native aggregate explicitly requires all native and test262 jobs", () => {
