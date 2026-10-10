@@ -11,5 +11,5 @@ delivers: "Implements option B of the maintainer decision of 2026-10-07 as a
   maintainer accepts the update."
 dependencies:
   - dynamic-import
-landed: false
+landed: true
 status: ready
