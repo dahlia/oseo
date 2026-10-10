@@ -11,6 +11,4 @@ dependencies:
   - import-attributes
   - observation-batch-plan
 landed: false
-status: parked
-reason: "Depends on import-attributes, which awaits permission for additional
-  review cycles. This dependency hold records no failure of this batch."
+status: blocked

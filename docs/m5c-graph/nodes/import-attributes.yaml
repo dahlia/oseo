@@ -7,8 +7,4 @@ delivers: "Admits import attributes and JSON modules (the import-attributes
 dependencies:
   - observation-batch-plan
 landed: false
-status: parked
-reason: "Awaiting permission for additional review cycles after five starts.
-  Two diagnostic findings from the completed third review are fixed. The
-  remaining starts ended with inspection failures or an empty final verdict;
-  both required clean review stages remain outstanding."
+status: ready
