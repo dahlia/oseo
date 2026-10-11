@@ -82,4 +82,6 @@ dependencies:
   - well-known-intrinsics-harness
   - with-strict-assignment-fallback
 landed: false
-status: blocked
+status: parked
+reason: "Depends on import-attributes, which awaits additional internal
+  review allowance after 10 spent starts."
