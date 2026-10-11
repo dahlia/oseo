@@ -7,7 +7,4 @@ delivers: "Admits import attributes and JSON modules (the import-attributes
 dependencies:
   - observation-batch-plan
 landed: false
-status: parked
-reason: "Awaiting additional internal review allowance after 10 spent starts.
-  Review 10 completed with one documentation finding, now repaired in the
-  preserved worktree. No clean final review or commit is authorized yet."
+status: ready

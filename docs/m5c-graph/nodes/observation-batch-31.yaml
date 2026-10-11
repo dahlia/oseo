@@ -11,6 +11,4 @@ dependencies:
   - import-attributes
   - observation-batch-plan
 landed: false
-status: parked
-reason: "Depends on import-attributes, which awaits additional internal
-  review allowance after 10 spent starts."
+status: blocked
