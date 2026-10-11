@@ -1,0 +1,30 @@
+group: language/module-code
+key: "90"
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: resolution
+      features:
+        - import-attributes
+        - globalThis
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/import-attributes/import-attribute-value-string-single.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/import-attributes/import-attribute-v\
+        alue-string-single.js:108:55: error[OSEO2001]: Unsupported
+        static import attribute."
+      errorType: SyntaxError
+      failedPhase: resolution
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -146,6 +146,15 @@ assessments:
       and buffer evidence. These core algorithms do not normatively
       require Annex B; retain bounded remediation until the maintainer
       accounting decision, without authorizing a whole-path exclusion.
+  import-attributes-dynamic-boundary:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    remediationOwner: node:import-attributes-dynamic-coverage-remediation
+    reason: Dynamic import is rejected before runtime option evaluation,
+      enumeration, abrupt completion, promises, or JSON identity assertions
+      execute. These original mixed subjects remain open under the exact
+      separately approved reservation; no source-evaluation-only exclusion is
+      claimed and the existing 178-path reservation is unchanged.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2844,6 +2853,894 @@ paths:
     upstreamSection: sec-performeval-rules-in-initializer
     subject: error if `arguments` in StatementList of eval (direct eval)
     assessment: eval-semantics
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-a\
+      wait-expr.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8eff1142d7769d49f1dac22d8cb5913df4356a91e2b6882f35703edce0d7\
+      5ac8"
+    observationDigest: "dc3c5111f70ed76337d27c1164a0853df8f5ced85dcd9a04540cdf6\
+      a7f0cec00"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall parameter list forwards the Await production parameter -
+      AwaitExpression"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-a\
+      wait-ident.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6dd2c12b4cb8cec4373c9a4cd02e919c54089dca9b171fbe7061f0c42068\
+      85ac"
+    observationDigest: "b06d71d9ec91bf5cea4303b57f51616f421f1602a7ef47ae3ff76eb\
+      67b43d0e1"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall parameter list forwards the Await production parameter -
+      IdentifierReference"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-e\
+      valuation-abrupt-return.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "205a388341bbffc00f293a387ce078c16927d7d90cdac707ca6e88c637e9\
+      c439"
+    observationDigest: "84b4847d498535df1fa0cd5ac45b771fa627b45ff79c87bd7fcd992\
+      66a8268db"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: 'Forwards "return" completion when evaluating second parameter'
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-e\
+      valuation-abrupt-throw.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5e08087db48598651cbe0dc75e363c791029dc16dc91c5ea4587be0407c0\
+      c401"
+    observationDigest: "0c6e7fec3c1672b1c07640c643af1926e974fd5e574fabde94c8c95\
+      83d293003"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: 'Forwards "throw" completion when evaluating second parameter'
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-e\
+      valuation-sequence.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "046c83149a26f9dbbe7081cac4e8494345acd0b4e33ba1a894f373d629a8\
+      c9b2"
+    observationDigest: "f35592cbc9457c4780e2a58fce17b92dc06d567329b1dbe62f6a030\
+      e99fa180a"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Evaluates parameters in correct sequence"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-g\
+      et-with-error.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "db226d9acddd240ced0391fa685f3a1201611846cb6322afe6d8b9ce018e\
+      e05c"
+    observationDigest: "7b2a0e16cff3b8533c6e7a9159e650a686832ce659b55a3ef2a885b\
+      2d6be1e8a"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: 'Rejects promise when accessing "assert" property throws an error'
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-i\
+      n.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "101783cf342e9ecbc39e9e4c2f3ce2f06f80e655a03e611d6ff325f2cd99\
+      46b8"
+    observationDigest: "95f8a5fecaecc65f331d91e81efda52837ea080d253e3e233db6c39\
+      5baf0ace6"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall parameter list enables the Yield production parameter"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-n\
+      on-object.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "170ecb5d2b640bc43bc847e759c4d71fe840d031eff9ca5121c5a3cbbd01\
+      0f8c"
+    observationDigest: "fe0a88698f8eab74d2b2a63602767cb13701e09a151bb30c2d8f0b4\
+      693bcfc64"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "Rejects promise when the second argument is neither undefined nor an
+      object"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-t\
+      railing-comma-fulfill.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e954f4a13f5bc8bdc095767c9ff13b9a0b9b73a2834c73240a0effc18196\
+      6f68"
+    observationDigest: "7331beaad025112e23f69abbf11f69cf4277ab537927a7c40f53c1f\
+      11427c959"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall parameter list supports an optional trailing comma
+      (fulfillment semantics)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-t\
+      railing-comma-reject.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a5010d6255cb6804c2353513419f54afff307d33039024d60ca7d7a8c796\
+      fd01"
+    observationDigest: "e2a7c3318a6ab43efddac8847f655a6151b210705b78c6746542e39\
+      23de96223"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall parameter list supports an optional trailing comma
+      (rejection semantics)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
+      ith-enumeration-abrupt.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9eaf1b965a1209e840768cf39c43fa1a4546201de53f66fb4a2e05dca347\
+      d042"
+    observationDigest: "ab8d1bef7dd34887c0dd53817e3e42fe9812250db00e5a03229385e\
+      e25cf72ac"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Reports abrupt completions produced by attributes enumeration"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
+      ith-enumeration-enumerable.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d41403f828a98f68800f7224bd595ff3c0cdafce04d9b3748d56dc0cfb15\
+      cf9f"
+    observationDigest: "3f1312dc563f2670b3319f2d90506de82ab960e0d7a04809cb17a4f\
+      e17a14038"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Follows the semantics of the EnumerableOwnPropertyNames abstract
+      operation during attributes enumeration"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
+      ith-enumeration.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5cf6c903817c230d1c00bc04ec59f2c5f7d93b78e7a050d8003d2900a65b\
+      b0cf"
+    observationDigest: "d19e0d1faad42efe150fb98abb0768842deb1d630313b211fd3324a\
+      2ff313b09"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Follows the semantics of the EnumerableOwnPropertyNames abstract
+      operation during attributes enumeration"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
+      ith-non-object.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "02c1eb95c4c179e8fba169a69cbc3dca5f1202ee425491a966a5c7dff8b6\
+      f55a"
+    observationDigest: "72af4c528383ffc647651c746d37ca4d4c047f038077c8c8387d393\
+      84c5bfd39"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "Rejects promise when the `assert` property of the second argument is
+      neither undefined nor an object"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
+      ith-undefined.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "01dff1ae605e96457dc2d127f23420f8d366bbd78a177f8a9d9d5ab85122\
+      ae0d"
+    observationDigest: "1d1c878dc41f8c97c8c94f3e2bb6820b689bbb118069df326153c7a\
+      c45bb9f4a"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Accepts undefined for the `assert` property of the second argumen\
+      t"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
+      ith-value-abrupt.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "77df552ccacaeb6c725c67ad8deda5e7c3c08a4efba1548e13c694e34a22\
+      e84e"
+    observationDigest: "bbaa5e126fb980a61003f186a03aa32aefcc292584a7d4701ec0946\
+      745dbbb3d"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Rejects promise when retrieving a value of the `assert` object
+      produces an abrupt completion"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
+      ith-value-non-string.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "61d67ed8fe7ea23c15829ff96f2d6590a801f557980c6f6d3218f4cf2bb7\
+      8b25"
+    observationDigest: "3bc53347fa8cd408f061da6a45be2793196097eda2a3ec688aa8a8b\
+      c948a0a54"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Rejects promise when any property of the `assert` object is not a
+      string"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-y\
+      ield-expr.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3e8d9b95295b75199b970affd56ee1510b5923239564ea810ef290932e38\
+      5bb0"
+    observationDigest: "c2b12e5654958b969918f30f77f71bcb394adc2b8fdbdbeb22467f6\
+      de2abe4cd"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall parameter list forwards the Yield production parameter -
+      YieldExpression"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/2nd-param-y\
+      ield-ident-valid.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "34724c05281958e8e8cf2dd32afedd58eaba3e3b1b34826750bca4cdfa59\
+      5850"
+    observationDigest: "d90e65ac44a9862ffa354483f51270dbc911c1235449b04698efdbd\
+      fc0fac7fa"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall parameter list forwards the Yield production parameter -
+      valid IdentifierReference"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/trailing-co\
+      mma-fulfill.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8b7f2ed33880ebdc0aa7b53a15e9e07b8c9dfa5dcb303c86e9a36eb8034d\
+      ffdf"
+    observationDigest: "f4d0fcce518fd0925a45d4ffa305833257499aef0fc2369be873f01\
+      5c0b066da"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall parameter list supports an optional trailing comma
+      (fulfillment semantics)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/import-attributes/trailing-co\
+      mma-reject.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "24c8f6880e2562fb9efc353dacf303f24c819104198c8d225c150129563d\
+      1008"
+    observationDigest: "18a1fe6dceca3686877c0b59dc6e1d9a393995b686d75a2804ae47f\
+      7d0a7cff2"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall parameter list supports an optional trailing comma
+      (rejection semantics)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-ass\
+      ignment-expression-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cd304f7c0e02951673099b084b3ca7749ed2e6bd45c2f5aac939549feb78\
+      1f6b"
+    observationDigest: "df5a850a477cc4ed077bb5168d28c74484ec2d51b976baebc378887\
+      24b53dcbf"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-ass\
+      ignment-expression-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3a11888e3afb989682b42daea9226fb3df257541462671033e1730ffb98d\
+      54c9"
+    observationDigest: "31c3c3b12cb80e017c631c6e00163cd51bbc1fefa31078bdc776ba8\
+      236f357b4"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-imp\
+      ort-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4d1910c33559e295006bb502b3dfc1331cb169f275bbcb974e5021725c69\
+      9cd3"
+    observationDigest: "d7e606e8155174c1773551a6a033a83799f25e8aa9a12447787d470\
+      e03eda4d2"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-imp\
+      ort-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9694caa8ed7e63b1cc5afc2e72e9e504f71eea0f2fad386c2dee4024fc8c\
+      1e3e"
+    observationDigest: "3e95539d23b82372b563fadd6c1a28f5138329576e2ad72d299695f\
+      0057a55ae"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
+      ow-function-await-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9f3b1da153c6aad0706dc9df53e260e23719386eaa3c4985d2c8c55aef32\
+      d6ce"
+    observationDigest: "5f9bac1e239981734d50e6f08b1038197335b44ed7c1d85e00aab16\
+      66d783e0f"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall trailing comma following first parameter (nested in async
+      arrow function)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
+      ow-function-await-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "96eb7cafd4af38d699eb758393b572f69b9c0e9665032361dac1ecc65065\
+      44d9"
+    observationDigest: "b39781de4359182c0307de8624080f8f0f22ea69792b1d6a6b8f003\
+      68883af7b"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested in
+      async arrow function)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
+      ow-function-return-await-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9246bda19f844e506f4ca7c8e79c80c54089dd8d6565d6d6971b1d449378\
+      2778"
+    observationDigest: "9fa5d1592e8f2f6de6431d09c46da76b9efee49b7c03f09fedc174f\
+      8aeea01a7"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall trailing comma following first parameter (nested in async
+      arrow function, returned)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
+      ow-function-return-await-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "880862d26d3e25d142f15c6f627434a7622b200409bd87abdd83424f081e\
+      046f"
+    observationDigest: "5076722b08ba7286873bc0d16836f4bedbfb24a4bb6c2bf1f765bcf\
+      0453ed060"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested in
+      async arrow function, returned)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
+      ction-await-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ff8e8d77ddc07d3deaf2d26ae8810371207b6c62c550e995d528d2efc66b\
+      8a5a"
+    observationDigest: "940376ffe012ad9677b601831a5ab7c50018ffbfc44b936de55e846\
+      ab9fad4b4"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
+      ction-await-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8913521e9056b9cfcb6b7f779816c9ad395997815ae702161377f1c0b07d\
+      2533"
+    observationDigest: "1b91da16458e7fdaec02a01c8bea3ee746acc698a926a7f8e2e4085\
+      d00b1cf8f"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
+      ction-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "348ba4c1dd85b67a7a99c3f24ac16d305393f33c36a637e31677b1b3da24\
+      cae5"
+    observationDigest: "f6d77c7e1a2107bd567897deae58d8e01a56cf3bd096ccf8d0d1495\
+      3b9958cde"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
+      ction-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a4a002f80d5e84ab166ce5cf8e62a0d45ebdd2f700e91e8767837e8de075\
+      5b4d"
+    observationDigest: "1bc9ed3cca379497949620f43d3140fe6de496dd461ad88f7188aa3\
+      8add1d7e6"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
+      ction-return-await-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6fc2afdd3712e59127434b4d50681ce9324cd98cb5f6dc6548e072f31b38\
+      fb01"
+    observationDigest: "b399e704824a4e2b45d081a036f056d7ebd66c33cc20dce6e49d573\
+      95bc4610e"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
+      ction-return-await-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a1f1f404c1fe2b779f880b0904b9807cb3b70dd839a25b9dde4baecbfa5a\
+      241c"
+    observationDigest: "d604d9387cb3f49c81dbb387d326e12818766179f34491e4d28d7ce\
+      d94b90fb1"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested arrow
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-gen\
+      -await-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8224fb3571fddf0ae2056389c60551931cb7164955ad29afaf8d6bd09386\
+      3dcf"
+    observationDigest: "25e4b99eec936b5cc10b89720eb7c83dc3b10c22d1ac9301b0e8f84\
+      437691a66"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall trailing comma following first parameter (nested in async
+      generator, awaited)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-async-gen\
+      -await-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "aed0f2b9babb1b318d66604ed4aff8ed5404211c301ae38f3f0d20fb7a47\
+      a07b"
+    observationDigest: "155beb972832c16d770f14f375fa5e04467b36866e590495c18d82f\
+      dc2d9a822"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested in
+      async generator, awaited)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-block-imp\
+      ort-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9fd3513cd3f40cee060102821a660c9dee34a1786d96e783c9dcc02329aa\
+      590f"
+    observationDigest: "0e861c33b0c8bfad7f5daca67604500cd617b125f90391b6b1c8097\
+      28f3f4810"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested block
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-block-imp\
+      ort-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "833cf191bf2382ae175f1a0a987243e1b22c8327c06afa5a129f18e92afa\
+      69af"
+    observationDigest: "fc09ab0c2fdb66bd01786e0e66164305a94542fb7b6a03d88030015\
+      e5a53f3d9"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested block
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-block-lab\
+      eled-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e752e7243319af0e6bee16103ed82d028960d54e2c16557489c9840b3481\
+      2be8"
+    observationDigest: "3dc911d1b49e7b149eda146b6d429db9c008bfc0139217ef4e01d40\
+      48c1b5948"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested block
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-block-lab\
+      eled-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "74ad2cf8bd2d3a032476d647afa11ae91d223349aeecc940e52f8b9c5c7b\
+      883a"
+    observationDigest: "7e52c878267c4b759ec16d248012b66e11a96a7337049f21bf7f468\
+      394209239"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested block
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-do-while-\
+      import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bd07cc88c8a6ba335430d9753b1333beba70427772e4292db1d92ecdd03f\
+      7750"
+    observationDigest: "0605b1a210f636621864dfe9f02364892b76c30598c331fd6b31f05\
+      da79e15bc"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall trailing comma following first parameter (nested do while
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-do-while-\
+      import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c6e1ba17dd9e6f4d7b8227a983f68b49eedc83c5c78b70151ea8a9b7886d\
+      bb60"
+    observationDigest: "7b6a947cebbbe7ea085b4796a3fb56e7d8af271192a034ee47218a7\
+      07556160a"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested do
+      while syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-else-brac\
+      eless-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "37680d4894af8ad68858c07dfbdf3f9005f9ae4820545e7e40a3d3c484a0\
+      e967"
+    observationDigest: "62676d6d04e9283b85829305f1c9dd48cacf1828e6ce847a3da8b10\
+      11b75689c"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested else
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-else-brac\
+      eless-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3ece62a381ba4f005f5cca2be503e50464a7e75850b32e35126af986698d\
+      8d4c"
+    observationDigest: "3dd36140510f868db075b48dcfff35f829e201ceda6a3b47cff7406\
+      e1bb6df43"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested else
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-else-impo\
+      rt-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b3b7bd1e0d5ff35437c90283104b30d67a520ba9fb4246ce8e580ffe3302\
+      e672"
+    observationDigest: "17050e57455af13168ff44befc4b5f7138ee4c5763b958e3ff66850\
+      b59becedc"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested else
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-else-impo\
+      rt-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2772a4c7b25f3eb49332beb0e5444aae0d0a8b5f43728fc1938dd6e97976\
+      add8"
+    observationDigest: "5bdabdbb5c0f83dfbdbf91b6f7469c0495384001c9a590a882d023f\
+      3e6d70c90"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested else
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
+      import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d5bb3c4a301b6f14278bb2be6eaa45528bd59402e30134a0b8839c6ec100\
+      3e28"
+    observationDigest: "de56d909e5117ae77c539d67e3311756f1f8a0f4c295c89e033c982\
+      f481fcee7"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall trailing comma following first parameter (nested function
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
+      import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b4d56fc4015aa5c4d691b8e6db4a7a7a00679ec69d7abb30889a4973dcab\
+      fe16"
+    observationDigest: "5a58d2d2b31578b3c140682946c869afa674253d48d0dc92fc41984\
+      3e0af1821"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested
+      function syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
+      return-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ca306bfd3c3433934da3df1db53d23102f10c9fe25748a88d1252f757ce8\
+      7b37"
+    observationDigest: "5f0417fc74eefb06ad8a9bede787fbd4101669c44db80245407e29b\
+      1c53ed3ae"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject:
+      "ImportCall trailing comma following first parameter (nested function
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
+      return-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "07bb1d15ad29fd61c412c8e5e0961bd636312a300bcc7bbc77a124abd772\
+      94d5"
+    observationDigest: "7f6f631ecaea145117230333bba362c3cbcfee8c000e01e4ecc2248\
+      b6221d34c"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested
+      function syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-if-bracel\
+      ess-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4575a1f64de36b7b8ad97ffcb219f98bf29299ee486d578ab339a7aea3f6\
+      2e72"
+    observationDigest: "35b1c2c22eff1496a661e3ee09494ab7b40360d8b7b43153b3115c5\
+      8b5d09890"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested if sy\
+      ntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-if-bracel\
+      ess-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "14469b03e56ad9fd40ba0b1a35ecd734d29632a96b9b242fe6fdcefb1f1c\
+      9869"
+    observationDigest: "e6b3e07f5ea0c36836c936b05f200e3afd4b44515734ba46549cb2a\
+      268ab7c0f"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested if s\
+      yntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-if-import\
+      -attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bc942e48843aca39195069f9f89540d2a43bdd35eac69ef51b808c643cc9\
+      f3b3"
+    observationDigest: "d59b5a25a6ec1557b9c5e25f2464f39aebbb246f48493b752d7289c\
+      249308cf4"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested if sy\
+      ntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-if-import\
+      -attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dd6a37712324425c70fbf3ed1397c015c979ac83a5e54f118457c6375d97\
+      ed1c"
+    observationDigest: "791b5f237dde2d87926db2abba418a47a41dad3da1cab6b414fe260\
+      38e20a1c4"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested if s\
+      yntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-while-imp\
+      ort-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ac66b1eac41f6dc38e3c6d9da2708c03d97d25af2d254eea6063428ce78c\
+      f847"
+    observationDigest: "9d7858befeeb4458a1b1093a79862f2f786ac6499973dd5816d4a08\
+      37942db88"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested while
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-while-imp\
+      ort-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2c89f7363d43eefe7713fd683d34e8daadbed117d605f39f4261c91248bf\
+      4831"
+    observationDigest: "30624d31ba73564124d9a848b9e32cc2ccd9a80d13d89f78c9a117d\
+      760165bbe"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested while
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-with-expr\
+      ession-import-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b455abc64e121a5d7b70f7f9612b1127f4f1d98116a8ad7aa84009bf2bd2\
+      48ed"
+    observationDigest: "5b0ed0b668462dd2da352c072c74601db05c4ce8c579ed24114cc9a\
+      545497e2c"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested with
+      syntax in the expression position)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-with-expr\
+      ession-import-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6a9b44c9e2c41486527ed42236bba3c6f23bac8829bc4e89491d719a7bae\
+      af1e"
+    observationDigest: "3a901730e657407cbbb0079a3b63e6d2d2eeb0ddd02ec92d57b0903\
+      9c1a26852"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested with
+      syntax in the expression position)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-with-impo\
+      rt-attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "be6334f300d14a1b51177aac1b3ac103033e60bf1f143ed50c0a5ea84109\
+      fe60"
+    observationDigest: "21b5f0009716db105fd7cc373561760f55b1ea7c2cad46b435f8afd\
+      0678519fd"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (nested with
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/nested-with-impo\
+      rt-attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2c6767d4cf328ea718dee578c61dcf528b1be5dd7012aaea674be92a46d0\
+      7561"
+    observationDigest: "818f05fb936f543cb0922bed13031c6b3a591e6c8d9495404649084\
+      04d7ca9c8"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (nested with
+      syntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/top-level-import\
+      -attributes-trailing-comma-first.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "82bea0f5c0c01533655d8100cb892f3a207e682adaab95cb512280c9f643\
+      4a78"
+    observationDigest: "57327229d3124f1694cbd329ad38de713ceee81c47349dd5e99159e\
+      fa58f1578"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following first parameter (top level sy\
+      ntax)"
+    assessment: "import-attributes-dynamic-boundary"
+  - path:
+      "test/language/expressions/dynamic-import/syntax/valid/top-level-import\
+      -attributes-trailing-comma-second.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "96892748935c96f543440b4341b69b8dc436935d8acaa0345a1aae0cea87\
+      1dc0"
+    observationDigest: "7f0f2d79cad9af4b3c1930757235a961e32c22796806bda717d1e36\
+      08d7ce68c"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall trailing comma following second parameter (top level s\
+      yntax)"
+    assessment: "import-attributes-dynamic-boundary"
   - path: test/language/expressions/equals/S11.9.1_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2993,6 +3890,17 @@ paths:
     section: sec-typeof-operator
     subject: Checking by using eval
     assessment: fixture-construction
+  - path: "test/language/import/import-attributes/json-idempotency.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "77d171afb82f0820ac23ce6f0c4def3406810b4c3593a9aedac7760df727\
+      f6a6"
+    observationDigest: "da9e079f077386fd1fd2a0325d6719a51265bb7b217ed1ec1b31425\
+      694fb176c"
+    missingDynamicTag: false
+    section: "sec-parse-json-module"
+    subject: "The same object representation is returned to all import sites"
+    assessment: "import-attributes-dynamic-boundary"
   - path: test/language/statements/async-generator/eval-var-scope-syntax-err.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject

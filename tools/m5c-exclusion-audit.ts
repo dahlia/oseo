@@ -29,6 +29,10 @@ const auditPath = "docs/m5c-closure/exclusion-audit.yaml";
 const dynamicOwner = "adr:0016-dynamic-source-boundary";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const remediationOwner = "node:dynamic-source-coverage-remediation";
+const importAttributesOwner =
+  "node:import-attributes-dynamic-coverage-remediation";
+const importAttributesReservationPath =
+  "docs/m5c-graph/import-attributes-dynamic-coverage.md";
 const annexRemediationOwners = new Set([
   "node:regexp-split-coverage-remediation",
   "node:typed-array-proto-coverage-remediation",
@@ -138,6 +142,8 @@ export function hasEvalCall(
 
 /** Inputs are explicit so regression tests need no corpus execution. */
 export interface M5cExclusionAuditInputs {
+  /** Exact separately accepted dynamic attribute reservation. */
+  readonly importAttributesDynamicPaths?: ReadonlySet<string>;
   readonly ledger: M5cClosureLedger;
   readonly results: readonly Test262Result[];
   readonly records: ReadonlyMap<string, string>;
@@ -405,11 +411,41 @@ export function validateM5cExclusionAudit(
         }
       }
     }
+    let dynamicRemediationOwner = remediationOwner;
+    const reservedDynamicAttribute =
+      inputs.importAttributesDynamicPaths?.has(path) ?? false;
+    if (
+      reservedDynamicAttribute &&
+      (proposedOwner !== dynamicOwner || excluded)
+    ) {
+      throw new Error(
+        `Audit needs the exact dynamic attribute reservation: ${path}.`,
+      );
+    }
+    if (
+      proposedOwner === dynamicOwner &&
+      !excluded &&
+      (reservedDynamicAttribute ||
+        assessment.remediationOwner === importAttributesOwner ||
+        entry.owner === importAttributesOwner)
+    ) {
+      if (
+        assessment.remediationOwner !== importAttributesOwner ||
+        !inputs.importAttributesDynamicPaths?.has(path) ||
+        !dynamicImportRejection.test(detail) ||
+        !result.case.features.includes("import-attributes")
+      ) {
+        throw new Error(
+          `Audit needs the exact dynamic attribute reservation: ${path}.`,
+        );
+      }
+      dynamicRemediationOwner = importAttributesOwner;
+    }
     const owner = excluded
       ? proposedOwner
       : proposedOwner === annexOwner
         ? annexRemediationOwner
-        : remediationOwner;
+        : dynamicRemediationOwner;
     if (entry.owner !== owner) {
       throw new Error(`Audit requires owner ${owner} for ${path}.`);
     }
@@ -420,11 +456,22 @@ export function validateM5cExclusionAudit(
     if (
       (entry.owner.startsWith("adr:") ||
         entry.owner === remediationOwner ||
+        entry.owner === importAttributesOwner ||
         annexRemediationOwners.has(entry.owner)) &&
       !seen.has(entry.path)
     ) {
       throw new Error(
         `Ledger owner has no reviewed exclusion audit: ${entry.path}.`,
+      );
+    }
+  }
+  // The reservation is a set contract. Each reserved path keeps its reviewed
+  // row, whose row checks require the bounded owner or an observation
+  // promotion; reassigning a ledger owner cannot drop it from the audit.
+  for (const reserved of inputs.importAttributesDynamicPaths ?? []) {
+    if (!seen.has(reserved)) {
+      throw new Error(
+        `Dynamic attribute reservation lacks its audit row: ${reserved}.`,
       );
     }
   }
@@ -485,6 +532,7 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
     sources.set(path, readFileSync(join(suite, path), "utf8"));
   }
   return validateM5cExclusionAudit(text, {
+    importAttributesDynamicPaths: readImportAttributesReservation(),
     ledger: parseM5cClosureLedger(
       readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
     ).ledger,
@@ -493,6 +541,26 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
     sources,
     replacementEvidence,
   });
+}
+
+/** Read and verify the separately accepted 64-path reservation. */
+function readImportAttributesReservation(): ReadonlySet<string> {
+  const text = readFileSync(
+    join(repositoryRoot, importAttributesReservationPath),
+    "utf8",
+  );
+  const paths = [...text.matchAll(/^\| \*(test\/[^*]+)\* +\|/gmu)]
+    .map((match) => match[1]!)
+    .toSorted();
+  if (
+    paths.length !== 64 ||
+    new Set(paths).size !== 64 ||
+    exclusionAuditDigest(paths.join("\n") + "\n") !==
+      "8c9557f0ac4f8001bddd01a25dc3b6efef6a76e1d5a8cf34b23c1bd2d86ee9da"
+  ) {
+    throw new Error("Dynamic import attribute reservation changed.");
+  }
+  return new Set(paths);
 }
 
 const entry = process.argv[1];

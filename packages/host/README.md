@@ -6,6 +6,12 @@ for Node.js and Deno. Compiler-core code consumes only the host-neutral
 interface. Both hosts canonicalize file module identities and share a relative
 `file:` resolver, content hashing, and owned loader diagnostics.
 
+The file loader identifies dependencies with a *.json* pathname as JSON
+modules and other files as JavaScript modules. It retains their original
+bytes and digest. The compiler validates static `type: "json"` requests
+against that module kind before canonical identity deduplication; the host
+does not parse JSON or execute dynamic import options.
+
 Node.js and Deno adapters also normalize their runtime operating-system and
 architecture spellings into an execution-host description. Unknown values stay
 explicitly unknown so the composition root can reject unsupported native

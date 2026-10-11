@@ -83,3 +83,49 @@ static WebAssembly binary into the graph. That decision must define a
 discriminated loader result and graph node while preserving canonical identity,
 content digests, deterministic dependencies, and the one-instance rule across
 module kinds.
+
+
+Static import attributes and JSON modules
+-----------------------------------------
+
+The bounded M5c admission accepts static `with` clauses and JSON modules.
+Dynamic import and its options remain outside this admission under ADR 0016.
+The pinned prerequisite cohort has 24 static paths and 65 dynamic-boundary
+observation candidates; its 89 paths do not imply dynamic semantic coverage.
+
+Attributes are owned, source-located request metadata. The closed file host
+supports the `type` key with value `json`; unsupported keys and type values
+produce resolution diagnostics. Every request is validated before canonical
+URL deduplication, including repeated requests and requests through aliases.
+Bindings in one syntactic request share its resolution diagnostic. Distinct
+source sites are validated separately even when their URLs match. A cached
+loader failure is reported once per canonical module.
+An empty clause and an absent clause select ordinary JavaScript. The file
+host requires the JSON type for a *.json* dependency and rejects that type
+for a JavaScript file. Other hosts may implement their own media policy.
+
+Loader results and graph nodes distinguish JavaScript and JSON. Both retain
+canonical URL identity and the digest of the original content. JSON files
+remove leading U+FEFF characters before grammar validation, while their
+digest still identifies the original file content. Interior U+FEFF data,
+JavaScript files, and custom loader text remain unchanged. JSON entry
+modules remain unsupported and receive an entry diagnostic. JSON nodes
+have no dependencies and expose only a default export. Graph construction
+validates JSON grammar before any native execution, so malformed JSON is a
+resolution-time `SyntaxError`. Named JSON imports use the existing missing
+export diagnostic. No parser AST crosses the compiler boundary.
+
+The compiler converts validated JSON values to owned generic construction
+operations before any JavaScript evaluator starts. Synthetic linking
+initializes each default cell to `undefined`; its scheduled evaluation
+publishes the prepared value. A source cycle can observe `undefined`
+before that evaluation, and a suspended observer can resume after publication.
+Object keys are data properties, including
+`__proto__`; arrays and objects remain extensible. Construction never reads
+the mutable global `JSON.parse` property. Existing traced cells, namespaces,
+and generic allocation safepoints retain the value through aliases, cycles,
+and collection. The backend receives ordinary MIR and needs no JSON loader,
+source evaluator, or bootstrap runtime in the native artifact.
+
+This amendment authorizes only static JSON modules. Revisit it before another
+non-source kind, import phase, or runtime source-loading policy is admitted.

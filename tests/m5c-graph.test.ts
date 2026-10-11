@@ -385,6 +385,48 @@ test("the checked-in M5c work graph is valid", () => {
   assert.equal(summary.parked, 0);
 });
 
+interface NodeContract extends PublicationNode {
+  readonly delivers: string;
+  readonly status: string;
+}
+
+function readImportAttributesNode(id: string): NodeContract {
+  // SAFETY: the contract test first validates every graph node's shape.
+  return parseYaml(
+    readFileSync(
+      new URL(`../docs/m5c-graph/nodes/${id}.yaml`, import.meta.url),
+      "utf8",
+    ),
+  ) as NodeContract;
+}
+
+test("import attribute remediation retains its bounded graph contract", () => {
+  validateCurrentM5cWorkGraph();
+  const owner = readImportAttributesNode(
+    "import-attributes-dynamic-coverage-remediation",
+  );
+  assert.equal(owner.landed, false);
+  assert.equal(owner.status, "blocked");
+  assert.deepEqual(owner.dependencies, ["dynamic-import", "import-attributes"]);
+  assert.match(owner.delivers, /exactly the 64 pinned/u);
+  assert.match(owner.delivers, /authorizes no exclusions/u);
+  const reservation = readImportAttributesNode("observation-batch-31");
+  assert.equal(reservation.landed, false);
+  assert.equal(reservation.status, "blocked");
+  assert.deepEqual(reservation.dependencies, [
+    "dynamic-import",
+    "import-attributes",
+    "observation-batch-plan",
+  ]);
+  assert.match(reservation.delivers, /zero remaining unreviewed/u);
+  const prerequisite = readImportAttributesNode("import-attributes");
+  assert.deepEqual(prerequisite.dependencies, ["observation-batch-plan"]);
+  assert.match(prerequisite.delivers, /static import attributes and JSON/u);
+  assert.match(prerequisite.delivers, /89 unreviewed/u);
+  assert.match(prerequisite.delivers, /remain rejected under ADR 0016/u);
+  assert.equal(prerequisite.status, "ready");
+});
+
 interface PublicationNode {
   readonly id: string;
   readonly dependencies: readonly string[];

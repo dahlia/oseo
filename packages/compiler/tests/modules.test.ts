@@ -66,6 +66,46 @@ function testModule(sourceId: string, source: string): SyntaxModule {
   };
 }
 
+test("rejects a JSON entry with its own source diagnostic", async () => {
+  const entryId = "file:///app/data.json";
+  const result = await buildModuleGraph(
+    {
+      parseModule() {
+        assert.fail("A JSON entry must not reach the JavaScript frontend.");
+      },
+    },
+    {
+      load(canonicalId) {
+        return Promise.resolve({
+          diagnostics: [],
+          source: {
+            kind: "json",
+            source: '{"answer":262}',
+            sourceHash: "json-entry",
+            sourceId: canonicalId,
+          },
+        });
+      },
+    },
+    {
+      resolve() {
+        assert.fail("A JSON entry must not resolve an import request.");
+      },
+    },
+    entryId,
+  );
+  assert.equal(result.graph, undefined);
+  assert.equal(result.diagnostics.length, 1);
+  assert.equal(result.diagnostics[0]?.code, "OSEO2001");
+  assert.equal(
+    result.diagnostics[0]?.message,
+    "A JSON module cannot be the entry module.",
+  );
+  assert.equal(result.diagnostics[0]?.sourceId, entryId);
+  assert.deepEqual(result.diagnostics[0]?.range, moduleRange);
+  assert.deepEqual(result.diagnostics[0]?.byteRange, { start: 0, end: 0 });
+});
+
 test("deduplicates module instances across cycles and aliases", async () => {
   const sources = new Map([
     ["file:///app/a.js", "./main.js"],

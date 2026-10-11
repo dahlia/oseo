@@ -23,9 +23,36 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 142
+M5a is complete. The normative family records described below inventory 143
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
+
+M5c node `import-attributes` admits static import and re-export attributes
+and default-only JSON modules. The file host accepts `type: "json"` for
+JSON dependencies and validates each request before canonical URL
+deduplication. JSON syntax errors occur during discovery; named exports
+are rejected during linking. Aliases and cycles share one traced, extensible
+data value constructed before source evaluators run. Construction retains
+duplicate-key, UTF-16, negative-zero, and `__proto__` data semantics without
+reading the mutable realm `JSON.parse` binding. Synthetic linking initializes
+the default cell to `undefined`; scheduled evaluation publishes the prepared
+value. A cyclic source observer reads `undefined` before publication and can
+read the shared value after resuming from `await`.
+
+The JSON file loader removes leading U+FEFF characters before validation
+and hashes the original content. Interior U+FEFF data and JavaScript file
+text are preserved; custom loaders retain their own text policy. JSON entry
+modules remain unsupported and receive an entry-specific diagnostic.
+
+The pinned prerequisite selector contains 89 paths: 24 static subjects and
+65 dynamic-boundary subjects. Dynamic import and runtime options remain
+outside admission under ADR 0016. The separately bounded
+`import-attributes-dynamic-coverage-remediation` node owns the 64 actual
+`ImportExpression` rejections; none is a newly approved exclusion. The
+indexed import-attributes family records fixed, generated, structural,
+differential, specialization, guard-fallback, collection, and standards
+evidence in *tests/property/m5-import-attributes.property.test.ts* and
+*tests/fixtures/import-attributes/*.
 
 M5c node `annexb-proto-dependency-classification` makes only a missing
 `__proto__` lookup reaching an intrinsic `Object.prototype` observable as

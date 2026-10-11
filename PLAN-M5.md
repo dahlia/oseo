@@ -28,13 +28,13 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a and M5b are complete. The 141 indexed records in the normative
+M5a and M5b are complete. The 143 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
-graph. The reviewed manifest records 18,343 passes across 21,383 paths, and
-the property inventory records 165 domains, 165 seeds, and an ordinary case
-budget of 5,905.
+graph. The M5c entry snapshot recorded 18,343 passes across 21,383 paths,
+165 property domains, 165 seeds, and an ordinary case budget of 5,905.
+The checked-in manifest and property suites carry the current measurements.
 
 
 M5a implementation history
@@ -7433,3 +7433,44 @@ M5 is complete only when:
     documented tasks; and
  -  `mise run check`, `mise run test`, and the extended property task pass from
     a clean checkout.
+
+
+Static import attributes and JSON modules
+-----------------------------------------
+
+M5c node `import-attributes` implements the bounded ADR 0009 amendment.
+The frontend preserves located static attribute entries on imports and
+re-exports. The closed graph checks every request against the loader's
+module kind before URL deduplication, validates JSON grammar during
+resolution, and links only its default export. Generic data initialization
+precedes all source evaluators without calling a mutable realm JSON global.
+Synthetic linking initializes the default cell to `undefined`; scheduled
+evaluation publishes the prepared value through that traced cell. Aliases,
+namespaces, re-exports and cycles share the cell, including reads before
+publication and reads after a cyclic observer resumes from `await`.
+
+The file loader removes leading U+FEFF characters only from JSON sources
+and retains the original-content hash. Package regressions preserve interior
+U+FEFF data and JavaScript text; custom loaders keep their own text policy.
+Generated valid graphs cover zero, one, and two leading BOMs. The invalid
+domain includes JSON entry modules, which remain unsupported and receive
+an entry-specific diagnostic. Seeds, case counts, and limits are unchanged.
+
+Request discovery groups bindings by their located source request, not by
+canonical URL. Fixed regressions and the generated invalid domain prove one
+diagnostic per invalid request, separate errors at distinct source sites,
+and one report of a cached loader failure. The minimized missing-type case
+retains its seed and replay path as an ordinary regression.
+
+The indexed family supplies parser metadata and diagnostic examples,
+fixed native graphs, bounded generated valid and invalid domains, an
+independent expected-output oracle, Node.js/Deno differential execution,
+both specialization policies, false hints, shape and arithmetic guard
+misses, and collection at every safepoint. Generated graphs cover both
+observer-first and JSON-first request orders while shrinking retains the
+closed three-node cycle. Its stable seed family reserves
+`0x60008600` through `0x600086ff`. The pinned prerequisite selector has
+24 static and 65 dynamic-boundary subjects; observing the latter does not
+admit dynamic execution or runtime options under ADR 0016. Its unresolved
+64-path reservation has a separate active remediation owner and no new
+exclusion authority.

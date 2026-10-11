@@ -1132,7 +1132,16 @@ export interface SourceFrontend {
 
 /** One source-located module specifier retained outside a bootstrap AST. */
 export interface SyntaxModuleSpecifier extends LocatedSyntax {
+  /** Static request metadata, absent when no with clause was written. */
+  readonly attributes?: readonly SyntaxImportAttribute[];
   readonly byteRange: ByteRange;
+  readonly value: string;
+}
+
+/** One static attribute with its original diagnostic location. */
+export interface SyntaxImportAttribute extends LocatedSyntax {
+  readonly byteRange: ByteRange;
+  readonly key: string;
   readonly value: string;
 }
 
@@ -1191,13 +1200,21 @@ export interface ModuleSourceFrontend {
 
 /** Source and stable content identity supplied by a compiler host. */
 export interface LoadedModuleSource extends SourceInput {
+  /** Omitted by older source-only loaders; omission means JavaScript. */
+  readonly kind?: "javascript";
+  readonly sourceHash: string;
+}
+
+/** Original JSON bytes, validated by the compiler during graph discovery. */
+export interface LoadedJsonModule extends SourceInput {
+  readonly kind: "json";
   readonly sourceHash: string;
 }
 
 /** Owned result of loading one canonical module identifier. */
 export interface ModuleLoadResult {
   readonly diagnostics: readonly Diagnostic[];
-  readonly source?: LoadedModuleSource;
+  readonly source?: LoadedModuleSource | LoadedJsonModule;
 }
 
 /** Import site that caused a dependency module to be loaded. */
@@ -1238,13 +1255,17 @@ export interface ModuleDependency {
 export interface ModuleResolution extends ModuleDependency {}
 
 /** One uniquely identified node in a closed module graph. */
-export interface ModuleGraphNode {
+interface ModuleGraphNodeBase {
   readonly canonicalId: string;
   readonly dependencies: readonly ModuleDependency[];
   readonly resolutions: readonly ModuleResolution[];
   readonly sourceHash: string;
   readonly syntax: SyntaxModule;
 }
+
+/** A source node or a default-only synthetic JSON node. */
+export type ModuleGraphNode = ModuleGraphNodeBase &
+  ({ readonly moduleKind?: "javascript" } | { readonly moduleKind: "json" });
 
 /** Deterministic closed graph rooted at one canonical entry. */
 export interface ModuleGraph {

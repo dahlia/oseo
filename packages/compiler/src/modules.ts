@@ -1,4 +1,5 @@
 import type { Diagnostic } from "./source.ts";
+import { jsonModuleSyntax } from "./module-json.ts";
 import type {
   LocatedSyntax,
   ModuleDependency,
@@ -7,6 +8,7 @@ import type {
   ModuleGraphResult,
   ModuleLoadReferrer,
   ModuleLoader,
+  ModuleLoadResult,
   ModuleResolution,
   ModuleResolver,
   ModuleSourceFrontend,
@@ -14,6 +16,7 @@ import type {
   SyntaxModule,
   SyntaxModuleSpecifier,
 } from "./syntax.ts";
+/** Retain each syntactic request once without merging distinct source sites. */
 function moduleSpecifiers(
   module: SyntaxModule,
 ): readonly SyntaxModuleSpecifier[] {
@@ -24,9 +27,17 @@ function moduleSpecifiers(
       specifiers.push(entry.specifier);
     }
   }
-  return specifiers.toSorted(
-    (left, right) => left.byteRange.start - right.byteRange.start,
-  );
+  const requests = new Set<string>();
+  return specifiers
+    .toSorted((left, right) => left.byteRange.start - right.byteRange.start)
+    .filter((specifier) => {
+      const key =
+        `${specifier.byteRange.start}:${specifier.byteRange.end}:` +
+        specifier.value;
+      if (requests.has(key)) return false;
+      requests.add(key);
+      return true;
+    });
 }
 
 /**
@@ -41,26 +52,104 @@ export async function buildModuleGraph(
   const diagnostics: Diagnostic[] = [];
   const modules: ModuleGraphNode[] = [];
   const discovered = new Set<string>();
+  const loadedSources = new Map<string, ModuleLoadResult>();
 
   const visit = async (
     canonicalId: string,
     referrer?: ModuleLoadReferrer,
   ): Promise<void> => {
+    let loaded = loadedSources.get(canonicalId);
+    if (loaded == null) {
+      loaded = await loader.load(canonicalId, referrer);
+      loadedSources.set(canonicalId, loaded);
+      diagnostics.push(...loaded.diagnostics);
+    }
+    if (loaded.source == null || loaded.diagnostics.length > 0) return;
+    if (referrer == null && loaded.source.kind === "json") {
+      diagnostics.push(
+        linkDiagnostic(
+          canonicalId,
+          {
+            range: {
+              start: { line: 1, column: 1 },
+              end: { line: 1, column: 1 },
+            },
+          },
+          "A JSON module cannot be the entry module.",
+        ),
+      );
+      return;
+    }
+    const requestedJson =
+      referrer?.specifier.attributes?.some(
+        (attribute) => attribute.key === "type" && attribute.value === "json",
+      ) ?? false;
+    if (requestedJson !== (loaded.source.kind === "json")) {
+      diagnostics.push(
+        linkDiagnostic(
+          referrer?.importerId ?? canonicalId,
+          referrer?.specifier ?? {
+            range: {
+              start: { line: 1, column: 1 },
+              end: { line: 1, column: 1 },
+            },
+          },
+          "The module kind does not match its import attributes.",
+        ),
+      );
+      return;
+    }
     if (discovered.has(canonicalId)) return;
     discovered.add(canonicalId);
-    const loaded = await loader.load(canonicalId, referrer);
-    diagnostics.push(...loaded.diagnostics);
-    if (loaded.source == null || loaded.diagnostics.length > 0) return;
-    const parsed = frontend.parseModule({
-      source: loaded.source.source,
-      sourceId: canonicalId,
-    });
+    let parsed;
+    if (loaded.source.kind === "json") {
+      try {
+        parsed = { diagnostics: [], module: jsonModuleSyntax(loaded.source) };
+      } catch (error) {
+        const diagnostic = linkDiagnostic(
+          referrer?.importerId ?? canonicalId,
+          referrer?.specifier ?? {
+            range: {
+              start: { line: 1, column: 1 },
+              end: { line: 1, column: 1 },
+            },
+          },
+          error instanceof SyntaxError
+            ? "Invalid JSON module source."
+            : "JSON module construction exceeds compiler limits.",
+        );
+        diagnostics.push(
+          error instanceof SyntaxError
+            ? diagnostic
+            : { ...diagnostic, code: "OSEO1001" },
+        );
+        return;
+      }
+    } else {
+      parsed = frontend.parseModule({
+        source: loaded.source.source,
+        sourceId: canonicalId,
+      });
+    }
     diagnostics.push(...parsed.diagnostics);
     if (parsed.module == null || parsed.diagnostics.length > 0) return;
     const dependencies: ModuleDependency[] = [];
     const resolutions: ModuleResolution[] = [];
     const dependencyIds = new Set<string>();
     for (const specifier of moduleSpecifiers(parsed.module)) {
+      const unsupportedAttribute = specifier.attributes?.find(
+        (attribute) => attribute.key !== "type" || attribute.value !== "json",
+      );
+      if (unsupportedAttribute != null) {
+        diagnostics.push(
+          linkDiagnostic(
+            canonicalId,
+            unsupportedAttribute,
+            "Unsupported static import attribute.",
+          ),
+        );
+        continue;
+      }
       const resolved = resolver.resolve(canonicalId, specifier);
       diagnostics.push(...resolved.diagnostics);
       if (resolved.canonicalId == null || resolved.diagnostics.length > 0) {
@@ -84,8 +173,9 @@ export async function buildModuleGraph(
       resolutions,
       sourceHash: loaded.source.sourceHash,
       syntax: parsed.module,
+      moduleKind: loaded.source.kind ?? "javascript",
     });
-    for (const dependency of dependencies) {
+    for (const dependency of resolutions) {
       // eslint-disable-next-line no-await-in-loop -- Preserve source order.
       await visit(dependency.canonicalId, {
         importerId: canonicalId,

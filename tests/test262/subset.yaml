@@ -21,6 +21,8 @@ supportedFeatures:
   - DataView.prototype.setUint8
   - FinalizationRegistry
   - Float16Array
+  - import-attributes
+  - json-modules
   - Map
   - Object.fromEntries
   - Object.hasOwn
@@ -95793,6 +95795,198 @@ tests:
   - path: test/language/expressions/does-not-equals/bigint-and-string.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-await-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-await-ident.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-evaluation-abrupt-return.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-evaluation-abrupt-throw.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-evaluation-sequence.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-get-with-error.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-in.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-trailing-comma-fulfill.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-trailing-comma-reject.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-enumeration-abrupt.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-enumeration-enumerable.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-enumeration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-non-object.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-undefined.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-value-abrupt.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-value-non-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-yield-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-yield-ident-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-yield-ident-valid.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/trailing-comma-fulfill.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/import-attributes/trailing-comma-reject.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-arrow-assignment-expression-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-arrow-assignment-expression-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-arrow-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-arrow-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-return-await-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-return-await-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-block-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-block-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-block-labeled-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-block-labeled-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-do-while-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-do-while-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-else-braceless-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-else-braceless-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-else-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-else-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-function-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-function-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-function-return-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-function-return-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-if-braceless-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-if-braceless-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-if-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-if-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-while-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-while-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-with-expression-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-with-expression-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-with-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/nested-with-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/top-level-import-attributes-trailing-comma-first.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/valid/top-level-import-attributes-trailing-comma-second.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
   - path: test/language/expressions/equals/S11.9.1_A1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, expression-operators]
@@ -98275,6 +98469,42 @@ tests:
   - path: test/language/identifiers/val-this.js
     expectedClassification: expected-negative
     dependencies: [var-bindings]
+  - path: test/language/import/import-attributes/json-extensibility-array.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-extensibility-object.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-idempotency.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking, dynamic-source]
+  - path: test/language/import/import-attributes/json-invalid.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-named-bindings.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-value-array.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-value-boolean.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-value-null.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-value-number.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-value-object.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-value-string.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/import/import-attributes/json-via-namespace.js
+    expectedClassification: pass
+    dependencies: [module-linking]
   - path: test/language/keywords/ident-ref-this.js
     expectedClassification: expected-negative
     dependencies: [object-literals]
@@ -98625,6 +98855,45 @@ tests:
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-unpaired-surrogate.js
     expectedClassification: unsupported-profile-feature
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/allow-nlt-before-with.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/early-dup-attribute-key-export.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/early-dup-attribute-key-import-nobinding.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/early-dup-attribute-key-import-withbinding.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-empty.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-key-identifiername.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-key-string-double.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-key-string-single.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-many.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-newlines.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-trlng-comma.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-value-string-double.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/import-attributes/import-attribute-value-string-single.js
+    expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-bndng-const.js
     expectedClassification: pass

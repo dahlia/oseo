@@ -3,6 +3,8 @@ import type {
   SourceInput,
   SyntaxExportEntry,
   SyntaxImportEntry,
+  SyntaxImportAttribute,
+  SyntaxModuleSpecifier,
   SyntaxModule,
   SyntaxFunction,
   SyntaxStatement,
@@ -10,6 +12,7 @@ import type {
 import {
   node,
   nodes,
+  isString,
   type BabelNode,
   type ConvertContext,
   type ConvertOptions,
@@ -79,22 +82,38 @@ export function exportForDeclaration(
   ];
 }
 
-export function hasModuleAttributes(
+/** Convert static request metadata before it leaves the parser boundary. */
+function attributedSpecifier(
   context: ConvertContext,
   value: BabelNode,
-): boolean {
-  if (
-    nodes(value.attributes).length > 0 ||
-    nodes(value.assertions).length > 0
-  ) {
-    return true;
-  }
+): SyntaxModuleSpecifier | undefined {
+  const specifier = moduleSpecifier(context, node(value.source));
+  if (specifier == null) return undefined;
   const source = node(value.source);
-  if (source?.end == null || value.end == null) return false;
   const suffix = context.input.source
-    .slice(source.end, value.end)
+    .slice(source?.end ?? 0, value.end ?? 0)
     .replaceAll(/\/\*[\s\S]*?\*\/|\/\/[^\r\n]*/gu, "");
-  return /\b(?:assert|with)\s*\{/u.test(suffix);
+  if (nodes(value.attributes).length === 0 && !/\bwith\s*\{/u.test(suffix))
+    return specifier;
+  const attributes: SyntaxImportAttribute[] = [];
+  for (const attribute of nodes(value.attributes)) {
+    const keyNode = node(attribute.key);
+    const key = keyNode == null ? undefined : moduleName(keyNode);
+    const attributeValue = node(attribute.value)?.value;
+    if (key == null || !isString(attributeValue)) {
+      return unsupported(
+        context,
+        attribute,
+        "Invalid static import attribute.",
+      );
+    }
+    attributes.push({
+      ...location(context, attribute),
+      key,
+      value: attributeValue,
+    });
+  }
+  return { ...specifier, attributes };
 }
 
 export function moduleProgram(
@@ -119,15 +138,11 @@ export function moduleProgram(
   body.push(...hoisted);
   for (const item of nodes(programNode.body)) {
     if (item.type === "ImportDeclaration") {
-      if (hasModuleAttributes(context, item)) {
-        unsupported(context, item, "Module attributes are outside M4.");
-        break;
-      }
       if (item.importKind === "type") {
         unsupported(context, item, "Type-only imports are outside M4.");
         break;
       }
-      const specifier = moduleSpecifier(context, node(item.source));
+      const specifier = attributedSpecifier(context, item);
       if (specifier == null) break;
       const rawSpecifiers = nodes(item.specifiers);
       if (rawSpecifiers.length === 0) {
@@ -174,11 +189,7 @@ export function moduleProgram(
       continue;
     }
     if (item.type === "ExportAllDeclaration") {
-      if (hasModuleAttributes(context, item)) {
-        unsupported(context, item, "Module attributes are outside M4.");
-        break;
-      }
-      const specifier = moduleSpecifier(context, node(item.source));
+      const specifier = attributedSpecifier(context, item);
       if (specifier == null) break;
       if (item.exported != null) {
         unsupported(context, item, "Namespace re-exports are outside M4.");
@@ -188,17 +199,13 @@ export function moduleProgram(
       continue;
     }
     if (item.type === "ExportNamedDeclaration") {
-      if (hasModuleAttributes(context, item)) {
-        unsupported(context, item, "Module attributes are outside M4.");
-        break;
-      }
       if (item.exportKind === "type") {
         unsupported(context, item, "Type-only exports are outside M4.");
         break;
       }
       const sourceNode = node(item.source);
       const specifier =
-        sourceNode == null ? undefined : moduleSpecifier(context, sourceNode);
+        sourceNode == null ? undefined : attributedSpecifier(context, item);
       if (sourceNode != null && specifier == null) break;
       const declarationNode = node(item.declaration);
       if (declarationNode != null) {

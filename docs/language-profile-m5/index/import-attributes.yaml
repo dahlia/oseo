@@ -1,0 +1,3 @@
+version: 1
+id: import-attributes
+record: docs/language-profile-m5/families/import-attributes.yaml

@@ -1,0 +1,6 @@
+{
+  "answer": 262,
+  "values": [1, "x", null, true],
+  "__proto__": { "safe": true },
+  "zero": -0
+}

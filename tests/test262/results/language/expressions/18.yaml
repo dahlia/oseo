@@ -358,6 +358,33 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: true
+      features:
+        - dynamic-import
+        - import-attributes
+        - Proxy
+      flags:
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/import-attributes/2nd-param-with-enumeration-abrupt.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - module-linking
+      - dynamic-source
+    observation:
+      detail: 'test/language/expressions/dynamic-import/import-attributes/2nd-param-with-enumeration-abrupt.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/import-attributes/2nd-param-with-enumeration-abrupt.js:140:1:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: false
       features:
         - destructuring-binding

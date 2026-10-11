@@ -239,6 +239,168 @@ test("dynamic import tag debt must match the reviewed dependencies", () => {
   );
 });
 
+test("dynamic attribute remediation requires its exact reservation", () => {
+  const observed = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  };
+  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
+  const boundedOwner = "node:import-attributes-dynamic-coverage-remediation";
+  audit.assessments.reviewed.remediationOwner = boundedOwner;
+  const bounded = {
+    ...inputs,
+    importAttributesDynamicPaths: new Set([path]),
+    results: inputs.results.map((entry) => ({
+      ...entry,
+      case: {
+        ...entry.case,
+        features: ["import-attributes", "dynamic-import"],
+      },
+    })),
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) => ({
+        ...entry,
+        owner: boundedOwner,
+      })),
+    },
+  };
+  assert.equal(
+    validateM5cExclusionAudit(stringifyYaml(audit), bounded).remediation,
+    1,
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...bounded,
+        importAttributesDynamicPaths: new Set<string>(),
+      }),
+    /exact dynamic attribute reservation/u,
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...bounded,
+        results: inputs.results,
+      }),
+    /exact dynamic attribute reservation/u,
+  );
+});
+
+test("reserved dynamic attributes reject ordinary reassessment", () => {
+  const observed = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  };
+  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        importAttributesDynamicPaths: new Set([path]),
+        results: inputs.results.map((entry) =>
+          Object.assign({}, entry, {
+            case: {
+              ...entry.case,
+              features: ["import-attributes", "dynamic-import"],
+            },
+          }),
+        ),
+      }),
+    /exact dynamic attribute reservation/u,
+  );
+});
+
+test("reserved dynamic attributes reject exclusion reassessment", () => {
+  const observed = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  };
+  const { audit, inputs } = fixture(false, 'import("x", {});', observed);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        importAttributesDynamicPaths: new Set([path]),
+        results: inputs.results.map((entry) =>
+          Object.assign({}, entry, {
+            case: {
+              ...entry.case,
+              features: ["import-attributes", "dynamic-import"],
+            },
+          }),
+        ),
+      }),
+    /exact dynamic attribute reservation/u,
+  );
+});
+
+test("dynamic attribute audit rejects one omitted reservation", () => {
+  const observed = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  };
+  const sourceText = 'import("x", {});';
+  const { audit, inputs } = fixture(true, sourceText, observed);
+  const boundedOwner = "node:import-attributes-dynamic-coverage-remediation";
+  const second = "test/language/eval-code/second.js";
+  const firstAuditPath = audit.paths[0];
+  const firstResult = inputs.results[0];
+  const firstLedgerEntry = inputs.ledger.entries[0];
+  assert.ok(firstAuditPath);
+  assert.ok(firstResult);
+  assert.ok(firstLedgerEntry);
+  audit.assessments.reviewed.remediationOwner = boundedOwner;
+  audit.paths.push({ ...firstAuditPath, path: second });
+  const bounded = {
+    ...inputs,
+    importAttributesDynamicPaths: new Set([path, second]),
+    sources: new Map([
+      [path, sourceText],
+      [second, sourceText],
+    ]),
+    results: [path, second].map((item) => ({
+      case: {
+        async: firstResult.case.async,
+        features: ["import-attributes", "dynamic-import"],
+        flags: firstResult.case.flags,
+        includes: firstResult.case.includes,
+        mode: firstResult.case.mode,
+        path: item,
+        strictness: firstResult.case.strictness,
+        suiteRevision: firstResult.case.suiteRevision,
+      },
+      classification: firstResult.classification,
+      dependencies: firstResult.dependencies,
+      observation: firstResult.observation,
+      unsupportedFeatures: firstResult.unsupportedFeatures,
+    })),
+    ledger: {
+      ...inputs.ledger,
+      entries: [path, second].map((item) => ({
+        owner: boundedOwner,
+        path: item,
+        prerequisites: firstLedgerEntry.prerequisites,
+        state: firstLedgerEntry.state,
+      })),
+    },
+  };
+  assert.equal(
+    validateM5cExclusionAudit(stringifyYaml(audit), bounded).remediation,
+    2,
+  );
+  for (const omitted of [path, second]) {
+    const incomplete = {
+      ...audit,
+      paths: audit.paths.filter((row) => row.path !== omitted),
+    };
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(incomplete), bounded),
+      /has no reviewed exclusion audit/u,
+    );
+  }
+});
+
 test("unresolved non-source coverage requires remediation ownership", () => {
   const { audit, inputs } = fixture(true);
   assert.equal(
@@ -400,6 +562,100 @@ test("promotion uses observation ownership and removes the exclusion", () => {
   });
 });
 
+test("observed promotions close reserved dynamic attribute assessments", () => {
+  const observed = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  };
+  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
+  audit.assessments.reviewed.remediationOwner =
+    "node:import-attributes-dynamic-coverage-remediation";
+  for (const classification of ["pass", "expected-negative"] as const) {
+    const promoted: M5cExclusionAuditInputs = {
+      ...inputs,
+      importAttributesDynamicPaths: new Set([path]),
+      ledger: {
+        ...inputs.ledger,
+        entries: inputs.ledger.entries.map((entry) => ({
+          ...entry,
+          owner: "observation",
+          state: classification,
+        })),
+      },
+      results: inputs.results.map((entry) =>
+        Object.assign({}, entry, {
+          classification,
+          observation: { passed: true },
+        }),
+      ),
+    };
+    assert.deepEqual(
+      validateM5cExclusionAudit(stringifyYaml(audit), promoted),
+      {
+        exclusions: 0,
+        remediation: 0,
+        missingDynamicTags: 0,
+      },
+    );
+  }
+});
+
+test("reserved dynamic attributes reject a reassigned omitted row", () => {
+  const observed = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  };
+  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
+  audit.paths = [];
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        importAttributesDynamicPaths: new Set([path]),
+        ledger: {
+          ...inputs.ledger,
+          entries: inputs.ledger.entries.map((entry) =>
+            Object.assign({}, entry, { owner: "node:dynamic-import" }),
+          ),
+        },
+      }),
+    /reservation lacks its audit row/u,
+  );
+});
+
+test("reserved dynamic attributes reject an omitted promoted row", () => {
+  const observed = {
+    ...observation,
+    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+  };
+  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
+  audit.paths = [];
+  for (const classification of ["pass", "expected-negative"] as const) {
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(stringifyYaml(audit), {
+          ...inputs,
+          importAttributesDynamicPaths: new Set([path]),
+          ledger: {
+            ...inputs.ledger,
+            entries: inputs.ledger.entries.map((entry) => ({
+              ...entry,
+              owner: "observation",
+              state: classification,
+            })),
+          },
+          results: inputs.results.map((entry) =>
+            Object.assign({}, entry, {
+              classification,
+              observation: { passed: true },
+            }),
+          ),
+        }),
+      /reservation lacks its audit row/u,
+    );
+  }
+});
+
 test("checked-in audit counts match ledger owners after promotions", () => {
   const ledger = parseM5cClosureLedger(
     readFileSync(
@@ -413,6 +669,7 @@ test("checked-in audit counts match ledger owners after promotions", () => {
   const remediation = ledger.entries.filter(
     (entry) =>
       entry.owner === remediationOwner ||
+      entry.owner === "node:import-attributes-dynamic-coverage-remediation" ||
       entry.owner === annexRemediationOwner ||
       entry.owner === protoRemediationOwner,
   );
