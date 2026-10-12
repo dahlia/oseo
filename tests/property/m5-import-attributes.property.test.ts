@@ -333,6 +333,117 @@ test("generated invalid JSON requests preserve diagnostic phases", async () => {
   );
 });
 
+test("generated JavaScript requests typed as JSON are rejected", async () => {
+  const mismatchArbitrary = fc.record({
+    form: fc.constantFrom(
+      "default",
+      "namespace",
+      "named",
+      "export-from",
+      "side-effect",
+    ),
+    answer: fc.integer({ min: -1000, max: 1000 }),
+    untypedAlias: fc.constantFrom("none", "before", "after"),
+  });
+  await assertAsyncProperty(
+    "JavaScript dependency requested with the JSON type",
+    fc.asyncProperty(mismatchArbitrary, async (value) => {
+      const { form, answer, untypedAlias } = value;
+      const typed =
+        form === "default"
+          ? 'import value from "./plain.js" with {type:"json"};'
+          : form === "namespace"
+            ? 'import * as value from "./plain.js" with {type:"json"};'
+            : form === "named"
+              ? 'import {answer} from "./plain.js" with {type:"json"};'
+              : form === "export-from"
+                ? 'export {default as value} from "./plain.js" ' +
+                  'with {type:"json"};'
+                : 'import "./plain.js" with {type:"json"};';
+      const untyped = 'import plain from "././plain.js";';
+      const lines = [
+        'import first from "./data.json" with {type:"json"};',
+        ...(untypedAlias === "before" ? [untyped] : []),
+        typed,
+        ...(untypedAlias === "after" ? [untyped] : []),
+      ];
+      const source = lines.join("\n");
+      const typedLine = lines.indexOf(typed);
+      const typedStart =
+        new TextEncoder().encode(lines.slice(0, typedLine).join("\n")).length +
+        1 +
+        typed.indexOf('"./plain.js"');
+      const result = await buildModuleGraph(
+        babelModuleFrontend,
+        {
+          load(canonicalId) {
+            return Promise.resolve({
+              diagnostics: [],
+              source: canonicalId.endsWith(".json")
+                ? {
+                    kind: "json",
+                    source: `{"answer":${answer}}`,
+                    sourceHash: `json:${answer}`,
+                    sourceId: canonicalId,
+                  }
+                : canonicalId.endsWith("/plain.js")
+                  ? {
+                      source:
+                        `export default ${answer};\n` +
+                        `export const answer = ${answer};`,
+                      sourceHash: `plain:${answer}`,
+                      sourceId: canonicalId,
+                    }
+                  : { source, sourceHash: "entry", sourceId: canonicalId },
+            });
+          },
+        },
+        {
+          resolve(importerId, specifier) {
+            return {
+              canonicalId: new URL(specifier.value, importerId).href,
+              diagnostics: [],
+            };
+          },
+        },
+        "file:///app/entry.mjs",
+      );
+      assert.equal(result.graph, undefined);
+      assert.deepEqual(
+        result.diagnostics.map((diagnostic) => ({
+          code: diagnostic.code,
+          line: diagnostic.range.start.line,
+          message: diagnostic.message,
+          sourceId: diagnostic.sourceId,
+          start: diagnostic.byteRange.start,
+          end: diagnostic.byteRange.end,
+        })),
+        [
+          {
+            code: "OSEO2001",
+            line: typedLine + 1,
+            message: "The module kind does not match its import attributes.",
+            sourceId: "file:///app/entry.mjs",
+            start: typedStart,
+            end: typedStart + '"./plain.js"'.length,
+          },
+        ],
+      );
+    }),
+    {
+      domain:
+        "closed graphs with one JavaScript dependency requested with the " +
+        "JSON type through a default, namespace, named, re-export or " +
+        "side-effect request, with no, earlier or later untyped alias",
+      numRuns: 16,
+      profile: "M5c static import attributes and JSON modules",
+      seed: 0x6000_8602,
+      sizeLimit: "three requests, one JSON and one JavaScript dependency",
+      timeLimitMilliseconds: 30_000,
+    },
+  );
+});
+
 interface JsonGraphCase {
   readonly answer: number;
   readonly duplicate: number;

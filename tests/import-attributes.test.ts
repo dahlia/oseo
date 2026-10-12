@@ -17,6 +17,7 @@ async function graphOf(
   const sources = new Map([
     ["file:///app/main.js", source],
     ["file:///app/data.json", json],
+    ["file:///app/plain.js", "export default 1;"],
   ]);
   const loads: string[] = [];
   const result = await buildModuleGraph(
@@ -164,6 +165,38 @@ test("validates every request before alias deduplication", async () => {
       },
     ),
   );
+});
+
+test("a JavaScript file requested as JSON is a located error", async () => {
+  const direct = await graphOf(
+    'import value from "./plain.js" with {type:"json"};',
+  );
+  assert.equal(direct.graph, undefined);
+  assert.deepEqual(direct.diagnostics, [
+    {
+      byteRange: { start: 18, end: 30 },
+      code: "OSEO2001",
+      message: "The module kind does not match its import attributes.",
+      range: {
+        start: { line: 1, column: 19 },
+        end: { line: 1, column: 31 },
+      },
+      sourceId: "file:///app/main.js",
+    },
+  ]);
+  const aliased = await graphOf(
+    [
+      'import first from "./plain.js";',
+      'import second from "././plain.js" with {type:"json"};',
+    ].join("\n"),
+  );
+  assert.equal(aliased.graph, undefined);
+  assert.equal(aliased.diagnostics.length, 1);
+  assert.equal(
+    aliased.diagnostics[0]?.message,
+    "The module kind does not match its import attributes.",
+  );
+  assert.equal(aliased.diagnostics[0]?.range.start.line, 2);
 });
 
 test("malformed JSON and missing named exports are rejected", async () => {
