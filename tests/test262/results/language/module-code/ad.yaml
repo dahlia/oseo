@@ -6,6 +6,31 @@ results:
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
+        - import-attributes
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/import-attributes/early-dup-attribute-key-import-withbinding.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/import-attributes/early-dup-attribut\
+        e-key-import-withbinding.js:98:3: error[OSEO0001]: Source could
+        not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
         - class
         - class-fields-private
       flags:

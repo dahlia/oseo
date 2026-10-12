@@ -3,6 +3,51 @@ key: "71"
 results:
   - case:
       async: false
+      features:
+        - import-attributes
+        - globalThis
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/import-attributes/import-attribute-empty.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/import-attributes/import-attribute-1_FIXTURE.js
+            - test/language/module-code/import-attributes/import-attribute-2_FIXTURE.js
+            - test/language/module-code/import-attributes/import-attribute-3_FIXTURE.js
+          id: test/language/module-code/import-attributes/import-attribute-empty.js
+          sourceHash: fnv1a64:6e6872a969b1da51
+        - dependencies: []
+          id: test/language/module-code/import-attributes/import-attribute-1_FIXTURE.js
+          sourceHash: fnv1a64:31f77150dd994f24
+        - dependencies: []
+          id: test/language/module-code/import-attributes/import-attribute-2_FIXTURE.js
+          sourceHash: fnv1a64:18a4f050cf71b7f1
+        - dependencies: []
+          id: test/language/module-code/import-attributes/import-attribute-3_FIXTURE.js
+          sourceHash: fnv1a64:1ff3b750d3331916
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features: []

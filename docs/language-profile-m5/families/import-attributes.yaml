@@ -1,0 +1,76 @@
+version: 1
+id: import-attributes
+title: Static import attributes and JSON modules
+scope:
+  - "Static with clauses retain owned key/value metadata and locations on
+    imports and re-exports. Duplicate keys and non-string values are parse
+    errors; unknown keys and unsupported types are resolution errors."
+  - "The closed file host requires type json for JSON dependencies. Every
+    request is validated before canonical URL deduplication. JSON grammar
+    is checked during graph discovery; named bindings fail during linking.
+    Bindings sharing one source request share its resolution diagnostic;
+    distinct sites retain separate diagnostics, and loader failures are
+    reported once per cached canonical module."
+  - "The JSON file loader removes leading U+FEFF characters before grammar
+    validation while hashing original content. Interior U+FEFF data and
+    JavaScript file text are preserved; custom loaders own their text policy.
+    JSON entries remain unsupported and receive an entry diagnostic."
+  - "Default-only JSON synthetic modules construct generic data before
+    any source evaluator starts. Aliases, repeated imports, namespaces,
+    re-exports and cycles share one traced cell, initialized to undefined
+    during linking and published during scheduled JSON evaluation. Cyclic
+    observers can read before publication or resume after it. Objects and
+    arrays stay extensible, __proto__ stays a data key, and JSON.parse is
+    never looked up through the mutable realm global during construction."
+  - "Dynamic import and runtime option semantics remain rejected under
+    ADR 0016. The 89-path prerequisite cohort has 24 static semantic paths
+    and 65 dynamic-boundary candidates; these are separate support claims."
+owners:
+  - PLAN-M5C.md
+  - docs/adr/0009-module-identity-and-linking.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/property/m5-import-attributes.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/import-attributes.test.ts
+      - packages/host/tests/index.test.ts
+      - packages/compiler/tests/modules.test.ts
+      - tests/fixtures/import-attributes/entry.mjs
+      - tests/fixtures/import-attributes/data.json
+      - tests/fixtures/import-attributes/publication-entry.mjs
+      - tests/fixtures/import-attributes/publication-observer.mjs
+      - tests/fixtures/import-attributes/publication-async-entry.mjs
+      - tests/fixtures/import-attributes/publication-async-observer.mjs
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-import-attributes.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - tests/property/m5-import-attributes.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/fixtures/import-attributes/entry.mjs
+      - tests/property/m5-import-attributes.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/property/m5-import-attributes.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/async.test.ts
+      - tests/import-attributes.test.ts
+      - tests/property/m5-import-attributes.property.test.ts

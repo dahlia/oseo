@@ -25,6 +25,33 @@ results:
       passed: false
     unsupportedFeatures: []
   - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: resolution
+      features:
+        - import-attributes
+        - globalThis
+      flags:
+        - module
+        - raw
+      includes: []
+      mode: module
+      path: test/language/module-code/import-attributes/allow-nlt-before-with.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/module-code/import-attributes/ensure-linking-err\
+        or_FIXTURE.js:9:10: error[OSEO2001]: Module has no export
+        'nonExistent'."
+      errorType: SyntaxError
+      failedPhase: resolution
+      passed: false
+    unsupportedFeatures: []
+  - case:
       async: true
       features:
         - top-level-await

@@ -76,6 +76,18 @@ run, so the hosted observation is a lower bound on the worst case rather than
 a stable cost. Refreshing the whole table from one newer run would mix Node.js
 and Deno pins, so only this file changed.
 
+The import-attributes family also postdates the weight-source runs. Its
+October 10, 2026 local Linux focused observation measured the eight-case
+generated property at 8.758 seconds, invalid requests at 0.005 seconds, and
+the fixed identity, publication and asynchronous publication cases at
+2.284, 0.412 and 0.881 seconds. Multiplying only generated case durations
+by ten and retaining fixed cases gives an estimated 91.21 seconds, rounded
+up to the 92-second Linux weight. This is a projection from an ordinary
+local observation, not measured extended CI cost. The macOS weight remains
+an estimate: its prior adjacent-family 202-second estimate is scaled by
+the Linux weight change, `202 * 92/85`, and rounded up to 219 seconds.
+Neither weight changes cases, seeds, size limits or interrupt deadlines.
+
 The newer main run [36312192623] at `af9bb68c` is retained as the closest
 before-run comparison.
 `git diff af9bb68c 86228614 -- packages tests tools .github mise.toml` is empty

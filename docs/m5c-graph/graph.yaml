@@ -8,20 +8,20 @@ usage: "Take a node whose status is ready and whose landed field is false.
   prerequisite on the m5-exit-audit path. Update baseline whenever the
   checked-in reviewed manifest changes; check:m5c-graph rejects stale counts."
 baseline:
-  suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-  inventoryPaths: 41091
-  reviewedPaths: 25348
-  unreviewedPaths: 15743
-  passes: 21667
-  expectedNegatives: 2190
-  unsupportedProfileFeatures: 1491
-  semanticFailures: 0
+  expectedNegatives: 2205
   harnessFailures: 0
   infrastructureFailures: 0
+  inventoryPaths: 41091
+  passes: 21677
+  reviewedPaths: 25437
+  semanticFailures: 0
+  suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+  unreviewedPaths: 15654
+  unsupportedProfileFeatures: 1555
 summary:
-  nodes: 81
+  nodes: 82
   ready: 71
-  blocked: 10
+  blocked: 11
   parked: 0
   landed: 17
 serializationPoints:
@@ -902,3 +902,461 @@ collisions:
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
       prerequisites are excluded because their dependencies serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-tolocalestring-arguments
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - destructuring-binding-target-order
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - eval-intrinsic-value
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - fn-global-object-harness
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - frontmatter-feature-tags
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - function-caller-restrictions
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - generator-dispatch-stack-charge
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - hashbang-comments
+      - import-attributes-dynamic-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - import-meta
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - iterator-helpers
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - iterator-next-callability
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - minor-feature-tag-admission
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - module-export-forms
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - module-top-level-await-patterns
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - non-blocking-agent
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-01
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-03
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-05
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-06
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-08
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-11
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-12
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-13
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-14
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-15
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-16
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-17
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-18
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-19
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-20
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-21
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-22
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-23
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-24
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-25
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-26
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-27
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-28
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-29
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-30
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-31
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - observation-batch-32
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - parenthesized-assignment-function-name
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - primitive-wrapper-objects
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - promise-feature-admission
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - proper-tail-calls
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - regexp-pattern-extensions
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - regexp-property-escape-harness
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - regexp-split-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - resizable-array-buffer-harness
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - test262-host-script-bindings
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - typed-array-construction-order
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - typed-array-feature-admission
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - typed-array-proto-coverage-remediation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - unhandled-rejection-observation
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - well-known-intrinsics-harness
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - with-strict-assignment-fallback
+    note:
+      The bounded dynamic attribute owner and this independent publisher both
+      refresh canonical observations; serialize manifest publication.
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - eval-intrinsic-value
+      - import-attributes-dynamic-coverage-remediation
+      - typed-array-proto-coverage-remediation
+    note: The separately bounded dynamic attribute owner refreshes its
+      mixed-coverage records; serialize independent exclusion-audit
+      publication.
+  - path: tests/test262/results.yaml
+    nodes:
+      - annexb-legacy-lookup-dependency-classification
+      - import-attributes-dynamic-coverage-remediation
+    note: "The bounded dynamic attribute owner and this independent
+      batch11 prerequisite share canonical evidence publication inputs;
+      serialize their edits without widening either owner."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - annexb-legacy-lookup-dependency-classification
+      - import-attributes-dynamic-coverage-remediation
+    note: "The bounded dynamic attribute owner and this independent
+      batch11 prerequisite share canonical evidence publication inputs;
+      serialize their edits without widening either owner."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-duplicate-constructor-early-error
+      - import-attributes-dynamic-coverage-remediation
+    note: "The bounded dynamic attribute owner and this independent
+      batch11 prerequisite share canonical evidence publication inputs;
+      serialize their edits without widening either owner."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - import-attributes-dynamic-coverage-remediation
+    note: "The bounded dynamic attribute owner and this independent
+      batch11 prerequisite share canonical evidence publication inputs;
+      serialize their edits without widening either owner."
+  - path: docs/m5c-closure/exclusion-audit.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - import-attributes-dynamic-coverage-remediation
+    note: "The bounded dynamic attribute owner and this independent
+      batch11 prerequisite share canonical evidence publication inputs;
+      serialize their edits without widening either owner."

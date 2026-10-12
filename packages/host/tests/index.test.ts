@@ -12,6 +12,7 @@ import {
   createFileModuleLoader,
   createNodeHost,
   fileModuleResolver,
+  hashModuleSource,
   normalizeExecutionHost,
 } from "../src/index.ts";
 
@@ -787,6 +788,33 @@ test("loads file modules with stable content hashes", async () => {
   assert.equal(first.source?.sourceId, "file:///work/answer.js");
   assert.match(first.source?.sourceHash ?? "", /^fnv1a64:[0-9a-f]{16}$/u);
   assert.equal(second.source?.sourceHash, first.source?.sourceHash);
+});
+
+test("normalizes JSON file BOMs while hashing original contents", async () => {
+  const data = '{"value":"inside\uFEFFvalue"}';
+  const hashes = await Promise.all(
+    [0, 1, 2].map(async (count) => {
+      const original = "\uFEFF".repeat(count) + data;
+      const loader = createFileModuleLoader({
+        ...createNodeHost(),
+        async readTextFile(): Promise<string> {
+          return original;
+        },
+      });
+      const result = await loader.load("file:///work/data.json");
+      assert.deepEqual(result.diagnostics, []);
+      assert.equal(result.source?.kind, "json");
+      assert.equal(result.source?.source, data);
+      assert.equal(result.source?.sourceHash, hashModuleSource(original));
+      assert.ok(result.source);
+      const javascript = await loader.load("file:///work/data.js");
+      assert.equal(javascript.source?.kind, "javascript");
+      assert.equal(javascript.source?.source, original);
+      assert.equal(javascript.source?.sourceHash, hashModuleSource(original));
+      return result.source.sourceHash;
+    }),
+  );
+  assert.equal(new Set(hashes).size, 3);
 });
 
 test("locates dependency load failures at the import specifier", async () => {

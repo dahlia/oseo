@@ -118,3 +118,24 @@ and retains the original upstream path unchanged. Existing constructor
 properties supply generated constructor, clone, and buffer coverage.
 Replacement evidence supports the core contract; assigning an exclusion still
 requires the remediation node's maintainer accounting decision.
+
+
+Dynamic import attributes and JSON identity
+-------------------------------------------
+
+The separately approved reservation in
+*../m5c-graph/import-attributes-dynamic-coverage.md* contains exactly 64
+pinned paths whose actual observation rejects `ImportExpression` before
+option evaluation, enumeration, abrupt completion, promises, or JSON
+identity assertions execute. Their ledger owner is
+`node:import-attributes-dynamic-coverage-remediation`. This reservation
+adds no exclusions and does not widen the existing 178-path
+`dynamic-source-coverage-remediation` contract.
+
+Each path retains its original normative subject, source digest, and fresh
+observation digest. Its assessment uses `disposition: remediation`,
+`normativeDependency: not-demonstrated`, and the separate `remediationOwner`.
+The audit validates that owner against the fixed reservation, the upstream
+`import-attributes` feature, and the exact accepted `ImportExpression`
+rejection. It cannot use an unrelated diagnostic or source-evaluation-only
+assertion to close the remaining runtime attribute or identity coverage.

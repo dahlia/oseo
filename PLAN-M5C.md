@@ -407,6 +407,25 @@ for the record procedure. The separate `dynamic-import-staged-plan` node plans
 ADR 0016 alternative 3; it does not alter this interim ownership rule.
 
 
+Static import attributes and JSON modules
+-----------------------------------------
+
+The `import-attributes` node admits static `with` clauses and default-only
+JSON dependencies in the closed file graph. ADR 0009 records the bounded
+module-kind contract, per-request validation before deduplication, generic
+data construction, shared identity, and resolution/linking diagnostics.
+*tests/property/m5-import-attributes.property.test.ts* supplies generated
+valid graphs and invalid requests, independent observations under Node.js
+and Deno, both specialization policies, guard misses, and forced collection.
+
+Its exact pinned selector has 89 paths, comprising 24 static subjects and
+65 dynamic-boundary subjects. Dynamic runtime options remain outside ADR
+0016 admission. The separately approved 64-path reservation in
+*docs/m5c-graph/import-attributes-dynamic-coverage.md* belongs to
+`import-attributes-dynamic-coverage-remediation`. It adds no exclusion and
+does not widen the existing dynamic-source remediation reservation.
+
+
 Work graph construction
 -----------------------
 

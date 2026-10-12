@@ -1,0 +1,29 @@
+group: language/import
+key: 5e
+results:
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: resolution
+      features:
+        - import-attributes
+        - json-modules
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/import/import-attributes/json-named-bindings.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+    observation:
+      detail: "test/language/import/import-attributes/json-named-bindings.js:\
+        95:9: error[OSEO2001]: Module has no export 'name'."
+      errorType: SyntaxError
+      failedPhase: resolution
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

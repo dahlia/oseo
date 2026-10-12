@@ -162,7 +162,8 @@ construction and linking. *hir.ts*, *hir-build.ts*, and *hir-print.ts* separate
 the HIR representation from construction and rendering. *mir.ts*,
 *mir-build.ts*, *mir-specialize.ts*, and *mir-print.ts* do the same for generic
 lowering, guarded specialization, and MIR rendering. *module-compile.ts* owns
-whole-graph asynchronous compilation, *compile.ts* composes source compilation,
+whole-graph asynchronous compilation, *module-json.ts* constructs JSON module
+data through generic owned syntax, *compile.ts* composes source compilation,
 and *native.ts* owns native extension contracts. *index.ts* remains the public
 export and composition surface. Automated boundary checks reject cycles in the
 compiler and Babel adapter source graphs.
@@ -600,6 +601,19 @@ compiler allocates every exported cell and shared namespace before lowering
 each module body into a private evaluator. Imports reuse exporter cell
 identifiers, so evaluator boundaries do not copy a binding or make C
 declaration order semantic.
+
+M5c extends this graph with default-only JSON nodes and owned static import
+attributes. The file host supplies the module-kind discriminant and original
+content digest. It removes leading U+FEFF characters from JSON files before
+grammar validation while the digest still identifies the original content;
+interior U+FEFF data, JavaScript files, and custom loader text stay unchanged.
+The compiler validates every request before deduplication.
+JSON grammar is checked during graph discovery. Generic data construction
+prepares each JSON value before any JavaScript evaluator starts. Synthetic
+linking initializes the default export cell to `undefined`, and the JSON
+module's scheduled evaluation publishes the prepared value, preserving aliases
+and cycles without reading mutable realm JSON globals.
+ADR 0009 bounds this contract; dynamic import options remain outside it.
 
 Static WebAssembly modules may later join the same closed graph without
 becoming ECMAScript source. Their binary imports and exports, content digests,

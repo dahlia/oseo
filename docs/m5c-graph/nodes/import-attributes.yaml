@@ -1,9 +1,11 @@
 version: 1
 id: import-attributes
 title: Admit import attributes
-delivers: "Admits import attributes and JSON modules (the import-attributes
-  and json-modules features), so the 89 unreviewed paths that need them can be
-  observed."
+delivers: "Admits static import attributes and JSON modules. The fixed
+  import-attributes/json-modules prerequisite selector has 89 unreviewed
+  paths: 24 static semantic cases and 65 dynamic-boundary observation
+  candidates. Dynamic import and its runtime options remain rejected under
+  ADR 0016; observing those candidates does not admit their semantics."
 dependencies:
   - observation-batch-plan
 landed: false

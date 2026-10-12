@@ -1,11 +1,14 @@
 version: 1
 id: observation-batch-31
-title: Observe language/ after dynamic-import+import-attributes
-delivers: "Observes the 65 unreviewed paths that
-  docs/m5c-closure/observation-batches.yaml selects for observation-batch-31
-  (46 review units, after dynamic-import, import-attributes): admits them to
-  the reviewed subset with dependency tags, regenerates the manifest and the
-  ledger, and assigns every unsupported result an owner."
+title: Reconcile the original import attribute reservation
+delivers: "Audits the exact original 65 path/source identities retained in
+  docs/m5c-graph/import-attributes-reservation-reconciliation.md after their
+  first admission by import-attributes. Verifies one parse expected negative
+  and 64 active remediation observations against canonical manifest and
+  ledger records, and records the remaining runtime attribute and JSON
+  identity coverage debt. The reservation has zero remaining unreviewed
+  paths; this node performs no duplicate first admission, claims no new
+  pass or automatic closure, and authorizes no exclusion."
 dependencies:
   - dynamic-import
   - import-attributes

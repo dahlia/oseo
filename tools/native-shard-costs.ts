@@ -78,6 +78,8 @@ export const nativeShardCosts = {
     "tests/property/m5-lexical-super.property.test.ts": 356,
     "tests/property/m5-map-intrinsic.property.test.ts": 384,
     "tests/property/m5-math-namespace.property.test.ts": 1152,
+    // Local generated 8.76s x10 plus fixed cases projects to 92s.
+    "tests/property/m5-import-attributes.property.test.ts": 92,
     "tests/property/m5-module-continuation.property.test.ts": 226,
     "tests/property/m5-number-intrinsic.property.test.ts": 678,
     "tests/property/m5-number-prototype.property.test.ts": 712,
@@ -213,6 +215,8 @@ export const nativeShardCosts = {
     "tests/property/m5-lexical-super.property.test.ts": 451,
     "tests/property/m5-map-intrinsic.property.test.ts": 243,
     "tests/property/m5-math-namespace.property.test.ts": 1151,
+    // Adjacent-family 202s estimate scaled by the Linux 92/85 projection.
+    "tests/property/m5-import-attributes.property.test.ts": 219,
     "tests/property/m5-module-continuation.property.test.ts": 202,
     "tests/property/m5-number-intrinsic.property.test.ts": 802,
     "tests/property/m5-number-prototype.property.test.ts": 560,

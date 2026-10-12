@@ -948,10 +948,12 @@ export function createFileModuleLoader(host: CompilerHost): ModuleLoader {
       }
       try {
         const source = await host.readTextFile(url);
+        const kind = url.pathname.endsWith(".json") ? "json" : "javascript";
         return {
           diagnostics: [],
           source: {
-            source,
+            kind,
+            source: kind === "json" ? source.replace(/^\uFEFF+/u, "") : source,
             sourceHash: hashModuleSource(source),
             sourceId: url.href,
           },

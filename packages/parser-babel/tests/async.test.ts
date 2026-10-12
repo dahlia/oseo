@@ -236,7 +236,7 @@ test("rejects type-only imports instead of creating runtime bindings", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /Type-only imports/u);
 });
 
-test("rejects module attributes before lowering module entries", () => {
+test("retains static attributes as owned module request metadata", () => {
   for (const source of [
     'import data from "./data.json" with { type: "json" };',
     'import data from "./data.json" with {};',
@@ -247,13 +247,17 @@ test("rejects module attributes before lowering module entries", () => {
       source,
       sourceId: "file:///app/main.js",
     });
-    assert.equal(result.parsed, false);
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001");
-    assert.match(result.diagnostics[0]?.message ?? "", /attributes/u);
-    assert.deepEqual(result.diagnostics[0]?.range.start, {
-      column: 1,
-      line: 1,
-    });
+    assert.equal(result.parsed, true);
+    assert.deepEqual(result.diagnostics, []);
+    const request =
+      result.module?.imports[0]?.specifier ??
+      result.module?.exports.find(
+        (entry) => entry.kind === "indirect" || entry.kind === "star",
+      )?.specifier;
+    assert.deepEqual(
+      request?.attributes?.map(({ key, value }) => ({ key, value })),
+      source.includes("with {}") ? [] : [{ key: "type", value: "json" }],
+    );
   }
 
   const comment = babelModuleFrontend.parseModule({

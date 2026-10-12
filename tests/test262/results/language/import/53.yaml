@@ -1,0 +1,43 @@
+group: language/import
+key: "53"
+results:
+  - case:
+      async: false
+      features:
+        - import-attributes
+        - json-modules
+      flags:
+        - module
+      includes:
+        - propertyHelper.js
+      mode: module
+      path: test/language/import/import-attributes/json-value-object.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      moduleGraph:
+        - dependencies:
+            - test/language/import/import-attributes/json-value-object_FIXTURE.json
+          id: test/language/import/import-attributes/json-value-object.js
+          sourceHash: fnv1a64:9970b4723e5f8633
+        - dependencies: []
+          id: test/language/import/import-attributes/json-value-object_FIXTURE.json
+          sourceHash: fnv1a64:71eac782051f179f
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

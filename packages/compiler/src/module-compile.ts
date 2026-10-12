@@ -1240,6 +1240,7 @@ export function compileModuleGraph(
   const functions: HirFunction[] = [];
   const globalBindings: HirGlobalBinding[] = [];
   const intrinsicInitializers: HirStatement[] = [];
+  const jsonInitializers: HirStatement[] = [];
   const moduleBodies = new Map<string, readonly HirStatement[]>();
   let nextBindingId = linked.graph.cells.length;
   let nextFunctionId = 0;
@@ -1383,7 +1384,48 @@ export function compileModuleGraph(
         graph: linked.graph,
       };
     }
-    moduleBodies.set(moduleId, evaluationBody);
+    if (node.moduleKind === "json") {
+      const declaration = evaluationBody[0];
+      if (evaluationBody.length !== 1 || declaration?.kind !== "const") {
+        throw new Error("JSON module must construct one default value.");
+      }
+      const dataId = nextBindingId;
+      nextBindingId += 1;
+      const dataName = `*json-data:${moduleId}*`;
+      globalBindings.push({ id: dataId, name: dataName });
+      // Prepare parsed data before realm code can modify its construction.
+      // Synthetic Link initializes the export to undefined; only its
+      // scheduled Evaluate publishes the prepared value, including cycles.
+      jsonInitializers.push(
+        { ...declaration, bindingId: dataId, name: dataName },
+        {
+          ...declaration,
+          initializer: moduleUndefined(declaration.range),
+          kind: "let",
+        },
+      );
+      moduleBodies.set(moduleId, [
+        {
+          expression: {
+            bindingId: declaration.bindingId,
+            kind: "binding-set",
+            mutable: true,
+            name: declaration.name,
+            range: declaration.range,
+            value: {
+              bindingId: dataId,
+              kind: "binding",
+              name: dataName,
+              range: declaration.range,
+            },
+          },
+          kind: "expression",
+          range: declaration.range,
+        },
+      ]);
+    } else {
+      moduleBodies.set(moduleId, evaluationBody);
+    }
     functions.push(...retainModuleSource(result.program.functions, moduleId));
   }
 
@@ -1591,6 +1633,7 @@ export function compileModuleGraph(
     body: [
       ...intrinsicInitializers,
       ...namespaceInitializers,
+      ...jsonInitializers,
       ...functionInitializers,
       ...moduleInitializers,
       {
