@@ -13,4 +13,4 @@ dependencies:
   - dynamic-import
   - import-attributes
 landed: false
-status: blocked
+status: ready

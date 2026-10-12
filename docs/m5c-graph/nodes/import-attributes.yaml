@@ -8,5 +8,5 @@ delivers: "Admits static import attributes and JSON modules. The fixed
   ADR 0016; observing those candidates does not admit their semantics."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

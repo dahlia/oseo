@@ -14,4 +14,4 @@ dependencies:
   - import-attributes
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready
