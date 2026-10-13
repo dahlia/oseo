@@ -88,6 +88,14 @@ an estimate: its prior adjacent-family 202-second estimate is scaled by
 the Linux weight change, `202 * 92/85`, and rounded up to 219 seconds.
 Neither weight changes cases, seeds, size limits or interrupt deadlines.
 
+The class constructor early-error family also postdates the weight-source
+runs. Its October 12, 2026 local Linux extended run summed its three case
+durations to 30.531 seconds, rounded up to the 31-second Linux weight. This
+is a local sum of concurrent case durations, not measured CI cost or file
+wall time. No macOS run has measured the suite, so its 27-second weight
+remains the earlier estimate of ten times the Linux ordinary generated case
+sum. Neither weight changes cases, seeds, size limits or interrupt deadlines.
+
 The newer main run [36312192623] at `af9bb68c` is retained as the closest
 before-run comparison.
 `git diff af9bb68c 86228614 -- packages tests tools .github mise.toml` is empty

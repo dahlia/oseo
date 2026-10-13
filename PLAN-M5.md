@@ -440,6 +440,24 @@ are admitted by later units. The manifest moves to 812
 passes, 363 expected negatives, and 150 unsupported profile features with no
 semantic or harness failures.
 
+M5c node `class-duplicate-constructor-early-error` restores the parse-phase
+rejection for a second non-static constructor definition. The rule is checked
+over the whole class body before the heritage or any element converts, so
+unsupported syntax in an earlier member, the first constructor body or the
+heritage cannot mask it. Class-header rejections that run first (generic
+parameters, TypeScript class modifiers and implements clauses, decorators, a
+missing class name or body) still report OSEO1001. Fixed frontend controls pin
+Script and Module goals, both Script strictness modes, class forms, constructor
+spellings, masking syntax and source spans. Generated valid and invalid class
+bodies at seeds `0x60008700` and `0x60008701` compare independent Node.js and
+Deno JavaScript syntax observations, retain structural shrinking and replay, and
+assert that both specialization options reject before IR. The two domains add 64
+ordinary cases. The invalid input allocates no runtime value and reaches no
+collector or guard; existing valid class fixtures retain the applicable runtime
+evidence. Batch 11 retains ownership of the exact 1,199-path selector and the
+first canonical admission of its duplicate case. This node adds no syntax,
+exclusion or classification vocabulary.
+
 Class getter and setter accessors are now admitted, the third unit of the
 functions and executable syntax stream. A `get` or `set` class element carries
 its accessor kind through the owned syntax tree and HIR into the

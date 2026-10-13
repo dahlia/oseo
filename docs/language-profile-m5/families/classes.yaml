@@ -3,6 +3,19 @@ id: classes
 title: "Class definitions"
 scope:
   - "Basic class declarations, expressions, methods, and strict bodies."
+  - "A second non-static constructor definition is a source-located OSEO0001
+    early error in class declarations and expressions, in Script and Module
+    goals, checked over the whole class body after the class-header checks and
+    before the heritage or any element converts, so unsupported syntax in an
+    earlier member, the first constructor body or the heritage cannot mask it.
+    Class-header rejections (generic parameters, TypeScript modifiers and
+    implements clauses, decorators, a missing name or body) keep OSEO1001.
+    Static methods and computed constructor-named members retain their
+    permitted roles. Rejection occurs before syntax IR, HIR, MIR,
+    specialization or native execution; it creates no runtime value or
+    collection point. Existing class runtime evidence covers the valid
+    definitions, while frontend and invalid-generator evidence covers the
+    rejection contract."
 owners:
   - PLAN-M5.md
 evidence:
@@ -10,10 +23,12 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/classes.ts
+      - tests/property/m5-class-early-errors.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/classes.ts
+      - packages/parser-babel/tests/class-early-errors.test.ts
   forced-collection:
     status: covered
     references:
@@ -22,6 +37,7 @@ evidence:
     status: covered
     references:
       - tests/property/m5-class.property.test.ts
+      - tests/property/m5-class-early-errors.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family owns no specialized path or family-specific guard."
@@ -41,3 +57,4 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/basics.test.ts
+      - packages/parser-babel/tests/class-early-errors.test.ts
