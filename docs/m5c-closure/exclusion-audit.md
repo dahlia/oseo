@@ -139,3 +139,35 @@ The audit validates that owner against the fixed reservation, the upstream
 `import-attributes` feature, and the exact accepted `ImportExpression`
 rejection. It cannot use an unrelated diagnostic or source-evaluation-only
 assertion to close the remaining runtime attribute or identity coverage.
+
+
+Incidental legacy accessor lookups
+----------------------------------
+
+ECMA-262 16th edition clause 20.1.3.9 defines
+`Object.prototype.__lookupGetter__` and `Object.prototype.__lookupSetter__` as
+normative optional legacy methods. ADR 0020 maps that clause onto the ADR 0013
+Annex B exclusion. The exact owned rejections are each one stderr line,
+wrapped here after `excluded`:
+
+~~~~ text
+error[OSEO1001]: The Object.prototype.__lookupGetter__ method is excluded
+by the M5 optional legacy accessor policy.
+error[OSEO1001]: The Object.prototype.__lookupSetter__ method is excluded
+by the M5 optional legacy accessor policy.
+~~~~
+
+The checker accepts either one only at the end of the process stderr, only
+when the reviewed source contains a call of the named method in call syntax
+(a direct, optional, or string-literal computed member call, as for `eval`),
+and only with
+`remediationOwner: node:class-private-accessor-lookup-coverage-remediation`,
+`disposition: remediation`, and the ADR 0013 proposed owner. That owner
+accepts no other rejection. A different code, method name, wording, or stdout
+text is outside the surface. The `__proto__` and RegExp split pairs are
+unchanged.
+
+The two batch 11 paths that call these methods receive their rows when batch
+11 observes them. Their private getter and setter assertions are not
+excluded, and replacement evidence and the maintainer accounting decision
+belong to the coverage remediation node.

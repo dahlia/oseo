@@ -189,6 +189,29 @@ static OseoResult object_get(
                 "by Annex B."
             );
         }
+        /* ECMA-262 16th edition 20.1.3.9 makes the legacy lookup methods
+         * normative optional; ADR 0020 maps that clause onto the ADR 0013
+         * Annex B exclusion. Only the same missing lookup at an intrinsic
+         * %Object.prototype% would observe the omitted method, so user
+         * properties, proxies, and null prototypes keep the core path. */
+        if (object->immutable_prototype && !object->module_namespace) {
+            if (oseo_internal_string_is_ascii(key, "__lookupGetter__")) {
+                return failure(
+                    context,
+                    "OSEO1001",
+                    "The Object.prototype.__lookupGetter__ method is "
+                    "excluded by the M5 optional legacy accessor policy."
+                );
+            }
+            if (oseo_internal_string_is_ascii(key, "__lookupSetter__")) {
+                return failure(
+                    context,
+                    "OSEO1001",
+                    "The Object.prototype.__lookupSetter__ method is "
+                    "excluded by the M5 optional legacy accessor policy."
+                );
+            }
+        }
         current = object->prototype;
     }
     return normal(oseo_undefined());

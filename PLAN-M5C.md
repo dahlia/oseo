@@ -688,9 +688,47 @@ and requires each mixed Annex B assessment to name its bounded owner.
 ADR 0013 accepts no new exclusion; a maintainer accounting decision is
 still required for that remediation.
 
-Complete regeneration observes 25,348 paths: 21,667 passes, 2,190 expected
-negatives, and 1,491 unsupported profile features, with no semantic,
-harness, or infrastructure failures. The sole added record is the owned
-path, and every previously reviewed observation is unchanged. The graph
-baseline, closure ledger, and observation batches follow those canonical
-records. The node remains `landed: false` and `status: ready` until merged.
+That node's complete regeneration observed 25,348 paths: 21,667 passes,
+2,190 expected negatives, and 1,491 unsupported profile features, with no
+semantic, harness, or infrastructure failures. These totals are a historical
+snapshot of that landing, not the current manifest. The sole added record
+was the owned path, and every previously reviewed observation was
+unchanged. The graph baseline, closure ledger, and observation batches
+followed those canonical records. The node has since landed.
+
+
+Incidental legacy accessor lookup dependency
+--------------------------------------------
+
+The `annexb-legacy-lookup-dependency-classification` node classifies the
+incidental lookup in exactly two paths under
+*test/language/expressions/class/elements/*:
+*private-getter-is-not-a-own-property.js* and
+*private-setter-is-not-a-own-property.js*. Each calls
+`this.__lookupGetter__("#m")` or `this.__lookupSetter__("#m")` before its core
+private getter read or private setter write. The 16th edition defines those
+methods in clause 20.1.3.9 as normative optional legacy behavior; ADR 0020 maps
+that clause onto the ADR 0013 Annex B exclusion, and the inventory excludes
+their direct tests as `optional-section:annex-b`. Observation batch 11 observed
+both paths at `dad52f19` as semantic failures with the ordinary `OSEO2001`
+TypeError for calling `undefined`.
+
+A missing lookup of either exact name reaching an intrinsic
+`Object.prototype` now reports the owned `OSEO1001` rejection “The
+Object.prototype.\_\_lookupGetter\_\_ method is excluded by the M5 optional
+legacy accessor policy.” or its Setter counterpart. User properties and
+methods with those names, non-callable shadows, null prototypes, proxy traps,
+reflection, `__defineGetter__`, `__defineSetter__`, and unrelated or private
+accessor TypeErrors keep their behavior. Runtime ABI `m5-130` records this
+boundary. The `__proto__` rejection, its audit surface, and its owner are
+unchanged.
+
+This node admits no path and writes no audit row or ledger owner. Batch 11
+retains its exact 1,199-path reservation and the first admission of both
+paths. After it observes them, their reviewed exclusion-audit rows and ledger
+entries use `node:class-private-accessor-lookup-coverage-remediation`; the
+exclusion audit accepts the new rejection only with that remediation owner,
+only when the source contains a call of the named method in call syntax,
+and never as an exclusion. The
+private accessor subjects remain mixed coverage debt, and ADR 0013 accepts no
+new exclusion.

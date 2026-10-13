@@ -42,6 +42,19 @@ const annexProtoRejection = new RegExp(
     "is excluded by Annex B\\.$",
   "u",
 );
+/**
+ * The mixed private accessor owner accepts only the optional legacy lookup
+ * rejection (ECMA-262 16th edition 20.1.3.9, mapped onto the ADR 0013 Annex
+ * B policy by ADR 0020), and that rejection accepts only this owner.
+ */
+const lookupRemediationOwner =
+  "node:class-private-accessor-lookup-coverage-remediation";
+const annexLookupRejection = new RegExp(
+  "error\\[OSEO1001\\]: The Object\\.prototype\\." +
+    "(__lookupGetter__|__lookupSetter__) method is excluded by the M5 " +
+    "optional legacy accessor policy\\.$",
+  "u",
+);
 const dynamicImportRejection = new RegExp(
   "error\\[OSEO1001\\]: ImportExpression is outside the M1 profile\\." +
     "(?=$|\\r?\\n|\\\\n)",
@@ -133,6 +146,59 @@ export function hasEvalCall(
       (node.type === "CallExpression" ||
         node.type === "OptionalCallExpression") &&
       evalCallee(node.callee)
+    )
+      return true;
+    pending.push(...Object.values(node));
+  }
+  return false;
+}
+
+/**
+ * A member callee that names `method` statically: `o.m`, `o?.m`, `o["m"]`, or
+ * `o?.["m"]`, with any parentheses. Dynamic keys and bare identifiers do not.
+ */
+function lookupCallee(value: StructuredDataInput, method: string): boolean {
+  const node = syntaxNode(value);
+  if (node?.type === "ParenthesizedExpression") {
+    return lookupCallee(node.expression, method);
+  }
+  if (
+    node?.type !== "MemberExpression" &&
+    node?.type !== "OptionalMemberExpression"
+  ) {
+    return false;
+  }
+  const property = syntaxNode(node.property);
+  return node.computed === true
+    ? property?.type === "StringLiteral" && property.value === method
+    : property?.type === "Identifier" && property.name === method;
+}
+
+/**
+ * Require a call of the named legacy lookup method in call syntax, including
+ * optional and static computed member calls, rather than text in a string or
+ * comment or a value read. Like hasEvalCall this is not reference resolution
+ * or proof of execution; the human assessment still binds the observation.
+ */
+export function hasLookupCall(
+  source: string,
+  mode: Test262Result["case"]["mode"],
+  method: string,
+): boolean {
+  const tree = syntaxNode(parseBabel(source, { sourceType: mode }));
+  const pending: StructuredDataInput[] = [tree];
+  while (pending.length > 0) {
+    const value = pending.pop();
+    if (Array.isArray(value)) {
+      pending.push(...value);
+      continue;
+    }
+    const node = syntaxNode(value);
+    if (node == null) continue;
+    if (
+      (node.type === "CallExpression" ||
+        node.type === "OptionalCallExpression") &&
+      lookupCallee(node.callee, method)
     )
       return true;
     pending.push(...Object.values(node));
@@ -366,7 +432,12 @@ export function validateM5cExclusionAudit(
             "is admitted only by Annex B",
         )) ||
       annexProtoRejection.test(accessorDetail);
-    if (proposedOwner === dynamicOwner ? !dynamicSurface : !annexSurface) {
+    const lookupMethod = annexLookupRejection.exec(accessorDetail)?.[1];
+    if (
+      proposedOwner === dynamicOwner
+        ? !dynamicSurface
+        : !annexSurface && lookupMethod == null
+    ) {
       throw new Error(
         `Audit rejection is outside the record surface: ${path}.`,
       );
@@ -379,9 +450,31 @@ export function validateM5cExclusionAudit(
     }
     if (missingTag) missingDynamicTags += 1;
     const annexRemediationOwner = assessment.remediationOwner;
+    if (lookupMethod != null) {
+      // A rejected optional observer never closes its in-claim subject.
+      if (
+        proposedOwner !== annexOwner ||
+        excluded ||
+        annexRemediationOwner !== lookupRemediationOwner
+      ) {
+        throw new Error(
+          `Audit needs the legacy lookup remediation owner: ${path}.`,
+        );
+      }
+      if (!hasLookupCall(source, result.case.mode, lookupMethod)) {
+        throw new Error(
+          `Audit legacy lookup rejection lacks its source call: ${path}.`,
+        );
+      }
+    } else if (annexRemediationOwner === lookupRemediationOwner) {
+      throw new Error(
+        `Audit legacy lookup owner needs its rejection: ${path}.`,
+      );
+    }
     if (
       !excluded &&
       proposedOwner === annexOwner &&
+      annexRemediationOwner !== lookupRemediationOwner &&
       (!isString(annexRemediationOwner) ||
         !annexRemediationOwners.has(annexRemediationOwner))
     ) {
@@ -457,6 +550,7 @@ export function validateM5cExclusionAudit(
       (entry.owner.startsWith("adr:") ||
         entry.owner === remediationOwner ||
         entry.owner === importAttributesOwner ||
+        entry.owner === lookupRemediationOwner ||
         annexRemediationOwners.has(entry.owner)) &&
       !seen.has(entry.path)
     ) {

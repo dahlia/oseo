@@ -544,3 +544,7 @@ families:
     owner: tests/property/m5-class-early-errors.property.test.ts
     start: 0x60008700
     end: 0x600087ff
+  - family: m5-annexb-legacy-lookup-boundary
+    owner: tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts
+    start: 0x60008800
+    end: 0x600088ff

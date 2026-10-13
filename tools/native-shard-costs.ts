@@ -9,6 +9,9 @@
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
     "tests/property/m4-async.property.test.ts": 465,
+    // Local Linux extended run (October 13, 2026): concurrent case sum
+    // 234.579 s, rounded up. Not CI evidence and not a file wall time.
+    "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 235,
     // New boundary suite uses the adjacent prototype family's estimate
     // until both native CI hosts supply concurrent-duration measurements.
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 321,
@@ -149,6 +152,9 @@ export const nativeShardCosts = {
   },
   "macos-aarch64": {
     "tests/property/m4-async.property.test.ts": 283,
+    // Unmeasured estimate: reuses the adjacent Annex B prototype boundary
+    // value. Neither native CI nor macOS has measured this suite.
+    "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 292,
     // New boundary suite uses the adjacent prototype family's estimate
     // until both native CI hosts supply concurrent-duration measurements.
     "tests/property/m5-annexb-proto-boundary.property.test.ts": 292,

@@ -9,11 +9,13 @@ import {
   exclusionAuditDigest,
   exclusionObservationDigest,
   hasEvalCall,
+  hasLookupCall,
   validateCurrentM5cExclusionAudit,
   validateM5cExclusionAudit,
 } from "../tools/m5c-exclusion-audit.ts";
 import type { M5cExclusionAuditInputs } from "../tools/m5c-exclusion-audit.ts";
 import { parseM5cClosureLedger } from "../tools/m5c-closure-ledger.ts";
+import type { M5cClosureLedger } from "../tools/m5c-closure-ledger.ts";
 
 const revision = "fixture";
 const path = "test/language/eval-code/example.js";
@@ -22,6 +24,8 @@ const remediationOwner = "node:dynamic-source-coverage-remediation";
 const annexOwner = "adr:0013-m5-edition-and-manifest";
 const annexRemediationOwner = "node:regexp-split-coverage-remediation";
 const protoRemediationOwner = "node:typed-array-proto-coverage-remediation";
+const lookupRemediationOwner =
+  "node:class-private-accessor-lookup-coverage-remediation";
 const source = 'eval("1");';
 const observation = {
   passed: false,
@@ -656,13 +660,12 @@ test("reserved dynamic attributes reject an omitted promoted row", () => {
   }
 });
 
-test("checked-in audit counts match ledger owners after promotions", () => {
-  const ledger = parseM5cClosureLedger(
-    readFileSync(
-      new URL("../docs/m5c-closure/ledger.yaml", import.meta.url),
-      "utf8",
-    ),
-  ).ledger;
+/**
+ * Independent ledger-side counts. Remediation owners are every owner the
+ * audit accepts for a non-excluded row; dynamic-tag debt applies only to the
+ * dynamic-source owners, never to the Annex B ones.
+ */
+function expectedAuditCounts(ledger: M5cClosureLedger) {
   const exclusions = ledger.entries.filter((entry) =>
     entry.owner.startsWith("adr:"),
   );
@@ -671,9 +674,10 @@ test("checked-in audit counts match ledger owners after promotions", () => {
       entry.owner === remediationOwner ||
       entry.owner === "node:import-attributes-dynamic-coverage-remediation" ||
       entry.owner === annexRemediationOwner ||
-      entry.owner === protoRemediationOwner,
+      entry.owner === protoRemediationOwner ||
+      entry.owner === lookupRemediationOwner,
   );
-  assert.deepEqual(validateCurrentM5cExclusionAudit(), {
+  return {
     exclusions: exclusions.length,
     remediation: remediation.length,
     missingDynamicTags: [...exclusions, ...remediation].filter(
@@ -681,9 +685,56 @@ test("checked-in audit counts match ledger owners after promotions", () => {
         entry.owner !== annexOwner &&
         entry.owner !== annexRemediationOwner &&
         entry.owner !== protoRemediationOwner &&
+        entry.owner !== lookupRemediationOwner &&
         !entry.prerequisites.includes("dynamic-source"),
     ).length,
-  });
+  };
+}
+
+test("checked-in audit counts match ledger owners after promotions", () => {
+  const ledger = parseM5cClosureLedger(
+    readFileSync(
+      new URL("../docs/m5c-closure/ledger.yaml", import.meta.url),
+      "utf8",
+    ),
+  ).ledger;
+  assert.deepEqual(
+    validateCurrentM5cExclusionAudit(),
+    expectedAuditCounts(ledger),
+  );
+});
+
+test("call syntax separates lookup calls from reads and text", () => {
+  for (const mode of ["script", "module"] as const) {
+    for (const method of ["__lookupGetter__", "__lookupSetter__"]) {
+      for (const code of [
+        `this.${method}("k");`,
+        `o?.${method}("k");`,
+        `o.${method}?.("k");`,
+        `o["${method}"]("k");`,
+        `o?.["${method}"]("k");`,
+        `(o.${method})("k");`,
+        `f(() => o.${method}("k"));`,
+      ]) {
+        assert.equal(hasLookupCall(code, mode, method), true, code);
+      }
+      const other =
+        method === "__lookupGetter__" ? "__lookupSetter__" : "__lookupGetter__";
+      for (const code of [
+        `// o.${method}("k")\n0;`,
+        `const text = "o.${method}('k')";`,
+        `const read = o.${method};`,
+        `typeof o.${method};`,
+        `o.${other}("k");`,
+        `o.${method}X("k");`,
+        `${method}("k");`,
+        `o[key]("k");`,
+        `o.${method}.call(o, "k");`,
+      ]) {
+        assert.equal(hasLookupCall(code, mode, method), false, code);
+      }
+    }
+  }
 });
 
 test("call syntax distinguishes eval calls from values and text", () => {
@@ -855,6 +906,210 @@ test("near-miss accessor diagnostics preserve unrelated failures", () => {
         validateM5cExclusionAudit(stringifyYaml(audit), {
           ...inputs,
           results: [{ ...result, observation: observed }],
+        }),
+      /outside the record surface/u,
+      detail,
+    );
+  }
+});
+
+/** Builds a mixed legacy lookup audit whose source calls the named method. */
+function lookupFixture(
+  method: "__lookupGetter__" | "__lookupSetter__",
+  detail: string,
+  sourceText = `assert.sameValue(this.${method}("#m"), undefined);`,
+) {
+  const observed = { ...observation, detail };
+  const { audit, inputs } = fixture(true, sourceText, observed);
+  audit.paths[0]!.proposedOwner = annexOwner;
+  audit.paths[0]!.priorCohort = "annex-b";
+  audit.paths[0]!.missingDynamicTag = false;
+  audit.assessments.reviewed.remediationOwner = lookupRemediationOwner;
+  const lookupInputs: M5cExclusionAuditInputs = {
+    ...inputs,
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: lookupRemediationOwner }),
+      ),
+    },
+  };
+  return { audit, inputs: lookupInputs };
+}
+
+const lookupDiagnostic = (method: string): string =>
+  `error[OSEO1001]: The Object.prototype.${method} method is excluded ` +
+  "by the M5 optional legacy accessor policy.";
+
+test("the exact legacy lookup rejection uses only its bounded owner", () => {
+  for (const method of ["__lookupGetter__", "__lookupSetter__"] as const) {
+    const detail = lookupDiagnostic(method);
+    for (const rejection of [
+      detail,
+      `${detail}\n`,
+      `${detail}\\n`,
+      `failed (1): stdout="" stderr="test/case.js:111:22: ${detail}\\n"`,
+    ]) {
+      const { audit, inputs } = lookupFixture(method, rejection);
+      assert.equal(
+        validateM5cExclusionAudit(stringifyYaml(audit), inputs).remediation,
+        1,
+        rejection,
+      );
+      for (const other of [
+        annexRemediationOwner,
+        protoRemediationOwner,
+        "node:observation-batch-11",
+      ]) {
+        audit.assessments.reviewed.remediationOwner = other;
+        assert.throws(
+          () =>
+            validateM5cExclusionAudit(stringifyYaml(audit), {
+              ...inputs,
+              ledger: {
+                ...inputs.ledger,
+                entries: inputs.ledger.entries.map((entry) =>
+                  Object.assign({}, entry, { owner: other }),
+                ),
+              },
+            }),
+          /legacy lookup remediation owner/u,
+          other,
+        );
+      }
+      audit.assessments.reviewed.remediationOwner = lookupRemediationOwner;
+      audit.assessments.reviewed.disposition = "exclusion";
+      audit.assessments.reviewed.normativeDependency = "annex-b-only";
+      assert.throws(
+        () =>
+          validateM5cExclusionAudit(stringifyYaml(audit), {
+            ...inputs,
+            ledger: {
+              ...inputs.ledger,
+              entries: inputs.ledger.entries.map((entry) =>
+                Object.assign({}, entry, { owner: annexOwner }),
+              ),
+            },
+          }),
+        /legacy lookup remediation owner/u,
+      );
+      audit.assessments.reviewed.disposition = "remediation";
+      audit.assessments.reviewed.normativeDependency = "not-demonstrated";
+      audit.paths = [];
+      assert.throws(
+        () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+        /no reviewed exclusion audit/u,
+      );
+    }
+  }
+});
+
+test("ledger-side counts agree on a mixed legacy lookup row", () => {
+  // A batch 11 row owned by the lookup remediation node, whose dependencies
+  // lack dynamic-source: remediation, and no dynamic-tag debt.
+  const { audit, inputs } = lookupFixture(
+    "__lookupSetter__",
+    lookupDiagnostic("__lookupSetter__"),
+  );
+  assert.deepEqual(
+    validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+    expectedAuditCounts(inputs.ledger),
+  );
+});
+
+test("the legacy lookup owner never accepts another rejection", () => {
+  for (const detail of [
+    "error[OSEO1001]: The Object.prototype.__proto__ accessor " +
+      "is excluded by Annex B.",
+    "error[OSEO1001]: A named backreference in a pattern that " +
+      "declares no group name is admitted only by Annex B",
+  ]) {
+    const { audit, inputs } = lookupFixture("__lookupGetter__", detail);
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+      /legacy lookup owner needs its rejection/u,
+      detail,
+    );
+  }
+});
+
+test("legacy lookup source calls are recognized by syntax", () => {
+  const detail = lookupDiagnostic("__lookupGetter__");
+  for (const sourceText of [
+    'this["__lookupGetter__"]("#m");',
+    'this.__lookupGetter__?.("#m");',
+    'this?.__lookupGetter__("#m");',
+    '(this.__lookupGetter__)("#m");',
+  ]) {
+    const { audit, inputs } = lookupFixture(
+      "__lookupGetter__",
+      detail,
+      sourceText,
+    );
+    assert.equal(
+      validateM5cExclusionAudit(stringifyYaml(audit), inputs).remediation,
+      1,
+      sourceText,
+    );
+  }
+  for (const sourceText of [
+    '/* this.__lookupGetter__("#m") */ typeof this.__lookupGetter__;',
+    'const text = "this.__lookupGetter__(1)";',
+    "const read = this.__lookupGetter__;",
+    'this[name]("#m");',
+    '__lookupGetter__("#m");',
+    'this.__lookupGetterX__("#m");',
+  ]) {
+    const { audit, inputs } = lookupFixture(
+      "__lookupGetter__",
+      detail,
+      sourceText,
+    );
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+      /legacy lookup rejection lacks its source call/u,
+      sourceText,
+    );
+  }
+});
+
+test("a legacy lookup rejection must name a method the source calls", () => {
+  const { audit, inputs } = lookupFixture(
+    "__lookupGetter__",
+    lookupDiagnostic("__lookupGetter__"),
+    'assert.sameValue(this.__lookupSetter__("#m"), undefined);',
+  );
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), inputs),
+    /legacy lookup rejection lacks its source call/u,
+  );
+});
+
+test("near-miss legacy lookup diagnostics stay outside the surface", () => {
+  const getter = lookupDiagnostic("__lookupGetter__");
+  for (const detail of [
+    getter.replace("OSEO1001", "OSEO2001"),
+    `${getter} Extra text.`,
+    getter.replace("__lookupGetter__", "__defineGetter__"),
+    getter.replace("__lookupGetter__", "__lookupgetter__"),
+    getter.replace("by the M5 optional legacy accessor policy.", "by Annex B."),
+    "error[OSEO1001]: Unknown binding '__lookupGetter__'.",
+    "error[OSEO2001]: TypeError: Called value is not a function.",
+    `failed (1): stdout="${getter}\\n" ` +
+      "stderr=\"case.js:1:1: error[OSEO1001]: Unknown binding 'other'.\\n\"",
+  ]) {
+    const { audit, inputs } = lookupFixture("__lookupGetter__", detail);
+    audit.assessments.reviewed.remediationOwner = annexRemediationOwner;
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(stringifyYaml(audit), {
+          ...inputs,
+          ledger: {
+            ...inputs.ledger,
+            entries: inputs.ledger.entries.map((entry) =>
+              Object.assign({}, entry, { owner: annexRemediationOwner }),
+            ),
+          },
         }),
       /outside the record surface/u,
       detail,
