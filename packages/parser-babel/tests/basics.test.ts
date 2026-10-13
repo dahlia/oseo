@@ -2234,7 +2234,6 @@ test("rejects class elements outside the admitted profile", () => {
     ["class C { declare field: number; }", /class field modifiers/u],
     ["class C { readonly field = 1; }", /class field modifiers/u],
     ["class C { field?: number; }", /class field modifiers/u],
-    ["class C { constructor() {} constructor() {} }", /one constructor/u],
   ];
   for (const [source, message] of cases) {
     const result = compileSource(babelFrontend, {
@@ -2245,6 +2244,22 @@ test("rejects class elements outside the admitted profile", () => {
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
     assert.match(result.diagnostics[0]?.message ?? "", message, source);
   }
+});
+
+test("reports a duplicate class constructor as an early error", () => {
+  const source = "class C { constructor() {} constructor() {} }";
+  const sourceId = "class-rejection.ts";
+  const result = compileSource(babelFrontend, { source, sourceId });
+  assert.equal(result.mir, undefined);
+  assert.deepEqual(result.diagnostics, [
+    {
+      byteRange: { end: 43, start: 27 },
+      code: "OSEO0001",
+      message: "A class defines one constructor.",
+      range: { end: { column: 44, line: 1 }, start: { column: 28, line: 1 } },
+      sourceId,
+    },
+  ]);
 });
 
 test("lowers a derived class to a heritage operand and super call", () => {

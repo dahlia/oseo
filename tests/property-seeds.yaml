@@ -540,3 +540,7 @@ families:
     owner: tests/property/m5-import-attributes.property.test.ts
     start: 0x60008600
     end: 0x600086ff
+  - family: m5-class-early-errors
+    owner: tests/property/m5-class-early-errors.property.test.ts
+    start: 0x60008700
+    end: 0x600087ff

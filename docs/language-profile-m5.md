@@ -1712,7 +1712,18 @@ current evidence assessment. Those live only in the indexed records above.
     non-enumerable, and non-configurable, and carries the writable,
     non-enumerable, configurable `constructor` property back to the class. A
     body that omits `constructor` gets a synthesized empty constructor with
-    a `length` of zero. Each method definition reuses the non-constructible
+    a `length` of zero. A second non-static constructor definition reports a
+    source-located `OSEO0001` parse-phase early error before HIR or MIR exists.
+    The rule applies to declarations and expressions in Script and Module
+    goals, including quoted and escaped constructor names. Static methods
+    and computed method, accessor, and field names retain their permitted
+    roles; duplicate ordinary methods remain valid. The bootstrap
+    TypeScript parser accepts duplicate constructor definitions, so the
+    frontend enforces the ECMAScript early error through its owned helper.
+    It checks the whole class body before the heritage or any element
+    converts, so an earlier unsupported member, constructor body, or
+    heritage in the same class cannot mask the error.
+    Each method definition reuses the non-constructible
     method function kind and the anonymous-function name inference already
     built for object literal methods, so a method has no own `prototype`
     property, its `name` matches its key for both static and computed keys,
@@ -8266,3 +8277,15 @@ M5 measurement work reuses the M4 property infrastructure defined by
 [*PLAN-PT.md*](../PLAN-PT.md). New semantic units added during M5 extend the
 applicable valid and invalid generators in the same change that admits the
 syntax, as required by [*CONTRIBUTING.md*](../CONTRIBUTING.md).
+
+The class constructor early-error domains use seeds `0x60008700` and
+`0x60008701` in *tests/property/m5-class-early-errors.property.test.ts*.
+Thirty-two valid bodies and thirty-two duplicate-constructor bodies compare
+independent Node.js syntax checks and Deno JavaScript observations. Structured
+shrinking preserves constructor multiplicity, class form, permitted members,
+optional earlier unsupported syntax and source locations. Invalid bodies yield
+the same parse diagnostic under both specialization options and create no IR,
+runtime value or safepoint. The existing indexed `classes` family records this
+bounded evidence; no new syntax family or Test262 path is admitted. Batch 11
+retains its exact 1,199-path reservation and first canonical admission of the
+duplicate case.

@@ -3933,6 +3933,19 @@ export function classExpression(
   if (identifier != null && name == null) return unsupported(context, value);
   const bodyNode = node(value.body);
   if (bodyNode == null) return unsupported(context, value);
+  // The duplicate-constructor early error is a property of the whole class
+  // body, so check it before converting the heritage or any element. Syntax
+  // the profile does not admit yet must not mask the error that holds.
+  let constructorSeen = false;
+  for (const element of nodes(bodyNode.body)) {
+    if (element.type !== "ClassMethod" || element.kind !== "constructor") {
+      continue;
+    }
+    if (constructorSeen) {
+      return earlyError(context, element, "A class defines one constructor.");
+    }
+    constructorSeen = true;
+  }
   const superClassNode = node(value.superClass);
   context.strictStack.push(true);
   const heritage =
@@ -3970,7 +3983,7 @@ export function classExpression(
     const staticPlacement = element.static === true;
     if (element.kind === "constructor") {
       if (constructorFunction != null) {
-        unsupported(context, element, "A class defines one constructor.");
+        earlyError(context, element, "A class defines one constructor.");
         break;
       }
       const converted = functionDeclaration(

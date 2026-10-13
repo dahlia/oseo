@@ -3,7 +3,14 @@
 
 This package contains the bootstrap Babel adapter. It converts accepted source
 immediately to Oseo-owned syntax and turns parser or profile failures into Oseo
-diagnostics. Babel nodes do not cross its public boundary.
+diagnostics. Babel nodes do not cross its public boundary. Class declarations
+and expressions reject a second non-static constructor with a source-located
+`OSEO0001` early-error diagnostic, even when an earlier member, the first
+constructor body or the heritage uses unsupported syntax; class-header
+rejections such as generics, TypeScript modifiers or decorators still report
+`OSEO1001`. Static methods and computed members named `constructor` keep their
+permitted class roles. Unrelated unsupported syntax retains its `OSEO1001`
+diagnostic.
 Parenthesized call and assignment targets are normalized before classification.
 The compiler then resolves `console` and `Object` lexically before admitting
 host or reflection intrinsics. M3 function values, objects, arrays, loops, and

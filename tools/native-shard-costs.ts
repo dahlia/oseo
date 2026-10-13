@@ -38,6 +38,9 @@ export const nativeShardCosts = {
     "tests/property/m5-boolean-intrinsic.property.test.ts": 418,
     "tests/property/m5-call-spread.property.test.ts": 239,
     "tests/property/m5-catch-binding.property.test.ts": 159,
+    // Local Linux extended run (October 12, 2026): concurrent case sum
+    // 30.531 s, rounded up. Not CI evidence and not a file wall time.
+    "tests/property/m5-class-early-errors.property.test.ts": 31,
     "tests/property/m5-class.property.test.ts": 548,
     "tests/property/m5-compound-assignment.property.test.ts": 174,
     "tests/property/m5-cross-realm.property.test.ts": 120,
@@ -175,6 +178,9 @@ export const nativeShardCosts = {
     "tests/property/m5-boolean-intrinsic.property.test.ts": 322,
     "tests/property/m5-call-spread.property.test.ts": 178,
     "tests/property/m5-catch-binding.property.test.ts": 202,
+    // Provisional estimate: Linux focused ordinary case sum 2.683 s times
+    // ten. Neither native CI nor macOS has measured this source-only suite.
+    "tests/property/m5-class-early-errors.property.test.ts": 27,
     "tests/property/m5-class.property.test.ts": 820,
     "tests/property/m5-compound-assignment.property.test.ts": 192,
     "tests/property/m5-cross-realm.property.test.ts": 120,

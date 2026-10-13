@@ -295,6 +295,23 @@ Parser robustness over arbitrary bytes and unrestricted JavaScript grammar is
 a separate fuzzing concern. It may reuse replay utilities, but it must report a
 different evidence class and must not inflate the valid-program property count.
 
+The M5 class constructor early-error suite generates class declarations and
+named or anonymous expressions, zero or one constructor for valid bodies, and
+two to four constructors for invalid bodies. Up to three permitted member
+groups, four constructor spellings, four line endings, strict directives and
+prefix lines preserve useful syntax and location boundaries. Invalid bodies may
+also place an unsupported field before the first constructor or an unsupported
+import in its body, so masking by earlier syntax stays covered; both shrink
+away. Its two domains reserve `0x60008700` and `0x60008701` and add 64 ordinary
+cases, with the same construction and shrinking at ten times the budget in the
+extended gate. Node.js syntax checks and Deno `eval --ext=js` provide
+independent oracles. The explicit JavaScript goal avoids TypeScript
+transpilation changing the source being measured. A fixed multiline static
+constructor method retains the minimized oracle-methodology regression. Invalid
+bodies reject with exact `OSEO0001` spans under both specialization options
+before HIR or MIR exists; there is no native executable, allocation, safepoint
+or guard to observe.
+
 
 HIR and MIR properties
 ----------------------
