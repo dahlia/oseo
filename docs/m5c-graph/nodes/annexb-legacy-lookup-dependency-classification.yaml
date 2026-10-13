@@ -28,5 +28,5 @@ delivers: "Classifies exactly 2 batch11 paths,
   reservation; batch11 owns first canonical admission of these 2 paths."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

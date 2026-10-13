@@ -26,4 +26,4 @@ delivers: "Resolves exactly 2 mixed-coverage batch11 paths,
 dependencies:
   - annexb-legacy-lookup-dependency-classification
 landed: false
-status: blocked
+status: ready

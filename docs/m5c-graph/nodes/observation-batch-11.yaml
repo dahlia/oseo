@@ -11,4 +11,4 @@ dependencies:
   - class-duplicate-constructor-early-error
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready
