@@ -9,6 +9,15 @@ prototype objects, and nullish receiver errors retain their core behavior.
 No legacy accessor is installed, and writes and reflection retain their
 existing contracts.
 
+A missing `__lookupGetter__` or `__lookupSetter__` read that reaches an
+intrinsic `Object.prototype` reports `OSEO1001` for the omitted normative
+optional legacy method (ECMA-262 16th edition clause 20.1.3.9, which ADR 0020
+maps onto the ADR 0013 Annex B exclusion). The diagnostic follows the same
+ordinary descriptor and proxy dispatch and also applies to another realm's
+prototype. User properties and methods with those names, null prototype
+objects, symbols, and nullish receiver errors retain their core behavior. No
+legacy method is installed.
+
 Sanitizer evidence (2026-09-17): historical Zig 0.16.0 runs did not
 provide ASan coverage. The separate Linux host C sanitizer lane now verifies
 instrumentation; its measured scope is recorded in the [activity audit]. This

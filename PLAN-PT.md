@@ -312,6 +312,25 @@ bodies reject with exact `OSEO0001` spans under both specialization options
 before HIR or MIR exists; there is no native executable, allocation, safepoint
 or guard to observe.
 
+The M5 optional legacy lookup suite generates one to three prototype levels,
+each empty or holding a user method, a getter that returns a method, or a
+non-callable value, over an intrinsic, null, or proxy root, for either
+`__lookupGetter__` or `__lookupSetter__`. A chain of empty levels over the
+intrinsic prototype is rewritten to start with a user method, so the first
+domain never needs a precondition. Its independent model chooses the innermost
+defined level, and Node.js and Deno must agree with that model before native
+execution runs under both specialization options with absent, truthful, and
+false hints and collection at every safepoint. Native runs assert collections
+and, when specialized, shape-guard misses. The second domain generates zero to
+three empty levels over the intrinsic prototype after one or two shadowed warm
+reads and checks the exact stdout, line and column, and `OSEO1001` text; its
+reference is the profile rule, not a reference host, because Node.js and Deno
+implement the optional methods. The runtime prints no counters after that
+uncatchable diagnostic, so this domain checks the specialized read shape in
+MIR while the first domain measures misses through the same read. The family
+reserves `0x60008800` and `0x60008801` and adds 20 ordinary cases, with the
+same construction and shrinking at ten times the budget in the extended gate.
+
 
 HIR and MIR properties
 ----------------------

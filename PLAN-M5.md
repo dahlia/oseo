@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-21,383 reviewed cases: 18,343 passes, 1,560 expected negatives, and 1,480
+25,437 reviewed cases: 21,677 passes, 2,205 expected negatives, and 1,555
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -7269,6 +7269,33 @@ specialization policies, deliberate shape-guard misses, generic fallback, and
 collection at every safepoint. Native diagnostic tests pin direct, computed,
 Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI is
 `oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary stay unchanged.
+
+M5c node `annexb-legacy-lookup-dependency-classification` makes only a
+missing `__lookupGetter__` or `__lookupSetter__` lookup reaching an intrinsic
+`Object.prototype` observable as `OSEO1001`. The 16th edition defines both
+methods in clause 20.1.3.9 as normative optional legacy behavior, and ADR 0020
+maps that clause onto the ADR 0013 Annex B exclusion, so the diagnostic names
+the M5 optional legacy accessor policy. The existing immutable-prototype brand
+identifies that intrinsic across realms. User properties and methods with
+those names, non-callable shadows, null prototypes, proxy traps, reflection,
+and unrelated or private accessor TypeErrors retain their behavior. No method
+is installed, and `__defineGetter__` and `__defineSetter__` stay absent. The
+indexed Object prototype family records this boundary. Generated shadowed
+chains compare Node.js and Deno with native execution under both
+specialization policies, absent, truthful, and false hints, shape-guard misses
+with generic fallback, and collection at every safepoint (seed `0x60008800`).
+Generated chains reaching the intrinsic pin the exact rejection location under
+both policies (seed `0x60008801`). The runtime ABI is `oseo-runtime-m5-130`.
+
+The batch 11 paths *private-getter-is-not-a-own-property.js* and
+*private-setter-is-not-a-own-property.js* under
+*test/language/expressions/class/elements/* call one of these methods before
+their core private accessor assertions.
+Observation batch 11 owns their first admission. Their observed unsupported
+results, reviewed exclusion-audit rows, and ledger owner
+`node:class-private-accessor-lookup-coverage-remediation` arrive with that
+batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
+remain mixed coverage debt.
 
 
 Ahead-of-time challenge boundary
