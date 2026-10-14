@@ -93,7 +93,7 @@ export interface ProbeOptions {
 export const defaultRecheckDelayMilliseconds = 120_000;
 
 /** Mac lanes the generator may configure, one runner label each. */
-const maxLanes = 2;
+const maxLanes = 4;
 
 const laneLabels: readonly string[] = Array.from(
   { length: maxLanes },
@@ -194,7 +194,7 @@ export async function runnerSelections(
 ): Promise<readonly string[]> {
   const count = Number(env.OSEO_SELFHOSTED_LANES);
   if (!Number.isInteger(count) || count < 1 || count > maxLanes) {
-    throw new Error("OSEO_SELFHOSTED_LANES must be one or two");
+    throw new Error(`OSEO_SELFHOSTED_LANES must be 1 to ${maxLanes}`);
   }
   const selections: string[] = Array.from({ length: count }, () => hosted);
   if (

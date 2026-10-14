@@ -161,8 +161,22 @@ function hostedFallbackEnvironment(
   );
 }
 
-/** Mac lanes share one machine; concurrency beyond two was not measured. */
-const maxSelfHostedLanes = 2;
+/**
+ * Lanes beyond the hosted ones are grouped by machine, two per Mac mini in
+ * lane order: lanes one and two on the first, lanes three and four on the
+ * second. The pair factors in `selfHostedPairSlowdowns` describe two lanes
+ * sharing one machine, so they apply within a machine and not across them.
+ * Three lanes on one machine is outside that model.
+ */
+const selfHostedLanesPerMachine = 2;
+
+/** Two Mac minis, two lanes each. */
+const maxSelfHostedLanes = 4;
+
+/** The Mac mini a self-hosted lane offset belongs to. */
+function selfHostedMachine(laneOffset: number): number {
+  return Math.floor(laneOffset / selfHostedLanesPerMachine);
+}
 
 /** Seconds a job takes on one runner class, before Mac-lane overlap. */
 export type MacosJobSeconds = (
@@ -202,18 +216,20 @@ function pairSlowdown(job: MacosLaneJob, partner: MacosLaneJob): number {
 }
 
 /**
- * Derived end times, in seconds after the run starts, of Mac lanes on one
- * machine. Every lane starts after the readiness allowance and runs its
- * jobs back to back. While both lanes are busy, each job advances at its
- * one-lane speed divided by its pair slowdown; a lane running alone, after
- * the other finished, advances at one-lane speed. One lane is a plain sum.
+ * Derived end times, in seconds after the run starts, of the Mac lanes.
+ * Every lane starts after the readiness allowance and runs its jobs back
+ * to back. While both lanes of one machine are busy, each job there
+ * advances at its one-lane speed divided by its pair slowdown; a lane whose
+ * partner finished, or that has none, advances at one-lane speed. Lanes on
+ * different machines do not slow each other down, so one lane per machine
+ * is a plain sum.
  */
 export function selfHostedLaneEnds(
   lanes: readonly (readonly MacosLaneJob[])[],
   seconds: MacosJobSeconds = modeledJobSeconds,
 ): readonly number[] {
   if (lanes.length > maxSelfHostedLanes) {
-    throw new Error("More than two Mac lanes were not measured");
+    throw new Error("More than four Mac lanes were not measured");
   }
   const ends = lanes.map(() => selfHostedProbeSeconds);
   const next = lanes.map(() => 0);
@@ -230,7 +246,12 @@ export function selfHostedLaneEnds(
       .filter((lane) => next[lane]! < lanes[lane]!.length);
     if (active.length === 0) return ends;
     const rates = active.map((lane) => {
-      const partnerLane = active.find((other) => other !== lane);
+      // Only the other lane on the same Mac mini competes for its cores.
+      const partnerLane = active.find(
+        (other) =>
+          other !== lane &&
+          selfHostedMachine(other) === selfHostedMachine(lane),
+      );
       if (partnerLane == null) return 1;
       const job = lanes[lane]![next[lane]!]!;
       const partner = lanes[partnerLane]![next[partnerLane]!]!;
@@ -287,7 +308,7 @@ export function macosLanes(
     selfHostedCount < 0 ||
     selfHostedCount > maxSelfHostedLanes
   ) {
-    throw new Error("Only zero, one, or two self-hosted Mac lanes");
+    throw new Error("Self-hosted Mac lanes must be zero to four");
   }
   const lanes: MacosLaneJob[][] = Array.from(
     { length: hostedLaneCount + selfHostedCount },
