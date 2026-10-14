@@ -19,11 +19,11 @@ baseline:
   unreviewedPaths: 14455
   unsupportedProfileFeatures: 1660
 summary:
-  nodes: 82
+  nodes: 83
   ready: 75
-  blocked: 7
+  blocked: 8
   parked: 0
-  landed: 20
+  landed: 21
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge
@@ -100,6 +100,7 @@ collisions:
       - annexb-proto-dependency-classification
       - array-sort-stability
       - array-tolocalestring-arguments
+      - compound-member-assignment-key-order
       - cross-realm-host
       - destructuring-binding-target-order
       - dynamic-import
@@ -142,6 +143,7 @@ collisions:
       - annexb-proto-dependency-classification
       - array-sort-stability
       - array-tolocalestring-arguments
+      - compound-member-assignment-key-order
       - destructuring-binding-target-order
       - dynamic-import
       - dynamic-source-coverage-remediation
@@ -183,6 +185,7 @@ collisions:
     nodes:
       - array-sort-stability
       - array-tolocalestring-arguments
+      - compound-member-assignment-key-order
       - cross-realm-host
       - destructuring-binding-target-order
       - dynamic-import
@@ -224,6 +227,7 @@ collisions:
     nodes:
       - array-sort-stability
       - array-tolocalestring-arguments
+      - compound-member-assignment-key-order
       - destructuring-binding-target-order
       - dynamic-import
       - dynamic-source-coverage-remediation
@@ -564,6 +568,42 @@ collisions:
       from each group because dependencies already serialize them."
   - path: tests/test262/results.yaml
     nodes:
+      - compound-member-assignment-key-order
+      - iterator-next-callability
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-05
+      - observation-batch-06
+      - observation-batch-10
+      - observation-batch-11
+      - observation-batch-13
+      - observation-batch-14
+      - observation-batch-15
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - parenthesized-assignment-function-name
+      - with-strict-assignment-fallback
+    note: "Independent observation and remediation lanes publish the same
+      manifest index, partitions, parity digest, subset, ledger, and batch
+      counts. Serialize their publication; ordered prerequisites are omitted
+      from each group because dependencies already serialize them."
+  - path: tests/test262/results.yaml
+    nodes:
       - iterator-next-callability
       - observation-batch-01
       - observation-batch-03
@@ -593,11 +633,8 @@ collisions:
       - observation-batch-31
       - observation-batch-32
       - parenthesized-assignment-function-name
-      - with-strict-assignment-fallback
-    note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+    note: "Batch 12 retains publication collisions with independent lanes;
+      its two semantic prerequisites are already ordered by dependencies."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - annexb-proto-dependency-classification
@@ -758,6 +795,7 @@ collisions:
     nodes:
       - array-tolocalestring-arguments
       - class-private-accessor-lookup-coverage-remediation
+      - compound-member-assignment-key-order
       - destructuring-binding-target-order
       - dynamic-source-coverage-remediation
       - dynamic-source-retagging
@@ -796,6 +834,7 @@ collisions:
     nodes:
       - array-tolocalestring-arguments
       - class-duplicate-constructor-early-error
+      - compound-member-assignment-key-order
       - destructuring-binding-target-order
       - dynamic-source-coverage-remediation
       - dynamic-source-retagging
@@ -834,6 +873,7 @@ collisions:
     nodes:
       - annexb-legacy-lookup-dependency-classification
       - array-tolocalestring-arguments
+      - compound-member-assignment-key-order
       - destructuring-binding-target-order
       - dynamic-source-coverage-remediation
       - dynamic-source-retagging
@@ -1310,6 +1350,7 @@ collisions:
       refresh canonical observations; serialize manifest publication.
   - path: tests/test262/results.yaml
     nodes:
+      - compound-member-assignment-key-order
       - import-attributes-dynamic-coverage-remediation
       - with-strict-assignment-fallback
     note:
@@ -1360,3 +1401,16 @@ collisions:
     note: "The bounded dynamic attribute owner and this independent
       batch11 prerequisite share canonical evidence publication inputs;
       serialize their edits without widening either owner."
+  - path: tests/test262/results.yaml
+    nodes:
+      - compound-member-assignment-key-order
+      - import-attributes-dynamic-coverage-remediation
+    note: "The bounded compound member ordering repair and the dynamic
+      attribute owner both publish canonical observations; serialize their
+      manifest regeneration."
+  - path: tests/test262/results.yaml
+    nodes:
+      - compound-member-assignment-key-order
+      - observation-batch-08
+    note: "Batch 8 and the batch 12 key-order prerequisite independently
+      publish canonical observations; serialize their manifest changes."

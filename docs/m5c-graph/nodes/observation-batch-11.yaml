@@ -10,5 +10,5 @@ dependencies:
   - annexb-legacy-lookup-dependency-classification
   - class-duplicate-constructor-early-error
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

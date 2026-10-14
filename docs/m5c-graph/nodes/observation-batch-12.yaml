@@ -7,6 +7,8 @@ delivers: "Observes the 501 unreviewed paths that
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
+  - compound-member-assignment-key-order
   - observation-batch-plan
+  - with-strict-assignment-fallback
 landed: false
-status: ready
+status: blocked

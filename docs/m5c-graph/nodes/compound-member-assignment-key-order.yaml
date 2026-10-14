@@ -1,0 +1,32 @@
+version: 1
+id: compound-member-assignment-key-order
+title: Order compound member assignment key conversion
+delivers: "Repairs compound member assignment base[prop] op= expr for exactly
+  33 paths, test/language/expressions/compound-assignment/\
+  S11.13.2_A7.{1..11}_T{1,2,4}.js, which observe semantic-failure on
+  3204222601acfcc2449c4dd0e9ab940d12765696. Follow ECMAScript 2025 6.2.5.5
+  GetValue, 6.2.5.6 PutValue, and 13.15.2: evaluate the base and the key
+  expression, then the GetValue step ToObject on the base, which throws
+  TypeError for null or undefined before ToPropertyKey, then ToPropertyKey
+  once, store that key in the Reference, and let PutValue reuse it; the right
+  operand runs only after GetValue. Do not change upstream sources or
+  assertions, the canonical reader, classification vocabulary, or the batch
+  12 reservation, and do not authorize an exclusion. Node's double
+  conversion in the T4 cases is an observed reference divergence, not an
+  oracle. Add focused examples for every compound operator with null,
+  undefined, primitive, and object bases and with throwing and counting key
+  conversions, plus simple assignment, logical assignment, and update
+  expression controls that must keep their current results. Follow the full
+  applicable PLAN-M5.md evidence contract: differential and generated
+  properties or an extension of existing assignment properties, both
+  specialization policies, forced-collection evidence, and the normative
+  family record and profile. Add a guard-miss test reaching a compiled
+  generic fallback if the repair touches a specialized path or guard;
+  otherwise retain the applicable guard-fallback omission and its named
+  replacement evidence. Regenerate the complete reviewed manifest and
+  derived ledger for the compiler change; already-reviewed paths may move
+  only toward pass. Batch 12 owns the 33 paths' first canonical admission
+  as actually observed passes."
+dependencies: []
+landed: false
+status: ready
