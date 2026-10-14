@@ -9,8 +9,9 @@ hosted macOS lanes, one per runner. `oseo-mac-1` was registered earliest and
 `oseo-mac-2` on 2026-10-06; the second machine's runners followed on
 2026-10-14. A lane whose runner is offline, disabled, or wedged falls back to
 hosted; a busy lane queues its jobs on the runner. Branch run `37398055382`
-measured the first machine's two lanes; the second machine's lanes are
-modeled from them and await their own measurement. See *PLAN-GATE.md*. The
+measured the first machine's two lanes, and branch run `38551733723`
+measured all four; its attempt 2 passed every job in a measured 67.65 min
+against the 51.3 min the lane model derives. See *PLAN-GATE.md* (U30). The
 coordinator owns registration, repository variables, secrets, and branch
 pushes. The operator checklist is outside the repository.
 
@@ -487,7 +488,10 @@ Verify the machine before the first run with the checks the first machine
 uses: the health check under `sudo` for each label, the U17 first-execution
 probe through each listener, and free disk during the first runs. Then enable
 the switch for a two-attempt branch push and compare the four lanes with the
-two-lane measurements in *PLAN-GATE.md*.
+two-lane measurements in *PLAN-GATE.md*. Expect the first attempt to be
+slower than the second: in branch run `38551733723` the second machine's
+`oseo-mac-3` took a measured 81 min of serial work for its five jobs with an
+empty Zig cache and 60.3 min for the same five with a warm one.
 
 
 Security and activation
