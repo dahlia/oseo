@@ -43,11 +43,11 @@ owners:
       collisions, the first-source-argument rule, and two eval
       strictness-inheritance tests. Their reviewed audit assessments
       bound the assertions to source evaluation. Observation-batch-11
-      adds 79 class field initializer tests of the PerformEval
+      adds 77 class field initializer tests of the PerformEval
       initializer rules for super property, super call, arguments, and
       new.target in direct or indirect eval source, audited as
       eval-semantics."
-    paths: 161
+    paths: 159
   node:class-private-accessor-lookup-coverage-remediation:
     note: Observation-batch-11 admits the two class-elements tests that call
       Object.prototype.__lookupGetter__ or __lookupSetter__ before their
@@ -80,15 +80,18 @@ owners:
       probes, call argument evaluation ordering, and six eval argument
       or spread cases. Their ordinary binding, syntax, argument
       evaluation, or iteration coverage stays inside the claim.
-      Observation-batch-11 adds 17 paths: 14 class tests that evaluate a
+      Observation-batch-11 adds 19 paths: 14 class tests that evaluate a
       class source string repeatedly through a direct eval call or new
       Function to compare private names and brands, one comma whitespace
       probe, one static field initializer that reads this through eval,
-      and subclass-Function.js, whose instanceof assertions on a
-      Function subclass instance reach the Function constructor. Their
-      private name, brand, syntax, this-binding, and class heritage
+      subclass-Function.js, whose instanceof assertions on a Function
+      subclass instance reach the Function constructor, and two private
+      field initializer tests whose direct eval source contains
+      new.target and whose final assertion reads the ordinary public
+      property c.x, independent of the eval result. Their private name,
+      brand, syntax, this-binding, class heritage, and public property
       coverage stays inside the claim."
-    paths: 195
+    paths: 197
   node:eval-intrinsic-value:
     note: "Unknown binding 'eval' in 25 paths that read eval as a value
       without evaluating source; ADR 0016 excludes eval in call position
@@ -24702,7 +24705,7 @@ paths:
   test/language/expressions/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
-  test/language/expressions/class/elements/nested-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
+  test/language/expressions/class/elements/nested-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-indirect-eval-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-literal-name-init-err-contains-arguments.js: [expected-negative, observation]
@@ -24880,7 +24883,7 @@ paths:
   test/language/expressions/class/elements/private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
-  test/language/expressions/class/elements/private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
+  test/language/expressions/class/elements/private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/elements/private-field-access-on-inner-arrow-function.js: [pass, observation]
   test/language/expressions/class/elements/private-field-access-on-inner-function.js: [pass, observation]
   test/language/expressions/class/elements/private-field-after-optional-chain.js: [pass, observation]

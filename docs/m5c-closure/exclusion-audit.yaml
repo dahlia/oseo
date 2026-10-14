@@ -3679,7 +3679,7 @@ paths:
   - path: "test/language/expressions/class/elements/nested-private-direct-eval-\
       err-contains-newtarget.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
+    priorCohort: "incidental-scaffolding"
     sourceDigest: "953355769378162a45854247463d10bc16fd1dde93e5776bdfbac0cb9b19\
       c91a"
     observationDigest: "28ae9512b6d71c94114f8944e0f008e2c7804678fd18d6bcdfc8e4b\
@@ -3688,7 +3688,7 @@ paths:
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
-    assessment: "eval-semantics"
+    assessment: "fixture-construction"
   - path: "test/language/expressions/class/elements/nested-private-indirect-eva\
       l-contains-arguments.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -3861,7 +3861,7 @@ paths:
   - path: "test/language/expressions/class/elements/private-direct-eval-err-con\
       tains-newtarget.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "source-subject"
+    priorCohort: "incidental-scaffolding"
     sourceDigest: "1ab6e04331242b80ac3660702320d5b58a49e52279471066bddeb763cffe\
       a185"
     observationDigest: "3812fb9a2b6d79879f92e3274e31ecd67e0ff88f699c6ab3d15b286\
@@ -3870,7 +3870,7 @@ paths:
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
     subject: "error if `new.target` in StatementList of eval (direct eval)"
-    assessment: "eval-semantics"
+    assessment: "fixture-construction"
   - path: "test/language/expressions/class/elements/private-getter-is-not-a-own\
       -property.js"
     proposedOwner: "adr:0013-m5-edition-and-manifest"
