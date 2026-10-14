@@ -1,7 +1,7 @@
 version: 1
 id: eval-intrinsic-value
 title: Decide the eval function value
-delivers: "Owns the 26 reviewed unsupported paths assigned to
+delivers: "Owns the 33 reviewed unsupported paths assigned to
   node:eval-intrinsic-value in the derived closure ledger, rejected with
   Unknown binding 'eval'. These include 25 paths
   that read %eval% as a value: 8 Promise
@@ -10,7 +10,22 @@ delivers: "Owns the 26 reviewed unsupported paths assigned to
   intrinsic cases admitted by observation-batch-04, plus
   test/language/expressions/assignment/simple-basic-identifierreference-eval.js
   from observation-batch-09, which assigns the bare identifier without source
-  evaluation. The eval cases observe
+  evaluation, plus seven observation-batch-11 paths under
+  test/language/expressions/class/:
+  private-getter-brand-check-multiple-evaluations-of-class-eval-indirect.js,
+  private-method-brand-check-multiple-evaluations-of-class-eval-indirect.js,
+  private-setter-brand-check-multiple-evaluations-of-class-eval-indirect.js,
+  private-static-field-multiple-evaluations-of-class-eval-indirect.js,
+  private-static-getter-multiple-evaluations-of-class-eval-indirect.js,
+  private-static-method-brand-check-\
+  multiple-evaluations-of-class-eval-indirect.js, and
+  private-static-setter-multiple-evaluations-of-class-eval-indirect.js.
+  Each passes the bare eval identifier as an argument to a helper that calls
+  it on a class source string, and the identifier read is rejected as an
+  unknown binding before that call or any private name or brand assertion
+  runs. Their private name and brand subjects stay inside the claim; once
+  identifier reads are admitted, their new observation must be reassessed
+  rather than assumed. The eval cases observe
   length, name, prototype absence, and nonconstructibility without source
   evaluation. The Proxy case
   wraps eval and calls the proxy with no arguments, so it evaluates no source

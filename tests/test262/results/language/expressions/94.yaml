@@ -733,6 +733,62 @@ results:
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
+        - object-spread
+        - async-iteration
+        - class-static-methods-private
+      flags:
+        - generated
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/async-gen-private-method-static/yield-identifier-spread-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-iteration
+      - classes
+      - object-own-keys
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class
+        - new.target
+        - class-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/class/elements/private-indirect-eval-err-contains-newtarget.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - dynamic-source
+    observation:
+      detail: "test/language/expressions/class/elements/private-indirect-eval\
+        -err-contains-newtarget.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/private-indir\
+        ect-eval-err-contains-newtarget.js:103:12: error[OSEO1001]:
+        Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
         - class-methods-private
         - class
       flags:

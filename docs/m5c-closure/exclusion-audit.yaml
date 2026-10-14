@@ -154,7 +154,24 @@ assessments:
       enumeration, abrupt completion, promises, or JSON identity assertions
       execute. These original mixed subjects remain open under the exact
       separately approved reservation; no source-evaluation-only exclusion is
-      claimed and the existing 178-path reservation is unchanged.
+      claimed and the original 178-path dynamic-source-coverage-remediation
+      cohort is unchanged by this reservation.
+  annex-b-legacy-lookup:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    remediationOwner: node:class-private-accessor-lookup-coverage-remediation
+    reason: The only observed rejection is the optional legacy
+      Object.prototype.__lookupGetter__ or __lookupSetter__ call, which
+      ECMA-262 20.1.3.9 defines as normative optional and ADR 0020 maps
+      onto the ADR 0013 Annex B exclusion. The same source asserts that the
+      private getter or setter is neither an own property nor found by
+      public-name membership, then reads the private getter or writes
+      through the private setter. Those private accessor subjects do not
+      require the legacy method and stay inside the claim. Rejection is
+      authorized, but whole-path closure is unresolved; retain the bounded
+      private accessor coverage remediation owner until replacement
+      evidence and the maintainer accounting decision, without
+      authorizing a whole-path exclusion.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2814,6 +2831,396 @@ paths:
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Evaluated code honors the strictness of the calling context"
     assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-dire\
+      ct-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "34941bc60d65cf999aa71ecb1e6fdd28d968ba3f5d78fb9c060033f69bd0\
+      fe13"
+    observationDigest: "982e99a01872dac45d45e17cdfc40118bc9be09bb89a98e5f73649c\
+      46e1c0b53"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-dire\
+      ct-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "6319711cfcacc0bec25c52d0db6d7bc31860c9f7279f5d3dab21eea6ad50\
+      73c5"
+    observationDigest: "54dbbc4349aa7bdb59df4e073c3f45afff935d3615dc6aec1092828\
+      331e98874"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-dire\
+      ct-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "7d897f97fd0d686217cd3a15d28c2ef67e4c419efb55b82416effce69fba\
+      6ac8"
+    observationDigest: "1c5982a59324b2588610781d7ec8971b440cc517c76c933b5e0e55b\
+      263804552"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-dire\
+      ct-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0d968ab9997c7d7a03b0f7f3dd3fbb49fed62b14bf5d791625d4f4593afb\
+      7f5a"
+    observationDigest: "e4270e2db28f0019be1a9792b3614df2bcf7cb645de232c9537a637\
+      bd2fdb107"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-dire\
+      ct-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b917495fd12c59226e6b139a380393202bdb3651cdd31ece47a6eba69457\
+      d0b8"
+    observationDigest: "6daaca7bf301b0ddf449f00577c79dd84eb55de9dbf276b9784c2f9\
+      da541e01b"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-indi\
+      rect-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3ab514fef0e0ee57c4569f8c0c025494bc7341ba6165c4380210a421d796\
+      383b"
+    observationDigest: "23bb20470c24928de697858f8c447a03df5cb234571614da396da6f\
+      0974d3905"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-indi\
+      rect-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "4b5f31d182ada27e2197625331c63921c423ed5c1a9f8c4c15f6c27b1d74\
+      5f0e"
+    observationDigest: "030544587b7e4a0f1d6b613cffc2264b3f35078b39e68a613287920\
+      1077f0947"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-indi\
+      rect-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "6d74ac6266494efa27e8ba179954ad7a4a0fbb27f28dbf854816b1501b68\
+      d18e"
+    observationDigest: "224db0f345f8a852934e2df006dc49279fc487054bccfd4f41edb2a\
+      ecdbed6c4"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-indi\
+      rect-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "4f149267d539e3a7b6c1af16da08efc83d7b7b9d9cba3ec2a5b5df8d493f\
+      6fcb"
+    observationDigest: "cd9ffa99368bddcaa532ac36e54b6af07cb055bb1821fd03e6c2cfc\
+      781ac4fd4"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-derived-cls-indi\
+      rect-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "f05eca4ff87f4086a418080a400ba25cfe7fd712bdfd684c3b56da58b5c3\
+      ea06"
+    observationDigest: "7e32f6a6fe9c0cac9b2e005eaf0f036c23024405b1ea2aa92dbb13d\
+      1f5459482"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-direct-eval-err-\
+      contains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "abc56c4e98ab139fc1dba58d8c1bbfed7adbf4e4fd93d2ec9e9152036181\
+      970f"
+    observationDigest: "6d1cd764b3bbffe19c3b31858c5278919abb6311ab6916cfdd90136\
+      b9ed6a018"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-direct-eval-err-\
+      contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "76bd055405d09654c85f57e2076263a5d9a2c746ef843e9c72b636152f6f\
+      fb68"
+    observationDigest: "d01e416a658ffce1a47f23aa41e75ea27d0dfa9a862df93c67285af\
+      789d03b82"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-indirect-eval-er\
+      r-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "bf006fa53c71e95c30f3d02aad89369bae512b0619619a8b75946c07ffa9\
+      ad2a"
+    observationDigest: "dff078ace993414cb00fab0e15ddc9d469a79699555c68c852c6f6e\
+      9c059b33a"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-direct-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "383c38de317b3e9e2f0cb0644ddc491a8a9774d128ffa87b7f9b8db91813\
+      9449"
+    observationDigest: "24a638b9f968e0ba9b060449275957eb5aefd64c6065a1da968c04b\
+      3256f9679"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-direct-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3bbbf869df305699896bfe92b516ee01c195c1f7bddbca8bbbdaa30dcb9d\
+      eecf"
+    observationDigest: "f8d4e399aba7a63d9e95b18161fbcf93575497a940aebdf07138524\
+      3f3913a79"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-direct-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "7a1d9bfb9b8931eb682a8de5d11fad64591047dd8b84cde9a2b649304071\
+      c292"
+    observationDigest: "2292fd6cd5a2e841c9eb1cbfa2854d725b4257c0d2d0f457cc1b3f1\
+      66b23d686"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-direct-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "96e66d51e07bb331758c7ad3c1bfa795498e86fbebf059803adb02d23034\
+      54ef"
+    observationDigest: "5db08f8e4c4a69916e5a269a83b7c4c875cb5396960ade674efe393\
+      0311b6f03"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-direct-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3cf4500c35d6edb69a9d494c22e763879e1545345901be5104f21fea8649\
+      aa4b"
+    observationDigest: "006c0232e1d4296d9ea6ec7bb6532e62e22ce92d25eb5da3ea90ac9\
+      3ed89a7c2"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-indirect-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "e5cd50546dc5ce97b93b56f9429660b3c2871260c663cb6d7f926a80b663\
+      d826"
+    observationDigest: "e0e7df5c185ba621e621ecde087e502eb3fcfde9c92ee54008beab0\
+      3dc413c7c"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-indirect-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "705531502a73b52c27d11ace4886be86d7523b5118d05ba27ae0ed5b90ac\
+      3b7a"
+    observationDigest: "bddbea3d4add6a48282d282bfd673a138492c51ca4e0e5741f4cf0d\
+      75cbcdbfe"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-indirect-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "e1b46305531343f54f7001563c54e0a90a643eb87211f3b99b6a27c55ed8\
+      8613"
+    observationDigest: "f848581df6a9622128bb221cc351db6cc9ec3e8f5311ece25a49649\
+      c2ac5ef45"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-indirect-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "ac3c0773db1e30b2cf1bd70e88ddbb90b707767e3941140d33a301f03b85\
+      7358"
+    observationDigest: "4cd9387c0b88e2a58e90b4e422e9e49f8febf40e416d3c43f559a20\
+      f558db31e"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-derived-\
+      cls-indirect-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "873dace5fc6d35b754b3ecefea77ca1741703fa25611baa1fe92168e26e7\
+      c12f"
+    observationDigest: "f83992125e5f12313948ccb308fac5fa939f1b35b12b865efb40318\
+      5602335a8"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-direct-e\
+      val-err-contains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "f26fac6bfb1e0488353c4ccd53a90fe4d8879f7c8515ffb820a59456b531\
+      1649"
+    observationDigest: "6c14ec7db797cdbc6da97e28783edbbcfc46f19f59145d33de7fd4e\
+      aa28409c7"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-direct-e\
+      val-err-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "ce0ece0a00f301116251a7a2f638b084d8f297fe5221656925fc2e200b86\
+      db85"
+    observationDigest: "85777c1d97b8cfd8510a2a234c7409a85e125fd6fb9d0eb4d2ac894\
+      c0d391c25"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/arrow-body-private-indirect\
+      -eval-err-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "ee332160ac6fd484f83cc4e3c3a1490baaa8dab6412156eb459010d2d4a8\
+      0868"
+    observationDigest: "43d17970c11bfa389a29cf4c5537cf51ba4e90ef4475866562e26f8\
+      090b1a86f"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/derived-cls-direct-eval-con\
+      tains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "09fb533d2ca22cb403d9d1edc4f60739dfcc3134f0364d9db9ac2c065789\
+      e4c9"
+    observationDigest: "efa51dfe98f6483f5e04044e7becc25759c83148f59319a67820832\
+      dde5f7056"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/derived-cls-direct-eval-con\
+      tains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "2da2e3e8180edd9b655f594ac2590814e5e7ed55f247d3ed6cfeb795de54\
+      b89d"
+    observationDigest: "3b25b8184aa29d04c1a6efafa6eac04583582c3cd475e1f716454cb\
+      7e9dfce0a"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/derived-cls-direct-eval-err\
+      -contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5c87a8ae9287f5491cdb39cc8f304bfd23946fc9e853c3049f699cd746aa\
+      3ba9"
+    observationDigest: "0086d411cc847d6fa9631b147aed31f75306a6a9b390778caf7ed7e\
+      3b5c9d81b"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/derived-cls-direct-eval-err\
+      -contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "d4cebae191bf11a280cb2f4c7edc03964a2f81dcde9c481cb42a8138b94d\
+      324c"
+    observationDigest: "b3dc4685416d662ae563dcde114d44b6ff7c58c24d748a5a3534b98\
+      a74e35be8"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/class/elements/derived-cls-direct-eval-err\
       -contains-supercall.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2840,6 +3247,58 @@ paths:
     upstreamSection: sec-performeval-rules-in-initializer
     subject: super.x in StatementList of eval (indirect eval)
     assessment: eval-semantics
+  - path: "test/language/expressions/class/elements/derived-cls-indirect-eval-c\
+      ontains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9e30a751762196b9db6113828c57ae4bff398965bc0169634f25ccc3192d\
+      70d2"
+    observationDigest: "eda26914f73bff601838a25cbe4a631c781225ae702305f35568b54\
+      53253cc00"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/derived-cls-indirect-eval-e\
+      rr-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "2a2af7dd4bd141846ffc86d03f7dfb12e63fce8d33980c7832fd3bfd61dc\
+      edc6"
+    observationDigest: "f9b382d76c74299195588838e970c98e2fd85bc842c4a6190397028\
+      341c42e92"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/derived-cls-indirect-eval-e\
+      rr-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9e9b4a2e076708b26b29c5f56d1af0f61bbb82e91964a2a567fa28ae11d9\
+      3baa"
+    observationDigest: "abcb2571e482e1e929607d07fcd0576d3b5ad88c3c03d05cfef08f6\
+      cfeb5502f"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/derived-cls-indirect-eval-e\
+      rr-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "09379d1bd158e9c23bdcc874ee1a3b1a9c2c74f01e7ecbb10e39ca044578\
+      8338"
+    observationDigest: "911be20475864e59498c05e7f8c246f533d7a18f8c4ebe7d922e2e1\
+      7c32a8e9e"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
   - path: "test/language/expressions/class/elements/direct-eval-err-contains-ar\
       guments.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2853,6 +3312,836 @@ paths:
     upstreamSection: sec-performeval-rules-in-initializer
     subject: error if `arguments` in StatementList of eval (direct eval)
     assessment: eval-semantics
+  - path: "test/language/expressions/class/elements/direct-eval-err-contains-ne\
+      wtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "40441820f02993efa2774504848a55e03831db79d40291587beb24e8763f\
+      7028"
+    observationDigest: "ad864594432fa10017b4630d970f908d821f5efd1b41684e4e9e2c9\
+      1b24fb41a"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/indirect-eval-contains-argu\
+      ments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "18cd1821ea085d19c8520df3cf26e547c60f8574988365b7c261e87627a2\
+      32d8"
+    observationDigest: "ceba2248ab3f8a38cf5a8c1f69a774cba8f40365450d5d519ddcabe\
+      c14bbb4c9"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/indirect-eval-err-contains-\
+      newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "23f2e667aaffd9f90a4446daf3c0d602d6d6178596da867ac97e2c1a6e24\
+      572e"
+    observationDigest: "31079d8ad06fe7fcb47f4391d4aa086e377c96d748a6b21527bd962\
+      ff7dc8521"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-direct-e\
+      val-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3fb1e0791047cbf959b7f7fe352df3094a445c35a8cb3b80e0a83f160817\
+      fd1a"
+    observationDigest: "1164aaa29a194cbcb64a8c1f6eb39c24f22dcf4f97afb2768cfeead\
+      216feb67b"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-direct-e\
+      val-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5803321a423d0a428877786aec1290e3e746f673266de146af5e9634faf7\
+      6abb"
+    observationDigest: "731f3d3c58bdbd1a915caf69f148208d8dfffafc9183f0d77368801\
+      15f434971"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-direct-e\
+      val-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "60a72e619f41b6bf1f52862b7efd531fb8922ddebff775fbd38ff3ea5d7a\
+      a25d"
+    observationDigest: "810d2ba37a324bad7b2fd813255cd60c4ce913dcc7a7a06efaa87e3\
+      ce612695f"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-direct-e\
+      val-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "f7247b2b30bbc6febdbd21882016cfb061411a5174ff1a033586e2861cd3\
+      de7a"
+    observationDigest: "e4faa699a23be4cbc44e25b58486c5a5ae8579a88ad42b7416a2691\
+      bd355f238"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-direct-e\
+      val-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9b8962bfb1953917ddf307502d69ea3a9537a0c94166ab26ed08a97c6435\
+      7054"
+    observationDigest: "d452bc246cdff91f39320d0e27895da24efd088273614a4bf96dfc0\
+      8cf178c8f"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-indirect\
+      -eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "c8fd85bd45f07c3e5c351b77384cd8524a3351db39b9c1ca170e3df04c38\
+      bcb0"
+    observationDigest: "a75019a9ada070a7a4543800e35b58ae42747fc3b63c48bad97649f\
+      2062c0aad"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-indirect\
+      -eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0953cde6daf07b6e4f1b8c410ca5f043adbcdac52cb577b265405003e486\
+      7470"
+    observationDigest: "2c4f2b15e0e295e77c4a99cdd149cd8b685fdbb230397d6b0173085\
+      f92a459f6"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-indirect\
+      -eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "efb1de41adcf668bfac8f80a8f34f05d9ad8e48c9c7d28f9b593c0fc501c\
+      97c7"
+    observationDigest: "bbeee65dcbf4d871dbfdfc22cf2f228e8a6fe8f0e09989a2bceb208\
+      c01b7169e"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-indirect\
+      -eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "a02b2620941ffb749dd2361f1d1c28c7cb335b8c6aa199fe7693b91c37e2\
+      8b1e"
+    observationDigest: "500f04e2f70bf30117214dabad32e34f2dcec158c84f519b994e7c4\
+      d1490ec92"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-derived-cls-indirect\
+      -eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "6949efd67ee84ba33b446be7faabe4f284c41e390b74b67193a6d9fee114\
+      8506"
+    observationDigest: "450cb73f9d3ef9613aba9ee2dce532d2d2be6ac2803f6d06ca6f740\
+      e8bfa21ba"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-direct-eval-err-cont\
+      ains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "08c227c620577379221ed3527753606fb807c5a82f7be3e4c45f0ecc2743\
+      e3aa"
+    observationDigest: "d351b8e7719e5ec60dc559c28cf424911711668406c4a00432cf22a\
+      7c9a378f2"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-direct-eval-err-cont\
+      ains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "57abf9628a1d3aa6ce844daee99539844dd3ad33a14e55ebdbf7a66401f8\
+      12e8"
+    observationDigest: "5f8a6ebdde833cf75f740615ed160b6042a0014014dfdcc2661b6d9\
+      f9c176fc6"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-indirect-eval-contai\
+      ns-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "1c7c4f883350fb1fed509a612486b5774bab91fd330b88d2f13221ac1a6d\
+      fcde"
+    observationDigest: "fe1031e0247ad4801283c5b1dd7fb1a0b7e816d3da8c0d04f92c201\
+      0414d7e22"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-indirect-eval-err-co\
+      ntains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "a57100ae0c0ac331433f28c3de4f56b884e4140bdd08a82581896221f2ec\
+      7659"
+    observationDigest: "09940955c28ea6b5c821d3be87e8c96fc1ca5d70bb966b83803dc72\
+      7d41e5650"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      direct-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3011efbc47c6fece748d4e6a48063a0603658887146119063ebb4dc0fc7b\
+      7fb2"
+    observationDigest: "3815c88c8b51022f1ddcdf61ba7d12556d7fbfafe9b33ba68359c1f\
+      482101ae4"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      direct-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3c2e300dd864cc6666eab36099b1aa39b9c48b6f0bf33fb1c9e94d55fb32\
+      36a3"
+    observationDigest: "55bf1792542003c4144280655d7a021fbd4d7066faf7ee670b1b1a2\
+      dbc110b95"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      direct-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "433e3ca09b7faea96a14fdc9adf38158f40bb7acb170db49ae9b0764acf3\
+      f60a"
+    observationDigest: "1a8023b10504d8e3776b11cf9033bbc8bd1f8647480d0fd278c1c02\
+      0d2948f08"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      direct-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "e86cfb678e13ddc9f8eedca2cce00d400335451b18bdc0b1390287c08d89\
+      bd49"
+    observationDigest: "8d6de1d6862c9a6b4cf063595a98987d9e409985949a7354d3b0308\
+      dab35c5ca"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      direct-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b6b3f7474d91d36f4861d4cc7079d8f510fa52fee0420ad0f571f21fba11\
+      78cb"
+    observationDigest: "7b1b6929aa8390932af692f8289c677747d862cec5bdc026ae2326e\
+      3109b1c61"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      indirect-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "78be9eb96aa816f5199e901c32e0e3931b037c6c8379a3e6909093a7351d\
+      fc0e"
+    observationDigest: "1e5108d99e63357fa49dccf592239cf96064b6e1fc17b58522abd3a\
+      7fb31e0ca"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      indirect-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b17deeb7022e18a9f2d6a425532b9a5aa6efb101776e44bd858fccc62f8f\
+      9168"
+    observationDigest: "2af340d1474548a5d986727d48c8cf5ed808be91abb10e1eb12aae6\
+      15c2b31f6"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      indirect-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "1c6d2e2a747875386c07da24705f18f7631a95d202aae786209798fcc36a\
+      4617"
+    observationDigest: "6961ab07bd7f25cca37718ff8dad3024de41096ebe748fe47b16701\
+      cd18aec01"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      indirect-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "4779b8ab72b3e697bff2d9233f9dfabcedb9bffd6b60b144cfe6169c0c65\
+      d707"
+    observationDigest: "528322f56d1f71ce2b6e6087f50271eac225d24b2f6495a30c021c8\
+      4ceda5fc5"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-derived-cls-\
+      indirect-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "552c6264d31a1b100a65a30e5426d15c54cd885cf2da1e546401dc488e5a\
+      3903"
+    observationDigest: "75f87bede808c43f47c4490f52eb43b19a1ee1e509ee7b539f295d9\
+      c7161dc05"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-direct-eval-\
+      err-contains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "d6564df8ee22c6f98635a906f6857b962d5edddca7b720a8996c8f9c32ec\
+      39bd"
+    observationDigest: "d5137e4c0d6f4081e58c74a766876c5fe01b767acd20d6094543427\
+      8a630f759"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-direct-eval-\
+      err-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "953355769378162a45854247463d10bc16fd1dde93e5776bdfbac0cb9b19\
+      c91a"
+    observationDigest: "28ae9512b6d71c94114f8944e0f008e2c7804678fd18d6bcdfc8e4b\
+      946262b0e"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-indirect-eva\
+      l-contains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "e4a248a18cef5357db29347a233eaffdc620e000b63de6677ac9c35fc12e\
+      2b21"
+    observationDigest: "bfab7b30658e5b3df2f66e4d45fbf1fe6193faf5efc134a33a71a58\
+      75e5cb0b8"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/nested-private-indirect-eva\
+      l-err-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "66de3e0e3310cd3c17199f39a237dbbe412321d56e9f9bacaa00cc774afc\
+      426f"
+    observationDigest: "76929b8b13c6501ebbdb4a8ba8677bb5765ab4235cac934b7577fef\
+      f4f9214fc"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-direct-\
+      eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "84035055d59366c7f0ca3b20c90bc3d8b68aed2c75d46d756c4f7b453083\
+      e778"
+    observationDigest: "3453eb36131decab55f1a9142348c047ac02c84c5f015f45c04ab5b\
+      603684434"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-direct-\
+      eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "365bf72bb0a1a0c6ef08e8e1da9cf256e55863f6b1be52e6ba1e00052106\
+      9af0"
+    observationDigest: "0493ec4c6f9d045d5e033abba67219fad0a9a44e25f33a7913639f9\
+      33e917c20"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-direct-\
+      eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "33d5b3d8417bcbc0942a0d1d3a2bfec1d0482ea1323e45ab94193c3c898a\
+      2723"
+    observationDigest: "f539fa77ca9be7e1f7a9c21875680db6a7dadf9a49f3f986205d3d5\
+      cc8424f79"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-direct-\
+      eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "7b962e6f5a1afec78f98e37812ba302881c36c3ed5dc671b7786189e5ae3\
+      e977"
+    observationDigest: "833020360bdbe6931a4c01121a169fa9425cc0b385932c37bc615a4\
+      6994653af"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-direct-\
+      eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b9bf4de2e1dc38330a82b534685df02727d755f3aef9a0086490fb45f0f0\
+      fabf"
+    observationDigest: "1c7a8cab9732be50013921f458b76852a6afd336e74ae5ca6d952fc\
+      02e1cab4d"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-indirec\
+      t-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "130b9200ded5165d7bc61d672220458251c31e1534a3a0b3e223be03f4f3\
+      f4f2"
+    observationDigest: "037d6af42ec4c95450265bf896a240962b85c490d4d492ffb2a0f86\
+      182c48053"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-indirec\
+      t-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "31307071500af614bd62188bc2bfce39315ea4f3e64c61859dcc6c32d336\
+      590d"
+    observationDigest: "5cd57f2564c7537a8e6bbb3b3d46737be34b997c59e92c7bc6fbc50\
+      18b88db3e"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-indirec\
+      t-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "a48e264f74f2476a804a58eeb811db5990f4c5b7572809a000cffd7be366\
+      91f8"
+    observationDigest: "e5f088b1f30c7ff7c5acf63fa622b6f90a7500fb78f95883ed347b1\
+      9a46f80c2"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-indirec\
+      t-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "9855761d06ba28346ac2edc69f4d75e74a446a28e28713e64d56de5735fa\
+      d54a"
+    observationDigest: "2d69a777449132b0de0594800b02519cdb0c2d4470f1c559a416f8b\
+      139e50af4"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-derived-cls-indirec\
+      t-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "268d8b08be908db886763371c611a3a2a2cd5e091c9c27e04558cb3b124a\
+      f90b"
+    observationDigest: "11d956b0953c30d2dd5f7b92fe8a157a0e048b5d71b4f0039a6f599\
+      f36021ccf"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-direct-eval-err-con\
+      tains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "06556971498da1beb8db6cf5795ddebef38d810f5cf692116933983ede8a\
+      abc2"
+    observationDigest: "b52cf251817404fd230cfd0eaabdc04f904e386b1434cddc070f15a\
+      43f1b0ebd"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-direct-eval-err-con\
+      tains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "1ab6e04331242b80ac3660702320d5b58a49e52279471066bddeb763cffe\
+      a185"
+    observationDigest: "3812fb9a2b6d79879f92e3274e31ecd67e0ff88f699c6ab3d15b286\
+      480215c70"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-getter-is-not-a-own\
+      -property.js"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
+    priorCohort: "annex-b"
+    sourceDigest: "95d871a9ba9807b652fd91b031d3ee2c207f5b1daed5564525b675d12c71\
+      349e"
+    observationDigest: "ea5c234a5dc488802b864609d4c022263d072563810313140f032ac\
+      ff1bfb5da"
+    missingDynamicTag: false
+    section: "prod-FieldDefinition"
+    subject: "Private getter is not stored as an own property of objects (field
+      definitions in a class expression)"
+    assessment: "annex-b-legacy-lookup"
+  - path: "test/language/expressions/class/elements/private-indirect-eval-conta\
+      ins-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "27f87000668bef742f287c3699fdb237c114a9ef1f7af84c6f29eb3653be\
+      82be"
+    observationDigest: "b440c6c1428393b60befb9d613b41328e114aef183db1c944ed2980\
+      3f1d97db7"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-indirect-eval-err-c\
+      ontains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "1951d7beb6ff0ce49188fae6a1b2f553987d92558889e8892b5e93ad9ce9\
+      8ee2"
+    observationDigest: "40ce3be51d3df18c1c827e6ed043e7751907488a10250a49a41b941\
+      0c603b6ab"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    upstreamSection: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/class/elements/private-setter-is-not-a-own\
+      -property.js"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
+    priorCohort: "annex-b"
+    sourceDigest: "bc75d399d2f76fa31e787e6d80b715befc51d36a57e3027900f6da86ca5b\
+      7689"
+    observationDigest: "182e8dda8c9e223d012fc39cdd5a79ff03836d69e81e636aa4a981e\
+      d374c0b8c"
+    missingDynamicTag: false
+    section: "prod-FieldDefinition"
+    subject: "Private setter is not stored as an own property of objects (field
+      definitions in a class expression)"
+    assessment: "annex-b-legacy-lookup"
+  - path: "test/language/expressions/class/elements/static-field-init-with-this\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "644cac2a5bf43a356eac968fa4130002d4d47118bc5909f8ec2999656255\
+      0108"
+    observationDigest: "e8abc93016904fa86c58342bfb19dfe7f8aa7e846f18d34b9660869\
+      63faf0703"
+    missingDynamicTag: false
+    section: "prod-FieldDefinition"
+    subject: "Static fields initializer has `this` biding (field definitions in
+      a class expression)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-getter-brand-check-multiple-\
+      evaluations-of-class-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c93b1d57e2b7166d88bf542c8a0ab32db916e7aa128cf37b0ca2f8b97694\
+      2100"
+    observationDigest: "328fa1a711b25db374140f9323c2c39495f2bc61c5ba353cae26cdb\
+      9f1d04b3c"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private getter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-getter-brand-check-multiple-\
+      evaluations-of-class-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ff2a48f2985dd1bc257eba2057562c625a5722a46bb75d463952e05d4145\
+      5cf2"
+    observationDigest: "48cbf738de9584fcdef934ac270269b84936fbacc86d63067898521\
+      cb6631d85"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private getter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-method-brand-check-multiple-\
+      evaluations-of-class-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4752f29f0e6fe908e1e29d7abb5facd609a1f2b9c6de47fe54c2d871c4c8\
+      5e36"
+    observationDigest: "dff6dc78be0a93dd015fc9ebaba9f9b117b13a5ed5a4f151f9f68f1\
+      361bcbcd6"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private method)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-method-brand-check-multiple-\
+      evaluations-of-class-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a742bb24bb8ec1a9630542cc9f8d1326674f45648a44d0cf9e1ca6c08aa7\
+      9022"
+    observationDigest: "9ef6859452f503faba4a87feda58dbf189b89e0e1448c1170fb1e0d\
+      59659e31e"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private method)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-setter-brand-check-multiple-\
+      evaluations-of-class-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9f136b2b89552b223a0ebb2f309d862d66f40e591d4f12713f0cc9963a90\
+      9837"
+    observationDigest: "d9958d109c5eb6a2beb8bcb32588a3e727d3469bf3a87146f7687da\
+      6a07cb6d3"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private setter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-setter-brand-check-multiple-\
+      evaluations-of-class-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "61bd2214cd458f7dde8c79a399c3c783c75f713833b3493909f553b5a362\
+      b6de"
+    observationDigest: "37f9bfde888bfdae1c2b1c46c723850651dba9dfe731cd465fc27b5\
+      9553cf576"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private setter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-field-multiple-evalua\
+      tions-of-class-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0317317878f54107a2882410910e6906bd01a32dd584511c96deba83278f\
+      a921"
+    observationDigest: "2ef4f19612971c69a1fac19dcc99c604e09785ea5756cbf210f28ef\
+      7b9ad311f"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name
+      (private static field)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-field-multiple-evalua\
+      tions-of-class-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bcb60765fcd725a95185867c8f70370062e2778fa685a418713355ad1e6f\
+      b990"
+    observationDigest: "209a0d5e3b608bd9cc85527938854f857178eed5a715126e5dee477\
+      555a754d7"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name
+      (private static field)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-getter-multiple-evalu\
+      ations-of-class-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d598a5cdfbc2be9e0d353276b5b7bbf47c5d671747486ca9335d08772e71\
+      591a"
+    observationDigest: "5100c6b50a9edcc461c4cb36d95afc0579a353233ada38a967c987f\
+      d59d556c6"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name
+      (private static getter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-getter-multiple-evalu\
+      ations-of-class-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "82f33e27a248dbbaf79a55e235c20beccdb143013ff5689ca3c95671242b\
+      47d7"
+    observationDigest: "99a303ca7633a156f3e5516724abcac74bfaa6d4f449e6ab01c1b0c\
+      7f6949761"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name
+      (private static getter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-method-brand-check-mu\
+      ltiple-evaluations-of-class-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0e741b10350c1dbd6ba218ea9468d8f2e14c693dba537ca7803bb876b484\
+      96d5"
+    observationDigest: "0404ff0ca558f43b138a6e7ac3a8aac0af65919e56edf06c5b84e0b\
+      8bbcc146a"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private static methods)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-method-brand-check-mu\
+      ltiple-evaluations-of-class-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4c263ed6d36d3b7539cb7c81aa50a8ed700aeedd8beb620a1b62f57287e3\
+      dd00"
+    observationDigest: "e2330540986ec9934ea6f4d299c01ce0fe58d17ad2a3dcaac29a34e\
+      2d3b29344"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand
+      (private static methods)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-setter-multiple-evalu\
+      ations-of-class-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "76361d7562781e118cbaa113f80d20efccfb389c46775cdde62d1f767df7\
+      a1f9"
+    observationDigest: "b88274994d63f5758dbf3e33d8a0738344b61de36e6da51e4a5aa5e\
+      6aa62a8ed"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name
+      (private static setter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-setter-multiple-evalu\
+      ations-of-class-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9e49cde6331bf54bab75f38189f32f1237f4099f55e018344e89b4258ff3\
+      9402"
+    observationDigest: "437e8a0cbffb9b817cab1abc5fc606b0518f79bd0cfb52d3eabcdd9\
+      28839ddd1"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name
+      (private static setter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/subclass-builtins/subclass-Function.\
+      js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3c41d5e40784cdf9e2e41e5854b4b0f98b358c65e00eb20a529640e8cd00\
+      d4d8"
+    observationDigest: "97896ab35a3a63ed1fd6a0d0a0f884c6c8fffe04fc798e1126e4b1f\
+      50d2be607"
+    missingDynamicTag: false
+    section: "sec-function-constructor"
+    subject: "new SubFunction() instanceof Function (Subclass instanceof
+      Heritage)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/comma/S11.14_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e83bcdaaaa0b25b4b08380d1896ffbbe22b6d2b393d203ca580fe2d37244\
+      9d95"
+    observationDigest: "fe9db51915ab82b75de1bea5131e3121e438a685e03ba094b6c079c\
+      771d8b1ed"
+    missingDynamicTag: false
+    section: "sec-comma-operator"
+    subject: "Whitespace and line terminators around the comma operator"
+    assessment: "fixture-construction"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-a\
       wait-expr.js"

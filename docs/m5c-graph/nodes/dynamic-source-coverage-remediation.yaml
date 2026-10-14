@@ -1,11 +1,17 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 178 reviewed unsupported paths assigned to
+delivers: "Resolves the 195 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure ledger.
   Select exactly those owners and their exclusion-audit path assessments:
   the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
-  source classification, 5 from observation-batch-07, and 16 from batch 09.
+  source classification, 5 from observation-batch-07, 16 from batch 09, and
+  17 from batch 11: 14 class tests that evaluate a class source string
+  repeatedly through a direct eval call or new Function to compare private
+  names and brands, one comma whitespace probe, one static field
+  initializer that reads this through eval, and
+  test/language/expressions/class/subclass-builtins/subclass-Function.js,
+  whose class heritage instanceof assertions reach the Function constructor.
   Their eval or source constructor rejection is authorized, but non-source
   subject coverage remains unresolved.
   Obtain the maintainer accounting decision in

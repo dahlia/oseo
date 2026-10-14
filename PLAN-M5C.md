@@ -732,3 +732,10 @@ only when the source contains a call of the named method in call syntax,
 and never as an exclusion. The
 private accessor subjects remain mixed coverage debt, and ADR 0013 accepts no
 new exclusion.
+
+Observation batch 11 then observed both paths at `e6db3a1c` as
+`unsupported-profile-feature` with the exact owned rejection at the end of
+stderr, and admits them with their unchanged `classes` dependency tag. Their
+`annex-b-legacy-lookup` audit rows and ledger entries name the
+`node:class-private-accessor-lookup-coverage-remediation` owner, and no
+whole-path exclusion is recorded.
