@@ -129,8 +129,9 @@ pinned paths whose actual observation rejects `ImportExpression` before
 option evaluation, enumeration, abrupt completion, promises, or JSON
 identity assertions execute. Their ledger owner is
 `node:import-attributes-dynamic-coverage-remediation`. This reservation
-adds no exclusions and does not widen the existing 178-path
-`dynamic-source-coverage-remediation` contract.
+adds no exclusions and did not widen the original 178-path
+`dynamic-source-coverage-remediation` cohort. Observation batch 11 later
+added 19 paths to that owner, whose current contract is 197 paths.
 
 Each path retains its original normative subject, source digest, and fresh
 observation digest. Its assessment uses `disposition: remediation`,
@@ -167,7 +168,8 @@ accepts no other rejection. A different code, method name, wording, or stdout
 text is outside the surface. The `__proto__` and RegExp split pairs are
 unchanged.
 
-The two batch 11 paths that call these methods receive their rows when batch
-11 observes them. Their private getter and setter assertions are not
-excluded, and replacement evidence and the maintainer accounting decision
-belong to the coverage remediation node.
+Observation batch 11 observed both paths at `e6db3a1c` with exactly these
+rejections and records them under the `annex-b-legacy-lookup` assessment, with
+`priorCohort: annex-b` and the remediation owner above. Their private getter
+and setter assertions are not excluded, and replacement evidence and the
+maintainer accounting decision belong to the coverage remediation node.
