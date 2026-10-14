@@ -123,7 +123,10 @@ credential. No PAT or GitHub API credential is stored on the Mac. The
 operator pins and verifies the downloaded runner archive, registers
 `oseo-mac-1` once, and installs the system LaunchDaemon with
 *tools/selfhosted-mac/install-service.sh*. `OSEO_RUNNER_LABEL` selects the
-runner, `oseo-mac-1` by default or `oseo-mac-2`; any other value is rejected.
+runner, `oseo-mac-1` by default or any of `oseo-mac-2` through
+`oseo-mac-4`; any other value is rejected. Only the first two lanes are
+configured in the generated workflow; a runner registered under either of
+the other two labels stays unused until that configuration changes.
 The daemon is `org.oseo.runner.<label>`, and the installer requires the
 runner root to be registered under that name. The daemon's `UserName` is the
 dedicated account; it starts at boot without a GUI login. Its executable is
