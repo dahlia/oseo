@@ -42,7 +42,16 @@ case $phase in
     ;;
   completed)
     if [[ -d $work && ! -L $work ]]; then
-      find "$work" -mindepth 1 -maxdepth 1 ! -name _temp \
+      # The runner's own action cache stays. Clearing it made every job
+      # re-download its actions, and with four lanes behind one address
+      # codeload answered 429 and failed jobs in their setup step; main run
+      # 38574256610 lost two that way. A link in its place is removed
+      # instead of preserved, so the runner recreates a real directory
+      # rather than writing through whatever a job pointed it at.
+      if [[ -L $work/_actions ]]; then
+        rm -f -- "$work/_actions"
+      fi
+      find "$work" -mindepth 1 -maxdepth 1 ! -name _temp ! -name _actions \
         -exec rm -rf -- {} +
       if [[ -d $job_temp && ! -L $job_temp ]]; then
         find "$job_temp" -mindepth 1 -maxdepth 1 \
