@@ -1,5 +1,5 @@
 /**
- * Generate two optional Mac lanes, `oseo-mac-1` and `oseo-mac-2`, on one
- * machine; the repository variable keeps both off.
+ * Generate four optional Mac lanes, `oseo-mac-1` through `oseo-mac-4`, two
+ * on each of two Mac minis; the repository variable keeps all of them off.
  */
-export const configuredSelfHostedLanes = 2;
+export const configuredSelfHostedLanes = 4;

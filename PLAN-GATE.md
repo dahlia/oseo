@@ -2435,3 +2435,91 @@ attempts would likely move more hosted work onto the Mac. That retune is
 not applied here and would need its own two-attempt measurement. Job
 names, the aggregate's required set, Zig-only eligibility, hosted
 fallback, shard totals, and coverage did not change.
+
+### Second Mac mini (U30)
+
+The maintainer added a second Mac mini on 2026-10-14 and asked for two
+runners on it, so the generator now configures four optional Mac lanes:
+`oseo-mac-1` and `oseo-mac-2` on the first machine, `oseo-mac-3` and
+`oseo-mac-4` on the second. The machine is the same class as the first, an
+Apple M6 with 12 logical CPUs, 16 GiB of memory, and a 228 GiB volume, which
+is the host [U25 evidence](./docs/evidence/u25/README.md) measured, so the
+30 GiB per-account Zig cache cap and its derived 38 GiB two-account ceiling
+carry over unchanged.
+
+Lanes are grouped by machine, two per Mac mini in lane order. The pair
+factors in *tools/macos-job-costs.ts* describe two lanes sharing one
+machine: they are derived from the first machine's measured walls, with the
+family's largest measured factor standing in for the three pairings that
+were never measured. The model therefore applies them within a machine and
+not across machines: a job on lane three competes with lane four and with
+nothing on the first machine. Three lanes on one machine is outside that
+model, and the generator still refuses more than four lanes.
+
+What the four-lane arrangement estimates rather than measures:
+
+ -  The second machine's job walls. `selfHostedJobSeconds` holds measured
+    `oseo-mac-1` medians, and the model reuses them for lanes three and four
+    because the two machines are the same class. No job has run on the new
+    machine.
+ -  The pair factors inside the second machine, reused from the first,
+    which were themselves derived rather than measured for three pairings.
+
+With the current cost tables the derived macOS makespan falls from 77.2 min
+on two lanes to 51.3 min on four, against 93.5 min on one lane; the four
+lanes carry 25 of the 34 macOS jobs, against 19 on two lanes. Over the ten
+measured attempts in *docs/evidence/u25/model/* the derived range falls from
+the two-lane model to 47.8 to 61.3 min. `node tools/macos-lane-report.ts`
+prints both. The measured run below came in above all of these derived
+figures.
+
+Branch run `38551733723` then measured the arrangement at `cb91a995` and
+the projection was optimistic. Attempt 2 ran with warm caches on both
+machines and no other run in flight: every job passed, the run took a
+measured 67.65 min, and its last macOS job ended a measured 67.17 min after
+the run started, against the 51.3 min the model derives. All four lanes
+started within one second of each other. Their measured serial work and
+ends, in minutes after the run started, were 52.0 and 52.7 for
+`oseo-mac-1`, 62.0 and 62.8 for `oseo-mac-2`, 60.3 and 61.0 for
+`oseo-mac-3`, and 66.4 and 67.2 for `oseo-mac-4`.
+
+Two causes separate cleanly in that run, which ran both machines at once:
+
+ -  The second machine is slower per job. Its measured medians against the
+    first machine's in the same attempt are 11.9 against 10.5 min for
+    `native support`, 9.7 against 8.7 for `test262`, and 9.2 against 7.4
+    for the one `native` fixture job on each, a derived 1.11 to 1.24 times.
+    Both machines are the same class, so this is measured behavior without
+    an established cause.
+ -  The cost tables predate the current corpus. `oseo-mac-1` carries the
+    three own-key shards, whose durations are pinned, and it ended a
+    derived 4.5% above its modeled end; the three lanes carrying test262
+    and `native support` jobs ended a derived 28 to 33% above theirs.
+    Refreshing *tools/macos-job-costs.ts* needs its own two-attempt
+    measurement and is not part of this change.
+
+The arrangement still pays for itself. Main runs on two lanes measured
+91.85 to 94.45 min with the macOS tail setting them; this four-lane run
+measured 67.65 min, a derived 24 to 27 min shorter. macOS remains the
+critical path, so the makespan is still what a faster Mac job would move.
+
+Attempt 1 is retained as the cold-cache observation and is not a clean
+attempt: `native support (linux-x86_64-gnu, 1/5)` reached the job's
+90-minute timeout and was cancelled. That job is byte-identical to its
+form at the base commit, every one of the 25 jobs this change rewrites is
+a macOS job, and the same job passed in a measured 32.9 min in attempt 2,
+against 37.3 to 59.2 min in the four preceding main runs. Its headroom
+against the 90-minute timeout is thin, which is a separate matter from
+this change. Attempt 1 also measured the second machine's cold-cache cost:
+`oseo-mac-3` took a measured 81 min of serial work for five jobs there,
+against 60.3 min for the same five in attempt 2.
+
+The main-run observation that motivated the second machine is separate and
+measured: in run `38339956465` every one of the last eight jobs was
+`macos-aarch64`, and the final one, `native support (macos-aarch64, 1/12)`,
+took 13.85 min but started 78 min into the run. The two lanes were
+queue-bound, not duration-bound.
+
+Job names, the aggregate's required set, Zig-only eligibility, hosted
+fallback and its time scale, shard totals, seeds, case budgets, interrupt
+limits, and the own-key shared-lane rule did not change.
