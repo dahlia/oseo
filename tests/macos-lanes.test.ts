@@ -1572,6 +1572,8 @@ test(
     const runners = [
       { label: undefined, fixture: "oseo-mac-1", user: "oseo-runner" },
       { label: "oseo-mac-2", fixture: "oseo-mac-2", user: "oseo-runner2" },
+      { label: "oseo-mac-3", fixture: "oseo-mac-3", user: "oseo-runner3" },
+      { label: "oseo-mac-4", fixture: "oseo-mac-4", user: "oseo-runner4" },
     ];
     for (const { label, fixture, user } of runners) {
       const inherited = Object.fromEntries(
@@ -1605,7 +1607,7 @@ test(
         new RegExp(`org\\.oseo\\.runner\\.${fixture}\\.plist for ${user}`),
       );
     }
-    for (const invalid of ["oseo-mac-0", "oseo-mac-3", "oseo-mac-1 ", "x"]) {
+    for (const invalid of ["oseo-mac-0", "oseo-mac-5", "oseo-mac-1 ", "x"]) {
       const env = {
         ...process.env,
         OSEO_RUNNER_ROOT: "/tmp/oseo-runner",
@@ -1620,7 +1622,7 @@ test(
       ]) {
         const rejected = spawnSync("bash", args, { encoding: "utf8", env });
         assert.equal(rejected.status, 2, `${invalid}: ${args.join(" ")}`);
-        assert.match(rejected.stderr, /oseo-mac-1 or oseo-mac-2/u);
+        assert.match(rejected.stderr, /oseo-mac-1 through oseo-mac-4/u);
       }
     }
   },
