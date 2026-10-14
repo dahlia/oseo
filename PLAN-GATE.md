@@ -636,9 +636,9 @@ Projected cost at the M5c edition denominator
 The tables below preserve the measured ten-shard baseline. U6 raises current
 CI test262 totals to twelve; its tail, fixed-cost, and combined-workload
 comparison is in [U6 evidence](./docs/evidence/u6/README.md).
-The corrected Linux native-support total is five, including a singleton
-own-key shard; the historical rates and tables below retain their source
-run totals.
+The Linux native-support total is seven; the historical rates and tables
+below retain their source run totals, including the earlier five with its
+singleton own-key shard.
 
 This projection extends the measured CI baseline in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md) from its measured
@@ -2534,3 +2534,46 @@ queue-bound, not duration-bound.
 Job names, the aggregate's required set, Zig-only eligibility, hosted
 fallback and its time scale, shard totals, seeds, case budgets, interrupt
 limits, and the own-key shared-lane rule did not change.
+
+### Linux extended property total and timeout (U31)
+
+`native support (linux-x86_64-gnu, 1/5)` reached the job's 90-minute
+timeout in attempt 1 of branch run `38551733723` and was cancelled, which
+failed the run. The job's work is not near that limit on average: the same
+job measured 37.3, 48.7, 59.0, and 59.2 minutes in the four preceding main
+runs and 32.9 minutes in attempt 2. In the clean four-lane main run
+`38593093817` the five shards measured 54, 38, 31, 62, and 55 minutes, so
+the lane sat between a third and two thirds of the limit and one slow
+hosted runner exceeded it.
+
+The measured spread is not explained by the cost model, which puts the five
+shards within 1.04 times of each other, so the model cannot be used to
+rebalance what it already treats as balanced. Raising the total does help,
+because the model's per-shard cost is its widest worker's load rather than
+its weight sum. Modeled maximum shard walls by total, over the 133 files
+that remain after `--exclude-case-sharded`, with the Linux width of four:
+
+| Total | Modeled maximum shard wall |
+| ----: | -------------------------: |
+|     5 |                   47.4 min |
+|     6 |                   41.0 min |
+|     7 |                   38.3 min |
+|     8 |                   38.3 min |
+|     9 |                   38.3 min |
+
+Seven is the knee. Past it the maximum is pinned by the single heaviest
+file, *tests/property/m5-reflect-namespace.property.test.ts* at a measured
+2,299 seconds, which no partition can split; further totals add jobs
+without lowering the maximum. The total is therefore seven, a derived 19%
+below the five-shard maximum.
+
+The job timeout also rises from 90 to 120 minutes. It is a backstop rather
+than the suites' deadline: every property suite carries its own interrupt
+limit and an interrupted run fails on that limit, so a genuinely stuck
+property still fails without the job timeout. Raising it costs wall clock
+only in the rare case that nothing else catches a hang.
+
+Case budgets, seeds, sizes, interrupt limits, the own-key case shards and
+their duration-sum rule, the `native` aggregate's required set, and every
+macOS total are unchanged. The complete input set and every index of the
+new total still run on each matching host.

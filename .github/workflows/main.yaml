@@ -244,7 +244,10 @@ jobs:
       native support (${{ matrix.target }},
       ${{ matrix.shard }}/${{ matrix.total }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -252,23 +255,31 @@ jobs:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 1
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 2
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 3
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 4
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 5
-            total: 5
+            total: 7
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 6
+            total: 7
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 7
+            total: 7
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
@@ -643,7 +654,10 @@ jobs:
     name: native support (macos-aarch64, 7/12)
     runs-on: macos-15
     if: ${{ !cancelled() }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -676,7 +690,10 @@ jobs:
     runs-on: macos-15
     if: ${{ !cancelled() }}
     needs: test_native_support_macos_7
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -864,7 +881,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -902,7 +922,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -941,7 +964,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -979,7 +1005,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1017,7 +1046,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1055,7 +1087,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1183,7 +1218,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r3, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1222,7 +1260,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r3, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1260,7 +1301,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r3, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1459,7 +1503,10 @@ jobs:
       OSEO_PROPERTY_TIME_SCALE: >-
         ${{ contains(needs.mac_ready.outputs.r4, 'self-hosted')
         && '1' || '4' }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
