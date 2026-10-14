@@ -159,7 +159,13 @@ Actions files and job metadata prepared by the runner. It also removes a
 stale own-key duration record if the runner's temp cleanup missed it. At
 completion, the hook clears the work tree and the contents of the
 runner-managed job temp directory, *\_work/\_temp/*, preserving that
-directory itself and registration files. The daemon's
+directory itself, the runner's action cache in *\_work/\_actions/*, and
+registration files. The action cache is preserved so that a job does not
+re-download its actions: clearing it made every job fetch them again, and
+with four lanes behind one address codeload answered 429 and failed two
+jobs of main run `38574256610` in their setup step. A link in the cache's
+place is removed rather than preserved, so the runner recreates a real
+directory instead of writing through a path a job chose. The daemon's
 *oseo-temp/* is separate: the live listener keeps .NET pipes and sockets
 there, and worker and job processes can leave cache files. Hooks never
 clear it. Inspect its size through the health check and remove stale files

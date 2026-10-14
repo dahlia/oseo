@@ -1809,12 +1809,31 @@ test(
       assert.ok(!existsSync(join(temp, "duration.json")));
       const completed = spawnSync("/bin/bash", [cleanup, "completed"], { env });
       assert.equal(completed.status, 0, String(completed.stderr));
-      assert.ok(!existsSync(actions));
+      // The action cache survives so no job re-downloads its actions.
+      assert.ok(existsSync(join(actions, "action.yml")));
       assert.ok(!existsSync(join(runner, "_work", "oseo")));
       assert.ok(existsSync(temp));
       assert.ok(!existsSync(join(temp, "event.json")));
       assert.ok(existsSync(join(runner, "oseo-temp", "listener.pipe")));
       assert.ok(existsSync(join(runner, ".runner")));
+      // A link planted in the cache's place is removed, not preserved, so
+      // the runner recreates a real directory instead of writing through
+      // it. The escape target itself is left alone.
+      const outside = join(root, "outside");
+      mkdirSync(outside);
+      writeFileSync(join(outside, "keep"), "keep");
+      rmSync(actions, { recursive: true });
+      symlinkSync(outside, actions);
+      writeFileSync(join(runner, "_work", "leftover"), "stale");
+      const linkedCache = spawnSync("/bin/bash", [cleanup, "completed"], {
+        env,
+      });
+      assert.equal(linkedCache.status, 0, String(linkedCache.stderr));
+      assert.ok(!existsSync(actions));
+      assert.ok(existsSync(join(outside, "keep")));
+      assert.ok(!existsSync(join(runner, "_work", "leftover")));
+      mkdirSync(actions);
+      writeFileSync(join(actions, "action.yml"), "prepared");
       const trailingSlash = spawnSync("/bin/bash", [cleanup, "started"], {
         env: { ...env, OSEO_RUNNER_ROOT: `${runner}/` },
       });

@@ -2514,6 +2514,17 @@ this change. Attempt 1 also measured the second machine's cold-cache cost:
 `oseo-mac-3` took a measured 81 min of serial work for five jobs there,
 against 60.3 min for the same five in attempt 2.
 
+The first four-lane main run, `38574256610`, then failed in a way two
+lanes had not: `native (macos-aarch64, 2/3)` on `oseo-mac-4` and
+`native (macos-aarch64, 3/3)` on `oseo-mac-2` both failed in their setup
+step, while the hosted `native (macos-aarch64, 1/3)` passed. Their logs
+show three consecutive 429 responses downloading `actions/checkout`. The
+completion hook was clearing the runner's action cache along with the work
+tree, so every self-hosted job re-downloaded its actions; doubling the
+lanes doubled that rate from one address and codeload refused it. The hook
+now preserves *\_work/\_actions/*. The failure was exposed rather than
+introduced by the lane change: the hook had always cleared that directory.
+
 The main-run observation that motivated the second machine is separate and
 measured: in run `38339956465` every one of the last eight jobs was
 `macos-aarch64`, and the final one, `native support (macos-aarch64, 1/12)`,
