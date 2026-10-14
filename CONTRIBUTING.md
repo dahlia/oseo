@@ -544,7 +544,7 @@ set.
 CI now passes `--exclude-case-sharded` to those file shards and runs
 *tests/property/m5-object-own-keys.property.test.ts* in three separate
 case-shard jobs on each native host. All three jobs are required by the
-`native` aggregate. With that exclusion, all five Linux file shards carry
+`native` aggregate. With that exclusion, all seven Linux file shards carry
 remaining files. The local unsharded extended task still runs the file once
 with all cases. The Linux singleton rule still applies to other wrapper
 invocations that include the file without the exclusion flag.

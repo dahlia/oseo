@@ -229,11 +229,20 @@ test("every check name and concurrency policy is preserved", () => {
   assert.deepEqual(
     existingNames,
     [
-      ...nameBaseline.checkNamesObserved,
+      // The Linux extended property total rose from five to seven so that
+      // no shard sits near the job timeout; see PLAN-GATE.md (U31). The
+      // observed baseline keeps the five names that run recorded.
+      ...nameBaseline.checkNamesObserved.filter(
+        (name: string) => !name.startsWith("native support (linux-x86_64-gnu,"),
+      ),
+      ...Array.from(
+        { length: 7 },
+        (_, index) => `native support (linux-x86_64-gnu, ${index + 1}/7)`,
+      ),
       "host C sanitizers (Linux, property)",
     ].toSorted(),
   );
-  assert.equal(names(after).length, 65);
+  assert.equal(names(after).length, 67);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);

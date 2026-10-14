@@ -345,7 +345,10 @@ jobs:
       native support (${{ matrix.target }},
       ${{ matrix.shard }}/${{ matrix.total }})
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 90
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -353,23 +356,31 @@ jobs:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 1
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 2
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 3
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 4
-            total: 5
+            total: 7
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 5
-            total: 5
+            total: 7
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 6
+            total: 7
+          - os: ubuntu-latest
+            target: linux-x86_64-gnu
+            shard: 7
+            total: 7
           - os: macos-15
             target: macos-aarch64
             shard: 1
