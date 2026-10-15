@@ -604,13 +604,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
   if (process.platform !== "win32") {
     const lint = spawnSync(
       "jactionlint",
-      [
-        "--profile",
-        "correctness",
-        "--stdin-filename",
-        ".github/workflows/main.yaml",
-        "-",
-      ],
+      ["--stdin-filename", ".github/workflows/main.yaml", "-"],
       { input: rendered },
     );
     assert.equal(lint.error, undefined);

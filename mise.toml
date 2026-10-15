@@ -63,10 +63,9 @@ depends = [
 
 [tasks."check:actions"]
 description = "Validate GitHub Actions workflows"
-# The correctness profile is jactionlint's actionlint-equivalent set. Its
-# default profile adds security and policy rules that this workflow does
-# not satisfy yet; adopting them is a separate decision.
-run = "jactionlint --profile correctness"
+# .github/jactionlint.yaml selects the profile and the two rules this
+# repository turns off, each with its reason.
+run = "jactionlint"
 
 [tasks."check:anti-slop"]
 description = "Exercise every enabled generic anti-slop rule"

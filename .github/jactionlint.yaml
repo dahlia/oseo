@@ -1,0 +1,35 @@
+# Rule selection for jactionlint. `mise run check:actions` and the macOS
+# lane test both read this file; neither passes --profile, so the profile
+# below is what CI enforces.
+#
+# The default profile adds jactionlint's security and policy rules to the
+# correctness set that actionlint covered. Two of those rules are turned
+# off here, each for a reason that is a property of this repository rather
+# than a judgment about the rule.
+profile: default
+
+rules:
+  # Every finding is in .github/workflows/main.yaml, which
+  # tools/generate-macos-lanes.ts writes. The template calls format() with
+  # matrix.target, matrix.shard and matrix.total, which are not literals;
+  # the generator binds a lane's matrix into the call and only then are
+  # they. Folding the bound call into its string would have to be repeated
+  # in the lane test, which compares generated steps against the template's
+  # steps under the same binding, so the rule would cost more coupling than
+  # it removes. Hand-written workflow code is not exempt from it in
+  # practice, because there is none left to write here.
+  obfuscation: off
+
+  # The six actions this repository uses are all referenced by major tag,
+  # and there is no Dependabot configuration to raise a pinned digest. A
+  # single commit-pinned action among five tagged ones would be
+  # inconsistent without being safer, and pinning all six would mean
+  # bumping each one by hand. Revisit this together: adopt digests and
+  # Dependabot, or neither.
+  unpinned-uses: off
+
+self-hosted-runner:
+  # The generated workflow selects the Mac lanes through
+  # fromJSON(needs.mac_ready.outputs.rN), which this linter cannot resolve
+  # statically, so no label needs declaring here.
+  labels: []
