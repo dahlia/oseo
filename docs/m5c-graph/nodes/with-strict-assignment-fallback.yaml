@@ -25,5 +25,5 @@ delivers: "Owns exactly 12 observed paths: the original
   independently. Already-reviewed paths may move only toward pass."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
