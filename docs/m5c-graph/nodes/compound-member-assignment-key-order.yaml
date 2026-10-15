@@ -28,5 +28,5 @@ delivers: "Repairs compound member assignment base[prop] op= expr for exactly
   only toward pass. Batch 12 owns the 33 paths' first canonical admission
   as actually observed passes."
 dependencies: []
-landed: false
+landed: true
 status: ready

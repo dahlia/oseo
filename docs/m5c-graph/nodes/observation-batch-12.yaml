@@ -11,4 +11,4 @@ dependencies:
   - observation-batch-plan
   - with-strict-assignment-fallback
 landed: false
-status: blocked
+status: ready
