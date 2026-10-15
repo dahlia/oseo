@@ -76,7 +76,7 @@ interface NameBaseline {
 
 const template = readFileSync("tools/main-workflow.template.yaml", "utf8");
 const generated = generateMacosWorkflow(template);
-// SAFETY: The checked-in workflow schema is validated by actionlint.
+// SAFETY: The checked-in workflow schema is validated by jactionlint.
 const before = parse(template) as Workflow;
 // SAFETY: Generation retains the checked-in workflow schema.
 const after = parse(generated) as Workflow;
@@ -536,7 +536,7 @@ test("committed workflow matches generator output exactly", () => {
 });
 
 test("zero self-hosted lanes route every macOS job to hosted", () => {
-  // SAFETY: The generated workflow schema is checked by actionlint.
+  // SAFETY: The generated workflow schema is checked by jactionlint.
   const zero = parse(generated) as Workflow;
   assert.equal(zero.jobs.mac_ready, undefined);
   for (const job of macosJobs()) {
@@ -603,14 +603,20 @@ test("one extra lane retains every job and aggregate dependency", () => {
   const rendered = generateMacosWorkflow(template, 1);
   if (process.platform !== "win32") {
     const lint = spawnSync(
-      "actionlint",
-      ["-stdin-filename", ".github/workflows/main.yaml", "-"],
+      "jactionlint",
+      [
+        "--profile",
+        "correctness",
+        "--stdin-filename",
+        ".github/workflows/main.yaml",
+        "-",
+      ],
       { input: rendered },
     );
     assert.equal(lint.error, undefined);
     assert.equal(lint.status, 0, lint.stderr.toString());
   }
-  // SAFETY: actionlint validates this generated workflow schema.
+  // SAFETY: jactionlint validates this generated workflow schema.
   const workflow = parse(rendered) as Workflow;
   for (const planned of macosJobs().filter(
     (entry) => entry.family === "test" || entry.family === "host C sanitizers",
@@ -1099,7 +1105,7 @@ test("four Mac lanes route each label with its own hosted fallback", () => {
     );
   }
   const rendered = readFileSync(".github/workflows/main.yaml", "utf8");
-  // SAFETY: actionlint validates this generated workflow schema.
+  // SAFETY: jactionlint validates this generated workflow schema.
   const workflow = parse(rendered) as Workflow;
   assert.deepEqual(
     names(workflow).filter((name) => name !== "macOS self-hosted availability"),
@@ -1154,7 +1160,7 @@ test("hosted fallback widens only Mac-lane property deadlines", () => {
     hostedFallbackTimeScale >= selfHostedFamilySpeedRatios["native support"]!,
   );
   const rendered = readFileSync(".github/workflows/main.yaml", "utf8");
-  // SAFETY: actionlint validates this generated workflow schema.
+  // SAFETY: jactionlint validates this generated workflow schema.
   const workflow = parse(rendered) as Workflow;
   const lanes = macosLanes(configuredSelfHostedLanes);
   let scaled = 0;
@@ -1194,7 +1200,7 @@ test("hosted fallback widens only Mac-lane property deadlines", () => {
       job.id,
     );
   }
-  // SAFETY: actionlint validates this generated workflow schema.
+  // SAFETY: jactionlint validates this generated workflow schema.
   const one = parse(generateMacosWorkflow(template, 1)) as Workflow;
   for (const job of macosLanes(1)[5]!) {
     assert.deepEqual(

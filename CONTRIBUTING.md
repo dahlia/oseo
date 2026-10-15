@@ -100,7 +100,7 @@ dependencies that duplicate this provider.
 
 The workspace uses this toolchain:
 
- -  [actionlint] for GitHub Actions workflow validation;
+ -  [jactionlint] for GitHub Actions workflow validation;
  -  [aube] for JavaScript package installation and
     workspace management;
  -  [Oxfmt] for JavaScript, TypeScript, and data-file formatting;
@@ -134,7 +134,7 @@ different package manager to modify dependency state. Do not hand-edit generated
 lockfiles.
 
 [mise]: https://mise.jdx.dev/
-[actionlint]: https://github.com/rhysd/actionlint
+[jactionlint]: https://github.com/jdx/jactionlint
 [aube]: https://aube.jdx.dev/
 [Oxfmt]: https://oxc.rs/docs/guide/usage/formatter
 [Oxlint]: https://oxc.rs/docs/guide/usage/linter

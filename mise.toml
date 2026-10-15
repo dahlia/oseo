@@ -9,7 +9,8 @@ postinstall = "mise run install-hooks"
 [tools]
 "aqua:dahlia/hongdown" = "0.5.3"
 "aqua:nushell/nushell" = "0.116.0"
-actionlint = "1.7.12"
+# The mise registry has no jactionlint entry yet, so name the backend.
+"ubi:jdx/jactionlint" = "2.1.0"
 aube = "2.5.0"
 deno = "2.9.7"
 node = "24.21.0"
@@ -62,7 +63,10 @@ depends = [
 
 [tasks."check:actions"]
 description = "Validate GitHub Actions workflows"
-run = "actionlint"
+# The correctness profile is jactionlint's actionlint-equivalent set. Its
+# default profile adds security and policy rules that this workflow does
+# not satisfy yet; adopting them is a separate decision.
+run = "jactionlint --profile correctness"
 
 [tasks."check:anti-slop"]
 description = "Exercise every enabled generic anti-slop rule"
