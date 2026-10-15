@@ -7,18 +7,19 @@
  *
  * The table has two vintages, which a reader must not mix up:
  *
- *  -  Sixteen entries were refreshed from six runs that observed the job
- *     on a hosted runner: main runs 38688027859, 38681888021,
- *     38606086453, 38593093817 and 38574256610, and attempt 2 of branch
- *     run 38551733723. A trailing count below six gives the number of
- *     hosted observations, and an even count uses the mean of the two
- *     middle ones. Every refreshed entry with five or six observations
- *     moved by a factor of 0.94 to 1.44; the single-observation entries
- *     moved by 1.19 to 1.83 and are the least trustworthy, because a job
- *     that normally runs on a Mac lane fell back to hosted exactly once,
- *     possibly under contention.
- *  -  Twenty-one entries are marked `retained`. Four Mac lanes now carry
- *     them in every run, so none of the six runs observed them hosted and
+ *  -  Twenty-one entries were refreshed from eight run attempts that
+ *     observed the job on a hosted runner: main runs 38724558390,
+ *     38707734330, 38688027859, 38681888021, 38606086453, 38593093817
+ *     and 38574256610, and attempt 2 of branch run 38551733723. A
+ *     trailing count below eight gives the number of hosted
+ *     observations, and an even count uses the mean of the two middle
+ *     ones. Run 38724558390 then measured the refreshed entries at 0.79
+ *     to 1.11 times their value and the retained ones at 0.95 to 1.86,
+ *     which is why the two vintages must not be read as equivalent.
+ *     Single-observation entries remain the least trustworthy: a job
+ *     that normally runs on a Mac lane was placed hosted once.
+ *  -  Sixteen entries are marked `retained`. Four Mac lanes carry them in
+ *     every run, so none of the eight attempts observed them hosted and
  *     their hosted median cannot be refreshed from CI as it stands. They
  *     keep the median of the earlier seven attempts: all-hosted runs
  *     37121778924 and 37167895777, branch run 37194069657 attempts 1 and
@@ -27,10 +28,12 @@
  *
  * The refreshed entries rose against their retained neighbours, so the
  * table is likely to understate the retained ones and to place them on a
- * Mac lane more readily than it should. Closing that gap needs two
- * all-hosted runs, which [U29 evidence] measured at 159.0 to 197.5
- * minutes each; it is not worth that until a placement decision turns on
- * it. The earlier basis replaced main-run 36516215200 walls and derived
+ * Mac lane more readily than it should. Dedicated all-hosted runs are not
+ * needed to close that gap: raising an entry moves its job between the
+ * hosted and Mac lanes, and each run that places one hosted yields the
+ * observation that corrects it, which is how five retained entries were
+ * refreshed here. The earlier basis replaced main-run 36516215200 walls
+ * and derived
  * own-key and native-support planning weights, several of which lay below
  * every later observation of their job.
  */
@@ -40,19 +43,22 @@ interface MacosJobCosts {
 
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
-  "host C sanitizers (macOS, native)": 2456,
-  "host C sanitizers (macOS, property)": 2058,
-  "native support (macos-aarch64, 2/12)": 2042, // 1
+  "host C sanitizers (macOS, native)": 2492,
+  "test262 (macos-aarch64, 12/12)": 2212, // 1
+  "host C sanitizers (macOS, property)": 2070,
   "test262 (macos-aarch64, 2/12)": 2033, // 5
+  "test262 (macos-aarch64, 11/12)": 1976, // 2
   "native support (macos-aarch64, 1/12)": 1940, // retained
-  "test262 (macos-aarch64, 11/12)": 1894, // 1
-  "test262 (macos-aarch64, 4/12)": 1870, // 1
-  "native support (macos-aarch64, 4/12)": 1713, // 1
+  "native support (macos-aarch64, 2/12)": 1924, // 2
+  "test262 (macos-aarch64, 3/12)": 1906, // 1
   "native support (macos-aarch64, 6/12)": 1702, // 5
-  "test262 (macos-aarch64, 5/12)": 1692,
-  "test262 (macos-aarch64, 6/12)": 1540, // retained
+  "test262 (macos-aarch64, 4/12)": 1690, // 2
+  "native support (macos-aarch64, 4/12)": 1672, // 2
+  "test262 (macos-aarch64, 5/12)": 1665, // 7
   "native support (macos-aarch64, 7/12)": 1512,
-  "test262 (macos-aarch64, 8/12)": 1500, // retained
+  "test262 (macos-aarch64, 8/12)": 1507, // 1
+  "native support (macos-aarch64, 8/12)": 1499, // 1
+  "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
   "native support (macos-aarch64, 9/12)": 1330, // retained
   "native support (macos-aarch64, 3/12)": 1323, // retained
@@ -63,20 +69,17 @@ export const macosJobCosts: MacosJobCosts = {
   "native support (macos-aarch64, 10/12)": 1270, // retained
   "test262 (macos-aarch64, 10/12)": 1225, // retained
   "test262 (macos-aarch64, 7/12)": 1200, // retained
-  "native support (macos-aarch64, 8/12)": 1194, // retained
-  "test262 (macos-aarch64, 12/12)": 1190, // retained
-  "test262 (macos-aarch64, 3/12)": 1110, // retained
+  "test (macos-latest, node, 3/4)": 1097, // 3
   "native (macos-aarch64, 1/3)": 1088, // 5
-  "test (macos-latest, node, 2/4)": 1066, // 1
-  "test (macos-latest, node, 1/4)": 1057, // 1
-  "test (macos-latest, node, 3/4)": 1037, // 1
+  "test (macos-latest, node, 2/4)": 1066, // 3
+  "test (macos-latest, node, 1/4)": 1056, // 3
   "native (macos-aarch64, 3/3)": 1014, // retained
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
   "native (macos-aarch64, 2/3)": 917, // retained
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
-  "test (macos-latest, node, 4/4)": 822, // 1
+  "test (macos-latest, node, 4/4)": 822, // 3
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
-  "test (macos-latest, deno)": 111,
+  "test (macos-latest, deno)": 114,
 };
 
 /**

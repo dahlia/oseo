@@ -2635,13 +2635,25 @@ The four Node.js shards now land on four different hosted lanes instead of
 bunching, which is the placement error that left two of them finishing
 last in `38688027859`.
 
-Twenty-one entries could not be refreshed. Four Mac lanes carry them in
-every run, so no recent run observed them hosted. They keep the earlier
-seven-attempt median and are marked `retained` in the table. Since every
-well-observed refresh rose, the table now probably understates them, and
-the model will move a retained job to a Mac lane more readily than it
-should. Two all-hosted runs would close that gap at a measured 159.0 to
-197.5 minutes each; that is not spent until a decision turns on it.
+Main run `38724558390` then measured the first refresh against reality
+and separated the two vintages cleanly. The refreshed entries came in at
+0.79 to 1.11 times their modeled weight: the two macOS sanitizers at 1.02
+and 1.08, `native support (macos-aarch64, 7/12)` at 1.02, the Deno job at
+0.99, and the four Node.js shards at 0.79 to 1.11. The retained entries
+came in at 0.95 to 1.86, with `test262 (macos-aarch64, 12/12)` at 1.86 and
+`test262 (macos-aarch64, 3/12)` at 1.72.
+
+That run also explains its own 75.63-minute wall. Hosted lane three held
+`test262 (macos-aarch64, 3/12)`, modeled at 1,110 seconds and measured at
+1,906, and the 13.3-minute overrun pushed the Node.js shard behind it to
+finish last at 75.6 minutes.
+
+Dedicated all-hosted runs turn out to be unnecessary. Raising an entry
+moves its job between the hosted and the Mac lanes, so each run that
+places a retained job hosted yields the observation that corrects it. Five
+retained entries were refreshed that way from `38724558390` and
+`38707734330`, leaving sixteen. The refresh therefore continues
+incrementally, and the derived four-lane makespan is 65.8 minutes.
 
 `selfHostedJobSeconds` is deliberately untouched. Its values are one-lane
 Mac walls, measured when a single lane existed, and the model multiplies
