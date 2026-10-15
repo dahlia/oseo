@@ -2652,8 +2652,36 @@ Dedicated all-hosted runs turn out to be unnecessary. Raising an entry
 moves its job between the hosted and the Mac lanes, so each run that
 places a retained job hosted yields the observation that corrects it. Five
 retained entries were refreshed that way from `38724558390` and
-`38707734330`, leaving sixteen. The refresh therefore continues
-incrementally, and the derived four-lane makespan is 65.8 minutes.
+`38707734330`, and three more from `38734773531`, leaving thirteen. The
+refresh continues incrementally, and the derived four-lane makespan is
+66.3 minutes.
+
+The refresh is converging on the model rather than on the wall. Run
+`38734773531` measured 76.42 minutes against a derived 65.8, and its
+refreshed entries came in at 0.80 to 1.22 times their weight while the
+retained ones came in at 1.13 to 1.62.
+
+The hosted lanes bound the wall, but not because a fixed set of jobs is
+pinned to them. Only six of the thirty-seven macOS jobs cannot run on a
+Mac lane: the four Node.js shards, the Deno job, and the sanitizer
+property suite. The four Mac lanes are saturated at twenty-three jobs, so
+eight eligible jobs overflow onto the hosted lanes, and those lanes carry
+a modeled 293.1 minutes across five of them.
+
+Reading that total as a floor of 58.6 minutes would be wrong in the way
+an earlier draft of this section was wrong. Overflow is not pinned work.
+Making one more job Mac-eligible does not take its weight off the hosted
+lanes; it lets a different eligible job backfill. Allowing the Apple
+clang `native` sanitizer suite onto the lanes was tried and measured in
+the model: hosted work stayed at fourteen jobs and 307.5 minutes, and the
+derived makespan moved from 66.3 to 67.1 minutes. The change was dropped,
+along with the estimated family ratio and the nine estimated pair factors
+it needed.
+
+What the wall responds to is therefore total macOS capacity against total
+macOS work, not which jobs may run where. A third Mac mini, two more
+lanes, would move overflow off the slower hosted lanes; so would less
+macOS work. Both are decisions beyond this section.
 
 `selfHostedJobSeconds` is deliberately untouched. Its values are one-lane
 Mac walls, measured when a single lane existed, and the model multiplies
