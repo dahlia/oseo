@@ -2519,11 +2519,20 @@ lanes had not: `native (macos-aarch64, 2/3)` on `oseo-mac-4` and
 `native (macos-aarch64, 3/3)` on `oseo-mac-2` both failed in their setup
 step, while the hosted `native (macos-aarch64, 1/3)` passed. Their logs
 show three consecutive 429 responses downloading `actions/checkout`. The
-completion hook was clearing the runner's action cache along with the work
-tree, so every self-hosted job re-downloaded its actions; doubling the
-lanes doubled that rate from one address and codeload refused it. The hook
-now preserves *\_work/\_actions/*. The failure was exposed rather than
-introduced by the lane change: the hook had always cleared that directory.
+failure was exposed rather than introduced by the lane change: nothing
+about action downloads changed, but doubling the lanes doubled how many
+self-hosted jobs start at once from one address, and three overlapping
+runs multiplied it again.
+
+Preserving the completion hook's deletion of *\_work/\_actions/* was tried
+as the remedy and measured as ineffective. With the cache preserved, main
+run `38688027859` still logged four action downloads in a late
+`oseo-mac-4` job and four in the last `oseo-mac-1` job: the runner fetches
+its actions per job regardless of what the hook leaves behind. The
+preservation was reverted, since it bought nothing and loosened what one
+job can leave for the next. No further remedy is applied: the runner
+already retries a 429 three times with backoff, and the condition has not
+recurred in the four runs since.
 
 The main-run observation that motivated the second machine is separate and
 measured: in run `38339956465` every one of the last eight jobs was
