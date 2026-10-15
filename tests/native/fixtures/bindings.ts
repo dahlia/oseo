@@ -1157,29 +1157,48 @@ holder.value = 0;
 const shortResult = target()[key()] &&= right();
 console.log("short", shortResult, holder.value, order);
 
-let conversionCount = 0;
-let conversionOrder = "";
-const changingKey = {
-  [Symbol.toPrimitive]: function () {
-    conversionCount += 1;
-    conversionOrder += "key" + conversionCount + " ";
-    return conversionCount === 1 ? "read" : "write";
+// A nullish base throws TypeError from GetValue's ToObject before the key
+// is converted or the right operand runs. The single-conversion write of
+// a non-nullish base is a V8 reference discrepancy, so it is checked
+// against fixed expected values in m5-compound-assignment.property.test.ts.
+let nullishOrder = "";
+const nullishKey = {
+  toString() {
+    nullishOrder += "key ";
+    return "value";
   },
 };
-const changingHolder = { read: 1, write: 9 };
-function conversionRight() {
-  conversionOrder += "right ";
-  return 2;
+function nullishRight() {
+  nullishOrder += "right ";
+  return 1;
 }
-const conversionResult = changingHolder[changingKey] += conversionRight();
-console.log(
-  "conversion",
-  conversionResult,
-  changingHolder.read,
-  changingHolder.write,
-  conversionCount,
-  conversionOrder,
-);
+function nullishCompound(base) {
+  const attempts = [
+    () => base[nullishKey] *= nullishRight(),
+    () => base[nullishKey] /= nullishRight(),
+    () => base[nullishKey] %= nullishRight(),
+    () => base[nullishKey] += nullishRight(),
+    () => base[nullishKey] -= nullishRight(),
+    () => base[nullishKey] <<= nullishRight(),
+    () => base[nullishKey] >>= nullishRight(),
+    () => base[nullishKey] >>>= nullishRight(),
+    () => base[nullishKey] &= nullishRight(),
+    () => base[nullishKey] ^= nullishRight(),
+    () => base[nullishKey] |= nullishRight(),
+    () => base[nullishKey] **= nullishRight(),
+  ];
+  for (const attempt of attempts) {
+    try {
+      attempt();
+      nullishOrder += "none ";
+    } catch (error) {
+      nullishOrder += (error instanceof TypeError ? "type" : "other") + " ";
+    }
+  }
+}
+nullishCompound(null);
+nullishCompound(undefined);
+console.log("nullish", nullishOrder);
 
 let logicalConversionCount = 0;
 let logicalConversionOrder = "";

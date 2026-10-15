@@ -120,17 +120,17 @@ try {
   console.log(error.message, abruptUpdateOrder);
 }
 
+// The observable key-conversion form of this BigInt compound member
+// subject is a recorded V8 discrepancy: V8 converts the key again before
+// PutValue. m5-compound-assignment.property.test.ts keeps it verbatim with
+// fixed expected values. Here the key expression is observable and its
+// string result converts without an observable step.
 let order = "";
 const holder = { first: 4n, second: 100n };
-const key = {
-  [Symbol.toPrimitive]() {
-    order += "key ";
-    return order === "key " ? "first" : "second";
-  },
-};
+function key() { order += "key "; return "second"; }
 function object() { order += "object "; return holder; }
 function right() { order += "right "; return 3n; }
-console.log(object()[key] += right(), holder.second, order);
+console.log(object()[key()] += right(), holder.second, order);
 
 let abruptOrder = "";
 const abruptHolder = { value: 8n };

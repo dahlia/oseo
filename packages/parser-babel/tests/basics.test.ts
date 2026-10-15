@@ -667,6 +667,78 @@ test("preserves compound assignment references in owned IR", () => {
   assert.equal(mir.match(/property-set property-set/gu)?.length, 1);
 });
 
+test("converts an arithmetic compound member key once", () => {
+  const operators = [
+    "*",
+    "/",
+    "%",
+    "+",
+    "-",
+    "<<",
+    ">>",
+    ">>>",
+    "&",
+    "^",
+    "|",
+    "**",
+  ];
+  for (const operator of operators) {
+    const result = compileSource(babelFrontend, {
+      source:
+        "let base = null; let key = 'item';\n" +
+        "function right() { return 1; }\n" +
+        `base[key] ${operator}= right();\n`,
+      sourceId: "compound-member-key.js",
+    });
+    assert.deepEqual(result.diagnostics, [], operator);
+    assert.ok(result.mir != null);
+    const mir = printMir(result.mir);
+    const lines = mir.split("\n");
+    const index = (pattern: RegExp) => {
+      const found = lines.findIndex((line) => pattern.test(line));
+      assert.ok(found >= 0, `${operator}: ${pattern}`);
+      return found;
+    };
+    // GetValue applies ToObject before ToPropertyKey, converts the key
+    // once, and reads before the right operand; PutValue reuses the key.
+    assert.equal(mir.match(/= property-key /gu)?.length, 1, operator);
+    const coercible = index(/= object-coercible /u);
+    const key = index(/= property-key /u);
+    const read = index(/= property-get /u);
+    const right = index(/= read right /u);
+    const write = index(/= property-set /u);
+    assert.ok(coercible < key && key < read && read < right, operator);
+    assert.ok(right < write, operator);
+    const keyId = /%(\d+) = property-key /u.exec(lines[key] ?? "")?.[1];
+    const objectId = /%(\d+) = object-coercible /u.exec(
+      lines[coercible] ?? "",
+    )?.[1];
+    assert.match(
+      lines[write] ?? "",
+      new RegExp(`property-set %${objectId}, %${keyId}, `, "u"),
+    );
+  }
+});
+
+test("keeps logical compound member key conversion unchanged", () => {
+  for (const operator of ["&&", "||", "??"]) {
+    const result = compileSource(babelFrontend, {
+      source:
+        "let base = null; let key = 'item';\n" +
+        "function right() { return 1; }\n" +
+        `base[key] ${operator}= right();\n`,
+      sourceId: "logical-member-key.js",
+    });
+    assert.deepEqual(result.diagnostics, [], operator);
+    assert.ok(result.mir != null);
+    const mir = printMir(result.mir);
+    // This repair covers arithmetic operators only; logical assignment
+    // retains its earlier read and write conversions.
+    assert.equal(mir.match(/= property-key /gu)?.length, 2, operator);
+    assert.equal(mir.match(/= object-coercible /gu), null, operator);
+  }
+});
+
 test("preserves prefix and postfix update references in owned IR", () => {
   const result = compileSource(babelFrontend, {
     source:

@@ -330,4 +330,31 @@ measurements or file wall times. Replace both entries with actual native
 CI case sums when available, including a fresh macOS observation. This
 update changes no case budgets, seeds, deadlines or shard totals.
 
+The `compound-member-assignment-key-order` node adds slot `0x60000c01` and
+fixed native cases to *tests/property/m5-compound-assignment.property.test.ts*.
+A local Linux single-file extended run on 2026-10-15, with the extended task's
+`OSEO_PROPERTY_RUN_SCALE`, `OSEO_PROPERTY_SEED`, and `OSEO_PROPERTY_SIZE`
+values, first measured 482.918 seconds across its seven registrations, of
+which the five native registrations summed 482.916 seconds; that set the
+earlier 483-second weight. Within a later local Linux
+`mise run test:property:extended` on a candidate tree based on main
+`6214c68c` with this node's uncommitted repair applied, all seven
+registrations of this file then present passed, and its five native case
+durations summed 599.532 seconds while the host ran under CPUQuota=1400%,
+nice 5 and MemoryMax=48G; that historical measurement first set the
+600-second weight. The node later moved the original BigInt observable-key
+case from *tests/native/fixtures/bigint.ts* into this file as an eighth,
+native fixed registration, with a reference-only console prelude. Within a
+later local Linux `mise run test:property:extended` on a candidate tree based
+on main `9e78357d` with the uncommitted repair (raw diff `03311b88`), all
+eight registrations of this file passed, and its six native case durations
+summed 599.822 seconds under the same CPUQuota=1400%, nice 5 and
+MemoryMax=48G. These record this file's measurements only, not the outcome
+of either whole run. The Linux weight stays 600 seconds, rounded up from the
+later sum; the two model-only registrations, 0.833 and 0.672 milliseconds,
+are not counted.
+The macOS weight is also 600, an explicitly unmeasured provisional estimate
+reusing the Linux value. Neither is a CI measurement, a file wall time, or an
+isolated-file latency; replace both with native CI case sums when available.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906
