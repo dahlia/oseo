@@ -233,7 +233,15 @@ test("every check name and concurrency policy is preserved", () => {
       // no shard sits near the job timeout; see PLAN-GATE.md (U31). The
       // observed baseline keeps the five names that run recorded.
       ...nameBaseline.checkNamesObserved.filter(
-        (name: string) => !name.startsWith("native support (linux-x86_64-gnu,"),
+        (name: string) =>
+          !name.startsWith("native support (linux-x86_64-gnu,") &&
+          name !== "test (macos-latest, node)",
+      ),
+      // The hosted macOS Node.js suite is partitioned by Node's own
+      // --test-shard; see PLAN-GATE.md (U32).
+      ...Array.from(
+        { length: 4 },
+        (_, index) => `test (macos-latest, node, ${index + 1}/4)`,
       ),
       ...Array.from(
         { length: 7 },
@@ -242,7 +250,7 @@ test("every check name and concurrency policy is preserved", () => {
       "host C sanitizers (Linux, property)",
     ].toSorted(),
   );
-  assert.equal(names(after).length, 67);
+  assert.equal(names(after).length, 70);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -294,8 +302,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 34);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 34);
+  assert.equal(jobs.length, 37);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 37);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -323,11 +331,13 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
     }
   }
   // Hosted medians of seven measured run attempts, all on hosted lanes.
+  // Splitting the hosted macOS Node.js job into four shards left its total
+  // unchanged but packs less evenly across five lanes than one job did.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    9135,
+    9272,
   );
 });
 
@@ -553,8 +563,8 @@ test("lane-count preview leaves the committed workflow alone", () => {
 test("one extra lane retains every job and aggregate dependency", () => {
   const lanes = macosLanes(1);
   assert.equal(lanes.length, 6);
-  assert.equal(lanes.flat().length, 34);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 34);
+  assert.equal(lanes.flat().length, 37);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 37);
   assert.ok(lanes[5]!.length > 0);
   assert.deepEqual(
     lanes[5]!
@@ -937,7 +947,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 5609);
+  assert.equal(Math.round(modeled), 5472);
 });
 
 test("faster native support work uses additional capacity", () => {
@@ -995,8 +1005,8 @@ test("availability decides the second machine's lanes too", async () => {
 test("three Mac lanes keep every job and the own-key lane", () => {
   const lanes = macosLanes(3);
   assert.equal(lanes.length, 8);
-  assert.equal(lanes.flat().length, 34);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 34);
+  assert.equal(lanes.flat().length, 37);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 37);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   assert.deepEqual(
     lanes
@@ -1069,8 +1079,8 @@ test("four Mac lanes route each label with its own hosted fallback", () => {
   assert.equal(configuredSelfHostedLanes, 4);
   const lanes = macosLanes(4);
   assert.equal(lanes.length, 9);
-  assert.equal(lanes.flat().length, 34);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 34);
+  assert.equal(lanes.flat().length, 37);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 37);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   // One readiness output, so one runner class, for the shared deadline.
   assert.deepEqual(

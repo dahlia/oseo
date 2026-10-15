@@ -2577,3 +2577,32 @@ Case budgets, seeds, sizes, interrupt limits, the own-key case shards and
 their duration-sum rule, the `native` aggregate's required set, and every
 macOS total are unchanged. The complete input set and every index of the
 new total still run on each matching host.
+
+### Hosted macOS Node.js partition (U32)
+
+In the clean four-lane main run `38593093817` the longest single job was
+`test (macos-latest, node)` at a measured 63 minutes, which ended 63
+minutes into a 64.42-minute run. The same task measured 34 minutes on
+`ubuntu-latest` and 6 on `windows-latest`, where no native test can run
+because the host is not a supported native execution environment. The cost
+is therefore native build and execution on a hosted macOS runner, the work
+the Mac lanes exist to avoid, in the one macOS job the lanes deliberately
+leave hosted for image coverage.
+
+The job is now four, partitioned by Node's own `--test-shard`. That flag
+partitions the files Node discovers, so the union of the shards equals the
+unsharded set by construction and no file can be missed by a reimplemented
+discovery rule. It assigns files by position rather than cost, so the four
+will not be equal; their weights in *tools/macos-job-costs.ts* are the
+single measured 2,772 seconds divided by four and must be refreshed from a
+measured run.
+
+Four is chosen because a quarter of 63 minutes is about 16, already below
+the Linux property shards at a modeled 38.3 minutes and the Mac lanes at a
+measured 47 to 56. Further shards would not shorten the run while other
+constraints stand, and each one costs a job.
+
+The suites, their budgets, and the local unsharded `mise run test:node`
+gate are unchanged; `test:node` gained only the ability to forward the
+flag. The `native` aggregate's required set does not include this job and
+does not change.
