@@ -7,6 +7,22 @@ scope:
     mutation during lookup, and abrupt completion order. This family owns the
     dynamic lookup contract; intrinsic unscopables objects remain with their
     owning built-in families."
+  - "Simple, compound, logical, and update assignments retain the selected
+    Object Environment Record across RHS evaluation and coercion. Strict
+    SetMutableBinding throws ReferenceError if HasProperty now misses;
+    non-strict SetMutableBinding still writes the retained object. Class
+    code, including a heritage operand, computed key, static block, static
+    field initializer, or static method, is strict even inside sloppy code
+    and applies the same strict checks."
+  - "Strict all-miss simple, destructuring, for-in, and for-of writes to
+    the runtime-owned call targets console, setTimeout, and clearTimeout
+    remain source-located rejections: their hidden cells cannot model
+    strict PutValue."
+  - "Existing array/object assignment leaves and for-in/of binding heads
+    with a real lexical fallback preserve strict SetMutableBinding when
+    object lookup selects a binding deleted by unscopables. Initial misses
+    still write the lexical fallback. Pattern preparation order remains
+    outside this unit and is tracked as a separate source-based concern."
 owners:
   - PLAN-M5.md
 evidence:
@@ -16,28 +32,33 @@ evidence:
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/array-prototype-index-search.ts
       - tests/property/m5-array-prototype-index-search.property.test.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
   forced-collection:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/array-prototype-index-search.ts
       - tests/property/m5-array-prototype-index-search.property.test.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
   generated:
     status: covered
     references:
       - tests/property-seeds.yaml
       - tests/property/m5-array-prototype-index-search.property.test.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
   guard-fallback:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/array-prototype-index-search.ts
       - tests/property/m5-array-prototype-index-search.property.test.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
   specialization:
     status: covered
     references:
@@ -45,6 +66,7 @@ evidence:
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/array-prototype-index-search.ts
       - tests/property/m5-array-prototype-index-search.property.test.ts
+      - tests/property/m5-globalthis-binding.property.test.ts
   standards:
     status: covered
     references:

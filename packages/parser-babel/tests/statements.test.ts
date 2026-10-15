@@ -1078,16 +1078,17 @@ test("reads read-first with fallback writes from the global object", () => {
     assert.match(hir, /"missing" in %b\d+\(\*intrinsic global object\*\)/u);
     assert.doesNotMatch(hir, /\*with fallback/u, source);
   }
-  // Strict code keeps the all-miss write outside the profile, because a
-  // strict PutValue must throw when the property disappears in between.
-  const strict = compileSource(babelFrontend, {
-    source: "with ({}) { (function () { 'use strict'; missing += 1; })(); }",
-    sourceId: "strict-with-read-first.ts",
-  });
-  assert.match(
-    strict.diagnostics[0]?.message ?? "",
-    /Assigning global-object name 'missing' through a with fallback/u,
-  );
+  // Strict writes retain an explicit missing-binding throw for both
+  // the selected object environment and the global fallback.
+  for (const operation of ["missing = 1", "missing += 1", "missing++"]) {
+    const strict = compileSource(babelFrontend, {
+      source: `with ({}) { (function () { 'use strict'; ${operation}; })(); }`,
+      sourceId: "strict-with-write.ts",
+    });
+    assert.deepEqual(strict.diagnostics, [], operation);
+    assert.ok(strict.mir != null);
+    assert.match(printMir(strict.mir), /read \*missing intrinsic:missing\*/u);
+  }
   // A runtime-owned name still reads its hidden fallback cell, which
   // throws before any write, so the same operations stay admitted.
   for (const operation of ["console++", "--console", "console += 1"]) {
@@ -1152,21 +1153,37 @@ test("rejects a strict write to a with fallback binding", () => {
       source,
     );
   }
-  // A global-object name has no hidden cell; its strict all-miss write
-  // would reach the global object's property, which stays outside the
-  // profile through a with fallback.
-  const global = compileSource(babelFrontend, {
-    source:
+  // The other runtime-owned call targets share the same residual
+  // rejection, including a strict class heritage operand.
+  for (const [name, source] of [
+    [
+      "setTimeout",
       "with ({}) {\n" +
-      '  const f = () => { "use strict"; missing = 1; };\n' +
-      "}",
-    sourceId: "with-strict-global-write.ts",
-  });
-  assert.equal(global.diagnostics[0]?.code, "OSEO1001");
-  assert.match(
-    global.diagnostics[0]?.message ?? "",
-    /Assigning global-object name 'missing' through a with fallback/u,
-  );
+        '  function f() { "use strict"; ({ t: setTimeout } = {}); }\n' +
+        "}",
+    ],
+    [
+      "clearTimeout",
+      "with ({}) {\n" +
+        '  function f() { "use strict"; for (clearTimeout in {}) {} }\n' +
+        "}",
+    ],
+    [
+      "setTimeout",
+      "with ({}) {\n  class C extends (setTimeout = 1, Object) {}\n}",
+    ],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "typeof-with-strict-write.ts",
+    });
+    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+    assert.match(
+      result.diagnostics[0]?.message ?? "",
+      new RegExp(`Assigning with fallback binding '${name}' in strict code`),
+      source,
+    );
+  }
 });
 
 test("keeps strict read-first with fallback operations admitted", () => {
@@ -1187,6 +1204,61 @@ test("keeps strict read-first with fallback operations admitted", () => {
     });
     assert.deepEqual(result.diagnostics, [], source);
     assert.ok(result.hir != null, source);
+  }
+});
+
+test("lowers class heritage writes and deletes as strict code", () => {
+  // A ClassDefinition is strict code in its entirety, so a failed Set or
+  // delete in its heritage operand throws TypeError even inside sloppy
+  // code, including a write through a with object or the global object.
+  // Line 1 holds sloppy controls and line 2 holds only heritage code.
+  // Line 3 follows the class in the same block, script, or function, so
+  // its sloppy writes prove the strictness does not outlive the operand.
+  for (const source of [
+    "with ({}) { undefined = 0; }\n" +
+      "with ({}) { class C extends (undefined = 1, Object) {}\n" +
+      "  undefined = 2; }",
+    "with (Object.freeze({ x: 0 })) { x = 2; }\n" +
+      "with (Object.freeze({ x: 0 })) { class C extends (x = 1, Object) {}\n" +
+      "  x = 3; }",
+    "with ({}) { x += 1; }\n" +
+      "with ({ x: 0 }) { class C extends (x &&= 1, x++, Object) {}\n" +
+      "  x &&= 2; x++; }",
+    "NaN = 0;\nclass C extends (NaN = 1, Object) {}\nNaN = 2;",
+    "const o = Object.freeze({ x: 1 }); delete o.x; o.x = 2;\n" +
+      "class C extends (delete o.x, o.x = 3, Object) {}\n" +
+      "delete o.x; o.x = 4;",
+    "function f(o) { o.x = 1;\n" +
+      "  class C extends (o.x = 2, delete o.x, Object) {}\n" +
+      "  o.x = 3; return delete o.x; }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "class-heritage-strict.js",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+    const strictness = [
+      ...result.mir.script.blocks,
+      ...result.mir.functions.flatMap((functionValue) => functionValue.blocks),
+    ].flatMap((block) =>
+      block.operations.flatMap((operation) =>
+        operation.kind === "property-set" ||
+        operation.kind === "property-delete"
+          ? [{ line: operation.range.start.line, strict: operation.strict }]
+          : [],
+      ),
+    );
+    const before = strictness.filter((write) => write.line === 1);
+    const heritage = strictness.filter((write) => write.line === 2);
+    const after = strictness.filter((write) => write.line === 3);
+    assert.ok(before.length > 0, source);
+    assert.ok(heritage.length > 0, source);
+    assert.ok(after.length > 0, source);
+    for (const write of [...before, ...after]) {
+      assert.equal(write.strict, undefined, source);
+    }
+    for (const write of heritage) assert.equal(write.strict, true, source);
   }
 });
 
@@ -1395,5 +1467,76 @@ test("indexes wide structured annotations once per pattern", () => {
     assert.ok(small != null && large != null);
     const ratio = large.elapsed / small.elapsed;
     assert.ok(ratio < 6, `${name} hint scaling ratio was ${ratio.toFixed(2)}`);
+  }
+});
+
+test("retains strict PutValue after RHS deletes a with binding", () => {
+  const source = `
+const environment = { x: 0 };
+with (environment) {
+  (function () {
+    "use strict";
+    x = (delete environment.x, 1);
+  })();
+}
+`;
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const result = compileSource(
+      babelFrontend,
+      { source, sourceId: "with-strict-deleted-binding.js" },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.hir != null);
+    assert.ok(result.mir != null);
+    assert.match(printHir(result.hir), /with\[[^\]]+\] x =/u);
+    const mir = printMir(result.mir);
+    assert.match(mir, /read \*missing intrinsic:x\*/u);
+    assert.match(mir, /property-delete/u);
+    assert.match(mir, /binary in/u);
+  }
+});
+
+test("retains strict PutValue for with pattern and loop targets", () => {
+  for (const body of [
+    "[x] = [2];",
+    "({ value: x } = { value: 2 });",
+    "for (x of [2]) {}",
+    "for (x in { a: 1 }) {}",
+  ]) {
+    for (const strict of [false, true]) {
+      const source = `
+let x = 0;
+const target = { x: 1 };
+const environment = new Proxy(target, {
+  get(object, key, receiver) {
+    if (key === Symbol.unscopables) {
+      delete object.x;
+      return undefined;
+    }
+    return Reflect.get(object, key, receiver);
+  },
+});
+with (environment) {
+  (function () {
+    ${strict ? '"use strict";' : ""}
+    ${body}
+  })();
+}
+`;
+      for (const specialization of ["disabled", "enabled"] as const) {
+        const result = compileSource(
+          babelFrontend,
+          { source, sourceId: "with-strict-existing-target.js" },
+          { specialization },
+        );
+        assert.deepEqual(result.diagnostics, [], body);
+        assert.ok(result.mir != null);
+        const mir = printMir(result.mir);
+        const missing = /read \*missing intrinsic:x\*/u;
+        if (strict) assert.match(mir, missing, body);
+        else assert.doesNotMatch(mir, missing, body);
+      }
+    }
   }
 });

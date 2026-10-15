@@ -155,11 +155,13 @@ function withFallbackBinding(
 }
 
 /**
- * Reject a strict-code write to a `with` fallback. A strict all-miss
- * PutValue throws ReferenceError instead of creating a sloppy global,
- * while this profile's fallback lowering would initialize the hidden
- * cell, so the write stays outside the admitted global-object profile
- * until the strict throw is lowered; it consequently never records an
+ * Reject a strict-code write to a `with` fallback that has no realm
+ * global-object property behind it. Global-object names reach the
+ * global object's strict PutValue instead, so only runtime-owned call
+ * targets such as `console`, `setTimeout`, and `clearTimeout` remain
+ * here: their fallback is a hidden cell, which cannot model a strict
+ * PutValue's resolution and failure checks. The rejection covers simple,
+ * pattern, and loop-head writes; it consequently never records an
  * initializing name that could poison the typeof fold.
  */
 function rejectStrictWithFallbackWrite(
@@ -1002,16 +1004,14 @@ function resolveExpression(
       return undefined;
     }
     if (value == null) return undefined;
-    // A non-strict all-miss `with` write reaches the realm global
-    // object the way ECMA-262's sloppy global reference does: a simple
-    // assignment creates or updates the property, and a compound or
-    // logical assignment first reads the property, or throws the
-    // unresolvable reference's ReferenceError when it is absent. A
-    // strict all-miss write stays rejected below.
+    // An all-miss sloppy or strict `with` write uses the realm global
+    // object. Sloppy simple assignment creates or updates the property;
+    // strict writes retain initial-resolution and missing-property
+    // throws. Compound and logical assignments first read the property
+    // or throw ReferenceError for an unresolvable reference.
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      !state.strict &&
       isGlobalObjectResolvedName(expression.name)
     ) {
       const fallback = {
@@ -1022,6 +1022,7 @@ function resolveExpression(
         return {
           ...expression,
           fallback,
+          globalReference: intrinsicGlobalReference(expression.name, state),
           kind: "with-set",
           objectBindingIds: resolution.objectBindingIds,
           value: inferFunctionName(value, expression.name),
@@ -1037,6 +1038,7 @@ function resolveExpression(
             state,
           ),
         },
+        globalReference: intrinsicGlobalReference(expression.name, state),
         kind: "with-update",
         objectBindingIds: resolution.objectBindingIds,
         value:
@@ -1098,6 +1100,7 @@ function resolveExpression(
         return {
           ...expression,
           fallback,
+          globalReference: intrinsicGlobalReference(expression.name, state),
           kind: "with-set",
           objectBindingIds: resolution.objectBindingIds,
           value: inferred,
@@ -1106,6 +1109,7 @@ function resolveExpression(
       return {
         ...expression,
         fallback,
+        globalReference: intrinsicGlobalReference(expression.name, state),
         kind: "with-update",
         objectBindingIds: resolution.objectBindingIds,
         value: inferred,
@@ -1180,13 +1184,12 @@ function resolveExpression(
       );
       return undefined;
     }
-    // A non-strict all-miss update reads and then writes the realm
+    // An all-miss update reads and then writes the realm
     // global object's property, exactly as an update of an unshadowed
     // global name does.
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      !state.strict &&
       isGlobalObjectResolvedName(expression.name)
     ) {
       return {
@@ -1200,6 +1203,7 @@ function resolveExpression(
             state,
           ),
         },
+        globalReference: intrinsicGlobalReference(expression.name, state),
         kind: "with-step",
         objectBindingIds: resolution.objectBindingIds,
       };
@@ -1234,6 +1238,7 @@ function resolveExpression(
           mutable: binding.mutable,
           name: binding.name,
         },
+        globalReference: intrinsicGlobalReference(expression.name, state),
         kind: "with-step",
         objectBindingIds: resolution.objectBindingIds,
       };
@@ -3115,7 +3120,15 @@ function resolveBindingPattern(
       mutable: binding.mutable,
       ...includePropertiesWhen(() => {
         if (resolution.objectBindingIds.length === 0) return undefined;
-        return { withObjectBindingIds: resolution.objectBindingIds };
+        return {
+          withObjectBindingIds: resolution.objectBindingIds,
+          ...includePropertiesWhen(() => {
+            if (!state.strict) return undefined;
+            return {
+              globalReference: intrinsicGlobalReference(pattern.name, state),
+            };
+          }),
+        };
       }),
     };
   }
@@ -3390,7 +3403,15 @@ function resolveForInTarget(
       mutable: binding.mutable,
       ...includePropertiesWhen(() => {
         if (resolution.objectBindingIds.length === 0) return undefined;
-        return { withObjectBindingIds: resolution.objectBindingIds };
+        return {
+          withObjectBindingIds: resolution.objectBindingIds,
+          ...includePropertiesWhen(() => {
+            if (!state.strict) return undefined;
+            return {
+              globalReference: intrinsicGlobalReference(target.name, state),
+            };
+          }),
+        };
       }),
     };
   }
@@ -4038,7 +4059,18 @@ function resolveStatement(
             mutable: binding.mutable,
             ...includePropertiesWhen(() => {
               if (resolution.objectBindingIds.length === 0) return undefined;
-              return { withObjectBindingIds: resolution.objectBindingIds };
+              return {
+                withObjectBindingIds: resolution.objectBindingIds,
+                ...includePropertiesWhen(() => {
+                  if (!state.strict) return undefined;
+                  return {
+                    globalReference: intrinsicGlobalReference(
+                      binding.name,
+                      state,
+                    ),
+                  };
+                }),
+              };
             }),
           };
         }

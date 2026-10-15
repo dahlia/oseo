@@ -730,3 +730,744 @@ while (turn < 2) {
     });
   },
 );
+
+/** Mutable oracle stores retain each binding object's observed state. */
+interface WithBindingStates {
+  global: number | undefined;
+  inner: number | undefined;
+  outer: number | undefined;
+}
+
+/** A retained object-environment reference, independently of later lookup. */
+interface WithPutValueCase {
+  readonly base: "global" | "inner" | "outer";
+  readonly change: "delete" | "keep" | "readonly" | "replace";
+  readonly operation: "=" | "+=" | "&&=" | "??=" | "||=";
+  readonly strict: boolean;
+  readonly value: number;
+}
+
+const withPutValueArbitrary: fc.Arbitrary<WithPutValueCase> = fc.record({
+  base: fc.constantFrom("global", "inner", "outer"),
+  change: fc.constantFrom("delete", "keep", "readonly", "replace"),
+  operation: fc.constantFrom("=", "+=", "&&=", "??=", "||="),
+  strict: fc.boolean(),
+  value: fc.integer({ max: 8, min: 1 }),
+});
+
+function withPutValueSource(
+  testCase: WithPutValueCase,
+  context?: WithStrictContext,
+): string {
+  const directive = testCase.strict ? '"use strict";' : "";
+  const assignment = `oseoWithPutValue ${testCase.operation} rhs()`;
+  const evaluation =
+    context == null
+      ? `(function () {
+        ${directive}
+        return (${assignment});
+      })()`
+      : withStrictContextEvaluation(context, assignment);
+  const mutation = {
+    delete: "delete selected.oseoWithPutValue;",
+    keep: "",
+    readonly:
+      'Object.defineProperty(selected, "oseoWithPutValue", ' +
+      "{ writable: false });",
+    replace: "selected.oseoWithPutValue = 99;",
+  }[testCase.change];
+  return `
+const realm = this;
+const outer = {};
+const inner = {};
+const selected = ${testCase.base === "global" ? "realm" : testCase.base};
+selected.oseoWithPutValue = ${testCase.value};
+let result;
+let rhsCalls = 0;
+function rhs() {
+  rhsCalls++;
+  ${mutation}
+  // A new nearer binding must not replace the reference retained by LHS.
+  if (selected !== inner) inner.oseoWithPutValue = 77;
+  for (let index = 0; index < 4; index++) {
+    const garbage = { nested: { index } };
+  }
+  return 2;
+}
+with (outer) {
+  with (inner) {
+    try {
+      result = ${evaluation};
+    } catch (error) { result = error.name; }
+  }
+}
+console.log(
+  result,
+  rhsCalls,
+  selected.oseoWithPutValue,
+  "oseoWithPutValue" in selected,
+);
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(1, 1), hinted("1", 1));
+const probe = { value: 0 };
+for (let turn = 0; turn < 2; turn++) {
+  console.log("guard", probe.value);
+  if (turn === 0) probe.marker = 1;
+}
+console.log(
+  "binding-state",
+  realm.oseoWithPutValue,
+  "oseoWithPutValue" in realm,
+  outer.oseoWithPutValue,
+  "oseoWithPutValue" in outer,
+  inner.oseoWithPutValue,
+  "oseoWithPutValue" in inner,
+);
+delete realm.oseoWithPutValue;
+`;
+}
+
+/**
+ * ECMA-262 2025 13.15 retains lref and, for a read-first assignment, lval.
+ * The RHS runs only after that read and only when a logical test takes it.
+ * 9.1.1.2.5 tests the selected binding object's current HasProperty,
+ * independent of a nearer object, before Set with the reference's strictness.
+ */
+function withPutValueExpected(testCase: WithPutValueCase): string {
+  const short = testCase.operation === "||=" || testCase.operation === "??=";
+  const written = testCase.operation === "+=" ? testCase.value + 2 : 2;
+  const error =
+    !short && testCase.strict
+      ? testCase.change === "delete"
+        ? "ReferenceError"
+        : testCase.change === "readonly"
+          ? "TypeError"
+          : undefined
+      : undefined;
+  const present = !(error === "ReferenceError");
+  const after = !present
+    ? "undefined"
+    : short || testCase.change === "readonly"
+      ? testCase.value
+      : written;
+  const states: WithBindingStates = {
+    global: undefined,
+    inner: undefined,
+    outer: undefined,
+  };
+  states[testCase.base] = present ? Number(after) : undefined;
+  if (!short && testCase.base !== "inner") states.inner = 77;
+  const bases: readonly WithPutValueCase["base"][] = [
+    "global",
+    "outer",
+    "inner",
+  ];
+  const bindingState = bases
+    .map((base) => {
+      const value = states[base];
+      return `${value} ${value !== undefined}`;
+    })
+    .join(" ");
+  return [
+    `${error ?? (short ? testCase.value : written)} ` +
+      `${short ? 0 : 1} ${after} ${present}`,
+    "hint 2 11",
+    "guard 0",
+    "guard 0",
+    `binding-state ${bindingState}`,
+    "",
+  ].join("\n");
+}
+
+/**
+ * The two measured V8 reference hosts re-resolve a with store after the
+ * RHS. ECMA-262 2025 retains its original Environment Record instead.
+ * Full binding-state observations also expose redirected read-only writes.
+ * This exception is limited to the current positive 1..8 generated domain.
+ */
+function withPutValueReferenceDiscrepancy(testCase: WithPutValueCase): boolean {
+  if (
+    !Number.isInteger(testCase.value) ||
+    testCase.value < 1 ||
+    testCase.value > 8
+  )
+    return false;
+  const takesRhs =
+    testCase.operation === "=" ||
+    testCase.operation === "+=" ||
+    testCase.operation === "&&=";
+  return (
+    takesRhs &&
+    (testCase.base !== "inner" ||
+      (testCase.change === "delete" && !testCase.strict))
+  );
+}
+
+/**
+ * Collect both references even for a measured discrepancy, preserving their
+ * real output while keeping the normative model as the native oracle.
+ * Unexpected process failures remain failures in every class.
+ */
+async function assertWithReferenceEvidence(
+  source: string,
+  stdout: string,
+  testCase: WithPutValueCase | WithWriteLeafCase,
+  discrepancy: string | undefined,
+): Promise<void> {
+  const observations = await references(source);
+  const expectedObservation = { exitStatus: 0, stderr: "", stdout };
+  if (discrepancy == null) {
+    assertMatchingObservations([expectedObservation, ...observations]);
+    return;
+  }
+  for (const [index, observation] of observations.entries()) {
+    assert.equal(observation.exitStatus, 0);
+    assert.equal(observation.stderr, "");
+    process.stdout.write(
+      JSON.stringify({
+        kind: "reference-discrepancy-evidence",
+        host: index === 0 ? "Node.js" : "Deno",
+        discrepancy,
+        testCase,
+        expected: expectedObservation,
+        actual: observation,
+        matchesModel: observation.stdout === stdout,
+      }) + "\n",
+    );
+  }
+}
+
+test(
+  "generated with PutValue retains its object environment",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "with PutValue rechecks the retained binding object",
+      fc.asyncProperty(withPutValueArbitrary, async (testCase) => {
+        const source = withPutValueSource(testCase);
+        const observation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: withPutValueExpected(testCase),
+        };
+        await assertWithReferenceEvidence(
+          source,
+          observation.stdout,
+          testCase,
+          withPutValueReferenceDiscrepancy(testCase)
+            ? "retained with reference across RHS changes"
+            : undefined,
+        );
+        await assertNative(source, observation);
+      }),
+      {
+        context: [
+          `target=${nativeTarget?.name ?? "unsupported"}`,
+          `host=${host.executionHost?.operatingSystem ?? "unknown"}/` +
+            (host.executionHost?.architecture ?? "unknown"),
+        ],
+        domain:
+          "retained inner, outer, or global object environment with a " +
+          "positive integer value; RHS deletion, replacement, read-only " +
+          "transition, or no mutation; simple, arithmetic, or logical " +
+          "assignment in strict or sloppy code with a new nearer binding",
+        numRuns: 16,
+        profile: "M5 with strict assignment fallback",
+        seed: 0x6000_7e01,
+        sizeLimit:
+          "two with objects, one global fallback, one integer in 1..8, " +
+          "one assignment, four garbage objects, and false-hint/shape misses",
+        timeLimitMilliseconds: 240_000,
+      },
+    );
+  },
+);
+
+/**
+ * Class code evaluated inside a sloppy function. ECMA-262 2025 11.2.2
+ * makes every part of a ClassDefinition strict code, so each context
+ * selects strict PutValue without a directive. The heritage operand and
+ * computed key are lowered inline in the enclosing function; the static
+ * block, static field initializer, and static method are their own
+ * functions.
+ */
+type WithStrictContext =
+  | "class-computed-key"
+  | "class-heritage"
+  | "class-static-block"
+  | "class-static-field"
+  | "class-static-method";
+
+/** A retained object-environment reference written from class code. */
+interface WithStrictContextCase extends Omit<WithPutValueCase, "strict"> {
+  readonly context: WithStrictContext;
+}
+
+const withStrictContextArbitrary: fc.Arbitrary<WithStrictContextCase> =
+  fc.record({
+    base: fc.constantFrom("global", "inner", "outer"),
+    change: fc.constantFrom("delete", "keep", "readonly", "replace"),
+    context: fc.constantFrom(
+      "class-computed-key",
+      "class-heritage",
+      "class-static-block",
+      "class-static-field",
+      "class-static-method",
+    ),
+    operation: fc.constantFrom("=", "+=", "&&=", "??=", "||="),
+    value: fc.integer({ max: 8, min: 1 }),
+  });
+
+/** Evaluate `assignment` once in class code and yield its value. */
+function withStrictContextEvaluation(
+  context: WithStrictContext,
+  assignment: string,
+): string {
+  const body = {
+    "class-computed-key": `let value;
+        class C { [(value = (${assignment}), "m")]() {} }
+        return value;`,
+    "class-heritage": `let value;
+        class C extends ((value = (${assignment})), Object) {}
+        return value;`,
+    "class-static-block": `let value;
+        class C { static { value = (${assignment}); } }
+        return value;`,
+    "class-static-field": `let value;
+        class C { static f = (value = (${assignment})); }
+        return value;`,
+    "class-static-method": `class C { static m() { return (${assignment}); } }
+        return C.m();`,
+  }[context];
+  return `(() => {
+        ${body}
+      })()`;
+}
+
+test(
+  "generated class code keeps with PutValue strict",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "class code rechecks the retained binding object strictly",
+      fc.asyncProperty(withStrictContextArbitrary, async (testCase) => {
+        // Class code is strict regardless of the sloppy enclosing
+        // function, so the strict retained-reference oracle applies.
+        const strictCase = { ...testCase, strict: true as const };
+        const source = withPutValueSource(strictCase, testCase.context);
+        const observation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: withPutValueExpected(strictCase),
+        };
+        await assertWithReferenceEvidence(
+          source,
+          observation.stdout,
+          strictCase,
+          withPutValueReferenceDiscrepancy(strictCase)
+            ? "retained with reference across RHS changes"
+            : undefined,
+        );
+        await assertNative(source, observation);
+      }),
+      {
+        context: [
+          `target=${nativeTarget?.name ?? "unsupported"}`,
+          `host=${host.executionHost?.operatingSystem ?? "unknown"}/` +
+            (host.executionHost?.architecture ?? "unknown"),
+        ],
+        domain:
+          "retained inner, outer, or global object environment with a " +
+          "positive integer value; RHS deletion, replacement, read-only " +
+          "transition, or no mutation; simple, arithmetic, or logical " +
+          "assignment in a class heritage operand, computed key, static " +
+          "block, static field initializer, or static method inside " +
+          "sloppy code with a new nearer binding",
+        numRuns: 16,
+        profile: "M5 with strict assignment fallback",
+        seed: 0x6000_7e03,
+        sizeLimit:
+          "two with objects, one global fallback, one integer in 1..8, " +
+          "one class, one assignment, four garbage objects, and " +
+          "false-hint/shape misses",
+        timeLimitMilliseconds: 240_000,
+      },
+    );
+  },
+);
+
+/** Existing assignment leaves whose lexical fallback must remain distinct. */
+interface WithWriteLeafCase {
+  readonly hit: boolean;
+  readonly kind: "array" | "for-in" | "for-of" | "object";
+  readonly strict: boolean;
+  readonly value: number;
+}
+
+const withWriteLeafArbitrary: fc.Arbitrary<WithWriteLeafCase> = fc.record({
+  hit: fc.boolean(),
+  kind: fc.constantFrom("array", "for-in", "for-of", "object"),
+  strict: fc.boolean(),
+  value: fc.integer({ max: 8, min: 1 }),
+});
+
+function withWriteLeafSource(testCase: WithWriteLeafCase): string {
+  const body = {
+    array: `[x] = [${testCase.value}];`,
+    "for-in": "for (x in { a: 1 }) {}",
+    "for-of": `for (x of [${testCase.value}]) {}`,
+    object: `({ value: x } = { value: ${testCase.value} });`,
+  }[testCase.kind];
+  return `
+let x = 0;
+let writes = 0;
+const target = ${testCase.hit ? "{ x: 1 }" : "{}"};
+const environment = new Proxy(target, {
+  get(object, key, receiver) {
+    if (key === Symbol.unscopables) {
+      delete object.x;
+      for (let index = 0; index < 4; index++) {
+        const garbage = { nested: { index } };
+      }
+      return undefined;
+    }
+    return Reflect.get(object, key, receiver);
+  },
+  set(object, key, value, receiver) {
+    writes++;
+    return Reflect.set(object, key, value, receiver);
+  },
+});
+let result = "ok";
+with (environment) {
+  (function () {
+    ${testCase.strict ? '"use strict";' : ""}
+    try { ${body} }
+    catch (error) { result = error.name; }
+  })();
+}
+console.log(result, x, writes, "x" in target, target.x);
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(1, 1), hinted("1", 1));
+const probe = { value: 0 };
+for (let turn = 0; turn < 2; turn++) {
+  console.log("guard", probe.value);
+  if (turn === 0) probe.marker = 1;
+}
+`;
+}
+
+/**
+ * HasBinding first finds x, then Get(@@unscopables) deletes it without
+ * blocking it. ECMA-262 2025 9.1.1.2.1 still selects that object record;
+ * 9.1.1.2.5 then throws before Set in strict code or writes in sloppy
+ * code. An initial HasBinding miss writes the real outer lexical cell.
+ * Values, keys, and initializers have no selection-changing effects:
+ * this domain does not assess preexisting pattern preparation order.
+ */
+function withWriteLeafExpected(testCase: WithWriteLeafCase): string {
+  const assigned = testCase.kind === "for-in" ? "a" : testCase.value;
+  const throws = testCase.hit && testCase.strict;
+  const stored = testCase.hit && !throws;
+  return [
+    `${throws ? "ReferenceError" : "ok"} ` +
+      `${testCase.hit ? 0 : assigned} ${stored ? 1 : 0} ` +
+      `${stored} ${stored ? assigned : "undefined"}`,
+    "hint 2 11",
+    "guard 0",
+    "guard 0",
+    "",
+  ].join("\n");
+}
+
+/**
+ * Both measured reference hosts perform strict property Set after a with
+ * lookup deletes its hit through unscopables; 9.1.1.2.5 requires a fresh
+ * HasProperty and ReferenceError before Set. Initial misses and sloppy
+ * hits remain differential controls in the current positive 1..8 domain.
+ */
+function withWriteLeafReferenceDiscrepancy(
+  testCase: WithWriteLeafCase,
+): boolean {
+  return (
+    Number.isInteger(testCase.value) &&
+    testCase.value >= 1 &&
+    testCase.value <= 8 &&
+    testCase.hit &&
+    testCase.strict
+  );
+}
+
+test(
+  "generated existing with write leaves preserve strictness",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "existing with write leaves recheck the selected binding object",
+      fc.asyncProperty(withWriteLeafArbitrary, async (testCase) => {
+        const source = withWriteLeafSource(testCase);
+        const observation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: withWriteLeafExpected(testCase),
+        };
+        await assertWithReferenceEvidence(
+          source,
+          observation.stdout,
+          testCase,
+          withWriteLeafReferenceDiscrepancy(testCase)
+            ? "strict with SetMutableBinding after unscopables deletion"
+            : undefined,
+        );
+        await assertNative(source, observation);
+      }),
+      {
+        context: [
+          `target=${nativeTarget?.name ?? "unsupported"}`,
+          `host=${host.executionHost?.operatingSystem ?? "unknown"}/` +
+            (host.executionHost?.architecture ?? "unknown"),
+        ],
+        domain:
+          "existing array/object assignment or for-in/of identifier " +
+          "heads with an outer lexical fallback; an initial object miss " +
+          "or an object hit deleted by unscopables; strict/sloppy writes",
+        numRuns: 16,
+        profile: "M5 with shared write strictness",
+        seed: 0x6000_7e02,
+        sizeLimit:
+          "one lexical cell, one proxy, one assignment leaf, one integer " +
+          "in 1..8, four garbage objects, and false-hint/shape misses",
+        timeLimitMilliseconds: 240_000,
+      },
+    );
+  },
+);
+
+/**
+ * Exact fixed subjects whose Node/Deno discrepancy was independently
+ * observed; source bytes and normative expected logs stay paired here.
+ * These private records must not become fixture-module exports: the
+ * fragment scanner treats every export of that module as a Fixture[].
+ */
+interface WithFixedModelCase {
+  readonly name: string;
+  readonly source: string;
+  readonly stdout: string;
+}
+
+const withFixedModelCases: readonly WithFixedModelCase[] = [
+  {
+    name: "leaf-0-true-true",
+    source: `
+{
+  let x = 0;
+  let writes = 0;
+  const target = { x: 1 };
+  const environment = new Proxy(target, {
+    get(object, key, receiver) {
+      if (key === Symbol.unscopables) {
+        delete object.x;
+        return undefined;
+      }
+      return Reflect.get(object, key, receiver);
+    },
+    set(object, key, value, receiver) {
+      writes++;
+      return Reflect.set(object, key, value, receiver);
+    },
+  });
+  let result = "ok";
+  with (environment) {
+    (function () {
+      "use strict";
+      try { [x] = [2]; }
+      catch (error) { result = error.name; }
+    })();
+  }
+  console.log(0, true, true, result, x, writes,
+    "x" in target, target.x);
+}
+`,
+    stdout: "0 true true ReferenceError 0 0 false undefined\n",
+  },
+  {
+    name: "leaf-1-true-true",
+    source: `
+{
+  let x = 0;
+  let writes = 0;
+  const target = { x: 1 };
+  const environment = new Proxy(target, {
+    get(object, key, receiver) {
+      if (key === Symbol.unscopables) {
+        delete object.x;
+        return undefined;
+      }
+      return Reflect.get(object, key, receiver);
+    },
+    set(object, key, value, receiver) {
+      writes++;
+      return Reflect.set(object, key, value, receiver);
+    },
+  });
+  let result = "ok";
+  with (environment) {
+    (function () {
+      "use strict";
+      try { ({ value: x } = { value: 2 }); }
+      catch (error) { result = error.name; }
+    })();
+  }
+  console.log(1, true, true, result, x, writes,
+    "x" in target, target.x);
+}
+`,
+    stdout: "1 true true ReferenceError 0 0 false undefined\n",
+  },
+  {
+    name: "leaf-2-true-true",
+    source: `
+{
+  let x = 0;
+  let writes = 0;
+  const target = { x: 1 };
+  const environment = new Proxy(target, {
+    get(object, key, receiver) {
+      if (key === Symbol.unscopables) {
+        delete object.x;
+        return undefined;
+      }
+      return Reflect.get(object, key, receiver);
+    },
+    set(object, key, value, receiver) {
+      writes++;
+      return Reflect.set(object, key, value, receiver);
+    },
+  });
+  let result = "ok";
+  with (environment) {
+    (function () {
+      "use strict";
+      try { for (x of [2]) {} }
+      catch (error) { result = error.name; }
+    })();
+  }
+  console.log(2, true, true, result, x, writes,
+    "x" in target, target.x);
+}
+`,
+    stdout: "2 true true ReferenceError 0 0 false undefined\n",
+  },
+  {
+    name: "leaf-3-true-true",
+    source: `
+{
+  let x = 0;
+  let writes = 0;
+  const target = { x: 1 };
+  const environment = new Proxy(target, {
+    get(object, key, receiver) {
+      if (key === Symbol.unscopables) {
+        delete object.x;
+        return undefined;
+      }
+      return Reflect.get(object, key, receiver);
+    },
+    set(object, key, value, receiver) {
+      writes++;
+      return Reflect.set(object, key, value, receiver);
+    },
+  });
+  let result = "ok";
+  with (environment) {
+    (function () {
+      "use strict";
+      try { for (x in { a: 1 }) {} }
+      catch (error) { result = error.name; }
+    })();
+  }
+  console.log(3, true, true, result, x, writes,
+    "x" in target, target.x);
+}
+`,
+    stdout: "3 true true ReferenceError 0 0 false undefined\n",
+  },
+  {
+    name: "retained-outer-with-proxy-trace",
+    source: `
+const log = [];
+const outer = { x: 1 };
+const inner = {};
+const scope = new Proxy(outer, {
+  has(target, key) {
+    if (key === "x") log.push("has");
+    return Reflect.has(target, key);
+  },
+  set(target, key, value, receiver) {
+    if (key === "x") log.push("set");
+    return Reflect.set(target, key, value, receiver);
+  },
+});
+with (scope) {
+  with (inner) {
+    (function () {
+      "use strict";
+      x = (log.push("rhs"), inner.x = 99, 2);
+    })();
+  }
+}
+console.log("order", log.join(","), outer.x, inner.x);
+`,
+    stdout: "order has,rhs,has,set 2 99\n",
+  },
+  {
+    name: "retained-initially-unresolvable",
+    source: `with ({}) {
+  (function () {
+    "use strict";
+    try { oseoFreshWithName = (globalThis.oseoFreshWithName = 3); }
+    catch (error) { console.log("unresolved", error.name); }
+  })();
+}
+console.log("rhs global", globalThis.oseoFreshWithName);
+delete globalThis.oseoFreshWithName;
+`,
+    stdout: "unresolved ReferenceError\nrhs global 3\n",
+  },
+];
+
+/** The existing passing guard fixture, appended after each exact subject. */
+const withFixedGuardProbe = `
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(1, 1), hinted("1", 1));
+const probe = { value: 0 };
+for (let turn = 0; turn < 2; turn++) {
+  console.log("guard", probe.value);
+  if (turn === 0) probe.marker = 1;
+}
+`;
+
+test(
+  "fixed with reference discrepancies follow the ECMA-262 model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    for (const fixed of withFixedModelCases) {
+      // Each subject was observed in both reference hosts; the fixed
+      // normative expectation, not their divergent output, owns this check.
+      try {
+        await assertNative(fixed.source + withFixedGuardProbe, {
+          exitStatus: 0,
+          stderr: "",
+          stdout: fixed.stdout + "hint 2 11\nguard 0\nguard 0\n",
+        });
+      } catch (cause) {
+        throw new Error(`Fixed with subject '${fixed.name}' failed.`, {
+          cause,
+        });
+      }
+    }
+  },
+);

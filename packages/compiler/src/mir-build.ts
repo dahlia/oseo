@@ -894,10 +894,10 @@ function lowerPropertyWrite(
 }
 
 /**
- * GetBindingValue of the global object's Object Environment Record for a
+ * GetBindingValue of a global or with Object Environment Record for a
  * reference that ResolveBinding already found. The property is tested
- * again before the read, since a Proxy on the global object's prototype
- * chain can answer differently; a property gone by then reads as
+ * again before the read, since a Proxy can answer differently; a
+ * property gone by then reads as
  * `undefined` in non-strict code and throws the missing binding's
  * ReferenceError in strict code.
  */
@@ -1022,8 +1022,8 @@ function lowerGlobalRead(
 }
 
 /**
- * PutValue through an identifier reference that the global Environment
- * Record resolves through the realm global object. `resolved` is
+ * PutValue through a global or with Object Environment Record.
+ * `resolved` is
  * ResolveBinding's HasProperty answer, taken before the value existed, or
  * `undefined` when an earlier GetValue of the same reference already
  * proved it resolvable. A resolvable reference reaches SetMutableBinding,
@@ -1371,6 +1371,7 @@ function lowerWithBindingRead(
   fallback: HirWithBindingReference | HirWithGlobalObjectFallback,
   range: SourceRange,
   builder: MirBuilder,
+  reference: HirGlobalReference,
 ): number {
   const globalRead = "objectBindingId" in fallback ? fallback.read : undefined;
   if ("objectBindingId" in fallback && globalRead == null) {
@@ -1389,13 +1390,14 @@ function lowerWithBindingRead(
     whenTrue: propertyBlock.id,
   };
   builder.current = propertyBlock;
-  const propertyValue = lowerPropertyRead(
+  const propertyValue = lowerGlobalBindingValue(
     selected.object,
     selected.key,
+    reference,
     range,
     builder,
   );
-  propertyBlock.terminator = {
+  builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values: [propertyValue],
@@ -1424,8 +1426,7 @@ function lowerWithBindingRead(
 
 /**
  * Write the realm global object's property behind an all-miss `with`
- * chain. Only non-strict code reaches it, so the write is the ordinary
- * non-throwing PutValue of a global identifier reference: `resolved` is
+ * chain, preserving the strict missing-binding throw. `resolved` is
  * the chain's ResolveBinding answer, or `undefined` after a GetValue
  * already found the reference.
  */
@@ -1435,6 +1436,7 @@ function lowerWithGlobalObjectWrite(
   value: number,
   range: SourceRange,
   builder: MirBuilder,
+  reference: HirGlobalReference,
 ): number {
   const object = lowerBindingRead(
     fallback.objectBindingId,
@@ -1451,7 +1453,7 @@ function lowerWithGlobalObjectWrite(
     object,
     key,
     value,
-    {},
+    reference,
     range,
     builder,
   );
@@ -1463,6 +1465,7 @@ function lowerWithBindingWrite(
   value: number,
   range: SourceRange,
   builder: MirBuilder,
+  reference: HirGlobalReference,
 ): number {
   const propertyBlock = createMirBlock(builder);
   const fallbackBlock = createMirBlock(builder);
@@ -1477,14 +1480,16 @@ function lowerWithBindingWrite(
     whenTrue: propertyBlock.id,
   };
   builder.current = propertyBlock;
-  const propertyResult = lowerPropertyWrite(
+  const propertyResult = lowerGlobalReferenceWrite(
+    undefined,
     selected.object,
     selected.key,
     value,
+    reference,
     range,
     builder,
   );
-  propertyBlock.terminator = {
+  builder.current.terminator = {
     kind: "jump",
     target: joinBlock.id,
     values: [propertyResult],
@@ -1498,6 +1503,7 @@ function lowerWithBindingWrite(
           value,
           range,
           builder,
+          reference,
         )
       : lowerBindingWrite({ ...fallback, range }, value, builder);
   // The global-object write branches on its binding tests, so the jump
@@ -3220,10 +3226,15 @@ function lowerClassExpression(
       builder,
     );
   }
-  const heritage =
-    expression.heritage == null
-      ? undefined
-      : lowerExpression(expression.heritage, builder);
+  // The heritage operand is class code too, so a failed Set or delete in
+  // it throws even when the enclosing function or script is not strict.
+  let heritage: number | undefined;
+  if (expression.heritage != null) {
+    const enclosingStrictCode = builder.strictCode;
+    builder.strictCode = true;
+    heritage = lowerExpression(expression.heritage, builder);
+    builder.strictCode = enclosingStrictCode;
+  }
   // Every private name the body declares exists before the constructor
   // closure does, so the closure captures the cells already holding the
   // identities this evaluation created. A second evaluation of the same
@@ -3739,6 +3750,7 @@ function lowerExpression(
       value,
       expression.range,
       builder,
+      expression.globalReference,
     );
   }
   if (expression.kind === "with-update") {
@@ -3748,6 +3760,7 @@ function lowerExpression(
       expression.fallback,
       expression.range,
       builder,
+      expression.globalReference,
     );
     return lowerAssignmentValue(
       current,
@@ -3760,6 +3773,7 @@ function lowerExpression(
           value,
           expression.range,
           builder,
+          expression.globalReference,
         ),
       expression.range,
       builder,
@@ -3772,6 +3786,7 @@ function lowerExpression(
       expression.fallback,
       expression.range,
       builder,
+      expression.globalReference,
     );
     return lowerUpdateValue(
       current,
@@ -3784,6 +3799,7 @@ function lowerExpression(
           value,
           expression.range,
           builder,
+          expression.globalReference,
         ),
       expression.range,
       builder,
@@ -5690,7 +5706,14 @@ function lowerForHeadTarget(
       },
       builder,
     );
-    lowerWithBindingWrite(selected, target, value, target.range, builder);
+    lowerWithBindingWrite(
+      selected,
+      target,
+      value,
+      target.range,
+      builder,
+      target.globalReference ?? {},
+    );
     return;
   }
   if (target.kind === "binding" || target.kind === "declaration") {
@@ -6352,7 +6375,14 @@ function lowerBindingTarget(
       },
       builder,
     );
-    lowerWithBindingWrite(selected, pattern, value, pattern.range, builder);
+    lowerWithBindingWrite(
+      selected,
+      pattern,
+      value,
+      pattern.range,
+      builder,
+      pattern.globalReference ?? {},
+    );
     return;
   }
   if (mode === "write") {
