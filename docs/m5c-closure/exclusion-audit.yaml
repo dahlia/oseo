@@ -4142,6 +4142,336 @@ paths:
     section: "sec-comma-operator"
     subject: "Whitespace and line terminators around the comma operator"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-1-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bb850bf59179ff94b166b42c3003497e9c50c143fc4f9a69e2d95dcfc60b\
+      f15d"
+    observationDigest: "bca45fbf41c1bcf95c9d316b31ac77163f9b653152f6d62f35a457b\
+      d6ecc68cb"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "ReferenceError is thrown if the LeftHandSideExpression of a Compound
+      Assignment operator(*=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-10-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c6001a29cf1a80c2106d4520aacc5738db77ce5eb10f31f0559dbb8f9995\
+      14cc"
+    observationDigest: "9648fd8dad0bd93570b53fdfa81d220e08373076dca87e7b4bd1fbc\
+      5b47f98ea"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "ReferenceError is thrown if the LeftHandSideExpression of a Compound
+      Assignment operator(^=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-11-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d8268662741a95bc2a6c6f021354477ed4874dbda384eec99b89bc40afbb\
+      90d4"
+    observationDigest: "3e59b423e1543b75b1909bb4558f9d5f2eb9d1b10394f98a71ba4b8\
+      261fd0879"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "ReferenceError is thrown if the LeftHandSideExpression of a Compound
+      Assignment operator(|=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-2-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e1f51ddbdc3f1d9b4a0e0e09fe9b4112656c7a28c346a457224e29d24977\
+      aa10"
+    observationDigest: "1199e7b63c9935d9eadb1e031e5788c0d10fa76053b639545f2614f\
+      ba2be7903"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(/=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-4-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0fa130b05397cbc4f6ed3cdba9d0d9c57bef70e874d1b3ecfacfe0a0f33c\
+      ac49"
+    observationDigest: "f49d760b2521385ec5d2899d39ba747aa2b577d75e5d67f01561ed1\
+      23110f9f9"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(+=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-5-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1fb79d0b9135bce17553f1854bcfb32deaa77aa029bff4ae1193c93de6f8\
+      ea85"
+    observationDigest: "94592a81b25e11477547b63fafa00d84db52277594d06debc685f3b\
+      c348b4f86"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(-=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-6-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5512efeb298132c68f78139094b10ec0ae0f11c5f1755b079b986236f304\
+      5b7c"
+    observationDigest: "329becbb089c3bb72cfa3603ce22644871d0b37f876169e879a4d64\
+      6948e484d"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(<<=) evaluates to an unresolvable
+      reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-8-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bd090dc38d7ed2e2dff444dfd49375c71baba9b96d09768f30d14b1bd972\
+      c248"
+    observationDigest: "f082ccaa38d0bda3ad46835925668681bdeb09ee7be586286d4db8e\
+      dc04a81c9"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(>>>=) evaluates to an unresolvable
+      reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-9-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d5eb4bea930d47fba0e931aa3b33522788a725634863b0bc74c2dfaf4ad3\
+      ef8c"
+    observationDigest: "d9e81a217b31dffd3139b2eb479d400c031ae3406178c5c8cc21430\
+      55c879329"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(&=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.10_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "663688921461b65df33e93fbe4c6af84324ed50487b0c2220deea12cf151\
+      3fe2"
+    observationDigest: "dce6a83cee29941975c368bcee773c5499379cb282d8ad2ad8d523c\
+      3ef7bbb74"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x ^= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.11_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "716d02217c839a73f8fae9f516a07401a37146e22715c53e8d17e69293bb\
+      c68b"
+    observationDigest: "811ced2ba1c2059be321d000d9b34ff75717ddcd84b64dde6481045\
+      fbaf0d2e3"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x |= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.1_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a553b08e009170f0263cc1f88541adef2f78e15852e2961950ef9c57de77\
+      7948"
+    observationDigest: "9a989aee3e68498e71a69ab08ba8b466aa98642a87219a995ff5895\
+      592b1c122"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x *= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.2_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "15e1a7f12297c0b524719fb4ba6fc5e78ae4d6b5e3c7825a06506864c9a0\
+      6afa"
+    observationDigest: "1c9456a05a099a1d9448f02ca4593194221b2ea52568a156ab98399\
+      0c4db11d7"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x /= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.3_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "632eb4b76bb421667c2301157d704d7cac4029d40a084050fc7deb7a59f5\
+      a053"
+    observationDigest: "a1f27c63f3a7e26bf791f56be721fbc7dd30c4df84b00bbfd135080\
+      a2f1e1766"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x %= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.4_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a2bc57d8ce94b0880de3d88464ba904ebe5080ffa30cc1b3e3844917bbb1\
+      cc67"
+    observationDigest: "01620ca099a5a253b0375bf1faecc109858e117206b6630c2e87c14\
+      80b803ddf"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x += y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.5_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fbc32293d12565925bf001a235bc3f2f3f62cc733c14eb12bde9d9af60d1\
+      1e05"
+    observationDigest: "7f52808e37d37b2bbed110590dd0a6531e289a206e9220134b0914f\
+      ced592352"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x -= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.6_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8a827e48c5cacb17e9992be069f908b885c7c718d5a4300bd5dd323aba2e\
+      200a"
+    observationDigest: "a9520260d4f781b0cc1af40eedb41e4c0e5a409657438d9f7247eb4\
+      f557a8675"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x <<= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.7_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "50a317b028f229eaa99e01102e43f372939b6732cbf096c9719822626763\
+      d504"
+    observationDigest: "498efa2722ee61b62efd0842a05d21203f5ed67e3305dcbd1d94165\
+      bc0ecbc22"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x >>= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.8_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e4caed881462b4903e856c0f03b8c032c5c1d8f8000814ceaf24b3367ea4\
+      f743"
+    observationDigest: "d2d642df067d745bd00aeb0863436fc329c8f1f2493e025ba6e9970\
+      9e437f465"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x >>>= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.9_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0c8c65e0d65110166ea3705ff5fa1365a0d4025ca8b6784befe4cc84a045\
+      e889"
+    observationDigest: "e029e621500ffb7f32f68b20c6b785ca75dd28cae6894e29bdb979c\
+      65f91b26b"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x &= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/concatenation/S9.8_A1_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6234cffa5d835290033eb2609f7864d34c11c9bf590274dbbd0ebdab19e5\
+      9b5a"
+    observationDigest: "670be974ff70029c9b38373b1e379307a3d573658f1e74cbbbe1604\
+      e7abe6d0e"
+    missingDynamicTag: false
+    section: "sec-addition-operator-plus"
+    subject:
+      'Undefined values is undefined, void 0 and eval("var x"). Use implicit
+      transformation'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/conditional/S11.12_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "39f1061c03578012e0acb3c5aed3886a83cc5c3bdd2ebddcd020bceaaa4f\
+      328e"
+    observationDigest: "3a1f4066b328a6aa8dade5cab4215b0443b4681fe0033a3f90754c1\
+      6ffa79683"
+    missingDynamicTag: false
+    section: "sec-conditional-operator"
+    subject: "Checking by using eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/delete/11.4.1-4.a-7.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "79f60c6919a48e435630e8c4a611e560513539cfa81f25975708713d5e5c\
+      3765"
+    observationDigest: "c249f55eb713ca42bfd41a3e19903495f6db455f4c66ef2625edd6c\
+      2b8d09109"
+    missingDynamicTag: false
+    section: "sec-delete-operator-runtime-semantics-evaluation"
+    subject: "delete operator inside 'eval'"
+    assessment: "fixture-construction"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-a\
       wait-expr.js"

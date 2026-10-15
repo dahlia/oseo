@@ -1,11 +1,11 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 197 reviewed unsupported paths assigned to
+delivers: "Resolves the 220 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure ledger.
   Select exactly those owners and their exclusion-audit path assessments:
   the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
-  source classification, 5 from observation-batch-07, 16 from batch 09, and
+  source classification, 5 from observation-batch-07, 16 from batch 09,
   19 from batch 11: 14 class tests that evaluate a class source string
   repeatedly through a direct eval call or new Function to compare private
   names and brands, one comma whitespace probe, one static field
@@ -15,7 +15,18 @@ delivers: "Resolves the 197 reviewed unsupported paths assigned to
   and the two class elements tests
   nested-private-direct-eval-err-contains-newtarget.js and
   private-direct-eval-err-contains-newtarget.js, whose final assertion
-  reads the ordinary public property c.x independent of the eval result.
+  reads the ordinary public property c.x independent of the eval result,
+  and 23 from batch 12 that use eval only as test scaffolding:
+  test/language/expressions/compound-assignment/11.13.2-N-s.js for N in 1,
+  2, 4, 5, 6, 8, 9, 10, and 11, which defer an unresolvable compound
+  assignment target into eval code;
+  test/language/expressions/compound-assignment/S11.13.2_A6.N_T1.js for N
+  from 1 through 11, which declare a more local var through eval while the
+  right operand runs; test/language/expressions/concatenation/S9.8_A1_T2.js,
+  whose third check reads the result of eval of var x; the whitespace probe
+  test/language/expressions/conditional/S11.12_A1.js; and
+  test/language/expressions/delete/11.4.1-4.a-7.js, which deletes a global
+  var inside eval code.
   Their eval or source constructor rejection is authorized, but non-source
   subject coverage remains unresolved.
   Obtain the maintainer accounting decision in
