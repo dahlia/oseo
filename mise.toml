@@ -9,7 +9,8 @@ postinstall = "mise run install-hooks"
 [tools]
 "aqua:dahlia/hongdown" = "0.5.3"
 "aqua:nushell/nushell" = "0.116.0"
-actionlint = "1.7.12"
+# The mise registry has no jactionlint entry yet, so name the backend.
+"ubi:jdx/jactionlint" = "2.1.0"
 aube = "2.5.0"
 deno = "2.9.7"
 node = "24.21.0"
@@ -62,7 +63,9 @@ depends = [
 
 [tasks."check:actions"]
 description = "Validate GitHub Actions workflows"
-run = "actionlint"
+# .github/jactionlint.yaml selects the profile and the two rules this
+# repository turns off, each with its reason.
+run = "jactionlint"
 
 [tasks."check:anti-slop"]
 description = "Exercise every enabled generic anti-slop rule"
@@ -249,6 +252,9 @@ run = "node tests/native.ts"
 [tasks."test:node"]
 description = "Run source, version, and built ESM tests under Node.js"
 depends = ["build"]
+# CI passes Node's own --test-shard so that the partition uses Node's file
+# discovery and no file can be missed.
+raw_args = true
 run = "node --test"
 
 [tasks."test:property:extended"]

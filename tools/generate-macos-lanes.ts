@@ -64,15 +64,19 @@ export function macosJobs(): readonly MacosLaneJob[] {
                   : "test",
     });
   }
-  for (const runtime of ["node", "deno"]) {
+  add(
+    "test",
+    "deno",
+    "test (macos-latest, deno)",
+    { os: "macos-latest", runtime: "deno" },
+    "macos-latest",
+  );
+  for (let shard = 1; shard <= 4; shard++) {
     add(
-      "test",
-      runtime,
-      `test (macos-latest, ${runtime})`,
-      {
-        os: "macos-latest",
-        runtime,
-      },
+      "test_node_shard",
+      String(shard),
+      `test (macos-latest, node, ${shard}/4)`,
+      { shard, total: 4 },
       "macos-latest",
     );
   }
@@ -440,11 +444,11 @@ export function generateMacosWorkflow(
   // Preserve Linux/Windows matrix jobs verbatim apart from macOS entries.
   for (const [id, block] of blocks) {
     let linux = block;
-    if (id === "test_sanitizer_macos") linux = "";
+    if (id === "test_sanitizer_macos" || id === "test_node_shard") linux = "";
     else {
       linux = linux.replace(/^          - macos-latest\n/m, "");
       linux = linux.replace(
-        /^          - os: macos-15\n(?:            [^\n]*\n)+/gm,
+        /^          - os: macos-(?:15|latest)\n(?:            [^\n]*\n)+/gm,
         "",
       );
     }
@@ -476,6 +480,8 @@ export function generateMacosWorkflow(
     "            process.exit(success ? 0 : 1);",
     "          '",
     "      - uses: actions/checkout@v7",
+    "        with:",
+    "          persist-credentials: false",
     "      - uses: jdx/mise-action@v4",
     "        with:",
     "          install: true",
@@ -577,6 +583,8 @@ function selfHostedAvailabilityJob(count: number): string {
     outputs,
     "    steps:",
     "      - uses: actions/checkout@v7",
+    "        with:",
+    "          persist-credentials: false",
     "      - uses: jdx/mise-action@v4",
     "        with:",
     "          install: true",

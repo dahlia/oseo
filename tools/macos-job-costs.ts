@@ -25,7 +25,13 @@ interface MacosJobCosts {
 
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
-  "test (macos-latest, node)": 2772,
+  // Derived: the single measured 2,772-second job divided by its four
+  // shards. Node's --test-shard partitions files by position, not by
+  // cost, so the four will not be equal; refresh from a measured run.
+  "test (macos-latest, node, 1/4)": 693,
+  "test (macos-latest, node, 2/4)": 693,
+  "test (macos-latest, node, 3/4)": 693,
+  "test (macos-latest, node, 4/4)": 693,
   "host C sanitizers (macOS, native)": 2252,
   "host C sanitizers (macOS, property)": 2189,
   "native support (macos-aarch64, 1/12)": 1940, // 2
