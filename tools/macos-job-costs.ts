@@ -1,23 +1,38 @@
 /**
  * Each entry is the median, rounded to whole seconds, of the job's measured
  * hosted `macos-15` or `macos-latest` walls (`started_at` to
- * `completed_at`) in seven run attempts: all-hosted runs 37121778924 and
- * 37167895777, Mac-lane branch run 37194069657 attempts 1 and 2, main run
- * 37206614757, and branch run 37215661294 attempts 1 and 2. Every job ran
- * in all seven, but a job placed on `oseo-mac-1` in an attempt has no
- * hosted wall there. The trailing comment gives the number of hosted
- * observations when it is below seven:
+ * `completed_at`). The lane generator sorts hosted jobs by these weights
+ * before assignment, and `modeledJobSeconds` converts a weight to a Mac
+ * estimate for any job without a measured Mac wall.
  *
- *  -  2: the two all-hosted runs only;
- *  -  4: the two all-hosted runs and both attempts of 37215661294;
- *  -  5: the two all-hosted runs, both attempts of 37194069657, and
- *     37206614757.
+ * The table has two vintages, which a reader must not mix up:
  *
- * An even count uses the mean of the two middle observations. The medians
- * replace the earlier main-run 36516215200 walls and derived own-key and
- * native-support planning weights, several of which lay below every
- * later observation of their job. The lane generator sorts hosted jobs
- * by these weights before assignment.
+ *  -  Sixteen entries were refreshed from six runs that observed the job
+ *     on a hosted runner: main runs 38688027859, 38681888021,
+ *     38606086453, 38593093817 and 38574256610, and attempt 2 of branch
+ *     run 38551733723. A trailing count below six gives the number of
+ *     hosted observations, and an even count uses the mean of the two
+ *     middle ones. Every refreshed entry with five or six observations
+ *     moved by a factor of 0.94 to 1.44; the single-observation entries
+ *     moved by 1.19 to 1.83 and are the least trustworthy, because a job
+ *     that normally runs on a Mac lane fell back to hosted exactly once,
+ *     possibly under contention.
+ *  -  Twenty-one entries are marked `retained`. Four Mac lanes now carry
+ *     them in every run, so none of the six runs observed them hosted and
+ *     their hosted median cannot be refreshed from CI as it stands. They
+ *     keep the median of the earlier seven attempts: all-hosted runs
+ *     37121778924 and 37167895777, branch run 37194069657 attempts 1 and
+ *     2, main run 37206614757, and branch run 37215661294 attempts 1
+ *     and 2.
+ *
+ * The refreshed entries rose against their retained neighbours, so the
+ * table is likely to understate the retained ones and to place them on a
+ * Mac lane more readily than it should. Closing that gap needs two
+ * all-hosted runs, which [U29 evidence] measured at 159.0 to 197.5
+ * minutes each; it is not worth that until a placement decision turns on
+ * it. The earlier basis replaced main-run 36516215200 walls and derived
+ * own-key and native-support planning weights, several of which lay below
+ * every later observation of their job.
  */
 interface MacosJobCosts {
   readonly [name: string]: number;
@@ -25,46 +40,43 @@ interface MacosJobCosts {
 
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
-  // Derived: the single measured 2,772-second job divided by its four
-  // shards. Node's --test-shard partitions files by position, not by
-  // cost, so the four will not be equal; refresh from a measured run.
-  "test (macos-latest, node, 1/4)": 693,
-  "test (macos-latest, node, 2/4)": 693,
-  "test (macos-latest, node, 3/4)": 693,
-  "test (macos-latest, node, 4/4)": 693,
-  "host C sanitizers (macOS, native)": 2252,
-  "host C sanitizers (macOS, property)": 2189,
-  "native support (macos-aarch64, 1/12)": 1940, // 2
-  "test262 (macos-aarch64, 6/12)": 1540,
-  "test262 (macos-aarch64, 8/12)": 1500, // 2
-  "test262 (macos-aarch64, 9/12)": 1456,
-  "test262 (macos-aarch64, 5/12)": 1398,
-  "native support (macos-aarch64, 7/12)": 1367,
-  "native support (macos-aarch64, 4/12)": 1363, // 2
-  "native support (macos-aarch64, 9/12)": 1330,
-  "native support (macos-aarch64, 3/12)": 1323,
-  "native support (macos-aarch64, 11/12)": 1313,
-  "native support (macos-aarch64, 5/12)": 1308,
-  "native support (macos-aarch64, 12/12)": 1294, // 5
-  "test262 (macos-aarch64, 1/12)": 1288, // 4
-  "native support (macos-aarch64, 10/12)": 1270, // 2
-  "test262 (macos-aarch64, 10/12)": 1225,
-  "test262 (macos-aarch64, 7/12)": 1200,
-  "native support (macos-aarch64, 8/12)": 1194, // 5
-  "test262 (macos-aarch64, 12/12)": 1190,
-  "native support (macos-aarch64, 6/12)": 1182, // 5
-  "test262 (macos-aarch64, 2/12)": 1180, // 4
-  "test262 (macos-aarch64, 4/12)": 1163,
-  "test262 (macos-aarch64, 11/12)": 1156, // 4
-  "native support (macos-aarch64, 2/12)": 1117, // 2
-  "test262 (macos-aarch64, 3/12)": 1110,
-  "native (macos-aarch64, 3/3)": 1014, // 5
-  "own-key cases (macos-aarch64, 2/3)": 995, // 2
-  "native (macos-aarch64, 2/3)": 917,
-  "native (macos-aarch64, 1/3)": 886,
-  "own-key cases (macos-aarch64, 3/3)": 854, // 2
-  "own-key cases (macos-aarch64, 1/3)": 810, // 2
-  "test (macos-latest, deno)": 110,
+  "host C sanitizers (macOS, native)": 2456,
+  "host C sanitizers (macOS, property)": 2058,
+  "native support (macos-aarch64, 2/12)": 2042, // 1
+  "test262 (macos-aarch64, 2/12)": 2033, // 5
+  "native support (macos-aarch64, 1/12)": 1940, // retained
+  "test262 (macos-aarch64, 11/12)": 1894, // 1
+  "test262 (macos-aarch64, 4/12)": 1870, // 1
+  "native support (macos-aarch64, 4/12)": 1713, // 1
+  "native support (macos-aarch64, 6/12)": 1702, // 5
+  "test262 (macos-aarch64, 5/12)": 1692,
+  "test262 (macos-aarch64, 6/12)": 1540, // retained
+  "native support (macos-aarch64, 7/12)": 1512,
+  "test262 (macos-aarch64, 8/12)": 1500, // retained
+  "test262 (macos-aarch64, 9/12)": 1456, // retained
+  "native support (macos-aarch64, 9/12)": 1330, // retained
+  "native support (macos-aarch64, 3/12)": 1323, // retained
+  "native support (macos-aarch64, 11/12)": 1313, // retained
+  "native support (macos-aarch64, 5/12)": 1308, // retained
+  "native support (macos-aarch64, 12/12)": 1294, // retained
+  "test262 (macos-aarch64, 1/12)": 1288, // retained
+  "native support (macos-aarch64, 10/12)": 1270, // retained
+  "test262 (macos-aarch64, 10/12)": 1225, // retained
+  "test262 (macos-aarch64, 7/12)": 1200, // retained
+  "native support (macos-aarch64, 8/12)": 1194, // retained
+  "test262 (macos-aarch64, 12/12)": 1190, // retained
+  "test262 (macos-aarch64, 3/12)": 1110, // retained
+  "native (macos-aarch64, 1/3)": 1088, // 5
+  "test (macos-latest, node, 2/4)": 1066, // 1
+  "test (macos-latest, node, 1/4)": 1057, // 1
+  "test (macos-latest, node, 3/4)": 1037, // 1
+  "native (macos-aarch64, 3/3)": 1014, // retained
+  "own-key cases (macos-aarch64, 2/3)": 995, // retained
+  "native (macos-aarch64, 2/3)": 917, // retained
+  "own-key cases (macos-aarch64, 3/3)": 854, // retained
+  "test (macos-latest, node, 4/4)": 822, // 1
+  "own-key cases (macos-aarch64, 1/3)": 810, // retained
+  "test (macos-latest, deno)": 111,
 };
 
 /**
