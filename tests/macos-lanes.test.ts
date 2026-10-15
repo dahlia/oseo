@@ -330,14 +330,13 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       if (index > 0) assert.ok(lane[index - 1]!.seconds >= planned.seconds);
     }
   }
-  // Hosted medians of seven measured run attempts, all on hosted lanes.
-  // Splitting the hosted macOS Node.js job into four shards left its total
-  // unchanged but packs less evenly across five lanes than one job did.
+  // Hosted medians, refreshed for the sixteen jobs that six recent runs
+  // observed hosted and retained for the rest; see PLAN-GATE.md (U33).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    9272,
+    10607,
   );
 });
 
@@ -947,7 +946,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 5472);
+  assert.equal(Math.round(modeled), 6040);
 });
 
 test("faster native support work uses additional capacity", () => {

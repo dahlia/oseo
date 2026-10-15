@@ -2615,3 +2615,40 @@ The suites, their budgets, and the local unsharded `mise run test:node`
 gate are unchanged; `test:node` gained only the ability to forward the
 flag. The `native` aggregate's required set does not include this job and
 does not change.
+
+### Refreshed hosted medians (U33)
+
+The four-lane arrangement measured 64.42 minutes in main run `38593093817`
+and 78.08 in `38688027859`, against the 51.3 the lane model derived, and
+the model's error was traceable: *tools/macos-job-costs.ts* held hosted
+medians from runs that predate the current corpus. Six runs that observed
+jobs on hosted runners put sixteen of its thirty-seven entries right. The
+entries with five or six observations moved by a factor of 0.94 to 1.44,
+and the four `test (macos-latest, node, N/4)` weights, which this plan
+derived as a quarter of the unsplit job, measured 822 to 1,066 seconds
+against the 693 assumed.
+
+With the refreshed table the derived four-lane makespan rises from 51.3 to
+61.5 minutes, against 64.42 and 78.08 measured, and the binding lane
+changes from a Mac lane to a hosted one, which is what both runs showed.
+The four Node.js shards now land on four different hosted lanes instead of
+bunching, which is the placement error that left two of them finishing
+last in `38688027859`.
+
+Twenty-one entries could not be refreshed. Four Mac lanes carry them in
+every run, so no recent run observed them hosted. They keep the earlier
+seven-attempt median and are marked `retained` in the table. Since every
+well-observed refresh rose, the table now probably understates them, and
+the model will move a retained job to a Mac lane more readily than it
+should. Two all-hosted runs would close that gap at a measured 159.0 to
+197.5 minutes each; that is not spent until a decision turns on it.
+
+`selfHostedJobSeconds` is deliberately untouched. Its values are one-lane
+Mac walls, measured when a single lane existed, and the model multiplies
+them by a pair slowdown. Every Mac wall observable now is already slowed
+by a partner, so adopting those observations would count the slowdown
+twice. Refreshing that table needs a deliberate one-lane run.
+
+Case budgets, seeds, sizes, interrupt limits, job names, the aggregate's
+required set and every shard total are unchanged. Only lane placement
+moves.
