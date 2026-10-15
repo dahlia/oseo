@@ -28,6 +28,8 @@ export interface HirBindingIdentifier extends LocatedSyntax {
    * lexical fallback when the target occurs inside `with`.
    */
   readonly withObjectBindingIds?: readonly number[];
+  /** Strict SetMutableBinding for a selected with object on a write leaf. */
+  readonly globalReference?: HirGlobalReference;
 }
 
 /** One lexical assignment fallback behind an ordered `with` object chain. */
@@ -48,10 +50,12 @@ export const intrinsicGlobalObjectName = "*intrinsic global object*";
 
 /**
  * One realm global-object property fallback behind an ordered `with`
- * object chain. An all-miss non-strict PutValue reaches the global
- * object, where it creates or updates this property, so the fallback
- * names the hidden global-object capture and the property key instead
- * of a hidden cell no later reference to the same name would observe.
+ * object chain. An all-miss sloppy or strict write uses this fallback.
+ * Sloppy PutValue creates or updates the property. Strict PutValue
+ * retains the initial resolution and throws for an unresolved reference
+ * or a property lost before the write. The capture and key retain the
+ * global property identity instead of storing a value in a hidden cell
+ * no later reference would observe.
  */
 export interface HirWithGlobalObjectFallback {
   readonly name: string;
@@ -241,6 +245,8 @@ export type HirForOfTarget =
       readonly name: string;
       readonly range: SourceRange;
       readonly withObjectBindingIds?: readonly number[];
+      /** Strict SetMutableBinding for a selected with object. */
+      readonly globalReference?: HirGlobalReference;
     }
   | {
       readonly key: HirExpression;
@@ -759,6 +765,8 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly fallback: HirWithBindingReference | HirWithGlobalObjectFallback;
+      /** Object Environment Record checks for the retained reference. */
+      readonly globalReference: HirGlobalReference;
       readonly kind: "with-set";
       readonly name: string;
       readonly objectBindingIds: readonly number[];
@@ -766,6 +774,8 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly fallback: HirWithBindingReference | HirWithGlobalObjectFallback;
+      /** Object Environment Record checks for the retained reference. */
+      readonly globalReference: HirGlobalReference;
       readonly kind: "with-update";
       readonly name: string;
       readonly objectBindingIds: readonly number[];
@@ -774,6 +784,8 @@ export type HirExpression =
     })
   | (LocatedSyntax & {
       readonly fallback: HirWithBindingReference | HirWithGlobalObjectFallback;
+      /** Object Environment Record checks for the retained reference. */
+      readonly globalReference: HirGlobalReference;
       readonly kind: "with-step";
       readonly name: string;
       readonly objectBindingIds: readonly number[];

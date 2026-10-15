@@ -59026,6 +59026,18 @@ tests:
         symbols,
         var-bindings,
       ]
+  - path: test/language/expressions/assignment/assignment-operator-calls-putvalue-lref--rval-.js
+    expectedClassification: pass
+    dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/assignment/dstr/array-elem-nested-array.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]

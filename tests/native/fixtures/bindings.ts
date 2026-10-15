@@ -63,6 +63,216 @@ try {
 `,
   },
   {
+    name: "with-strict-deleted-binding",
+    nonStrictScript: true,
+    source: `
+let count = 0;
+const scope = { x: 1 };
+with (scope) {
+  (function () {
+    "use strict";
+    try {
+      count++;
+      x = (delete scope.x, 2);
+      count++;
+    } catch (error) {
+      console.log("error", error instanceof ReferenceError);
+    }
+    count++;
+  })();
+}
+console.log("after", count, "x" in scope);
+`,
+  },
+  {
+    name: "with-strict-compound-deleted-binding",
+    nonStrictScript: true,
+    // These local regressions retain B12's first canonical admission of
+    // its eleven equivalent upstream paths. They add no reviewed path.
+    source: [
+      "let count = 0;",
+      ...["+", "-", "*", "/", "%", "**", "<<", ">>", ">>>", "&", "^", "|"].map(
+        (operator) => `
+{
+  const scope = { x: 1 };
+  with (scope) {
+    (function () {
+      "use strict";
+      try { x ${operator}= (delete scope.x, 2); }
+      catch (error) {
+        console.log("${operator}=", error instanceof ReferenceError);
+        count++;
+      }
+    })();
+  }
+  console.log("missing", "x" in scope);
+}
+`,
+      ),
+      "console.log(count);",
+    ].join("\n"),
+  },
+  {
+    name: "with-strict-update-deleted-binding",
+    nonStrictScript: true,
+    // The matching update control remains differential. Exact divergent
+    // subjects are private fixed native observations in the property suite.
+    source: `const updating = {
+  get x() { delete this.x; return 1; },
+};
+with (updating) {
+  (function () {
+    "use strict";
+    try { x++; }
+    catch (error) { console.log("update", error.name, "x" in updating); }
+  })();
+}
+`,
+  },
+  {
+    name: "with-strict-heritage-write",
+    nonStrictScript: true,
+    // A class heritage operand is strict code inside sloppy code, so its
+    // failed Set or delete throws TypeError, and an all-miss write throws
+    // ReferenceError. The sloppy lines are the non-throwing controls.
+    source: `
+function report(label, run) {
+  try { console.log(label, run()); }
+  catch (error) { console.log(label, error.name); }
+}
+const frozen = Object.freeze({ x: 0 });
+const refusing = new Proxy({ x: 0 }, { set() { return false; } });
+const deleting = { x: 1 };
+const open = { x: 0 };
+globalThis.oseoHeritageGlobal = 0;
+with ({}) {
+  report("global-undefined", () => {
+    class C extends (undefined = 1, Object) {}
+    return "ok";
+  });
+  report("global-missing", () => {
+    class C extends (oseoHeritageMissing = 1, Object) {}
+    return "ok";
+  });
+  report("global-writable", () => {
+    class C extends (oseoHeritageGlobal = 1, Object) {}
+    return oseoHeritageGlobal;
+  });
+  report("sloppy-undefined", () => (undefined = 1, "ok"));
+}
+with (frozen) {
+  report("frozen-simple", () => {
+    class C extends (x = 1, Object) {}
+    return "ok";
+  });
+  report("frozen-compound", () => {
+    class C extends (x += 1, Object) {}
+    return "ok";
+  });
+  report("frozen-update", () => {
+    class C extends (x++, Object) {}
+    return "ok";
+  });
+  report("sloppy-frozen", () => (x = 1, x += 1, x++, x));
+  report("after-with-heritage", () => {
+    class C extends (x, Object) {}
+    x = 1;
+    x += 1;
+    return x;
+  });
+}
+with (Object.freeze({ x: 1 })) {
+  report("frozen-logical", () => {
+    class C extends (x &&= 2, Object) {}
+    return "ok";
+  });
+}
+with (refusing) {
+  report("proxy-refusing", () => {
+    class C extends (x = 1, Object) {}
+    return "ok";
+  });
+  report("sloppy-proxy", () => (x = 1, x));
+}
+with (deleting) {
+  report("deleted-binding", () => {
+    class C extends (x = (delete deleting.x, 2), Object) {}
+    return "ok";
+  });
+}
+with (open) {
+  report("open-object", () => {
+    class C extends (x = 5, Object) {}
+    return x;
+  });
+}
+report("plain-global", () => {
+  class C extends (NaN = 1, Object) {}
+  return "ok";
+});
+report("plain-delete", () => {
+  class C extends (delete frozen.x, Object) {}
+  return "ok";
+});
+report("sloppy-plain", () => (NaN = 1, delete frozen.x));
+report("after-plain-heritage", () => {
+  class C extends (NaN, Object) {}
+  NaN = 1;
+  frozen.x = 1;
+  return delete frozen.x;
+});
+console.log("after", "x" in deleting, open.x, frozen.x,
+  globalThis.oseoHeritageGlobal, "oseoHeritageMissing" in globalThis);
+`,
+  },
+  {
+    name: "with-existing-write-leaf-strictness",
+    nonStrictScript: true,
+    source: [
+      "[x] = [2];",
+      "({ value: x } = { value: 2 });",
+      "for (x of [2]) {}",
+      "for (x in { a: 1 }) {}",
+    ]
+      .flatMap((body, index) =>
+        [false, true].flatMap((strict) =>
+          (strict ? [false] : [false, true]).map(
+            (hit) => `
+{
+  let x = 0;
+  let writes = 0;
+  const target = ${hit ? "{ x: 1 }" : "{}"};
+  const environment = new Proxy(target, {
+    get(object, key, receiver) {
+      if (key === Symbol.unscopables) {
+        delete object.x;
+        return undefined;
+      }
+      return Reflect.get(object, key, receiver);
+    },
+    set(object, key, value, receiver) {
+      writes++;
+      return Reflect.set(object, key, value, receiver);
+    },
+  });
+  let result = "ok";
+  with (environment) {
+    (function () {
+      ${strict ? '"use strict";' : ""}
+      try { ${body} }
+      catch (error) { result = error.name; }
+    })();
+  }
+  console.log(${index}, ${strict}, ${hit}, result, x, writes,
+    "x" in target, target.x);
+}
+`,
+          ),
+        ),
+      )
+      .join("\n"),
+  },
+  {
     name: "labeled-statements",
     source: `
 outer: for (let i = 0; i < 3; i = i + 1) {

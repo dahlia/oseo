@@ -131,8 +131,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 25,437 reviewed cases: 21,677 passes, 2,205
-expected negatives, and 1,555 unsupported profile features. It records no
+The current manifest contains 26,637 reviewed cases: 22,627 passes, 2,350
+expected negatives, and 1,660 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -7867,10 +7867,13 @@ fixed native evidence checks the specified order against the model alone. A
 property
 a program creates at run time, directly, through `globalThis`, or through
 `Object.defineProperty`, is therefore visible to every later reference,
-including accessors and inherited properties. A non-strict all-miss `with`
-chain reaches the same property for simple, compound, logical, and update
-writes; destructuring and loop-head targets and strict writes behind such a
-chain remain source-located rejections. An unhandled rejection whose reason is
+including accessors and inherited properties. Sloppy and strict all-miss
+`with` chains reach the same property for simple, compound, logical, and
+update writes. Global-object fallback destructuring and loop-head targets
+retain source-located rejections, as do strict all-miss simple,
+destructuring, and loop-head writes to the runtime-owned call targets
+`console`, `setTimeout`, and `clearTimeout`. An unhandled rejection whose
+reason is
 an intrinsic error instance reports the rejection boundary text and keeps the
 reason's kind marker.
 
@@ -8144,10 +8147,14 @@ complete. The remaining gaps retain their existing owners.
     gap. The runtime-owned call targets `console`, `setTimeout`, and
     `clearTimeout` likewise keep hidden cells rather than global properties,
     so `typeof` and `delete` of them stay rejected. Second, an all-miss
-    `with` chain admits a non-strict simple, compound, logical, or update
-    write to the global object, but a destructuring, `for-in`, or `for-of`
-    target and every strict write through such a chain stay source-located
-    rejections. Third, the record validates one independently compiled
+    `with` chain admits sloppy and strict simple, compound, logical, or
+    update writes to the global object. Global-object fallback destructuring,
+    `for-in`, and `for-of` targets retain source-located rejections. Strict
+    all-miss simple, destructuring, `for-in`, and `for-of` writes to the
+    runtime-owned call targets `console`, `setTimeout`, and `clearTimeout`
+    also stay rejected, because their hidden cells cannot model strict
+    PutValue. Third,
+    the record validates one independently compiled
     Script at a time and does not retain `[[VarNames]]` across Scripts.
     Two interactions sit outside this unit for different reasons. Annex B
     block-level function hoisting is outside the candidate claim under
@@ -8316,3 +8323,71 @@ runtime value or safepoint. The existing indexed `classes` family records this
 bounded evidence; no new syntax family or Test262 path is admitted. Batch 11
 retains its exact 1,199-path reservation and first canonical admission of the
 duplicate case.
+
+
+Strict assignment through with environments
+-------------------------------------------
+
+M5c node `with-strict-assignment-fallback` retains the selected Object
+Environment Record through simple, compound, logical, and update writes.
+ECMA-262 2025 `SetMutableBinding` and assignment evaluation require
+`HasProperty` on the retained binding object: a deleted strict
+binding throws `ReferenceError`; a failed strict `Set` throws `TypeError`.
+Sloppy writes retain the selected object after deletion. A nearer binding
+created during the right operand does not redirect the write. Read-first
+operators also preserve `GetBindingValue`'s separate presence check.
+Class code is strict even inside sloppy code, so a class heritage operand,
+computed key, static block, static field initializer, or static method
+applies the same strict checks. The heritage operand now lowers as strict
+code; this also gives any failed `Set` or `delete` in it, with or without
+`with`, the `TypeError` that ECMA-262 2025 requires.
+
+Existing array/object assignment leaves and for-in/of binding heads with
+lexical fallbacks preserve strictness when a selected binding disappears
+while reading `Symbol.unscopables`. Initial misses write their lexical
+fallbacks. This evidence does not establish general destructuring reference
+preparation order: identifier targets are still resolved after iterator or
+property reads. That separate boundary remains outside this repair.
+
+The existing *m5-globalthis-binding.property.test.ts* family reserves slots
+`0x60007e01`, `0x60007e02`, and `0x60007e03` for retained-object writes,
+existing write leaves, and retained-object writes from five class code
+contexts inside sloppy code. Each structured domain has 16 ordinary cases
+and a 240-second interrupt limit. Shrinking retains the selected object,
+operation, mutation, strictness or class context, and bounded positive
+integer. Slot03 reuses the slot01 source and strict model unchanged, so
+slot01's generated sources stay byte for byte the same. The independent
+ECMA-262 2025 model checks full global/outer/inner binding state. Both
+specialization policies force collection and retain false numeric hints, shape
+misses and compiled generic fallback; this change adds no specialization or
+guard.
+
+Node.js 24.21.0 and Deno 2.9.7 disagree with the normative model in measured
+classes. For values 1 through 8, slot01 records reference discrepancies when
+`=`, `+=` or `&&=` takes its right operand and the selected object is global
+or outer, or is inner with sloppy deletion. Slot02 records discrepancies
+only for strict selected hits. Slot03 records the strict slot01 classes:
+`=`, `+=`, or `&&=` with a global or outer selected object, in every class
+context. Every generated case collects both reference
+outputs and requires successful reference execution. Outside these classes,
+reference outputs must match the model. Native assertions require model
+output, including six private fixed discrepancy subjects in this suite.
+Shared differential fixtures retain matching controls.
+
+The complete eight-registration focused suite passed on the original source
+base, including all six fixed subjects. Exact source bytes survived the
+fresh-base integration. This focused observation does not replace the whole
+ordinary and extended gates. The existing seed block and slot00 budget,
+runtime ABI and package versions remain unchanged. B12 retains first
+canonical admission of its eleven compound-assignment paths.
+
+Review R2 found that the heritage operand kept the enclosing sloppy
+strictness. Slot03 and the fixed `with-strict-heritage-write` native
+fixture were added with that repair. Before native execution, all 600
+slot03 sources with values 1 and 8 compiled without a diagnostic, and Node.js
+and Deno matched the model outside the slot03 discrepancy classes. On Linux
+x86-64, the focused native run of that fixture matched Node.js and Deno under
+both policies with forced collection. All nine registrations of the property
+file passed, including slot03. Both R2 reproducer sources printed `TypeError`
+natively under both policies with forced collection. These focused runs do
+not replace the whole ordinary and extended gates.

@@ -7,7 +7,10 @@ scope:
   - "Known globals keep their property-backed cells; every other unresolved
     global reference resolves through the realm global object at run time,
     including typeof, delete, sloppy and strict writes, and all-miss with
-    reads and non-strict writes."
+    reads and sloppy or strict simple, compound, logical, and update
+    writes. Strict all-miss with writes to the runtime-owned call targets
+    console, setTimeout, and clearTimeout remain source-located
+    rejections."
   - "The unresolvable-reference ReferenceError, the rejection boundary for an
     intrinsic error reason, and the test262 host-binding and
     harness-definition capability classifications."

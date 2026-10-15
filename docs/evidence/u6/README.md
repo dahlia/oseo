@@ -320,4 +320,14 @@ The final evidence-only `mise run check` also passed in 64.98 observed seconds
 with the assigned Zig cache and `MISE_JOBS=1`; this is gate context, not a
 performance measurement.
 
+A complete local Linux `mise run test:property:extended` run on 2026-10-15
+measured a summed case duration of 1132.411863192 seconds across all nine
+registrations in *tests/property/m5-globalthis-binding.property.test.ts*.
+The Linux weight is 1133 seconds, rounded up from that sum. The macOS weight
+is also 1133, an explicitly unmeasured provisional estimate reusing the local
+Linux sum, without a guaranteed conservative bound. These are not CI
+measurements or file wall times. Replace both entries with actual native
+CI case sums when available, including a fresh macOS observation. This
+update changes no case budgets, seeds, deadlines or shard totals.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

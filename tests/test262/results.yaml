@@ -18499,7 +18499,7 @@ summary:
   expectedNegatives: 2350
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 22626
+  passes: 22627
   semanticFailures: 0
   unsupportedProfileFeatures: 1660
   dependencies:
@@ -18605,21 +18605,21 @@ summary:
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 718
+      passes: 719
       semanticFailures: 0
       unsupportedProfileFeatures: 13
     - dependency: expression-operators
       expectedNegatives: 372
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2508
+      passes: 2509
       semanticFailures: 0
       unsupportedProfileFeatures: 25
     - dependency: functions
       expectedNegatives: 458
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7576
+      passes: 7577
       semanticFailures: 0
       unsupportedProfileFeatures: 718
     - dependency: generators
@@ -18654,7 +18654,7 @@ summary:
       expectedNegatives: 153
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 669
+      passes: 670
       semanticFailures: 0
       unsupportedProfileFeatures: 16
     - dependency: module-linking
@@ -18668,7 +18668,7 @@ summary:
       expectedNegatives: 14
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1491
+      passes: 1492
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: object-own-keys
@@ -18682,7 +18682,7 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 13602
+      passes: 13603
       semanticFailures: 0
       unsupportedProfileFeatures: 192
     - dependency: promise-settlement
@@ -18808,7 +18808,7 @@ summary:
       expectedNegatives: 89
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2832
+      passes: 2833
       semanticFailures: 0
       unsupportedProfileFeatures: 27
     - dependency: weak-collections
@@ -19257,7 +19257,7 @@ summary:
       expectedNegatives: 1280
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5189
+      passes: 5190
       semanticFailures: 0
       unsupportedProfileFeatures: 225
     - group: language/function-code

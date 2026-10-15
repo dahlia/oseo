@@ -232,6 +232,16 @@ prove dynamic-global equivalence or eliminate the fallback requirement.
 Stage 1 whole-Script baseline
 -----------------------------
 
+The `with-strict-assignment-fallback` repair deliberately regenerates only
+the two *bindings/with-statements* records, one per specialization policy.
+Its shared Object Environment Record writer now performs `HasProperty`
+before `SetMutableBinding`, including sloppy writes. Each policy adds three
+presence checks before property writes. Printed HIR and non-source emitted-C
+metadata remain identical; MIR and C add those checks and their root layout. A
+source-only comparison reproduced all 44 old hashes on clean main before
+measuring the candidate, retained fixture bytes and record order, and left the
+other 42 hashes unchanged. This changes no runtime ABI.
+
 The initial baseline is main commit
 `779e281908622d39e2a138548058438903019046`. Direct comparison covered 318
 fixture/policy outputs from eight existing native fixture families: bindings,

@@ -5,6 +5,8 @@
  * The m5-array-sort-stability entries come from run 37884543813 instead,
  * because the file postdates both weight-source runs and its first
  * checked-in values were estimates.
+ * The globalThis entries use local Linux and provisional macOS evidence
+ * documented below and in the evidence README.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -71,7 +73,9 @@ export const nativeShardCosts = {
     "tests/property/m5-generic-string-coercion.property.test.ts": 331,
     "tests/property/m5-global-numeric-functions.property.test.ts": 483,
     "tests/property/m5-global-object-record.property.test.ts": 422,
-    "tests/property/m5-globalthis-binding.property.test.ts": 532,
+    // Local Linux full extended run (October 15, 2026): case sum
+    // 1132.411863192 s rounded up; not CI or a file wall time.
+    "tests/property/m5-globalthis-binding.property.test.ts": 1133,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 861,
     "tests/property/m5-harness-promise-helper.property.test.ts": 428,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 305,
@@ -214,7 +218,9 @@ export const nativeShardCosts = {
     "tests/property/m5-generic-string-coercion.property.test.ts": 270,
     "tests/property/m5-global-numeric-functions.property.test.ts": 682,
     "tests/property/m5-global-object-record.property.test.ts": 321,
-    "tests/property/m5-globalthis-binding.property.test.ts": 485,
+    // Unmeasured provisional estimate reusing the local Linux case sum.
+    // Replace with macOS CI evidence; not a guaranteed conservative bound.
+    "tests/property/m5-globalthis-binding.property.test.ts": 1133,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 638,
     "tests/property/m5-harness-promise-helper.property.test.ts": 431,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 226,
