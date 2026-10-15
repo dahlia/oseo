@@ -14,6 +14,7 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/bigint.ts
+      - tests/property/m5-compound-assignment.property.test.ts
   forced-collection:
     status: covered
     references:

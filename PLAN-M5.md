@@ -1535,7 +1535,9 @@ identifier and member targets. Identifier targets perform one checked read
 before the right operand and one checked write afterward. Member targets
 evaluate their object and property-key expression once. They convert the
 retained key value for the read, then convert it again after the right operand
-on the taken write path. Plain `=` assignment to a computed member likewise
+on the taken write path. M5c node `compound-member-assignment-key-order` later
+replaced that order for arithmetic member targets; see *Compound member key
+order* below. Plain `=` assignment to a computed member likewise
 retains the raw key and converts it only after the right operand, as `PutValue`
 specifies. Logical assignments lower through explicit branches,
 so their short path skips the right operand, second conversion, and write.
@@ -7590,3 +7592,71 @@ both policies with forced collection. All nine registrations of the property
 file passed, including slot03. Both R2 reproducer sources printed `TypeError`
 natively under both policies with forced collection. These focused runs do
 not replace the whole ordinary and extended gates.
+
+
+Compound member key order
+-------------------------
+
+M5c node `compound-member-assignment-key-order` repairs `base[key] op= value`
+for the twelve arithmetic, exponentiation, bitwise, and shift operators on an
+ordinary computed or named member. ECMA-262 2025 13.15.2 evaluates the base
+and the key expression, then `GetValue` (6.2.5.5) applies `ToObject` to the
+base before `ToPropertyKey` and stores the converted key in the Reference,
+which `PutValue` (6.2.5.6) reuses. MIR now lowers that reference with the
+assignment-target `RequireObjectCoercible` check, one key conversion, the
+read, the right operand, and the write with the same key. A null or
+undefined base therefore throws `TypeError` before the key is converted or
+the right operand runs. The check returns the original base, so a primitive
+base stays the receiver of both the read and the write rather than being
+replaced by a wrapper object. The tested primitive cases use number and string
+bases whose default prototype chains have no setter for the key: there the
+read finds no property, the write is ignored in sloppy code, and it throws
+`TypeError` in strict code. An inherited setter on a primitive's prototype
+chain is outside that tested case.
+
+The change is limited to that arithmetic reference. Logical member
+assignment, `super` and global identifier references, simple member
+assignment, and update expressions keep their earlier lowering. A logical
+member assignment still converts its key before a nullish base throws and
+converts it again before a taken write. A simple member assignment still
+converts the key before `PutValue`'s `ToObject` check. Update expressions
+already throw before conversion for a nullish base, but convert an object key
+twice. A `super` compound assignment also converts its key twice. These are
+retained behaviors, not conforming ones; the generated and fixed controls
+use primitive string keys, whose conversion cannot be observed, for the
+three non-arithmetic forms.
+
+Node.js 24.21.0 and Deno 2.9.7 agree with ECMA-262 2025 for a nullish base,
+but both convert an arithmetic member key a second time before the write.
+That is a reference discrepancy, not an oracle. The tests run each
+reference source as a global Script through indirect `eval`, because Deno
+would otherwise load the file as a strict module, and require the references
+to equal a labeled V8 model that differs from the normative model only by
+that second conversion.
+
+The existing *m5-compound-assignment.property.test.ts* family keeps slot
+`0x60000c00` and its generator unchanged; its native model now expects one
+conversion for an arithmetic member target and keeps the retained logical
+count, while its references must equal the labeled V8 count. Slot
+`0x60000c01` generates one to four subjects in sloppy or strict code:
+arithmetic operators over null, undefined, number, string, and object bases
+with counting, throwing, or string keys, and logical, simple, and update
+controls with string keys. It has 20 ordinary cases and a 240-second
+interrupt limit. Shrinking keeps the strictness and each subject's operator,
+base, key, and bounded values. Native runs use both specialization policies
+with collection at every safepoint. Fixed cases in the same file cover every
+arithmetic operator over every base and key kind in both strictness modes,
+every control over every base, and the S11.13.2\_A7 T4 shape, a key whose
+conversions name different properties, through both `toString` and
+`Symbol.toPrimitive`, plus a member compound assignment whose right operand
+awaits, which keeps the checked base and converted key across suspension. The
+`compound-assignments` native fixture now checks the nullish-base order for all
+twelve operators instead of the double-converting `+=` case, which moved to
+those fixed cases. The repair adds no specialized path or guard, so the
+guard-fallback omission and its replacement evidence remain.
+
+The 33 paths matching *S11.13.2\_A7.{1..11}\_T{1,2,4}.js* in
+*test/language/expressions/compound-assignment/* observed `semantic-failure`
+before this repair and pass after it in a focused runner check; the eleven `T3`
+siblings pass before and after. Batch 12 keeps their first canonical admission,
+so this node adds no subset row.

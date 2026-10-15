@@ -242,6 +242,16 @@ source-only comparison reproduced all 44 old hashes on clean main before
 measuring the candidate, retained fixture bytes and record order, and left the
 other 42 hashes unchanged. This changes no runtime ABI.
 
+The `compound-member-assignment-key-order` repair deliberately regenerates
+only the two *async/async-await-positions* records, one per specialization
+policy. That fixture's two `retained.value += await ...` statements are
+arithmetic member compound assignments, whose MIR now checks the base with
+the assignment-target `RequireObjectCoercible` operation and converts the key
+once instead of twice. Printed HIR is unchanged; MIR and C change at those two
+sites. On clean main the same source-only comparison reproduced all 44 old
+hashes; with the repair the other 42 hashes stay unchanged. This changes no
+runtime ABI.
+
 The initial baseline is main commit
 `779e281908622d39e2a138548058438903019046`. Direct comparison covered 318
 fixture/policy outputs from eight existing native fixture families: bindings,

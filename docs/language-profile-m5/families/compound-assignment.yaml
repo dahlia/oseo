@@ -3,6 +3,18 @@ id: compound-assignment
 title: "Compound assignment"
 scope:
   - "Arithmetic and logical compound assignment to references."
+  - "An arithmetic compound assignment to an ordinary computed or named
+    member, base[key] op= value for all twelve arithmetic, exponentiation,
+    bitwise, and shift operators, follows ECMA-262 2025 GetValue and
+    PutValue: a null or undefined base throws TypeError before the key is
+    converted or the right operand runs, and the key is converted once and
+    reused by the write. Both measured V8 hosts convert the key again before
+    the write; that discrepancy is recorded against fixed expected values."
+  - "Logical member assignment, super and global identifier references,
+    simple member assignment, and update expressions keep their earlier key
+    conversion order. A logical member write still converts its key twice
+    and converts it before a nullish base throws; that retained behavior is
+    not claimed as conforming."
 owners:
   - PLAN-M5.md
 evidence:
@@ -10,10 +22,12 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/bindings.ts
+      - tests/property/m5-compound-assignment.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/bindings.ts
+      - tests/property/m5-compound-assignment.property.test.ts
   forced-collection:
     status: covered
     references:

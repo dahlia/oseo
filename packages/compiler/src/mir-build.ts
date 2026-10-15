@@ -1686,6 +1686,46 @@ function lowerLogicalValue(
   return recordRoot(builder, result, range);
 }
 
+function isLogicalAssignmentOperator(
+  operator: AssignmentOperator,
+): operator is LogicalOperator {
+  return operator === "&&" || operator === "??" || operator === "||";
+}
+
+/**
+ * Lowers an arithmetic compound assignment to an ordinary computed or
+ * named member reference, `base[key] op= value`. ECMA-262 2025 GetValue
+ * applies ToObject to the base before it converts the key, so a nullish
+ * base throws TypeError without observing the key's conversion, and it
+ * stores the converted key in the Reference that PutValue then reuses.
+ * The key is therefore converted exactly once, after the base check and
+ * before the right operand. `super`, global identifier, and logical
+ * assignment references keep their own lowering.
+ */
+function lowerArithmeticPropertyUpdate(
+  objectInput: number,
+  keyInput: number,
+  expression: Extract<HirExpression, { readonly kind: "property-update" }>,
+  builder: MirBuilder,
+): number {
+  const object = lowerObjectCoercible(
+    objectInput,
+    expression.object.range,
+    builder,
+  );
+  const key = convertPropertyKey(keyInput, expression.key.range, builder);
+  const current = lowerPropertyRead(object, key, expression.range, builder);
+  return lowerAssignmentValue(
+    current,
+    expression.operator,
+    expression.value,
+    (value) =>
+      lowerPropertyWrite(object, key, value, expression.range, builder),
+    expression.range,
+    builder,
+  );
+}
+
 function lowerAssignmentValue(
   current: number,
   operator: AssignmentOperator,
@@ -1694,7 +1734,7 @@ function lowerAssignmentValue(
   range: SourceRange,
   builder: MirBuilder,
 ): number {
-  if (operator === "&&" || operator === "??" || operator === "||") {
+  if (isLogicalAssignmentOperator(operator)) {
     return lowerLogicalValue(
       current,
       operator,
@@ -4811,6 +4851,18 @@ function lowerExpression(
     // A global identifier reaches here only after ResolveBinding found
     // it, so its read is GetBindingValue and its write SetMutableBinding.
     const globalReference = expression.globalReference;
+    if (
+      operand == null &&
+      globalReference == null &&
+      !isLogicalAssignmentOperator(expression.operator)
+    ) {
+      return lowerArithmeticPropertyUpdate(
+        object,
+        keyInput,
+        expression,
+        builder,
+      );
+    }
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
     const current =
       globalReference == null

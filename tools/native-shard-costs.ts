@@ -5,8 +5,8 @@
  * The m5-array-sort-stability entries come from run 37884543813 instead,
  * because the file postdates both weight-source runs and its first
  * checked-in values were estimates.
- * The globalThis entries use local Linux and provisional macOS evidence
- * documented below and in the evidence README.
+ * The globalThis and compound-assignment entries use local Linux and
+ * provisional macOS evidence documented below and in the evidence README.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -47,7 +47,12 @@ export const nativeShardCosts = {
     // 30.531 s, rounded up. Not CI evidence and not a file wall time.
     "tests/property/m5-class-early-errors.property.test.ts": 31,
     "tests/property/m5-class.property.test.ts": 548,
-    "tests/property/m5-compound-assignment.property.test.ts": 174,
+    // Local Linux `mise run test:property:extended` (October 15, 2026) on a
+    // candidate tree based on 6214c68c with the uncommitted compound repair:
+    // the file's five native case durations sum to 599.532 s, rounded up,
+    // measured inside the whole run under CPUQuota=1400%, nice 5 and
+    // MemoryMax=48G. Not CI, a file wall time, or an isolated run.
+    "tests/property/m5-compound-assignment.property.test.ts": 600,
     "tests/property/m5-cross-realm.property.test.ts": 120,
     "tests/property/m5-data-view.property.test.ts": 570,
     "tests/property/m5-date-family.property.test.ts": 621,
@@ -192,7 +197,8 @@ export const nativeShardCosts = {
     // ten. Neither native CI nor macOS has measured this source-only suite.
     "tests/property/m5-class-early-errors.property.test.ts": 27,
     "tests/property/m5-class.property.test.ts": 820,
-    "tests/property/m5-compound-assignment.property.test.ts": 192,
+    // UNMEASURED on macOS: provisional reuse of the local Linux value.
+    "tests/property/m5-compound-assignment.property.test.ts": 600,
     "tests/property/m5-cross-realm.property.test.ts": 120,
     "tests/property/m5-data-view.property.test.ts": 452,
     "tests/property/m5-date-family.property.test.ts": 479,
