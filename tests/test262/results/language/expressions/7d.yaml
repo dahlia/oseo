@@ -1050,6 +1050,162 @@ results:
   - case:
       async: false
       features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/division/S11.5.2_A3_T2.3.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+      - functions
+      - object-properties
+      - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - class-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/function/early-errors/invalid-names-member-expression-this.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - classes
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - generators
+        - default-parameters
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/function/param-dflt-yield-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - default-parameters
+      - functions
+      - generators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - object-rest
+        - generators
+        - destructuring-binding
+      flags:
+        - generated
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/expressions/generators/dstr/obj-ptrn-rest-skip-non-enumerable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/instanceof/S11.8.6_A7_T3.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - dynamic-source
+      - expression-operators
+      - functions
+      - object-properties
+      - symbols
+      - var-bindings
+    observation:
+      detail: 'test/language/expressions/instanceof/S11.8.6_A7_T3.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/instanceof/S11.8.6_A7_T3.js:87:14:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
       flags:
         - generated
       includes: []
