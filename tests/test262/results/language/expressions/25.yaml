@@ -714,7 +714,11 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
+      - functions
+      - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:
@@ -746,7 +750,11 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
+      - functions
+      - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:

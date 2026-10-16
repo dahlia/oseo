@@ -840,6 +840,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - abrupt-completion
+      - control-flow
       - dynamic-source
       - expression-operators
       - functions

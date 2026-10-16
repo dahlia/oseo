@@ -970,6 +970,7 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
       - var-bindings
     execution:
@@ -1002,6 +1003,7 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
       - var-bindings
     execution:

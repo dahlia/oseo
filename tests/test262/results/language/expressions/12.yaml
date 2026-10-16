@@ -616,7 +616,9 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

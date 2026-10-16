@@ -99797,632 +99797,2091 @@ tests:
       [dynamic-source, error-intrinsics, expression-operators, functions]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.10.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.11.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.1.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.10.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.11.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.2.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.3.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.4.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.5.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.6.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.7.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.8.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T2.9.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.1.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.10.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.11.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.2.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.3.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.4.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.5.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.6.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.7.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.8.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A2.1_T3.9.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, error-intrinsics, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T10.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T11.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.1_T9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T10.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T11.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.10_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.11_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.1_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.3.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, expression-operators, object-properties, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.7.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, expression-operators, object-properties, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.2_T2.9.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, expression-operators, object-properties, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.3_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.4_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.5_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.6_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.7_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.8_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T1.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T1.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T1.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T1.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.5.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.6.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.7.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.8.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A4.9_T2.9.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.10_T1.js
     expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.10_T2.js
@@ -100430,10 +101889,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.10_T3.js
@@ -100441,10 +101902,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.11_T1.js
@@ -100452,10 +101915,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.11_T2.js
@@ -100463,10 +101928,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.11_T3.js
@@ -100474,10 +101941,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.1_T1.js
@@ -100485,10 +101954,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.1_T2.js
@@ -100496,10 +101967,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.1_T3.js
@@ -100507,10 +101980,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.2_T1.js
@@ -100518,10 +101993,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.2_T2.js
@@ -100529,10 +102006,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.2_T3.js
@@ -100540,10 +102019,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.3_T1.js
@@ -100551,10 +102032,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.3_T2.js
@@ -100562,10 +102045,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.3_T3.js
@@ -100573,10 +102058,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.4_T1.js
@@ -100584,10 +102071,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.4_T2.js
@@ -100595,10 +102084,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.4_T3.js
@@ -100606,10 +102097,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.5_T1.js
@@ -100617,10 +102110,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.5_T2.js
@@ -100628,10 +102123,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.5_T3.js
@@ -100639,10 +102136,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.6_T1.js
@@ -100650,10 +102149,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.6_T2.js
@@ -100661,10 +102162,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.6_T3.js
@@ -100672,10 +102175,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.7_T1.js
@@ -100683,10 +102188,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.7_T2.js
@@ -100694,10 +102201,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.7_T3.js
@@ -100705,10 +102214,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.8_T1.js
@@ -100716,10 +102227,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.8_T2.js
@@ -100727,10 +102240,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.8_T3.js
@@ -100738,10 +102253,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.9_T1.js
@@ -100749,10 +102266,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.9_T2.js
@@ -100760,10 +102279,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A5.9_T3.js
@@ -100771,10 +102292,12 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A6.10_T1.js
@@ -100782,6 +102305,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100792,6 +102316,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100802,6 +102327,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100812,6 +102338,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100822,6 +102349,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100832,6 +102360,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100842,6 +102371,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100852,6 +102382,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100862,6 +102393,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100872,6 +102404,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100882,6 +102415,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         dynamic-source,
         expression-operators,
         functions,
@@ -100920,6 +102454,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.10_T4.js
@@ -100930,6 +102465,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.11_T1.js
@@ -100965,6 +102501,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.11_T4.js
@@ -100975,6 +102512,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.1_T1.js
@@ -101010,6 +102548,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.1_T4.js
@@ -101020,6 +102559,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.2_T1.js
@@ -101055,6 +102595,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.2_T4.js
@@ -101065,6 +102606,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.3_T1.js
@@ -101100,6 +102642,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.3_T4.js
@@ -101110,6 +102653,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.4_T1.js
@@ -101145,6 +102689,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.4_T4.js
@@ -101155,6 +102700,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.5_T1.js
@@ -101190,6 +102736,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.5_T4.js
@@ -101200,6 +102747,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.6_T1.js
@@ -101235,6 +102783,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.6_T4.js
@@ -101245,6 +102794,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.7_T1.js
@@ -101280,6 +102830,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.7_T4.js
@@ -101290,6 +102841,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.8_T1.js
@@ -101325,6 +102877,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.8_T4.js
@@ -101335,6 +102888,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.9_T1.js
@@ -101370,6 +102924,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/S11.13.2_A7.9_T4.js
@@ -101380,6 +102935,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/add-arguments-strict.js
@@ -101432,6 +102988,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--11.js
@@ -101454,6 +103011,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--13.js
@@ -101476,6 +103034,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--15.js
@@ -101498,6 +103057,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--17.js
@@ -101520,6 +103080,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--19.js
@@ -101542,6 +103103,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--20.js
@@ -101553,6 +103115,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--21.js
@@ -101586,6 +103149,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--5.js
@@ -101608,6 +103172,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--7.js
@@ -101630,6 +103195,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/compound-assignment-operator-calls-putvalue-lref--v--9.js
@@ -101652,6 +103218,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/expressions/compound-assignment/div-arguments-strict.js
@@ -101916,6 +103483,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-bitand.js
     expectedClassification: pass
@@ -101927,6 +103495,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-bitor.js
     expectedClassification: pass
@@ -101938,6 +103507,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-bitxor.js
     expectedClassification: pass
@@ -101949,6 +103519,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-div.js
     expectedClassification: pass
@@ -101960,6 +103531,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-exp.js
     expectedClassification: pass
@@ -101971,6 +103543,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-lshift.js
     expectedClassification: pass
@@ -101982,6 +103555,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-mod.js
     expectedClassification: pass
@@ -101993,6 +103567,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-mult.js
     expectedClassification: pass
@@ -102004,6 +103579,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-rshift.js
     expectedClassification: pass
@@ -102015,6 +103591,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-srshift.js
     expectedClassification: pass
@@ -102026,6 +103603,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-method-sub.js
     expectedClassification: pass
@@ -102037,6 +103615,7 @@ tests:
         functions,
         lexical-bindings,
         object-properties,
+        symbols,
       ]
   - path: test/language/expressions/compound-assignment/left-hand-side-private-reference-readonly-accessor-property-add.js
     expectedClassification: pass
@@ -102262,79 +103841,188 @@ tests:
     dependencies: [expression-operators, var-bindings]
   - path: test/language/expressions/concatenation/S9.8_A1_T2.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [abrupt-completion, dynamic-source, expression-operators]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        dynamic-source,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/expressions/concatenation/S9.8_A2_T2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators]
+    dependencies: [abrupt-completion, control-flow, expression-operators]
   - path: test/language/expressions/concatenation/S9.8_A3_T2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators]
+    dependencies: [abrupt-completion, control-flow, expression-operators]
   - path: test/language/expressions/concatenation/S9.8_A4_T2.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/expressions/concatenation/S9.8_A5_T2.js
     expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A1.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        dynamic-source,
+        expression-operators,
+        functions,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A2.1_T1.js
+    expectedClassification: pass
+    dependencies: [expression-operators]
+  - path: test/language/expressions/conditional/S11.12_A2.1_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A2.1_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A2.1_T4.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A2.1_T5.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A2.1_T6.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A3_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A3_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A3_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A3_T4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/conditional/S11.12_A4_T1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A4_T2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A4_T3.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+  - path: test/language/expressions/conditional/S11.12_A4_T4.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, control-flow, expression-operators]
+  - path: test/language/expressions/conditional/coalesce-expr-ternary.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, object-literals, symbols, var-bindings]
+  - path: test/language/expressions/conditional/in-branch-1.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
         expression-operators,
         functions,
         object-literals,
         object-properties,
         var-bindings,
       ]
-  - path: test/language/expressions/conditional/S11.12_A1.js
-    expectedClassification: unsupported-profile-feature
-    dependencies: [abrupt-completion, dynamic-source, expression-operators]
-  - path: test/language/expressions/conditional/S11.12_A2.1_T1.js
-    expectedClassification: pass
-    dependencies: [expression-operators]
-  - path: test/language/expressions/conditional/S11.12_A2.1_T2.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, error-intrinsics, expression-operators]
-  - path: test/language/expressions/conditional/S11.12_A2.1_T3.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, error-intrinsics, expression-operators]
-  - path: test/language/expressions/conditional/S11.12_A2.1_T4.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, error-intrinsics, expression-operators]
-  - path: test/language/expressions/conditional/S11.12_A2.1_T5.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A2.1_T6.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A3_T1.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A3_T2.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A3_T3.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A3_T4.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators]
-  - path: test/language/expressions/conditional/S11.12_A4_T1.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A4_T2.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A4_T3.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
-  - path: test/language/expressions/conditional/S11.12_A4_T4.js
-    expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators]
-  - path: test/language/expressions/conditional/coalesce-expr-ternary.js
-    expectedClassification: pass
-    dependencies: [expression-operators, object-literals, symbols, var-bindings]
-  - path: test/language/expressions/conditional/in-branch-1.js
-    expectedClassification: pass
-    dependencies:
-      [expression-operators, functions, object-literals, var-bindings]
   - path: test/language/expressions/conditional/in-branch-2.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -102343,7 +104031,7 @@ tests:
     dependencies: [expression-operators]
   - path: test/language/expressions/conditional/symbol-conditional-evaluation.js
     expectedClassification: pass
-    dependencies: [expression-operators, symbols, var-bindings]
+    dependencies: [expression-operators, functions, symbols, var-bindings]
   - path: test/language/expressions/delete/11.4.1-0-1.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
@@ -102385,7 +104073,13 @@ tests:
   - path: test/language/expressions/delete/11.4.1-4-a-3-s.js
     expectedClassification: pass
     dependencies:
-      [expression-operators, object-literals, object-properties, var-bindings]
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/delete/11.4.1-4-a-4-s.js
     expectedClassification: pass
     dependencies:
@@ -102399,7 +104093,13 @@ tests:
   - path: test/language/expressions/delete/11.4.1-4.a-1.js
     expectedClassification: pass
     dependencies:
-      [expression-operators, object-literals, object-properties, var-bindings]
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/delete/11.4.1-4.a-10.js
     expectedClassification: pass
     dependencies: [expression-operators, object-properties, var-bindings]
@@ -102412,7 +104112,8 @@ tests:
     dependencies: [expression-operators, object-properties, var-bindings]
   - path: test/language/expressions/delete/11.4.1-4.a-13.js
     expectedClassification: pass
-    dependencies: [expression-operators, object-properties, var-bindings]
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
   - path: test/language/expressions/delete/11.4.1-4.a-14.js
     expectedClassification: pass
     dependencies: [expression-operators, object-properties, var-bindings]
@@ -102442,19 +104143,40 @@ tests:
   - path: test/language/expressions/delete/11.4.1-4.a-3.js
     expectedClassification: pass
     dependencies:
-      [expression-operators, object-literals, object-properties, var-bindings]
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/delete/11.4.1-4.a-4.js
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/delete/11.4.1-4.a-5.js
     expectedClassification: pass
-    dependencies: [expression-operators, object-properties, var-bindings]
+    dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
   - path: test/language/expressions/delete/11.4.1-4.a-6.js
     expectedClassification: pass
-    dependencies: [expression-operators, object-properties, var-bindings]
+    dependencies:
+      [
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/delete/11.4.1-4.a-7.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, expression-operators, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/delete/11.4.1-4.a-8-s.js
     expectedClassification: pass
     dependencies:
@@ -102467,7 +104189,7 @@ tests:
       ]
   - path: test/language/expressions/delete/11.4.1-4.a-8.js
     expectedClassification: pass
-    dependencies: [expression-operators, var-bindings]
+    dependencies: [expression-operators, object-properties, var-bindings]
   - path: test/language/expressions/delete/11.4.1-4.a-9-s.js
     expectedClassification: pass
     dependencies:
@@ -102500,6 +104222,7 @@ tests:
     dependencies:
       [
         expression-operators,
+        functions,
         object-properties,
         regular-expressions,
         var-bindings,
@@ -102509,7 +104232,8 @@ tests:
     dependencies: [error-intrinsics, expression-operators, object-properties]
   - path: test/language/expressions/delete/S11.4.1_A2.1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, functions]
   - path: test/language/expressions/delete/S11.4.1_A2.2_T1.js
     expectedClassification: pass
     dependencies: [expression-operators]
@@ -102518,6 +104242,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-properties,
@@ -102525,12 +104250,14 @@ tests:
       ]
   - path: test/language/expressions/delete/S11.4.1_A2.2_T3.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, object-properties]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
   - path: test/language/expressions/delete/S11.4.1_A3.1.js
     expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-properties,
@@ -102538,7 +104265,8 @@ tests:
       ]
   - path: test/language/expressions/delete/S11.4.1_A3.2_T1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
   - path: test/language/expressions/delete/S11.4.1_A3.2_T2.js
     expectedClassification: pass
     dependencies: [expression-operators, functions, object-properties]
@@ -102547,6 +104275,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-properties,
@@ -102554,7 +104283,16 @@ tests:
       ]
   - path: test/language/expressions/delete/S11.4.1_A3.3_T1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, error-intrinsics, expression-operators]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        symbols,
+      ]
   - path: test/language/expressions/delete/S11.4.1_A3.3_T2.js
     expectedClassification: pass
     dependencies: [expression-operators, functions, object-properties]
@@ -102563,6 +104301,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-properties,
@@ -102571,24 +104310,47 @@ tests:
   - path: test/language/expressions/delete/S11.4.1_A3.3_T4.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, expression-operators, functions, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/delete/S11.4.1_A3.3_T5.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, expression-operators, functions, object-properties]
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+      ]
   - path: test/language/expressions/delete/S11.4.1_A3.3_T6.js
     expectedClassification: pass
     dependencies: [expression-operators, functions]
   - path: test/language/expressions/delete/S11.4.1_A4.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/delete/S11.4.1_A5.js
     expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         error-intrinsics,
         expression-operators,
+        functions,
         object-own-keys,
         object-properties,
         regular-expressions,
@@ -102596,7 +104358,8 @@ tests:
       ]
   - path: test/language/expressions/delete/S8.12.7_A1.js
     expectedClassification: pass
-    dependencies: [abrupt-completion, expression-operators, object-properties]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, object-properties]
   - path: test/language/expressions/delete/S8.12.7_A2_T1.js
     expectedClassification: pass
     dependencies: [expression-operators, object-literals, object-properties]
@@ -102605,6 +104368,7 @@ tests:
     dependencies:
       [
         abrupt-completion,
+        control-flow,
         expression-operators,
         functions,
         object-literals,

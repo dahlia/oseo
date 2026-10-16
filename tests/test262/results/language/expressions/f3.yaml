@@ -808,8 +808,10 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - abrupt-completion
+      - control-flow
       - dynamic-source
       - expression-operators
+      - functions
     observation:
       detail: "test/language/expressions/conditional/S11.12_A1.js non-strict
         disabled failed (1): stdout=\"\"

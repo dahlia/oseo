@@ -615,6 +615,7 @@ results:
     classification: pass
     dependencies:
       - expression-operators
+      - functions
       - object-literals
       - object-properties
       - var-bindings

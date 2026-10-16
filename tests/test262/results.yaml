@@ -18563,9 +18563,9 @@ summary:
       expectedNegatives: 231
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 970
+      passes: 1233
       semanticFailures: 0
-      unsupportedProfileFeatures: 48
+      unsupportedProfileFeatures: 61
     - dependency: data-view
       expectedNegatives: 0
       harnessFailures: 0
@@ -18619,9 +18619,9 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8345
+      passes: 8528
       semanticFailures: 0
-      unsupportedProfileFeatures: 780
+      unsupportedProfileFeatures: 783
     - dependency: generators
       expectedNegatives: 200
       harnessFailures: 0
@@ -18682,9 +18682,9 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14396
+      passes: 14556
       semanticFailures: 0
-      unsupportedProfileFeatures: 217
+      unsupportedProfileFeatures: 218
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -18745,7 +18745,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1578
+      passes: 1816
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - dependency: top-level-await
@@ -18810,7 +18810,7 @@ summary:
       infrastructureFailures: 0
       passes: 3722
       semanticFailures: 0
-      unsupportedProfileFeatures: 69
+      unsupportedProfileFeatures: 70
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0

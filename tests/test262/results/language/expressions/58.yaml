@@ -879,6 +879,7 @@ results:
       - functions
       - object-literals
       - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:
@@ -906,8 +907,12 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - error-intrinsics
       - expression-operators
+      - functions
+      - object-properties
+      - symbols
     execution:
       harnessIncludes:
         - base.js

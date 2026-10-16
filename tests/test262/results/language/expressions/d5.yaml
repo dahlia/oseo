@@ -808,6 +808,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - abrupt-completion
+      - control-flow
       - dynamic-source
       - expression-operators
       - functions
@@ -866,6 +867,7 @@ results:
     classification: pass
     dependencies:
       - expression-operators
+      - functions
       - object-properties
       - var-bindings
     execution:

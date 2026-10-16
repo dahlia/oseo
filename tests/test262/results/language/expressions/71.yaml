@@ -746,10 +746,12 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
       - functions
       - object-literals
       - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:
@@ -777,6 +779,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - abrupt-completion
+      - control-flow
       - dynamic-source
       - expression-operators
       - functions

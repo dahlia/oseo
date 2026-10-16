@@ -864,10 +864,12 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
       - functions
       - object-literals
       - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:
@@ -926,6 +928,7 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
     execution:
       harnessIncludes:
@@ -958,6 +961,8 @@ results:
     dependencies:
       - dynamic-source
       - expression-operators
+      - functions
+      - object-properties
       - var-bindings
     observation:
       detail: "test/language/expressions/delete/11.4.1-4.a-7.js non-strict

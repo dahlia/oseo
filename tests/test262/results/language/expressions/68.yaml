@@ -579,8 +579,12 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - error-intrinsics
       - expression-operators
+      - functions
+      - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:
@@ -612,6 +616,7 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
+      - control-flow
       - expression-operators
       - var-bindings
     execution:
@@ -680,8 +685,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - abrupt-completion
+      - control-flow
       - dynamic-source
       - expression-operators
+      - functions
+      - var-bindings
     observation:
       detail: "test/language/expressions/concatenation/S9.8_A1_T2.js
         non-strict disabled failed (1): stdout=\"\"
