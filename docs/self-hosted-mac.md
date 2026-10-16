@@ -135,7 +135,9 @@ operator pins and verifies the downloaded runner archive, registers
 `oseo-mac-1` once, and installs the system LaunchDaemon with
 *tools/selfhosted-mac/install-service.sh*. `OSEO_RUNNER_LABEL` selects the
 runner, `oseo-mac-1` by default or any of `oseo-mac-2` through
-`oseo-mac-4`; any other value is rejected.
+`oseo-mac-6`; any other value is rejected. The generated workflow
+configures four lanes, so a runner registered as `oseo-mac-5` or
+`oseo-mac-6` stays unused until that configuration changes.
 The daemon is `org.oseo.runner.<label>`, and the installer requires the
 runner root to be registered under that name. The daemon's `UserName` is the
 dedicated account; it starts at boot without a GUI login. Its executable is
