@@ -69,8 +69,8 @@ PY
 }
 
 # The generated workflow and the availability probe know only these lanes.
-[[ $runner_label =~ ^oseo-mac-[1-4]$ ]] || {
-  echo 'Runner label must be oseo-mac-1 through oseo-mac-4' >&2
+[[ $runner_label =~ ^oseo-mac-[1-6]$ ]] || {
+  echo 'Runner label must be oseo-mac-1 through oseo-mac-6' >&2
   exit 2
 }
 [[ $runner_root == /* && $runner_root != / ]] || {
