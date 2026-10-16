@@ -167,15 +167,16 @@ function hostedFallbackEnvironment(
 
 /**
  * Lanes beyond the hosted ones are grouped by machine, two per Mac mini in
- * lane order: lanes one and two on the first, lanes three and four on the
- * second. The pair factors in `selfHostedPairSlowdowns` describe two lanes
- * sharing one machine, so they apply within a machine and not across them.
- * Three lanes on one machine is outside that model.
+ * lane order: lanes one and two on the first, three and four on the
+ * second, five and six on the third. The pair factors in
+ * `selfHostedPairSlowdowns` describe two lanes sharing one machine, so
+ * they apply within a machine and not across them. Three lanes on one
+ * machine is outside that model.
  */
 const selfHostedLanesPerMachine = 2;
 
-/** Two Mac minis, two lanes each. */
-const maxSelfHostedLanes = 4;
+/** Three Mac minis, two lanes each. */
+const maxSelfHostedLanes = 6;
 
 /** The Mac mini a self-hosted lane offset belongs to. */
 function selfHostedMachine(laneOffset: number): number {
@@ -233,7 +234,7 @@ export function selfHostedLaneEnds(
   seconds: MacosJobSeconds = modeledJobSeconds,
 ): readonly number[] {
   if (lanes.length > maxSelfHostedLanes) {
-    throw new Error("More than four Mac lanes were not measured");
+    throw new Error("More than six Mac lanes were not measured");
   }
   const ends = lanes.map(() => selfHostedProbeSeconds);
   const next = lanes.map(() => 0);
@@ -312,7 +313,7 @@ export function macosLanes(
     selfHostedCount < 0 ||
     selfHostedCount > maxSelfHostedLanes
   ) {
-    throw new Error("Self-hosted Mac lanes must be zero to four");
+    throw new Error("Self-hosted Mac lanes must be zero to six");
   }
   const lanes: MacosLaneJob[][] = Array.from(
     { length: hostedLaneCount + selfHostedCount },

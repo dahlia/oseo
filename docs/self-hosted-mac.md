@@ -1,10 +1,9 @@
 Self-hosted Mac capacity lane
 =============================
 
-Status: configured for four persistent runners on two Mac minis,
-`oseo-mac-1` and `oseo-mac-2` on the first and `oseo-mac-3` and `oseo-mac-4`
-on the second, disabled by the repository variable
-`OSEO_SELFHOSTED_MAC_ENABLED`. The two machines add four lanes to the five
+Status: configured for six persistent runners on three Mac minis, two per
+machine in label order, disabled by the repository variable
+`OSEO_SELFHOSTED_MAC_ENABLED`. The three machines add six lanes to the five
 hosted macOS lanes, one per runner. `oseo-mac-1` was registered earliest and
 `oseo-mac-2` on 2026-10-06; the second machine's runners followed on
 2026-10-14. A lane whose runner is offline, disabled, or wedged falls back to
@@ -19,8 +18,8 @@ pushes. The operator checklist is outside the repository.
 Scheduling
 ----------
 
-*tools/macos-lane-config.ts* configures four optional Mac lanes,
-`oseo-mac-1` through `oseo-mac-4`. The generator places only Zig-backed
+*tools/macos-lane-config.ts* configures six optional Mac lanes,
+`oseo-mac-1` through `oseo-mac-6`. The generator places only Zig-backed
 `macos-aarch64` test262,
 extended native property, own-key case, and native fixture jobs there. Apple
 clang host sanitizer jobs and `macos-latest` Node.js/Deno jobs always use
@@ -37,21 +36,20 @@ for native support, and 3.1 for native fixtures, applied only after a
 derived 60-second fixed setup share. The generator places the three own-key
 case shards on the `oseo-mac-1` lane first, then the rest longest first. It
 starts each Mac lane with an estimated 60-second availability probe.
-Lanes are grouped by machine, two per Mac mini in lane order. Because the
-two lanes of one machine share its cores, the model slows a Mac job while
+Lanes are grouped by machine, two per Mac mini in lane order: one and two
+on the first, three and four on the second, five and six on the third. Because
+the two lanes of one machine share its cores, the model slows a Mac job while
 its partner lane is busy, by the derived pair factor in
-`selfHostedPairSlowdowns` for its family and its partner's, and runs it at
-its one-lane speed while that partner is idle. Lanes on different machines
-do not slow each other down. The pair factors are derived from the first
-machine's measurements, with conservative substitutes for the pairings that
-were never measured, and they are reused for the second machine; three lanes
-on one machine is outside the model, and the generator refuses more than four
-lanes. *PLAN-GATE.md* records the
-factors and the derived makespans; `node tools/macos-lane-report.ts` prints
-them. The earlier
-U21 one-machine ratios are kept in [U21 evidence]; *PLAN-GATE.md* records
-why they were replaced. There is no per-job registration cost: the runner
-stays registered.
+`selfHostedPairSlowdowns` for its family and its partner's, and runs it at its
+one-lane speed while that partner is idle. Lanes on different machines do not
+slow each other down. The pair factors are derived from the first machine's
+measurements, with conservative substitutes for the pairings that were never
+measured, and they are reused for the second machine; three lanes on one
+machine is outside the model, and the generator refuses more than four lanes.
+*PLAN-GATE.md* records the factors and the derived makespans;
+`node tools/macos-lane-report.ts` prints them. The earlier U21 one-machine
+ratios are kept in [U21 evidence]; *PLAN-GATE.md* records why they were
+replaced. There is no per-job registration cost: the runner stays registered.
 The optional jobs have no predecessor chain. Each selected Mac runner accepts
 its own lane's jobs serially; hosted fallback can use all five hosted slots.
 All three own-key case shards are on the `oseo-mac-1` lane and use its
@@ -135,9 +133,7 @@ operator pins and verifies the downloaded runner archive, registers
 `oseo-mac-1` once, and installs the system LaunchDaemon with
 *tools/selfhosted-mac/install-service.sh*. `OSEO_RUNNER_LABEL` selects the
 runner, `oseo-mac-1` by default or any of `oseo-mac-2` through
-`oseo-mac-6`; any other value is rejected. The generated workflow
-configures four lanes, so a runner registered as `oseo-mac-5` or
-`oseo-mac-6` stays unused until that configuration changes.
+`oseo-mac-6`; any other value is rejected.
 The daemon is `org.oseo.runner.<label>`, and the installer requires the
 runner root to be registered under that name. The daemon's `UserName` is the
 dedicated account; it starts at boot without a GUI login. Its executable is

@@ -2692,3 +2692,63 @@ twice. Refreshing that table needs a deliberate one-lane run.
 Case budgets, seeds, sizes, interrupt limits, job names, the aggregate's
 required set and every shard total are unchanged. Only lane placement
 moves.
+
+### Third Mac mini (U35)
+
+A third Mac mini joined on 2026-10-16, bringing the lanes to six, two per
+machine. It matches the other two: an Apple M6 with 12 logical CPUs,
+16 GiB of memory, macOS 27.0.1 and Apple clang 21.0.0, so the 30 GiB
+per-account cache cap and the pair factors carry over as they did for the
+second machine.
+
+U33 established why this is the lever that was left. Only six of the
+thirty-seven macOS jobs cannot run on a Mac lane, and with four lanes the
+Mac side was saturated at twenty-three jobs while eight eligible jobs
+overflowed onto the slower hosted lanes, which then set the wall at a
+measured 75.63 and 76.42 minutes. Six lanes absorb most of that overflow:
+the model places twenty-seven jobs on Mac lanes and derives a 49.1-minute
+makespan against 66.3 for four.
+
+That derivation deserves little trust on its own. The model was optimistic
+twice in a row, deriving 51.3 minutes against 64.42 measured and 65.8
+against 76.42, and the third machine's walls and pair factors are reused
+from the first rather than measured. What the arrangement is worth will
+come from the first runs on it, and the hosted medians it shifts will
+refresh by the incremental route U33 describes.
+
+Attempt 1 of branch run 38935645986 took 108.4 minutes and measures
+nothing. Main run 38932915489 was still going, from 16:33:41Z to
+18:04:33Z, and overlapped it for sixty-nine minutes. Main configures four
+lanes, so both runs queued jobs against `oseo-mac-1` through `oseo-mac-4`
+and each run saw the other's jobs as runner idle time: fourteen,
+twenty-seven, seventeen and thirty-six idle minutes on those four lanes,
+against zero on `oseo-mac-5` and `oseo-mac-6`, which main cannot select.
+Two runs that share self-hosted lanes cannot both be measured, so a
+measured attempt has to wait for an empty queue.
+
+Attempt 2 ran alone and took 53.9 minutes against the 49.1 derived, with
+lane idle down to 0.2 to 0.3 minutes. The six Mac lanes ended at 28.9,
+38.9, 45.5, 41.7, 44.6 and 40.6 minutes. That is about 22 minutes below
+the 75.63 and 76.42 measured on four lanes, and the model was 8.9 percent
+low rather than the 20.4 and 13.9 percent of the two earlier attempts.
+
+The Mac lanes are no longer the wall. The run now ends on two hosted
+chains: `host C sanitizers (Linux)` at 52.6 minutes, which no Mac lane can
+take, and the hosted macOS chain whose last job,
+`test (macos-latest, node, 4/4)`, ran from 39.7 to 53.9.
+`test (ubuntu-latest, node)` is third at 48.7. A seventh Mac lane would
+move none of them.
+
+The third machine is neither slower than the others nor penalized by its
+cold cache. Its lanes ran 44.0 minutes over five jobs and 40.0 over four,
+against 44.8 over four and 41.0 over five on the second machine. The
+second machine's first run cost 81 minutes on a lane that later ran 60.3
+warm, so that penalty appears to belong to the `runtime-archive-cache`
+action rather than to the Zig cache.
+
+No retained median was refreshed. Only the six ineligible jobs and two
+overflow jobs ran hosted, so all thirteen retained entries ran on Mac
+lanes again. The incremental route U33 describes has stalled by its own
+success: the more the lanes absorb, the fewer observations the hosted side
+yields. Correcting those thirteen now needs a deliberate run with the Mac
+lanes disabled.
