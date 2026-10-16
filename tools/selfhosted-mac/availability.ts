@@ -93,7 +93,7 @@ export interface ProbeOptions {
 export const defaultRecheckDelayMilliseconds = 120_000;
 
 /** Mac lanes the generator may configure, one runner label each. */
-const maxLanes = 4;
+const maxLanes = 6;
 
 const laneLabels: readonly string[] = Array.from(
   { length: maxLanes },

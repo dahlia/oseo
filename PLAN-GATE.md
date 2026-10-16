@@ -2692,3 +2692,26 @@ twice. Refreshing that table needs a deliberate one-lane run.
 Case budgets, seeds, sizes, interrupt limits, job names, the aggregate's
 required set and every shard total are unchanged. Only lane placement
 moves.
+
+### Third Mac mini (U35)
+
+A third Mac mini joined on 2026-10-16, bringing the lanes to six, two per
+machine. It matches the other two: an Apple M6 with 12 logical CPUs,
+16 GiB of memory, macOS 27.0.1 and Apple clang 21.0.0, so the 30 GiB
+per-account cache cap and the pair factors carry over as they did for the
+second machine.
+
+U33 established why this is the lever that was left. Only six of the
+thirty-seven macOS jobs cannot run on a Mac lane, and with four lanes the
+Mac side was saturated at twenty-three jobs while eight eligible jobs
+overflowed onto the slower hosted lanes, which then set the wall at a
+measured 75.63 and 76.42 minutes. Six lanes absorb most of that overflow:
+the model places twenty-seven jobs on Mac lanes and derives a 49.1-minute
+makespan against 66.3 for four.
+
+That derivation deserves little trust on its own. The model was optimistic
+twice in a row, deriving 51.3 minutes against 64.42 measured and 65.8
+against 76.42, and the third machine's walls and pair factors are reused
+from the first rather than measured. What the arrangement is worth will
+come from the first runs on it, and the hosted medians it shifts will
+refresh by the incremental route U33 describes.

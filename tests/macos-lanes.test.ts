@@ -599,7 +599,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
       .flat()
       .some((job) => job.family === "host C sanitizers"),
   );
-  assert.throws(() => macosLanes(5));
+  assert.throws(() => macosLanes(7));
   const rendered = generateMacosWorkflow(template, 1);
   if (process.platform !== "win32") {
     const lint = spawnSync(
@@ -962,8 +962,8 @@ test("faster native support work uses additional capacity", () => {
   ).length;
   assert.ok(dedicatedNative > 0);
   assert.ok(dedicatedNative > hostedNative / 5);
-  for (const invalid of [-1, 1.5, 5]) {
-    assert.throws(() => macosLanes(invalid), /zero to four/);
+  for (const invalid of [-1, 1.5, 7]) {
+    assert.throws(() => macosLanes(invalid), /zero to six/);
   }
 });
 
@@ -1075,10 +1075,10 @@ test("availability finds the one runner after a full page", async () => {
   );
 });
 
-test("four Mac lanes route each label with its own hosted fallback", () => {
-  assert.equal(configuredSelfHostedLanes, 4);
-  const lanes = macosLanes(4);
-  assert.equal(lanes.length, 9);
+test("six Mac lanes route each label with its own hosted fallback", () => {
+  assert.equal(configuredSelfHostedLanes, 6);
+  const lanes = macosLanes(6);
+  assert.equal(lanes.length, 11);
   assert.equal(lanes.flat().length, 37);
   assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 37);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
@@ -1108,12 +1108,19 @@ test("four Mac lanes route each label with its own hosted fallback", () => {
   assert.deepEqual(workflow.jobs.native!.needs, after.jobs.native!.needs);
   const readiness = workflow.jobs.mac_ready!;
   const outputs = parsedMapping(readiness.outputs, "Readiness outputs");
-  assert.deepEqual(Object.keys(outputs).toSorted(), ["r1", "r2", "r3", "r4"]);
+  assert.deepEqual(Object.keys(outputs).toSorted(), [
+    "r1",
+    "r2",
+    "r3",
+    "r4",
+    "r5",
+    "r6",
+  ]);
   const probe = readiness.steps.find((step) => step.id === "probe");
   assert.ok(probe);
   assert.equal(
     parsedMapping(probe.env, "Probe environment").OSEO_SELFHOSTED_LANES,
-    4,
+    6,
   );
   assert.match(String(probe.if), /github\.event_name == 'push'/);
   for (const [index, lane] of lanes.entries()) {
@@ -1254,8 +1261,11 @@ test("Mac lane overlap applies measured pair slowdowns", () => {
   ]);
   assert.throws(
     () =>
-      selfHostedLaneEnds([[t262], [support], [own], [t262], [own]], seconds),
-    /More than four Mac lanes/,
+      selfHostedLaneEnds(
+        [[t262], [support], [own], [t262], [own], [support], [own]],
+        seconds,
+      ),
+    /More than six Mac lanes/,
   );
   // Lanes three and four sit on the second Mac mini, so a job there neither
   // slows nor is slowed by the first machine's lanes.
@@ -1433,10 +1443,10 @@ test("availability decides each Mac lane independently", async () => {
     [hosted, hosted],
   );
   await Promise.all(
-    ["0", "5", "1.5", ""].map((lanes) =>
+    ["0", "7", "1.5", ""].map((lanes) =>
       assert.rejects(
         select(twoRunners, { OSEO_SELFHOSTED_LANES: lanes }),
-        /must be 1 to 4/,
+        /must be 1 to 6/,
       ),
     ),
   );
