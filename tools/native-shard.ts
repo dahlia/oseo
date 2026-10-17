@@ -4,9 +4,25 @@ import { nativeShardCosts } from "./native-shard-costs.ts";
 import { parseTestShardArguments } from "./shard.ts";
 import type { TestShard } from "./shard.ts";
 
-/** This one case-sharded file runs outside the native file shards. */
-export const caseShardedNativeFile =
+/**
+ * The own-key property, which reserves a singleton Linux file shard
+ * whenever a partition can provide one. Its deadline margin is the
+ * narrowest in the corpus, so cost batching must not put other heavyweight
+ * files beside it.
+ */
+export const ownKeyNativeFile =
   "tests/property/m5-object-own-keys.property.test.ts";
+
+/**
+ * Case-sharded files, which run outside the native file shards. Each one
+ * has its own CI jobs that partition its generated cases instead, so a
+ * file shard that still carried it would duplicate that work and, for the
+ * files here, would also set its shard's wall on its own.
+ */
+export const caseShardedNativeFiles: readonly string[] = [
+  ownKeyNativeFile,
+  "tests/property/m5-reflect-namespace.property.test.ts",
+];
 
 /** Fixed host-specific scheduling model for native property partitions. */
 export interface NativeShardModel {
@@ -41,7 +57,7 @@ export function selectNativeTestShard(
   // This property approached its deadline in two historical Linux runs and
   // exceeded it when cost batching put other heavyweight files beside it.
   // Reserve a singleton shard whenever a partition can provide one.
-  const isolated = caseShardedNativeFile;
+  const isolated = ownKeyNativeFile;
   if (platform === "linux" && shard.total > 1 && files.includes(isolated)) {
     if (shard.index === 1) return [isolated];
     return selectNativeTestShard(
@@ -125,7 +141,9 @@ export function nativeTestArguments(
     throw new Error("Native sharding requires explicit property file paths.");
   }
   const files = parsed.values["exclude-case-sharded"]
-    ? parsed.positionals.filter((path) => path !== caseShardedNativeFile)
+    ? parsed.positionals.filter(
+        (path) => !caseShardedNativeFiles.includes(path),
+      )
     : parsed.positionals;
   const selected = selectNativeTestShard(files, shard!, platform);
   // Node without files discovers the full suite; never launch an empty shard.

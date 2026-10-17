@@ -5,9 +5,11 @@ import test from "node:test";
 import {
   nativeShardCosts,
   ownKeyCaseShardCosts,
+  reflectCaseShardCosts,
 } from "../tools/native-shard-costs.ts";
 
 import {
+  caseShardedNativeFiles,
   nativeTestArguments,
   selectNativeTestShard,
 } from "../tools/native-shard.ts";
@@ -71,11 +73,16 @@ test("Linux isolates own-key properties from every other file", async () => {
   }
 });
 
-test("case-sharded file leaves both CI file partitions", async () => {
+test("case-sharded files leave both CI file partitions", async () => {
   const files = (await readdir(new URL("property/", import.meta.url)))
     .filter((path) => path.endsWith(".property.test.ts"))
     .map((path) => `tests/property/${path}`);
-  const ownKeys = "tests/property/m5-object-own-keys.property.test.ts";
+  // Both files have dedicated case-shard jobs; see PLAN-GATE.md (U38).
+  assert.deepEqual(caseShardedNativeFiles.toSorted(), [
+    "tests/property/m5-object-own-keys.property.test.ts",
+    "tests/property/m5-reflect-namespace.property.test.ts",
+  ]);
+  for (const path of caseShardedNativeFiles) assert.ok(files.includes(path));
   for (const [platform, total] of [
     ["linux", 5],
     ["darwin", 12],
@@ -88,12 +95,17 @@ test("case-sharded file leaves both CI file partitions", async () => {
     ).flat();
     assert.deepEqual(
       selected.toSorted(),
-      files.filter((path) => path !== ownKeys).toSorted(),
+      files.filter((path) => !caseShardedNativeFiles.includes(path)).toSorted(),
     );
-    assert.equal(new Set(selected).size, files.length - 1);
+    assert.equal(
+      new Set(selected).size,
+      files.length - caseShardedNativeFiles.length,
+    );
   }
   assert.equal(ownKeyCaseShardCosts["linux-x86_64-gnu"], 1109);
   assert.equal(ownKeyCaseShardCosts["macos-aarch64"], 1189);
+  assert.equal(reflectCaseShardCosts["linux-x86_64-gnu"], 767);
+  assert.equal(reflectCaseShardCosts["macos-aarch64"], 761);
 });
 
 test("native shards start the measured expensive batch first", () => {

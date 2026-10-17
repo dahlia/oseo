@@ -309,23 +309,39 @@ export const nativeShardCosts = {
 
 /**
  * Derived case-shard weights from the U6 concurrent-duration table above.
- * These are scheduling estimates, not measured case-shard job times.
+ * These are scheduling estimates, not measured case-shard job times. Each
+ * case-sharded file splits its generated cases three ways, so a shard
+ * carries one third of the file's weight on its host.
  */
-interface OwnKeyCaseShardCosts {
+interface CaseShardCosts {
   readonly "linux-x86_64-gnu": number;
   readonly "macos-aarch64": number;
 }
 
+/** A property file both host weight tables measure. */
+type NativeShardFile = keyof (typeof nativeShardCosts)["linux-x86_64-gnu"] &
+  keyof (typeof nativeShardCosts)["macos-aarch64"];
+
+/** Derived one-third weights for dedicated case-shard job planning. */
+function caseShardCosts(path: NativeShardFile): CaseShardCosts {
+  return {
+    "linux-x86_64-gnu": Math.ceil(
+      nativeShardCosts["linux-x86_64-gnu"][path] / 3,
+    ),
+    "macos-aarch64": Math.ceil(nativeShardCosts["macos-aarch64"][path] / 3),
+  };
+}
+
 /** Derived one-third own-key costs for dedicated case-shard job planning. */
-export const ownKeyCaseShardCosts: OwnKeyCaseShardCosts = {
-  "linux-x86_64-gnu": Math.ceil(
-    nativeShardCosts["linux-x86_64-gnu"][
-      "tests/property/m5-object-own-keys.property.test.ts"
-    ] / 3,
-  ),
-  "macos-aarch64": Math.ceil(
-    nativeShardCosts["macos-aarch64"][
-      "tests/property/m5-object-own-keys.property.test.ts"
-    ] / 3,
-  ),
-};
+export const ownKeyCaseShardCosts: CaseShardCosts = caseShardCosts(
+  "tests/property/m5-object-own-keys.property.test.ts",
+);
+
+/**
+ * Derived one-third Reflect namespace costs. U38 case-sharded this file
+ * for the same reason: unsharded it set its own Linux file shard's wall,
+ * which U31 showed no file partition can lower.
+ */
+export const reflectCaseShardCosts: CaseShardCosts = caseShardCosts(
+  "tests/property/m5-reflect-namespace.property.test.ts",
+);

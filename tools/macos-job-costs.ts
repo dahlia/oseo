@@ -26,6 +26,25 @@
  *     2, main run 37206614757, and branch run 37215661294 attempts 1
  *     and 2.
  *
+ *  -  Three entries are marked `derived`, the `reflect cases` shards that
+ *     U38 introduced. CI has never run them, so they have no hosted
+ *     observation at all, and these are estimates rather than medians.
+ *     U38 measured their Mac walls at 179.7, 179.4 and 180.0 seconds, and
+ *     the estimate applies the own-key family's ratio, 2.3, which is the
+ *     only one measured for this job shape: one property file, one case
+ *     shard, the extended wrapper, a dedicated runner. A proportional
+ *     route, scaling the own-key hosted medians by the ratio of the two
+ *     files' Mac walls, gives 383 instead, so 336 is the lower of the two
+ *     and places the job on a Mac lane a little more readily than a true
+ *     median might. Two bases were rejected. Hosted Linux walls do not
+ *     convert: the 1,754 seconds that run 39025004305 measured for this
+ *     file shared one runner with three other files, so they are not a
+ *     dedicated job's time, and own-key measures a Mac lane at 1.14 times
+ *     hosted Linux against 3.25 for that figure. The U6 weight table does
+ *     not either, because it overstates the two files by a derived 1.31
+ *     against 2.50. The first run that places one of these hosted
+ *     replaces the estimate.
+ *
  * The refreshed entries rose against their retained neighbours, so the
  * table is likely to understate the retained ones and to place them on a
  * Mac lane more readily than it should. Dedicated all-hosted runs are not
@@ -79,6 +98,9 @@ export const macosJobCosts: MacosJobCosts = {
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "test (macos-latest, node, 4/4)": 854, // 4
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
+  "reflect cases (macos-aarch64, 1/3)": 336, // derived
+  "reflect cases (macos-aarch64, 2/3)": 336, // derived
+  "reflect cases (macos-aarch64, 3/3)": 336, // derived
   "test (macos-latest, deno)": 107, // 8
 };
 
@@ -108,6 +130,9 @@ export const selfHostedJobSeconds: SelfHostedJobSeconds = {
   "native support (macos-aarch64, 2/12)": 488, // 5
   "native support (macos-aarch64, 4/12)": 449, // 5
   "own-key cases (macos-aarch64, 3/3)": 442, // 5
+  "reflect cases (macos-aarch64, 3/3)": 180, // 1
+  "reflect cases (macos-aarch64, 1/3)": 180, // 2
+  "reflect cases (macos-aarch64, 2/3)": 179, // 2
   "own-key cases (macos-aarch64, 1/3)": 433, // 5
   "native support (macos-aarch64, 10/12)": 375, // 5
   "own-key cases (macos-aarch64, 2/3)": 374, // 5
@@ -135,6 +160,11 @@ export const selfHostedJobSeconds: SelfHostedJobSeconds = {
  * Own-key cases always have a measured Mac median, so their ratio only
  * guards a future job without one.
  *
+ * Reflect namespace case shards borrow the own-key ratio. All three have a
+ * measured Mac wall, so the value only guards a future fourth shard, and
+ * U38 derived their hosted estimates from this same ratio, which makes it
+ * a borrowed measurement rather than independent evidence for them.
+ *
  * The host C sanitizer family is not Mac-lane eligible, so its ratio
  * reaches no schedule. It records a measurement anyway. U37 ran both
  * macOS suites on the first Mac mini over SSH and measured a derived
@@ -155,6 +185,7 @@ interface SelfHostedFamilySpeedRatios {
 export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
   "native support": 3.2,
   "own-key cases": 2.3,
+  "reflect cases": 2.3,
   native: 3.1,
   test262: 4.2,
   "host C sanitizers": 2.9,
@@ -234,28 +265,39 @@ interface SelfHostedPairSlowdowns {
 }
 
 export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
+  "reflect cases": {
+    test262: 1.45,
+    "native support": 1.27,
+    "own-key cases": 1.45,
+    native: 1.45,
+    "reflect cases": 1.07,
+  },
   test262: {
     test262: 1.26,
     "native support": 1.08,
     "own-key cases": 1.01,
     native: 1.01,
+    "reflect cases": 1.26,
   },
   "native support": {
     test262: 1.37,
     "native support": 1.13,
     "own-key cases": 1.05,
     native: 1.05,
+    "reflect cases": 1.37,
   },
   "own-key cases": {
     test262: 1.45,
     "native support": 1.27,
     "own-key cases": 1.45,
     native: 1.45,
+    "reflect cases": 1.45,
   },
   native: {
     test262: 1.41,
     "native support": 1.04,
     "own-key cases": 1.41,
     native: 1.41,
+    "reflect cases": 1.41,
   },
 };

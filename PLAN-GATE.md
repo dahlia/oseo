@@ -2846,3 +2846,100 @@ measurement does not move the run wall either way: main run 39012514327
 finished in 55.1 minutes with its wall set by
 `native support (linux-x86_64-gnu, 2/7)` at 54.6, against a macOS side
 that ended at 52.8. The wall is Linux's, and U36 named the lever past it.
+
+### Reflect namespace case shards (U38)
+
+U31 established that the maximum Linux `native support` file shard is
+pinned by one file, *tests/property/m5-reflect-namespace.property.test.ts*,
+which no file partition can split, and U36 named case sharding it as the
+only lever past that wall. Run 39025004305 confirmed the diagnosis
+directly rather than by model: its shard 1/7 ran four files on four
+workers, and the job's log timed this file's three suites at a measured
+1,072,978, 453,649 and 225,682 milliseconds inside a 1,785-second job, so
+the file alone set the shard's wall and the other three files finished
+under it.
+
+The file admits case sharding. It uses no `fc.pre`, which case sharding
+forbids because a precondition rejection would change generated run
+alignment, and the extended task's run scale of ten puts its case budgets
+at 120, 240 and 120 against a shard total of three. Its widest suite runs
+at a measured 29.8 percent of its interrupt limit, so each shard keeps the
+whole property's limit with room to spare.
+
+Both hosts now run the file in three dedicated case-shard jobs, named
+`reflect cases (TARGET, N/3)`, and the file shards exclude it.
+`caseShardedNativeFile` in *tools/native-shard.ts* becomes
+`caseShardedNativeFiles`, a list, beside a separate `ownKeyNativeFile` for
+the Linux singleton rule, which still covers own-keys alone because what
+it protects is that file's deadline margin and not its weight. The
+`native` aggregate requires every new job through the existing
+`needs.*.result` expansion. Reported check names rise from 72 to 78.
+
+The jobs carry no duration record, which own-keys does carry. This file
+has three property domains and the recorder writes one record per job with
+an exclusive create, so three domains cannot each record without changing
+the record format, and that belongs with the recorder rather than with a
+partition change. Each shard still keeps the whole property's interrupt
+limit and fails on interruption, which is the protection that matters, and
+the aggregate still requires all six jobs.
+
+U38 measured the new jobs on the first Mac mini over SSH rather than
+seeding them from estimate: a derived 179.7, 179.4 and 180.0 seconds solo,
+agreeing within 0.3 percent, and a measured pair factor of 1.07, the
+lowest in `selfHostedPairSlowdowns`. The hosted medians remain estimates,
+because CI has never run these jobs; they apply the own-key family's
+measured 2.3 ratio to the measured Mac walls. Two other bases were
+rejected and the rejection is the useful part: hosted Linux walls do not
+convert, because the 1,754 seconds this file measured shared one runner
+with three other files, and treating a third of that as a dedicated job
+implies a Mac lane 3.25 times faster than hosted Linux where own-keys
+measures 1.14; and the U6 weight table does not convert either, because it
+overstates the two case-sharded files by a derived 1.31 against 2.50. The
+evidence is under *docs/evidence/u38/*.
+
+The partition lowers both hosts' maximum file shard against the
+checked-in weight model: Linux from 38.3 to 33.4 derived minutes over
+seven shards, and macOS from 38.0 to 22.7 over twelve. More usefully, both
+lose their single-file floor, so raising a total lowers the maximum again,
+which U31 showed it could not do while this file was present. The Linux
+spread tightens from 34.7 to 38.3 minutes down to 32.1 to 33.4.
+
+The three new macOS jobs cost the lane model nothing. With six Mac lanes
+the derived macOS makespan stays at 49.1 minutes and the hosted job set
+stays at 221.0 derived minutes, because every new job is Mac-lane eligible
+and the lanes had the headroom; Mac lane ends move from 36.3 to 42.1
+minutes to 36.0 to 43.0. That 49.1 is an upper bound on the macOS gain:
+the model still charges `native support (macos-aarch64, 1/12)` the
+retained hosted median it measured while that shard carried this file, and
+lowering it now would invent an observation.
+
+Case budgets, seeds, sizes, interrupt limits, generators, the reviewed
+corpus, every shard total and both duration contracts are unchanged, and
+the compatibility counts stay at 22,627 of 26,637.
+
+Branch run 39053800730 then ran it, and the Linux prediction failed. All
+six new jobs passed, at a measured 8.5, 9.0 and 8.5 minutes on hosted
+Linux and 7.0, 4.6 and 5.5 on Mac lanes, so the partition itself works.
+But the seven Linux file shards, which the model put between 32.1 and 33.4
+derived minutes, measured 48.4, 39.4, 30.6, 25.3, 37.9, 47.9 and 45.0: a
+23-minute spread against a predicted 1.3. The error tracks a shard's file
+count, a measured 1.49 times the model at twelve files and 0.79 at
+twenty-eight, so the checked-in U6 weights no longer describe this corpus.
+They underestimate a shard with few files and overestimate one with many,
+which means the balanced partition the cost rule computes is not the
+partition CI runs, and every derived minute above is arithmetic on a stale
+table rather than a confirmed forecast.
+
+The Linux maximum moved from a measured 50.7 minutes to 48.4, which is
+inside ordinary variance: runs 39012514327 and 39025004305 differed by 3.9
+minutes with nothing between them that touched CI scheduling. Shard 1/7
+itself rose from a measured 40.3 minutes to 48.4 as the partition
+redistributed, because another file became its pole.
+
+So the structural finding is fixed and the wall is not. No shard is owned
+by one file any longer, which is what lets a larger total lower the
+maximum again, and that was the point U31 and U36 established. Refreshing
+the weight table from CI logs, by the procedure in
+*docs/evidence/u6/README.md*, is the prerequisite for trusting any further
+Linux partition change, and it is the next unit rather than part of this
+one.
