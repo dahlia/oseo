@@ -147,3 +147,53 @@ The model still charges `native support (macos-aarch64, 1/12)` its
 retained hosted median of 1,940 seconds, which was measured while that
 shard still carried this file. Lowering it now would be inventing an
 observation, so it stays until a run measures the cheaper shard.
+
+
+What the first run measured
+---------------------------
+
+Branch run 39053800730 ran the change. All six new jobs passed, at a
+measured 8.5, 9.0 and 8.5 minutes on hosted Linux and 7.0, 4.6 and 5.5 on
+Mac lanes. The Linux walls sit just under the 9.8-minute upper bound above,
+so a third of the contended figure was a fair ceiling and the dedicated
+job is only slightly cheaper than it.
+
+The predicted Linux gain did not appear, and the prediction's basis is
+what failed. The model expected all seven file shards to land between
+32.1 and 33.4 derived minutes. They measured 48.4, 39.4, 30.6, 25.3,
+37.9, 47.9 and 45.0, a spread of 23 minutes against a predicted 1.3, and
+the error tracks how many files a shard holds:
+
+| Shard | Files | Modeled  | Measured | Measured / modeled |
+| ----- | ----- | -------- | -------- | ------------------ |
+| 1     | 12    | 32.4 min | 48.4 min | 1.49               |
+| 2     | 16    | 33.0 min | 39.4 min | 1.19               |
+| 3     | 16    | 33.1 min | 30.6 min | 0.92               |
+| 4     | 28    | 32.1 min | 25.3 min | 0.79               |
+| 5     | 20    | 33.1 min | 37.9 min | 1.14               |
+| 6     | 20    | 33.4 min | 47.9 min | 1.43               |
+| 7     | 20    | 33.0 min | 45.0 min | 1.36               |
+
+The checked-in U6 weights therefore no longer describe this corpus. They
+underestimate a shard with few files and overestimate one with many, so
+the balanced partition the cost rule computes is not the partition CI
+runs. Every derived minute in the section above rests on those weights and
+should be read as arithmetic on a stale table, not as a prediction this
+run confirmed.
+
+The Linux maximum went from a measured 50.7 minutes in run 39025004305 to
+48.4 here. That is inside ordinary variance: runs 39012514327 and
+39025004305 differed by 3.9 minutes with no change that touched CI
+scheduling. One run cannot separate a 2.3-minute move from that noise.
+
+The structural finding U31 made is still fixed. No shard is owned by one
+file any longer: shard 1/7 held four files before and holds twelve now.
+What that bought is that a larger total can lower the maximum again,
+which it could not while this file was present. What it did not buy is a
+lower wall today, because another file became the pole of the shard that
+sets it, and shard 1/7 itself rose from a measured 40.3 minutes to 48.4
+as the partition redistributed.
+
+Refreshing the weight table from CI logs, by the procedure in
+*docs/evidence/u6/README.md*, is the prerequisite for trusting any further
+partition change on Linux.

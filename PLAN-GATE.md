@@ -2915,8 +2915,31 @@ lowering it now would invent an observation.
 
 Case budgets, seeds, sizes, interrupt limits, generators, the reviewed
 corpus, every shard total and both duration contracts are unchanged, and
-the compatibility counts stay at 22,627 of 26,637. What this does not do
-is lower the Linux wall by the full 4.9 derived minutes on its own: the
-observed Linux maximum has been 50.7 and 54.6 minutes against a modeled
-38.3, so the model runs about 30 percent low there, and the next run
-measures what the tighter spread is actually worth.
+the compatibility counts stay at 22,627 of 26,637.
+
+Branch run 39053800730 then ran it, and the Linux prediction failed. All
+six new jobs passed, at a measured 8.5, 9.0 and 8.5 minutes on hosted
+Linux and 7.0, 4.6 and 5.5 on Mac lanes, so the partition itself works.
+But the seven Linux file shards, which the model put between 32.1 and 33.4
+derived minutes, measured 48.4, 39.4, 30.6, 25.3, 37.9, 47.9 and 45.0: a
+23-minute spread against a predicted 1.3. The error tracks a shard's file
+count, a measured 1.49 times the model at twelve files and 0.79 at
+twenty-eight, so the checked-in U6 weights no longer describe this corpus.
+They underestimate a shard with few files and overestimate one with many,
+which means the balanced partition the cost rule computes is not the
+partition CI runs, and every derived minute above is arithmetic on a stale
+table rather than a confirmed forecast.
+
+The Linux maximum moved from a measured 50.7 minutes to 48.4, which is
+inside ordinary variance: runs 39012514327 and 39025004305 differed by 3.9
+minutes with nothing between them that touched CI scheduling. Shard 1/7
+itself rose from a measured 40.3 minutes to 48.4 as the partition
+redistributed, because another file became its pole.
+
+So the structural finding is fixed and the wall is not. No shard is owned
+by one file any longer, which is what lets a larger total lower the
+maximum again, and that was the point U31 and U36 established. Refreshing
+the weight table from CI logs, by the procedure in
+*docs/evidence/u6/README.md*, is the prerequisite for trusting any further
+Linux partition change, and it is the next unit rather than part of this
+one.
