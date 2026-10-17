@@ -1,0 +1,2090 @@
+{
+  "sourceRun": "39070198868",
+  "headSha": "c78d9df1ac12a19688d07664ac22d7f6a780074c",
+  "jobs": [
+    {
+      "name": "native support (macos-aarch64, 7/12)",
+      "id": 117506036405,
+      "conclusion": "success",
+      "jobSeconds": 1586.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:49.1491300Z",
+      "workers": 3,
+      "shardReportedAt": "2026-10-17T21:16:49.2296720Z",
+      "files": {
+        "tests/property/m5-compound-assignment.property.test.ts": [
+          1.600084,
+          158721.260833,
+          0.952917,
+          476804.233291,
+          19159.273917,
+          582402.081875,
+          2240.77925,
+          1683.993583
+        ],
+        "tests/property/m5-number-prototype.property.test.ts": [
+          543173.108125
+        ],
+        "tests/property/m5-object-integrity-levels.property.test.ts": [
+          462120.85775
+        ],
+        "tests/property/m5-object-create.property.test.ts": [
+          322262.855
+        ],
+        "tests/property/m5-set-composition-methods.property.test.ts": [
+          318271.767625
+        ],
+        "tests/property/m5-object-define-properties.property.test.ts": [
+          323160.825166
+        ],
+        "tests/property/m5-string-prototype-pad.property.test.ts": [
+          282201.125
+        ],
+        "tests/property/m5-generic-string-coercion.property.test.ts": [
+          245682.043458
+        ],
+        "tests/property/m5-typed-array-sort.property.test.ts": [
+          304488.894
+        ],
+        "tests/property/m5-optional-catch-binding.property.test.ts": [
+          0.819209,
+          131161.199125
+        ],
+        "tests/property/m5-parameter-binding.property.test.ts": [
+          0.92225,
+          140427.60675
+        ],
+        "tests/property/m5-tagged-template.property.test.ts": [
+          0.532959,
+          157450.833042
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 22,
+        "pass": 22,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1530883.793625,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (macos-aarch64, 8/12)",
+      "id": 117506036408,
+      "conclusion": "success",
+      "jobSeconds": 1121.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:37.0149370Z",
+      "workers": 3,
+      "shardReportedAt": "2026-10-17T21:16:37.0758670Z",
+      "files": {
+        "tests/property/m5-uri-handling-functions.property.test.ts": [
+          510480.018625
+        ],
+        "tests/property/m5-regexp-symbol-methods.property.test.ts": [
+          217050.035583,
+          140137.771833,
+          122979.967667
+        ],
+        "tests/property/m5-date-family.property.test.ts": [
+          422210.027709
+        ],
+        "tests/property/m5-array-prototype-change-by-copy.property.test.ts": [
+          264169.529084
+        ],
+        "tests/property/m5-array-prototype-reduction.property.test.ts": [
+          220369.758667
+        ],
+        "tests/property/m5-delete.property.test.ts": [
+          0.757459,
+          210790.376208
+        ],
+        "tests/property/m4-async.property.test.ts": [
+          265930.575417
+        ],
+        "tests/property/m5-typed-array-mutation.property.test.ts": [
+          211198.02175,
+          12562.202041
+        ],
+        "tests/property/m5-typed-array-iterative.property.test.ts": [
+          206587.009667,
+          6689.461667
+        ],
+        "tests/property/m5-object-rest.property.test.ts": [
+          0.498625,
+          152978.879042
+        ],
+        "tests/property/m5-object-binding.property.test.ts": [
+          0.978667,
+          121094.27975
+        ],
+        "tests/property/nio-clock-wakeup.property.test.ts": [
+          118354.317625
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1078866.376542,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 5/7)",
+      "id": 117506036477,
+      "conclusion": "success",
+      "jobSeconds": 1866.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:12.9076936Z",
+      "workers": 4,
+      "shardReportedAt": "2026-10-17T21:16:12.9731014Z",
+      "files": {
+        "tests/property/m5-top-level-this.property.test.ts": [
+          0.984507,
+          0.235999,
+          572911.511092
+        ],
+        "tests/property/m5-array-buffer.property.test.ts": [
+          550102.73376
+        ],
+        "tests/property/m5-date-family.property.test.ts": [
+          608465.118005
+        ],
+        "tests/property/m5-for-in.property.test.ts": [
+          1.530326,
+          524331.564552
+        ],
+        "tests/property/m5-global-numeric-functions.property.test.ts": [
+          666195.388304
+        ],
+        "tests/property/m5-set-composition-methods.property.test.ts": [
+          405474.516022
+        ],
+        "tests/property/m5-array-prototype-predicate-search.property.test.ts": [
+          357518.783255
+        ],
+        "tests/property/m5-array-prototype-mutation.property.test.ts": [
+          361358.930688
+        ],
+        "tests/property/m5-array-prototype-copying.property.test.ts": [
+          325535.971932
+        ],
+        "tests/property/m5-boolean-intrinsic.property.test.ts": [
+          360491.602176
+        ],
+        "tests/property/m5-object-define-property.property.test.ts": [
+          354857.588848
+        ],
+        "tests/property/m5-array-prototype-reduction.property.test.ts": [
+          314617.140437
+        ],
+        "tests/property/m5-regexp-literal-aot.property.test.ts": [
+          287016.519386,
+          150599.109039,
+          123.685178
+        ],
+        "tests/property/m5-json-stringify.property.test.ts": [
+          288204.379081
+        ],
+        "tests/property/m5-iterator-helpers-eager.property.test.ts": [
+          284165.871959
+        ],
+        "tests/property/m5-generic-string-coercion.property.test.ts": [
+          281531.871354
+        ],
+        "tests/property/m5-update-expression.property.test.ts": [
+          1.781072,
+          150715.794388
+        ],
+        "tests/property/m5-cross-realm.property.test.ts": [
+          185479.822436
+        ],
+        "tests/property/m5-parameter-binding.property.test.ts": [
+          1.506105,
+          120366.923809
+        ],
+        "tests/property/m5-default-parameter.property.test.ts": [
+          88058.995267
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 27,
+        "pass": 27,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1846311.769734,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 2/12)",
+      "id": 117506036492,
+      "conclusion": "success",
+      "jobSeconds": 1608.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1891 expected-negative=187 unsupported=142 duration=1569523.05ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7407,
+          "host": 67,
+          "diagnostic": 32,
+          "with": 6,
+          "module": 10
+        },
+        "executed": {
+          "split": 7404,
+          "host": 64,
+          "with": 6,
+          "module": 10
+        },
+        "harnessComparisons": 7279,
+        "deterministicObjects": 0,
+        "objectsBuilt": 128,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 11/12)",
+      "id": 117506036495,
+      "conclusion": "success",
+      "jobSeconds": 1582.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2219/26637 pass=1891 expected-negative=194 unsupported=134 duration=1543634.01ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7383,
+          "host": 71,
+          "diagnostic": 34,
+          "with": 10,
+          "module": 8
+        },
+        "executed": {
+          "split": 7379,
+          "host": 68,
+          "with": 10,
+          "module": 8
+        },
+        "harnessComparisons": 7263,
+        "deterministicObjects": 0,
+        "objectsBuilt": 120,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 2/7)",
+      "id": 117506036518,
+      "conclusion": "success",
+      "jobSeconds": 2707.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:20.2916931Z",
+      "workers": 4,
+      "shardReportedAt": "2026-10-17T21:16:20.3662169Z",
+      "files": {
+        "tests/property/m5-math-namespace.property.test.ts": [
+          1139314.199325
+        ],
+        "tests/property/m5-globalthis-binding.property.test.ts": [
+          1.962786,
+          650080.008914,
+          3534.048225,
+          5111.379386,
+          9028.344226,
+          689799.212531,
+          685406.802652,
+          590295.99568,
+          13292.638826
+        ],
+        "tests/property/m5-for-await-of.property.test.ts": [
+          301657.882348,
+          321889.088222,
+          441047.371107,
+          268375.498436
+        ],
+        "tests/property/m5-string-prototype-match-and-split.property.test.ts": [
+          891263.894115,
+          428234.426426
+        ],
+        "tests/property/m5-map-intrinsic.property.test.ts": [
+          433562.563049
+        ],
+        "tests/property/m5-generator.property.test.ts": [
+          1.505308,
+          0.636832,
+          1.100891,
+          0.281166,
+          443228.584796
+        ],
+        "tests/property/m5-typeof-unresolved.property.test.ts": [
+          1.377869,
+          395657.393122
+        ],
+        "tests/property/m5-json-parse.property.test.ts": [
+          417904.661053
+        ],
+        "tests/property/m5-string-prototype-case.property.test.ts": [
+          363229.33017,
+          8502.54963
+        ],
+        "tests/property/m5-array-prototype-iterators.property.test.ts": [
+          454738.489595
+        ],
+        "tests/property/m5-object-create.property.test.ts": [
+          516778.57656
+        ],
+        "tests/property/m5-intrinsic-graph-root.property.test.ts": [
+          333029.62234
+        ],
+        "tests/property/m5-optional-catch-binding.property.test.ts": [
+          1.983844,
+          170810.23667
+        ],
+        "tests/property/m5-catch-binding.property.test.ts": [
+          1.889658,
+          162913.9456
+        ],
+        "tests/property/m5-parameter-var.property.test.ts": [
+          145756.561188
+        ],
+        "tests/property/m5-generator-parameter.property.test.ts": [
+          2.086297,
+          167785.087337
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 37,
+        "pass": 37,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 2678731.105638,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 6/12)",
+      "id": 117506036547,
+      "conclusion": "success",
+      "jobSeconds": 1047.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1884 expected-negative=196 unsupported=140 duration=1006583.77ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7407,
+          "host": 53,
+          "diagnostic": 32,
+          "module": 10,
+          "with": 2
+        },
+        "executed": {
+          "split": 7405,
+          "host": 48,
+          "module": 10,
+          "with": 2
+        },
+        "harnessComparisons": 7307,
+        "deterministicObjects": 0,
+        "objectsBuilt": 100,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 3/7)",
+      "id": 117506036556,
+      "conclusion": "success",
+      "jobSeconds": 1427.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:14.8056242Z",
+      "workers": 4,
+      "shardReportedAt": "2026-10-17T21:16:14.8664735Z",
+      "files": {
+        "tests/property/m5-promise-intrinsic.property.test.ts": [
+          479235.23865,
+          247996.824185,
+          216411.722357
+        ],
+        "tests/property/m5-object-literal.property.test.ts": [
+          0.906171,
+          0.431282,
+          185298.231531,
+          1.485577,
+          430444.339626,
+          26.83901
+        ],
+        "tests/property/m5-string-prototype-replace.property.test.ts": [
+          373444.884703,
+          189627.533596
+        ],
+        "tests/property/m5-harness-native-function-matcher.property.test.ts": [
+          18214.162588,
+          571650.646713
+        ],
+        "tests/property/m5-object-define-properties.property.test.ts": [
+          286738.890919
+        ],
+        "tests/property/m5-array-prototype-index-search.property.test.ts": [
+          266887.402384
+        ],
+        "tests/property/m5-regexp-prototype-and-exec.property.test.ts": [
+          186237.093873,
+          121631.975451,
+          89182.600578,
+          11247.593994
+        ],
+        "tests/property/m5-symbol-intrinsic.property.test.ts": [
+          364941.709741
+        ],
+        "tests/property/m5-set-intrinsic.property.test.ts": [
+          222574.194836
+        ],
+        "tests/property/m5-regexp-intrinsic.property.test.ts": [
+          177273.771235,
+          45650.635532
+        ],
+        "tests/property/m5-typed-array-iterative.property.test.ts": [
+          204888.920917,
+          6867.913163
+        ],
+        "tests/property/m5-delete.property.test.ts": [
+          1.299956,
+          209850.37852
+        ],
+        "tests/property/m5-for-binding.property.test.ts": [
+          1.120084,
+          145391.841261
+        ],
+        "tests/property/m5-for-of-binding.property.test.ts": [
+          1.151121,
+          133251.352561
+        ],
+        "tests/property/m5-super-without-extends.property.test.ts": [
+          166922.220524
+        ],
+        "tests/property/m5-optional-chaining.property.test.ts": [
+          2.072645,
+          96822.709055
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 34,
+        "pass": 34,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1404578.096364,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 6/7)",
+      "id": 117506036557,
+      "conclusion": "success",
+      "jobSeconds": 2866.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:14.6433400Z",
+      "workers": 4,
+      "shardReportedAt": "2026-10-17T21:16:14.7180447Z",
+      "files": {
+        "tests/property/m5-string-prototype-access.property.test.ts": [
+          715667.003366
+        ],
+        "tests/property/m5-compound-assignment.property.test.ts": [
+          2.362642,
+          204848.288103,
+          1.7115,
+          656150.274396,
+          33015.590901,
+          937116.318465,
+          3255.827005,
+          2739.701645
+        ],
+        "tests/property/m5-array-prototype-species-mapping.property.test.ts": [
+          669243.389458
+        ],
+        "tests/property/m5-array-constructor.property.test.ts": [
+          673113.053446
+        ],
+        "tests/property/m5-function-intrinsic-chains.property.test.ts": [
+          641718.447498
+        ],
+        "tests/property/m5-pattern-await.property.test.ts": [
+          1.26393,
+          595357.255859
+        ],
+        "tests/property/m5-atomics-and-shared-memory.property.test.ts": [
+          587412.410039
+        ],
+        "tests/property/m5-array-prototype-iterative.property.test.ts": [
+          491901.194397
+        ],
+        "tests/property/m5-typed-array-constructors.property.test.ts": [
+          693527.437126
+        ],
+        "tests/property/m5-delete-super.property.test.ts": [
+          1.351589,
+          470933.224196
+        ],
+        "tests/property/m5-uri-handling-functions.property.test.ts": [
+          920558.866899
+        ],
+        "tests/property/m5-atomics-single-agent.property.test.ts": [
+          462992.532127
+        ],
+        "tests/property/m5-typed-array-sort.property.test.ts": [
+          448184.534596
+        ],
+        "tests/property/m5-async-await.property.test.ts": [
+          320550.221826
+        ],
+        "tests/property/m5-typed-array-search-and-join.property.test.ts": [
+          350250.693123,
+          18417.008917
+        ],
+        "tests/property/m5-string-iterator.property.test.ts": [
+          453803.043025
+        ],
+        "tests/property/m5-destructuring-assignment.property.test.ts": [
+          1.99604,
+          210556.738642
+        ],
+        "tests/property/m5-tagged-template.property.test.ts": [
+          1.30918,
+          183143.419167
+        ],
+        "tests/property/m5-async-generator.property.test.ts": [
+          225649.430331
+        ],
+        "tests/property/m5-object-binding.property.test.ts": [
+          3.115867,
+          130872.872159
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 33,
+        "pass": 33,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 2843349.257894,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 5/12)",
+      "id": 117506036561,
+      "conclusion": "success",
+      "jobSeconds": 1243.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1884 expected-negative=205 unsupported=131 duration=1203753.41ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7394,
+          "host": 46,
+          "diagnostic": 31,
+          "module": 18,
+          "with": 6
+        },
+        "executed": {
+          "split": 7389,
+          "host": 44,
+          "module": 18,
+          "with": 6
+        },
+        "harnessComparisons": 7286,
+        "deterministicObjects": 0,
+        "objectsBuilt": 108,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 1/12)",
+      "id": 117506036564,
+      "conclusion": "success",
+      "jobSeconds": 1240.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1899 expected-negative=184 unsupported=137 duration=1198049.64ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7465,
+          "host": 44,
+          "diagnostic": 28,
+          "with": 8,
+          "module": 12
+        },
+        "executed": {
+          "split": 7461,
+          "host": 40,
+          "with": 8,
+          "module": 12
+        },
+        "harnessComparisons": 7349,
+        "deterministicObjects": 0,
+        "objectsBuilt": 116,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 8/12)",
+      "id": 117506036566,
+      "conclusion": "success",
+      "jobSeconds": 1619.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1885 expected-negative=205 unsupported=130 duration=1549100.4ms pool=3 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7402,
+          "diagnostic": 31,
+          "host": 69,
+          "with": 4,
+          "module": 8
+        },
+        "executed": {
+          "split": 7399,
+          "host": 68,
+          "with": 4,
+          "module": 8
+        },
+        "harnessComparisons": 7298,
+        "deterministicObjects": 0,
+        "objectsBuilt": 104,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 1/7)",
+      "id": 117506036577,
+      "conclusion": "success",
+      "jobSeconds": 2078.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:22.1306118Z",
+      "packageBeforeNativeSeconds": 9.783286,
+      "workers": 4,
+      "shardReportedAt": "2026-10-17T21:16:22.1894299Z",
+      "files": {
+        "tests/property/m5-proxy-exotic-object.property.test.ts": [
+          1396408.506238,
+          161727.154086
+        ],
+        "tests/property/m5-object-constructor.property.test.ts": [
+          1162480.965516
+        ],
+        "tests/property/m5-promise-combine.property.test.ts": [
+          621830.999937,
+          380225.885711,
+          430629.304952
+        ],
+        "tests/property/m5-array-sort-stability.property.test.ts": [
+          1636055.719583
+        ],
+        "tests/property/m5-string-prototype-pad.property.test.ts": [
+          368138.492936
+        ],
+        "tests/property/m5-array-spread.property.test.ts": [
+          241089.236408
+        ],
+        "tests/property/m5-optional-private.property.test.ts": [
+          1.437299,
+          225475.514425
+        ],
+        "tests/property/m5-array-binding.property.test.ts": [
+          1.615262,
+          170863.82795
+        ],
+        "tests/property/m5-call-spread.property.test.ts": [
+          208638.524367
+        ],
+        "tests/property/m5-for-of-assignment.property.test.ts": [
+          1.155534,
+          186822.9057
+        ],
+        "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": [
+          223960.682754,
+          93466.52043
+        ],
+        "tests/property/m5-module-continuation.property.test.ts": [
+          152203.796547
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 2048061.728426,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 4/12)",
+      "id": 117506036596,
+      "conclusion": "success",
+      "jobSeconds": 867.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1880 expected-negative=200 unsupported=140 duration=834507.65ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7385,
+          "host": 45,
+          "diagnostic": 27,
+          "with": 10,
+          "module": 12
+        },
+        "executed": {
+          "split": 7381,
+          "host": 40,
+          "with": 10,
+          "module": 12
+        },
+        "harnessComparisons": 7277,
+        "deterministicObjects": 0,
+        "objectsBuilt": 108,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 7/7)",
+      "id": 117506036600,
+      "conclusion": "success",
+      "jobSeconds": 2006.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:18.5516307Z",
+      "workers": 4,
+      "shardReportedAt": "2026-10-17T21:16:18.6098002Z",
+      "files": {
+        "tests/property/m5-data-view.property.test.ts": [
+          522165.796323
+        ],
+        "tests/property/m5-string-prototype-search-and-slice.property.test.ts": [
+          501945.711168
+        ],
+        "tests/property/m5-class.property.test.ts": [
+          1.737331,
+          1.11086,
+          0.205185,
+          0.394085,
+          1.432478,
+          0.324903,
+          0.481775,
+          0.312264,
+          0.423679,
+          0.406443,
+          0.308939,
+          0.220127,
+          0.246466,
+          405367.137704,
+          155638.935505,
+          149674.362356
+        ],
+        "tests/property/m5-bigint-intrinsic.property.test.ts": [
+          478634.800316
+        ],
+        "tests/property/m5-for-in-object-pattern.property.test.ts": [
+          1.115865,
+          628028.407563
+        ],
+        "tests/property/m5-super-targets.property.test.ts": [
+          0.891882,
+          439838.355122
+        ],
+        "tests/property/m5-lexical-declaration-list.property.test.ts": [
+          0.880425,
+          432456.601203
+        ],
+        "tests/property/m5-object-descriptor-queries.property.test.ts": [
+          437934.517229
+        ],
+        "tests/property/m5-typed-array-statics.property.test.ts": [
+          364148.557096
+        ],
+        "tests/property/m5-harness-promise-helper.property.test.ts": [
+          7134.185837,
+          570710.252168
+        ],
+        "tests/property/m5-global-object-record.property.test.ts": [
+          342294.577259
+        ],
+        "tests/property/m5-object-integrity-levels.property.test.ts": [
+          526209.564519
+        ],
+        "tests/property/m5-array-prototype-change-by-copy.property.test.ts": [
+          354379.649895
+        ],
+        "tests/property/m5-iterator-helpers-lazy.property.test.ts": [
+          264483.40654
+        ],
+        "tests/property/m5-annexb-proto-boundary.property.test.ts": [
+          308486.239894
+        ],
+        "tests/property/m5-object-prototype.property.test.ts": [
+          257129.477654
+        ],
+        "tests/property/m5-for-of.property.test.ts": [
+          178789.981843
+        ],
+        "tests/property/m5-rest-parameter.property.test.ts": [
+          109392.311779
+        ],
+        "tests/property/nio-clock-wakeup.property.test.ts": [
+          133134.230004
+        ],
+        "tests/property/m5-object-rest.property.test.ts": [
+          0.934396,
+          136240.367532
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 40,
+        "pass": 40,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 1979898.157138,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 10/12)",
+      "id": 117506036608,
+      "conclusion": "success",
+      "jobSeconds": 1126.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2219/26637 pass=1866 expected-negative=201 unsupported=152 duration=1083532.63ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7295,
+          "diagnostic": 34,
+          "host": 66,
+          "with": 8,
+          "module": 12
+        },
+        "executed": {
+          "split": 7291,
+          "host": 60,
+          "with": 8,
+          "module": 12
+        },
+        "harnessComparisons": 7179,
+        "deterministicObjects": 0,
+        "objectsBuilt": 116,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 12/12)",
+      "id": 117506036614,
+      "conclusion": "success",
+      "jobSeconds": 863.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2219/26637 pass=1891 expected-negative=192 unsupported=136 duration=830786.8ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7434,
+          "diagnostic": 30,
+          "host": 44,
+          "with": 10,
+          "module": 8
+        },
+        "executed": {
+          "split": 7429,
+          "host": 40,
+          "with": 10,
+          "module": 8
+        },
+        "harnessComparisons": 7318,
+        "deterministicObjects": 0,
+        "objectsBuilt": 116,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 3/12)",
+      "id": 117506036616,
+      "conclusion": "success",
+      "jobSeconds": 1285.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1893 expected-negative=186 unsupported=141 duration=1243777.28ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7416,
+          "diagnostic": 35,
+          "host": 55,
+          "with": 6,
+          "module": 10
+        },
+        "executed": {
+          "split": 7414,
+          "host": 52,
+          "with": 6,
+          "module": 10
+        },
+        "harnessComparisons": 7288,
+        "deterministicObjects": 0,
+        "objectsBuilt": 128,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "native support (linux-x86_64-gnu, 4/7)",
+      "id": 117506036625,
+      "conclusion": "success",
+      "jobSeconds": 2657.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:16:20.6353574Z",
+      "workers": 4,
+      "shardReportedAt": "2026-10-17T21:16:20.7106873Z",
+      "files": {
+        "tests/property/m5-string-intrinsic.property.test.ts": [
+          1052449.368555
+        ],
+        "tests/property/m5-regexp-symbol-methods.property.test.ts": [
+          464719.148918,
+          284977.574948,
+          226765.733863
+        ],
+        "tests/property/m5-number-prototype.property.test.ts": [
+          935677.973483
+        ],
+        "tests/property/m5-number-intrinsic.property.test.ts": [
+          1049581.415004
+        ],
+        "tests/property/m5-weak-collections.property.test.ts": [
+          590414.760053
+        ],
+        "tests/property/m4-async.property.test.ts": [
+          463197.695224
+        ],
+        "tests/property/m5-arguments-object.property.test.ts": [
+          1.229521,
+          156024.353578,
+          233566.911991,
+          257085.988775
+        ],
+        "tests/property/m5-well-known-symbols.property.test.ts": [
+          1.359262,
+          591402.830923
+        ],
+        "tests/property/m5-function-prototype.property.test.ts": [
+          416769.879251
+        ],
+        "tests/property/m5-typed-array-core.property.test.ts": [
+          493220.73749
+        ],
+        "tests/property/m5-typed-array-mutation.property.test.ts": [
+          377555.16087,
+          22724.56066
+        ],
+        "tests/property/m5-lexical-super.property.test.ts": [
+          285962.839147,
+          266461.976581
+        ],
+        "tests/property/m5-array-prototype-sort.property.test.ts": [
+          404005.207872
+        ],
+        "tests/property/m5-aggregate-error.property.test.ts": [
+          1.601772,
+          264847.08139
+        ],
+        "tests/property/m5-runtime-error-observation.property.test.ts": [
+          1.21277,
+          440228.258659
+        ],
+        "tests/property/m5-iterator-intrinsic.property.test.ts": [
+          376350.026148
+        ],
+        "tests/property/m5-import-attributes.property.test.ts": [
+          1054.156924,
+          2682.753601,
+          113049.129338,
+          78.959869,
+          106.425168,
+          236536.453008
+        ],
+        "tests/property/m5-bigint.property.test.ts": [
+          93.344612,
+          81.032133,
+          77.399143,
+          87489.726945
+        ],
+        "tests/property/m5-generator-methods.property.test.ts": [
+          50822.305927
+        ],
+        "tests/property/m5-generator-throw.property.test.ts": [
+          46256.691506
+        ],
+        "tests/property/m5-export-default-class.property.test.ts": [
+          43556.070771
+        ],
+        "tests/property/m5-class-early-errors.property.test.ts": [
+          78.818825,
+          26941.015745,
+          28542.552239
+        ],
+        "tests/property/m5-ephemeron-tracing.property.test.ts": [
+          39152.598105
+        ],
+        "tests/property/m5-regexp-matcher.property.test.ts": [
+          3227.730605,
+          3898.729758
+        ],
+        "tests/property/m5-regexp-pattern.property.test.ts": [
+          925.672838,
+          538.50199
+        ],
+        "tests/property/m5-regexp-unicode-property-escapes.property.test.ts": [
+          249.274578,
+          676.95819,
+          77.105255
+        ],
+        "tests/property/m5-regexp-pattern-extensions.property.test.ts": [
+          262.931389
+        ],
+        "tests/property/unicode-tables.property.test.ts": [
+          98.867251,
+          151.255267,
+          69.823706
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 54,
+        "pass": 54,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 2627847.989061,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 8/12)",
+      "id": 117506036637,
+      "conclusion": "success",
+      "jobSeconds": 1162.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1885 expected-negative=205 unsupported=130 duration=1124693.97ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7402,
+          "diagnostic": 31,
+          "host": 69,
+          "with": 4,
+          "module": 8
+        },
+        "executed": {
+          "split": 7399,
+          "host": 68,
+          "with": 4,
+          "module": 8
+        },
+        "harnessComparisons": 7298,
+        "deterministicObjects": 0,
+        "objectsBuilt": 104,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 7/12)",
+      "id": 117506036651,
+      "conclusion": "success",
+      "jobSeconds": 1293.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1891 expected-negative=190 unsupported=139 duration=1248302.46ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7445,
+          "host": 38,
+          "diagnostic": 33,
+          "with": 4,
+          "module": 10
+        },
+        "executed": {
+          "split": 7442,
+          "host": 36,
+          "with": 4,
+          "module": 10
+        },
+        "harnessComparisons": 7345,
+        "deterministicObjects": 0,
+        "objectsBuilt": 100,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (linux-x86_64-gnu, 9/12)",
+      "id": 117506036659,
+      "conclusion": "success",
+      "jobSeconds": 1267.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=linux-x86_64-gnu tests=2220/26637 pass=1872 expected-negative=210 unsupported=138 duration=1227053.86ms pool=4 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7358,
+          "host": 62,
+          "diagnostic": 29,
+          "with": 4,
+          "module": 2
+        },
+        "executed": {
+          "split": 7355,
+          "host": 60,
+          "with": 4,
+          "module": 2
+        },
+        "harnessComparisons": 7250,
+        "deterministicObjects": 0,
+        "objectsBuilt": 108,
+        "objectsReused": 0
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 1/12)",
+      "id": 117506102882,
+      "conclusion": "success",
+      "jobSeconds": 497.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1899 expected-negative=184 unsupported=137 duration=410106.91ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7465,
+          "host": 44,
+          "diagnostic": 28,
+          "with": 8,
+          "module": 12
+        },
+        "executed": {
+          "split": 7461,
+          "host": 40,
+          "with": 8,
+          "module": 12
+        },
+        "harnessComparisons": 7349,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 116
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 5/12)",
+      "id": 117506103059,
+      "conclusion": "success",
+      "jobSeconds": 629.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1884 expected-negative=205 unsupported=131 duration=505833.58ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7394,
+          "host": 46,
+          "diagnostic": 31,
+          "module": 18,
+          "with": 6
+        },
+        "executed": {
+          "split": 7389,
+          "host": 44,
+          "module": 18,
+          "with": 6
+        },
+        "harnessComparisons": 7286,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 108
+      }
+    },
+    {
+      "name": "native support (macos-aarch64, 9/12)",
+      "id": 117506103076,
+      "conclusion": "success",
+      "jobSeconds": 509.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:24:05.0054650Z",
+      "workers": 12,
+      "shardReportedAt": "2026-10-17T21:24:05.0415080Z",
+      "files": {
+        "tests/property/m5-regexp-prototype-and-exec.property.test.ts": [
+          187079.619125,
+          143911.97325,
+          84323.263584,
+          13067.856208
+        ],
+        "tests/property/m5-array-buffer.property.test.ts": [
+          399005.206125
+        ],
+        "tests/property/m5-bigint-intrinsic.property.test.ts": [
+          373134.776583
+        ],
+        "tests/property/m5-function-intrinsic-chains.property.test.ts": [
+          358782.743375
+        ],
+        "tests/property/m5-pattern-await.property.test.ts": [
+          0.343542,
+          340928.461917
+        ],
+        "tests/property/m5-regexp-literal-aot.property.test.ts": [
+          219927.347167,
+          132657.407958,
+          53.736584
+        ],
+        "tests/property/m5-array-prototype-iterators.property.test.ts": [
+          274551.467458
+        ],
+        "tests/property/m5-array-prototype-predicate-search.property.test.ts": [
+          293925.701417
+        ],
+        "tests/property/m5-object-define-property.property.test.ts": [
+          285249.260625
+        ],
+        "tests/property/m5-for-of.property.test.ts": [
+          137282.172083
+        ],
+        "tests/property/m5-default-parameter.property.test.ts": [
+          87989.35975
+        ],
+        "tests/property/m5-generator-parameter.property.test.ts": [
+          0.639625,
+          137870.259542
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 428752.940125,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (macos-aarch64, 4/12)",
+      "id": 117506103093,
+      "conclusion": "success",
+      "jobSeconds": 522.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:17:48.7408860Z",
+      "workers": 9,
+      "shardReportedAt": "2026-10-17T21:17:48.7827580Z",
+      "files": {
+        "tests/property/m5-string-prototype-match-and-split.property.test.ts": [
+          292365.29375,
+          125857.175875
+        ],
+        "tests/property/m5-for-in-object-pattern.property.test.ts": [
+          0.366917,
+          322421.206292
+        ],
+        "tests/property/m5-object-literal.property.test.ts": [
+          0.460125,
+          2.432125,
+          152546.516625,
+          0.3555,
+          215109.786,
+          13.245583
+        ],
+        "tests/property/m5-typed-array-core.property.test.ts": [
+          212764.703375
+        ],
+        "tests/property/m5-regexp-intrinsic.property.test.ts": [
+          148919.245792,
+          35224.437666
+        ],
+        "tests/property/m5-delete-super.property.test.ts": [
+          0.342417,
+          206619.738542
+        ],
+        "tests/property/m5-iterator-helpers-lazy.property.test.ts": [
+          168690.417666
+        ],
+        "tests/property/m5-typed-array-search-and-join.property.test.ts": [
+          166304.673375,
+          7117.184541
+        ],
+        "tests/property/m5-intrinsic-graph-root.property.test.ts": [
+          161024.220875
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 19,
+        "pass": 19,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 418522.708625,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (macos-aarch64, 10/12)",
+      "id": 117506103103,
+      "conclusion": "success",
+      "jobSeconds": 369.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:24:16.6384430Z",
+      "workers": 12,
+      "shardReportedAt": "2026-10-17T21:24:16.6735940Z",
+      "files": {
+        "tests/property/m5-typed-array-constructors.property.test.ts": [
+          297143.357
+        ],
+        "tests/property/m5-array-prototype-species-mapping.property.test.ts": [
+          277600.535833
+        ],
+        "tests/property/m5-data-view.property.test.ts": [
+          295292.78075
+        ],
+        "tests/property/m5-super-targets.property.test.ts": [
+          0.337125,
+          276214.854584
+        ],
+        "tests/property/m5-weak-collections.property.test.ts": [
+          260367.262834
+        ],
+        "tests/property/m5-array-prototype-iterative.property.test.ts": [
+          242215.55975
+        ],
+        "tests/property/m5-string-iterator.property.test.ts": [
+          222878.955709
+        ],
+        "tests/property/m5-generator.property.test.ts": [
+          0.406542,
+          0.174667,
+          0.317375,
+          0.068958,
+          231887.441416
+        ],
+        "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": [
+          199201.412708,
+          81613.398917
+        ],
+        "tests/property/m5-optional-private.property.test.ts": [
+          1.042042,
+          162987.249833
+        ],
+        "tests/property/m5-destructuring-assignment.property.test.ts": [
+          0.5715,
+          127459.721958
+        ],
+        "tests/property/m5-optional-chaining.property.test.ts": [
+          0.574541,
+          132915.86
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 21,
+        "pass": 21,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 297434.893459,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (macos-aarch64, 9/12)",
+      "id": 117506103108,
+      "conclusion": "success",
+      "jobSeconds": 629.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1872 expected-negative=210 unsupported=138 duration=507469.37ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7358,
+          "host": 62,
+          "diagnostic": 29,
+          "with": 4,
+          "module": 2
+        },
+        "executed": {
+          "split": 7355,
+          "host": 60,
+          "with": 4,
+          "module": 2
+        },
+        "harnessComparisons": 7250,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 108
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 11/12)",
+      "id": 117506103119,
+      "conclusion": "success",
+      "jobSeconds": 654.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2219/26637 pass=1891 expected-negative=194 unsupported=134 duration=565361.51ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7383,
+          "host": 71,
+          "diagnostic": 34,
+          "with": 10,
+          "module": 8
+        },
+        "executed": {
+          "split": 7379,
+          "host": 68,
+          "with": 10,
+          "module": 8
+        },
+        "harnessComparisons": 7263,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 120
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 3/12)",
+      "id": 117506103122,
+      "conclusion": "success",
+      "jobSeconds": 508.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1893 expected-negative=186 unsupported=141 duration=418015.93ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7416,
+          "diagnostic": 35,
+          "host": 55,
+          "with": 6,
+          "module": 10
+        },
+        "executed": {
+          "split": 7414,
+          "host": 52,
+          "with": 6,
+          "module": 10
+        },
+        "harnessComparisons": 7288,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 128
+      }
+    },
+    {
+      "name": "native support (macos-aarch64, 12/12)",
+      "id": 117506103132,
+      "conclusion": "success",
+      "jobSeconds": 625.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:27:54.5179930Z",
+      "workers": 12,
+      "shardReportedAt": "2026-10-17T21:27:54.5529810Z",
+      "files": {
+        "tests/property/m5-lexical-declaration-list.property.test.ts": [
+          0.389583,
+          468926.162375
+        ],
+        "tests/property/m5-string-prototype-access.property.test.ts": [
+          493629.910791
+        ],
+        "tests/property/m5-harness-promise-helper.property.test.ts": [
+          7810.15625,
+          539715.245167
+        ],
+        "tests/property/m5-object-descriptor-queries.property.test.ts": [
+          470919.878667
+        ],
+        "tests/property/m5-atomics-single-agent.property.test.ts": [
+          390930.670334
+        ],
+        "tests/property/m5-array-prototype-index-search.property.test.ts": [
+          403847.538292
+        ],
+        "tests/property/m5-runtime-error-observation.property.test.ts": [
+          0.364917,
+          396203.331917
+        ],
+        "tests/property/m5-typeof-unresolved.property.test.ts": [
+          0.31075,
+          357395.892834
+        ],
+        "tests/property/m5-iterator-helpers-eager.property.test.ts": [
+          339636.641459
+        ],
+        "tests/property/m5-for-of-binding.property.test.ts": [
+          0.519708,
+          248397.036542
+        ],
+        "tests/property/m5-for-of-assignment.property.test.ts": [
+          0.447834,
+          270676.328584
+        ],
+        "tests/property/m5-call-spread.property.test.ts": [
+          295677.510916
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 18,
+        "pass": 18,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 547847.12925,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (macos-aarch64, 11/12)",
+      "id": 117506103139,
+      "conclusion": "success",
+      "jobSeconds": 653.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:27:56.1410150Z",
+      "workers": 12,
+      "shardReportedAt": "2026-10-17T21:27:56.2274230Z",
+      "files": {
+        "tests/property/m5-for-in.property.test.ts": [
+          0.511333,
+          556285.538292
+        ],
+        "tests/property/m5-lexical-super.property.test.ts": [
+          347577.784041,
+          171577.2185
+        ],
+        "tests/property/m5-well-known-symbols.property.test.ts": [
+          0.415458,
+          528726.864958
+        ],
+        "tests/property/m5-array-constructor.property.test.ts": [
+          542719.289417
+        ],
+        "tests/property/m5-string-prototype-search-and-slice.property.test.ts": [
+          562856.741417
+        ],
+        "tests/property/m5-array-sort-stability.property.test.ts": [
+          574736.705583
+        ],
+        "tests/property/m5-annexb-proto-boundary.property.test.ts": [
+          450083.956875
+        ],
+        "tests/property/m5-object-prototype.property.test.ts": [
+          403044.401834
+        ],
+        "tests/property/m5-typed-array-statics.property.test.ts": [
+          495912.054583
+        ],
+        "tests/property/m5-for-binding.property.test.ts": [
+          12.196917,
+          313913.468834
+        ],
+        "tests/property/m5-catch-binding.property.test.ts": [
+          0.537583,
+          196600.659125
+        ],
+        "tests/property/m5-module-continuation.property.test.ts": [
+          316992.986833
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 17,
+        "pass": 17,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 575421.417042,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (macos-aarch64, 5/12)",
+      "id": 117506103140,
+      "conclusion": "success",
+      "jobSeconds": 388.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:30:22.3431790Z",
+      "workers": 9,
+      "shardReportedAt": "2026-10-17T21:30:22.3790210Z",
+      "files": {
+        "tests/property/m5-string-intrinsic.property.test.ts": [
+          322120.195292
+        ],
+        "tests/property/m5-global-numeric-functions.property.test.ts": [
+          312608.581875
+        ],
+        "tests/property/m5-top-level-this.property.test.ts": [
+          0.311875,
+          0.051833,
+          305762.626916
+        ],
+        "tests/property/m5-boolean-intrinsic.property.test.ts": [
+          210849.826791
+        ],
+        "tests/property/m5-global-object-record.property.test.ts": [
+          209193.607958
+        ],
+        "tests/property/m5-array-prototype-mutation.property.test.ts": [
+          214299.723334
+        ],
+        "tests/property/m5-string-prototype-case.property.test.ts": [
+          163125.245708,
+          3087.513959
+        ],
+        "tests/property/m5-map-intrinsic.property.test.ts": [
+          197449.073917
+        ],
+        "tests/property/m5-async-await.property.test.ts": [
+          156976.89875
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 12,
+        "pass": 12,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 322361.63875,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (macos-aarch64, 4/12)",
+      "id": 117506103141,
+      "conclusion": "success",
+      "jobSeconds": 419.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1880 expected-negative=200 unsupported=140 duration=306227.65ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7385,
+          "host": 45,
+          "diagnostic": 27,
+          "with": 10,
+          "module": 12
+        },
+        "executed": {
+          "split": 7381,
+          "host": 40,
+          "with": 10,
+          "module": 12
+        },
+        "harnessComparisons": 7277,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 108
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 2/12)",
+      "id": 117506103171,
+      "conclusion": "success",
+      "jobSeconds": 644.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1891 expected-negative=187 unsupported=142 duration=558126.74ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7407,
+          "host": 67,
+          "diagnostic": 32,
+          "with": 6,
+          "module": 10
+        },
+        "executed": {
+          "split": 7404,
+          "host": 64,
+          "with": 6,
+          "module": 10
+        },
+        "harnessComparisons": 7279,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 128
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 7/12)",
+      "id": 117506103178,
+      "conclusion": "success",
+      "jobSeconds": 495.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1891 expected-negative=190 unsupported=139 duration=413380.59ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "host": 38,
+          "split": 7445,
+          "diagnostic": 33,
+          "with": 4,
+          "module": 10
+        },
+        "executed": {
+          "split": 7442,
+          "host": 36,
+          "with": 4,
+          "module": 10
+        },
+        "harnessComparisons": 7345,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 100
+      }
+    },
+    {
+      "name": "native support (macos-aarch64, 2/12)",
+      "id": 117506103216,
+      "conclusion": "success",
+      "jobSeconds": 741.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:38:18.3248280Z",
+      "workers": 12,
+      "shardReportedAt": "2026-10-17T21:38:18.3610790Z",
+      "files": {
+        "tests/property/m5-promise-intrinsic.property.test.ts": [
+          431240.638708,
+          131767.027,
+          105237.421916
+        ],
+        "tests/property/m5-object-constructor.property.test.ts": [
+          496823.114458
+        ],
+        "tests/property/m5-promise-combine.property.test.ts": [
+          348839.059708,
+          150346.92475,
+          131226.275708
+        ],
+        "tests/property/m5-aggregate-error.property.test.ts": [
+          0.290666,
+          182798.504041
+        ],
+        "tests/property/m5-array-spread.property.test.ts": [
+          196124.91075
+        ],
+        "tests/property/m5-async-generator.property.test.ts": [
+          189571.7945
+        ],
+        "tests/property/m5-generator-throw.property.test.ts": [
+          42495.569167
+        ],
+        "tests/property/m5-export-default-class.property.test.ts": [
+          34357.018542
+        ],
+        "tests/property/m5-ephemeron-tracing.property.test.ts": [
+          19026.793125
+        ],
+        "tests/property/m5-class-early-errors.property.test.ts": [
+          67.60025,
+          19497.624167,
+          24896.161583
+        ],
+        "tests/property/m5-regexp-matcher.property.test.ts": [
+          2282.188542,
+          1613.243792
+        ],
+        "tests/property/m5-regexp-pattern.property.test.ts": [
+          822.222083,
+          369.918583
+        ],
+        "tests/property/m5-regexp-pattern-extensions.property.test.ts": [
+          103.297542
+        ],
+        "tests/property/m5-regexp-unicode-property-escapes.property.test.ts": [
+          92.361375,
+          338.247083,
+          10.632167
+        ],
+        "tests/property/unicode-tables.property.test.ts": [
+          22.691958,
+          45.680084,
+          29.945
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 28,
+        "pass": 28,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 668570.605208,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (macos-aarch64, 6/12)",
+      "id": 117506103217,
+      "conclusion": "success",
+      "jobSeconds": 568.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:53:17.5325460Z",
+      "workers": 12,
+      "shardReportedAt": "2026-10-17T21:53:17.6012780Z",
+      "files": {
+        "tests/property/m5-arguments-object.property.test.ts": [
+          0.3685,
+          151459.468917,
+          197150.891292,
+          87185.799875
+        ],
+        "tests/property/m5-harness-native-function-matcher.property.test.ts": [
+          16533.974667,
+          461979.449667
+        ],
+        "tests/property/m5-string-prototype-replace.property.test.ts": [
+          403211.577791,
+          88671.57025
+        ],
+        "tests/property/m5-symbol-intrinsic.property.test.ts": [
+          405567.254875
+        ],
+        "tests/property/m5-atomics-and-shared-memory.property.test.ts": [
+          341605.336916
+        ],
+        "tests/property/m5-set-intrinsic.property.test.ts": [
+          330228.007833
+        ],
+        "tests/property/m5-array-prototype-copying.property.test.ts": [
+          338768.870667
+        ],
+        "tests/property/m5-json-parse.property.test.ts": [
+          337263.893
+        ],
+        "tests/property/m5-json-stringify.property.test.ts": [
+          316826.045167
+        ],
+        "tests/property/m5-cross-realm.property.test.ts": [
+          220681.920917
+        ],
+        "tests/property/m5-bigint.property.test.ts": [
+          160.10375,
+          87.042625,
+          56.432583,
+          97218.423208
+        ],
+        "tests/property/m5-generator-methods.property.test.ts": [
+          63742.863167
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 20,
+        "pass": 20,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 492491.553125,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "native support (macos-aarch64, 1/12)",
+      "id": 117506103223,
+      "conclusion": "success",
+      "jobSeconds": 947.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:43:36.3356350Z",
+      "packageBeforeNativeSeconds": 3.743557,
+      "workers": 6,
+      "shardReportedAt": "2026-10-17T21:43:36.3778400Z",
+      "files": {
+        "tests/property/m5-proxy-exotic-object.property.test.ts": [
+          385010.646625,
+          55536.28325
+        ],
+        "tests/property/m5-math-namespace.property.test.ts": [
+          320019.269875
+        ],
+        "tests/property/m5-globalthis-binding.property.test.ts": [
+          0.398083,
+          207713.719625,
+          1290.70575,
+          2161.399667,
+          2227.146083,
+          203943.967459,
+          232075.968583,
+          198651.798,
+          5944.615958
+        ],
+        "tests/property/m5-update-expression.property.test.ts": [
+          0.602709,
+          83877.230792
+        ],
+        "tests/property/m5-parameter-var.property.test.ts": [
+          71448.369917
+        ],
+        "tests/property/m5-rest-parameter.property.test.ts": [
+          70219.975417
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 16,
+        "pass": 16,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 854259.018208,
+      "interruptedExampleCounts": []
+    },
+    {
+      "name": "test262 (macos-aarch64, 12/12)",
+      "id": 117506103234,
+      "conclusion": "success",
+      "jobSeconds": 602.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2219/26637 pass=1891 expected-negative=192 unsupported=136 duration=528932.35ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7434,
+          "diagnostic": 30,
+          "host": 44,
+          "with": 10,
+          "module": 8
+        },
+        "executed": {
+          "split": 7429,
+          "host": 40,
+          "with": 10,
+          "module": 8
+        },
+        "harnessComparisons": 7318,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 116
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 6/12)",
+      "id": 117506103236,
+      "conclusion": "success",
+      "jobSeconds": 342.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2220/26637 pass=1884 expected-negative=196 unsupported=140 duration=278119.14ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7407,
+          "host": 53,
+          "diagnostic": 32,
+          "module": 10,
+          "with": 2
+        },
+        "executed": {
+          "split": 7405,
+          "host": 48,
+          "module": 10,
+          "with": 2
+        },
+        "harnessComparisons": 7307,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 100
+      }
+    },
+    {
+      "name": "test262 (macos-aarch64, 10/12)",
+      "id": 117506103244,
+      "conclusion": "success",
+      "jobSeconds": 533.0,
+      "archive": "warm",
+      "runner": "test262 revision=f2d1435644797268dca1f7988cad5a4e89ccd8d2 target=macos-aarch64 tests=2219/26637 pass=1866 expected-negative=201 unsupported=152 duration=414203.71ms pool=8 retries=0",
+      "builds": {
+        "attempts": {
+          "split": 7295,
+          "diagnostic": 34,
+          "host": 66,
+          "with": 8,
+          "module": 12
+        },
+        "executed": {
+          "split": 7291,
+          "host": 60,
+          "with": 8,
+          "module": 12
+        },
+        "harnessComparisons": 7179,
+        "deterministicObjects": 0,
+        "objectsBuilt": 0,
+        "objectsReused": 116
+      }
+    },
+    {
+      "name": "native support (macos-aarch64, 3/12)",
+      "id": 117506103378,
+      "conclusion": "success",
+      "jobSeconds": 481.0,
+      "archive": "warm",
+      "nativeCommandReportedAt": "2026-10-17T21:52:02.1991330Z",
+      "workers": 9,
+      "shardReportedAt": "2026-10-17T21:52:02.2347250Z",
+      "files": {
+        "tests/property/m5-class.property.test.ts": [
+          0.580875,
+          0.355459,
+          0.063708,
+          0.077833,
+          0.082834,
+          0.114875,
+          0.107875,
+          0.112667,
+          0.08725,
+          0.124834,
+          0.108375,
+          0.076167,
+          0.058916,
+          216324.851458,
+          70319.773709,
+          63081.790666
+        ],
+        "tests/property/m5-for-await-of.property.test.ts": [
+          126236.30125,
+          106790.16375,
+          118662.900125,
+          66574.657333
+        ],
+        "tests/property/m5-number-intrinsic.property.test.ts": [
+          300243.222917
+        ],
+        "tests/property/m5-function-prototype.property.test.ts": [
+          182008.772708
+        ],
+        "tests/property/m5-iterator-intrinsic.property.test.ts": [
+          180394.481584
+        ],
+        "tests/property/m5-array-prototype-sort.property.test.ts": [
+          173799.304917
+        ],
+        "tests/property/m5-import-attributes.property.test.ts": [
+          735.531417,
+          1237.360875,
+          2811.837083,
+          17.918125,
+          21.290459,
+          125404.8125
+        ],
+        "tests/property/m5-super-without-extends.property.test.ts": [
+          164984.97325
+        ],
+        "tests/property/m5-array-binding.property.test.ts": [
+          0.674667,
+          107964.711625
+        ]
+      },
+      "caseFailures": [],
+      "nativeCounts": {
+        "tests": 33,
+        "pass": 33,
+        "fail": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "nativeRunnerMilliseconds": 418532.41825,
+      "interruptedExampleCounts": []
+    }
+  ]
+}

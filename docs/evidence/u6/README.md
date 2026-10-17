@@ -1,6 +1,63 @@
 U6 shard assignment evidence
 ============================
 
+Current weight source
+---------------------
+
+Refreshing the file weights lowers the modeled Linux maximum over seven
+shards from 47.3 minutes to 44.1, holding one run's measured case costs
+fixed. That 3.2 minutes is a modeled difference; no CI run has executed
+the refreshed partition. The remaining 44.1 minutes belongs to one file,
+*tests/property/m5-globalthis-binding.property.test.ts*, whose summed case
+durations give it a 2,647-second weight. No whole-file partition can model
+a shorter longest shard than that weight. The aggregate work bound over
+all 132 refreshed files and 28 Linux workers is 35.7 minutes. The next
+three weights are
+*tests/property/m5-compound-assignment.property.test.ts* at 1,838 seconds,
+*tests/property/m5-array-sort-stability.property.test.ts* at 1,637, and
+*tests/property/m5-proxy-exotic-object.property.test.ts* at 1,559.
+
+*tools/native-shard-costs.ts* now derives from main run [39070198868] at
+`c78d9df1`, which observed all seven Linux and all twelve macOS file
+shards under one set of toolchain pins, Node.js 24.21.0 and Deno 2.9.7.
+*ci-39070198868.json.txt* retains its measured case durations. Each
+refreshed entry is that file's summed case milliseconds divided by 1,000
+and rounded up. `python3 docs/evidence/u6/summarize.py` derives the same
+weights internally and reproduces *model.txt*; it does not read or check
+the TypeScript table, which was compared against its derivation by hand.
+The refresh covers 132 files per host. The two entries in
+`caseShardedNativeFiles` keep their older values, because CI excludes
+those files from the file shards and this run did not observe them there.
+
+The superseded table was stale file by file rather than uniformly. Across
+both hosts its entries range from 0.26 to 3.59 times the refreshed weight
+for the same file, the extremes being
+*tests/property/m5-import-attributes.property.test.ts* on Linux and
+*tests/property/m5-math-namespace.property.test.ts* on macOS.
+
+Replaying this run's own partition in its observed file order gives a
+47.3-minute longest shard against 47.8 measured, with per-shard
+differences of 0.38 to 0.53 minutes; *model.txt* carries all seven.
+`selectNativeTestShard` already simulates each shard's workers and assigns
+a batch to the shard with the shortest modeled completion, so this replay
+is evidence that stale weights, not the partitioning rule, produced the
+error. One run's agreement does not establish the model across runs.
+
+Two limits apply. The refresh replaces a maximum over two historical
+observations with a single newer observation, so it provides no estimate
+of run-to-run variation and the weights are not conservative bounds.
+Second, the hosts are not comparable across sources: over the 132
+refreshed files, total weight falls 18 percent on macOS and rises 10
+percent on Linux, or 16 and 9 percent over the complete tables. The
+superseded macOS figures were measured on hosted runners, most macOS file
+shards now run on Mac lanes, and this run's macOS jobs ran at three, six,
+nine and twelve workers, which also changes how much concurrent time a
+case accumulates. Per-job median ratios of refreshed to superseded weight
+range from 0.55 to 1.42 with no monotone relationship to worker count.
+These observations do not separate hardware, concurrency, file cohort and
+implementation change.
+
+
 Inputs and reproduction
 -----------------------
 
@@ -53,10 +110,12 @@ python3 docs/evidence/u6/summarize.py
 
 *model.txt* preserves the latter command's derived/estimated output. Summed
 case milliseconds divided by 1,000 are derived per-file scheduling weights,
-not measured subprocess lifetimes. *tools/native-shard-costs.ts* keeps the
-larger derived sum for each file/host across the two runs, rounded up to whole
-seconds. Unknown files use the upper median of that host's table. Run-varying
-costs are outside canonical evidence, and no expected classification changes.
+not measured subprocess lifetimes. Historically
+*tools/native-shard-costs.ts* kept the larger derived sum for each
+file/host across the two runs named above; the current table instead takes
+one run's sum, as the section on the current weight source records. Unknown
+files use the upper median of that host's table. Run-varying costs are
+outside canonical evidence, and no expected classification changes.
 
 The test262 CI runner reports only aggregate duration, pool size, retries, and
 classification counts. Its per-path CI distribution is unmeasured. U10's
@@ -64,37 +123,14 @@ local Linux native-execution sums for three detached-buffer paths are retained
 in *docs/evidence/u10/new-metrics.json.txt*; they are neither CI path wall times
 nor measured macOS weights, so U6 does not extrapolate them into a path table.
 
-One entry no longer comes from the two weight-source runs.
-*tests/property/m5-array-sort-stability.property.test.ts* landed after both,
-so its first checked-in weight of 600 seconds for each host was an estimate.
-Main run [37884543813] measured the file's single property at 384,038
-milliseconds on the self-hosted macOS lane and 1,186,962 milliseconds on the
-hosted Linux runner that passed, which replace that estimate as 384 and 1,187
-seconds. The same corpus interrupted at 1,800,006 milliseconds after 17 of 20
-cases on a different hosted Linux runner in the two earlier attempts of that
-run, so the hosted observation is a lower bound on the worst case rather than
-a stable cost. Refreshing the whole table from one newer run would mix Node.js
-and Deno pins, so only this file changed.
-
-The import-attributes family also postdates the weight-source runs. Its
-October 10, 2026 local Linux focused observation measured the eight-case
-generated property at 8.758 seconds, invalid requests at 0.005 seconds, and
-the fixed identity, publication and asynchronous publication cases at
-2.284, 0.412 and 0.881 seconds. Multiplying only generated case durations
-by ten and retaining fixed cases gives an estimated 91.21 seconds, rounded
-up to the 92-second Linux weight. This is a projection from an ordinary
-local observation, not measured extended CI cost. The macOS weight remains
-an estimate: its prior adjacent-family 202-second estimate is scaled by
-the Linux weight change, `202 * 92/85`, and rounded up to 219 seconds.
-Neither weight changes cases, seeds, size limits or interrupt deadlines.
-
-The class constructor early-error family also postdates the weight-source
-runs. Its October 12, 2026 local Linux extended run summed its three case
-durations to 30.531 seconds, rounded up to the 31-second Linux weight. This
-is a local sum of concurrent case durations, not measured CI cost or file
-wall time. No macOS run has measured the suite, so its 27-second weight
-remains the earlier estimate of ten times the Linux ordinary generated case
-sum. Neither weight changes cases, seeds, size limits or interrupt deadlines.
+Three groups of entries were estimates or single-file measurements under
+the superseded table: *tests/property/m5-array-sort-stability.property.test.ts*
+from run 37884543813, the import-attributes family from an October 10, 2026
+local Linux observation scaled by ten, and the class constructor
+early-error family from an October 12, 2026 local Linux extended run. Run
+39070198868 measures all three on both hosts, so none of them remains an
+estimate and the reasoning that produced those values is superseded. Their
+history is in this file's Git log.
 
 The newer main run [36312192623] at `af9bb68c` is retained as the closest
 before-run comparison.
@@ -103,9 +139,10 @@ at the branch base `86228614`; all intervening changes are documentation. This
 source uses the same Node.js 24.21.0 and Deno 2.9.7 pins as the experiment,
 whereas the two weight-source runs use Node.js 24.18.0 and Deno 2.9.2. Its
 measured inventory is the same 21,383 paths and 128 property files.
-*ci-36312192623.json.txt* retains its observations; *summarize.py* replays it
-after deriving weights from only the two older runs. Weights are not tuned to
-this comparison or to the after run.
+*ci-36312192623.json.txt* retains its observations; *summarize.py* replays
+it, and at the time derived weights from only the two older runs. It now
+derives them from run 39070198868 and replays all three historical runs.
+Weights are not tuned to this comparison or to the after run.
 
 The observed `objectsBuilt` counter is 96 to 128 per ten-way test262 shard
 in the three retained main runs, with a derived sum of 1,117 per target per run.
@@ -135,7 +172,6 @@ these runner summaries, and no cache hit is credited as an improvement.
 [36243816479]: https://github.com/dahlia/oseo/actions/runs/36243816479
 [36261458909]: https://github.com/dahlia/oseo/actions/runs/36261458909
 [36312192623]: https://github.com/dahlia/oseo/actions/runs/36312192623
-[37884543813]: https://github.com/dahlia/oseo/actions/runs/37884543813
 
 
 Model and decision

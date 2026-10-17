@@ -2925,10 +2925,12 @@ derived minutes, measured 48.4, 39.4, 30.6, 25.3, 37.9, 47.9 and 45.0: a
 23-minute spread against a predicted 1.3. The error tracks a shard's file
 count, a measured 1.49 times the model at twelve files and 0.79 at
 twenty-eight, so the checked-in U6 weights no longer describe this corpus.
-They underestimate a shard with few files and overestimate one with many,
-which means the balanced partition the cost rule computes is not the
+The balanced partition the cost rule computes is therefore not the
 partition CI runs, and every derived minute above is arithmetic on a stale
-table rather than a confirmed forecast.
+table rather than a confirmed forecast. U39 refreshed the table from main
+run 39070198868 and found no support there for the file-count reading
+above: replaying that run's own partition with its own case sums matches
+each of its seven measured walls within 0.53 minutes.
 
 The Linux maximum moved from a measured 50.7 minutes to 48.4, which is
 inside ordinary variance: runs 39012514327 and 39025004305 differed by 3.9
@@ -2943,3 +2945,73 @@ the weight table from CI logs, by the procedure in
 *docs/evidence/u6/README.md*, is the prerequisite for trusting any further
 Linux partition change, and it is the next unit rather than part of this
 one.
+
+### Refreshed native shard weights (U39)
+
+Refreshing the native file weights lowers the modeled Linux maximum over
+seven shards from 47.3 minutes to 44.1, holding main run 39070198868's
+measured case costs fixed. That 3.2 minutes is modeled; no CI run has
+executed the refreshed partition. The remaining 44.1 minutes belongs to
+*tests/property/m5-globalthis-binding.property.test.ts*, whose summed case
+durations give it a 2,647-second weight, and no whole-file partition can
+model a shorter longest shard than one file's weight. The aggregate work
+bound over all 132 refreshed files and 28 Linux workers is 35.7 minutes,
+so raising the Linux total cannot approach it while this file stays whole.
+That is the shape U31 established and U38 removed for the Reflect
+namespace. Case-sharding this file is the next candidate and would be the
+third. Its weight is 2.34 times the superseded 1,133 seconds, which dates
+the table's error rather than the file's execution.
+
+*tools/native-shard-costs.ts* now derives from run 39070198868 at
+`c78d9df1`, which observed all seven Linux and all twelve macOS file
+shards under Node.js 24.21.0 and Deno 2.9.7.
+*docs/evidence/u6/ci-39070198868.json.txt* retains its measured case
+durations, and `python3 docs/evidence/u6/summarize.py` derives the same
+weights internally and reproduces *docs/evidence/u6/model.txt*. The
+refresh covers 132 files per host; the two entries in
+`caseShardedNativeFiles` keep their older values, because CI excludes
+those files from the file shards and this run did not observe them there.
+
+The superseded table was stale file by file. Across both hosts its entries
+range from 0.26 to 3.59 times the refreshed weight for the same file.
+
+`selectNativeTestShard` already simulates each shard's workers and assigns
+a batch to the shard with the shortest modeled completion. Replaying run
+39070198868's own partition in its observed file order gives a 47.3-minute
+longest shard against 47.8 measured, with per-shard differences of 0.38 to
+0.53 minutes. That is evidence the inputs, not the partitioning rule,
+carried the error, which is the part of U38's reading that needs
+correcting: U38 attributed the spread to stale weights and also described
+the error as tracking a shard's file count, and this replay gives that
+second reading no support. One run's agreement does not establish the
+model across runs, and U38's 25.3-to-48.4-minute spread came from branch
+run 39053800730, not from this source.
+
+Two limits apply to the refreshed table. It replaces a maximum over two
+historical observations with a single newer one, so it estimates no
+run-to-run variation and its entries are not conservative bounds. And the
+macOS column is not comparable with its predecessor: over the 132
+refreshed files, total weight falls 18 percent on macOS and rises 10 on
+Linux, or 16 and 9 over the complete tables, while the superseded macOS
+figures were measured on hosted runners and most macOS file shards now run
+on Mac lanes. This run's macOS jobs ran at three, six, nine and twelve
+workers, which also changes how much concurrent time a case accumulates.
+Per-job median ratios of refreshed to superseded weight range from 0.55 to
+1.42 with no monotone relationship to worker count, which is not enough to
+separate hardware, concurrency, file cohort and implementation change.
+
+The source run also had large hosted macOS queue delays, measured from
+`created_at` to `started_at`. They sum to 53.4 minutes against 1.35 in run
+39025004305 across the same ten hosted macOS jobs, and the five that
+needed a fresh `macos-latest` machine later in the run waited 7.55 to
+13.12 minutes each while the five that start with the run waited under ten
+seconds. Peak measured hosted macOS concurrency was five in both runs, and
+three of those jobs were active when the predecessor of
+`test (macos-latest, node, 4/4)` finished, so lane contention does not
+explain that job's 13.1-minute wait. These intervals are outside
+`macosFixedSetupSeconds`, which applies to modeled execution. They are
+also not the whole gap between the two runs' 64.2 and 51.8 minutes:
+`host C sanitizers (macOS, property)`, which heads the critical path, took
+39.68 minutes against 28.88. The queue intervals bear on reading this
+run's wall clock, not on the weights, and one run is not evidence for a
+model term.

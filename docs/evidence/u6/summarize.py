@@ -8,21 +8,43 @@ import math
 import re
 import statistics
 
-RUNS = ['36243816479', '36261458909']
+RUNS = ['39070198868']
+# The historical weight-source runs. CI now case-shards two files out of
+# the file shards, so the current source observes neither; their weights
+# stay retained from these runs, which did observe them.
+RETAINED = ['36243816479', '36261458909']
+# Replayed without tuning the current weights to them. The first two
+# sourced the superseded table; the third was its matching-base comparison.
+REPLAYS = RETAINED + ['36312192623']
 ROOT = 'docs/evidence/u6/'
-runs = [json.load(open(ROOT + 'ci-' + run + '.json.txt')) for run in RUNS]
-weights = {}
-for run in runs:
-    for job in run['jobs']:
-        if 'files' not in job:
-            continue
-        host = job['name'].split('(', 1)[1].split(',')[0]
-        table = weights.setdefault(host, {})
-        for path, cases in job['files'].items():
-            table[path] = max(table.get(path, 0), math.ceil(sum(cases) / 1000))
 
-# Replay a newer matching-base run without tuning the two-run weights to it.
-runs.append(json.load(open(ROOT + 'ci-36312192623.json.txt')))
+
+def load(run):
+    return json.load(open(ROOT + 'ci-' + run + '.json.txt'))
+
+
+def derive(sources, into=None):
+    table = {} if into is None else into
+    for run in sources:
+        for job in run['jobs']:
+            if 'files' not in job:
+                continue
+            host = job['name'].split('(', 1)[1].split(',')[0]
+            entries = table.setdefault(host, {})
+            for path, cases in job['files'].items():
+                entries[path] = max(entries.get(path, 0),
+                                    math.ceil(sum(cases) / 1000))
+    return table
+
+
+runs = [load(run) for run in RUNS]
+weights = derive(runs)
+# Keep an entry the current source does not observe at its older value
+# instead of dropping the file from the model.
+for host, entries in derive([load(run) for run in RETAINED]).items():
+    for path, cost in entries.items():
+        weights.setdefault(host, {}).setdefault(path, cost)
+runs.extend(load(run) for run in REPLAYS)
 
 
 def completion(files, costs, width):
@@ -88,8 +110,8 @@ for run in runs:
                           round(old['jobSeconds'] / 60, 2),
                           round(completion(old['files'], costs, width) / 60, 2),
                           round(after[i - 1], 2))
-        if host == 'linux-x86_64-gnu':
-            isolated = 'tests/property/m5-object-own-keys.property.test.ts'
+        isolated = 'tests/property/m5-object-own-keys.property.test.ts'
+        if host == 'linux-x86_64-gnu' and isolated in costs:
             remaining = {path: cost for path, cost in costs.items()
                          if path != isolated}
             parts = [[isolated]] + partition(
