@@ -1,0 +1,7 @@
+Derived macOS makespan and hosted load, six Mac lanes
+
+variant	makespan_min	hosted_jobs	hosted_total_min	hosted_lane_bound_min
+baseline (both suites hosted)	49.1	10	221.0	44.2
+both suites Mac-eligible	56.9	12	234.3	46.9
+property only	55.8	11	229.3	45.9
+native only	49.1	11	224.8	45.0

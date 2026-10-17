@@ -2787,3 +2787,62 @@ is already sharded is the lever past it.
 
 Case budgets, seeds, sizes, interrupt limits, the `native` aggregate's
 required set, every macOS total and the property suites are unchanged.
+
+### Apple clang sanitizers on a Mac lane (U37)
+
+The macOS host C sanitizer jobs were the last Mac-lane candidate whose
+`selfHostedFamilySpeedRatios` entry was a placeholder. A sweep over it
+produced 49.1 minutes at 1, 56.9 at 3.2, and 43.7 at 4.0, so the decision
+flipped inside the plausible range and no sweep could settle it. U37
+measured the family instead. It ran both suites on the first Mac mini over
+SSH at `80d2394a`, the way U25 measured the eligible families: two clones
+with separate `ZIG_GLOBAL_CACHE_DIR`, a replay of the job's post-checkout
+steps with `OSEO_HOST_CC=clang` and `GITHUB_ACTIONS=true`, and a driver
+that waited for `oseo-mac-1` and `oseo-mac-2` to report idle and sampled
+their busy state every 30 seconds. No sample recorded a busy lane and no
+step failed, so every wall below stands. The evidence is under
+*docs/evidence/u37/*.
+
+The solo walls are a measured 954.1, 949.9, and 953.3 seconds for the
+native suite and 698.0 and 692.7 for the property suite, against hosted
+medians of 2,492 and 2,092. Converted the way the rest of the table is,
+the suites give a derived 2.725 and 3.198, pooling to a family ratio of
+2.9. Three paired experiments give a derived worst overlapped factor of
+1.41 for the native suite and 1.09 for the property suite. The whole-wall
+slowdown is only 1.21 to 1.23, but that is not the model's input: two
+thirds of the longer job's wall overlaps and the rest runs alone, so the
+overlapped factor is the larger number and 1.41 ties the worst value in
+`selfHostedPairSlowdowns`.
+
+With those measurements in the model the lever loses, and loses in every
+variant. Against a baseline of 49.1 derived minutes, admitting both suites
+gives 56.9, the property suite alone 55.8, and the native suite alone
+49.1. The result does not rest on the placement heuristic: the hosted job
+set's total rises from a derived 221.0 minutes to 234.3, 229.3, and 224.8,
+and its per-lane lower bound from 44.2 to 46.9, 45.9, and 45.0. Even a
+perfect hosted packing would start above the baseline.
+
+The mechanism is capacity arithmetic. Moving both suites off the hosted
+pool removes a derived 76.4 hosted minutes, and running them on Mac lanes
+costs a measured 27.5 Mac-lane minutes, but a Mac-lane minute is worth 2.5
+to 4.2 hosted minutes, so the test262 and `native support` work evicted to
+make room costs about 90 hosted minutes. The family's own 2.9 is below the
+3.2 and 4.2 it displaces, so the exchange loses whichever suite makes it.
+Nothing about the toolchain was the obstacle: Apple clang 21.0.0 with its
+ASan and UBSan runtimes is installed on all three Mac minis, and both
+suites ran there to completion.
+
+The family therefore stays on hosted `macos-15`. Two things changed in the
+model: the placeholder ratio became the measured 2.9, and the exclusion in
+`selfHostedEligible` now records a measured reason rather than an absent
+one. No lane assignment, check name, timeout, case budget, seed, or suite
+changed, and the generated workflow is byte-identical.
+
+Two bills are worth keeping in view. The two jobs spend a measured 75.9
+minutes of hosted macOS time per run, which Mac lanes would absorb in
+27.5, so a fourth Mac mini would make this question worth reopening on
+cost grounds even though it is settled on makespan grounds. And the
+measurement does not move the run wall either way: main run 39012514327
+finished in 55.1 minutes with its wall set by
+`native support (linux-x86_64-gnu, 2/7)` at 54.6, against a macOS side
+that ended at 52.8. The wall is Linux's, and U36 named the lever past it.
