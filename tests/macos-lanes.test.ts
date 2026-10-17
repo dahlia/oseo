@@ -235,7 +235,14 @@ test("every check name and concurrency policy is preserved", () => {
       ...nameBaseline.checkNamesObserved.filter(
         (name: string) =>
           !name.startsWith("native support (linux-x86_64-gnu,") &&
-          name !== "test (macos-latest, node)",
+          name !== "test (macos-latest, node)" &&
+          name !== "host C sanitizers (Linux)",
+      ),
+      // The Linux native sanitizer fixtures are partitioned by the
+      // round-robin shard flag; see PLAN-GATE.md (U36).
+      ...Array.from(
+        { length: 3 },
+        (_, index) => `host C sanitizers (Linux, ${index + 1}/3)`,
       ),
       // The hosted macOS Node.js suite is partitioned by Node's own
       // --test-shard; see PLAN-GATE.md (U32).
@@ -250,7 +257,7 @@ test("every check name and concurrency policy is preserved", () => {
       "host C sanitizers (Linux, property)",
     ].toSorted(),
   );
-  assert.equal(names(after).length, 70);
+  assert.equal(names(after).length, 72);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -409,18 +416,25 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
 test("Linux sanitizer split retains every suite and its preflight", () => {
   const native = after.jobs.test_sanitizer!;
   const property = after.jobs.test_sanitizer_property!;
-  assert.equal(native.name, "host C sanitizers (Linux)");
+  assert.equal(native.name, "host C sanitizers (Linux, ${{ matrix.shard }}/3)");
   assert.equal(property.name, "host C sanitizers (Linux, property)");
-  assert.equal(native["timeout-minutes"], 90);
+  assert.equal(native["timeout-minutes"], 45);
   assert.equal(property["timeout-minutes"], 75);
+  assert.deepEqual(entries(native), [{ shard: 1 }, { shard: 2 }, { shard: 3 }]);
   assert.deepEqual(
     native.steps.filter((step) => step.run).map((step) => step.run),
     [
       "mise run test:sanitizer:self",
       "mise run test:sanitizer:self",
       "mise run test:sanitizer:runtime",
-      "mise run test:sanitizer:native",
+      "mise run test:sanitizer:native --shard ${{ matrix.shard }}/3",
     ],
+  );
+  // The GCC preflight and the unshardable runtime fixtures run in exactly
+  // one shard; the native fixtures run in every one.
+  assert.deepEqual(
+    native.steps.filter((step) => step.run).map((step) => step.if),
+    [undefined, "matrix.shard == 1", "matrix.shard == 1", undefined],
   );
   assert.deepEqual(
     property.steps.filter((step) => step.run).map((step) => step.run),
@@ -447,7 +461,7 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
     if: "failure() || cancelled()",
     uses: "actions/upload-artifact@v7",
     with: {
-      name: "host-cc-sanitizer-failures",
+      name: "host-cc-sanitizer-failures-${{ matrix.shard }}-of-3",
       path: "/tmp/oseo-native-*",
       "if-no-files-found": "warn",
     },
