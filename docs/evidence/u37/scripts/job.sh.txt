@@ -1,0 +1,54 @@
+#!/bin/bash
+# U37: run one macOS host C sanitizer job's post-checkout steps exactly as
+# the generated workflow does, to measure its Mac wall.
+# Usage: job.sh CLONE JOB OUTDIR
+# CLONE is a or b; JOB is san-nat or san-prop.
+#
+# Adapted from docs/evidence/u25/scripts/job.sh.txt. The only differences
+# are the job table, OSEO_HOST_CC=clang, and the host-cc archive key,
+# which is what the generated test_sanitizer_macos job uses.
+set -u
+clone=$1 job=$2 out=$3
+repo=$HOME/Desktop/oseo-m5ci-u37-$clone
+export PATH=$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH
+export ZIG_GLOBAL_CACHE_DIR=$HOME/m5ci-results/u37/zig-$clone
+export GITHUB_ACTIONS=true CI=true
+temp=$HOME/m5ci-results/u37/tmp/$clone-$job-$$
+rm -rf "$temp"; mkdir -p "$temp" "$out"
+log=$out/$job-$clone.log steps=$out/$job-$clone.steps.tsv
+echo $$ > "$out/$job-$clone.pid"
+cd "$repo" || exit 99
+step() { # name, command...
+  local name=$1; shift
+  local s e rc
+  s=$(python3 -c 'import time;print(f"{time.time():.3f}")')
+  echo "=== $name: $*" >>"$log"
+  "$@" >>"$log" 2>&1; rc=$?
+  e=$(python3 -c 'import time;print(f"{time.time():.3f}")')
+  printf '%s\t%s\t%s\t%s\t%s\n' "$job" "$name" "$s" "$e" "$rc" >>"$steps"
+  return $rc
+}
+printf 'job\tstep\tstart\tend\texit\n' >"$steps"
+fail=0
+# The sanitizer jobs compile with Apple clang, not Zig.
+export OSEO_HOST_CC=clang
+step build mise run build || fail=1
+OSEO_NATIVE_TOOLCHAIN=host-cc \
+  step archive-key mise run ci:runtime-archive-cache || fail=1
+export TMPDIR=$temp
+case $job in
+  san-nat)
+    step preflight mise run test:sanitizer:self || fail=1
+    step runtime mise run test:sanitizer:runtime || fail=1
+    step native mise run test:sanitizer:native || fail=1 ;;
+  san-prop)
+    step preflight mise run test:sanitizer:self || fail=1
+    # The workflow sets this scale for hosted macOS; it widens only the
+    # interrupt limit, so it is retained here to keep the suite identical.
+    OSEO_PROPERTY_TIME_SCALE=6 \
+      step property mise run test:sanitizer:property || fail=1 ;;
+  *) echo "unknown job $job" >>"$log"; fail=1 ;;
+esac
+echo "$fail" >"$out/$job-$clone.fail"
+rm -rf "$temp"
+exit $fail

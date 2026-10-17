@@ -1,0 +1,22 @@
+#!/bin/bash
+# U37: prepare two clones of the measured commit on the Mac, each with its
+# own Zig cache, standing in for two runner work directories.
+# Usage: setup.sh COMMIT
+set -euo pipefail
+commit=$1
+export PATH=$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH
+root=$HOME/m5ci-results/u37
+mkdir -p "$root/zig-a" "$root/zig-b" "$root/runs" "$root/tmp"
+for clone in a b; do
+  repo=$HOME/Desktop/oseo-m5ci-u37-$clone
+  if [ ! -d "$repo/.git" ]; then
+    git clone -q https://github.com/dahlia/oseo.git "$repo"
+  fi
+  git -C "$repo" fetch -q origin main
+  git -C "$repo" checkout -q --detach "$commit"
+  git -C "$repo" clean -qxdf -e node_modules
+  printf '%s %s\n' "$clone" "$(git -C "$repo" rev-parse HEAD)"
+done
+cd "$HOME/Desktop/oseo-m5ci-u37-a" && mise install -q
+echo "mise: $(mise --version)"
+clang --version | head -1

@@ -133,9 +133,20 @@ export const selfHostedJobSeconds: SelfHostedJobSeconds = {
  * fixtures over 2, and 2.34 for own-key cases over 15. Native fixtures use
  * 3.1 from one job's two attempts; the earlier derived U21 value was 2.2.
  * Own-key cases always have a measured Mac median, so their ratio only
- * guards a future job without one. The host C sanitizer and
- * cross-platform test families stay at 1 because they are not Mac-lane
- * eligible.
+ * guards a future job without one.
+ *
+ * The host C sanitizer family is not Mac-lane eligible, so its ratio
+ * reaches no schedule. It records a measurement anyway. U37 ran both
+ * macOS suites on the first Mac mini over SSH and measured a derived
+ * 2.725 for the native suite over three solo walls and 3.198 for the
+ * property suite over two, pooling to 2.9. That is below the 3.2 and 4.2
+ * of the native support and test262 work a Mac lane would have to evict
+ * to fit them, and the same unit measured their pair factor at a worst
+ * 1.41, so the family loses the exchange in every variant; see
+ * *docs/evidence/u37/README.md*. The earlier value here was a
+ * placeholder 1, which made the model report a regression of its own
+ * invention and could not be swept. Cross-platform test jobs stay at 1
+ * because they are not Mac-lane eligible and no Mac wall was measured.
  */
 interface SelfHostedFamilySpeedRatios {
   readonly [family: string]: number;
@@ -146,7 +157,7 @@ export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
   "own-key cases": 2.3,
   native: 3.1,
   test262: 4.2,
-  "host C sanitizers": 1,
+  "host C sanitizers": 2.9,
   test: 1,
 };
 

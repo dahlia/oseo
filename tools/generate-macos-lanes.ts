@@ -122,7 +122,18 @@ export function macosJobs(): readonly MacosLaneJob[] {
   return jobs;
 }
 
-/** Whether a job may run on a Zig-only self-hosted Mac lane. */
+/**
+ * Whether a job may run on a self-hosted Mac lane.
+ *
+ * The host C sanitizer family is excluded for a measured reason, not a
+ * missing toolchain: Apple clang and its ASan and UBSan runtimes are
+ * installed on all three Mac minis, and U37 ran both macOS suites there
+ * to completion. The family converts at 2.9 against the 3.2 and 4.2 of
+ * the work a lane would evict to fit it, so admitting either suite raises
+ * the hosted per-lane lower bound above the baseline. Cross-platform
+ * `test` jobs are excluded because they assert unscaled property limits
+ * and have no Mac wall. See *docs/evidence/u37/README.md*.
+ */
 function selfHostedEligible(job: MacosLaneJob): boolean {
   return (
     job.os === "macos-15" &&
