@@ -1,0 +1,5 @@
+pair	job	wall_s	warm_solo_s	slowdown	overlap_s	overlap_fraction	overlapped_factor
+warm	rn-1	206.4	179.7	1.149	206.4	1.00	1.149
+warm	rn-2	210.3	179.4	1.172	206.4	0.98	1.176
+pair	rn-1	192.0	179.7	1.068	191.7	1.00	1.069
+pair	rn-2	191.7	179.4	1.069	191.7	1.00	1.069

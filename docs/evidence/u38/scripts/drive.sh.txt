@@ -1,0 +1,70 @@
+#!/bin/bash
+# U37 driver, run from the Linux workstation. It measures the two macOS
+# host C sanitizer suites on the U21/U25 Mac mini over SSH, the way
+# docs/evidence/u25 measured the Mac-eligible families.
+#
+# Before each experiment it waits for oseo-mac-1 and oseo-mac-2 to be
+# idle, and while one runs it samples their busy state every 30 seconds so
+# a wall that overlapped a CI job can be discarded instead of believed.
+set -uo pipefail
+host=mac-mini-m6
+remote=/Users/dahlia/m5ci-results/u38
+out=$remote/runs
+local_out=${1:?usage: drive.sh LOCAL_OUT_DIR}
+mkdir -p "$local_out"
+lanes='oseo-mac-1 oseo-mac-2'
+
+busy_lanes() {
+  gh api repos/dahlia/oseo/actions/runners --jq \
+    '.runners[] | select(.busy) | .name' 2>/dev/null | tr '\n' ' '
+}
+wait_idle() {
+  local b
+  while true; do
+    b=$(busy_lanes)
+    local hit=
+    for l in $lanes; do case " $b " in *" $l "*) hit=1 ;; esac; done
+    [ -z "$hit" ] && return 0
+    echo "$(date -u +%H:%M:%S) waiting, busy: $b" >&2
+    sleep 60
+  done
+}
+sample() { # label
+  local label=$1
+  while :; do
+    printf '%s\t%s\t%s\n' "$label" "$(date -u +%s)" "$(busy_lanes)" \
+      >>"$local_out/overlap.tsv"
+    sleep 30
+  done
+}
+
+run_experiment() { # label, then CLONE:JOB pairs
+  local label=$1; shift
+  wait_idle
+  echo "=== $label: $* at $(date -u +%H:%M:%SZ)"
+  sample "$label" & local sampler=$!
+  local pids=()
+  for spec in "$@"; do
+    local clone=${spec%%:*} job=${spec##*:}
+    ssh -n "$host" "bash $remote/job.sh $clone $job $out/$label" &
+    pids+=($!)
+  done
+  local rc=0
+  for p in "${pids[@]}"; do wait "$p" || rc=1; done
+  kill "$sampler" 2>/dev/null
+  echo "=== $label finished rc=$rc at $(date -u +%H:%M:%SZ)"
+  mkdir -p "$local_out/$label"
+  scp -q "$host:$out/$label/*" "$local_out/$label/" 2>/dev/null
+  return $rc
+}
+
+printf 'label\tepoch\tbusy\n' >"$local_out/overlap.tsv"
+# The first pass runs the pair shape cold so that both clones end warm.
+# Warming only clone a would leave the paired san-prop measuring a cold
+# cache instead of the slowdown it is meant to isolate.
+run_experiment warm a:rn-1 b:rn-2
+run_experiment solo-1 a:rn-1
+run_experiment solo-2 a:rn-2
+run_experiment solo-3 a:rn-3
+run_experiment pair a:rn-1 b:rn-2
+echo "all experiments done at $(date -u +%H:%M:%SZ)"

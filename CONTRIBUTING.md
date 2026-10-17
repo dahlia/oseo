@@ -415,8 +415,13 @@ changes the case budget, so an interrupted run still fails. Minimize
 a failure and retain it as an ordinary regression fixture before fixing the
 implementation.
 
-CI may set `OSEO_PROPERTY_CASE_SHARD=INDEX/TOTAL` for one dedicated property
-file. The index is one-based. Every shard uses the same seed, replay path,
+CI may set `OSEO_PROPERTY_CASE_SHARD=INDEX/TOTAL` for a dedicated property
+file. Two files have one:
+*tests/property/m5-object-own-keys.property.test.ts* and
+*tests/property/m5-reflect-namespace.property.test.ts*, each in three
+jobs per native host. `caseShardedNativeFiles` in *tools/native-shard.ts*
+is the list, and the file shards exclude every entry. The index is
+one-based. Every shard uses the same seed, replay path,
 generator, `numRuns`, and size; generated run `i` executes its predicate only
 when `i % TOTAL == INDEX - 1`. The union of all indices is the ordinary
 suite, and no index executes in two shards. Shrink candidates run normally
@@ -430,9 +435,13 @@ other shards can fail earlier.
 Each shard keeps the original hard interrupt limit. Set
 `OSEO_PROPERTY_DURATION_FILE` to a writable JSON path to record its measured
 property duration; this requires `OSEO_PROPERTY_CASE_SHARD` as well. The
-`native` aggregate requires all six shard results
-and duration record, then fails if their duration sum on either host exceeds
-the original limit. An interrupted shard fails independently. The case budget
+own-key shards set it, so the `native` aggregate requires all six of their
+results and duration records, then fails if their duration sum on either
+host exceeds the original limit. The Reflect namespace shards do not: that
+file has three property domains and the recorder writes one record per job
+with an exclusive create, so three domains cannot each record without a
+record-format change. Its shards are still required by the aggregate.
+An interrupted shard fails independently of any record. The case budget
 and generators do not change. A replay path disables the shard filter and
 keeps the original interrupt limit.
 
@@ -541,13 +550,15 @@ margin. These model widths are fixed independently of local CPU availability,
 so every index of a total selects disjoint files from the same complete input
 set.
 
-CI now passes `--exclude-case-sharded` to those file shards and runs
-*tests/property/m5-object-own-keys.property.test.ts* in three separate
-case-shard jobs on each native host. All three jobs are required by the
-`native` aggregate. With that exclusion, all seven Linux file shards carry
-remaining files. The local unsharded extended task still runs the file once
-with all cases. The Linux singleton rule still applies to other wrapper
-invocations that include the file without the exclusion flag.
+CI now passes `--exclude-case-sharded` to those file shards and runs each
+file in `caseShardedNativeFiles` in three separate case-shard jobs on each
+native host, six jobs per file. Every one is required by the `native`
+aggregate. With that exclusion, all seven Linux file shards carry remaining
+files. The local unsharded extended task still runs both files once with
+all cases. The Linux singleton rule still applies to other wrapper
+invocations that include *m5-object-own-keys.property.test.ts* without the
+exclusion flag; it covers that file alone, because its deadline margin,
+not its weight, is what the singleton protects.
 Unknown files use the measured table's upper median weight. Empty shards execute
 nothing. Node.js's own `--test-shard` still assigns files by position; CI uses
 the wrapper flag instead.

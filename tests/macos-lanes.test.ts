@@ -255,9 +255,18 @@ test("every check name and concurrency policy is preserved", () => {
         (_, index) => `native support (linux-x86_64-gnu, ${index + 1}/7)`,
       ),
       "host C sanitizers (Linux, property)",
+      // The Reflect namespace property file now runs in dedicated
+      // case-shard jobs on both native hosts, outside the file shards;
+      // see PLAN-GATE.md (U38).
+      ...["linux-x86_64-gnu", "macos-aarch64"].flatMap((target) =>
+        Array.from(
+          { length: 3 },
+          (_, index) => `reflect cases (${target}, ${index + 1}/3)`,
+        ),
+      ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 72);
+  assert.equal(names(after).length, 78);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -309,8 +318,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 37);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 37);
+  assert.equal(jobs.length, 40);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 40);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -493,7 +502,7 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     throw new Error("Aggregate requires an explicit dependency list");
   }
   assert.deepEqual(needs.toSorted(), expected);
-  assert.equal(expected.length, 34);
+  assert.equal(expected.length, 38);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -539,7 +548,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 35);
+  assert.equal(needs.length, 39);
 });
 
 test("committed workflow matches generator output exactly", () => {
@@ -577,8 +586,8 @@ test("lane-count preview leaves the committed workflow alone", () => {
 test("one extra lane retains every job and aggregate dependency", () => {
   const lanes = macosLanes(1);
   assert.equal(lanes.length, 6);
-  assert.equal(lanes.flat().length, 37);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 37);
+  assert.equal(lanes.flat().length, 40);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 40);
   assert.ok(lanes[5]!.length > 0);
   assert.deepEqual(
     lanes[5]!
@@ -596,9 +605,13 @@ test("one extra lane retains every job and aggregate dependency", () => {
       .slice(5)
       .flat()
       .every((job) =>
-        ["native", "native support", "test262", "own-key cases"].includes(
-          job.family,
-        ),
+        [
+          "native",
+          "native support",
+          "test262",
+          "own-key cases",
+          "reflect cases",
+        ].includes(job.family),
       ),
   );
   assert.ok(
@@ -946,9 +959,13 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
     assert.ok(job != null, name);
     assert.equal(job.os, "macos-15");
     assert.ok(
-      ["native", "native support", "test262", "own-key cases"].includes(
-        job.family,
-      ),
+      [
+        "native",
+        "native support",
+        "test262",
+        "own-key cases",
+        "reflect cases",
+      ].includes(job.family),
     );
   }
   // The modeled Mac lane uses the measured seconds where present.
@@ -1019,8 +1036,8 @@ test("availability decides the second machine's lanes too", async () => {
 test("three Mac lanes keep every job and the own-key lane", () => {
   const lanes = macosLanes(3);
   assert.equal(lanes.length, 8);
-  assert.equal(lanes.flat().length, 37);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 37);
+  assert.equal(lanes.flat().length, 40);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 40);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   assert.deepEqual(
     lanes
@@ -1093,8 +1110,8 @@ test("six Mac lanes route each label with its own hosted fallback", () => {
   assert.equal(configuredSelfHostedLanes, 6);
   const lanes = macosLanes(6);
   assert.equal(lanes.length, 11);
-  assert.equal(lanes.flat().length, 37);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 37);
+  assert.equal(lanes.flat().length, 40);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 40);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   // One readiness output, so one runner class, for the shared deadline.
   assert.deepEqual(
@@ -1107,9 +1124,13 @@ test("six Mac lanes route each label with its own hosted fallback", () => {
   for (const job of lanes.slice(5).flat()) {
     assert.equal(job.os, "macos-15");
     assert.ok(
-      ["native", "native support", "test262", "own-key cases"].includes(
-        job.family,
-      ),
+      [
+        "native",
+        "native support",
+        "test262",
+        "own-key cases",
+        "reflect cases",
+      ].includes(job.family),
     );
   }
   const rendered = readFileSync(".github/workflows/main.yaml", "utf8");
@@ -1190,7 +1211,11 @@ test("hosted fallback widens only Mac-lane property deadlines", () => {
       assert.deepEqual(actual.env, before.jobs[job.sourceId]!.env, job.id);
       // Own-key duration records pin the original limit for the aggregate
       // deadline check, and test262 and native fixtures run no property.
-      if (["own-key cases", "test262", "native"].includes(job.family)) {
+      if (
+        ["own-key cases", "test262", "native", "reflect cases"].includes(
+          job.family,
+        )
+      ) {
         assert.ok(
           !JSON.stringify(actual).includes("OSEO_PROPERTY_TIME_SCALE"),
           job.id,

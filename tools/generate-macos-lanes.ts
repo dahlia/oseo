@@ -53,15 +53,17 @@ export function macosJobs(): readonly MacosLaneJob[] {
       family:
         sourceId === "test_property_case"
           ? "own-key cases"
-          : sourceId === "test_native_support"
-            ? "native support"
-            : sourceId === "test_sanitizer_macos"
-              ? "host C sanitizers"
-              : sourceId === "test_test262"
-                ? "test262"
-                : sourceId === "test_native"
-                  ? "native"
-                  : "test",
+          : sourceId === "test_reflect_case"
+            ? "reflect cases"
+            : sourceId === "test_native_support"
+              ? "native support"
+              : sourceId === "test_sanitizer_macos"
+                ? "host C sanitizers"
+                : sourceId === "test_test262"
+                  ? "test262"
+                  : sourceId === "test_native"
+                    ? "native"
+                    : "test",
     });
   }
   add(
@@ -106,6 +108,18 @@ export function macosJobs(): readonly MacosLaneJob[] {
   }
   for (let caseShard = 1; caseShard <= 3; caseShard++) {
     add(
+      "test_reflect_case",
+      String(caseShard),
+      `reflect cases (macos-aarch64, ${caseShard}/3)`,
+      {
+        os: "macos-15",
+        target: "macos-aarch64",
+        caseShard,
+      },
+    );
+  }
+  for (let caseShard = 1; caseShard <= 3; caseShard++) {
+    add(
       "test_property_case",
       String(caseShard),
       `own-key cases (macos-aarch64, ${caseShard}/3)`,
@@ -137,9 +151,13 @@ export function macosJobs(): readonly MacosLaneJob[] {
 function selfHostedEligible(job: MacosLaneJob): boolean {
   return (
     job.os === "macos-15" &&
-    ["native", "native support", "test262", "own-key cases"].includes(
-      job.family,
-    )
+    [
+      "native",
+      "native support",
+      "test262",
+      "own-key cases",
+      "reflect cases",
+    ].includes(job.family)
   );
 }
 

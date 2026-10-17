@@ -1,0 +1,47 @@
+#!/bin/bash
+# U38: run one macOS reflect-namespace case-shard job's post-checkout steps
+# exactly as the generated workflow would, to measure its Mac wall.
+# Usage: job.sh CLONE JOB OUTDIR
+# CLONE is a or b; JOB is rn-1, rn-2 or rn-3.
+#
+# Adapted from docs/evidence/u25/scripts/job.sh.txt. The only differences
+# are the job table, OSEO_HOST_CC=clang, and the host-cc archive key,
+# which is what the generated test_sanitizer_macos job uses.
+set -u
+clone=$1 job=$2 out=$3
+repo=$HOME/Desktop/oseo-m5ci-u38-$clone
+export PATH=$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH
+export ZIG_GLOBAL_CACHE_DIR=$HOME/m5ci-results/u38/zig-$clone
+export GITHUB_ACTIONS=true CI=true
+temp=$HOME/m5ci-results/u38/tmp/$clone-$job-$$
+rm -rf "$temp"; mkdir -p "$temp" "$out"
+log=$out/$job-$clone.log steps=$out/$job-$clone.steps.tsv
+echo $$ > "$out/$job-$clone.pid"
+cd "$repo" || exit 99
+step() { # name, command...
+  local name=$1; shift
+  local s e rc
+  s=$(python3 -c 'import time;print(f"{time.time():.3f}")')
+  echo "=== $name: $*" >>"$log"
+  "$@" >>"$log" 2>&1; rc=$?
+  e=$(python3 -c 'import time;print(f"{time.time():.3f}")')
+  printf '%s\t%s\t%s\t%s\t%s\n' "$job" "$name" "$s" "$e" "$rc" >>"$steps"
+  return $rc
+}
+printf 'job\tstep\tstart\tend\texit\n' >"$steps"
+fail=0
+step build mise run build || fail=1
+step archive-key mise run ci:runtime-archive-cache || fail=1
+export TMPDIR=$temp
+case $job in
+  rn-1|rn-2|rn-3)
+    # The own-key case-shard job's shape: one file, one case shard, the
+    # extended wrapper, and the duration record left unset.
+    OSEO_PROPERTY_CASE_SHARD="${job#rn-}/3" \
+      step cases mise run test:property:extended:native:shard \
+        tests/property/m5-reflect-namespace.property.test.ts || fail=1 ;;
+  *) echo "unknown job $job" >>"$log"; fail=1 ;;
+esac
+echo "$fail" >"$out/$job-$clone.fail"
+rm -rf "$temp"
+exit $fail

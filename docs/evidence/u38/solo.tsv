@@ -1,0 +1,8 @@
+run	clone	job	concurrent	build_s	archive_key_s	cases_s	job_wall_s	step_exits	fail_flag
+pair	a	rn-1	rn-2	0.6	0.2	191.2	192.0	0/0/0	0
+pair	b	rn-2	rn-1	0.6	0.2	191.0	191.7	0/0/0	0
+solo-1	a	rn-1		0.5	0.2	179.0	179.7	0/0/0	0
+solo-2	a	rn-2		0.5	0.1	178.8	179.4	0/0/0	0
+solo-3	a	rn-3		0.5	0.1	179.4	180.0	0/0/0	0
+warm	a	rn-1	rn-2	0.6	0.2	205.5	206.4	0/0/0	0
+warm	b	rn-2	rn-1	6.1	0.2	204.1	210.3	0/0/0	0
