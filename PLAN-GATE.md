@@ -2752,3 +2752,38 @@ lanes again. The incremental route U33 describes has stalled by its own
 success: the more the lanes absorb, the fewer observations the hosted side
 yields. Correcting those thirteen now needs a deliberate run with the Mac
 lanes disabled.
+
+### Linux host C sanitizer native shards (U36)
+
+With six Mac lanes the macOS side no longer sets the wall, so the two
+clean runs put it on a cluster of hosted Linux jobs.
+`host C sanitizers (Linux)` was the worst of them in one run and not in the
+other: 52.7 minutes in attempt 2 of branch run 38935645986 against 40.4 in main
+run 38957726165, which is the hosted runner spread rather than a change in its
+work. Its steps in the second run measured 0.1 minutes for each instrumentation
+preflight, 3.8 for the runtime fixtures and 36.1 for the native fixtures.
+
+The native fixtures are the only part worth partitioning, and
+`test:sanitizer:native` already runs *tests/native.ts*, which takes
+`--shard INDEX/TOTAL`, selects a round-robin partition of the reviewed
+fixture order and gates its three scenarios by shard position. Three
+shards therefore take one scenario each and their union is the unsharded
+set by construction, exactly as `test:native` has used the flag. The job
+becomes a three-entry matrix. The GCC preflight and the runtime fixtures
+do not shard, so shard one carries them and runs about 16 minutes against
+12 for the others. The timeout falls from 90 to 45 minutes, and each
+shard's failure artifact gains its shard suffix so the three names stay
+distinct. The reported check names rise from 70 to 72.
+
+What this is worth is bounded, and the bound is worth stating. The Linux
+wall is now `native support (linux-x86_64-gnu, N/7)` at a measured 45 to
+48.1 minutes, and U31 established that its maximum shard wall is pinned at
+a modeled 38.3 minutes by one file,
+*tests/property/m5-reflect-namespace.property.test.ts* at 2,299 measured
+seconds, which no partition can split. This change removes one of the two
+jobs that can set that wall, but it does not lower the wall on its own.
+Case sharding that one file the way *m5-object-own-keys.property.test.ts*
+is already sharded is the lever past it.
+
+Case budgets, seeds, sizes, interrupt limits, the `native` aggregate's
+required set, every macOS total and the property suites are unchanged.

@@ -123,11 +123,19 @@ jobs:
           if-no-files-found: warn
 
   test_sanitizer:
-    name: host C sanitizers (Linux)
+    name: host C sanitizers (Linux, ${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
-    # Run 37999730012 measured 56 minutes native plus 5.55 runtime.
-    # About 62 minutes with preflights/setup; 90 leaves cold-cache margin.
-    timeout-minutes: 90
+    # Run 38957726165 measured 36.1 minutes for the native fixtures and
+    # 3.8 for the runtime ones, so one shard carries about 16 minutes and
+    # the others 12. 45 minutes leaves cold-cache and slow-runner margin.
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard:
+          - 1
+          - 2
+          - 3
     steps:
       - uses: actions/checkout@v7
         with:
@@ -138,17 +146,24 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         with:
           toolchain: host-cc
+      # Each shard retains its own instrumentation preflight.
       - run: mise run test:sanitizer:self
-      - name: Verify GCC sanitizer instrumentation
+      # The GCC check and the runtime fixtures do not shard, so one shard
+      # carries them.
+      - if: matrix.shard == 1
+        name: Verify GCC sanitizer instrumentation
         run: mise run test:sanitizer:self
         env:
           OSEO_HOST_CC: gcc
-      - run: mise run test:sanitizer:runtime
-      - run: mise run test:sanitizer:native
+      - if: matrix.shard == 1
+        run: mise run test:sanitizer:runtime
+      - run: >-
+          mise run test:sanitizer:native
+          --shard ${{ matrix.shard }}/3
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-failures
+          name: host-cc-sanitizer-failures-${{ matrix.shard }}-of-3
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
