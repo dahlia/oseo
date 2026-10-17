@@ -6,16 +6,48 @@ Current weight source
 
 Refreshing the file weights lowers the modeled Linux maximum over seven
 shards from 47.3 minutes to 44.1, holding one run's measured case costs
-fixed. That 3.2 minutes is a modeled difference; no CI run has executed
-the refreshed partition. The remaining 44.1 minutes belongs to one file,
-*tests/property/m5-globalthis-binding.property.test.ts*, whose summed case
-durations give it a 2,647-second weight. No whole-file partition can model
-a shorter longest shard than that weight. The aggregate work bound over
-all 132 refreshed files and 28 Linux workers is 35.7 minutes. The next
-three weights are
+fixed. The first CI run of that partition measured 46.52 minutes against
+47.77 before it, so most of the modeled 3.2 minutes did not appear; the
+section on what the first run measured records why. The remaining 44.1 minutes
+belongs to one file, *tests/property/m5-globalthis-binding.property.test.ts*,
+whose summed case durations give it a 2,647-second weight. No whole-file
+partition can model a shorter longest shard than that weight. The aggregate
+work bound over all 132 refreshed files and 28 Linux workers is 35.7 minutes.
+The next three weights are
 *tests/property/m5-compound-assignment.property.test.ts* at 1,838 seconds,
 *tests/property/m5-array-sort-stability.property.test.ts* at 1,637, and
 *tests/property/m5-proxy-exotic-object.property.test.ts* at 1,559.
+
+Run [39076279469] at `b59ac914` is the first CI run of the refreshed
+partition, and *ci-39076279469.json.txt* retains its observations. Its
+Linux maximum measured 46.52 minutes against 47.77 for run 39070198868,
+which ran the superseded partition. The 3.2-minute modeled gain above did
+not appear, and 1.25 minutes is inside the variation these two runs show.
+
+The reason is that a derived weight is not reproducible between runs.
+Across the 132 files, only 53 on Linux and 59 on macOS land within 20
+percent of their value two hours earlier; Linux ratios span 0.50 to 1.80
+and macOS 0.46 to 3.34. What is stable is the aggregate and the extremes:
+Linux totals moved 0.951 times and macOS 1.032, and
+*tests/property/m5-globalthis-binding.property.test.ts* measured 2,647
+then 2,750 seconds on Linux. A weight sums a file's cases as they ran
+concurrently with whatever else shared the job, so it moves with the
+neighbors a partition happens to give it. The 0.26-to-3.59 range against
+the superseded table therefore mixes real corpus growth with this
+variation and is not evidence of drift alone.
+
+The partitioning rule is sound in both runs. Replaying run 39076279469's
+partition with its own case sums in observed order matches all seven walls
+within 0.68 minutes, as the earlier run matched within 0.53.
+
+The table choice barely matters while one file sets the maximum. Scored
+against both runs' observed costs, the partition chosen from run
+39070198868, the one chosen from run 39076279469, and the one chosen from
+a maximum over both all give the same 45.8-minute worst case; only the
+superseded partition is worse, at 47.3. Restoring a two-run maximum would
+change no partition decision. Case-sharding
+*tests/property/m5-globalthis-binding.property.test.ts* is the one change
+that can lower the Linux maximum, and it is the next unit.
 
 *tools/native-shard-costs.ts* now derives from main run [39070198868] at
 `c78d9df1`, which observed all seven Linux and all twelve macOS file

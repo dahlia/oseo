@@ -2950,17 +2950,18 @@ one.
 
 Refreshing the native file weights lowers the modeled Linux maximum over
 seven shards from 47.3 minutes to 44.1, holding main run 39070198868's
-measured case costs fixed. That 3.2 minutes is modeled; no CI run has
-executed the refreshed partition. The remaining 44.1 minutes belongs to
-*tests/property/m5-globalthis-binding.property.test.ts*, whose summed case
-durations give it a 2,647-second weight, and no whole-file partition can
-model a shorter longest shard than one file's weight. The aggregate work
-bound over all 132 refreshed files and 28 Linux workers is 35.7 minutes,
-so raising the Linux total cannot approach it while this file stays whole.
-That is the shape U31 established and U38 removed for the Reflect
+measured case costs fixed. Branch run 39076279469 then measured that
+partition at 46.52 minutes against 47.77, so most of the modeled gain did
+not appear, for reasons the closing paragraphs record. The remaining 44.1
+minutes belongs to *tests/property/m5-globalthis-binding.property.test.ts*,
+whose summed case durations give it a 2,647-second weight, and no whole-file
+partition can model a shorter longest shard than one file's weight. The
+aggregate work bound over all 132 refreshed files and 28 Linux workers is 35.7
+minutes, so raising the Linux total cannot approach it while this file stays
+whole. That is the shape U31 established and U38 removed for the Reflect
 namespace. Case-sharding this file is the next candidate and would be the
-third. Its weight is 2.34 times the superseded 1,133 seconds, which dates
-the table's error rather than the file's execution.
+third. Its weight is 2.34 times the superseded 1,133 seconds, which dates the
+table's error rather than the file's execution.
 
 *tools/native-shard-costs.ts* now derives from run 39070198868 at
 `c78d9df1`, which observed all seven Linux and all twelve macOS file
@@ -3015,3 +3016,46 @@ also not the whole gap between the two runs' 64.2 and 51.8 minutes:
 39.68 minutes against 28.88. The queue intervals bear on reading this
 run's wall clock, not on the weights, and one run is not evidence for a
 model term.
+
+#### What the first run measured
+
+Branch run 39076279469 at `b59ac914` is green and is the first CI run of
+the refreshed partition. Its Linux maximum measured 46.52 minutes against
+47.77 for run 39070198868, which ran the superseded partition. The 3.2
+modeled minutes became a measured 1.25, which is inside what these two
+runs vary by.
+
+A derived weight is not reproducible between runs, and that is the whole
+explanation. Across the 132 files, only 53 on Linux and 59 on macOS land
+within 20 percent of their value two hours earlier; Linux ratios span 0.50
+to 1.80 and macOS 0.46 to 3.34. The aggregate and the extremes hold still:
+Linux totals moved 0.951 times and macOS 1.032, and
+*tests/property/m5-globalthis-binding.property.test.ts* measured 2,647
+then 2,750 seconds. A weight sums a file's cases as they ran concurrently
+with whatever else shared the job, which CONTRIBUTING.md already states
+and this is the first measurement of. The 0.26-to-3.59 range this unit
+reported against the superseded table therefore mixes corpus growth with
+run-to-run variation, and the staleness claim should be read as the weaker
+one it supports.
+
+The partitioning rule holds up in both runs. Replaying run 39076279469's
+partition with its own case sums in observed order matches all seven walls
+within 0.68 minutes, against 0.53 for the earlier run. So the model
+predicts a run it can see and not the next one, which is a statement about
+the metric rather than the rule.
+
+That makes the table choice nearly irrelevant while one file sets the
+maximum. Scored against both runs' observed costs, the partitions chosen
+from run 39070198868, from run 39076279469, and from a maximum over both
+all give the same 45.8-minute worst case; only the superseded partition is
+worse, at 47.3. Restoring U6's two-run maximum would therefore change no
+partition decision, and the conservatism this unit gave up buys nothing
+back here. Keeping the single-run table is defensible on that basis and on
+its replacing accumulated local estimates with CI observations, not on the
+wall it was expected to save.
+
+Case-sharding *tests/property/m5-globalthis-binding.property.test.ts* is
+the one change that can lower the Linux maximum, and it is the next unit.
+Its 2,750-second weight is the most stable large measurement in either
+run. Raising the Linux total, rebalancing from a fresher table, or
+re-deriving a two-run maximum each leave the maximum where it is.
