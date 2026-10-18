@@ -3211,3 +3211,34 @@ longest Linux file shard measured 46.05. Reaching the derived 43.50 on the
 hosted lanes would leave the Mac lanes setting the wall, so this unit's
 remaining return is the difference between 50.18 and 60.17, not between
 43.50 and 60.17.
+
+#### What the second run measured
+
+U40 closes with green branch run 39108338578 at `5c8e8e56`. The run took
+56.98 minutes, against 60.17 for the first run of this order and 60.43
+for the last main run under the old one, and the self-hosted Mac lanes
+determined when it finished. Every job placed on a hosted lane measured
+between 0.78 and 1.20 times its table value, including the refreshed
+`reflect cases (macos-aarch64, 3/3)` at 0.83, where the previous run had
+measured its U38 estimate at 2.29. Three of the five lanes finished at or
+before their derived end, lane four exceeded it by 0.98 minutes, and lane
+three by 13.80, of which 12.87 minutes was the wait before its first job
+started. *docs/evidence/u40/README.md* carries the per-job figures.
+
+The unit closes here because the Mac lanes now determine completion. They
+carried 290.18 job-minutes over 30 jobs with 0.18 to 0.20 minutes of idle
+each, and their ends ran from 35.47 on `oseo-mac-1` to 56.58 on
+`oseo-mac-3`, which ended the run at 56.95. Dividing that work equally
+gives 48.76 minutes including the probe, about eight minutes below the
+latest finish, and the longest Linux file shard took 47.58.
+
+The next unit addresses those inputs. `selfHostedJobSeconds` holds 18
+measured Mac walls, all of them from `oseo-mac-1`, and every other job
+converts a hosted median through a family speed ratio. Mean
+measured-to-table ratios in this run were 0.92, 1.38, 1.91, 2.11, 1.98,
+and 1.77 for lanes one through six. Those averages do not separate job
+mix, machine speed, and contention between the two lanes that share a Mac
+mini, and the entries predate the six-lane configuration. This run
+measured a wall for each of the 30 jobs on the lane that ran it, which
+supports a cost refresh but does not establish how a job would perform on
+a different lane.

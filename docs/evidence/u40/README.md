@@ -157,3 +157,82 @@ near where it already runs: the Mac lanes carried 262.45 job-minutes over
 28 jobs and finished at 50.18, and the longest Linux file shard measured
 46.05. The `native` aggregate ended the run at 60.17 waiting on
 `reflect cases (macos-aarch64, 3/3)`.
+
+
+What the second run measured
+----------------------------
+
+Branch run 39108338578 at `5c8e8e56` is green and took 56.98 minutes,
+against 60.17 for the first run of this order and 60.43 for the last main
+run under the old one. The self-hosted Mac lanes, not the hosted lanes,
+determined when it finished.
+
+Every job placed on a hosted lane measured between 0.78 and 1.20 times
+its table value, the range the previous run's well-observed entries held:
+
+| job                                    | table | measured | ratio |
+| -------------------------------------- | ----- | -------- | ----- |
+| `test (macos-latest, deno)`            | 105   | 126      | 1.20  |
+| `native (macos-aarch64, 1/3)`          | 1117  | 1242     | 1.11  |
+| `test (macos-latest, node, 2/4)`       | 996   | 1096     | 1.10  |
+| `host C sanitizers (macOS, native)`    | 2478  | 2372     | 0.96  |
+| `test (macos-latest, node, 4/4)`       | 864   | 825      | 0.95  |
+| `native support (macos-aarch64, 3/12)` | 1323  | 1232     | 0.93  |
+| `test (macos-latest, node, 3/4)`       | 1311  | 1165     | 0.89  |
+| `reflect cases (macos-aarch64, 3/3)`   | 770   | 640      | 0.83  |
+| `test (macos-latest, node, 1/4)`       | 971   | 786      | 0.81  |
+| `host C sanitizers (macOS, property)`  | 2179  | 1700     | 0.78  |
+
+`reflect cases (macos-aarch64, 3/3)` is the one entry here that the
+previous run refreshed, and it is the only `reflect cases` shard this
+placement leaves hosted. In this run it measured 0.83 times its table
+value; the earlier observation was 2.29 times the U38 estimate it
+replaced. The retained `native support (macos-aarch64, 3/12)` has no
+refresh and measured 0.93.
+
+Three of the five lanes finished at or before their derived end. Lane
+four exceeded it by 0.98 minutes and lane three by 13.80:
+
+| hosted lane                                                     | derived | measured |
+| --------------------------------------------------------------- | ------- | -------- |
+| `host C sanitizers (macOS, native)`                             | 41.30   | 39.65    |
+| `host C sanitizers (macOS, property)`                           | 36.32   | 31.85    |
+| `test` node 3/4, `native (macos-aarch64, 1/3)`                  | 40.47   | 54.27    |
+| `test` node 2/4, deno, `native support (macos-aarch64, 3/12)`   | 40.40   | 41.38    |
+| `test` node 1/4, node 4/4, `reflect cases (macos-aarch64, 3/3)` | 43.42   | 37.90    |
+
+Lane three's two jobs took 0.35 minutes less than their combined table
+values. Its 12.87-minute wait before the first job started and the
+1.28-minute gap between the two account for the overrun after that
+saving. No other hosted lane waited more than 3.52 minutes to start.
+
+The six Mac lanes carried 290.18 job-minutes over 30 jobs, with 0.18 to
+0.20 minutes of idle each, and their ends ran from 35.47 to 56.58:
+
+| lane         | work  | end   |
+| ------------ | ----- | ----- |
+| `oseo-mac-3` | 55.98 | 56.58 |
+| `oseo-mac-4` | 52.93 | 53.52 |
+| `oseo-mac-5` | 50.32 | 50.92 |
+| `oseo-mac-6` | 48.20 | 48.80 |
+| `oseo-mac-2` | 47.87 | 48.45 |
+| `oseo-mac-1` | 34.88 | 35.47 |
+
+The `native` aggregate ended the run at 56.95 waiting on
+`test262 (macos-aarch64, 12/12)`, the last job on `oseo-mac-3`. Dividing
+the observed work equally gives 48.36 minutes per lane, or 48.76
+including the 0.40-minute probe. That idealized figure sits about eight
+minutes below the latest Mac lane finish, and it assumes work is
+divisible and that durations do not change when a job moves to another
+lane. The longest Linux file shard took 47.58 minutes.
+
+The cost inputs may explain part of the imbalance.
+`selfHostedJobSeconds` holds 18 measured Mac walls, all of them from
+`oseo-mac-1`; every other job converts a hosted median through a family
+speed ratio. Mean measured-to-table ratios in this run were 0.92, 1.38,
+1.91, 2.11, 1.98, and 1.77 for lanes one through six, over four, three,
+three, three, two, and two entries. These averages do not separate job
+mix, machine speed, and contention between the two lanes that share a Mac
+mini. The next unit starts from this run's 30 durations and lane
+assignments, which support a cost refresh but do not establish how a job
+would perform on a different lane.
