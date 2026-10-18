@@ -410,9 +410,9 @@ export function macosLanes(
       // A lane that follows a macOS sanitizer job inherits that job's
       // spread. Over 27 observations each, the property job measured
       // 1,559 to 3,146 seconds and the native job 2,034 to 2,765.
-      // Reserving a lane for each raises the derived maximum from 49.55
-      // to 50.47 minutes at median cost, and substituting the property
-      // job's measured p90 of 2,680 seconds leaves it at 50.47 instead
+      // Reserving a lane for each raises the derived maximum from 48.78
+      // to 49.10 minutes at median cost, and substituting the property
+      // job's measured p90 of 2,680 seconds leaves it at 49.10 instead
       // of raising it to 56.17; see PLAN-GATE.md (U41, U42). With no Mac
       // lane the hosted lanes must hold every job and cannot reserve
       // two, so the pure-hosted partition is unchanged.

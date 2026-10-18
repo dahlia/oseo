@@ -370,7 +370,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // twenty-two attempts, then four more from the first run of its
   // placement, U41 refreshed every macos-aarch64 entry observed hosted
   // since b59ac914, U42 refreshed the three its own runs added, and U43
-  // the three after that. See PLAN-GATE.md (U33, U40, U41, U42, U43).
+  // three after that and three more from its own run. See PLAN-GATE.md
+  // (U33, U40, U41, U42, U43).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
@@ -1006,7 +1007,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 8385);
+  assert.equal(Math.round(modeled), 8288);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1039,7 +1040,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
   // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
   // lanes what they measured rather than what stale entries claimed.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2897);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2946);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {

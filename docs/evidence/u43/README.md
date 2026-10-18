@@ -147,3 +147,74 @@ maximum modeled lane finish from 50.78 to 48.28 minutes, and the result
 still assigns no untested entry to a hosted lane. Both figures are for the
 U43 placement; the 50.47 above belongs to the placement that `005be48b`
 actually ran, which had neither the allowance nor these three entries.
+
+
+What the U43 branch run measured
+--------------------------------
+
+Branch run 39144030177 at `af8e6bd2` passed in 54.17 minutes, against 54.00
+for the main run before it. Hosted macOS allocation waiting totaled 3.7
+job-minutes against that run's 13.2, the second lowest of the eleven runs
+since `b59ac914`, which range from 2.3 to 37.7. On the lane that bound each
+run the difference is starker: the branch run's last hosted lane spent 0.45
+minutes waiting to start and between its jobs, where the main run's spent
+6.71. The branch run was nonetheless 0.17 minutes longer, so what separates
+the two is lane work content and hosted runner speed rather than allocation
+waiting.
+
+The placement held. No hosted lane received a Mac-eligible entry the window
+had not tested. The run was still ended by a hosted macOS lane, and again by
+a Mac-eligible job the placement had sent there:
+`native support (macos-aarch64, 12/12)` ran 23.28 minutes against its
+17.40-minute entry, 1.34 times it. The `native` aggregate then ran 0.37
+minutes, and the run finished 0.40 minutes after that lane ended.
+
+One hosted observation put that job in `measuredHostedJobs`, so the
+placement projected its entry unmultiplied. It did not make the entry a
+close estimate of the next duration. Hosted lane five also holds the same
+three jobs at every allowance tested, 1.0 included, so the allowance did not
+assemble the lane that bound the run.
+
+Modeled and measured lane ends below are minutes after the run started. The
+waiting column is each lane's start offset plus the gaps between its jobs,
+which is a different quantity from the created-to-started allocation waiting
+above.
+
+| lane     | modeled | measured | waiting |
+| -------- | ------- | -------- | ------- |
+| hosted 1 | 41.30   | 39.20    | 0.48    |
+| hosted 2 | 36.32   | 41.28    | 0.37    |
+| hosted 3 | 42.45   | 48.45    | 0.25    |
+| hosted 4 | 39.42   | 43.62    | 2.25    |
+| hosted 5 | 47.98   | 53.77    | 0.45    |
+| mac 1    | 47.51   | 41.38    | 0.66    |
+| mac 2    | 47.45   | 42.57    | 0.50    |
+| mac 3    | 46.12   | 46.90    | 0.53    |
+| mac 4    | 47.88   | 48.87    | 0.58    |
+| mac 5    | 48.28   | 44.77    | 0.56    |
+| mac 6    | 48.26   | 44.93    | 0.55    |
+
+Every Mac lane spent at most 0.28 minutes of its waiting between jobs; the
+rest is the 0.38-minute start offset. Four Mac lanes finished before their
+modeled end and two after it, by 0.78 and 0.99 minutes. The ten hosted
+durations ran 0.85 to 1.34 times their entries. The latest Linux job
+finished at 48.68 minutes.
+
+With this run included, three entries change, each to the median of its
+observations in seconds: `native support (macos-aarch64, 3/12)` from 1,264
+to 1,293 on three observations, `native (macos-aarch64, 1/3)` from 1,236 to
+1,239 on four, and `native support (macos-aarch64, 12/12)` from 1,044 to
+1,220 on two. The third sends that job to a Mac lane and brings
+`native (macos-aarch64, 2/3)` onto hosted lane five in its place. The
+modeled hosted maximum falls from 47.98 to 45.65 minutes and the modeled Mac
+maximum rises from 48.28 to 49.10, so the derived maximum rises to 49.10.
+Reserving the two sanitizer lanes now raises that maximum from 48.78 to
+49.10 at median cost and holds it at 49.10 rather than 56.17 when the
+property job runs at its measured p90.
+
+The updated placement's eleven modeled lane ends span 36.32 to 49.10 minutes
+and average 44.85. The two sanitizer lanes finish below that average because
+the reservation lets no other job follow them. A hosted lane end and a Mac
+lane end come from different cost models, so these figures do not establish
+how much further partitioning could lower the maximum, or whether a lower
+maximum needs less macOS work or another Mac.

@@ -3163,3 +3163,40 @@ entry exact: the 1.13 is the tested job U43 assigns to a hosted lane in place
 of an untested one. Recomputing the U43 placement with the three lowers its
 maximum modeled lane finish from 50.78 to 48.28 minutes, and it still assigns
 no untested entry to a hosted lane.
+
+#### What the U43 branch run measured
+
+Branch run 39144030177 at `af8e6bd2` passed in 54.17 minutes, against 54.00
+for the main run before it. Hosted macOS allocation waiting totaled 3.7
+job-minutes against that run's 13.2, and on the lane that bound each run the
+branch run spent 0.45 minutes waiting to start and between its jobs where the
+main run spent 6.71, so what separates the two walls is lane work content and
+hosted runner speed rather than allocation waiting. No hosted lane received a
+Mac-eligible entry the window had not tested, which is what the allowance is
+for. The run was still ended by a hosted macOS lane and again by a
+Mac-eligible job the placement had sent there:
+`native support (macos-aarch64, 12/12)` ran 23.28 minutes against its
+17.40-minute entry, 1.34 times it, after which the `native` aggregate ran 0.37
+minutes and the run finished 0.40 minutes after that lane ended. One hosted
+observation put that job in `measuredHostedJobs`, so the placement projected
+its entry unmultiplied; it did not make the entry a close estimate of the next
+duration. Hosted lane five holds the same three jobs at every allowance
+tested, 1.0 included, so the allowance did not assemble that lane. Four Mac
+lanes finished before their modeled end and two after it, by 0.78 and 0.99
+minutes, each with at most 0.28 minutes of idle between jobs; the ten hosted
+durations ran 0.85 to 1.34 times their entries, and the latest Linux job
+finished at 48.68 minutes.
+
+With this run included, three entries change, each to the median of its
+observations in seconds: `native support (macos-aarch64, 3/12)` from 1,264 to
+1,293 on three observations, `native (macos-aarch64, 1/3)` from 1,236 to 1,239
+on four, and `native support (macos-aarch64, 12/12)` from 1,044 to 1,220 on
+two. The third sends that job to a Mac lane and brings
+`native (macos-aarch64, 2/3)` onto hosted lane five, which lowers the modeled
+hosted maximum from 47.98 to 45.65 minutes, raises the modeled Mac maximum
+from 48.28 to 49.10, and so raises the derived maximum to 49.10. Those eleven
+modeled lane ends span 36.32 to 49.10 and average 44.85, with the two
+sanitizer lanes below that average because the reservation lets no other job
+follow them; a hosted lane end and a Mac lane end come from different cost
+models, so the figures do not establish how much further partitioning could
+lower the maximum. *docs/evidence/u43/README.md* records the per-lane figures.
