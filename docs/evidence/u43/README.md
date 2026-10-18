@@ -9,11 +9,10 @@ after the run began. For the third run running, that latest-finishing
 Mac-eligible job was one the placement had just sent to a hosted lane
 against an entry no run since `b59ac914` had tested.
 
-The hosted-duration observations below come from the nine main and branch
-runs since `b59ac914`, the runs whose macOS shard contents match the
-tree:
+The hosted-duration observations below come from the ten main and branch
+runs since `b59ac914`, the runs whose macOS shard contents match the tree:
 39076279469, 39080313970, 39084043803, 39104204370, 39108338578,
-39112383050, 39121592150, 39126360392, and 39132976769.
+39112383050, 39121592150, 39126360392, 39132976769, and 39139466097.
 
 
 What the last three runs measured
@@ -111,3 +110,40 @@ another repository occupied two of those five slots. In run 39132976769 the
 latest Linux job finished 52.92 minutes after the run began, against 46.27
 in the main run before it, and the Linux jobs accumulated 43.9 job-minutes
 of queueing. Neither figure is an elapsed delay: the waits overlap.
+
+
+What the merged U42 run measured
+--------------------------------
+
+Main run 39139466097 at `005be48b` passed in 54.00 minutes, against 58.67
+for the main run before the merge. Each of the six self-hosted Mac lanes
+finished before its own modeled finish time. The latest actual finish was
+45.87 minutes after the run started, on `oseo-mac-3`; the largest modeled
+finish was 50.47, on `oseo-mac-1`. Actual Mac lane finishes spanned 3.29
+minutes.
+
+A hosted macOS lane finished last, 53.62 minutes after the run started. It
+ran three jobs in sequence: `test (macos-latest, node, 2/4)` for 16.87
+minutes, `test (macos-latest, deno)` for 2.80, and
+`native support (macos-aarch64, 9/12)` for 27.23. The first started 2.70
+minutes after the run, and the gaps between jobs were 1.93 and 2.08 minutes.
+The latest Linux job finished at 51.35 minutes.
+
+The run measured a duration for each of the three jobs whose entries U43
+refreshed, and all three entries change again.
+`native support (macos-aarch64, 11/12)` ran 1,479 seconds against the 1,793 its
+single earlier observation had set, so its entry becomes the 1,636 median of
+the two. `native (macos-aarch64, 3/3)` ran 1,066 against 1,254, for a median of
+1,160. `native support (macos-aarch64, 9/12)` ran 1,634 against 1,448, for the
+1,475 median of 1,421, 1,475, and 1,634.
+
+Those three durations were 0.82, 0.85, and 1.13 times the entry in force
+for the run. Earlier observations do not make an entry exact: the 1.13 is
+`native support (macos-aarch64, 9/12)`, the tested job U43 assigns to a
+hosted lane in place of an untested one.
+
+Recomputing the placement with the three updated entries lowers the
+maximum modeled lane finish from 50.78 to 48.28 minutes, and the result
+still assigns no untested entry to a hosted lane. Both figures are for the
+U43 placement; the 50.47 above belongs to the placement that `005be48b`
+actually ran, which had neither the allowance nor these three entries.

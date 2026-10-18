@@ -89,21 +89,21 @@ export const macosJobCosts: MacosJobCosts = {
   "native support (macos-aarch64, 2/12)": 1924, // 2
   "test262 (macos-aarch64, 3/12)": 1906, // 1
   "native support (macos-aarch64, 10/12)": 1900, // 1 hosted since b59ac914
-  "native support (macos-aarch64, 11/12)": 1793, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 5/12)": 1665, // 7
   "test262 (macos-aarch64, 10/12)": 1644, // 1
+  "native support (macos-aarch64, 11/12)": 1636, // 2 hosted since b59ac914
   "native support (macos-aarch64, 4/12)": 1630, // 3
   "test262 (macos-aarch64, 4/12)": 1599, // 3
   "native support (macos-aarch64, 6/12)": 1575, // 4
   "native support (macos-aarch64, 7/12)": 1553, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 8/12)": 1543, // 3 hosted since b59ac914
+  "native support (macos-aarch64, 9/12)": 1475, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
-  "native support (macos-aarch64, 9/12)": 1448, // 2 hosted since b59ac914
   "test (macos-latest, node, 3/4)": 1311, // 18
   "native support (macos-aarch64, 3/12)": 1264, // 2 hosted since b59ac914
-  "native (macos-aarch64, 3/3)": 1254, // 1 hosted since b59ac914
   "native (macos-aarch64, 1/3)": 1236, // 3 hosted since b59ac914
+  "native (macos-aarch64, 3/3)": 1160, // 2 hosted since b59ac914
   "native support (macos-aarch64, 12/12)": 1044, // 1 hosted since b59ac914
   "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained

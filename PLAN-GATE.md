@@ -3140,3 +3140,26 @@ entries and the derived maximum stays a model output over per-job medians.
 address: the account's GitHub Pro ceiling of 40 concurrent jobs and 5
 concurrent macOS jobs shared across every repository it owns, and a Linux
 job that finished 52.92 minutes after its run began.
+
+#### What the merged U42 run measured
+
+Main run 39139466097 at `005be48b` passed in 54.00 minutes, against 58.67
+for the main run before the merge. Each of the six self-hosted Mac lanes
+finished before its own modeled finish time: the latest actual finish was
+45.87 minutes after the run started, on `oseo-mac-3`, against a largest
+modeled finish of 50.47 on `oseo-mac-1`, and actual finishes spanned 3.29
+minutes. A hosted macOS lane finished last, 53.62 minutes after the run
+started, running three jobs in sequence with a 2.70-minute offset before
+the first and gaps of 1.93 and 2.08 minutes between them. The latest Linux
+job finished at 51.35 minutes.
+
+The run measured a duration for each of the three jobs whose entries U43
+refreshed, and all three change again: `native support (macos-aarch64, 11/12)`
+to the 1,636 median of 1,479 and 1,793, `native (macos-aarch64, 3/3)` to the
+1,160 median of 1,066 and 1,254, and `native support (macos-aarch64, 9/12)` to
+the 1,475 median of 1,421, 1,475, and 1,634. Those three durations were 0.82,
+0.85, and 1.13 times the entry in force. Earlier observations do not make an
+entry exact: the 1.13 is the tested job U43 assigns to a hosted lane in place
+of an untested one. Recomputing the U43 placement with the three lowers its
+maximum modeled lane finish from 50.78 to 48.28 minutes, and it still assigns
+no untested entry to a hosted lane.
