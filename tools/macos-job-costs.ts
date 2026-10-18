@@ -79,6 +79,7 @@ export const macosJobCosts: MacosJobCosts = {
   "host C sanitizers (macOS, native)": 2478, // 22
   "test262 (macos-aarch64, 12/12)": 2212, // 1
   "host C sanitizers (macOS, property)": 2179, // 22
+  "native support (macos-aarch64, 5/12)": 2063, // 1 since b59ac914
   "test262 (macos-aarch64, 2/12)": 2054, // 4
   "test262 (macos-aarch64, 11/12)": 1976, // 2
   "native support (macos-aarch64, 8/12)": 1963, // 3 since b59ac914
@@ -100,7 +101,6 @@ export const macosJobCosts: MacosJobCosts = {
   "native support (macos-aarch64, 3/12)": 1323, // retained
   "native support (macos-aarch64, 11/12)": 1313, // retained
   "test (macos-latest, node, 3/4)": 1311, // 18
-  "native support (macos-aarch64, 5/12)": 1308, // retained
   "native support (macos-aarch64, 12/12)": 1294, // retained
   "test262 (macos-aarch64, 1/12)": 1288, // retained
   "native (macos-aarch64, 1/3)": 1117, // 4
@@ -112,9 +112,9 @@ export const macosJobCosts: MacosJobCosts = {
   "test (macos-latest, node, 4/4)": 864, // 18
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
-  "reflect cases (macos-aarch64, 1/3)": 336, // derived
-  "reflect cases (macos-aarch64, 2/3)": 336, // derived
-  "reflect cases (macos-aarch64, 3/3)": 336, // derived
+  "reflect cases (macos-aarch64, 1/3)": 777, // 1 since 731ffba9
+  "reflect cases (macos-aarch64, 3/3)": 770, // 1 since 731ffba9
+  "reflect cases (macos-aarch64, 2/3)": 696, // 1 since 731ffba9
   "test (macos-latest, deno)": 105, // 22
 };
 

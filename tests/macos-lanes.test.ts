@@ -363,14 +363,14 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       if (index > 0) assert.ok(lane[index - 1]!.seconds >= planned.seconds);
     }
   }
-  // Hosted medians of three vintages; U40 refreshed ten entries over the
-  // always-hosted families and the three that every run places hosted.
-  // See PLAN-GATE.md (U33, U40).
+  // Hosted medians of four vintages; U40 refreshed ten entries from
+  // twenty-two attempts, then four more from the first run of its
+  // placement, which observed them hosted. See PLAN-GATE.md (U33, U40).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    11335,
+    11523,
   );
 });
 
@@ -1001,7 +1001,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 6406);
+  assert.equal(Math.round(modeled), 6789);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1032,7 +1032,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   }
   // Placing them last gave three lanes one Mac-eligible job each, which
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2612);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2610);
 });
 
 test("faster native support work uses additional capacity", () => {

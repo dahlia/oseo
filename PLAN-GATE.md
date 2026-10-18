@@ -3175,3 +3175,39 @@ is not a wall-clock prediction. It carries no hosted runner allocation,
 which cost lane five 4.98 minutes in run 39084043803, and no duration
 spread, which ran from 372 to 1,533 seconds across observations of the
 four Node `test` shards.
+
+#### What the first run measured
+
+Branch run 39104204370 at `731ffba9` is green. The four Node `test`
+shards now start with the run and finish by 24.57 minutes, against one of
+them ending run 39084043803 at 60.43. The run still took 60.17 minutes,
+because the slack the reorder freed went to jobs whose hosted entries were
+wrong by more than the reorder saved: the three `reflect cases` estimates
+measured 2.07 to 2.31 times their value and the retained
+`native support (macos-aarch64, 5/12)` 1.58 times, which carried three
+hosted lanes to 56.07, 58.17, and 59.78 against a derived 40.15 to 41.92.
+
+The error follows the table's vintages exactly. Every entry with eighteen
+or more observations measured between 0.79 and 1.21 times its value, as
+did the four-observation `native (macos-aarch64, 1/3)`. The four that
+missed are the ones the table already named as untrustworthy: U38 derived
+the `reflect cases` figures with no hosted observation at all, and the
+retained entry predates the `b59ac914` repartition. This run observed all
+four, which is the correction route the table documents, and they are
+refreshed from it with one observation each. The derived maximum lane end
+moves from 43.53 to 43.50 and the placement sends
+`native support (macos-aarch64, 5/12)` and two `reflect cases` shards to
+Mac lanes, so the next run tests the order against entries that have all
+been observed hosted.
+
+Two measured terms sit outside the model and bound what the hosted lanes
+can still return. A hosted macOS job that starts mid-run waits for a
+machine: six gaps between consecutive jobs in a lane ran from 0.12 to 3.54
+minutes and the seventh ran 8.93, with four of the five hosted lanes idle
+at that moment, so it was allocation rather than the five-lane limit. And
+the other pools now bound the run near where it runs: the Mac lanes
+carried 262.45 job-minutes over 28 jobs and finished at 50.18, and the
+longest Linux file shard measured 46.05. Reaching the derived 43.50 on the
+hosted lanes would leave the Mac lanes setting the wall, so this unit's
+remaining return is the difference between 50.18 and 60.17, not between
+43.50 and 60.17.

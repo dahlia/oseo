@@ -95,3 +95,65 @@ are the least settled in the table.
 that no longer exists. The other nine moved by under eleven percent, which
 is the useful result: the always-hosted entries were already close, and
 the single-observation entries were not.
+
+
+What the first run measured
+---------------------------
+
+Branch run 39104204370 at `731ffba9` is green and ran the new order. The
+four Node `test` shards started within ten seconds of the run and were
+done by 24.57 minutes; in run 39084043803 one of them ended the run at
+60.43. That part worked.
+
+The run still took 60.17 minutes, and the hosted lanes are still why.
+
+| hosted lane                                                   | derived end | measured end |
+| ------------------------------------------------------------- | ----------- | ------------ |
+| `host C sanitizers (macOS, native)`                           | 41.30       | 39.28        |
+| sanitizers property, `reflect cases (macos-aarch64, 3/3)`     | 41.92       | 59.78        |
+| `test` node 3/4, `native (macos-aarch64, 1/3)`                | 40.47       | 39.52        |
+| `test` node 2/4, deno, `native support (macos-aarch64, 5/12)` | 40.15       | 56.07        |
+| `test` node 1/4, node 4/4, `reflect cases` 1/3 and 2/3        | 41.78       | 58.17        |
+
+The ordering change freed slack under the sanitizer ceiling, and the
+placement filled it with Mac-eligible jobs whose hosted entries were the
+two kinds this table calls least trustworthy. Hosted wall against table
+value for every job the run placed hosted:
+
+| job                                    | table | measured | ratio |
+| -------------------------------------- | ----- | -------- | ----- |
+| `reflect cases (macos-aarch64, 1/3)`   | 336   | 777      | 2.31  |
+| `reflect cases (macos-aarch64, 3/3)`   | 336   | 770      | 2.29  |
+| `reflect cases (macos-aarch64, 2/3)`   | 336   | 696      | 2.07  |
+| `native support (macos-aarch64, 5/12)` | 1308  | 2063     | 1.58  |
+| `host C sanitizers (macOS, property)`  | 2179  | 2641     | 1.21  |
+| `native (macos-aarch64, 1/3)`          | 1117  | 1105     | 0.99  |
+| `test (macos-latest, node, 2/4)`       | 996   | 949      | 0.95  |
+| `host C sanitizers (macOS, native)`    | 2478  | 2351     | 0.95  |
+| `test (macos-latest, node, 3/4)`       | 1311  | 1160     | 0.88  |
+| `test (macos-latest, deno)`            | 105   | 86       | 0.82  |
+| `test (macos-latest, node, 4/4)`       | 864   | 690      | 0.80  |
+| `test (macos-latest, node, 1/4)`       | 971   | 767      | 0.79  |
+
+The split is along vintage, not along family. Every entry with eighteen or
+more observations, and the four-observation `native (macos-aarch64, 1/3)`,
+measured between 0.79 and 1.21 times its value. The three `reflect cases`
+estimates and the retained `native support (macos-aarch64, 5/12)` are the
+only entries above 1.21, and they are the two the table flagged: U38
+derived the `reflect cases` figures without any hosted observation, and
+the retained entry predates the `b59ac914` repartition. Those four are now
+refreshed from this run, one observation each. The derived maximum lane
+end moves from 43.53 to 43.50, and the placement sends
+`native support (macos-aarch64, 5/12)` and two `reflect cases` shards to
+Mac lanes.
+
+Two terms the model still does not carry. A hosted macOS job starting
+mid-run waits for a machine: the gaps between consecutive jobs in a lane
+were 0.12, 0.12, 0.14, 0.73, 1.68, and 3.54 minutes, and then 8.93 before
+`reflect cases (macos-aarch64, 1/3)`, with four of the five hosted lanes
+free of other work at that moment, so the wait was allocation and not the
+five-lane limit. And the pools other than hosted macOS now bound the run
+near where it already runs: the Mac lanes carried 262.45 job-minutes over
+28 jobs and finished at 50.18, and the longest Linux file shard measured
+46.05. The `native` aggregate ended the run at 60.17 waiting on
+`reflect cases (macos-aarch64, 3/3)`.
