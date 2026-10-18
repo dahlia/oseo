@@ -79,85 +79,114 @@ export const macosJobCosts: MacosJobCosts = {
   "host C sanitizers (macOS, native)": 2478, // 22
   "test262 (macos-aarch64, 12/12)": 2212, // 1
   "host C sanitizers (macOS, property)": 2179, // 22
-  "native support (macos-aarch64, 5/12)": 2063, // 1 since b59ac914
+  "native support (macos-aarch64, 5/12)": 2063, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 2/12)": 2054, // 4
   "test262 (macos-aarch64, 11/12)": 1976, // 2
-  "native support (macos-aarch64, 8/12)": 1963, // 3 since b59ac914
+  "native support (macos-aarch64, 8/12)": 1963, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 7/12)": 1941, // 1
   "native support (macos-aarch64, 1/12)": 1940, // retained
+  "test262 (macos-aarch64, 1/12)": 1932, // 1 hosted since b59ac914
   "native support (macos-aarch64, 2/12)": 1924, // 2
   "test262 (macos-aarch64, 3/12)": 1906, // 1
+  "native support (macos-aarch64, 10/12)": 1900, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 5/12)": 1665, // 7
   "test262 (macos-aarch64, 10/12)": 1644, // 1
   "native support (macos-aarch64, 4/12)": 1630, // 3
   "test262 (macos-aarch64, 4/12)": 1599, // 3
   "native support (macos-aarch64, 6/12)": 1575, // 4
-  "native support (macos-aarch64, 7/12)": 1553, // 3 since b59ac914
-  "test262 (macos-aarch64, 8/12)": 1543, // 3 since b59ac914
+  "native support (macos-aarch64, 7/12)": 1553, // 3 hosted since b59ac914
+  "test262 (macos-aarch64, 8/12)": 1543, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
-  "native support (macos-aarch64, 10/12)": 1432, // 1
-  "native support (macos-aarch64, 9/12)": 1330, // retained
-  "native support (macos-aarch64, 3/12)": 1323, // retained
+  "native support (macos-aarch64, 9/12)": 1421, // 1 hosted since b59ac914
   "native support (macos-aarch64, 11/12)": 1313, // retained
   "test (macos-latest, node, 3/4)": 1311, // 18
-  "native support (macos-aarch64, 12/12)": 1294, // retained
-  "test262 (macos-aarch64, 1/12)": 1288, // retained
-  "native (macos-aarch64, 1/3)": 1117, // 4
+  "native support (macos-aarch64, 3/12)": 1264, // 2 hosted since b59ac914
+  "native (macos-aarch64, 1/3)": 1236, // 3 hosted since b59ac914
+  "native support (macos-aarch64, 12/12)": 1044, // 1 hosted since b59ac914
   "native (macos-aarch64, 3/3)": 1014, // retained
   "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
   "test (macos-latest, node, 1/4)": 971, // 18
-  "native (macos-aarch64, 2/3)": 917, // retained
+  "native (macos-aarch64, 2/3)": 904, // 1 hosted since b59ac914
   "test (macos-latest, node, 4/4)": 864, // 18
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
-  "reflect cases (macos-aarch64, 1/3)": 777, // 1 since 731ffba9
-  "reflect cases (macos-aarch64, 3/3)": 770, // 1 since 731ffba9
-  "reflect cases (macos-aarch64, 2/3)": 696, // 1 since 731ffba9
+  "reflect cases (macos-aarch64, 2/3)": 696, // 1 hosted since b59ac914
+  "reflect cases (macos-aarch64, 1/3)": 690, // 2 hosted since b59ac914
+  "reflect cases (macos-aarch64, 3/3)": 640, // 3 hosted since b59ac914
   "test (macos-latest, deno)": 105, // 22
 };
 
 /**
- * Measured median `oseo-mac-1` walls, rounded to whole seconds, for every
- * job that has run on that runner. The observations come from the
- * Mac-lane attempts of the seven runs above that did not run the job
- * hosted; the trailing comment gives their count:
+ * Estimated one-lane Mac seconds for every current Mac-lane job, rounded
+ * to whole seconds. The generator models such a job by this value instead
+ * of converting its hosted weight, because the derived ratio between the
+ * two varies inside a single family: from 2.23 to 5.22 across the twelve
+ * `native support` shards and 3.78 to 5.36 across the twelve test262
+ * shards.
  *
- *  -  5: both attempts of 37194069657, 37206614757, and both attempts of
- *     37215661294;
- *  -  3: both attempts of 37194069657 and 37206614757;
- *  -  2: both attempts of 37215661294.
+ * Each entry is the median of five to eight observations from the eight
+ * runs since `b59ac914`, the runs whose macOS shard contents match the
+ * tree. Each observation is normalized by removing the modeled pair
+ * slowdown of whatever ran on the other lane of the same machine, which
+ * inverts what `selfHostedLaneEnds` computes. The value therefore states
+ * one-lane work, and the generator applies `selfHostedPairSlowdowns` on
+ * top of it during placement.
  *
- * The generator models such a job on the Mac lane by this value instead
- * of converting its hosted weight, because one family ratio could not fit
- * jobs whose derived ratios against the earlier weights ranged from 2.7 to
- * 6.4. A job's Mac walls ranged by a derived 3 to 84 seconds across its
- * observations; hosted walls of all 34 jobs ranged by 6 to 1,004 seconds.
+ * Because the normalization divides by those factors, the table and
+ * `selfHostedPairSlowdowns` have to be derived together. U42 raised the
+ * factors and recomputed every entry under them, which moved the table a
+ * median 0.97 of its U41 values. The twelve observations whose partner
+ * lane was idle for over three quarters of the wall are the independent
+ * check: they measure a median 0.99 of their entry here, against 0.94 of
+ * the U41 entry.
+ *
+ * The trailing comment gives the observation count; a count below eight
+ * means the placement sent the job to a hosted lane in some of those runs.
+ * Changes to shard contents or hardware require revalidating the affected
+ * estimates. U41 replaced the whole table and
+ * *docs/evidence/u41/README.md* records what the 18 entries before it were
+ * measuring and how far off they were.
  */
 interface SelfHostedJobSeconds {
   readonly [name: string]: number;
 }
 
 export const selfHostedJobSeconds: SelfHostedJobSeconds = {
-  "native support (macos-aarch64, 1/12)": 752, // 5
-  "native support (macos-aarch64, 2/12)": 488, // 5
-  "native support (macos-aarch64, 4/12)": 449, // 5
-  "own-key cases (macos-aarch64, 3/3)": 442, // 5
-  "reflect cases (macos-aarch64, 3/3)": 180, // 1
-  "reflect cases (macos-aarch64, 1/3)": 180, // 2
-  "reflect cases (macos-aarch64, 2/3)": 179, // 2
-  "own-key cases (macos-aarch64, 1/3)": 433, // 5
-  "native support (macos-aarch64, 10/12)": 375, // 5
-  "own-key cases (macos-aarch64, 2/3)": 374, // 5
-  "test262 (macos-aarch64, 8/12)": 366, // 5
-  "native (macos-aarch64, 3/3)": 363, // 2
-  "native support (macos-aarch64, 6/12)": 354, // 2
-  "test262 (macos-aarch64, 1/12)": 345, // 3
-  "test262 (macos-aarch64, 2/12)": 336, // 3
-  "test262 (macos-aarch64, 11/12)": 329, // 3
-  "native support (macos-aarch64, 8/12)": 324, // 2
-  "native support (macos-aarch64, 12/12)": 295, // 2
+  "native support (macos-aarch64, 1/12)": 878, // 8
+  "native support (macos-aarch64, 2/12)": 678, // 8
+  "native support (macos-aarch64, 8/12)": 622, // 5
+  "native support (macos-aarch64, 5/12)": 540, // 7
+  "native support (macos-aarch64, 11/12)": 517, // 8
+  "test262 (macos-aarch64, 12/12)": 506, // 8
+  "native support (macos-aarch64, 10/12)": 504, // 7
+  "native support (macos-aarch64, 7/12)": 502, // 5
+  "native support (macos-aarch64, 12/12)": 501, // 7
+  "test262 (macos-aarch64, 2/12)": 492, // 8
+  "native support (macos-aarch64, 3/12)": 487, // 6
+  "test262 (macos-aarch64, 11/12)": 484, // 8
+  "test262 (macos-aarch64, 7/12)": 482, // 8
+  "native support (macos-aarch64, 6/12)": 473, // 8
+  "test262 (macos-aarch64, 8/12)": 451, // 5
+  "test262 (macos-aarch64, 4/12)": 445, // 8
+  "test262 (macos-aarch64, 5/12)": 444, // 8
+  "test262 (macos-aarch64, 10/12)": 441, // 8
+  "test262 (macos-aarch64, 3/12)": 433, // 8
+  "test262 (macos-aarch64, 9/12)": 429, // 8
+  "test262 (macos-aarch64, 6/12)": 423, // 8
+  "native support (macos-aarch64, 9/12)": 421, // 7
+  "test262 (macos-aarch64, 1/12)": 409, // 7
+  "native (macos-aarch64, 3/3)": 404, // 8
+  "native support (macos-aarch64, 4/12)": 361, // 8
+  "native (macos-aarch64, 1/3)": 355, // 5
+  "native (macos-aarch64, 2/3)": 350, // 7
+  "reflect cases (macos-aarch64, 3/3)": 331, // 5
+  "reflect cases (macos-aarch64, 2/3)": 281, // 7
+  "reflect cases (macos-aarch64, 1/3)": 270, // 6
+  "own-key cases (macos-aarch64, 1/3)": 241, // 8
+  "own-key cases (macos-aarch64, 3/3)": 205, // 8
+  "own-key cases (macos-aarch64, 2/3)": 197, // 8
 };
 
 /**
@@ -166,24 +195,28 @@ export const selfHostedJobSeconds: SelfHostedJobSeconds = {
  * `macosFixedSetupSeconds + (cost - setup) / ratio`.
  *
  * Each value is the derived pooled ratio `sum(hosted median - setup) /
- * sum(Mac wall - setup)` over every Mac observation of the jobs in
- * `selfHostedJobSeconds`, rounded down to one decimal: 4.24 for test262
- * over 14 observations, 3.20 for native support over 26, 3.15 for native
- * fixtures over 2, and 2.34 for own-key cases over 15. Native fixtures use
- * 3.1 from one job's two attempts; the earlier derived U21 value was 2.2.
- * Own-key cases always have a measured Mac median, so their ratio only
- * guards a future job without one.
+ * sum(one-lane Mac seconds - setup)` over the entries of
+ * `selfHostedJobSeconds`, rounded down to one decimal. U42 rederived all
+ * five from its refreshed table: before rounding, 4.37 for test262 over
+ * 12 jobs, 3.40 for native support over 12, 3.22 for native fixtures over
+ * 3, 2.67 for the Reflect namespace shards over 3, and 5.48 for own-key
+ * cases over 3. U41 had 4.05, 3.16, 3.13, 2.94, and 4.98, and the values
+ * before it were 4.2, 3.2, 3.1, 2.3, and 2.3.
  *
- * Reflect namespace case shards borrow the own-key ratio. All three have a
- * measured Mac wall, so the value only guards a future fourth shard, and
- * U38 derived their hosted estimates from this same ratio, which makes it
- * a borrowed measurement rather than independent evidence for them.
+ * The Reflect namespace shards had borrowed the own-key ratio, and U38
+ * used that same borrowed ratio to derive their hosted estimates, which
+ * U40 then replaced with hosted observations. Their 2.9 is no longer
+ * borrowed from either side.
+ *
+ * Every Mac-eligible job has an entry in `selfHostedJobSeconds`, so these
+ * ratios reach no job the generator places today. They guard a future
+ * shard or family that arrives without a Mac observation.
  *
  * The host C sanitizer family is not Mac-lane eligible, so its ratio
  * reaches no schedule. It records a measurement anyway. U37 ran both
  * macOS suites on the first Mac mini over SSH and measured a derived
  * 2.725 for the native suite over three solo walls and 3.198 for the
- * property suite over two, pooling to 2.9. That is below the 3.2 and 4.2
+ * property suite over two, pooling to 2.9. That is below the 3.4 and 4.3
  * of the native support and test262 work a Mac lane would have to evict
  * to fit them, and the same unit measured their pair factor at a worst
  * 1.41, so the family loses the exchange in every variant; see
@@ -197,11 +230,11 @@ interface SelfHostedFamilySpeedRatios {
 }
 
 export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
-  "native support": 3.2,
-  "own-key cases": 2.3,
-  "reflect cases": 2.3,
-  native: 3.1,
-  test262: 4.2,
+  "native support": 3.4,
+  "own-key cases": 5.4,
+  "reflect cases": 2.6,
+  native: 3.2,
+  test262: 4.3,
   "host C sanitizers": 2.9,
   test: 1,
 };
@@ -263,16 +296,35 @@ export const macosFixedSetupSeconds = 60;
  * A job progresses at `1 / factor` of its one-lane speed while the other
  * lane is busy, and at its one-lane speed while that lane is idle or done.
  *
- * Each measured value is the largest overlapped factor of that pairing in
- * *docs/evidence/u25/pair-jobs.tsv*, rounded up to two decimals: the
- * overlapped seconds of a job divided by the solo work left for the
- * overlap, both derived from measured SSH job walls with separate Zig
- * caches. Native support beside own-key and native fixture jobs was
- * measured only as one sequence of both partners, so 1.05 covers both.
- * Native fixture + native fixture, own-key + own-key, and own-key + native
- * fixture were not measured; each uses the family's largest measured
- * factor, 1.41 or 1.45, as a pessimistic stand-in. The generator keeps all
- * own-key shards on one Mac lane, so own-key + own-key cannot occur.
+ * A value with a trailing comment is a U42 estimate from the 238 Mac-lane
+ * job observations in the eight runs since `b59ac914`. Holding the U41
+ * `selfHostedJobSeconds` entries fixed, each observation states that the
+ * job's
+ * elapsed time, split by which family occupied the other lane, must
+ * divide back to its one-lane value; a regularized least-squares fit over
+ * those equations gives the factors. The comment gives the contended hours
+ * that back the value.
+ *
+ * The other values are the U25 estimates, each the largest overlapped
+ * factor of that pairing in *docs/evidence/u25/pair-jobs.tsv*, rounded up
+ * to two decimals. The fit had under 48 minutes of contended time for
+ * each of them and drove several below the model's minimum of 1.00, so
+ * they keep the measured stand-in. Native support beside own-key and
+ * native fixture jobs was measured only as one sequence of both partners,
+ * so 1.05 covers both. Native fixture + native fixture, own-key +
+ * own-key, and own-key + native fixture were not measured; each uses the
+ * family's largest measured factor, 1.41 or 1.45, as a pessimistic
+ * stand-in. The generator keeps all own-key shards on one Mac lane, so
+ * own-key + own-key cannot occur.
+ *
+ * The refit raises every pairing that a balanced Mac placement creates in
+ * quantity, because U25 overlapped its partners for part of their walls
+ * and most CI observations have a busy partner for over nine tenths of
+ * their wall. The higher factors also size the Mac side against its
+ * hardware: applying the 1.31 contended ratio the runs measure as a
+ * uniform factor over six lanes, the 33 jobs' 242.6 one-lane minutes come
+ * to an illustrative 53.0 minutes of wall clock. See
+ * *docs/evidence/u42/README.md*.
  */
 interface SelfHostedPairSlowdowns {
   readonly [family: string]: Readonly<Record<string, number>>;
@@ -280,36 +332,36 @@ interface SelfHostedPairSlowdowns {
 
 export const selfHostedPairSlowdowns: SelfHostedPairSlowdowns = {
   "reflect cases": {
-    test262: 1.45,
+    test262: 1.54, // 0.78 h
     "native support": 1.27,
     "own-key cases": 1.45,
     native: 1.45,
     "reflect cases": 1.07,
   },
   test262: {
-    test262: 1.26,
-    "native support": 1.08,
+    test262: 1.37, // 5.46 h
+    "native support": 1.23, // 4.89 h
     "own-key cases": 1.01,
     native: 1.01,
     "reflect cases": 1.26,
   },
   "native support": {
-    test262: 1.37,
-    "native support": 1.13,
+    test262: 1.39, // 4.89 h
+    "native support": 1.2, // 7.22 h
     "own-key cases": 1.05,
     native: 1.05,
     "reflect cases": 1.37,
   },
   "own-key cases": {
     test262: 1.45,
-    "native support": 1.27,
+    "native support": 1.34, // 1.19 h
     "own-key cases": 1.45,
     native: 1.45,
     "reflect cases": 1.45,
   },
   native: {
-    test262: 1.41,
-    "native support": 1.04,
+    test262: 1.45, // 1.53 h
+    "native support": 1.18, // 0.86 h
     "own-key cases": 1.41,
     native: 1.41,
     "reflect cases": 1.41,
