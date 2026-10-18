@@ -1,0 +1,263 @@
+Untested hosted entries (U43)
+=============================
+
+U42 landed and its branch run took 57.27 minutes, the first run under
+58.67 since the Mac lanes were balanced. The latest-finishing job was on a
+hosted macOS lane: `native support (macos-aarch64, 11/12)` ran 29.88
+minutes against a 21.88-minute model, and its lane finished 56.92 minutes
+after the run began. For the third run running, that latest-finishing
+Mac-eligible job was one the placement had just sent to a hosted lane
+against an entry no run since `b59ac914` had tested.
+
+The hosted-duration observations below come from the ten main and branch
+runs since `b59ac914`, the runs whose macOS shard contents match the tree:
+39076279469, 39080313970, 39084043803, 39104204370, 39108338578,
+39112383050, 39121592150, 39126360392, 39132976769, and 39139466097.
+
+
+What the last three runs measured
+---------------------------------
+
+| run         | job sent hosted                         | entry (s) | duration (s) | duration / entry |
+| ----------- | --------------------------------------- | --------- | ------------ | ---------------- |
+| 39121592150 | `test262 (macos-aarch64, 1/12)`         | 1,288     | 1,932        | 1.50             |
+| 39126360392 | `native support (macos-aarch64, 10/12)` | 1,432     | 1,900        | 1.33             |
+| 39132976769 | `native support (macos-aarch64, 11/12)` | 1,313     | 1,793        | 1.37             |
+| 39132976769 | `native (macos-aarch64, 3/3)`           | 1,014     | 1,254        | 1.24             |
+
+Run 39132976769 also hosted `native support (macos-aarch64, 9/12)`, whose
+1,421-second entry rested on one observation from run 39121592150. It ran
+1,475 seconds, 4 percent above its entry, while the two untested entries in
+the same run ran 24 and 37 percent above theirs.
+
+
+First observations and placement decisions
+------------------------------------------
+
+The first reading of this was that entries predating the repartition are
+systematically low, and the U42 record rejected that on the five such
+entries the window had observed, whose ratios had a median of 0.99. Neither
+the reading nor the rejection used a sample that can test the question. U41
+and U42 recalculated those entries from observations in this window, so
+comparing the same observations with the resulting medians is an in-sample
+check, not a test of the entries that preceded them.
+
+A comparison that avoids that reuse is a job's first observation in the
+window against an entry that predates it. Eight exist: 0.81, 0.93, 0.99,
+1.07, 1.24, 1.33, 1.37, and 1.50 times the entry, a mean of 1.16, five of
+the eight above 1. This small and selected sample does not establish
+whether such entries systematically understate a hosted duration.
+
+What it does show is where the large ratios sit. The four largest belong to
+the four jobs the placement had just chosen to host. That is consistent
+with a placement that gives each job the lane whose projected finish is
+earliest selecting, among uncertain hosted costs, the estimates that come
+out smallest. These observations do not isolate that effect from
+differences between the jobs or from which lanes were free, and better
+entries would reduce it. The allowance below is a precaution against the
+possibility, not a correction of a measured bias.
+
+
+What the placement now charges
+------------------------------
+
+Run 39132976769 added the first window observation for
+`native support (macos-aarch64, 11/12)` and `native (macos-aarch64, 3/3)` and a
+second for `native support (macos-aarch64, 9/12)`, so three entries move: 1,313
+to 1,793, 1,014 to 1,254, and 1,421 to 1,448. Sixteen of the 33 Mac-eligible
+jobs now have an entry a run since `b59ac914` has tested, and
+`measuredHostedJobs` lists them. The list names the tested jobs rather than the
+untested ones so that a newly added shard defaults to untested.
+
+When the placement projects a finish for a Mac-eligible job on a hosted
+lane, it multiplies that job's hosted median by
+`hostedUnmeasuredAllowance` unless the job is on that list. The factor is
+1.5, the largest ratio in those eight observations. It is a scenario
+multiplier, not an expected duration and not a bound on a future one.
+
+What it prices is that the two errors cost differently. At the tabulated
+costs, the allowance raises the modeled maximum from 49.95 to 50.78
+minutes. Without it the placement hosts `test262 (macos-aarch64, 9/12)`
+against an untested 1,456-second entry, on a lane whose other job brings it
+to 42.62 modeled minutes; charging that job 1.50 times its entry adds 12.13
+minutes to the lane and raises the maximum to 54.75. The allowance hosts
+`native support (macos-aarch64, 9/12)` instead, tested over two
+observations, and the maximum stays 50.78 under the same assumption, 3.97
+minutes lower. This is the same shape of trade as the sanitizer lane
+reservation.
+
+Every factor tested between 1.2 and 1.8, namely 1.2, 1.4, 1.5, and 1.8,
+produced the same partition. What the result rests on is the ordering
+between an untested entry and the tested alternatives, which 1.2 already
+establishes.
+
+The allowance is applied in the placement projection and nowhere else.
+`macosLaneEnds` continues to sum the unadjusted hosted entries, so the
+derived maximum stays a model output over per-job medians rather than a
+risk-adjusted one; it is not an estimate of a median run duration, and it
+omits queueing and start offsets. A test asserts that each hosted lane end
+equals the sum of its members' entries.
+
+
+What this does not address
+--------------------------
+
+The placement change does not address shared concurrency limits or Linux
+completion times. The account is on GitHub Pro, which allows 40 concurrent
+jobs and 5 concurrent macOS jobs across every repository it owns, and run
+39126360392 accumulated 37.7 job-minutes of hosted macOS queueing while
+another repository occupied two of those five slots. In run 39132976769 the
+latest Linux job finished 52.92 minutes after the run began, against 46.27
+in the main run before it, and the Linux jobs accumulated 43.9 job-minutes
+of queueing. Neither figure is an elapsed delay: the waits overlap.
+
+
+What the merged U42 run measured
+--------------------------------
+
+Main run 39139466097 at `005be48b` passed in 54.00 minutes, against 58.67
+for the main run before the merge. Each of the six self-hosted Mac lanes
+finished before its own modeled finish time. The latest actual finish was
+45.87 minutes after the run started, on `oseo-mac-3`; the largest modeled
+finish was 50.47, on `oseo-mac-1`. Actual Mac lane finishes spanned 3.29
+minutes.
+
+A hosted macOS lane finished last, 53.62 minutes after the run started. It
+ran three jobs in sequence: `test (macos-latest, node, 2/4)` for 16.87
+minutes, `test (macos-latest, deno)` for 2.80, and
+`native support (macos-aarch64, 9/12)` for 27.23. The first started 2.70
+minutes after the run, and the gaps between jobs were 1.93 and 2.08 minutes.
+The latest Linux job finished at 51.35 minutes.
+
+The run measured a duration for each of the three jobs whose entries U43
+refreshed, and all three entries change again.
+`native support (macos-aarch64, 11/12)` ran 1,479 seconds against the 1,793 its
+single earlier observation had set, so its entry becomes the 1,636 median of
+the two. `native (macos-aarch64, 3/3)` ran 1,066 against 1,254, for a median of
+1,160. `native support (macos-aarch64, 9/12)` ran 1,634 against 1,448, for the
+1,475 median of 1,421, 1,475, and 1,634.
+
+Those three durations were 0.82, 0.85, and 1.13 times the entry in force
+for the run. Earlier observations do not make an entry exact: the 1.13 is
+`native support (macos-aarch64, 9/12)`, the tested job U43 assigns to a
+hosted lane in place of an untested one.
+
+Recomputing the placement with the three updated entries lowers the
+maximum modeled lane finish from 50.78 to 48.28 minutes, and the result
+still assigns no untested entry to a hosted lane. Both figures are for the
+U43 placement; the 50.47 above belongs to the placement that `005be48b`
+actually ran, which had neither the allowance nor these three entries.
+
+
+What the U43 branch run measured
+--------------------------------
+
+Branch run 39144030177 at `af8e6bd2` passed in 54.17 minutes, against 54.00
+for the main run before it. Hosted macOS allocation waiting totaled 3.7
+job-minutes against that run's 13.2, the second lowest of the eleven runs
+since `b59ac914`, which range from 2.3 to 37.7. On the lane that bound each
+run the difference is starker: the branch run's last hosted lane spent 0.45
+minutes waiting to start and between its jobs, where the main run's spent
+6.71. The branch run was nonetheless 0.17 minutes longer, so what separates
+the two is lane work content and hosted runner speed rather than allocation
+waiting.
+
+The placement held. No hosted lane received a Mac-eligible entry the window
+had not tested. The run was still ended by a hosted macOS lane, and again by
+a Mac-eligible job the placement had sent there:
+`native support (macos-aarch64, 12/12)` ran 23.28 minutes against its
+17.40-minute entry, 1.34 times it. The `native` aggregate then ran 0.37
+minutes, and the run finished 0.40 minutes after that lane ended.
+
+One hosted observation put that job in `measuredHostedJobs`, so the
+placement projected its entry unmultiplied. It did not make the entry a
+close estimate of the next duration. Hosted lane five also holds the same
+three jobs at every allowance tested, 1.0 included, so the allowance did not
+assemble the lane that bound the run.
+
+Modeled and measured lane ends below are minutes after the run started. The
+waiting column is each lane's start offset plus the gaps between its jobs,
+which is a different quantity from the created-to-started allocation waiting
+above.
+
+| lane     | modeled | measured | waiting |
+| -------- | ------- | -------- | ------- |
+| hosted 1 | 41.30   | 39.20    | 0.48    |
+| hosted 2 | 36.32   | 41.28    | 0.37    |
+| hosted 3 | 42.45   | 48.45    | 0.25    |
+| hosted 4 | 39.42   | 43.62    | 2.25    |
+| hosted 5 | 47.98   | 53.77    | 0.45    |
+| mac 1    | 47.51   | 41.38    | 0.66    |
+| mac 2    | 47.45   | 42.57    | 0.50    |
+| mac 3    | 46.12   | 46.90    | 0.53    |
+| mac 4    | 47.88   | 48.87    | 0.58    |
+| mac 5    | 48.28   | 44.77    | 0.56    |
+| mac 6    | 48.26   | 44.93    | 0.55    |
+
+Every Mac lane spent at most 0.28 minutes of its waiting between jobs; the
+rest is the 0.38-minute start offset. Four Mac lanes finished before their
+modeled end and two after it, by 0.78 and 0.99 minutes. The ten hosted
+durations ran 0.85 to 1.34 times their entries. The latest Linux job
+finished at 48.68 minutes.
+
+With this run included, three entries change, each to the median of its
+observations in seconds: `native support (macos-aarch64, 3/12)` from 1,264
+to 1,293 on three observations, `native (macos-aarch64, 1/3)` from 1,236 to
+1,239 on four, and `native support (macos-aarch64, 12/12)` from 1,044 to
+1,220 on two. The third sends that job to a Mac lane and brings
+`native (macos-aarch64, 2/3)` onto hosted lane five in its place. The
+modeled hosted maximum falls from 47.98 to 45.65 minutes and the modeled Mac
+maximum rises from 48.28 to 49.10, so the derived maximum rises to 49.10.
+Reserving the two sanitizer lanes now raises that maximum from 48.78 to
+49.10 at median cost and holds it at 49.10 rather than 56.17 when the
+property job runs at its measured p90.
+
+The updated placement's eleven modeled lane ends span 36.32 to 49.10 minutes
+and average 44.85. The two sanitizer lanes finish below that average because
+the reservation lets no other job follow them. A hosted lane end and a Mac
+lane end come from different cost models, so these figures do not establish
+how much further partitioning could lower the maximum, or whether a lower
+maximum needs less macOS work or another Mac.
+
+
+What the refreshed placement measured
+-------------------------------------
+
+Branch run 39149674951 at `6c4e21cb` passed in 50.60 minutes, the shortest
+of the twelve runs since `b59ac914` and 3.40 below the 54.00-minute main
+run. All six Mac lanes finished before their modeled end, at 43.00, 44.60,
+45.70, 47.32, 46.20, and 46.72 minutes against 48.09, 49.10, 46.12, 48.78,
+48.39, and 47.17, with actual finishes spanning 4.32 minutes and at most
+0.30 minutes of idle between a lane's jobs. Hosted lanes ended at 37.63,
+46.80, 42.82, 43.82, and 50.22 against 41.30, 36.32, 42.50, 39.90, and
+45.65.
+
+Hosted lane five bound the run, and again with a Mac-eligible job the
+placement had sent there: `native (macos-aarch64, 2/3)`, the job this
+refresh moved onto that lane, ran 19.37 minutes against its 15.07-minute
+entry, 1.29 times it, after which the `native` aggregate ran 0.35 minutes.
+It is the fourth run in a row ended that way, and the four jobs were
+`native support (macos-aarch64, 11/12)` at 1.37 times its entry,
+`native support (macos-aarch64, 9/12)` at 1.13,
+`native support (macos-aarch64, 12/12)` at 1.34, and this one at 1.29. All
+four entries had been tested in the window, so the placement charged each
+unmultiplied. These four show that an entry tested since `b59ac914` can
+still underestimate a later duration, and that the distinction the allowance
+draws, `measuredHostedJobs` membership, does not account for variation among
+tested entries. Each of the four entries rested on one or two observations,
+but four comparisons do not establish whether observation count predicts an
+overrun.
+
+Hosted lane five also waited 2.23 minutes to start and 1.42 and 2.18 between
+its jobs, 5.83 in all, out of 17.7 job-minutes of hosted macOS allocation
+waiting in the run. Its work alone came to 44.39 minutes.
+
+That leaves the unsharded `test (ubuntu-latest, node)` close behind, at
+48.83 minutes, 1.77 short of the run's end. Its durations over the twelve
+runs fall into two groups: 24.72, 26.75, 34.85, 35.30, 35.90, and 36.17
+minutes in six runs, and 48.18, 48.60, 48.63, 48.67, 48.80, and 49.30 in the
+other six, with no observed duration between 36.17 and 48.18. The longer
+durations are roughly 13 minutes above the four near 35 to 36 and 22 to 25
+above the two shortest. What accounts for the difference is not established.
+At the longer durations this job can decide a run that the macOS lanes
+finish near 48, depending on its start time and the jobs that follow it.

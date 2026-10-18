@@ -46,7 +46,10 @@ import {
 import { configuredSelfHostedLanes } from "../tools/macos-lane-config.ts";
 import {
   hostedFallbackTimeScale,
+  hostedUnmeasuredAllowance,
   macosFixedSetupSeconds,
+  macosJobCosts,
+  measuredHostedJobs,
   selfHostedFamilySpeedRatios,
   selfHostedJobSeconds,
   selfHostedPairSlowdowns,
@@ -366,13 +369,14 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // Hosted medians of several vintages; U40 refreshed ten entries from
   // twenty-two attempts, then four more from the first run of its
   // placement, U41 refreshed every macos-aarch64 entry observed hosted
-  // since b59ac914, and U42 refreshed the three its own runs added. See
-  // PLAN-GATE.md (U33, U40, U41, U42).
+  // since b59ac914, U42 refreshed the three its own runs added, and U43
+  // three after that and three more from its own run. See PLAN-GATE.md
+  // (U33, U40, U41, U42, U43).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    11691,
+    12482,
   );
 });
 
@@ -1003,7 +1007,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 7905);
+  assert.equal(Math.round(modeled), 8288);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1036,7 +1040,50 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
   // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
   // lanes what they measured rather than what stale entries claimed.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 3028);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2946);
+});
+
+test("only a tested hosted entry reaches a hosted lane", () => {
+  const lanes = macosLanes(configuredSelfHostedLanes);
+  const eligible = lanes
+    .slice(0, 5)
+    .flatMap((lane) =>
+      lane.filter((job) => selfHostedJobSeconds[job.name] != null),
+    );
+  assert.ok(eligible.length > 0, "the placement hosts no Mac-eligible job");
+  for (const job of eligible) {
+    // The placement minimizes a projected finish, so it may select the
+    // hosted entries that understate. Nine runs since b59ac914 observed
+    // eight untested entries hosted for the first time, at 0.81 to 1.50
+    // times the entry, and the four largest were the four the placement
+    // had just chosen; see PLAN-GATE.md (U43).
+    assert.ok(
+      measuredHostedJobs.includes(job.name),
+      `${job.name} has no hosted observation since b59ac914`,
+    );
+  }
+  // Every listed job must still exist and be Mac-lane eligible.
+  const current = new Set(macosJobs().map((job) => job.name));
+  for (const name of measuredHostedJobs) {
+    assert.ok(current.has(name), name);
+    assert.ok(selfHostedJobSeconds[name] != null, name);
+  }
+});
+
+test("the unmeasured allowance prices a decision, not a lane end", () => {
+  assert.ok(hostedUnmeasuredAllowance > 1);
+  const lanes = macosLanes(configuredSelfHostedLanes);
+  const ends = macosLaneEnds(lanes);
+  // A hosted lane end is the plain sum of its members' hosted medians, so
+  // no reported cost carries the allowance the placement charged when it
+  // chose each job.
+  for (const [index, lane] of lanes.slice(0, 5).entries()) {
+    assert.equal(
+      ends[index],
+      lane.reduce((sum, job) => sum + macosJobCosts[job.name]!, 0),
+      lane.map((job) => job.name).join(" | "),
+    );
+  }
 });
 
 test("no job follows a macOS sanitizer job on a hosted lane", () => {
