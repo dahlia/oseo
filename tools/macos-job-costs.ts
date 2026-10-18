@@ -79,12 +79,13 @@ export const macosJobCosts: MacosJobCosts = {
   "host C sanitizers (macOS, native)": 2478, // 22
   "test262 (macos-aarch64, 12/12)": 2212, // 1
   "host C sanitizers (macOS, property)": 2179, // 22
-  "native support (macos-aarch64, 5/12)": 2063, // 1 since b59ac914
+  "native support (macos-aarch64, 5/12)": 2063, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 2/12)": 2054, // 4
   "test262 (macos-aarch64, 11/12)": 1976, // 2
-  "native support (macos-aarch64, 8/12)": 1963, // 3 since b59ac914
+  "native support (macos-aarch64, 8/12)": 1963, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 7/12)": 1941, // 1
   "native support (macos-aarch64, 1/12)": 1940, // retained
+  "test262 (macos-aarch64, 1/12)": 1932, // 1 hosted since b59ac914
   "native support (macos-aarch64, 2/12)": 1924, // 2
   "test262 (macos-aarch64, 3/12)": 1906, // 1
   "test262 (macos-aarch64, 5/12)": 1665, // 7
@@ -92,29 +93,28 @@ export const macosJobCosts: MacosJobCosts = {
   "native support (macos-aarch64, 4/12)": 1630, // 3
   "test262 (macos-aarch64, 4/12)": 1599, // 3
   "native support (macos-aarch64, 6/12)": 1575, // 4
-  "native support (macos-aarch64, 7/12)": 1553, // 3 since b59ac914
-  "test262 (macos-aarch64, 8/12)": 1543, // 3 since b59ac914
+  "native support (macos-aarch64, 7/12)": 1553, // 3 hosted since b59ac914
+  "test262 (macos-aarch64, 8/12)": 1543, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
   "native support (macos-aarch64, 10/12)": 1432, // 1
-  "native support (macos-aarch64, 9/12)": 1330, // retained
-  "native support (macos-aarch64, 3/12)": 1323, // retained
+  "native support (macos-aarch64, 9/12)": 1421, // 1 hosted since b59ac914
   "native support (macos-aarch64, 11/12)": 1313, // retained
   "test (macos-latest, node, 3/4)": 1311, // 18
   "native support (macos-aarch64, 12/12)": 1294, // retained
-  "test262 (macos-aarch64, 1/12)": 1288, // retained
-  "native (macos-aarch64, 1/3)": 1117, // 4
+  "native support (macos-aarch64, 3/12)": 1264, // 2 hosted since b59ac914
+  "native (macos-aarch64, 1/3)": 1236, // 3 hosted since b59ac914
   "native (macos-aarch64, 3/3)": 1014, // retained
   "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
   "test (macos-latest, node, 1/4)": 971, // 18
-  "native (macos-aarch64, 2/3)": 917, // retained
+  "native (macos-aarch64, 2/3)": 904, // 1 hosted since b59ac914
   "test (macos-latest, node, 4/4)": 864, // 18
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
-  "reflect cases (macos-aarch64, 1/3)": 777, // 1 since 731ffba9
-  "reflect cases (macos-aarch64, 3/3)": 770, // 1 since 731ffba9
-  "reflect cases (macos-aarch64, 2/3)": 696, // 1 since 731ffba9
+  "reflect cases (macos-aarch64, 1/3)": 777, // 1 hosted since b59ac914
+  "reflect cases (macos-aarch64, 2/3)": 696, // 1 hosted since b59ac914
+  "reflect cases (macos-aarch64, 3/3)": 640, // 3 hosted since b59ac914
   "test (macos-latest, deno)": 105, // 22
 };
 

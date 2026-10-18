@@ -158,3 +158,81 @@ does not establish the remaining wall-clock benefit.
 Changes to shard contents or hardware require revalidating the affected
 estimates, because no value here is independent of the partition, the
 machine, and the pairing that produced it.
+
+
+What the first run measured
+---------------------------
+
+Branch run 39121592150 at `354b9906` passed in 62.93 minutes, 4.26
+minutes longer than the last main run. The Mac lane finish spread fell
+from 23.65 minutes to 3.80, but hosted lane three determined completion.
+
+Mac lane work, finish time, and idle time, in minutes. Total work divided
+equally across six lanes is 47.99 minutes, which is a share of work and
+not an attainable finish, since a finish also carries the 0.42-minute
+probe:
+
+| lane         | work  | end   | idle |
+| ------------ | ----- | ----- | ---- |
+| `oseo-mac-4` | 50.27 | 50.85 | 0.17 |
+| `oseo-mac-3` | 49.43 | 50.05 | 0.20 |
+| `oseo-mac-1` | 48.08 | 48.78 | 0.28 |
+| `oseo-mac-6` | 46.85 | 47.47 | 0.20 |
+| `oseo-mac-5` | 46.83 | 47.40 | 0.15 |
+| `oseo-mac-2` | 46.48 | 47.05 | 0.15 |
+
+The latest finish sits 2.86 minutes above that work-only bound, against
+9.10 in run 39112383050, and no lane held more than 0.28 minutes of idle.
+
+Hosted lane three finished at 62.92. It held
+`test (macos-latest, node, 3/4)` and then
+`test262 (macos-aarch64, 1/12)`, which the refreshed Mac costs sent
+hosted for the first time since the `b59ac914` repartition. Its hosted
+entry was a retained 1,288 seconds and it ran 1,932, a ratio of 1.50 and
+10.73 minutes above its estimate. The lane also waited 9.17 minutes for a
+runner between its two jobs. The other nine hosted jobs ran between 0.68
+and 1.07 times their entries.
+
+The longest Linux file shard took 46.55 minutes, within the preceding six
+runs' range of 44.12 to 48.18. `test (ubuntu-latest, node)` took 48.67
+minutes, 0.07 above its preceding range of 34.85 to 48.60.
+
+
+Refreshed hosted medians
+------------------------
+
+Twelve `macos-aarch64` jobs have a hosted observation in the seven-run
+window, which is every job the placement has sent hosted since
+`b59ac914`. All twelve now carry that window's median and its count, and
+six of them moved. Seconds:
+
+| job                                    | superseded | refreshed | n   |
+| -------------------------------------- | ---------- | --------- | --- |
+| `test262 (macos-aarch64, 1/12)`        | 1288       | 1932      | 1   |
+| `native (macos-aarch64, 1/3)`          | 1117       | 1236      | 3   |
+| `native support (macos-aarch64, 9/12)` | 1330       | 1421      | 1   |
+| `native support (macos-aarch64, 3/12)` | 1323       | 1264      | 2   |
+| `native (macos-aarch64, 2/3)`          | 917        | 904       | 1   |
+| `reflect cases (macos-aarch64, 3/3)`   | 770        | 640       | 3   |
+
+The other 21 `macos-aarch64` jobs have never run hosted in the window, so
+nothing in CI can refresh them, and 18 of those carry an entry measured
+before their shard contents changed. Deriving a hosted median for them
+from the measured one-lane Mac seconds and the family ratio was tried and
+rejected. The per-job ratio `(hosted median - setup) / (one-lane - setup)`
+varies inside a family: the five `native support` shards with a window
+hosted observation derive 2.79, 3.30, 3.45, 3.65, and 4.12, and the three
+Reflect namespace shards 2.44, 2.69, and 3.16. These ratios do not
+establish a reliable conversion for a job without a hosted observation.
+
+The partition is instead checked against that exposure as a scenario.
+With the refreshed placement held fixed, substituting inverse conversions
+for all 21 unobserved entries raises hosted lane three from 43.42 to 46.10
+derived minutes and hosted lane four from 42.22 to 43.53. The maximum
+remains 48.17 on `oseo-mac-6`.
+
+The two unobserved jobs the placement now sends hosted are
+`native support (macos-aarch64, 12/12)`, with an entry of 1,294 seconds
+and a conversion of 1,455, and `native support (macos-aarch64, 10/12)`,
+with 1,432 and 1,511. These substitutions leave the modeled maximum
+unchanged; their hosted durations remain unmeasured in the window.

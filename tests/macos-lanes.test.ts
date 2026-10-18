@@ -363,14 +363,15 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       if (index > 0) assert.ok(lane[index - 1]!.seconds >= planned.seconds);
     }
   }
-  // Hosted medians of four vintages; U40 refreshed ten entries from
+  // Hosted medians of several vintages; U40 refreshed ten entries from
   // twenty-two attempts, then four more from the first run of its
-  // placement, which observed them hosted. See PLAN-GATE.md (U33, U40).
+  // placement, and U41 refreshed every macos-aarch64 entry observed
+  // hosted since b59ac914. See PLAN-GATE.md (U33, U40, U41).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    11523,
+    11654,
   );
 });
 
@@ -1001,7 +1002,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 8356);
+  assert.equal(Math.round(modeled), 8326);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1034,7 +1035,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
   // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
   // lanes what they measured rather than what stale entries claimed.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2898);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2890);
 });
 
 test("no job follows a macOS sanitizer job on a hosted lane", () => {
