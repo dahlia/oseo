@@ -54,6 +54,23 @@ import {
 } from "../tools/macos-job-costs.ts";
 import { selectNativeTestShard } from "../tools/native-shard.ts";
 
+/**
+ * Whether a Mac lane can run `job`, stated here rather than imported so
+ * that the placement assertions below do not restate the generator.
+ */
+function macLaneEligible(job: MacosLaneJob): boolean {
+  return (
+    job.os === "macos-15" &&
+    [
+      "native",
+      "native support",
+      "test262",
+      "own-key cases",
+      "reflect cases",
+    ].includes(job.family)
+  );
+}
+
 interface Job {
   readonly name?: string;
   readonly "runs-on": string;
@@ -346,14 +363,14 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
       if (index > 0) assert.ok(lane[index - 1]!.seconds >= planned.seconds);
     }
   }
-  // Hosted medians, refreshed for the twenty-four jobs that nine recent
-  // run attempts observed hosted, retained for the rest; see
-  // PLAN-GATE.md (U33).
+  // Hosted medians of four vintages; U40 refreshed ten entries from
+  // twenty-two attempts, then four more from the first run of its
+  // placement, which observed them hosted. See PLAN-GATE.md (U33, U40).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    11200,
+    11523,
   );
 });
 
@@ -949,8 +966,14 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
   // Without the pin, longer jobs would precede them on the Mac lane.
   assert.ok(mac.slice(3).some((job) => job.seconds > mac[0]!.seconds));
   for (const lane of [...lanes.slice(0, 5), mac.slice(3)]) {
+    // A hosted lane takes the jobs no Mac lane can run before the rest,
+    // and orders each of those two groups by descending hosted median.
+    const groups = lane.map((job) => (macLaneEligible(job) ? 1 : 0));
+    assert.deepEqual(groups, groups.toSorted());
     for (const [index, job] of lane.entries()) {
-      if (index > 0) assert.ok(lane[index - 1]!.seconds >= job.seconds);
+      if (index > 0 && groups[index] === groups[index - 1]) {
+        assert.ok(lane[index - 1]!.seconds >= job.seconds);
+      }
     }
   }
   assert.ok(Object.keys(selfHostedJobSeconds).length > 0);
@@ -978,7 +1001,38 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 6708);
+  assert.equal(Math.round(modeled), 6789);
+});
+
+test("hosted lanes take the jobs no Mac lane can run first", () => {
+  const lanes = macosLanes(configuredSelfHostedLanes);
+  const hosted = lanes.slice(0, 5);
+  // Every job that needs a hosted runner leads its lane, so no lane holds
+  // Mac-eligible work that a hosted-only job then has to wait behind.
+  for (const lane of hosted) {
+    const leading = lane.findIndex((job) => macLaneEligible(job));
+    const boundary = leading === -1 ? lane.length : leading;
+    assert.ok(
+      lane.slice(boundary).every((job) => macLaneEligible(job)),
+      lane.map((job) => job.name).join(" | "),
+    );
+  }
+  const ineligible = macosJobs().filter((job) => !macLaneEligible(job));
+  assert.equal(ineligible.length, 7);
+  for (const job of ineligible) {
+    const lane = hosted.find((candidate) =>
+      candidate.some((placed) => placed.id === job.id),
+    );
+    assert.ok(lane != null, job.name);
+    const index = lane.findIndex((placed) => placed.id === job.id);
+    assert.ok(
+      lane.slice(0, index).every((earlier) => !macLaneEligible(earlier)),
+      job.name,
+    );
+  }
+  // Placing them last gave three lanes one Mac-eligible job each, which
+  // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2610);
 });
 
 test("faster native support work uses additional capacity", () => {

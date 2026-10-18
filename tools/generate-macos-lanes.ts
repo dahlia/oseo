@@ -356,8 +356,22 @@ export function macosLanes(
       throw new Error(`Stale self-hosted measurement: ${name}`);
     }
   }
+  // Without a Mac lane every job is hosted, and the descending order below
+  // is the LPT partition. With one, a job a Mac lane can take has an
+  // alternative that a hosted-only job does not, so the hosted-only jobs
+  // are placed first: their lanes are then loaded before an eligible job
+  // projects a finish on one, and the projection stops understating what
+  // following them costs. Placing them last left three lanes holding one
+  // Mac-eligible job each, which U40 measured at 3.2 to 4.2 times its
+  // Mac wall, and stacked the hosted-only jobs behind them.
   const pinned = (job: MacosLaneJob): number =>
-    selfHostedCount > 0 && job.family === "own-key cases" ? 0 : 1;
+    selfHostedCount === 0
+      ? 1
+      : job.family === "own-key cases"
+        ? 0
+        : selfHostedEligible(job)
+          ? 2
+          : 1;
   const jobs = all.toSorted(
     (a, b) =>
       pinned(a) - pinned(b) ||
