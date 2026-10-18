@@ -3059,3 +3059,49 @@ the one change that can lower the Linux maximum, and it is the next unit.
 Its 2,750-second weight is the most stable large measurement in either
 run. Raising the Linux total, rebalancing from a fresher table, or
 re-deriving a two-run maximum each leave the maximum where it is.
+
+#### What the merged run measured
+
+Main run 39084043803 at `565378f5` is green at 60.43 minutes and ran the
+refreshed partition on main. Its longest Linux file shard measured 48.18
+minutes, against 47.77 for the superseded partition in run 39070198868 and
+46.52 for this one in run 39076279469. The refreshed partition therefore
+measured once below the superseded one and once above it. These runs do not
+establish whether the refresh lowered the Linux maximum at all, and they
+give the modeled 3.2-minute reduction no support.
+
+The same run bears on which resource sets a main run's wall clock. In this
+run the longest Linux file shard took 48.18 minutes, and two other
+measurements sit beside it:
+
+ -  `test (ubuntu-latest, node)` took 48.18 minutes, and has ranged from
+    25.78 to 50.03 across the last twelve successful main runs. No change
+    in this repository has been identified that explains that range.
+ -  The five hosted macOS lanes carried 240.59 job-minutes, which bounds
+    them below 48.12 minutes. That is a capacity bound on five lanes, not
+    a measured finish.
+
+The six self-hosted Mac lanes carried 248.91 job-minutes, a 41.49-minute
+bound, and their jobs finished by 46.70.
+
+The run finished 12.31 minutes above the hosted macOS bound. Three
+`macos-aarch64` jobs ran on hosted `macos-15` runners because the readiness
+probe found no free Mac lane, and took 29.33, 30.80, and 33.33 minutes
+against an 8.30-minute mean over the 30 jobs that ran on Mac lanes.
+`test (macos-latest, node, 3/4)` was chained behind the slowest of them, so
+it started at 38.43 and ended at 60.43, while the lane holding
+`host C sanitizers (macOS, native)` stood idle from 38.42. Each of the four
+most recent main runs had exactly three such fallbacks, summing 82.8, 72.1,
+77.1, and 93.5 minutes. Five hosted macOS lanes less the two sanitizer jobs
+that start with the run leaves three, which would explain that repeated
+count if those lanes stayed occupied for as long as the probe admits
+fallbacks. Four matching runs do not establish that explanation.
+
+The sentence above naming
+*tests/property/m5-globalthis-binding.property.test.ts* as the next unit
+should be replaced. Case-sharding that file remains the candidate for
+lowering the Linux maximum, but the Linux file shards did not determine
+this run's completion, and lowering their maximum alone would not have
+shortened it. The next unit should examine the hosted macOS chain instead:
+the fallback latency that enters the critical path, and the order in which
+the generated lanes stack their jobs.
