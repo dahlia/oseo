@@ -3128,3 +3128,50 @@ at the observed 8.30-minute mean, a 45.64-minute bound over six lanes.
 Both sit under the 48.18 minutes the Linux shards measured, which is a
 reason to measure that arrangement and not evidence that either pool would
 finish there.
+
+### Hosted macOS lane placement (U40)
+
+U39 closed by naming the hosted macOS lanes rather than the Linux file
+shards as what sets a main run's wall clock. This unit changes how
+`macosLanes` fills them and refreshes ten hosted medians.
+*docs/evidence/u40/README.md* holds the observations.
+
+Jobs that no Mac lane can run are now placed before the rest whenever a
+Mac lane exists. The placement walks jobs in descending hosted median and
+gives each one the lane whose projected finish is earliest, so a job a Mac
+lane can run compares a loaded Mac lane against the emptiest hosted lane.
+Under the old order that lane was still empty, because the four Node
+`test` shards had not been placed yet. Three such jobs took one hosted
+lane each, and the Node shards, which have no Mac lane to go to, were
+chained behind them. Placing the forced jobs first puts their load into
+the projection an eligible job reads. With no Mac lane configured every
+job is hosted and the descending order is already the LPT partition, so
+`macosLanes()` returns what it did.
+
+Run 39084043803 measured the cost of the old order.
+`test262 (macos-aarch64, 8/12)`, `native support (macos-aarch64, 7/12)`,
+and `native support (macos-aarch64, 8/12)` held one hosted lane each at
+30.80, 29.33, and 33.33 minutes, against an 8.30-minute mean over the 30
+jobs that ran on Mac lanes, and `test (macos-latest, node, 3/4)` chained
+behind the slowest of them ended the run at 60.43.
+
+Under the same cost function, the derived maximum lane end across eleven
+lanes falls from 49.10 minutes to 43.53 with both changes. Changing only
+the order gives 44.24; refreshing only the medians gives 50.72, because
+two refreshed entries set a hosted lane's ceiling in either order. These
+are model results and not a measured change in workflow duration.
+
+Ten hosted medians were refreshed from 22 run attempts. Seven entries
+carry eighteen or twenty-two observations. The other three carry three
+each, because earlier runs measured different macOS shard partitions.
+
+Three limits apply. The three-observation medians remain uncertain: U39
+measured a derived property weight moving by up to 3.34 times between runs
+two hours apart. The new order also assigns five Mac-eligible jobs to
+hosted lane slack, among them the three `reflect cases` shards, whose
+hosted entries are U38 estimates with no CI observation; the next run is
+intended to supply timings that check them. And the derived 43.53 minutes
+is not a wall-clock prediction. It carries no hosted runner allocation,
+which cost lane five 4.98 minutes in run 39084043803, and no duration
+spread, which ran from 372 to 1,533 seconds across observations of the
+four Node `test` shards.
