@@ -218,3 +218,46 @@ the reservation lets no other job follow them. A hosted lane end and a Mac
 lane end come from different cost models, so these figures do not establish
 how much further partitioning could lower the maximum, or whether a lower
 maximum needs less macOS work or another Mac.
+
+
+What the refreshed placement measured
+-------------------------------------
+
+Branch run 39149674951 at `6c4e21cb` passed in 50.60 minutes, the shortest
+of the twelve runs since `b59ac914` and 3.40 below the 54.00-minute main
+run. All six Mac lanes finished before their modeled end, at 43.00, 44.60,
+45.70, 47.32, 46.20, and 46.72 minutes against 48.09, 49.10, 46.12, 48.78,
+48.39, and 47.17, with actual finishes spanning 4.32 minutes and at most
+0.30 minutes of idle between a lane's jobs. Hosted lanes ended at 37.63,
+46.80, 42.82, 43.82, and 50.22 against 41.30, 36.32, 42.50, 39.90, and
+45.65.
+
+Hosted lane five bound the run, and again with a Mac-eligible job the
+placement had sent there: `native (macos-aarch64, 2/3)`, the job this
+refresh moved onto that lane, ran 19.37 minutes against its 15.07-minute
+entry, 1.29 times it, after which the `native` aggregate ran 0.35 minutes.
+It is the fourth run in a row ended that way, and the four jobs were
+`native support (macos-aarch64, 11/12)` at 1.37 times its entry,
+`native support (macos-aarch64, 9/12)` at 1.13,
+`native support (macos-aarch64, 12/12)` at 1.34, and this one at 1.29. All
+four entries had been tested in the window, so the placement charged each
+unmultiplied. These four show that an entry tested since `b59ac914` can
+still underestimate a later duration, and that the distinction the allowance
+draws, `measuredHostedJobs` membership, does not account for variation among
+tested entries. Each of the four entries rested on one or two observations,
+but four comparisons do not establish whether observation count predicts an
+overrun.
+
+Hosted lane five also waited 2.23 minutes to start and 1.42 and 2.18 between
+its jobs, 5.83 in all, out of 17.7 job-minutes of hosted macOS allocation
+waiting in the run. Its work alone came to 44.39 minutes.
+
+That leaves the unsharded `test (ubuntu-latest, node)` close behind, at
+48.83 minutes, 1.77 short of the run's end. Its durations over the twelve
+runs fall into two groups: 24.72, 26.75, 34.85, 35.30, 35.90, and 36.17
+minutes in six runs, and 48.18, 48.60, 48.63, 48.67, 48.80, and 49.30 in the
+other six, with no observed duration between 36.17 and 48.18. The longer
+durations are roughly 13 minutes above the four near 35 to 36 and 22 to 25
+above the two shortest. What accounts for the difference is not established.
+At the longer durations this job can decide a run that the macOS lanes
+finish near 48, depending on its start time and the jobs that follow it.

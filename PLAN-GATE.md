@@ -3200,3 +3200,30 @@ sanitizer lanes below that average because the reservation lets no other job
 follow them; a hosted lane end and a Mac lane end come from different cost
 models, so the figures do not establish how much further partitioning could
 lower the maximum. *docs/evidence/u43/README.md* records the per-lane figures.
+
+#### What the refreshed placement measured
+
+Branch run 39149674951 at `6c4e21cb` passed in 50.60 minutes, the shortest of
+the twelve runs since `b59ac914` and 3.40 below the 54.00-minute main run. All
+six Mac lanes finished before their modeled end, with actual finishes spanning
+4.32 minutes and at most 0.30 minutes of idle between a lane's jobs. Hosted
+lane five bound the run, and again with a Mac-eligible job the placement had
+sent there: `native (macos-aarch64, 2/3)`, the job this refresh moved onto that
+lane, ran 19.37 minutes against its 15.07-minute entry, 1.29 times it. It is
+the fourth run in a row ended that way, at 1.37, 1.13, 1.34, and 1.29 times
+the entry, by four different jobs. All four entries had been tested in the
+window, so the placement charged each unmultiplied; an entry tested since
+`b59ac914` can still underestimate a later duration, and `measuredHostedJobs`
+membership does not account for variation among tested entries. Each of the
+four rested on one or two observations, but four comparisons do not establish
+whether observation count predicts an overrun.
+
+The unsharded `test (ubuntu-latest, node)` finished at 48.83 minutes, 1.77
+short of the run's end. Its durations over the twelve runs fall into two
+groups: 24.72, 26.75, 34.85, 35.30, 35.90, and 36.17 minutes in six runs and
+48.18, 48.60, 48.63, 48.67, 48.80, and 49.30 in the other six, with no
+observed duration between 36.17 and 48.18. The longer durations are roughly 13
+minutes above the four near 35 to 36 and 22 to 25 above the two shortest, and
+at those durations the job can decide a run that the macOS lanes finish near
+48. What accounts for the difference is the next thing to measure.
+*docs/evidence/u43/README.md* records the per-lane figures.
