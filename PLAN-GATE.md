@@ -3084,24 +3084,47 @@ measurements sit beside it:
 The six self-hosted Mac lanes carried 248.91 job-minutes, a 41.49-minute
 bound, and their jobs finished by 46.70.
 
-The run finished 12.31 minutes above the hosted macOS bound. Three
-`macos-aarch64` jobs ran on hosted `macos-15` runners because the readiness
-probe found no free Mac lane, and took 29.33, 30.80, and 33.33 minutes
-against an 8.30-minute mean over the 30 jobs that ran on Mac lanes.
-`test (macos-latest, node, 3/4)` was chained behind the slowest of them, so
-it started at 38.43 and ended at 60.43, while the lane holding
-`host C sanitizers (macOS, native)` stood idle from 38.42. Each of the four
-most recent main runs had exactly three such fallbacks, summing 82.8, 72.1,
-77.1, and 93.5 minutes. Five hosted macOS lanes less the two sanitizer jobs
-that start with the run leaves three, which would explain that repeated
-count if those lanes stayed occupied for as long as the probe admits
-fallbacks. Four matching runs do not establish that explanation.
+The run finished 12.31 minutes above the hosted macOS bound.
+*tools/generate-macos-lanes.ts* assigns three `macos-aarch64` jobs to
+hosted lanes outright rather than through the readiness probe:
+`test262 (macos-aarch64, 8/12)`, `native support (macos-aarch64, 7/12)`,
+and `native support (macos-aarch64, 8/12)` carry a literal
+`runs-on: macos-15` and no `mac_ready` dependency. They took 30.80, 29.33,
+and 33.33 minutes against an 8.30-minute mean over the 30 jobs that ran on
+Mac lanes. `macosLanes` places each job on the lane whose derived end is
+earliest, and the hosted lanes hold only the two sanitizer jobs before
+these three, so this is a modeled trade in the generated file rather than
+a runtime decision, and it repeats in every run.
+
+Each hosted lane chains one `test (macos-latest, ...)` job behind its
+first. The generator models the five lanes ending between 42.40 and 49.10
+minutes; they measured 38.20 to 60.43. Lane five determined the run's
+completion. `native support (macos-aarch64, 8/12)` took 33.33 minutes
+against a modeled 24.98 and `test (macos-latest, node, 3/4)` took 22.00
+against 18.70, which is 11.65 minutes over the 43.68 modeled for the pair.
+The lane's first job also started 4.98 minutes into the run, where the
+other four started within ten seconds, and 0.11 minutes passed between its
+two jobs. Those three terms reach 60.42 against the 60.43 measured.
+`macosFixedSetupSeconds` covers modeled execution and not runner
+allocation, so the 4.98 minutes sit outside the model rather than inside
+its error.
 
 The sentence above naming
 *tests/property/m5-globalthis-binding.property.test.ts* as the next unit
 should be replaced. Case-sharding that file remains the candidate for
 lowering the Linux maximum, but the Linux file shards did not determine
 this run's completion, and lowering their maximum alone would not have
-shortened it. The next unit should examine the hosted macOS chain instead:
-the fallback latency that enters the critical path, and the order in which
-the generated lanes stack their jobs.
+shortened it.
+
+The next unit should examine the hosted macOS lanes instead. Their 240.59
+job-minutes give a 48.12-minute lower bound over five lanes, and a
+longest-processing-time packing of the same measured walls completes at
+51.33 against the 60.43 observed, ignoring runner allocation and assuming
+any `test` job may follow any other job. Moving the three `macos-aarch64`
+jobs to Mac lanes would leave 147.13 job-minutes hosted, bounded by the
+41.68-minute `host C sanitizers (macOS, property)` job rather than by the
+29.43-minute five-lane mean, and would add 24.90 minutes to the Mac lanes
+at the observed 8.30-minute mean, a 45.64-minute bound over six lanes.
+Both sit under the 48.18 minutes the Linux shards measured, which is a
+reason to measure that arrangement and not evidence that either pool would
+finish there.
