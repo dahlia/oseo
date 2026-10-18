@@ -236,3 +236,42 @@ mix, machine speed, and contention between the two lanes that share a Mac
 mini. The next unit starts from this run's 30 durations and lane
 assignments, which support a cost refresh but do not establish how a job
 would perform on a different lane.
+
+
+What the merged run measured
+----------------------------
+
+Main run 39112383050 at `2b3eb0af` is green and took 58.67 minutes,
+against 60.43 for the previous main run.
+
+Every hosted lane's first job started within 0.18 minutes of the run, and
+no gap between consecutive jobs in a lane exceeded 0.15 minutes. The
+branch run's 12.87-minute initial wait did not recur. Hosted durations
+against table value were 0.82, 0.95, 0.96, 0.98, 1.04, 1.04, 1.11, 1.14,
+1.27, and 1.44.
+
+The Mac lanes bound the run again with the same shape, carrying 294.90
+job-minutes over 30 jobs with at most 0.20 minutes of idle each:
+
+| lane         | work  | end   |
+| ------------ | ----- | ----- |
+| `oseo-mac-3` | 57.67 | 58.25 |
+| `oseo-mac-4` | 54.95 | 55.53 |
+| `oseo-mac-6` | 50.78 | 51.35 |
+| `oseo-mac-5` | 50.72 | 51.27 |
+| `oseo-mac-2` | 46.77 | 47.35 |
+| `oseo-mac-1` | 34.02 | 34.60 |
+
+Equal division gives 49.15 minutes per lane. The longest Linux file shard
+measured 46.27 minutes, 1.31 below the second branch run.
+
+The 1.44 ratio is `host C sanitizers (macOS, property)`, and its spread
+is the one hosted figure that now matters. Its last four observations are
+2,501, 2,641, 1,700, and 3,146 seconds, a factor of 1.85 between the
+smallest and the largest, against a 2,179-second median over 22
+observations. At 3,146 seconds it took 52.43 minutes and finished 52.62
+minutes into the run, the latest hosted finish. With that finish
+unchanged, balancing the Mac lanes alone could not have brought the run
+below 52.62. Under the current cost model the family stays hosted: it
+converts at 2.9, against the 3.2 and 4.2 of the families it would
+displace. Splitting the job is one option to measure.

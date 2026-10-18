@@ -3242,3 +3242,19 @@ mini, and the entries predate the six-lane configuration. This run
 measured a wall for each of the 30 jobs on the lane that ran it, which
 supports a cost refresh but does not establish how a job would perform on
 a different lane.
+
+#### What the merged run measured
+
+Main run 39112383050 at `2b3eb0af` is green and took 58.67 minutes,
+against 60.43 for the previous main run. Allocation was not a factor this
+time: every hosted lane's first job started within 0.18 minutes of the
+run, so the 12.87-minute wait the branch run measured was transient. The
+Mac lanes bound the run again in the same shape, `oseo-mac-3` ending at
+58.25 against `oseo-mac-1` at 34.60, with equal division at 49.15 and the
+longest Linux file shard at 46.27.
+
+`host C sanitizers (macOS, property)` finished at 52.62 minutes, the
+latest hosted finish. With that finish unchanged, balancing the Mac lanes
+alone could not have brought the run below it. See
+*docs/evidence/u40/README.md* for its duration history and the placement
+constraint that keeps the family hosted.
