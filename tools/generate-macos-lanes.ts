@@ -7,8 +7,10 @@ import { isNumber, isString } from "./value-kinds.ts";
 import { configuredSelfHostedLanes } from "./macos-lane-config.ts";
 import {
   hostedFallbackTimeScale,
+  hostedUnmeasuredAllowance,
   macosJobCosts,
   macosFixedSetupSeconds,
+  measuredHostedJobs,
   selfHostedFamilySpeedRatios,
   selfHostedJobSeconds,
   selfHostedPairSlowdowns,
@@ -356,6 +358,12 @@ export function macosLanes(
       throw new Error(`Stale self-hosted measurement: ${name}`);
     }
   }
+  for (const name of measuredHostedJobs) {
+    const job = all.find((candidate) => candidate.name === name);
+    if (job == null || !selfHostedEligible(job)) {
+      throw new Error(`Stale hosted observation: ${name}`);
+    }
+  }
   // Without a Mac lane every job is hosted, and the descending order below
   // is the LPT partition. With one, a job a Mac lane can take has an
   // alternative that a hosted-only job does not, so the hosted-only jobs
@@ -420,7 +428,19 @@ export function macosLanes(
       let projected: number;
       let candidateMacEnds = macEnds;
       if (candidate < hostedLaneCount) {
-        projected = loads[candidate]! + modeledJobSeconds(job, false);
+        // A Mac-eligible job whose hosted entry no run since
+        // `b59ac914` has tested costs more when the entry is low than
+        // when it is high, and the placement, choosing the smallest
+        // projection, may select the entries that understate. Charging
+        // `hostedUnmeasuredAllowance` here and not in `macosLaneEnds`
+        // prices that in the decision while leaving every reported cost
+        // unadjusted; see PLAN-GATE.md (U43).
+        const unmeasured =
+          selfHostedEligible(job) && !measuredHostedJobs.includes(job.name);
+        projected =
+          loads[candidate]! +
+          modeledJobSeconds(job, false) *
+            (unmeasured ? hostedUnmeasuredAllowance : 1);
       } else {
         const mac = lanes
           .slice(hostedLaneCount)

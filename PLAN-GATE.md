@@ -3096,3 +3096,47 @@ go below 50.47.
 *docs/evidence/u42/README.md* records the measurements, the refit, why a
 joint fit of work and slowdown was rejected, and why the retained hosted
 entries were not raised to their conversions.
+
+### Untested hosted entries (U43)
+
+Main run 39139466097 followed the U42 merge. Branch run 39132976769 at
+`c56e1bc7` had passed in 57.27 minutes against 58.67 for the previous main
+run, with the Mac lane maximum down from 58.25 to 51.08 minutes, the spread
+between the earliest and latest Mac lane end down from 23.65 to 4.72, and
+the binding Mac lane 0.61 minutes from its derived 50.47. A hosted lane
+determined the run anyway: `native support (macos-aarch64, 11/12)` ran
+29.88 minutes against a 21.88-minute model and its lane ended at 56.92.
+
+That was the third consecutive run ended by a Mac-eligible job the
+placement had just sent to a hosted lane against an entry no run since
+`b59ac914` had tested. The three ran 1.50, 1.33, and 1.37 times their
+entries, and a fourth untested entry in the same run as the third ran 1.24,
+while the one tested entry hosted beside it ran 1.04.
+
+The U42 record rejected a correction here on the five pre-repartition
+entries the window had observed, whose ratios had a median of 0.99. That
+sample cannot test the question: once the window observes a job, U41 or U42
+set its entry to the median of those same walls. The non-circular sample is
+a job's first observation in the window against an entry that predates it.
+Eight exist, at 0.81, 0.93, 0.99, 1.07, 1.24, 1.33, 1.37, and 1.50 times
+the entry, a mean of 1.16. Those entries are not biased low as a group. The
+four largest are the four the placement had just chosen to host, which is
+what minimizing a projected finish over uncertain estimates selects.
+
+U43 refreshes the three entries run 39132976769 observed, bringing the
+jobs with a tested entry to 16 of 33 in `measuredHostedJobs`, and charges
+`hostedUnmeasuredAllowance` of 1.5, the largest of those eight ratios, on the
+rest when the placement projects a hosted finish. At the tabulated costs the
+allowance raises the modeled maximum from 49.95 to 50.78 minutes. Without it
+the placement hosts `test262 (macos-aarch64, 9/12)` against an untested
+1,456-second entry on a lane modeled at 42.62 minutes; charging that job 1.50
+times its entry adds 12.13 minutes and raises the maximum to 54.75. With it the
+placement hosts the tested `native support (macos-aarch64, 9/12)` and the
+maximum stays 50.78 under the same assumption. Every factor tested between 1.2
+and 1.8, namely 1.2, 1.4, 1.5, and 1.8, gives the same partition. The allowance
+applies to the projection only, so `macosLaneEnds` still sums unadjusted
+entries and the derived maximum stays a model output over per-job medians.
+*docs/evidence/u43/README.md* records the measurements and what this does not
+address: the account's GitHub Pro ceiling of 40 concurrent jobs and 5
+concurrent macOS jobs shared across every repository it owns, and a Linux
+job that finished 52.92 minutes after its run began.

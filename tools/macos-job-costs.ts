@@ -89,6 +89,7 @@ export const macosJobCosts: MacosJobCosts = {
   "native support (macos-aarch64, 2/12)": 1924, // 2
   "test262 (macos-aarch64, 3/12)": 1906, // 1
   "native support (macos-aarch64, 10/12)": 1900, // 1 hosted since b59ac914
+  "native support (macos-aarch64, 11/12)": 1793, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 5/12)": 1665, // 7
   "test262 (macos-aarch64, 10/12)": 1644, // 1
   "native support (macos-aarch64, 4/12)": 1630, // 3
@@ -98,13 +99,12 @@ export const macosJobCosts: MacosJobCosts = {
   "test262 (macos-aarch64, 8/12)": 1543, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
-  "native support (macos-aarch64, 9/12)": 1421, // 1 hosted since b59ac914
-  "native support (macos-aarch64, 11/12)": 1313, // retained
+  "native support (macos-aarch64, 9/12)": 1448, // 2 hosted since b59ac914
   "test (macos-latest, node, 3/4)": 1311, // 18
   "native support (macos-aarch64, 3/12)": 1264, // 2 hosted since b59ac914
+  "native (macos-aarch64, 3/3)": 1254, // 1 hosted since b59ac914
   "native (macos-aarch64, 1/3)": 1236, // 3 hosted since b59ac914
   "native support (macos-aarch64, 12/12)": 1044, // 1 hosted since b59ac914
-  "native (macos-aarch64, 3/3)": 1014, // retained
   "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
   "test (macos-latest, node, 1/4)": 971, // 18
@@ -117,6 +117,62 @@ export const macosJobCosts: MacosJobCosts = {
   "reflect cases (macos-aarch64, 3/3)": 640, // 3 hosted since b59ac914
   "test (macos-latest, deno)": 105, // 22
 };
+
+/**
+ * The Mac-lane eligible jobs whose `macosJobCosts` entry rests on a hosted
+ * observation from a run since `b59ac914`, the repartition that last
+ * changed macOS shard contents. A job absent from this list has an entry
+ * of an older vintage, or none of its own, so its hosted cost is an
+ * estimate the current tree has never tested.
+ *
+ * The distinction exists because the placement minimizes a projected lane
+ * finish, so among uncertain hosted costs it may select the estimates that
+ * come out smallest; `hostedUnmeasuredAllowance` prices that possibility.
+ * Listing the tested jobs rather than the untested ones makes a newly
+ * added shard default to untested.
+ */
+export const measuredHostedJobs: readonly string[] = [
+  "native (macos-aarch64, 1/3)",
+  "native (macos-aarch64, 2/3)",
+  "native (macos-aarch64, 3/3)",
+  "native support (macos-aarch64, 10/12)",
+  "native support (macos-aarch64, 11/12)",
+  "native support (macos-aarch64, 12/12)",
+  "native support (macos-aarch64, 3/12)",
+  "native support (macos-aarch64, 5/12)",
+  "native support (macos-aarch64, 7/12)",
+  "native support (macos-aarch64, 8/12)",
+  "native support (macos-aarch64, 9/12)",
+  "reflect cases (macos-aarch64, 1/3)",
+  "reflect cases (macos-aarch64, 2/3)",
+  "reflect cases (macos-aarch64, 3/3)",
+  "test262 (macos-aarch64, 1/12)",
+  "test262 (macos-aarch64, 8/12)",
+];
+
+/**
+ * Factor the placement applies to the hosted cost of a Mac-lane eligible
+ * job outside `measuredHostedJobs` when it projects a finish on a hosted
+ * lane. It is a scenario multiplier, not an expected wall and not a bound
+ * on a future one, and it reaches no reported cost: `macosLaneEnds` still
+ * sums unadjusted entries.
+ *
+ * Nine runs since `b59ac914` observed eight such jobs hosted for the
+ * first time, against entries that predate the window. Their walls were
+ * 0.81, 0.93, 0.99, 1.07, 1.24, 1.33, 1.37, and 1.50 times the entry, a
+ * mean of 1.16 with five of the eight above 1. That sample is too small
+ * and too selected to establish whether these entries systematically
+ * understate; what it shows is that the four largest ratios belong to the
+ * four jobs the placement had just chosen to host.
+ *
+ * The value is the largest of those ratios, because the two errors cost
+ * differently. An entry that understates puts the job at the end of a
+ * hosted chain, and in three consecutive runs such a job ran 8 to 11
+ * minutes past its projection. Charging too much instead moves the job to
+ * one Mac lane, or leaves the hosted slot to a tested job; here it raises
+ * the derived maximum by 0.83 minutes. See *docs/evidence/u43/README.md*.
+ */
+export const hostedUnmeasuredAllowance = 1.5;
 
 /**
  * Estimated one-lane Mac seconds for every current Mac-lane job, rounded
