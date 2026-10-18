@@ -365,13 +365,14 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   }
   // Hosted medians of several vintages; U40 refreshed ten entries from
   // twenty-two attempts, then four more from the first run of its
-  // placement, and U41 refreshed every macos-aarch64 entry observed
-  // hosted since b59ac914. See PLAN-GATE.md (U33, U40, U41).
+  // placement, U41 refreshed every macos-aarch64 entry observed hosted
+  // since b59ac914, and U42 refreshed the three its own runs added. See
+  // PLAN-GATE.md (U33, U40, U41, U42).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    11654,
+    11691,
   );
 });
 
@@ -1002,7 +1003,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 8326);
+  assert.equal(Math.round(modeled), 7905);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1035,7 +1036,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
   // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
   // lanes what they measured rather than what stale entries claimed.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2890);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 3028);
 });
 
 test("no job follows a macOS sanitizer job on a hosted lane", () => {
@@ -1046,9 +1047,9 @@ test("no job follows a macOS sanitizer job on a hosted lane", () => {
   for (const lane of macosLanes(configuredSelfHostedLanes).slice(0, 5)) {
     const index = lane.findIndex((job) => job.family === "host C sanitizers");
     if (index === -1) continue;
-    // Their walls spread by a factor of two over 25 observations each, so
-    // a lane that follows one ends past the makespan whenever it runs
-    // long; see PLAN-GATE.md (U41).
+    // The property job's wall spread by a factor of two over 27
+    // observations, so a lane that follows it ends past the makespan
+    // whenever it runs long; see PLAN-GATE.md (U41, U42).
     assert.equal(lane.length, 1, lane.map((job) => job.name).join(" | "));
   }
   // With no Mac lane the five hosted lanes must hold all 33 jobs, so the

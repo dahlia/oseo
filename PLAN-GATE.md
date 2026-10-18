@@ -3044,3 +3044,55 @@ the measured one-lane Mac seconds was rejected as an estimator, and a
 scenario that charges all 21 that conversion and leaves the modeled
 maximum at 48.17 minutes. Two jobs the placement assigns hosted still
 lack hosted observations in that window.
+
+### Mac lane contention refresh (U42)
+
+Branch run 39126360392 at `733dffa2` passed in 66.25 minutes, 7.58
+minutes longer than the last main run. Hosted lane four was the last
+lane to finish, 65.82 minutes after the run began, holding 49.89 minutes
+of work and 15.93 of waiting, including a 15.20-minute allocation wait
+before `test (macos-latest, deno)` and 31.67 minutes for
+`native support (macos-aarch64, 10/12)` against a 1,432-second entry. That wait
+is the largest hosted macOS allocation wait in the eight runs since `b59ac914`.
+Across their 90 hosted macOS jobs the wait has a median of 0.15 minutes and a
+p90 of 5.22, and the per-run sum ranges from 2.4 to 37.7; this run is the 37.7
+and the 58.67-minute main run it is measured against is the 2.4.
+
+On the Mac side the heaviest lane, `oseo-mac-6`, ended at 57.98 against a
+derived 48.17. Its six jobs deconvolve to 50.55 minutes of one-lane work
+against the 41.03 their entries sum to, and by machine the run's 248.9
+deconvolved minutes split 76.5, 81.7, and 90.7.
+
+Two comparisons support revising `selfHostedPairSlowdowns` while holding
+`selfHostedJobSeconds` fixed. The 12 observations whose partner lane was
+idle for over three quarters of the wall measured 0.81 to 1.06 of their
+entry, median 0.94; among those whose partner lane was busy for over nine
+tenths of the wall, the per-run median ratio of wall to entry ran 1.12,
+1.11, 1.13, 1.23, 1.33, 1.34, 1.30, and 1.31 in chronological order. The lane
+model's error flips sign with packing density in the same way: it
+over-predicts the first three runs by 2.32 to 3.50 minutes per lane and
+under-predicts the last four by 3.23 to 4.19.
+
+U42 refits the eight pairings with at least 0.78 hours of contended time
+from the 238 Mac-lane observations, holding the one-lane table fixed, and
+then recomputes every one-lane entry under the new factors. All eight
+rise, the four with the most evidence being the pairings a balanced Mac
+placement creates in quantity: `native support` beside `native support`
+1.13 to 1.20, `test262` beside `test262` 1.26 to 1.37, `native support`
+beside `test262` 1.37 to 1.39, and `test262` beside `native support` 1.08
+to 1.23. The one-lane table moves a median 0.97 of its U41 values. Mean
+absolute lane error against measured work spans falls from 3.09 to 2.76
+minutes and the bias from 0.84 low to 0.25 high, with the gain
+concentrated in the five most recent runs.
+
+The same 33 jobs have a higher modeled cost under the refreshed tables,
+and the derived maximum rises from 48.17 to 50.47 minutes. The refreshed
+numbers also size the Mac side: the jobs carry 242.62 minutes of one-lane
+work, and applying the 1.31 contended ratio run 39126360392 measured as a
+uniform factor over six lanes gives an illustrative 53.0 minutes, against
+48.1 once the placement moves 22.37 minutes of it to hosted lanes. These
+estimates do not establish whether another placement of this work could
+go below 50.47.
+*docs/evidence/u42/README.md* records the measurements, the refit, why a
+joint fit of work and slowdown was rejected, and why the retained hosted
+entries were not raised to their conversions.
