@@ -399,6 +399,23 @@ export function macosLanes(
         candidate !== hostedLaneCount
       )
         continue;
+      // A lane that follows a macOS sanitizer job inherits that job's
+      // spread. The two measured 1,559 to 3,146 and 2,144 to 2,765
+      // seconds over 25 observations each. Reserving a lane for each
+      // raises the derived maximum from 48.23 to 48.29 minutes at median
+      // cost, and substituting the property job's measured p90 leaves it
+      // at 48.29 instead of raising it to 56.27; see PLAN-GATE.md (U41).
+      // With no Mac lane the hosted lanes must hold every job and cannot
+      // reserve two, so the pure-hosted partition is unchanged.
+      if (
+        selfHostedCount > 0 &&
+        candidate < hostedLaneCount &&
+        lanes[candidate]!.some(
+          (placed) => placed.family === "host C sanitizers",
+        )
+      ) {
+        continue;
+      }
       let projected: number;
       let candidateMacEnds = macEnds;
       if (candidate < hostedLaneCount) {

@@ -119,45 +119,66 @@ export const macosJobCosts: MacosJobCosts = {
 };
 
 /**
- * Measured median `oseo-mac-1` walls, rounded to whole seconds, for every
- * job that has run on that runner. The observations come from the
- * Mac-lane attempts of the seven runs above that did not run the job
- * hosted; the trailing comment gives their count:
+ * Estimated one-lane Mac seconds for every current Mac-lane job, rounded
+ * to whole seconds. The generator models such a job by this value instead
+ * of converting its hosted weight, because the derived ratio between the
+ * two varies inside a single family: from 2.25 to 5.43 across the twelve
+ * `native support` shards and 2.77 to 5.09 across the twelve test262
+ * shards.
  *
- *  -  5: both attempts of 37194069657, 37206614757, and both attempts of
- *     37215661294;
- *  -  3: both attempts of 37194069657 and 37206614757;
- *  -  2: both attempts of 37215661294.
+ * Each entry is the median of three to six observations from the six runs
+ * since `b59ac914`, the runs whose macOS shard contents match the tree.
+ * Each observation is normalized by removing the modeled pair slowdown of
+ * whatever ran on the other lane of the same machine, which inverts what
+ * `selfHostedLaneEnds` computes. The value therefore states one-lane work,
+ * and the generator applies `selfHostedPairSlowdowns` on top of it during
+ * placement.
  *
- * The generator models such a job on the Mac lane by this value instead
- * of converting its hosted weight, because one family ratio could not fit
- * jobs whose derived ratios against the earlier weights ranged from 2.7 to
- * 6.4. A job's Mac walls ranged by a derived 3 to 84 seconds across its
- * observations; hosted walls of all 34 jobs ranged by 6 to 1,004 seconds.
+ * The trailing comment gives the observation count; a count below six
+ * means the placement sent the job to a hosted lane in some of those runs.
+ * Changes to shard contents or hardware require revalidating the affected
+ * estimates. U41 replaced the whole table and
+ * *docs/evidence/u41/README.md* records what the 18 entries before it were
+ * measuring and how far off they were.
  */
 interface SelfHostedJobSeconds {
   readonly [name: string]: number;
 }
 
 export const selfHostedJobSeconds: SelfHostedJobSeconds = {
-  "native support (macos-aarch64, 1/12)": 752, // 5
-  "native support (macos-aarch64, 2/12)": 488, // 5
-  "native support (macos-aarch64, 4/12)": 449, // 5
-  "own-key cases (macos-aarch64, 3/3)": 442, // 5
-  "reflect cases (macos-aarch64, 3/3)": 180, // 1
-  "reflect cases (macos-aarch64, 1/3)": 180, // 2
-  "reflect cases (macos-aarch64, 2/3)": 179, // 2
-  "own-key cases (macos-aarch64, 1/3)": 433, // 5
-  "native support (macos-aarch64, 10/12)": 375, // 5
-  "own-key cases (macos-aarch64, 2/3)": 374, // 5
-  "test262 (macos-aarch64, 8/12)": 366, // 5
-  "native (macos-aarch64, 3/3)": 363, // 2
-  "native support (macos-aarch64, 6/12)": 354, // 2
-  "test262 (macos-aarch64, 1/12)": 345, // 3
-  "test262 (macos-aarch64, 2/12)": 336, // 3
-  "test262 (macos-aarch64, 11/12)": 329, // 3
-  "native support (macos-aarch64, 8/12)": 324, // 2
-  "native support (macos-aarch64, 12/12)": 295, // 2
+  "native support (macos-aarch64, 1/12)": 897, // 6
+  "native support (macos-aarch64, 2/12)": 707, // 6
+  "native support (macos-aarch64, 8/12)": 612, // 3
+  "native support (macos-aarch64, 5/12)": 546, // 5
+  "test262 (macos-aarch64, 12/12)": 544, // 6
+  "native support (macos-aarch64, 11/12)": 536, // 6
+  "test262 (macos-aarch64, 2/12)": 535, // 6
+  "native support (macos-aarch64, 10/12)": 528, // 6
+  "native support (macos-aarch64, 7/12)": 512, // 3
+  "native support (macos-aarch64, 12/12)": 510, // 6
+  "test262 (macos-aarch64, 1/12)": 503, // 6
+  "test262 (macos-aarch64, 11/12)": 503, // 6
+  "native support (macos-aarch64, 3/12)": 492, // 4
+  "native support (macos-aarch64, 6/12)": 489, // 6
+  "test262 (macos-aarch64, 9/12)": 484, // 6
+  "test262 (macos-aarch64, 7/12)": 481, // 6
+  "test262 (macos-aarch64, 4/12)": 465, // 6
+  "test262 (macos-aarch64, 5/12)": 465, // 6
+  "test262 (macos-aarch64, 10/12)": 439, // 6
+  "native support (macos-aarch64, 9/12)": 433, // 6
+  "test262 (macos-aarch64, 3/12)": 423, // 6
+  "native (macos-aarch64, 3/3)": 421, // 6
+  "test262 (macos-aarch64, 8/12)": 409, // 3
+  "test262 (macos-aarch64, 6/12)": 406, // 6
+  "native (macos-aarch64, 2/3)": 369, // 6
+  "native support (macos-aarch64, 4/12)": 349, // 6
+  "native (macos-aarch64, 1/3)": 306, // 3
+  "reflect cases (macos-aarch64, 3/3)": 298, // 3
+  "reflect cases (macos-aarch64, 2/3)": 296, // 5
+  "reflect cases (macos-aarch64, 1/3)": 287, // 5
+  "own-key cases (macos-aarch64, 1/3)": 242, // 6
+  "own-key cases (macos-aarch64, 3/3)": 232, // 6
+  "own-key cases (macos-aarch64, 2/3)": 203, // 6
 };
 
 /**
@@ -166,24 +187,27 @@ export const selfHostedJobSeconds: SelfHostedJobSeconds = {
  * `macosFixedSetupSeconds + (cost - setup) / ratio`.
  *
  * Each value is the derived pooled ratio `sum(hosted median - setup) /
- * sum(Mac wall - setup)` over every Mac observation of the jobs in
- * `selfHostedJobSeconds`, rounded down to one decimal: 4.24 for test262
- * over 14 observations, 3.20 for native support over 26, 3.15 for native
- * fixtures over 2, and 2.34 for own-key cases over 15. Native fixtures use
- * 3.1 from one job's two attempts; the earlier derived U21 value was 2.2.
- * Own-key cases always have a measured Mac median, so their ratio only
- * guards a future job without one.
+ * sum(one-lane Mac seconds - setup)` over the entries of
+ * `selfHostedJobSeconds`, rounded down to one decimal. U41 rederived all
+ * five from its refreshed table: 4.05 for test262 over 12 jobs, 3.16 for
+ * native support over 12, 3.13 for native fixtures over 3, 2.94 for the
+ * Reflect namespace shards over 3, and 4.98 for own-key cases over 3. The
+ * values before it were 4.2, 3.2, 3.1, 2.3, and 2.3.
  *
- * Reflect namespace case shards borrow the own-key ratio. All three have a
- * measured Mac wall, so the value only guards a future fourth shard, and
- * U38 derived their hosted estimates from this same ratio, which makes it
- * a borrowed measurement rather than independent evidence for them.
+ * The Reflect namespace shards had borrowed the own-key ratio, and U38
+ * used that same borrowed ratio to derive their hosted estimates, which
+ * U40 then replaced with hosted observations. Their 2.9 is no longer
+ * borrowed from either side.
+ *
+ * Every Mac-eligible job has an entry in `selfHostedJobSeconds`, so these
+ * ratios reach no job the generator places today. They guard a future
+ * shard or family that arrives without a Mac observation.
  *
  * The host C sanitizer family is not Mac-lane eligible, so its ratio
  * reaches no schedule. It records a measurement anyway. U37 ran both
  * macOS suites on the first Mac mini over SSH and measured a derived
  * 2.725 for the native suite over three solo walls and 3.198 for the
- * property suite over two, pooling to 2.9. That is below the 3.2 and 4.2
+ * property suite over two, pooling to 2.9. That is below the 3.1 and 4.0
  * of the native support and test262 work a Mac lane would have to evict
  * to fit them, and the same unit measured their pair factor at a worst
  * 1.41, so the family loses the exchange in every variant; see
@@ -197,11 +221,11 @@ interface SelfHostedFamilySpeedRatios {
 }
 
 export const selfHostedFamilySpeedRatios: SelfHostedFamilySpeedRatios = {
-  "native support": 3.2,
-  "own-key cases": 2.3,
-  "reflect cases": 2.3,
+  "native support": 3.1,
+  "own-key cases": 4.9,
+  "reflect cases": 2.9,
   native: 3.1,
-  test262: 4.2,
+  test262: 4.0,
   "host C sanitizers": 2.9,
   test: 1,
 };

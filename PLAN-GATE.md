@@ -3258,3 +3258,54 @@ latest hosted finish. With that finish unchanged, balancing the Mac lanes
 alone could not have brought the run below it. See
 *docs/evidence/u40/README.md* for its duration history and the placement
 constraint that keeps the family hosted.
+
+### Mac lane cost refresh (U41)
+
+U40 left the six Mac lanes determining when a main run finishes, one of
+them running 57.67 minutes of work while another ran 34.02. This unit
+replaces the cost inputs behind that imbalance.
+*docs/evidence/u41/README.md* holds the observations and the limits.
+
+`selfHostedJobSeconds` now covers all 33 Mac-eligible jobs rather than 18.
+Each entry is the median of three to six observations from the six runs
+since `b59ac914`, normalized by removing the modeled pair slowdown of
+whatever ran on the other lane of the same machine, so the value states
+one-lane work and `selfHostedPairSlowdowns` applies on top of it during
+placement. Dividing each refreshed estimate by what the generator used
+before gives a median of 1.43 over the 18 jobs that had an entry, from
+0.52 to 1.89, and 1.00 over the 15 that were converted from a hosted
+median, from 0.76 to 1.23: the stale entries, not the conversion, were
+what the placement got wrong. The own-key shards show how. In shard order
+their entries read 433, 374, and 442 seconds against refreshed estimates
+of 242, 203, and 232, and one rule keeps all three on `oseo-mac-1`, so
+that lane was charged 1,249 seconds for an estimated 677 seconds of work.
+
+`selfHostedFamilySpeedRatios` is rederived from the refreshed table and
+rounded down as before: 4.0 for test262, 3.1 for native support, 3.1 for
+native fixtures, 2.9 for the Reflect namespace shards, and 4.9 for own-key
+cases, against 4.2, 3.2, 3.1, 2.3, and 2.3. The Reflect namespace value is
+no longer borrowed from own-key cases. Every Mac-eligible job has a table
+entry, so these ratios reach no job the generator places today.
+
+The placement also stops stacking work behind a macOS sanitizer job
+whenever a Mac lane exists. The refreshed Mac costs send more work hosted,
+and the first partition they produced put a Reflect namespace shard behind
+`host C sanitizers (macOS, property)`, whose 25 observations run from
+1,559 to 3,146 seconds. Reserving a hosted lane for each sanitizer raises
+the modeled maximum from 48.23 to 48.29 minutes at median cost;
+substituting that job's measured p90 leaves the maximum at 48.29 rather
+than raising it to 56.27. With no Mac lane the five hosted lanes must hold
+every job, so the reservation cannot apply and the pure-hosted LPT
+partition is unchanged.
+
+Under the refreshed costs the partition falls from 52.51 derived minutes
+to 48.29. Three limits apply. That 48.29 is not a wall-clock prediction:
+the old partition derives 52.51 against measured Mac lane ends of 58.25,
+55.53, 51.35, 51.27, 47.35, and 34.60 in run 39112383050, reproducing the
+`oseo-mac-1` and `oseo-mac-2` ends almost exactly and underpredicting the
+other four by 9 to 11 percent. The longest Linux file shard took 46.27 and
+47.58 minutes in the last two runs, within 2.02 minutes of the new modeled
+maximum, which does not establish the remaining wall-clock benefit but
+does bound where to look for it. And the median per-job ratio of largest
+observation to smallest is 1.46, so changes to shard contents or hardware
+require revalidating the affected estimates.

@@ -1001,7 +1001,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 6789);
+  assert.equal(Math.round(modeled), 8356);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1032,7 +1032,33 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   }
   // Placing them last gave three lanes one Mac-eligible job each, which
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2610);
+  // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
+  // lanes what they measured rather than what stale entries claimed.
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2898);
+});
+
+test("no job follows a macOS sanitizer job on a hosted lane", () => {
+  const sanitizers = macosJobs().filter(
+    (job) => job.family === "host C sanitizers",
+  );
+  assert.equal(sanitizers.length, 2);
+  for (const lane of macosLanes(configuredSelfHostedLanes).slice(0, 5)) {
+    const index = lane.findIndex((job) => job.family === "host C sanitizers");
+    if (index === -1) continue;
+    // Their walls spread by a factor of two over 25 observations each, so
+    // a lane that follows one ends past the makespan whenever it runs
+    // long; see PLAN-GATE.md (U41).
+    assert.equal(lane.length, 1, lane.map((job) => job.name).join(" | "));
+  }
+  // With no Mac lane the five hosted lanes must hold all 33 jobs, so the
+  // reservation cannot apply and the LPT partition is unchanged.
+  const alone = macosLanes().filter((lane) =>
+    lane.some((job) => job.family === "host C sanitizers"),
+  );
+  assert.ok(
+    alone.some((lane) => lane.length > 1),
+    alone.map((lane) => lane.length).join(" "),
+  );
 });
 
 test("faster native support work uses additional capacity", () => {
