@@ -3227,3 +3227,66 @@ minutes above the four near 35 to 36 and 22 to 25 above the two shortest, and
 at those durations the job can decide a run that the macOS lanes finish near
 48. What accounts for the difference is the next thing to measure.
 *docs/evidence/u43/README.md* records the per-lane figures.
+
+### Linux duration and the binding macOS side (U44)
+
+Main run 39154284680 merged U43 and passed in 63.50 minutes against 50.60
+for the branch run of the same tree. All six Mac lanes finished inside
+their modeled ends for the third consecutive run, at 43.47, 44.68, 44.65,
+47.17, 45.05, and 44.53 minutes against 48.09, 49.10, 46.12, 48.78, 48.39,
+and 47.17. Allocation waiting is where the extra time went: hosted lane
+five waited 14.90 of its 63.17 minutes for its first job to start and then
+ran 47.96 minutes of work with 0.30 of gaps, and `test (ubuntu-latest, node)`
+waited 8.62 of its 57.28. Holding every duration and the job order fixed and
+removing that waiting ends the run at about 48.7. The lane's last job,
+`native (macos-aarch64, 2/3)`, ran 1.35 times its entry, the fifth consecutive
+run ended by a Mac-eligible job the placement sent to a hosted lane, at 1.37,
+1.13, 1.34, 1.29, and 1.35 times entries every one of which the window had
+tested.
+
+U44 refreshes the three entries the run observed hosted, each to the median
+of its hosted observations in seconds: `native (macos-aarch64, 2/3)` from
+904 to 1,162 on three observations, `native (macos-aarch64, 1/3)` from
+1,239 to 1,236 on six, and `native support (macos-aarch64, 3/12)` holding
+1,293 on five. The first sends its job to Mac lane four and brings
+`reflect cases (macos-aarch64, 2/3)` onto hosted lane five, lowering the
+modeled hosted maximum from 45.65 to 42.45 minutes and the modeled Mac maximum
+from 49.10 to 48.79, so the derived maximum becomes 48.79.
+
+U43 left open what separates the two groups of `test (ubuntu-latest, node)`
+durations. The difference is inside one step and spread over the whole
+suite. `mise run test:node` accounts for all but 16 to 23 seconds of the
+job in each of the thirteen runs since `b59ac914`, and over the 1,623 test
+names the 1,462.97-second and 2,907.41-second runs both report, the later
+duration divided by the earlier has a median of 1.98 with quartiles of 1.92
+and 2.04 among the 146 tests above 10 seconds. The expensive part of the
+suite moved by one factor rather than any one test growing. The runner
+image and hosted agent version were identical in all thirteen runs and the
+Azure region differs within each group rather than between them, so the
+logs do not say what the factor is.
+
+Each of the nine long Linux jobs gets its own factor. Normalized against
+each job's own fastest observation, the ratios group near 1.00, 1.10, 1.40,
+1.55, 1.85, and 1.97, and the spread within one run is 0.49 to 0.97 in all
+thirteen, so a run does not get one factor for its Linux jobs. The slowest
+of nine is therefore near the top of the range in every run, which is why
+the longest Linux job other than `test (ubuntu-latest, node)` ran between
+46.05 and 48.30 minutes in all thirteen while the individual jobs vary by
+close to a factor of two.
+
+Sharding that job therefore returns nothing yet. The Linux side finished
+before the macOS side in all thirteen runs, by 1.39 to 16.49 minutes, and
+in the closest run shortening it, with every other job's timing held fixed,
+moves the Linux end by 2.58 minutes and the run's end by none. The run also
+creates 49 GitHub-hosted jobs against a ceiling of 40, so extra Linux
+shards are not free; which ceiling produced the 14.90-minute wait is not
+identified. The hosted macOS slots are where the room is: 74.8 of their
+207.3 job-minutes sit in `host C sanitizers (macOS, property)` and
+`(macOS, native)`, which `selfHostedEligible` excludes from Mac lanes for
+the reason U37 measured, and while the longer of the two takes 40.82
+minutes no arrangement of the ten hosted jobs ends the hosted side before
+that, against an even share of 41.5. Sharding those two suites is the next
+thing to try. *docs/evidence/u44/README.md* records the measurements and
+what they leave open, namely which runner configurations the six ratio
+groups correspond to, since no job in the workflow reports its processor
+count.
