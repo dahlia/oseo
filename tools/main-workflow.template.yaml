@@ -62,10 +62,9 @@ jobs:
       fail-fast: false
       matrix:
         # Explicit combinations: the hosted macOS Node.js suite runs in
-        # test_node_shard instead, so only Deno joins from macOS here.
+        # test_node_shard and the Linux one in test_node_shard_linux, so
+        # only Deno joins from either of those hosts here.
         include:
-          - os: ubuntu-latest
-            runtime: node
           - os: ubuntu-latest
             runtime: deno
           - os: macos-latest
@@ -108,6 +107,40 @@ jobs:
             total: 4
           - shard: 4
             total: 4
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node
+          --test-shard=${{ matrix.shard }}/${{ matrix.total }}
+
+  # Linux only. Over the fifteen runs since b59ac914 the unsharded job
+  # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
+  # than a workload difference: all 1,623 tests scale together and
+  # `mise run test:node` is the only step of consequence, the rest taking
+  # 16 to 23 seconds. It ended run 39206357696 at 48.52 minutes. Node's
+  # own --test-shard partitions the files it discovers, so the union of
+  # the shards equals the unsharded set by construction.
+  test_node_shard_linux:
+    name: >-
+      test (ubuntu-latest, node,
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            total: 3
+          - shard: 2
+            total: 3
+          - shard: 3
+            total: 3
     steps:
       - uses: actions/checkout@v7
         with:

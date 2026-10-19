@@ -256,6 +256,7 @@ test("every check name and concurrency policy is preserved", () => {
         (name: string) =>
           !name.startsWith("native support (linux-x86_64-gnu,") &&
           name !== "test (macos-latest, node)" &&
+          name !== "test (ubuntu-latest, node)" &&
           name !== "host C sanitizers (Linux)",
       ),
       // The Linux native sanitizer fixtures are partitioned by the
@@ -265,10 +266,15 @@ test("every check name and concurrency policy is preserved", () => {
         (_, index) => `host C sanitizers (Linux, ${index + 1}/3)`,
       ),
       // The hosted macOS Node.js suite is partitioned by Node's own
-      // --test-shard; see PLAN-GATE.md (U32).
+      // --test-shard; see PLAN-GATE.md (U32), and the Linux one the same
+      // way; see PLAN-GATE.md (U46).
       ...Array.from(
         { length: 4 },
         (_, index) => `test (macos-latest, node, ${index + 1}/4)`,
+      ),
+      ...Array.from(
+        { length: 3 },
+        (_, index) => `test (ubuntu-latest, node, ${index + 1}/3)`,
       ),
       ...Array.from(
         { length: 7 },
@@ -286,7 +292,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 78);
+  assert.equal(names(after).length, 80);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);

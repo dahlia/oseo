@@ -63,10 +63,9 @@ jobs:
       fail-fast: false
       matrix:
         # Explicit combinations: the hosted macOS Node.js suite runs in
-        # test_node_shard instead, so only Deno joins from macOS here.
+        # test_node_shard and the Linux one in test_node_shard_linux, so
+        # only Deno joins from either of those hosts here.
         include:
-          - os: ubuntu-latest
-            runtime: node
           - os: ubuntu-latest
             runtime: deno
           - os: windows-latest
@@ -90,6 +89,33 @@ jobs:
   # cost is native build and execution on a slow hosted runner. Node's own
   # --test-shard partitions the files it discovers, which keeps the union
   # equal to the unsharded set by construction.
+  test_node_shard_linux:
+    name: >-
+      test (ubuntu-latest, node,
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            total: 3
+          - shard: 2
+            total: 3
+          - shard: 3
+            total: 3
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node
+          --test-shard=${{ matrix.shard }}/${{ matrix.total }}
+
   test_native:
     name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
     runs-on: ${{ matrix.platform.os }}
@@ -659,6 +685,14 @@ jobs:
           mise run test:node
           --test-shard=3/4
 
+  # Linux only. Over the fifteen runs since b59ac914 the unsharded job
+  # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
+  # than a workload difference: all 1,623 tests scale together and
+  # `mise run test:node` is the only step of consequence, the rest taking
+  # 16 to 23 seconds. It ended run 39206357696 at 48.52 minutes. Node's
+  # own --test-shard partitions the files it discovers, so the union of
+  # the shards equals the unsharded set by construction.
+
   test_native_macos_1:
     name: native (macos-aarch64, 1/3)
     runs-on: macos-15
@@ -703,6 +737,14 @@ jobs:
       - run: >-
           mise run test:node
           --test-shard=2/4
+
+  # Linux only. Over the fifteen runs since b59ac914 the unsharded job
+  # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
+  # than a workload difference: all 1,623 tests scale together and
+  # `mise run test:node` is the only step of consequence, the rest taking
+  # 16 to 23 seconds. It ended run 39206357696 at 48.52 minutes. Node's
+  # own --test-shard partitions the files it discovers, so the union of
+  # the shards equals the unsharded set by construction.
 
   test_macos_deno:
     name: test (macos-latest, deno)
@@ -786,6 +828,14 @@ jobs:
           mise run test:node
           --test-shard=1/4
 
+  # Linux only. Over the fifteen runs since b59ac914 the unsharded job
+  # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
+  # than a workload difference: all 1,623 tests scale together and
+  # `mise run test:node` is the only step of consequence, the rest taking
+  # 16 to 23 seconds. It ended run 39206357696 at 48.52 minutes. Node's
+  # own --test-shard partitions the files it discovers, so the union of
+  # the shards equals the unsharded set by construction.
+
   test_node_shard_macos_4:
     name: test (macos-latest, node, 4/4)
     runs-on: macos-latest
@@ -804,6 +854,14 @@ jobs:
       - run: >-
           mise run test:node
           --test-shard=4/4
+
+  # Linux only. Over the fifteen runs since b59ac914 the unsharded job
+  # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
+  # than a workload difference: all 1,623 tests scale together and
+  # `mise run test:node` is the only step of consequence, the rest taking
+  # 16 to 23 seconds. It ended run 39206357696 at 48.52 minutes. Node's
+  # own --test-shard partitions the files it discovers, so the union of
+  # the shards equals the unsharded set by construction.
 
   test_reflect_case_macos_2:
     name: reflect cases (macos-aarch64, 2/3)
