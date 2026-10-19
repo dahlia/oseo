@@ -167,6 +167,143 @@ function selfHostedEligible(job: MacosLaneJob): boolean {
 const hostedLaneCount = 5;
 
 /**
+ * The lane order the placement's invariants require: own-key case shards
+ * lead their Mac lane under one measured deadline, then the jobs no Mac
+ * lane can run, then the rest, each of the two groups by descending hosted
+ * median and then by name. `refineLanes` re-canonicalizes every lane it
+ * changes, so a refined placement keeps the order the tests assert.
+ */
+function canonicalLane(lane: readonly MacosLaneJob[]): readonly MacosLaneJob[] {
+  const own = lane.filter((job) => job.family === "own-key cases");
+  const rest = lane
+    .filter((job) => job.family !== "own-key cases")
+    .toSorted(
+      (a, b) =>
+        Number(selfHostedEligible(a)) - Number(selfHostedEligible(b)) ||
+        b.seconds - a.seconds ||
+        a.name.localeCompare(b.name, "en"),
+    );
+  return [...own, ...rest];
+}
+
+/**
+ * Whether a placement satisfies every rule the greedy pass enforces while
+ * it builds one. `refineLanes` rejects a candidate that does not, so the
+ * refinement can only move work between lanes that were already allowed
+ * to hold it.
+ */
+function feasibleLanes(
+  lanes: readonly (readonly MacosLaneJob[])[],
+  selfHostedCount: number,
+): boolean {
+  for (const [index, lane] of lanes.entries()) {
+    if (index < hostedLaneCount) {
+      // A hosted lane that holds a sanitizer job holds nothing else, and
+      // the own-key deadline is measured on a Mac lane.
+      if (lane.some((job) => job.family === "own-key cases")) return false;
+      if (lane.some((job) => job.family === "host C sanitizers")) {
+        if (lane.length !== 1) return false;
+      }
+      for (const job of lane) {
+        if (selfHostedEligible(job) && !measuredHostedJobs.includes(job.name)) {
+          return false;
+        }
+      }
+    } else if (lane.some((job) => !selfHostedEligible(job))) return false;
+  }
+  if (selfHostedCount === 0) return true;
+  // One measured deadline covers all three own-key shards, so they share
+  // the first Mac lane.
+  const carrying = lanes.filter((lane) =>
+    lane.some((job) => job.family === "own-key cases"),
+  );
+  return (
+    carrying.length === 1 &&
+    carrying[0] === lanes[hostedLaneCount] &&
+    carrying[0]!.filter((job) => job.family === "own-key cases").length === 3
+  );
+}
+
+/**
+ * Lower the modeled maximum by moving and exchanging single jobs.
+ *
+ * The greedy pass scores each job against the lanes available when it is
+ * placed, so an early choice it cannot revisit can leave the maximum above
+ * what the same job set admits. At the U44 costs the greedy maximum is
+ * 48.79 minutes and this pass reaches 47.00, where the Mac lanes end
+ * within 1.53 minutes of each other. The same neighborhood searched
+ * without `feasibleLanes` reaches 46.98, 0.02 lower, which does not
+ * establish the minimum achievable either way. See PLAN-GATE.md (U45).
+ *
+ * First improvement wins and the sweep order is fixed, so with the lane
+ * configuration and the rules above fixed the result is deterministic for
+ * a given set of cost tables. Both the move and the exchange neighborhood
+ * are swept until one full sweep finds nothing.
+ */
+function refineLanes(
+  initial: readonly (readonly MacosLaneJob[])[],
+  selfHostedCount: number,
+): readonly (readonly MacosLaneJob[])[] {
+  let lanes: readonly (readonly MacosLaneJob[])[] = initial.map(canonicalLane);
+  let best = Math.max(...macosLaneEnds(lanes));
+  const accept = (candidate: readonly (readonly MacosLaneJob[])[]): boolean => {
+    if (!feasibleLanes(candidate, selfHostedCount)) return false;
+    const end = Math.max(...macosLaneEnds(candidate));
+    if (end >= best - 1e-6) return false;
+    lanes = candidate;
+    best = end;
+    return true;
+  };
+  for (let sweep = 0; sweep < lanes.length * 64; sweep++) {
+    let improved = false;
+    for (let from = 0; from < lanes.length && !improved; from++) {
+      for (let index = 0; index < lanes[from]!.length && !improved; index++) {
+        const job = lanes[from]![index]!;
+        for (let to = 0; to < lanes.length && !improved; to++) {
+          if (to === from) continue;
+          improved = accept(
+            lanes.map((lane, at) =>
+              at === from
+                ? canonicalLane(lane.filter((_, other) => other !== index))
+                : at === to
+                  ? canonicalLane([...lane, job])
+                  : lane,
+            ),
+          );
+        }
+      }
+    }
+    for (let from = 0; from < lanes.length && !improved; from++) {
+      for (let index = 0; index < lanes[from]!.length && !improved; index++) {
+        for (let to = from + 1; to < lanes.length && !improved; to++) {
+          for (let other = 0; other < lanes[to]!.length && !improved; other++) {
+            const here = lanes[from]![index]!;
+            const there = lanes[to]![other]!;
+            improved = accept(
+              lanes.map((lane, at) =>
+                at === from
+                  ? canonicalLane([
+                      ...lane.filter((_, position) => position !== index),
+                      there,
+                    ])
+                  : at === to
+                    ? canonicalLane([
+                        ...lane.filter((_, position) => position !== other),
+                        here,
+                      ])
+                    : lane,
+              ),
+            );
+          }
+        }
+      }
+    }
+    if (!improved) return lanes;
+  }
+  return lanes;
+}
+
+/**
  * Mac-lane families whose jobs run fast-check properties under the
  * ordinary interrupt limits and therefore widen those limits when their
  * lane falls back to hosted. Own-key case shards are excluded on purpose:
@@ -468,7 +605,11 @@ export function macosLanes(
     if (index < hostedLaneCount) loads[index] = finish;
     else macEnds = chosenMacEnds;
   }
-  return lanes;
+  // With no Mac lane the five hosted lanes hold every job and the
+  // descending order above is the LPT partition the fallback documents, so
+  // the refinement applies only where a Mac lane exists to move work to.
+  if (selfHostedCount === 0) return lanes;
+  return refineLanes(lanes, selfHostedCount);
 }
 
 /** Bind existing matrix expressions without creating a matrix check name. */

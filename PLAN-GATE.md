@@ -3329,3 +3329,41 @@ because the sanitizer shards no longer fill them and a hosted candidate is
 scored by its own lane load. These model results favor investigating the
 placement before the sharding; *docs/evidence/u44/README.md* records both
 searches and the invariants they do not respect.
+
+### Refining the placement after the greedy pass (U45)
+
+The placement assigns each macOS job to the lane with the smallest
+projected finish at the moment it is placed and never revisits a choice, so
+an assignment that looked best against the lanes loaded at the time can
+leave the modeled maximum above what the same job set admits. U45 adds
+`refineLanes`, which sweeps two neighborhoods of the greedy placement
+afterward: moving one job to another lane, and exchanging one job on a lane
+with one on another. A candidate is accepted when it is feasible and its
+`macosLaneEnds` maximum is lower, first improvement wins, and the sweeps
+repeat until one accepts nothing.
+
+At the costs U44 committed this lowers the derived maximum from 48.79 to
+47.00 minutes. The six Mac lanes end within 1.53 minutes of each other
+rather than 2.67, with the maximum on a Mac lane at 47.00 and the next two
+at 46.98; `native support (macos-aarch64, 11/12)` and `(12/12)` move onto
+hosted lanes and the three `native (macos-aarch64, k/3)` shards end up on
+the first Mac lane together.
+
+Every candidate is re-canonicalized and checked, so a refined placement
+keeps the own-key pin, the rule that a hosted lane holding a sanitizer job
+holds nothing else, the hosted-only jobs and their leading position, and
+the rule that only an entry `measuredHostedJobs` lists reaches a hosted
+lane. The same neighborhood searched without those checks reaches 46.98
+minutes, 0.02 below the checked search's 47.00; those endpoints do not
+establish the minimum achievable with or without the invariants. With the
+lane configuration and placement rules fixed, the fixed sweep order makes
+the result deterministic for a given set of cost tables, and
+`mise run generate:macos-lanes --check` takes 0.40 seconds. With no Mac
+lane the pass does not run, leaving the pure-hosted LPT partition the
+fallback documents unchanged.
+
+The 47.00-minute result is a local optimum under feasible single moves and
+pairwise exchanges; global optimality is not established. Like every
+derived maximum in these records, it is a model output over per-job
+medians. *docs/evidence/u45/README.md* records what moved and what
+the figure does not establish.

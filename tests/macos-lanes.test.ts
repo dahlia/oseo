@@ -1040,8 +1040,10 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // Placing them last gave three lanes one Mac-eligible job each, which
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
   // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
-  // lanes what they measured rather than what stale entries claimed.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2928);
+  // lanes what they measured rather than what stale entries claimed, and
+  // U45's refinement pass lowered it from 2928 by moving and exchanging
+  // single jobs after the greedy pass; see PLAN-GATE.md (U45).
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2820);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {

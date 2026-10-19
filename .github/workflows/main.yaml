@@ -659,12 +659,15 @@ jobs:
           mise run test:node
           --test-shard=3/4
 
-  test_native_macos_1:
-    name: native (macos-aarch64, 1/3)
+  test_native_support_macos_12:
+    name: native support (macos-aarch64, 12/12)
     runs-on: macos-15
     if: ${{ !cancelled() }}
     needs: test_node_shard_macos_3
-    timeout-minutes: 60
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -675,13 +678,22 @@ jobs:
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - run: mise run test:native --shard 1/3
+      - run: >-
+          mise run test:property:extended:native:shard
+          --shard 12/12
+          --exclude-case-sharded
+          tests/property/*.property.test.ts
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: native-macos-aarch64-1-of-3
+          name: >-
+            ${{ format(
+            'native-support-diagnostics-{0}-{1}-of-{2}',
+            'macos-aarch64',
+            12,
+            12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -729,8 +741,8 @@ jobs:
   # --test-shard partitions the files it discovers, which keeps the union
   # equal to the unsharded set by construction.
 
-  test_native_support_macos_3:
-    name: native support (macos-aarch64, 3/12)
+  test_native_support_macos_11:
+    name: native support (macos-aarch64, 11/12)
     runs-on: macos-15
     if: ${{ !cancelled() }}
     needs: test_macos_deno
@@ -750,7 +762,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:property:extended:native:shard
-          --shard 3/12
+          --shard 11/12
           --exclude-case-sharded
           tests/property/*.property.test.ts
         env:
@@ -762,7 +774,7 @@ jobs:
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
             'macos-aarch64',
-            3,
+            11,
             12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
@@ -805,8 +817,8 @@ jobs:
           mise run test:node
           --test-shard=4/4
 
-  test_reflect_case_macos_2:
-    name: reflect cases (macos-aarch64, 2/3)
+  test_reflect_case_macos_3:
+    name: reflect cases (macos-aarch64, 3/3)
     runs-on: macos-15
     if: ${{ !cancelled() }}
     needs: test_node_shard_macos_4
@@ -837,14 +849,14 @@ jobs:
           mise run test:property:extended:native:shard
           tests/property/m5-reflect-namespace.property.test.ts
         env:
-          OSEO_PROPERTY_CASE_SHARD: 2/3
+          OSEO_PROPERTY_CASE_SHARD: 3/3
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
           name: >-
             ${{ format('reflect-cases-{0}-{1}-of-3',
-            'macos-aarch64', 2) }}
+            'macos-aarch64', 3) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -972,8 +984,8 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_native_support_macos_10:
-    name: native support (macos-aarch64, 10/12)
+  test_native_support_macos_6:
+    name: native support (macos-aarch64, 6/12)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r1 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
@@ -998,7 +1010,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:property:extended:native:shard
-          --shard 10/12
+          --shard 6/12
           --exclude-case-sharded
           tests/property/*.property.test.ts
         env:
@@ -1010,25 +1022,18 @@ jobs:
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
             'macos-aarch64',
-            10,
+            6,
             12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_native_support_macos_4:
-    name: native support (macos-aarch64, 4/12)
+  test_native_macos_1:
+    name: native (macos-aarch64, 1/3)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r1 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
-    env:
-      OSEO_PROPERTY_TIME_SCALE: >-
-        ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
-        && '1' || '4' }}
-    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
-    # while its work took a measured 32.9 to 62 minutes across runs; the
-    # suites carry their own interrupt deadlines, so this is a backstop.
-    timeout-minutes: 120
+    timeout-minutes: 60
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1039,39 +1044,23 @@ jobs:
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:property:extended:native:shard
-          --shard 4/12
-          --exclude-case-sharded
-          tests/property/*.property.test.ts
+      - run: mise run test:native --shard 1/3
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: >-
-            ${{ format(
-            'native-support-diagnostics-{0}-{1}-of-{2}',
-            'macos-aarch64',
-            4,
-            12) }}
+          name: native-macos-aarch64-1-of-3
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_native_support_macos_9:
-    name: native support (macos-aarch64, 9/12)
+  test_native_macos_2:
+    name: native (macos-aarch64, 2/3)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r1 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
       - mac_ready
-    env:
-      OSEO_PROPERTY_TIME_SCALE: >-
-        ${{ contains(needs.mac_ready.outputs.r1, 'self-hosted')
-        && '1' || '4' }}
-    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
-    # while its work took a measured 32.9 to 62 minutes across runs; the
-    # suites carry their own interrupt deadlines, so this is a backstop.
-    timeout-minutes: 120
+    timeout-minutes: 60
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -1082,22 +1071,13 @@ jobs:
         with:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:property:extended:native:shard
-          --shard 9/12
-          --exclude-case-sharded
-          tests/property/*.property.test.ts
+      - run: mise run test:native --shard 2/3
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: >-
-            ${{ format(
-            'native-support-diagnostics-{0}-{1}-of-{2}',
-            'macos-aarch64',
-            9,
-            12) }}
+          name: native-macos-aarch64-2-of-3
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1129,6 +1109,40 @@ jobs:
           if-no-files-found: warn
 
   # macOS lane 7, longest jobs first.
+  test_test262_macos_12:
+    name: test262 (macos-aarch64, 12/12)
+    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r2 || '"macos-15"') }}
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    timeout-minutes: 120
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:test262
+          --shard 12/12
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format(
+            'test262-{0}-{1}-of-{2}',
+            'macos-aarch64',
+            12,
+            12) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   test_native_support_macos_8:
     name: native support (macos-aarch64, 8/12)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r2 || '"macos-15"') }}
@@ -1216,8 +1230,8 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_native_support_macos_6:
-    name: native support (macos-aarch64, 6/12)
+  test_native_support_macos_3:
+    name: native support (macos-aarch64, 3/12)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r2 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
@@ -1242,7 +1256,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:property:extended:native:shard
-          --shard 6/12
+          --shard 3/12
           --exclude-case-sharded
           tests/property/*.property.test.ts
         env:
@@ -1254,89 +1268,12 @@ jobs:
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
             'macos-aarch64',
-            6,
-            12) }}
-          path: ${{ runner.temp }}/oseo-native-*
-          if-no-files-found: warn
-
-  test_native_support_macos_12:
-    name: native support (macos-aarch64, 12/12)
-    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r2 || '"macos-15"') }}
-    if: ${{ !cancelled() }}
-    needs:
-      - mac_ready
-    env:
-      OSEO_PROPERTY_TIME_SCALE: >-
-        ${{ contains(needs.mac_ready.outputs.r2, 'self-hosted')
-        && '1' || '4' }}
-    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
-    # while its work took a measured 32.9 to 62 minutes across runs; the
-    # suites carry their own interrupt deadlines, so this is a backstop.
-    timeout-minutes: 120
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:property:extended:native:shard
-          --shard 12/12
-          --exclude-case-sharded
-          tests/property/*.property.test.ts
-        env:
-          TMPDIR: ${{ runner.temp }}
-      - if: failure() || cancelled()
-        uses: actions/upload-artifact@v7
-        with:
-          name: >-
-            ${{ format(
-            'native-support-diagnostics-{0}-{1}-of-{2}',
-            'macos-aarch64',
-            12,
+            3,
             12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
   # macOS lane 8, longest jobs first.
-  test_test262_macos_12:
-    name: test262 (macos-aarch64, 12/12)
-    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r3 || '"macos-15"') }}
-    if: ${{ !cancelled() }}
-    needs:
-      - mac_ready
-    timeout-minutes: 120
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:test262
-          --shard 12/12
-        env:
-          TMPDIR: ${{ runner.temp }}
-      - if: failure() || cancelled()
-        uses: actions/upload-artifact@v7
-        with:
-          name: >-
-            ${{ format(
-            'test262-{0}-{1}-of-{2}',
-            'macos-aarch64',
-            12,
-            12) }}
-          path: ${{ runner.temp }}/oseo-native-*
-          if-no-files-found: warn
-
   test_native_support_macos_2:
     name: native support (macos-aarch64, 2/12)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r3 || '"macos-15"') }}
@@ -1380,8 +1317,51 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_test262_macos_4:
-    name: test262 (macos-aarch64, 4/12)
+  test_native_support_macos_10:
+    name: native support (macos-aarch64, 10/12)
+    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r3 || '"macos-15"') }}
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r3, 'self-hosted')
+        && '1' || '4' }}
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:property:extended:native:shard
+          --shard 10/12
+          --exclude-case-sharded
+          tests/property/*.property.test.ts
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format(
+            'native-support-diagnostics-{0}-{1}-of-{2}',
+            'macos-aarch64',
+            10,
+            12) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  test_test262_macos_6:
+    name: test262 (macos-aarch64, 6/12)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r3 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
@@ -1399,7 +1379,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard 4/12
+          --shard 6/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1409,7 +1389,7 @@ jobs:
             ${{ format(
             'test262-{0}-{1}-of-{2}',
             'macos-aarch64',
-            4,
+            6,
             12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
@@ -1517,8 +1497,51 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_test262_macos_5:
-    name: test262 (macos-aarch64, 5/12)
+  test_native_support_macos_4:
+    name: native support (macos-aarch64, 4/12)
+    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r4 || '"macos-15"') }}
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    env:
+      OSEO_PROPERTY_TIME_SCALE: >-
+        ${{ contains(needs.mac_ready.outputs.r4, 'self-hosted')
+        && '1' || '4' }}
+    # Run 38551733723 lost a Linux shard to the previous 90-minute limit
+    # while its work took a measured 32.9 to 62 minutes across runs; the
+    # suites carry their own interrupt deadlines, so this is a backstop.
+    timeout-minutes: 120
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:property:extended:native:shard
+          --shard 4/12
+          --exclude-case-sharded
+          tests/property/*.property.test.ts
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format(
+            'native-support-diagnostics-{0}-{1}-of-{2}',
+            'macos-aarch64',
+            4,
+            12) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  test_test262_macos_4:
+    name: test262 (macos-aarch64, 4/12)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r4 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
@@ -1536,7 +1559,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:test262
-          --shard 5/12
+          --shard 4/12
         env:
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
@@ -1546,7 +1569,7 @@ jobs:
             ${{ format(
             'test262-{0}-{1}-of-{2}',
             'macos-aarch64',
-            5,
+            4,
             12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
@@ -1582,33 +1605,6 @@ jobs:
             'macos-aarch64',
             8,
             12) }}
-          path: ${{ runner.temp }}/oseo-native-*
-          if-no-files-found: warn
-
-  test_native_macos_2:
-    name: native (macos-aarch64, 2/3)
-    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r4 || '"macos-15"') }}
-    if: ${{ !cancelled() }}
-    needs:
-      - mac_ready
-    timeout-minutes: 60
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: mise run test:native --shard 2/3
-        env:
-          TMPDIR: ${{ runner.temp }}
-      - if: failure() || cancelled()
-        uses: actions/upload-artifact@v7
-        with:
-          name: native-macos-aarch64-2-of-3
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
@@ -1690,8 +1686,42 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_native_support_macos_11:
-    name: native support (macos-aarch64, 11/12)
+  test_test262_macos_5:
+    name: test262 (macos-aarch64, 5/12)
+    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r5 || '"macos-15"') }}
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
+    timeout-minutes: 120
+    steps:
+      - name: Record macOS host version
+        run: sw_vers -productVersion
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:test262
+          --shard 5/12
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: >-
+            ${{ format(
+            'test262-{0}-{1}-of-{2}',
+            'macos-aarch64',
+            5,
+            12) }}
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
+  test_native_support_macos_9:
+    name: native support (macos-aarch64, 9/12)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r5 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
@@ -1716,7 +1746,7 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
           mise run test:property:extended:native:shard
-          --shard 11/12
+          --shard 9/12
           --exclude-case-sharded
           tests/property/*.property.test.ts
         env:
@@ -1728,41 +1758,7 @@ jobs:
             ${{ format(
             'native-support-diagnostics-{0}-{1}-of-{2}',
             'macos-aarch64',
-            11,
-            12) }}
-          path: ${{ runner.temp }}/oseo-native-*
-          if-no-files-found: warn
-
-  test_test262_macos_6:
-    name: test262 (macos-aarch64, 6/12)
-    runs-on: ${{ fromJSON(needs.mac_ready.outputs.r5 || '"macos-15"') }}
-    if: ${{ !cancelled() }}
-    needs:
-      - mac_ready
-    timeout-minutes: 120
-    steps:
-      - name: Record macOS host version
-        run: sw_vers -productVersion
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      - run: >-
-          mise run test:test262
-          --shard 6/12
-        env:
-          TMPDIR: ${{ runner.temp }}
-      - if: failure() || cancelled()
-        uses: actions/upload-artifact@v7
-        with:
-          name: >-
-            ${{ format(
-            'test262-{0}-{1}-of-{2}',
-            'macos-aarch64',
-            6,
+            9,
             12) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
@@ -1957,8 +1953,8 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_reflect_case_macos_3:
-    name: reflect cases (macos-aarch64, 3/3)
+  test_reflect_case_macos_2:
+    name: reflect cases (macos-aarch64, 2/3)
     runs-on: ${{ fromJSON(needs.mac_ready.outputs.r6 || '"macos-15"') }}
     if: ${{ !cancelled() }}
     needs:
@@ -1990,13 +1986,13 @@ jobs:
           mise run test:property:extended:native:shard
           tests/property/m5-reflect-namespace.property.test.ts
         env:
-          OSEO_PROPERTY_CASE_SHARD: 3/3
+          OSEO_PROPERTY_CASE_SHARD: 2/3
           TMPDIR: ${{ runner.temp }}
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
           name: >-
             ${{ format('reflect-cases-{0}-{1}-of-3',
-            'macos-aarch64', 3) }}
+            'macos-aarch64', 2) }}
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
