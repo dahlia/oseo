@@ -3367,3 +3367,61 @@ pairwise exchanges; global optimality is not established. Like every
 derived maximum in these records, it is a model output over per-job
 medians. *docs/evidence/u45/README.md* records what moved and what
 the figure does not establish.
+
+### Shortening the Linux side (U46)
+
+Branch run 39206357696 and main run 39227927384 were the first two runs in
+the window whose Linux side finished last, which is the condition U44 named
+for revisiting Linux sharding. U46 changes the partitioning of three Linux
+jobs whose durations in run 39227927384 were 48.13, 43.90, and 39.20
+minutes, and two measurements decide how.
+
+Taking each `native support (linux-x86_64-gnu, k/7)` shard's fastest
+duration over the fifteen runs since `b59ac914` gives 24.93, 23.67, 23.27,
+23.20, 25.68, 25.80, and 24.28 minutes, a maximum 1.06 times the mean.
+Those minima are consistent with a balanced partition, though they come
+from different runs and do not isolate runner speed. For six of the seven
+shards the job duration is within 1.5 to 5.2 percent of that shard's summed
+test-case duration divided by its four workers, which is consistent with
+substantial parallel work. Shard one is the exception, at 46.13 against
+38.77. It carries four files on four workers whose summed test-case
+durations are 2,732, 2,239, 2,220, and 2,106 derived seconds, and the job
+took 2,768: the largest sum plus about 20 seconds of setup is 2,752, 16
+below it. File sharding does not split a file, and for every total from 7
+to 14 `selectNativeTestShard` reports the same modeled maximum of 2,647
+derived seconds.
+
+So U46 case-shards that file, *m5-globalthis-binding*, which is the
+mechanism the two heavier files already use, and does it on Linux only. The
+weight table gives it 2,647 derived seconds on Linux against 855 on macOS,
+where the heaviest file outside the case-shard list has 1,242 and jobs
+compete for the five concurrent macOS slots the account has.
+`caseShardedNativeFiles` becomes a function of the platform. The shard
+total stays at seven: with the file excluded the heaviest remaining Linux
+file has 2,239 derived seconds and the seven-shard estimate is about 38.5
+minutes in that run's measurements, which does not establish whether a
+higher total would reduce elapsed time.
+
+U46 also splits `test (ubuntu-latest, node)` three ways and
+`host C sanitizers (Linux, property)` two ways, both through Node's own
+`--test-shard`, which partitions the files it discovers so the union equals
+the unsharded set by construction. The flag precedes every positional in
+both, which Node requires: placed after one, six files ran in all three
+shards rather than two in each.
+
+The hosted job count rises from 49 to 55. Run 39227927384 peaked at 39
+concurrent hosted jobs against the account's ceiling of 40, its 965.5
+hosted job-minutes divide by 40 slots to an idealized floor of 24.1 minutes
+against a longest hosted job of 48.13, and Linux setup measured 18 to 23
+seconds per job. Those figures suggest room for shorter jobs without
+establishing what adding them costs in queueing.
+
+Holding the other timings fixed, shortening the Linux jobs would leave the
+macOS side as the likely limit: that run's Linux side ended at 48.18 and
+its macOS side at 46.67. A run end near 47 is consistent with U45's modeled
+maximum against the measured 48.53. Further macOS reductions could then
+shorten the run until another job or an allocation delay became limiting,
+where before this change a reduction of a minute or two would have left the
+end where a Linux job near 48 put it.
+*docs/evidence/u46/README.md* records the measurements and what they do not
+address.
