@@ -73,20 +73,26 @@ test("Linux isolates own-key properties from every other file", async () => {
   }
 });
 
-test("case-sharded files leave both CI file partitions", async () => {
+test("case sharding leaves each host its own file partitions", async () => {
   const files = (await readdir(new URL("property/", import.meta.url)))
     .filter((path) => path.endsWith(".property.test.ts"))
     .map((path) => `tests/property/${path}`);
-  // Both files have dedicated case-shard jobs; see PLAN-GATE.md (U38).
-  assert.deepEqual(caseShardedNativeFiles.toSorted(), [
+  const shared = [
     "tests/property/m5-object-own-keys.property.test.ts",
     "tests/property/m5-reflect-namespace.property.test.ts",
+  ];
+  const linuxOnly = "tests/property/m5-globalthis-binding.property.test.ts";
+  assert.deepEqual(caseShardedNativeFiles("darwin").toSorted(), shared);
+  assert.deepEqual(caseShardedNativeFiles("linux").toSorted(), [
+    linuxOnly,
+    ...shared,
   ]);
-  for (const path of caseShardedNativeFiles) assert.ok(files.includes(path));
   for (const [platform, total] of [
-    ["linux", 5],
+    ["linux", 7],
     ["darwin", 12],
   ] as const) {
+    const excluded = caseShardedNativeFiles(platform);
+    for (const path of excluded) assert.ok(files.includes(path));
     const selected = Array.from({ length: total }, (_, offset) =>
       nativeTestArguments(
         [`--shard=${offset + 1}/${total}`, "--exclude-case-sharded", ...files],
@@ -95,12 +101,12 @@ test("case-sharded files leave both CI file partitions", async () => {
     ).flat();
     assert.deepEqual(
       selected.toSorted(),
-      files.filter((path) => !caseShardedNativeFiles.includes(path)).toSorted(),
+      files.filter((path) => !excluded.includes(path)).toSorted(),
     );
-    assert.equal(
-      new Set(selected).size,
-      files.length - caseShardedNativeFiles.length,
-    );
+    assert.equal(new Set(selected).size, files.length - excluded.length);
+    assert.equal(selected.includes(linuxOnly), platform === "darwin");
+    // Each excluded file runs in three case jobs whose cases cover it once.
+    assert.deepEqual([...selected, ...excluded].toSorted(), files.toSorted());
   }
   assert.equal(ownKeyCaseShardCosts["linux-x86_64-gnu"], 1109);
   assert.equal(ownKeyCaseShardCosts["macos-aarch64"], 1189);

@@ -416,11 +416,14 @@ a failure and retain it as an ordinary regression fixture before fixing the
 implementation.
 
 CI may set `OSEO_PROPERTY_CASE_SHARD=INDEX/TOTAL` for a dedicated property
-file. Two files have one:
+file. Both native hosts run
 *tests/property/m5-object-own-keys.property.test.ts* and
-*tests/property/m5-reflect-namespace.property.test.ts*, each in three
-jobs per native host. `caseShardedNativeFiles` in *tools/native-shard.ts*
-is the list, and the file shards exclude every entry. The index is
+*tests/property/m5-reflect-namespace.property.test.ts* in three jobs each.
+Linux also runs *tests/property/m5-globalthis-binding.property.test.ts*
+in three case-shard jobs; macOS keeps it in the file shards because its
+measured cost there does not justify extra jobs. The per-host list comes
+from `caseShardedNativeFiles(platform)` in *tools/native-shard.ts*, and
+file shards exclude only that host's entries. The index is
 one-based. Every shard uses the same seed, replay path,
 generator, `numRuns`, and size; generated run `i` executes its predicate only
 when `i % TOTAL == INDEX - 1`. The union of all indices is the ordinary
@@ -437,10 +440,11 @@ Each shard keeps the original hard interrupt limit. Set
 property duration; this requires `OSEO_PROPERTY_CASE_SHARD` as well. The
 own-key shards set it, so the `native` aggregate requires all six of their
 results and duration records, then fails if their duration sum on either
-host exceeds the original limit. The Reflect namespace shards do not: that
-file has three property domains and the recorder writes one record per job
-with an exclusive create, so three domains cannot each record without a
-record-format change. Its shards are still required by the aggregate.
+host exceeds the original limit. The Reflect namespace and Linux globalThis
+binding shards do not record durations: those files have three and four
+property domains, respectively, and the recorder exclusively creates one
+record per job. Recording each domain needs a record-format change. All
+of their shards are still required by the aggregate.
 An interrupted shard fails independently of any record. The case budget
 and generators do not change. A replay path disables the shard filter and
 keeps the original interrupt limit.
@@ -551,17 +555,18 @@ so every index of a total selects disjoint files from the same complete input
 set.
 
 CI now passes `--exclude-case-sharded` to those file shards and runs each
-file in `caseShardedNativeFiles` in three separate case-shard jobs on each
-native host, six jobs per file. Every one is required by the `native`
-aggregate. With that exclusion, all seven Linux file shards carry remaining
-files. The local unsharded extended task still runs both files once with
-all cases. The Linux singleton rule still applies to other wrapper
-invocations that include *m5-object-own-keys.property.test.ts* without the
-exclusion flag; it covers that file alone, because its deadline margin,
-not its weight, is what the singleton protects.
-Unknown files use the measured table's upper median weight. Empty shards execute
-nothing. Node.js's own `--test-shard` still assigns files by position; CI uses
-the wrapper flag instead.
+file in `caseShardedNativeFiles(platform)` in three separate case-shard
+jobs on that host. Own-key and Reflect namespace run on both hosts;
+globalThis binding runs this way only on Linux. Every job is required by
+the `native` aggregate. With that exclusion, all seven Linux file shards
+carry remaining files. The local unsharded extended task still runs all
+three files once with all cases. The Linux singleton rule still applies to
+other wrapper invocations that include *m5-object-own-keys.property.test.ts*
+without the exclusion flag; it covers that file alone, because its deadline
+margin, not its weight, is what the singleton protects. Unknown files use the
+measured table's upper median weight. Empty shards execute nothing. Node.js's
+own `--test-shard` still assigns files by position; CI uses the wrapper flag
+instead.
 
 Weights are derived sums of concurrent test-case durations, not isolated file
 latencies or processor time. Refresh them from CI logs when the file set or
