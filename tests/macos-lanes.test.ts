@@ -255,6 +255,7 @@ test("every check name and concurrency policy is preserved", () => {
       ...nameBaseline.checkNamesObserved.filter(
         (name: string) =>
           !name.startsWith("native support (linux-x86_64-gnu,") &&
+          !name.startsWith("test262 (linux-x86_64-gnu,") &&
           name !== "test (macos-latest, node)" &&
           name !== "test (ubuntu-latest, node)" &&
           name !== "host C sanitizers (Linux)",
@@ -273,8 +274,15 @@ test("every check name and concurrency policy is preserved", () => {
         (_, index) => `test (macos-latest, node, ${index + 1}/4)`,
       ),
       ...Array.from(
-        { length: 3 },
-        (_, index) => `test (ubuntu-latest, node, ${index + 1}/3)`,
+        { length: 2 },
+        (_, index) => `test (ubuntu-latest, node, ${index + 1}/2)`,
+      ),
+      // The Linux test262 total fell from twelve to eight so that the
+      // run's Ubuntu jobs fit the slots it receives; see PLAN-GATE.md
+      // (U48). macOS keeps twelve, which U6 chose for timeout margin.
+      ...Array.from(
+        { length: 8 },
+        (_, index) => `test262 (linux-x86_64-gnu, ${index + 1}/8)`,
       ),
       ...Array.from(
         { length: 7 },
@@ -295,7 +303,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 81);
+  assert.equal(names(after).length, 76);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);

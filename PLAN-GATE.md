@@ -3491,5 +3491,44 @@ waiting over 43 jobs against 5.1 over 37, and reverting U46's case shards
 returns the count to 40 rather than below the thirty-five that run observed
 starting at once. Whether a run gains depends on whether its probe would
 have waited, which is not known in advance.
+Branch run 39292194312 measured the probe at a 0.05-minute wait and all
+six lanes starting at 0.48 against the 0.42 of run 39227927384, so in a
+run whose probe would not have waited the prerequisite cost 0.06, and lane
+work stayed ordinary at 39.72 to 46.13. The run did not get shorter,
+because the queueing moved rather than disappearing: its Linux side ended
+at 55.42 on `native support (linux-x86_64-gnu, 5/7)`, which waited 8.57
+minutes and then ran 46.42, while shard six waited 0.03 and ended at 48.37
+after 47.90 of work. No run since has saturated the ceiling, which is the
+case the change exists for.
 *docs/evidence/u47/README.md* records the measurements and what they do not
+address.
+
+### Fitting the Ubuntu jobs to the slots (U48)
+
+Thirty-four of run 39292194312's forty hosted Ubuntu jobs started within
+0.48 minutes and five of the rest waited, two of them the long
+`native support` shards above. A wait on a long job is added to the Linux
+side while the same wait on a short job is absorbed, so which jobs lose
+the allocation decides the side, and nothing in the workflow selects that.
+Summed Ubuntu allocation waiting was 26.6 job-minutes, between run
+39227927384's 5.1 and run 39244971256's 59.6.
+
+The `native support` family cannot give up jobs, because fewer of its
+seven shards lengthens each, and the six case-shard jobs exist to take two
+files out of the file shards. That leaves the two families whose longest
+job is far below the side: Linux test262 goes from twelve shards to eight
+and the Linux Node.js suite from three to two, both per-entry matrix
+totals, so macOS keeps the twelve test262 shards U6 chose for timeout
+margin. Dividing this run's measured work across the new totals estimates
+31.1 and 20.4 minutes against measured maxima of 27.27 and 16.12, and even
+at twice those estimates test262 stays inside its 120-minute timeout and
+both families stay below the shards that set the side. The hosted Ubuntu
+count falls from 40 to 35.
+
+This reverses part of U6's choice for Linux only, and the corpus
+projection is U48's rather than U6's; if the Linux shards approach the
+timeout as the corpus grows, the slot count is what has to give. Nothing
+here reduces the Linux work itself, and the account shares the ceiling, so
+a run that overlaps another can still queue whatever it has.
+*docs/evidence/u48/README.md* records the measurements and what they do not
 address.

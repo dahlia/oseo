@@ -108,11 +108,9 @@ jobs:
       matrix:
         include:
           - shard: 1
-            total: 3
+            total: 2
           - shard: 2
-            total: 3
-          - shard: 3
-            total: 3
+            total: 2
     steps:
       - uses: actions/checkout@v7
         with:
@@ -262,51 +260,35 @@ jobs:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 1
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 2
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 3
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 4
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 5
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 6
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 7
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 8
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 9
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 10
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 11
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 12
-            total: 12
+            total: 8
     steps:
       - uses: actions/checkout@v7
         with:
