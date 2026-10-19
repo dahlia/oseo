@@ -233,3 +233,102 @@ job in the workflow reports its processor count or model, so the grouping
 is all the evidence there is. A step printing `nproc` and `/proc/cpuinfo`
 would let those fields be compared against job durations; it would not by
 itself establish the cause of the variation, and it has not been added.
+
+
+What the U44 branch run measured
+--------------------------------
+
+Branch run 39206357696 at `01a7cb48` passed in 48.62 minutes, the shortest
+of the fourteen runs since `b59ac914` and 1.98 below the previous shortest,
+the 50.60 of 39149674951.
+
+Allocation waiting was lower than in main run 39154284680. The 37 Ubuntu
+jobs accumulated 5.5 job-minutes of it against 88.1, with one wait over 2
+minutes, and the 10 hosted macOS jobs 8.9 against 27.2, with two. The job
+that ended the run waited 0.03 minutes, so allocation contributed nothing
+to its end; the totals alone do not establish what the account's ceilings
+cost the rest of the run.
+
+The entry change placed `native (macos-aarch64, 2/3)` on Mac lane four,
+which is what raising it to 1,162 was for, and it ran there in 8.10
+minutes. The hosted lanes ended at 43.43, 39.88, 41.38, 42.23, and 38.72
+minutes against modeled 41.30, 36.32, 42.45, 39.90, and 42.18, so the
+largest hosted end was 43.43 against a modeled 42.45, and no hosted lane
+ended the run. The streak of five runs each ended by a Mac-eligible job the
+placement had sent to a hosted lane stopped here.
+
+All ten hosted macOS jobs ran between 0.80 and 1.09 times their entries:
+`reflect cases (macos-aarch64, 2/3)` at 0.80, `native (macos-aarch64, 1/3)`
+at 0.92, `host C sanitizers (macOS, native)` at 0.93,
+`native support (macos-aarch64, 3/12)` at 0.95, and the other six between 1.00
+and 1.09. The jobs that ended the five preceding runs had ratios between 1.13
+and 1.37, so that sample is of run-ending jobs while this one is of every
+hosted job.
+
+All six Mac lanes finished inside their modeled ends for the fourth
+consecutive run, at 44.38, 45.33, 44.18, 47.72, 43.70, and 43.80 against
+48.79, 47.51, 46.12, 47.88, 48.28, and 48.26. Each lane idled 0.13 to 0.27
+minutes across its span.
+
+
+The Linux side ended this run
+-----------------------------
+
+`test (ubuntu-latest, node)` waited 0.03 minutes, ran 48.52, and ended at
+48.55. The last macOS job ended at 47.72, 0.83 minutes earlier, the
+opposite order from all thirteen earlier runs. The condition this record
+named was met in this run: the macOS side ended below about 48 minutes and
+the Linux job finished last.
+
+The nine long Linux jobs had these durations and end times, in minutes:
+
+| job                                      | duration | end   |
+| ---------------------------------------- | -------- | ----- |
+| `test (ubuntu-latest, node)`             | 48.52    | 48.55 |
+| `native support (linux-x86_64-gnu, 6/7)` | 48.23    | 48.27 |
+| `native support (linux-x86_64-gnu, 1/7)` | 45.52    | 45.55 |
+| `native support (linux-x86_64-gnu, 2/7)` | 44.45    | 44.48 |
+| `native support (linux-x86_64-gnu, 4/7)` | 43.60    | 43.63 |
+| `native support (linux-x86_64-gnu, 3/7)` | 42.90    | 42.93 |
+| `host C sanitizers (Linux, property)`    | 32.33    | 32.35 |
+| `native support (linux-x86_64-gnu, 5/7)` | 25.68    | 25.72 |
+| `native support (linux-x86_64-gnu, 7/7)` | 24.28    | 24.32 |
+
+Shortening `test (ubuntu-latest, node)` enough, with every other job's
+timing and the aggregate's own duration held fixed, moves the Linux end to
+the 48.27 of `native support (linux-x86_64-gnu, 6/7)` and the run's end
+from 48.62 to about 48.3. Going lower means shortening the `native support`
+shards too. The two sides ended 0.83 minutes apart, both near 48, so shortening
+either one alone returns a fraction of a minute; shortening the macOS jobs
+alone would not have changed this run's end at all.
+
+
+What a search of the placement model says
+-----------------------------------------
+
+The numbers here come from the cost model, not from a run. Hill climbing
+on single moves and swaps of the greedy placement, scored by the same
+`macosLaneEnds` maximum the tests assert, lowers it from the greedy 48.79
+to 46.98 minutes, balancing the eleven lanes between 38.68 and 46.98.
+
+Applying the same search to a job set with both macOS sanitizer suites
+split three ways reaches 45.50, with every lane between 41.63 and 45.50.
+The greedy placement on that job set instead gives 49.72, worse than its
+48.79 on the current set. In that placement the hosted lanes hold five
+Mac-eligible jobs rather than the current three: with the sanitizer shards
+no longer filling those lanes, the greedy scoring, which compares a hosted
+candidate by its own lane load, sends jobs there that cost 2.9 to 4.2
+times their Mac seconds. Scoring each candidate by the resulting maximum
+over all eleven lanes instead was tried and reached 51.39; in that result
+the hosted lanes ended between 26.23 and 42.22 while the Mac lanes rose to
+between 50.59 and 51.39.
+
+So the searched maximum is 1.48 minutes lower on the sharded job set,
+while the search improves on the greedy placement by 1.81 minutes on the
+current job set and 4.22 on the sharded one, and sharding alone raises the
+greedy maximum by 0.93. These are model comparisons, not measured run
+improvements, and they favor investigating the placement before the
+sharding. The search also respects only lane eligibility, not the
+invariants *tests/macos-lanes.test.ts* asserts about which jobs lead a
+hosted lane and which entries may reach one, so what a refinement pass
+carrying those constraints can reach is not established.

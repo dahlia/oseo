@@ -3290,3 +3290,42 @@ thing to try. *docs/evidence/u44/README.md* records the measurements and
 what they leave open, namely which runner configurations the six ratio
 groups correspond to, since no job in the workflow reports its processor
 count.
+
+#### What the U44 branch run measured
+
+Branch run 39206357696 passed in 48.62 minutes, the shortest of the
+fourteen runs since `b59ac914` and 1.98 below the previous shortest. Its 37
+Ubuntu jobs accumulated 5.5 job-minutes of allocation waiting against 88.1
+in main run 39154284680, and its 10 hosted macOS jobs 8.9 against 27.2. The
+job that ended the run waited 0.03 minutes, so allocation contributed
+nothing to its end.
+
+Raising `native (macos-aarch64, 2/3)` to 1,162 placed it on Mac lane four,
+where it ran in 8.10 minutes. The hosted lanes ended at 43.43, 39.88,
+41.38, 42.23, and 38.72 minutes against modeled 41.30, 36.32, 42.45,
+39.90, and 42.18, and no hosted lane ended the run, which stopped a streak
+of five. All ten hosted jobs ran between 0.80 and 1.09 times their entries,
+against the 1.13 to 1.37 of the jobs that ended those five runs. All six
+Mac lanes finished inside their modeled ends for the fourth consecutive
+run, at 44.38, 45.33, 44.18, 47.72, 43.70, and 43.80, idling 0.13 to 0.27
+minutes each.
+
+The Linux side ended this run, for the first time in the window.
+`test (ubuntu-latest, node)` waited 0.03 minutes, ran 48.52, and ended at
+48.55, while the last macOS job ended at 47.72. That meets the condition
+this section named. Shortening the Linux job enough, with every other
+timing held fixed, would move the run's end from 48.62 to the 48.3 that
+`native support (linux-x86_64-gnu, 6/7)` sets, so going lower means
+shortening the `native support` shards too. The two sides ended 0.83
+minutes apart, both near 48, and shortening the macOS jobs alone would not
+have changed this run's end.
+
+Hill climbing on single moves and swaps of the greedy placement, scored by
+the `macosLaneEnds` maximum, lowers it from 48.79 to 46.98 minutes in the
+model, and reaches 45.50 on a job set with both macOS sanitizer suites
+split three ways. The greedy placement on that sharded set instead gives
+49.72: its hosted lanes hold five Mac-eligible jobs rather than three,
+because the sanitizer shards no longer fill them and a hosted candidate is
+scored by its own lane load. These model results favor investigating the
+placement before the sharding; *docs/evidence/u44/README.md* records both
+searches and the invariants they do not respect.
