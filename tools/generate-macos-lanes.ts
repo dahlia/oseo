@@ -304,6 +304,41 @@ function refineLanes(
 }
 
 /**
+ * Add the readiness probe to a template job's prerequisites so that no job
+ * competes with it for the run's first hosted runner slot.
+ *
+ * The probe runs for about twenty seconds, but it holds every Mac lane:
+ * each lane job reads its outputs to choose a runner. When hosted demand
+ * reaches the account's concurrency ceiling the probe queues like any
+ * other job, and every minute it waits is added to all six lane ends.
+ * Runs 39234170440 and 39244971256 measured 2.43 and 6.97 minutes of that
+ * wait, and they are exactly the two runs whose observed hosted
+ * concurrency reached the ceiling; the five runs before them measured 0.02
+ * to 0.05. Depending on the probe costs every other job the probe's own
+ * duration once, about 0.35 minutes, and in exchange the lane start stops
+ * depending on how the ceiling happens to allocate.
+ *
+ * Only a template job with no prerequisites of its own needs this. The
+ * native aggregate already waits for every shard, so it reaches the probe
+ * transitively.
+ */
+function withReadinessNeed(block: string): string {
+  if (/^    needs:/m.test(block)) return block;
+  // None of these jobs reads the probe's outputs, so a failed probe must
+  // not skip them. Without this condition the prerequisite would turn one
+  // failed twenty-second job into a run that tested nothing.
+  const guard = /^    if:/m.test(block) ? "" : "    if: ${{ !cancelled() }}\n";
+  const output = block.replace(
+    /^    runs-on: /m,
+    `${guard}    needs:\n      - mac_ready\n    runs-on: `,
+  );
+  if (output === block) {
+    throw new Error("Template job has no runs-on to precede with needs");
+  }
+  return output;
+}
+
+/**
  * Mac-lane families whose jobs run fast-check properties under the
  * ordinary interrupt limits and therefore widen those limits when their
  * lane falls back to hosted. Own-key case shards are excluded on purpose:
@@ -663,6 +698,11 @@ export function generateMacosWorkflow(
   )) {
     blocks.set(match[1]!, match[0]);
   }
+  const workflow = parsedMapping(parse(template), "Workflow template");
+  const jobs = parsedMapping(workflow.jobs, "Workflow jobs");
+  // The block pattern also matches the trigger keys under `on`, which are
+  // not jobs and take no prerequisites.
+  const jobIds = new Set(Object.keys(jobs));
   let output = template;
   // Preserve Linux/Windows matrix jobs verbatim apart from macOS entries.
   for (const [id, block] of blocks) {
@@ -674,11 +714,12 @@ export function generateMacosWorkflow(
         /^          - os: macos-(?:15|latest)\n(?:            [^\n]*\n)+/gm,
         "",
       );
+      if (selfHostedCount > 0 && jobIds.has(id)) {
+        linux = withReadinessNeed(linux);
+      }
     }
     output = output.replace(block, linux);
   }
-  const workflow = parsedMapping(parse(template), "Workflow template");
-  const jobs = parsedMapping(workflow.jobs, "Workflow jobs");
   const native = parsedMapping(jobs.native, "Native aggregate");
   const nativeIds = native.needs;
   if (!Array.isArray(nativeIds) || !nativeIds.every(isString)) {
@@ -768,7 +809,9 @@ export function generateMacosWorkflow(
             ? "    needs:\n      - mac_ready\n" +
               hostedFallbackEnvironment(job, runnerOutput)
             : predecessor == null
-              ? ""
+              ? selfHostedCount > 0
+                ? "    needs: mac_ready\n"
+                : ""
               : `    needs: ${predecessor.id}\n`),
       );
       generated.push(block.trimEnd(), "");

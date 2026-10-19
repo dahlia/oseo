@@ -23,6 +23,9 @@ concurrency:
 
 jobs:
   check:
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -58,6 +61,9 @@ jobs:
       - run: mise run check
 
   test:
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -93,6 +99,9 @@ jobs:
     name: >-
       test (ubuntu-latest, node,
       ${{ matrix.shard }}/${{ matrix.total }})
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -118,6 +127,9 @@ jobs:
 
   test_native:
     name: native (${{ matrix.platform.target }}, ${{ matrix.shard }}/3)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ${{ matrix.platform.os }}
     timeout-minutes: 60
     strategy:
@@ -150,6 +162,9 @@ jobs:
 
   test_sanitizer:
     name: host C sanitizers (Linux, ${{ matrix.shard }}/3)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ubuntu-latest
     # Run 38957726165 measured 36.1 minutes for the native fixtures and
     # 3.8 for the runtime ones, so one shard carries about 16 minutes and
@@ -195,6 +210,9 @@ jobs:
 
   test_sanitizer_property:
     name: host C sanitizers (Linux, property, ${{ matrix.shard }}/2)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ubuntu-latest
     # The full suite took 24.80 to 48.30 minutes across fifteen runs.
     # Two shards leave slow-runner and cold-cache margin within 45 minutes.
@@ -232,6 +250,9 @@ jobs:
     name: >-
       test262 (${{ matrix.target }},
       ${{ matrix.shard }}/${{ matrix.total }})
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -315,6 +336,9 @@ jobs:
     name: >-
       native support (${{ matrix.target }},
       ${{ matrix.shard }}/${{ matrix.total }})
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ${{ matrix.os }}
     # Run 38551733723 lost a Linux shard to the previous 90-minute limit
     # while its work took a measured 32.9 to 62 minutes across runs; the
@@ -385,6 +409,9 @@ jobs:
     name: >-
       own-key cases (${{ matrix.target }},
       ${{ matrix.caseShard }}/3)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ${{ matrix.os }}
     timeout-minutes: 90
     strategy:
@@ -436,6 +463,9 @@ jobs:
     name: >-
       reflect cases (${{ matrix.target }},
       ${{ matrix.caseShard }}/3)
+    if: ${{ !cancelled() }}
+    needs:
+      - mac_ready
     runs-on: ${{ matrix.os }}
     # U38 measured a Mac lane at 3 minutes per shard and derives 5.6 for
     # a hosted macOS fallback. A dedicated hosted Linux job has no
@@ -596,6 +626,7 @@ jobs:
     name: host C sanitizers (macOS, native)
     runs-on: macos-15
     if: ${{ !cancelled() }}
+    needs: mac_ready
     # Each suite retains its own instrumentation preflight.
     # About 36–44 minutes for runtime/native and 29–35 for properties;
     # 75 minutes leaves room for setup, cold caches, and slower runner images.
@@ -638,6 +669,7 @@ jobs:
     name: host C sanitizers (macOS, property)
     runs-on: macos-15
     if: ${{ !cancelled() }}
+    needs: mac_ready
     # Each suite retains its own instrumentation preflight.
     # About 36–44 minutes for runtime/native and 29–35 for properties;
     # 75 minutes leaves room for setup, cold caches, and slower runner images.
@@ -680,6 +712,7 @@ jobs:
     name: test (macos-latest, node, 3/4)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
+    needs: mac_ready
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -745,6 +778,7 @@ jobs:
     name: test (macos-latest, node, 2/4)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
+    needs: mac_ready
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion
@@ -835,6 +869,7 @@ jobs:
     name: test (macos-latest, node, 1/4)
     runs-on: macos-latest
     if: ${{ !cancelled() }}
+    needs: mac_ready
     steps:
       - name: Record macOS host version
         run: sw_vers -productVersion

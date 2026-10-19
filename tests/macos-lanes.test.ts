@@ -686,10 +686,10 @@ test("one extra lane retains every job and aggregate dependency", () => {
   )) {
     const actual = workflow.jobs[planned.id]!;
     assert.equal(actual["runs-on"], planned.os);
-    assert.ok(
-      actual.needs == null ||
-        !JSON.stringify(actual.needs).includes("mac_ready"),
-    );
+    // A hosted lane head waits for the probe so that nothing competes with
+    // it for the first slot, but no hosted job takes its runner from the
+    // probe's outputs.
+    assert.ok(!JSON.stringify(actual).includes("mac_ready.outputs"));
   }
   assert.deepEqual(
     names(workflow).filter((name) => name !== "macOS self-hosted availability"),
@@ -1309,12 +1309,16 @@ test("six Mac lanes route each label with its own hosted fallback", () => {
   );
   assert.match(String(probe.if), /github\.event_name == 'push'/);
   for (const [index, lane] of lanes.entries()) {
-    for (const job of lane) {
+    for (const [position, job] of lane.entries()) {
       const actual = workflow.jobs[job.id]!;
       assert.equal(actual.name, job.name);
       if (index < 5) {
         assert.equal(actual["runs-on"], job.os);
-        assert.ok(!JSON.stringify(actual.needs ?? "").includes("mac_ready"));
+        // The head waits for the probe; the rest chain in lane order.
+        assert.equal(
+          actual.needs,
+          position === 0 ? "mac_ready" : lane[position - 1]!.id,
+        );
         continue;
       }
       assert.equal(
