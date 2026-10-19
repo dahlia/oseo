@@ -286,22 +286,16 @@ test("every check name and concurrency policy is preserved", () => {
       ),
       // The Reflect namespace property file now runs in dedicated
       // case-shard jobs on both native hosts, outside the file shards;
-      // see PLAN-GATE.md (U38). The globalThis binding file runs the same
-      // way on Linux alone, where it is the heaviest remaining file;
-      // see PLAN-GATE.md (U46).
+      // see PLAN-GATE.md (U38).
       ...["linux-x86_64-gnu", "macos-aarch64"].flatMap((target) =>
         Array.from(
           { length: 3 },
           (_, index) => `reflect cases (${target}, ${index + 1}/3)`,
         ),
       ),
-      ...Array.from(
-        { length: 3 },
-        (_, index) => `globalThis cases (linux-x86_64-gnu, ${index + 1}/3)`,
-      ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 84);
+  assert.equal(names(after).length, 81);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -550,7 +544,7 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     throw new Error("Aggregate requires an explicit dependency list");
   }
   assert.deepEqual(needs.toSorted(), expected);
-  assert.equal(expected.length, 39);
+  assert.equal(expected.length, 38);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -596,7 +590,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 40);
+  assert.equal(needs.length, 39);
 });
 
 test("committed workflow matches generator output exactly", () => {

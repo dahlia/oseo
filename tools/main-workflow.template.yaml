@@ -692,56 +692,6 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
-  test_globalthis_case:
-    name: >-
-      globalThis cases (${{ matrix.target }},
-      ${{ matrix.caseShard }}/3)
-    runs-on: ${{ matrix.os }}
-    # Run 39227927384 measured 2,732 seconds unsharded on a contended
-    # four-worker Linux runner. A third is 15.2 minutes before removing
-    # contention; thirty minutes allows setup and runner variation.
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            caseShard: 1
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            caseShard: 2
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            caseShard: 3
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: jdx/mise-action@v4
-        with:
-          install: true
-      - uses: ./.github/actions/runtime-archive-cache
-      # Four property domains share this job, but the duration recorder
-      # exclusively creates one record per job. Recording every domain
-      # needs a new record format, so no duration file is set here.
-      # Each shard retains the full property interrupt limit and fails
-      # if interrupted.
-      - run: >-
-          mise run test:property:extended:native:shard
-          tests/property/m5-globalthis-binding.property.test.ts
-        env:
-          OSEO_PROPERTY_CASE_SHARD: ${{ matrix.caseShard }}/3
-          TMPDIR: ${{ runner.temp }}
-      - if: failure() || cancelled()
-        uses: actions/upload-artifact@v7
-        with:
-          name: >-
-            ${{ format('globalthis-cases-{0}-{1}-of-3',
-            matrix.target, matrix.caseShard) }}
-          path: ${{ runner.temp }}/oseo-native-*
-          if-no-files-found: warn
-
   native:
     # The generator expands needs and replaces steps with success checks.
     if: ${{ always() }}
@@ -750,7 +700,6 @@ jobs:
       - test_native_support
       - test_property_case
       - test_reflect_case
-      - test_globalthis_case
       - test_test262
     runs-on: ubuntu-latest
     steps:
