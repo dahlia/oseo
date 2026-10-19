@@ -101,14 +101,14 @@ export const macosJobCosts: MacosJobCosts = {
   "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
   "test (macos-latest, node, 3/4)": 1311, // 18
-  "native support (macos-aarch64, 3/12)": 1293, // 3 hosted since b59ac914
-  "native (macos-aarch64, 1/3)": 1239, // 4 hosted since b59ac914
+  "native support (macos-aarch64, 3/12)": 1293, // 5 hosted since b59ac914
+  "native (macos-aarch64, 1/3)": 1236, // 6 hosted since b59ac914
   "native support (macos-aarch64, 12/12)": 1220, // 2 hosted since b59ac914
+  "native (macos-aarch64, 2/3)": 1162, // 3 hosted since b59ac914
   "native (macos-aarch64, 3/3)": 1160, // 2 hosted since b59ac914
   "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
   "test (macos-latest, node, 1/4)": 971, // 18
-  "native (macos-aarch64, 2/3)": 904, // 1 hosted since b59ac914
   "test (macos-latest, node, 4/4)": 864, // 18
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
