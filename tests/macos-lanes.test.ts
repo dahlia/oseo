@@ -274,7 +274,10 @@ test("every check name and concurrency policy is preserved", () => {
         { length: 7 },
         (_, index) => `native support (linux-x86_64-gnu, ${index + 1}/7)`,
       ),
-      "host C sanitizers (Linux, property)",
+      ...Array.from(
+        { length: 2 },
+        (_, index) => `host C sanitizers (Linux, property, ${index + 1}/2)`,
+      ),
       // The Reflect namespace property file now runs in dedicated
       // case-shard jobs on both native hosts, outside the file shards;
       // see PLAN-GATE.md (U38).
@@ -286,7 +289,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 78);
+  assert.equal(names(after).length, 79);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -450,10 +453,14 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
   const native = after.jobs.test_sanitizer!;
   const property = after.jobs.test_sanitizer_property!;
   assert.equal(native.name, "host C sanitizers (Linux, ${{ matrix.shard }}/3)");
-  assert.equal(property.name, "host C sanitizers (Linux, property)");
+  assert.equal(
+    property.name,
+    "host C sanitizers (Linux, property, ${{ matrix.shard }}/2)",
+  );
   assert.equal(native["timeout-minutes"], 45);
-  assert.equal(property["timeout-minutes"], 75);
+  assert.equal(property["timeout-minutes"], 45);
   assert.deepEqual(entries(native), [{ shard: 1 }, { shard: 2 }, { shard: 3 }]);
+  assert.deepEqual(entries(property), [{ shard: 1 }, { shard: 2 }]);
   assert.deepEqual(
     native.steps.filter((step) => step.run).map((step) => step.run),
     [
@@ -471,7 +478,12 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
   );
   assert.deepEqual(
     property.steps.filter((step) => step.run).map((step) => step.run),
-    ["mise run test:sanitizer:self", "mise run test:sanitizer:property"],
+    [
+      "mise run test:sanitizer:self",
+      "mise run test:sanitizer:property:shard " +
+        "--test-shard=${{ matrix.shard }}/2 " +
+        "tests/property/*.property.test.ts",
+    ],
   );
   assert.deepEqual(native.steps.slice(0, 3), property.steps.slice(0, 3));
   assert.equal(native["runs-on"], "ubuntu-latest");
@@ -503,7 +515,7 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
     ...nativeUpload,
     with: {
       ...parsedMapping(nativeUpload.with, "Native sanitizer artifact"),
-      name: "host-cc-sanitizer-property-failures",
+      name: "host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-2",
     },
   });
 });

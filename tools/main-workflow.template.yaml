@@ -200,11 +200,17 @@ jobs:
           if-no-files-found: warn
 
   test_sanitizer_property:
-    name: host C sanitizers (Linux, property)
+    name: host C sanitizers (Linux, property, ${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
-    # Run 37999730012 measured 45.52 minutes for properties.
-    # 75 minutes leaves room for preflight, setup, and cold caches.
-    timeout-minutes: 75
+    # The full suite took 24.80 to 48.30 minutes across fifteen runs.
+    # Two shards leave slow-runner and cold-cache margin within 45 minutes.
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+          - shard: 2
     steps:
       - uses: actions/checkout@v7
         with:
@@ -215,13 +221,16 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         with:
           toolchain: host-cc
-      # Each suite retains its own instrumentation preflight.
+      # Each shard retains its own instrumentation preflight.
       - run: mise run test:sanitizer:self
-      - run: mise run test:sanitizer:property
+      - run: >-
+          mise run test:sanitizer:property:shard
+          --test-shard=${{ matrix.shard }}/2
+          tests/property/*.property.test.ts
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-property-failures
+          name: host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-2
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
