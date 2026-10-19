@@ -13,7 +13,7 @@
  * the refreshed weight for the same file. One run estimates no
  * run-to-run variation, so these values are not conservative bounds.
  *
- * The two entries in `caseShardedNativeFiles` are retained from the
+ * The own-key and Reflect namespace entries are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
  * not observe them here; they still weigh other wrapper invocations and
  * divide into the case-shard estimates below.

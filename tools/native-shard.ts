@@ -14,15 +14,20 @@ export const ownKeyNativeFile =
   "tests/property/m5-object-own-keys.property.test.ts";
 
 /**
- * Case-sharded files, which run outside the native file shards. Each one
- * has its own CI jobs that partition its generated cases instead, so a
- * file shard that still carried it would duplicate that work and, for the
- * files here, would also set its shard's wall on its own.
+ * Files with dedicated case-shard jobs on the selected host. The list is
+ * per host because globalThis binding is heavy on Linux but light on
+ * macOS, where extra case jobs would consume scarce runner slots.
+ * Exclude these files from file shards to avoid duplicate execution.
  */
-export const caseShardedNativeFiles: readonly string[] = [
-  ownKeyNativeFile,
-  "tests/property/m5-reflect-namespace.property.test.ts",
-];
+export function caseShardedNativeFiles(platform: string): readonly string[] {
+  return [
+    ownKeyNativeFile,
+    "tests/property/m5-reflect-namespace.property.test.ts",
+    ...(platform === "linux"
+      ? ["tests/property/m5-globalthis-binding.property.test.ts"]
+      : []),
+  ];
+}
 
 /** Fixed host-specific scheduling model for native property partitions. */
 export interface NativeShardModel {
@@ -142,7 +147,7 @@ export function nativeTestArguments(
   }
   const files = parsed.values["exclude-case-sharded"]
     ? parsed.positionals.filter(
-        (path) => !caseShardedNativeFiles.includes(path),
+        (path) => !caseShardedNativeFiles(platform).includes(path),
       )
     : parsed.positionals;
   const selected = selectNativeTestShard(files, shard!, platform);
