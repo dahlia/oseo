@@ -146,4 +146,41 @@ those ten across the five lanes exhaustively gives a lowest achievable
 maximum of 2,825 seconds, or 47.08 minutes, and the placement reaches it.
 Going below that needs different job costs, different job boundaries,
 different eligibility, or more concurrency than the account's five hosted
-macOS slots and six Macs provide.
+macOS slots and the six self-hosted lanes on three Mac minis provide.
+
+
+What the main runs measured
+---------------------------
+
+Main runs 39422744044 at `d4e23e90` and 39455962104 at `77616a77` ran the
+same workflow and placement as branch run 39351734495; the commits between
+them changed only Markdown. Completion times are minutes from the run's first
+job creation. Linux work excludes the `native`, `test262`, `test`, and `check`
+aggregates, Mac-lane work sums the self-hosted job durations, and Ubuntu
+waiting is summed waiting in job-minutes.
+
+| run         | end   | Linux work | hosted macOS | Mac lanes | Mac-lane work | Ubuntu waiting |
+| ----------- | ----- | ---------- | ------------ | --------- | ------------- | -------------- |
+| 39351734495 | 49.77 | 47.30      | 49.77        | 47.68     | 263.2         | 2.5            |
+| 39422744044 | 54.00 | 45.47      | 50.03        | 53.62     | 292.0         | 1.5            |
+| 39455962104 | 50.63 | 48.80      | 48.55        | 47.60     | 259.6         | 1.4            |
+
+The 54.00-minute run drew slow Mac lanes. Each lane held the same jobs in
+all three runs, and the lanes' summed work was 263.2 and 259.6 minutes in
+the other two against 292.0 in that one, with every lane 6 to 20 percent
+slower than in the branch run. Its last Mac-lane job,
+`reflect cases (macos-aarch64, 1/3)`, ended at 53.62, and the `native`
+aggregate closed the run at 54.00. The six self-hosted lanes share three Mac
+minis, two lanes per machine. The cause of the longer job durations was not
+measured.
+
+The Linux figures earlier in these records took the latest Ubuntu job end,
+which includes that aggregate even though it waits for the macOS case
+shards. Excluding aggregates, the latest Ubuntu work ended at 47.30 in the
+branch run, not 48.00. Summed Ubuntu waiting stayed between 1.4 and 2.5
+job-minutes across the three runs.
+
+A `workflow_dispatch` run, 39436099733, was started to repeat the measurement
+and canceled. The readiness probe runs only on push events, so every Mac lane
+fell back to the five hosted macOS slots and the run could not measure the Mac
+lanes.
