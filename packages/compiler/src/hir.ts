@@ -384,6 +384,7 @@ export function isStandardGlobalName(name: string): boolean {
 const typedArrayIntrinsicNames: ReadonlySet<string> = new Set([
   "BigInt64Array",
   "BigUint64Array",
+  "Float16Array",
   "Float32Array",
   "Float64Array",
   "Int16Array",

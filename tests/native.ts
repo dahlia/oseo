@@ -59,6 +59,7 @@ import * as setComposition from "./native/fixtures/set-composition-methods.ts";
 import { setIntrinsicFixtures } from "./native/fixtures/set-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
+import * as typedArrayFloat16 from "./native/fixtures/typed-array-float16.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
@@ -217,6 +218,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
   ...typedArrays.typedArrayConstructorFixtures,
+  ...typedArrayFloat16.typedArrayFloat16Fixtures,
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
   ...agentFixtures.atomicsAndSharedMemoryFixtures,
@@ -1025,6 +1027,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-symbol-methods" ||
     fixture.name === "typed-array-constructors" ||
+    fixture.name === "typed-array-float16" ||
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
@@ -1151,6 +1154,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
+    fixture.name === "typed-array-float16" ||
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
@@ -1439,6 +1443,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "typed-array-constructors" ||
+            fixture.name === "typed-array-float16" ||
             fixture.name === "typed-array-core" ||
             fixture.name === "shared-array-buffer" ||
             fixture.name === "atomics-single-agent" ||

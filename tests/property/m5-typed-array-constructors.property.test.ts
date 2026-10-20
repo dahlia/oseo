@@ -1281,3 +1281,312 @@ test(
     );
   },
 );
+
+/*
+ * Float16Array conversion. ECMA-262 2025 NumericToRawBytes rounds a Number
+ * once, directly from binary64, to the nearest IEEE 754-2019 binary16 value
+ * with ties to even; values at or past 65520 become signed infinity. The
+ * oracle below reaches that answer by exact BigInt arithmetic over the
+ * operand's binary64 encoding, independently of Math.f16round, the
+ * runtime's DataView encoder, and both reference engines.
+ */
+
+type HalfInput =
+  | { readonly kind: "double"; readonly value: number }
+  | {
+      readonly bits: number;
+      readonly kind: "neighbor";
+      readonly negative: boolean;
+      readonly offset: "above" | "below" | "exact" | "tie";
+    };
+type HalfPath = "array-like" | "assignment" | "data-view" | "float64";
+
+interface HalfCase {
+  readonly inputs: readonly HalfInput[];
+  readonly path: HalfPath;
+}
+
+const float64Bits = new BigUint64Array(1);
+const float64Value = new Float64Array(float64Bits.buffer);
+
+/* Exact |value| as `significand * 2 ** exponent`, for a finite value. */
+function binary64Parts(value: number): {
+  readonly exponent: number;
+  readonly significand: bigint;
+} {
+  float64Value[0] = Math.abs(value);
+  const bits = float64Bits[0] ?? 0n;
+  const field = Number((bits >> 52n) & 0x7ffn);
+  const fraction = bits & 0xf_ffff_ffff_ffffn;
+  return field === 0
+    ? { exponent: -1074, significand: fraction }
+    : { exponent: field - 1075, significand: fraction | (1n << 52n) };
+}
+
+function binary16Value(bits: number): number {
+  const field = (bits >> 10) & 0x1f;
+  const fraction = bits & 0x3ff;
+  const magnitude =
+    field === 0 ? fraction * 2 ** -24 : (fraction + 1024) * 2 ** (field - 25);
+  return (bits & 0x8000) === 0 ? magnitude : -magnitude;
+}
+
+function roundToBinary16(value: number): number {
+  if (Number.isNaN(value) || value === 0 || !Number.isFinite(value)) {
+    return value;
+  }
+  const { exponent, significand } = binary64Parts(value);
+  const highest = significand.toString(2).length - 1 + exponent;
+  // Every subnormal shares the smallest normal's quantum, 2 ** -24.
+  const quantum = Math.max(highest, -14) - 10;
+  let units: bigint;
+  if (exponent >= quantum) {
+    units = significand << BigInt(exponent - quantum);
+  } else {
+    const shift = BigInt(quantum - exponent);
+    const truncated = significand >> shift;
+    const remainder = significand - (truncated << shift);
+    const half = 1n << (shift - 1n);
+    units =
+      remainder > half || (remainder === half && (truncated & 1n) === 1n)
+        ? truncated + 1n
+        : truncated;
+  }
+  const magnitude = Number(units) * 2 ** quantum;
+  const rounded = magnitude > 65504 ? Infinity : magnitude;
+  return value < 0 ? -rounded : rounded;
+}
+
+/*
+ * A binary64 operand at or around one binary16 value: the value itself,
+ * the exact midpoint to the next binary16 value, or the binary64 values
+ * adjacent to that midpoint. The largest finite pattern's midpoint is the
+ * overflow threshold 65520.
+ */
+function adjacentBinary64(value: number, direction: -1n | 1n): number {
+  float64Value[0] = value;
+  float64Bits[0] = (float64Bits[0] ?? 0n) + direction;
+  return float64Value[0] ?? Number.NaN;
+}
+
+function halfInputValue(input: HalfInput): number {
+  if (input.kind === "double") return input.value;
+  const low = binary16Value(input.bits);
+  const high = input.bits === 0x7bff ? 65536 : binary16Value(input.bits + 1);
+  // Both neighbors are positive binary16 values, so their exact midpoint
+  // is a positive binary64 value and its encoding steps to its neighbors.
+  const middle = (low + high) / 2;
+  const magnitude =
+    input.offset === "exact"
+      ? low
+      : input.offset === "tie"
+        ? middle
+        : adjacentBinary64(middle, input.offset === "above" ? 1n : -1n);
+  return input.negative ? -magnitude : magnitude;
+}
+
+function printHalfNumber(value: number): string {
+  if (Object.is(value, -0)) return "-0";
+  if (Number.isNaN(value)) return "NaN";
+  if (value === Infinity) return "Infinity";
+  if (value === -Infinity) return "-Infinity";
+  return String(value);
+}
+
+const halfInputArbitrary: fc.Arbitrary<HalfInput> = fc.oneof(
+  fc.record({
+    kind: fc.constant("double" as const),
+    value: fc.oneof(
+      fc.double(),
+      fc.double({ max: 70_000, min: -70_000 }),
+      fc.double({ max: 2 ** -13, min: -(2 ** -13) }),
+    ),
+  }),
+  fc.record({
+    bits: fc.oneof(
+      fc.integer({ max: 0x7bff, min: 0 }),
+      fc.constantFrom(0, 1, 0x3ff, 0x400, 0x3c00, 0x7bfe, 0x7bff),
+    ),
+    kind: fc.constant("neighbor" as const),
+    negative: fc.boolean(),
+    offset: fc.constantFrom("above", "below", "exact", "tie"),
+  }),
+);
+
+const halfCaseArbitrary: fc.Arbitrary<HalfCase> = fc.record({
+  inputs: fc.array(halfInputArbitrary, { maxLength: 6, minLength: 1 }),
+  path: fc.constantFrom("array-like", "assignment", "data-view", "float64"),
+});
+
+/*
+ * Every path stores through NumericToRawBytes: construction from an
+ * array-like or a Float64Array, element assignment, and DataView's
+ * setFloat16 over the same buffer. The view's bytes are then read back
+ * through DataView too, so both views must agree on the encoding.
+ */
+function printHalfCase(testCase: HalfCase): string {
+  const values = testCase.inputs
+    .map((input) => {
+      const value = halfInputValue(input);
+      return Object.is(value, -0) ? "-0" : String(value);
+    })
+    .join(", ");
+  const count = testCase.inputs.length;
+  const construction =
+    testCase.path === "array-like"
+      ? `new Float16Array({ length: ${count}, ...inputs })`
+      : testCase.path === "float64"
+        ? "new Float16Array(new Float64Array(inputs))"
+        : `new Float16Array(${count})`;
+  const store =
+    testCase.path === "assignment"
+      ? `for (let index = 0; index < ${count}; index = index + 1) {
+  view[index] = inputs[index];
+}`
+      : testCase.path === "data-view"
+        ? `for (let index = 0; index < ${count}; index = index + 1) {
+  bytes.setFloat16(index * 2, inputs[index], true);
+}`
+        : "";
+  return `
+/** @param {number} left @param {number} right */
+function hinted(left, right) { return left + right; }
+console.log("hint", hinted(2, 3), hinted("2", 3));
+function show(value) {
+  return Object.is(value, -0) ? "-0" : String(value);
+}
+const inputs = [${values}];
+const view = ${construction};
+const bytes = new DataView(view.buffer);
+${store}
+const observed = [];
+for (let index = 0; index < view.length; index = index + 1) {
+  observed.push(show(view[index]), show(bytes.getFloat16(index * 2, true)));
+}
+console.log("half", view.length, view.byteLength, observed.join(" "));
+`;
+}
+
+function halfExpected(testCase: HalfCase): string {
+  const observed = testCase.inputs.flatMap((input) => {
+    const shown = printHalfNumber(roundToBinary16(halfInputValue(input)));
+    return [shown, shown];
+  });
+  return [
+    "hint 5 23",
+    `half ${testCase.inputs.length} ${testCase.inputs.length * 2} ` +
+      observed.join(" "),
+    "",
+  ].join("\n");
+}
+
+test("the binary16 oracle rounds the fixed boundary cases", () => {
+  const cases: readonly (readonly [number, number])[] = [
+    [65504, 65504],
+    [65519.99, 65504],
+    [65520, Infinity],
+    [-65520, -Infinity],
+    [2 ** -25, 0],
+    [2 ** -25 + 2 ** -40, 2 ** -24],
+    [3 * 2 ** -25, 2 ** -23],
+    [1 + 2 ** -11, 1],
+    [1 + 3 * 2 ** -11, 1 + 2 ** -9],
+    [1 + 2 ** -11 + 2 ** -40, 1 + 2 ** -10],
+    [2049, 2048],
+    [2051, 2052],
+    [1 / 3, 0.333251953125],
+    [-1e-8, -0],
+  ];
+  for (const [input, rounded] of cases) {
+    assert.ok(Object.is(roundToBinary16(input), rounded), String(input));
+  }
+});
+
+test(
+  "generated Float16Array conversion matches ECMA-262 2025",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "Float16Array stores round once to binary16 with ties to even",
+      fc.asyncProperty(halfCaseArbitrary, async (testCase) => {
+        const source = printHalfCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: halfExpected(testCase),
+        };
+        assertMatchingObservations([
+          expectedObservation,
+          ...(await references(source)),
+        ]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-float16-array.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const mir = printMir(compiled.mir);
+          if (specialization === "enabled") {
+            assert.match(mir, /guard-smi/u);
+            assert.match(mir, /generic-fallback/u);
+          } else {
+            assert.doesNotMatch(mir, /guard-(?:smi|shape)/u);
+          }
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: nativeToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expectedObservation, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "enabled") {
+                  assert.ok(native.counters.guardMisses > 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one to six binary64 operands, each an arbitrary double, a " +
+          "double within the binary16 range or the subnormal band, or a " +
+          "signed finite binary16 value, the exact midpoint to its " +
+          "successor, or the adjacent binary64 value above or below that " +
+          "midpoint; stored through array-like or Float64Array " +
+          "construction, element assignment, or DataView setFloat16, with " +
+          "every element read back through the view and DataView, and one " +
+          "false numeric hint",
+        numRuns: 12,
+        profile: "M5 Float16Array conversion",
+        seed: 0x6000_6e02,
+        sizeLimit:
+          "one view of at most six elements, one construction or store " +
+          "path, two reads per element, and one false hint",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

@@ -900,7 +900,7 @@ test("rejects typeof of an unshadowed runtime intrinsic name", () => {
 test("reads typeof of materialized intrinsics through properties", () => {
   // Each admitted realm value reads the global object's property rather
   // than rejecting the reference.
-  for (const name of ["Promise", "RegExp", "Date"]) {
+  for (const name of ["Promise", "RegExp", "Date", "Float16Array"]) {
     const result = compileSource(babelFrontend, {
       source: `console.log(typeof ${name});`,
       sourceId: "typeof-intrinsic.ts",
@@ -912,14 +912,13 @@ test("reads typeof of materialized intrinsics through properties", () => {
 });
 
 test("rejects typeof of an unimplemented standard global name", () => {
-  // ECMA-262 clause 19 requires every conforming realm to bind these
-  // names, so an absent property's "undefined" answer would misreport
-  // them; each stays a source-located rejection until the profile admits
-  // it as a value, inside and outside `with` alike.
+  // ECMA-262 clause 19 requires every conforming realm to bind this
+  // name, so an absent property's "undefined" answer would misreport it;
+  // it stays a source-located rejection until the profile admits it as a
+  // value, inside and outside `with` alike.
   for (const source of [
-    "console.log(typeof Float16Array);",
     "console.log(typeof eval);",
-    "with ({}) { console.log(typeof Float16Array); }",
+    "with ({}) { console.log(typeof eval); }",
   ]) {
     const result = compileSource(babelFrontend, {
       source,

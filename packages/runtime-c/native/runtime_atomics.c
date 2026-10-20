@@ -113,6 +113,7 @@ static OseoResult atomics_validate_integer(
         ? kind == OSEO_TYPED_ARRAY_INT32 ||
             kind == OSEO_TYPED_ARRAY_BIGINT64
         : kind != OSEO_TYPED_ARRAY_UINT8_CLAMPED &&
+            kind != OSEO_TYPED_ARRAY_FLOAT16 &&
             kind != OSEO_TYPED_ARRAY_FLOAT32 &&
             kind != OSEO_TYPED_ARRAY_FLOAT64;
     if (!admitted) {

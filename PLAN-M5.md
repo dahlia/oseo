@@ -8055,3 +8055,87 @@ records remain unchanged; the only added record is the owned TypedArray
 construction-order case, observed as `pass`.
 This records preparation evidence. Local checks, candidate CI, and
 publication closure remain separate gates.
+
+
+Concrete TypedArray feature admission
+-------------------------------------
+
+M5c node `typed-array-feature-admission` owns 42 reviewed paths. Forty
+were not executed because their only unsupported frontmatter features were
+concrete TypedArray constructor names. The reviewed `supportedFeatures` list
+now admits the nine such tags upstream defines that it lacked:
+`Float32Array`, `Float64Array`, `Int8Array`, `Int16Array`, `Int32Array`,
+`Uint8Array`, `Uint8ClampedArray`, `Uint16Array`, and `Uint32Array`.
+`Float16Array` was already listed. No runner, inventory policy, or manifest
+schema change accompanies the tags.
+
+The other two paths are
+*Array.prototype.concat\_small-typed-array.js* under
+*test/built-ins/Array/prototype/concat/* and
+*typedarray-arg-set-values-diff-buffer-other-type-conversions-sab.js* under
+*test/built-ins/TypedArray/prototype/set/*. Both were rejected at compile time
+with `OSEO1001` because their own bodies evaluate `typeof Float16Array`.
+ECMA-262 2025 23.2 Table 73 requires `%Float16Array%`, element type Float16,
+element size 2, so answering `"undefined"` would misreport the realm, and the
+runtime had no such constructor. The node therefore adds it as a twelfth
+concrete kind rather than changing the `typeof` boundary:
+
+ -  `OSEO_TYPED_ARRAY_FLOAT16` takes the next element-kind value, realm
+    slots 271 and 272 hold its prototype and constructor, and the TypedArray
+    code range gains its constructor at the next free code ID. Existing
+    kinds, slots, and code IDs keep their values. The runtime identity is
+    `m5-133`.
+ -  Element reads and writes use the exact binary16 encoder and decoder that
+    DataView's `getFloat16` and `setFloat16` already used, so NumericToRawBytes
+    rounds once from binary64 with ties to even, 65520 and beyond become
+    signed infinity, and both views of one Data Block agree bit for bit.
+    A NaN stores the canonical quiet NaN.
+ -  Every other operation is table-driven by element kind:
+    `typed_array_construct` is unchanged and finds the new kind through its
+    code table, so the construction order of `typed-array-construction-order`
+    applies as is. Content-type checks treat Float16 as a Number kind, and
+    ValidateIntegerTypedArray rejects it for every `Atomics` operation.
+ -  The cluster's in-progress marker moves to the last constructor built,
+    now Float16Array, so `BigUint64Array`'s slot keeps its own constructor.
+    A failed build clears the appended pair with the older range.
+ -  The compiler treats `Float16Array` like the other concrete
+    constructors: a replaceable intrinsic owned by a global object
+    property, so `typeof`, `delete`, `with` fallback, and a top-level `var`
+    or function declaration follow the existing global-object paths. `eval`
+    is now the only clause 19 name the profile still rejects as a value.
+
+The reviewed *testTypedArray.js* harness restores both upstream
+`typeof Float16Array` probes and corrects its comment, which had called
+Float16Array a post-2025 global. Every reviewed path that includes the
+harness therefore also iterates Float16Array, so the complete manifest
+update observes all of them again; none is assumed to pass.
+
+The *m5-typed-array-constructors.property.test.ts* family keeps slots
+`0x60006e00` and `0x60006e01` and their eleven-constructor domains. New slot
+`0x60006e02` draws one to six binary64 operands: arbitrary doubles, doubles
+within the binary16 range or subnormal band, and signed binary16 values,
+the exact midpoints to their successors, and the adjacent binary64 values
+around those midpoints, including the 65520 overflow threshold. Each program
+stores them through array-like or Float64Array construction, element
+assignment, or DataView `setFloat16`, reads every element through the view
+and DataView, and adds the family's false numeric hint. The oracle rounds by
+exact BigInt arithmetic over the binary64 encoding, independently of
+`Math.f16round`, the runtime, and both references; a compile-free registration
+pins its boundary cases. Native runs use both specialization policies with
+collection at every safepoint and assert positive collection and, when
+enabled, guard-miss counts, with 12 ordinary cases and a 180-second limit.
+The fixed `typed-array-float16` native fixture covers the descriptors, the
+global property, `typeof`, rounding edges, every construction path, content
+type and alignment errors, DataView interop, NaN bits, sorting, search, and
+`Atomics` rejection, and joins the structural, forced-collection, and
+guard-miss lists of *tests/native.ts*.
+
+Preparation ran no native build or execution. A syntax-only C check of
+every runtime source passed. Node.js 24.21.0 and Deno 2.9.7 produced
+identical fixture output, and 300 sampled generated programs matched the
+oracle under Node.js, with every fiftieth also under Deno; the sampled
+programs compiled under both policies. Those are reference and compile
+observations, not native evidence. The native fixture and generated domain,
+the complete `mise run test262:update -- --accept-promotions`, the derived
+ledger, batch, graph, and profile counts, and the shard weights' measurement
+remain pending. Already-reviewed paths may move only toward `pass`.

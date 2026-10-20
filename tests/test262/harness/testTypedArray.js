@@ -4,12 +4,12 @@
 // formatter owns every JavaScript file here, so spacing differs from
 // upstream while every operation is identical. Upstream reads isPrimitive
 // from assert.js, which the reviewed base harness replaces, so the same
-// predicate is defined here. Upstream also probes `typeof Float16Array`,
-// a post-2025 global that this profile rejects as an unbound standard
-// name at compile time; the two probes are removed with the outcome they
-// always have on an ECMAScript 2025 host. The admitted ArrayBuffer surface
-// has resize and no transferToImmutable, so the constructor-argument
-// factories are exactly the ones upstream selects for such a host.
+// predicate is defined here. Both upstream `typeof Float16Array` probes
+// are kept: ECMAScript 2025 requires the Float16Array global, so on this
+// profile they select it like any other float constructor. The admitted
+// ArrayBuffer surface has resize and no transferToImmutable, so the
+// constructor-argument factories are exactly the ones upstream selects for
+// such a host.
 function isPrimitive(value) {
   return !value || (typeof value !== "object" && typeof value !== "function");
 }
@@ -32,8 +32,12 @@ var intArrayConstructors = nonClampedIntArrayConstructors.concat([
   Uint8ClampedArray,
 ]);
 
-// Float16Array is a newer feature. The ECMAScript 2025 profile has no such
-// global, so the upstream typeof probe always leaves this list unchanged.
+// Float16Array is a newer feature
+// adding it to this list unconditionally would cause implementations
+// lacking it to fail every test which uses it
+if (typeof Float16Array !== "undefined") {
+  floatArrayConstructors.push(Float16Array);
+}
 
 var bigIntArrayConstructors = [];
 if (typeof BigInt64Array !== "undefined") {
@@ -493,7 +497,9 @@ function isFloatTypedArrayConstructor(arg) {
  * @returns {string} "half", "single", or "double" for Float16Array, Float32Array, and Float64Array respectively.
  */
 function floatTypedArrayConstructorPrecision(FA) {
-  if (FA === Float32Array) {
+  if (typeof Float16Array !== "undefined" && FA === Float16Array) {
+    return "half";
+  } else if (FA === Float32Array) {
     return "single";
   } else if (FA === Float64Array) {
     return "double";

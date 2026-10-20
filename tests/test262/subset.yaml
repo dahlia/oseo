@@ -21,7 +21,12 @@ supportedFeatures:
   - DataView.prototype.setUint8
   - FinalizationRegistry
   - Float16Array
+  - Float32Array
+  - Float64Array
   - import-attributes
+  - Int8Array
+  - Int16Array
+  - Int32Array
   - json-modules
   - Map
   - Object.fromEntries
@@ -125,6 +130,10 @@ supportedFeatures:
   - TypedArray
   - TypedArray.prototype.at
   - u180e
+  - Uint8Array
+  - Uint8ClampedArray
+  - Uint16Array
+  - Uint32Array
   - well-formed-json-stringify
   - well-known-symbols
 tests:

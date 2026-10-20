@@ -1097,6 +1097,17 @@ array-like sources keep reading the prototype before any argument
 conversion, iteration, or element read. No entry point, public layout, heap
 kind, intrinsic slot, or built-in code ID is added.
 
+The `m5-133` ABI adds `Float16Array`, the twelfth concrete TypedArray
+constructor. Element kind `OSEO_TYPED_ARRAY_FLOAT16`, realm slots
+`OSEO_INTRINSIC_FLOAT16_ARRAY_PROTOTYPE` (271) and
+`OSEO_INTRINSIC_FLOAT16_ARRAY` (272), and the TypedArray range's next free
+constructor code ID are appended, so every existing kind, slot, and code ID
+keeps its value. Elements use the exact binary16 encoder and decoder of
+DataView's `getFloat16` and `setFloat16`, which this component now exports
+internally. The cluster's in-progress marker is the last constructor it
+builds, now Float16Array. `Atomics` rejects the new kind. No entry point,
+public layout, or heap kind is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

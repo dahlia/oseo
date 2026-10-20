@@ -1136,8 +1136,10 @@ OseoResult oseo_intrinsic(OseoContext *context, OseoIntrinsic intrinsic) {
     } else if (intrinsic >= OSEO_INTRINSIC_SET_PROTOTYPE &&
                intrinsic <= OSEO_INTRINSIC_SET_SPECIES) {
         materialized = oseo_internal_set_intrinsic(context);
-    } else if (intrinsic >= OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE &&
-               intrinsic <= OSEO_INTRINSIC_BIGUINT64_ARRAY) {
+    } else if ((intrinsic >= OSEO_INTRINSIC_TYPED_ARRAY_PROTOTYPE &&
+                intrinsic <= OSEO_INTRINSIC_BIGUINT64_ARRAY) ||
+               intrinsic == OSEO_INTRINSIC_FLOAT16_ARRAY_PROTOTYPE ||
+               intrinsic == OSEO_INTRINSIC_FLOAT16_ARRAY) {
         materialized = oseo_internal_typed_array_intrinsic(context);
     } else if (
         intrinsic >= OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_PROTOTYPE &&

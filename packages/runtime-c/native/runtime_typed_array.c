@@ -8,7 +8,7 @@
 #include <string.h>
 
 /*
- * %TypedArray%, the eleven concrete constructors, and the core prototype.
+ * %TypedArray%, the twelve concrete constructors, and the core prototype.
  * This component owns construction, element conversion, the
  * integer-indexed exotic element operations the generic property paths
  * delegate to, the prototype accessors, at, set, subarray, and the
@@ -16,7 +16,7 @@
  * copying, and sorting prototype methods, and the from and of statics.
  */
 
-#define TYPED_ARRAY_KIND_COUNT ((size_t)11u)
+#define TYPED_ARRAY_KIND_COUNT ((size_t)12u)
 #define TYPED_ARRAY_INDEX_LIMIT 9007199254740991.0
 
 static const char *const typed_array_names[TYPED_ARRAY_KIND_COUNT] = {
@@ -31,10 +31,11 @@ static const char *const typed_array_names[TYPED_ARRAY_KIND_COUNT] = {
     "Float64Array",
     "BigInt64Array",
     "BigUint64Array",
+    "Float16Array",
 };
 
 static const size_t typed_array_bytes[TYPED_ARRAY_KIND_COUNT] = {
-    1u, 1u, 1u, 2u, 2u, 4u, 4u, 4u, 8u, 8u, 8u,
+    1u, 1u, 1u, 2u, 2u, 4u, 4u, 4u, 8u, 8u, 8u, 2u,
 };
 
 static const OseoIntrinsic typed_array_prototypes[TYPED_ARRAY_KIND_COUNT] = {
@@ -49,6 +50,7 @@ static const OseoIntrinsic typed_array_prototypes[TYPED_ARRAY_KIND_COUNT] = {
     OSEO_INTRINSIC_FLOAT64_ARRAY_PROTOTYPE,
     OSEO_INTRINSIC_BIGINT64_ARRAY_PROTOTYPE,
     OSEO_INTRINSIC_BIGUINT64_ARRAY_PROTOTYPE,
+    OSEO_INTRINSIC_FLOAT16_ARRAY_PROTOTYPE,
 };
 
 static const OseoIntrinsic typed_array_constructors[TYPED_ARRAY_KIND_COUNT] = {
@@ -63,6 +65,7 @@ static const OseoIntrinsic typed_array_constructors[TYPED_ARRAY_KIND_COUNT] = {
     OSEO_INTRINSIC_FLOAT64_ARRAY,
     OSEO_INTRINSIC_BIGINT64_ARRAY,
     OSEO_INTRINSIC_BIGUINT64_ARRAY,
+    OSEO_INTRINSIC_FLOAT16_ARRAY,
 };
 
 static const size_t typed_array_codes[TYPED_ARRAY_KIND_COUNT] = {
@@ -77,6 +80,7 @@ static const size_t typed_array_codes[TYPED_ARRAY_KIND_COUNT] = {
     OSEO_FLOAT64_ARRAY_CONSTRUCTOR_CODE_ID,
     OSEO_BIGINT64_ARRAY_CONSTRUCTOR_CODE_ID,
     OSEO_BIGUINT64_ARRAY_CONSTRUCTOR_CODE_ID,
+    OSEO_FLOAT16_ARRAY_CONSTRUCTOR_CODE_ID,
 };
 
 static bool typed_array_bigint_kind(OseoTypedArrayKind kind) {
@@ -418,6 +422,11 @@ static void typed_array_write_raw(
         case OSEO_TYPED_ARRAY_FLOAT64:
             memcpy(target, &number, sizeof(number));
             break;
+        case OSEO_TYPED_ARRAY_FLOAT16: {
+            uint16_t stored = oseo_internal_float16_bits(number);
+            memcpy(target, &stored, sizeof(stored));
+            break;
+        }
         case OSEO_TYPED_ARRAY_BIGINT64:
         case OSEO_TYPED_ARRAY_BIGUINT64:
             memcpy(target, &bits, sizeof(bits));
@@ -472,6 +481,11 @@ static double typed_array_read_number(
             float stored;
             memcpy(&stored, source, sizeof(stored));
             return (double)stored;
+        }
+        case OSEO_TYPED_ARRAY_FLOAT16: {
+            uint16_t stored;
+            memcpy(&stored, source, sizeof(stored));
+            return oseo_internal_float16_number(stored);
         }
         case OSEO_TYPED_ARRAY_FLOAT64:
         case OSEO_TYPED_ARRAY_BIGINT64:
@@ -4142,9 +4156,15 @@ static OseoResult typed_array_install_core(
     return result;
 }
 
+/*
+ * The last constructor the loop below builds doubles as the cluster's
+ * in-progress marker, so its slot is written only once every other slot
+ * is complete. Float16Array was appended after BigUint64Array, which keeps
+ * the older realm slots stable and makes it that last constructor.
+ */
 static OseoResult typed_array_intrinsic_build(OseoContext *context) {
     OseoValue *marker =
-        &context->realm->intrinsics[OSEO_INTRINSIC_BIGUINT64_ARRAY];
+        &context->realm->intrinsics[OSEO_INTRINSIC_FLOAT16_ARRAY];
     if (tag_of(*marker) == OSEO_TAG_UNINITIALIZED) {
         return failure(
             context,
@@ -4226,7 +4246,7 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
         constructor->prototype_object = frame.slots[3];
         constructor->prototype_writable = false;
         if (typed_array_constructors[index] !=
-            OSEO_INTRINSIC_BIGUINT64_ARRAY) {
+            OSEO_INTRINSIC_FLOAT16_ARRAY) {
             context->realm->intrinsics[typed_array_constructors[index]] =
                 frame.slots[4];
         }
@@ -4262,6 +4282,10 @@ static OseoResult typed_array_intrinsic_build(OseoContext *context) {
              index += 1u) {
             context->realm->intrinsics[index] = oseo_undefined();
         }
+        context->realm->intrinsics[OSEO_INTRINSIC_FLOAT16_ARRAY_PROTOTYPE] =
+            oseo_undefined();
+        context->realm->intrinsics[OSEO_INTRINSIC_FLOAT16_ARRAY] =
+            oseo_undefined();
         oseo_roots_release(context, &frame);
         return result;
     }
