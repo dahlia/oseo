@@ -444,17 +444,17 @@ test("the consumer scan decodes frontmatter before selecting", () => {
 test("no pinned consumer reaches the bounded divergence", async () => {
   const root = new URL(import.meta.resolve("test262/package.json"));
   const tests = new URL("test/", root);
-  const candidates = await Promise.all(
-    (await filesBelow(tests))
-      .filter((path) => path.endsWith(".js") && !path.includes("_FIXTURE"))
-      .map(
-        async (path) =>
-          [
-            `test/${path}`,
-            await readFile(new URL(path, tests), "utf8"),
-          ] as const,
-      ),
-  );
+  // The corpus has tens of thousands of files, more than a host's open file
+  // limit may allow at once, so each one is read before the next is opened.
+  const candidates: (readonly [string, string])[] = [];
+  for (const path of await filesBelow(tests)) {
+    if (!path.endsWith(".js") || path.includes("_FIXTURE")) continue;
+    candidates.push([
+      `test/${path}`,
+      // eslint-disable-next-line no-await-in-loop -- One open file at a time.
+      await readFile(new URL(path, tests), "utf8"),
+    ]);
+  }
   const consumers = includeConsumers(candidates);
   const includeNames = new Set<string>();
   for (const consumer of consumers) {
