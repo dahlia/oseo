@@ -59038,6 +59038,22 @@ tests:
         object-properties,
         var-bindings,
       ]
+  - path: test/language/expressions/assignment/dstr/array-elem-iter-rtrn-close-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/assignment/dstr/array-elem-nested-array.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
@@ -59065,6 +59081,39 @@ tests:
   - path: test/language/expressions/assignment/dstr/array-rest-after-element.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, iterator-protocol, var-bindings]
+  - path: test/language/expressions/assignment/dstr/array-rest-iter-rtrn-close-err.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/expressions/assignment/dstr/array-rest-iter-rtrn-close-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        destructuring-bindings,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/assignment/dstr/array-rest-put-prop-ref.js
     expectedClassification: pass
     dependencies:

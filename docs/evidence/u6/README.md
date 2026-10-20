@@ -90,6 +90,46 @@ These observations do not separate hardware, concurrency, file cohort and
 implementation change.
 
 
+Iterator extension exception to the current table
+-------------------------------------------------
+
+The current weight-source runs above observed the pre-extension
+destructuring-assignment family, not the iterator changes below. Run
+39070198868 sums its two recorded registrations to 210,558.734682
+milliseconds on Linux and 127,460.293458 on macOS, rounded to 211 and 128
+seconds. Those baseline observations remain in the complete CI input.
+They do not measure the extended family. Only this family's two weights
+override that upstream table, using the local observation and explicitly
+provisional macOS estimate below. All other refreshed weights, including
+compound assignment at 1,838 Linux and 1,242 macOS seconds, remain intact.
+The historical host ratio below is 198/184; it is not the refreshed
+baseline ratio of 128/211. Neither ratio proves current macOS cost.
+
+The iterator-next-callability extension grows the existing destructuring
+assignment family. Its October 17, 2026 local Linux extended observation
+records these four native case durations:
+
+ -  `captured iterator next closures survive suspension and collection`:
+    15,689.738938 milliseconds;
+ -  `generated iterator acquisition and first steps match ECMA-262 2025`:
+    408,992.765308 milliseconds;
+ -  `generated unstepped iterator closes match ECMA-262 2025`:
+    400,165.103422 milliseconds; and
+ -  `generated destructuring assignments match the M5 property model`:
+    91,561.829090 milliseconds.
+
+Their sum is 916,409.436758 milliseconds, rounded up to the 917-second Linux
+weight. The two pure model tests are excluded. This is a sum of native test
+case durations from `mise run test:property:extended`, not file wall time,
+an ordinary property observation, sanitizer cost, or CI measurement. The
+historical weights were 184 Linux seconds and 198 macOS seconds. Current
+domain macOS duration remains unmeasured. Its provisional 987-second weight
+is the derived estimate `ceil(917 * 198/184)`, using that historical host
+ratio. It must be refreshed from an actual macOS CI per-test duration sum;
+the estimate is not a Mac observation or pass. Neither weight changes file
+inventory, seeds, case budgets, sizes, shard totals or interrupt limits.
+
+
 Inputs and reproduction
 -----------------------
 

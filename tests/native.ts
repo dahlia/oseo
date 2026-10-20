@@ -800,8 +800,105 @@ for (const specializationArgs of [[], ["--no-specialization"]] as const) {
   }
 }
 
+/**
+ * Fixed-2025 step failures do not close these consumers. Both reference
+ * hosts close them, so the native runner retains explicit normative logs.
+ * Getter failures and exhaustion stay in the differential fixture above.
+ * See AddEntriesFromIterable, AsyncFromSyncIteratorPrototype.next, and
+ * ForIn/OfBodyEvaluation in the es2025 specification.
+ */
+const iteratorNextConsumerControlsSource = `
+// Consumers that step immediately retain acquisition/step error ordering.
+function immediate(kind, consume) {
+  let log = "";
+  const input = {
+    [Symbol.iterator]() {
+      log += "acquire;";
+      return {
+        get next() {
+          log += "next-get;";
+          if (kind === "getter-throw") throw new RangeError();
+          if (kind === "noncallable") return null;
+          return function () {
+            log += "next-call;";
+            throw new RangeError();
+          };
+        },
+        return() { log += "close;"; return {}; },
+      };
+    },
+  };
+  try { consume(input); }
+  catch (error) { console.log("consumer", kind, error.name, log); }
+}
+for (const kind of ["noncallable", "call-throw"]) {
+  immediate(kind, input => Object.fromEntries(input));
+}
+
+// GetIterator(async)'s synchronous fallback calls the repaired helper.
+async function fallbackControls() {
+  for (const kind of ["noncallable", "call-throw"]) {
+    let log = "";
+    const input = {
+      [Symbol.iterator]() {
+        log += "acquire;";
+        return {
+          get next() {
+            log += "next-get;";
+            if (kind === "getter-throw") throw new RangeError();
+            if (kind === "noncallable") return undefined;
+            return function () {
+              log += "next-call;";
+              if (kind === "call-throw") throw new RangeError();
+              return { done: true };
+            };
+          },
+          return() { log += "close;"; return {}; },
+        };
+      },
+    };
+    try {
+      for await (const value of input) {}
+      console.log("fallback", kind, "done", log);
+    } catch (error) {
+      console.log("fallback", kind, error.name, log);
+    }
+  }
+}
+fallbackControls();
+`;
+
 const selectedFixtures = selectTestShard(fixtures, nativeArguments.shard);
 for (const fixture of selectedFixtures) {
+  if (fixture.name === "iterator-next-callability") {
+    // ECMA-262 2025 propagates failed next calls before these algorithms
+    // can reach IteratorClose. Both hosts close in these four cases, so
+    // their diagnostic observations cannot replace the normative logs.
+    const expected =
+      "consumer noncallable TypeError acquire;next-get;\n" +
+      "consumer call-throw RangeError acquire;next-get;next-call;\n" +
+      "fallback noncallable TypeError acquire;next-get;\n" +
+      "fallback call-throw RangeError acquire;next-get;next-call;\n";
+    for (const args of [[], ["--no-specialization"]] as const) {
+      process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+      try {
+        const native = await runNativeCli(
+          {
+            args: [...args, "iterator-next-consumer-controls.ts"],
+            source: iteratorNextConsumerControlsSource,
+            sourceId: "iterator-next-consumer-controls.ts",
+            version: "0.1.0",
+          },
+          host,
+        );
+        assert.equal(native.exitStatus, 0, native.stderr);
+        assert.equal(native.stdout, expected);
+        assert.equal(native.stderr, "");
+      } finally {
+        delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+      }
+    }
+  }
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
   const test262Host = fixture.test262Host === true;
@@ -1097,6 +1194,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-static-block-scope" ||
     fixture.name === "class-static-block-super" ||
     fixture.name === "generators" ||
+    fixture.name === "iterator-next-callability" ||
     fixture.name === "generator-delegated-throw" ||
     fixture.name === "function-intrinsic-chains" ||
     fixture.name === "async-generators" ||
@@ -1208,6 +1306,9 @@ for (const fixture of selectedFixtures) {
           assertMatchingObservations([nodeReference, denoReference, native]);
           assert(native.counters != null, `${fixture.name}: counters`);
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
+          if (fixture.name === "iterator-next-callability") {
+            assert.ok(native.counters.collections > 0);
+          }
           if (mode === "disabled") {
             assert.equal(native.counters.guardHits, 0);
             assert.equal(native.counters.guardMisses, 0);

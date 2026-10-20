@@ -13,6 +13,11 @@
  * the refreshed weight for the same file. One run estimates no
  * run-to-run variation, so these values are not conservative bounds.
  *
+ * Iterator-next-callability extends the destructuring-assignment family
+ * beyond that source run. Its two entries instead use a local Linux
+ * extended case sum and an explicitly provisional macOS estimate from
+ * the historical 198/184 host ratio. See the complete U6 provenance.
+ *
  * The two entries in `caseShardedNativeFiles` are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
  * not observe them here; they still weigh other wrapper invocations and
@@ -58,7 +63,9 @@ export const nativeShardCosts = {
     "tests/property/m5-default-parameter.property.test.ts": 89,
     "tests/property/m5-delete-super.property.test.ts": 471,
     "tests/property/m5-delete.property.test.ts": 210,
-    "tests/property/m5-destructuring-assignment.property.test.ts": 211,
+    // Local Linux extended case sum: 916.409436758 s, rounded up.
+    // October 17, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-destructuring-assignment.property.test.ts": 917,
     "tests/property/m5-ephemeron-tracing.property.test.ts": 40,
     "tests/property/m5-export-default-class.property.test.ts": 44,
     "tests/property/m5-for-await-of.property.test.ts": 1333,
@@ -196,7 +203,9 @@ export const nativeShardCosts = {
     "tests/property/m5-default-parameter.property.test.ts": 88,
     "tests/property/m5-delete-super.property.test.ts": 207,
     "tests/property/m5-delete.property.test.ts": 211,
-    "tests/property/m5-destructuring-assignment.property.test.ts": 128,
+    // Provisional estimate: ceil(917 * 198/184) from the historical
+    // host ratio; not a current macOS observation. Refresh from CI.
+    "tests/property/m5-destructuring-assignment.property.test.ts": 987,
     "tests/property/m5-ephemeron-tracing.property.test.ts": 20,
     "tests/property/m5-export-default-class.property.test.ts": 35,
     "tests/property/m5-for-await-of.property.test.ts": 419,

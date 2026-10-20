@@ -2,6 +2,213 @@ import type { Fixture } from "../fixture.ts";
 
 export const generatorFixtures: readonly Fixture[] = [
   {
+    // Acquisition captures next without calling it. An assignment target
+    // can suspend first, and every close observes return at close time.
+    name: "iterator-next-callability",
+    source: `
+function exercise(nextKind, closeKind, resumeKind, rest) {
+  let log = "";
+  let nextGets = 0;
+  let nextCalls = 0;
+  const token = { value: 17 };
+  const target = {};
+  const iterator = {
+    get return() {
+      log += "return-get;";
+      if (closeKind === "getter-throw") throw new RangeError("return-get");
+      if (closeKind === "absent") return undefined;
+      if (closeKind === "null-method") return null;
+      if (closeKind === "noncallable") return 1;
+      return function () {
+        log += "return-call;";
+        console.log("receiver", this === iterator, arguments.length);
+        if (closeKind === "call-throw") throw new RangeError("return-call");
+        if (closeKind === "null-result") return null;
+        if (closeKind === "primitive") return 1;
+        return {
+          get done() { throw new Error("close must not read done"); },
+          get value() { throw new Error("close must not read value"); },
+        };
+      };
+    },
+  };
+  if (nextKind !== "absent") {
+    Object.defineProperty(iterator, "next", {
+      configurable: true,
+      get() {
+        nextGets++;
+        log += "next-get;";
+        if (nextKind === "getter-throw") throw new RangeError("next-get");
+        if (nextKind === "undefined") return undefined;
+        if (nextKind === "null") return null;
+        if (nextKind === "number") return 1;
+        if (nextKind === "object") return {};
+        if (nextKind === "class") return class {};
+        return function () {
+          nextCalls++;
+          log += "next-call;";
+          console.log("receiver", this === iterator, arguments.length);
+          if (nextKind === "call-throw") throw new RangeError("next-call");
+          if (nextCalls === 1) return { value: token, done: false };
+          return { done: true };
+        };
+      },
+    });
+  }
+  const iterable = {
+    [Symbol.iterator]() {
+      log += "acquire;";
+      return iterator;
+    },
+  };
+  function* assign() {
+    try {
+      if (rest) [...target[yield "target"]] = iterable;
+      else [target[yield "target"]] = iterable;
+      log += "assigned;";
+    } finally {
+      log += "finally;";
+    }
+  }
+  const generator = assign();
+  console.log("case", nextKind, closeKind, resumeKind, rest);
+  try {
+    const first = generator.next();
+    console.log("suspended", first.value, first.done, log);
+    // Retain the captured closure only through the suspended frame.
+    Object.defineProperty(iterator, "next", {
+      configurable: true,
+      get() { throw new Error("next must not be read again"); },
+    });
+    let allocation = {};
+    for (let index = 0; index < 8; index++) {
+      allocation = { previous: allocation, index };
+    }
+    let result;
+    if (resumeKind === "return") result = generator.return("requested");
+    else if (resumeKind === "throw") {
+      result = generator.throw(new SyntaxError("injected"));
+    } else result = generator.next("key");
+    console.log("finished", result.value, result.done);
+  } catch (error) {
+    console.log("error", error.name);
+  }
+  console.log("end", nextGets, nextCalls, log, generator.next().done);
+  if (target.key !== undefined) {
+    console.log(
+      "retained", rest ? target.key[0] === token : target.key === token,
+    );
+  }
+}
+
+const nextKinds = [
+  "absent", "undefined", "null", "number", "object", "class", "callable",
+  "getter-throw", "call-throw",
+];
+const closeKinds = [
+  "absent", "null-method", "noncallable", "getter-throw",
+  "call-throw", "null-result", "primitive", "object",
+];
+for (const rest of [false, true]) {
+  for (const nextKind of nextKinds) {
+    exercise(nextKind, "object", "next", rest);
+    exercise(nextKind, "object", "return", rest);
+  }
+  for (const closeKind of closeKinds) {
+    exercise("absent", closeKind, "return", rest);
+    exercise("number", closeKind, "throw", rest);
+  }
+}
+
+// An empty pattern closes an acquired record without ever stepping it.
+let emptyCloses = 0;
+[] = {
+  [Symbol.iterator]() {
+    return { next: 1, return() { emptyCloses++; return {}; } };
+  },
+};
+console.log("empty", emptyCloses);
+
+// IteratorClose of the outer generator also closes its unstepped input.
+let nestedCloses = 0;
+function* abandoned() {
+  [...{}[yield "target"]] = {
+    [Symbol.iterator]() {
+      return { return() { nestedCloses++; return {}; } };
+    },
+  };
+}
+for (const value of abandoned()) { console.log("outer", value); break; }
+console.log("nested", nestedCloses);
+
+// Consumers that step immediately retain acquisition/step error ordering.
+function immediate(kind, consume) {
+  let log = "";
+  const input = {
+    [Symbol.iterator]() {
+      log += "acquire;";
+      return {
+        get next() {
+          log += "next-get;";
+          if (kind === "getter-throw") throw new RangeError();
+          if (kind === "noncallable") return null;
+          return function () {
+            log += "next-call;";
+            throw new RangeError();
+          };
+        },
+        return() { log += "close;"; return {}; },
+      };
+    },
+  };
+  try { consume(input); }
+  catch (error) { console.log("consumer", kind, error.name, log); }
+}
+for (const kind of ["getter-throw", "noncallable", "call-throw"]) {
+  immediate(kind, input => [...input]);
+  immediate(kind, input => { for (const value of input) {} });
+  immediate(kind, input => Array.from(input));
+  immediate(kind, input => new Set(input));
+  immediate(kind, input => new Map(input));
+  if (kind === "getter-throw") {
+    immediate(kind, input => Object.fromEntries(input));
+  }
+}
+
+// GetIterator(async)'s synchronous fallback calls the repaired helper.
+async function fallbackControls() {
+  for (const kind of ["getter-throw", "done"]) {
+    let log = "";
+    const input = {
+      [Symbol.iterator]() {
+        log += "acquire;";
+        return {
+          get next() {
+            log += "next-get;";
+            if (kind === "getter-throw") throw new RangeError();
+            if (kind === "noncallable") return undefined;
+            return function () {
+              log += "next-call;";
+              if (kind === "call-throw") throw new RangeError();
+              return { done: true };
+            };
+          },
+          return() { log += "close;"; return {}; },
+        };
+      },
+    };
+    try {
+      for await (const value of input) {}
+      console.log("fallback", kind, "done", log);
+    } catch (error) {
+      console.log("fallback", kind, error.name, log);
+    }
+  }
+}
+fallbackControls();
+`,
+  },
+  {
     name: "generators",
     source: `
 function* single() {

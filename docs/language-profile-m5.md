@@ -131,7 +131,7 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 26,637 reviewed cases: 22,627 passes, 2,350
+The current manifest contains 26,640 reviewed cases: 22,630 passes, 2,350
 expected negatives, and 1,660 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
@@ -1018,8 +1018,15 @@ current evidence assessment. Those live only in the indexed records above.
     length each call and whose `Symbol.iterator` returns itself, so
     `array[Symbol.iterator]().next()` and user-defined iterables with a
     `Symbol.iterator` method and a `next` method both drive iteration.
-    The iterator's next method is captured once by `GetIterator` and
-    reused for every step, as the iterator record requires.
+    `GetIterator` reads `next` once and captures its value without checking
+    callability. A throwing `next` getter is an acquisition error. Each step
+    calls the captured value with the iterator as receiver; an absent or
+    non-callable value throws `TypeError` at that call. Replacing `next`
+    after acquisition does not change the recorded value. An assignment
+    target can suspend at `yield` before the first step. A generator return
+    or throw at that suspension closes the acquired iterator without calling
+    `next`; close still observes the `return` getter, callability, result
+    shape, and completion precedence.
     `Promise.all`, `Promise.race`, synchronous `for-of`, array literal spread,
     and call and constructor argument spread consume object iterables through
     this protocol. A `for-of` head admits one `const`, `let`, or `var`
