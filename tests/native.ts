@@ -1272,6 +1272,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "debugger-statement" ||
     fixture.name === "optional-catch-binding" ||
     fixture.name === "compound-assignments" ||
+    fixture.name === "parenthesized-assignment-names" ||
     fixture.name === "delete-non-strict" ||
     fixture.name === "mapped-arguments-object" ||
     fixture.name === "mapped-arguments-hoisted-function" ||
@@ -1618,6 +1619,11 @@ for (const fixture of selectedFixtures) {
             // initializer runs must survive every forced collection
             // between the declarators, including across a suspension,
             // and a closure that captured them keeps the same cells.
+            assert.ok(native.counters.collections > 0);
+          }
+          if (fixture.name === "parenthesized-assignment-names") {
+            // Every anonymous value stays reachable through the binding
+            // or with fallback that stored it across forced collections.
             assert.ok(native.counters.collections > 0);
           }
           if (fixture.name === "catch-var-coexistence") {

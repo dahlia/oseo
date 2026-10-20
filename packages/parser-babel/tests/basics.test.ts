@@ -667,6 +667,74 @@ test("preserves compound assignment references in owned IR", () => {
   assert.equal(mir.match(/property-set property-set/gu)?.length, 1);
 });
 
+test("leaves anonymous values unnamed through parenthesized targets", () => {
+  // IsIdentifierRef is false for a ParenthesizedExpression, so neither
+  // simple, logical, nor destructuring assignment applies NamedEvaluation
+  // through one. The bare forms of the same targets keep the name.
+  const source =
+    "var simple, logical = null, element, property, withSet;\n" +
+    "(simple) = function () {};\n" +
+    "((logical)) ??= class {};\n" +
+    "[(element) = () => 0] = [];\n" +
+    "({ key: (property) = function () {} } = {});\n" +
+    "(implicitGlobal) = function () {};\n" +
+    "with ({}) { (withSet) = function () {}; }\n" +
+    "var bare, bareLogical = null, bareElement, bareProperty, bareWith;\n" +
+    "bare = function () {};\n" +
+    "bareLogical ??= class {};\n" +
+    "[bareElement = () => 0] = [];\n" +
+    "({ key: bareProperty = function () {} } = {});\n" +
+    "with ({}) { bareWith = function () {}; }\n";
+  const parsed = babelFrontend.parse({ source, sourceId: "names.js" });
+  assert.ok(parsed.parsed);
+  const statements = parsed.program?.body ?? [];
+  const expressions = statements.flatMap((statement) =>
+    statement.kind === "expression" ? [statement.expression] : [],
+  );
+  const simple = expressions.find(
+    (expression) =>
+      expression.kind === "binding-set" && expression.name === "simple",
+  );
+  const bare = expressions.find(
+    (expression) =>
+      expression.kind === "binding-set" && expression.name === "bare",
+  );
+  assert.equal(simple?.kind, "binding-set");
+  assert.equal(
+    simple?.kind === "binding-set" ? simple.parenthesizedTarget : undefined,
+    true,
+  );
+  assert.equal(bare?.kind, "binding-set");
+  assert.ok(bare?.kind === "binding-set" && !("parenthesizedTarget" in bare));
+
+  const compiled = compileSource(babelFrontend, {
+    source,
+    sourceId: "names.js",
+  });
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.hir != null);
+  const hir = printHir(compiled.hir);
+  for (const unnamed of [
+    /%b\d+ simple = function @f\d+ {2}@/u,
+    /%b\d+ logical \?\?= class\{constructor: function @f\d+ \}/u,
+    /\[%b\d+ element = function @f\d+ \]/u,
+    /%b\d+ property = function @f\d+ \}/u,
+    /\["implicitGlobal"\] = function @f\d+ {2}@/u,
+    /with\[%b\d+\] withSet = function @f\d+ {2}@/u,
+  ]) {
+    assert.match(hir, unnamed);
+  }
+  for (const named of [
+    /%b\d+ bare = function @f\d+ bare @/u,
+    /bareLogical \?\?= class\{constructor: function @f\d+ bareLogical\}/u,
+    /\[%b\d+ bareElement = function @f\d+ bareElement\]/u,
+    /bareProperty = function @f\d+ bareProperty\}/u,
+    /with\[%b\d+\] bareWith = function @f\d+ bareWith @/u,
+  ]) {
+    assert.match(hir, named);
+  }
+});
+
 test("converts an arithmetic compound member key once", () => {
   const operators = [
     "*",

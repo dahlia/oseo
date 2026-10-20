@@ -59174,6 +59174,9 @@ tests:
   - path: test/language/expressions/assignment/dstr/obj-rest-valid-object.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, object-properties, var-bindings]
+  - path: test/language/expressions/assignment/fn-name-lhs-cover.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
   - path: test/language/expressions/assignment/id-arguments-strict.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]

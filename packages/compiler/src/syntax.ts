@@ -379,12 +379,26 @@ export type SyntaxExpression =
   | (LocatedSyntax & {
       readonly kind: "binding-set";
       readonly name: string;
+      /**
+       * True when the source wrapped the target in parentheses, as in
+       * `(f) = function () {}`. IsIdentifierRef is false for a
+       * ParenthesizedExpression, so the assignment does not apply
+       * NamedEvaluation to an anonymous function or class value.
+       */
+      readonly parenthesizedTarget?: true;
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {
       readonly kind: "binding-update";
       readonly name: string;
       readonly operator: AssignmentOperator;
+      /**
+       * True when the source wrapped the target in parentheses, as in
+       * `(f) = function () {}`. IsIdentifierRef is false for a
+       * ParenthesizedExpression, so the assignment does not apply
+       * NamedEvaluation to an anonymous function or class value.
+       */
+      readonly parenthesizedTarget?: true;
       readonly value: SyntaxExpression;
     })
   | (LocatedSyntax & {
@@ -659,6 +673,12 @@ export interface SyntaxBindingElement<
   Pattern = SyntaxBindingPattern,
 > extends LocatedSyntax {
   readonly initializer?: SyntaxExpression;
+  /**
+   * True when a destructuring assignment target is parenthesized, as in
+   * `[(f) = function () {}] = []`. IsIdentifierRef is false for a
+   * ParenthesizedExpression, so the initializer is not named after it.
+   */
+  readonly parenthesizedTarget?: true;
   readonly pattern: Pattern;
 }
 
@@ -679,6 +699,12 @@ export interface SyntaxObjectBindingProperty<
   readonly computed?: true;
   readonly initializer?: SyntaxExpression;
   readonly key: SyntaxExpression;
+  /**
+   * True when a destructuring assignment target is parenthesized, as in
+   * `[(f) = function () {}] = []`. IsIdentifierRef is false for a
+   * ParenthesizedExpression, so the initializer is not named after it.
+   */
+  readonly parenthesizedTarget?: true;
   readonly pattern: Pattern;
 }
 
