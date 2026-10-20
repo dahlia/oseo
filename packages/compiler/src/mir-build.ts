@@ -6419,14 +6419,17 @@ function lowerBindingTarget(
     pattern.withObjectBindingIds != null &&
     pattern.withObjectBindingIds.length > 0
   ) {
-    const selected = lowerWithReference(
-      {
-        name: pattern.name,
-        objectBindingIds: pattern.withObjectBindingIds,
-        range: pattern.range,
-      },
-      builder,
-    );
+    const selected =
+      reference?.kind === "with-binding"
+        ? reference.selected
+        : lowerWithReference(
+            {
+              name: pattern.name,
+              objectBindingIds: pattern.withObjectBindingIds,
+              range: pattern.range,
+            },
+            builder,
+          );
     lowerWithBindingWrite(
       selected,
       pattern,
@@ -6492,6 +6495,8 @@ function lowerBindingTarget(
  * `superReceiver` is present exactly when the leaf named a `super`
  * property: the lookup then starts at the home object's prototype while
  * the stored value reaches the enclosing element's `this`.
+ * `with-binding` is an identifier leaf's ResolveBinding through its
+ * active `with` objects, selected before the leaf's source value is read.
  */
 type LoweredAssignmentReference =
   | {
@@ -6507,6 +6512,10 @@ type LoweredAssignmentReference =
       readonly kind: "private";
       readonly object: number;
       readonly privateName: number;
+    }
+  | {
+      readonly kind: "with-binding";
+      readonly selected: LoweredWithReference;
     };
 
 function lowerAssignmentReference(
@@ -6565,6 +6574,40 @@ function lowerAssignmentReference(
   return undefined;
 }
 
+/**
+ * Evaluate one keyed object pattern leaf's reference after its property
+ * key and before GetV reads the source. KeyedBindingInitialization and
+ * KeyedDestructuringAssignmentEvaluation both resolve an identifier leaf
+ * first, so a `with` object's HasProperty and `@@unscopables` lookups
+ * precede the source getter and the default initializer, and the write
+ * stores through the object selected then.
+ */
+function lowerKeyedAssignmentReference(
+  pattern: HirBindingPattern,
+  mode: BindingPatternMode,
+  builder: MirBuilder,
+): LoweredAssignmentReference | undefined {
+  if (
+    mode !== "write" ||
+    pattern.kind !== "binding-identifier" ||
+    pattern.withObjectBindingIds == null ||
+    pattern.withObjectBindingIds.length === 0
+  ) {
+    return lowerAssignmentReference(pattern, mode, builder);
+  }
+  return {
+    kind: "with-binding",
+    selected: lowerWithReference(
+      {
+        name: pattern.name,
+        objectBindingIds: pattern.withObjectBindingIds,
+        range: pattern.range,
+      },
+      builder,
+    ),
+  };
+}
+
 function lowerObjectBindingPattern(
   pattern: HirObjectBindingPattern,
   input: number,
@@ -6599,7 +6642,11 @@ function lowerObjectBindingPattern(
   for (const property of pattern.properties) {
     const key = lowerPropertyKey(property.key, builder);
     excludedKeys.push(key);
-    const target = lowerAssignmentReference(property.pattern, mode, builder);
+    const target = lowerKeyedAssignmentReference(
+      property.pattern,
+      mode,
+      builder,
+    );
     appendMirMetadata(
       builder,
       "safepoint",

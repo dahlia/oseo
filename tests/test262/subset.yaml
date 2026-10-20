@@ -55378,6 +55378,20 @@ tests:
   - path: test/language/computed-property-names/class/method/constructor-can-be-setter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        destructuring-bindings,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/destructuring/binding/syntax/destructuring-array-parameters-function-arguments-length.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, functions, object-properties]

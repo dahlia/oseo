@@ -3,6 +3,11 @@ id: object-binding
 title: "Object binding declarations"
 scope:
   - "Recursive object binding declarations and rest."
+  - "A keyed identifier leaf of a var object pattern inside with resolves
+    its binding after the property key and before GetV and the default
+    initializer. The write uses the reference selected then: the Object
+    Environment Record that holds the binding or, when every object
+    environment misses, the enclosing declarative or global binding."
 owners:
   - PLAN-M5.md
 evidence:
@@ -13,10 +18,13 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/native.ts
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/with-keyed-binding-target-order.ts
   forced-collection:
     status: covered
     references:
+      - tests/native.ts
       - tests/property/m5-object-binding.property.test.ts
   generated:
     status: covered
@@ -32,6 +40,7 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/with-keyed-binding-target-order.ts
   standards:
     status: covered
     references:

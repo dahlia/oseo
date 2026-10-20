@@ -3,6 +3,12 @@ id: destructuring-assignment
 title: "Destructuring assignment"
 scope:
   - "Recursive array and object assignment patterns."
+  - "A keyed identifier leaf of an object assignment pattern inside with
+    evaluates its reference after the property key and before GetV and
+    the default initializer. Sloppy and strict PutValue use the reference
+    selected then: the Object Environment Record that holds the binding
+    or, when every object environment misses, the enclosing declarative or
+    global binding."
 owners:
   - PLAN-M5.md
 evidence:
@@ -15,18 +21,21 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/native.ts
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/generators.ts
-      - tests/native.ts
+      - tests/native/fixtures/with-keyed-binding-target-order.ts
   forced-collection:
     status: covered
     references:
-      - tests/property/m5-destructuring-assignment.property.test.ts
       - tests/native.ts
+      - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/property/m5-object-binding.property.test.ts
   generated:
     status: covered
     references:
       - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/property/m5-object-binding.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family owns no specialized path or family-specific guard."
@@ -41,6 +50,7 @@ evidence:
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/generators.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/native/fixtures/with-keyed-binding-target-order.ts
   standards:
     status: covered
     references:

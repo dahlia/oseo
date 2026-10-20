@@ -64,6 +64,10 @@ import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
 import { crossRealmFixtures } from "./native/fixtures/cross-realm.ts";
 import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
+import {
+  withKeyedBindingTargetOrderExpected,
+  withKeyedBindingTargetOrderSource,
+} from "./native/fixtures/with-keyed-binding-target-order.ts";
 
 const { typedArrayIterativeFixtures } =
   await import("./native/fixtures/typed-array-iterative.ts");
@@ -867,6 +871,61 @@ async function fallbackControls() {
 }
 fallbackControls();
 `;
+
+/*
+ * KeyedBindingInitialization and KeyedDestructuringAssignmentEvaluation
+ * resolve a keyed object pattern identifier leaf inside `with` before GetV
+ * and the default initializer. Node.js and Deno (V8) still resolve it
+ * afterward and fail the reviewed test262 case, so this native-only
+ * observation compares the compiled program with the ECMA-262 trace. Both
+ * policies run with collection forced at every safepoint, and the retained
+ * environment selection must survive actual collections.
+ */
+for (const specialization of ["disabled", "enabled"] as const) {
+  const compiled = compileSource(
+    defaultComponents.frontend,
+    {
+      source: withKeyedBindingTargetOrderSource,
+      sourceId: "with-keyed-binding-target-order.ts",
+    },
+    { observeSpecialization: true, specialization },
+  );
+  assert.deepEqual(compiled.diagnostics, []);
+  assert(compiled.mir != null, "with keyed binding MIR");
+  process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+  try {
+    await withNativeFixture(
+      {
+        backend: cBackend,
+        host,
+        input: compiled.mir,
+        keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+        operation: "execute",
+        runtime: cRuntimeProvider,
+        target: nativeTarget,
+        toolchain: nativeToolchain,
+      },
+      (native) => {
+        assertMatchingObservations([
+          {
+            exitStatus: 0,
+            stderr: "",
+            stdout: withKeyedBindingTargetOrderExpected,
+          },
+          native,
+        ]);
+        assert(native.counters != null, "with keyed binding counters");
+        assert.ok(native.counters.collections > 0);
+        if (specialization === "disabled") {
+          assert.equal(native.counters.guardHits, 0);
+          assert.equal(native.counters.guardMisses, 0);
+        }
+      },
+    );
+  } finally {
+    delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+  }
+}
 
 const selectedFixtures = selectTestShard(fixtures, nativeArguments.shard);
 for (const fixture of selectedFixtures) {
