@@ -21,8 +21,12 @@ scope:
   - "Existing array/object assignment leaves and for-in/of binding heads
     with a real lexical fallback preserve strict SetMutableBinding when
     object lookup selects a binding deleted by unscopables. Initial misses
-    still write the lexical fallback. Pattern preparation order remains
-    outside this unit and is tracked as a separate source-based concern."
+    still write the lexical fallback."
+  - "Keyed object pattern identifier leaves, in var declarations and
+    destructuring assignments, resolve before GetV and the default
+    initializer and write the selection made then. Array element, array
+    rest, and object rest preparation order remains outside this unit and
+    is tracked as a separate source-based concern."
 owners:
   - PLAN-M5.md
 evidence:
@@ -36,8 +40,10 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/native.ts
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/native/fixtures/with-keyed-binding-target-order.ts
       - tests/property/m5-globalthis-binding.property.test.ts
   forced-collection:
     status: covered
@@ -46,12 +52,14 @@ evidence:
       - tests/native/fixtures/array-prototype-index-search.ts
       - tests/property/m5-array-prototype-index-search.property.test.ts
       - tests/property/m5-globalthis-binding.property.test.ts
+      - tests/property/m5-object-binding.property.test.ts
   generated:
     status: covered
     references:
       - tests/property-seeds.yaml
       - tests/property/m5-array-prototype-index-search.property.test.ts
       - tests/property/m5-globalthis-binding.property.test.ts
+      - tests/property/m5-object-binding.property.test.ts
   guard-fallback:
     status: covered
     references:
@@ -65,6 +73,7 @@ evidence:
       - tests/native.ts
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/native/fixtures/with-keyed-binding-target-order.ts
       - tests/property/m5-array-prototype-index-search.property.test.ts
       - tests/property/m5-globalthis-binding.property.test.ts
   standards:
@@ -76,6 +85,7 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/statements.test.ts
+      - packages/parser-babel/tests/bindings.test.ts
       - packages/compiler/src/mir-build.ts
       - packages/compiler/src/mir.ts
       - packages/backend-c/src/index.ts

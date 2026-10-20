@@ -7546,9 +7546,11 @@ code; this also gives any failed `Set` or `delete` in it, with or without
 Existing array/object assignment leaves and for-in/of binding heads with
 lexical fallbacks preserve strictness when a selected binding disappears
 while reading `Symbol.unscopables`. Initial misses write their lexical
-fallbacks. This evidence does not establish general destructuring reference
-preparation order: identifier targets are still resolved after iterator or
-property reads. That separate boundary remains outside this repair.
+fallbacks. This evidence did not establish general destructuring reference
+preparation order. M5c node `destructuring-binding-target-order` later
+repaired keyed object pattern identifier leaves; see *Keyed pattern targets
+through with environments* below. Array element and rest identifier targets
+are still resolved after iterator or property reads, a separate boundary.
 
 The existing *m5-globalthis-binding.property.test.ts* family reserves slots
 `0x60007e01`, `0x60007e02`, and `0x60007e03` for retained-object writes,
@@ -7788,3 +7790,75 @@ review of fixed commits, and every job of the exact candidate's CI run under
 *PLAN-M5C.md*. That CI supplies the ordinary and extended suites on both
 native hosts, including the complete reviewed manifest. No historical tree
 or other lane supplies this node's final gate evidence.
+
+
+Keyed pattern targets through with environments
+-----------------------------------------------
+
+M5c node `destructuring-binding-target-order` resolves a keyed object pattern
+identifier leaf before its source read. ECMA-262 2025 KeyedBindingInitialization
+(14.3.3.3) evaluates ResolveBinding for a SingleNameBinding, and
+KeyedDestructuringAssignmentEvaluation evaluates a non-pattern target
+reference, after the property key and before GetV and the default
+initializer. MIR now prepares that reference in the keyed property loop that
+`var` object binding declarations and object destructuring assignments share.
+A leaf inside `with` therefore performs each object environment's
+`HasProperty` lookup first, followed by its `Symbol.unscopables` lookup when
+the binding object has the property. Its write uses the reference selected
+then, without a second name resolution: the Object Environment Record that
+holds the binding or, when every object environment misses, the enclosing
+declarative or global binding. A getter or default that deletes
+the selected property does not redirect the write: sloppy SetMutableBinding
+recreates it, and a strict assignment throws `ReferenceError`. A default that
+adds the property after a miss does not capture the write. An abrupt `has`
+trap or `Symbol.unscopables` getter prevents the source read. The same loop
+serves object pattern heads of `for-in` and `for-of`. Array elements, array
+rest, object rest, and plain identifier heads keep their existing
+preparation order, a separate source-based concern.
+
+The reference hosts diverge from this order. Node.js 24.21.0 (V8 13.6.233.17)
+and Deno 2.9.7 (V8 15.0.245.2) resolve the leaf after GetV and the default
+initializer, and both fail the unmodified reviewed [keyed binding case] with
+`Test262Error`. That is a recorded reference failure, not an oracle, so
+this evidence uses no Node.js or Deno differential for the new leaf. It relies
+on the ECMA-262 2025 algorithms, that upstream case, a fixed native-only
+observation, and an independent generated model. No assertion requires the
+reference hosts to stay wrong.
+
+The fixed observation in *tests/native.ts* compiles the program in
+*tests/native/fixtures/with-keyed-binding-target-order.ts* under both
+specialization policies with collection forced at every safepoint, and
+requires a positive collection count and the exact ECMA-262 trace. With
+specialization disabled it also requires zero guard hits and misses. Its
+twelve programs cover:
+
+ -  computed key order and nested and sibling leaves;
+ -  shorthand defaults and a getter that deletes the selected binding;
+ -  a default that adds the binding after a miss, and `Symbol.unscopables`
+    blocking;
+ -  a throwing `has` trap and a throwing `Symbol.unscopables` getter;
+ -  sloppy and strict assignment after deletion or addition.
+
+The existing *m5-object-binding.property.test.ts* family adds slot
+`0x60002001` with 10 ordinary cases and a 180-second interrupt limit. It
+generates the caller form (sloppy `var`, sloppy or strict assignment), the
+initial selection (miss, hit, unscopables-blocked, throwing `has`, throwing
+`Symbol.unscopables`), key kind, source and default presence, and the
+mutation and its site. Native execution under both specialization policies,
+with forced collection and a positive collection count, must equal an
+independent ECMA-262 model. A minimized regression case from that domain
+runs as an ordinary test. The slot `0x60002000` domain and its Node.js and
+Deno comparisons are unchanged. Parser and MIR structural tests check that
+the leaf's `in` lookup precedes GetV under both policies for a `var`
+declaration and an assignment, and that a leaf without a lexical fallback
+still reports `OSEO1001`.
+
+The repair adds no specialized path or guard and no runtime, ABI, or heap
+change, so the object-binding and destructuring-assignment guard-fallback
+omissions and their replacement evidence remain. This node admits exactly
+the one reviewed path above as an observed pass. Its [assignment-pattern twin]
+stays unreviewed with `observation-batch-08`, which keeps its first
+canonical admission.
+
+[keyed binding case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
+[assignment-pattern twin]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/expressions/assignment/destructuring/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js

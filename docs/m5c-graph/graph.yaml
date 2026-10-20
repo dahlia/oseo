@@ -12,18 +12,18 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
   inventoryPaths: 41091
-  passes: 23750
-  reviewedPaths: 27898
+  passes: 23751
+  reviewedPaths: 27899
   semanticFailures: 0
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-  unreviewedPaths: 13193
+  unreviewedPaths: 13192
   unsupportedProfileFeatures: 1725
 summary:
   nodes: 84
-  ready: 77
-  blocked: 7
+  ready: 78
+  blocked: 6
   parked: 0
-  landed: 26
+  landed: 27
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge

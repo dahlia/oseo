@@ -1,0 +1,41 @@
+group: language/destructuring
+key: 1f
+results:
+  - case:
+      async: false
+      features:
+        - Proxy
+      flags:
+        - noStrict
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - proxy-exotic-object
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

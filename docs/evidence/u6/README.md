@@ -90,44 +90,91 @@ These observations do not separate hardware, concurrency, file cohort and
 implementation change.
 
 
-Iterator extension exception to the current table
--------------------------------------------------
+Exceptions to the current table
+-------------------------------
 
-The current weight-source runs above observed the pre-extension
-destructuring-assignment family, not the iterator changes below. Run
-39070198868 sums its two recorded registrations to 210,558.734682
-milliseconds on Linux and 127,460.293458 on macOS, rounded to 211 and 128
-seconds. Those baseline observations remain in the complete CI input.
-They do not measure the extended family. Only this family's two weights
-override that upstream table, using the local observation and explicitly
-provisional macOS estimate below. All other refreshed weights, including
-compound assignment at 1,838 Linux and 1,242 macOS seconds, remain intact.
-The historical host ratio below is 198/184; it is not the refreshed
-baseline ratio of 128/211. Neither ratio proves current macOS cost.
+The current weight-source runs above observed two families before later
+changes grew them. Only these four entries override that upstream table;
+all other refreshed weights, including compound assignment at 1,838 Linux
+and 1,242 macOS seconds, remain intact. None of the four changes file
+inventory, seeds, case budgets, sizes, shard totals or interrupt limits.
+
+### Destructuring assignment
 
 The iterator-next-callability extension grows the existing destructuring
-assignment family. Its October 17, 2026 local Linux extended observation
-records these four native case durations:
+assignment family. Run 39070198868 sums its two recorded registrations to
+210,558.734682 milliseconds on Linux and 127,460.293458 on macOS; those
+baseline observations remain in the complete CI input and do not measure
+the extended family.
 
- -  `captured iterator next closures survive suspension and collection`:
-    15,689.738938 milliseconds;
- -  `generated iterator acquisition and first steps match ECMA-262 2025`:
-    408,992.765308 milliseconds;
- -  `generated unstepped iterator closes match ECMA-262 2025`:
-    400,165.103422 milliseconds; and
- -  `generated destructuring assignments match the M5 property model`:
-    91,561.829090 milliseconds.
+CI run [39473400560] at `3170ba94` measures the extended family on both
+hosts. Job `native support (linux-x86_64-gnu, 4/7)` records six case
+durations summing to 1,219,306.454043 milliseconds, rounded up to the
+1,220-second Linux weight; job `native support (macos-aarch64, 1/12)`
+records six summing to 605,363.979249 milliseconds, rounded up to 606 on
+macOS. Both sums include every registration of the file, as the source
+run's do. They are concurrent case sums from one run, not job or file
+wall times, and they are not conservative bounds.
 
-Their sum is 916,409.436758 milliseconds, rounded up to the 917-second Linux
-weight. The two pure model tests are excluded. This is a sum of native test
-case durations from `mise run test:property:extended`, not file wall time,
-an ordinary property observation, sanitizer cost, or CI measurement. The
-historical weights were 184 Linux seconds and 198 macOS seconds. Current
-domain macOS duration remains unmeasured. Its provisional 987-second weight
-is the derived estimate `ceil(917 * 198/184)`, using that historical host
-ratio. It must be refreshed from an actual macOS CI per-test duration sum;
-the estimate is not a Mac observation or pass. Neither weight changes file
-inventory, seeds, case budgets, sizes, shard totals or interrupt limits.
+The inputs are retained outside the repository under
+*/data/oseo-m5c-reviews/*: the run metadata
+*iterator-c1-ci-complete.json*, the log archive *iterator-c1-ci-logs.zip*,
+the U8 registration index *iterator-c1-ci-test-names.json*, and the
+extracted *iterator-c1-ci-extracted.json*. Rerunning
+*docs/evidence/u6/extract-ci.py* at `30dab254` on the first three, with
+run ID `39473400560`, reproduces the fourth byte for byte. These values
+replace the earlier local Linux observation of 916,409.436758 milliseconds
+and its provisional 987-second macOS estimate from the historical 198/184
+host ratio; the CI observation measures macOS directly.
+
+[39473400560]: https://github.com/dahlia/oseo/actions/runs/39473400560
+
+### Object binding
+
+The `destructuring-binding-target-order` node adds two native
+registrations to *tests/property/m5-object-binding.property.test.ts*.
+Run 39070198868 measured the earlier file at 131 Linux and 122 macOS
+seconds. On October 21, 2026 a local Linux single-file extended run at
+`4be1c732` (tree `084bb54e`) executed
+
+~~~~ sh
+mise run test:property:extended:native:shard \
+  --shard 1/1 tests/property/m5-object-binding.property.test.ts
+~~~~
+
+with the task's unchanged `OSEO_PROPERTY_RUN_SCALE=10`,
+`OSEO_PROPERTY_SEED=1592590339` and `OSEO_PROPERTY_SIZE=large`, one file
+worker, `MISE_JOBS=1`, and no CPU quota. All five registrations passed:
+
+ -  `object binding model checks nullish inputs before computed keys`:
+    0.78685 milliseconds;
+ -  `generated object bindings match the M5 property model`:
+    87,772.211719 milliseconds;
+ -  `with keyed binding model resolves before GetV and the default`:
+    0.61342 milliseconds;
+ -  `a minimized with keyed case reports forced collections`:
+    1,424.412803 milliseconds; and
+ -  `generated with-scoped keyed bindings match the M5 property model`:
+    145,501.326048 milliseconds.
+
+Their sum is 234,699.350840 milliseconds, rounded up to the 235-second
+Linux weight; excluding the two model tests would not change it. This is
+one local observation of a file running alone, not a CI measurement, file
+wall time, or ordinary property cost, and it estimates no variation. The
+raw output, timestamps and exit status are retained outside the
+repository under
+*/data/m5c-destructuring-binding-target-order/cost-refresh-20261021/*.
+
+The scheduling table was edited after the wrapper selected this single
+file and before the measurement ended. The HEAD, property file, and
+native implementation stayed unchanged; the final working tree had one
+modified scheduling file. These durations cover the selected file and
+do not establish a clean-tree gate for the final scheduling table.
+
+The current macOS cost of this file is unmeasured. Its 219-second weight
+is the provisional estimate `ceil(235 * 122/131)`, using the file's own
+host ratio in run 39070198868. It is not a Mac observation, pass, or
+bound, and must be replaced with an actual macOS CI case sum.
 
 
 Inputs and reproduction

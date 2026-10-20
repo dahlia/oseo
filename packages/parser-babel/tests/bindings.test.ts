@@ -1042,6 +1042,93 @@ test("supports parenthesized awaited object assignments", () => {
   assert.match(printMir(result.mir), /GetV for object binding/u);
 });
 
+test("resolves a with-scoped keyed binding leaf before GetV", () => {
+  // KeyedBindingInitialization and KeyedDestructuringAssignmentEvaluation
+  // resolve the leaf before GetV and the default initializer. The object
+  // environment's HasProperty is therefore lowered once, ahead of the
+  // read, and the write stores through that retained selection instead
+  // of a second lookup. Value ids follow lowering order along this
+  // straight-line pattern.
+  const cases = [
+    "var { p: target = 1 } = { p: void 0 };",
+    "({ p: target = 1 } = { p: void 0 });",
+  ].flatMap((statement) =>
+    (["disabled", "enabled"] as const).map(
+      (specialization) => [statement, specialization] as const,
+    ),
+  );
+  for (const [statement, specialization] of cases) {
+    const source =
+      "function unpack(environment) {\n" +
+      "  var target;\n" +
+      "  with (environment) {\n" +
+      `    ${statement}\n` +
+      "  }\n" +
+      "  return target;\n" +
+      "}\n" +
+      "unpack({});\n";
+    const result = compileSource(
+      babelFrontend,
+      { source, sourceId: "with-keyed-binding-order.ts" },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
+    const unpack = result.mir.functions.find((item) =>
+      item.blocks.some((block) =>
+        block.operations.some(
+          (operation) => operation.detail === "GetV for object binding",
+        ),
+      ),
+    );
+    assert.ok(unpack != null);
+    const operations = unpack.blocks.flatMap((block) => block.operations);
+    const withObjects = new Set(
+      operations
+        .filter(
+          (operation) =>
+            operation.kind === "read" && operation.detail === "<with object>",
+        )
+        .map((operation) => operation.id),
+    );
+    const lookups = operations.filter(
+      (operation) =>
+        operation.kind === "binary" &&
+        operation.operator === "in" &&
+        withObjects.has(operation.arguments[1] ?? -1),
+    );
+    const read = operations.find(
+      (operation) => operation.detail === "GetV for object binding",
+    );
+    const writes = operations.filter(
+      (operation) =>
+        operation.kind === "write" &&
+        /^%b\d+ target$/u.test(operation.detail ?? ""),
+    );
+    assert.equal(lookups.length, 1, "one ResolveBinding lookup");
+    assert.ok(read != null);
+    assert.ok(lookups[0]!.id < read.id, "ResolveBinding before GetV");
+    const fallbackWrite = writes.at(-1);
+    assert.ok(fallbackWrite != null);
+    assert.ok(fallbackWrite.id > read.id, "lexical fallback write after GetV");
+  }
+});
+
+test("keeps rejecting a keyed with leaf without a lexical fallback", () => {
+  // Resolving the leaf earlier does not admit an all-miss destructuring
+  // write to a global-object name, which still has no hidden cell for a
+  // later reference to observe.
+  const result = compileSource(babelFrontend, {
+    source: "const key = 'p';\nwith ({}) { ({ [key]: missing = 1 } = {}); }\n",
+    sourceId: "with-keyed-binding-fallback.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.match(
+    result.diagnostics[0]?.message ?? "",
+    /Assigning global-object name 'missing' through a with fallback/u,
+  );
+});
+
 test("supports parenthesized direct await points", () => {
   const result = compileSource(babelFrontend, {
     source:
