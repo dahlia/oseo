@@ -8565,16 +8565,24 @@ complete. The remaining gaps retain their existing owners.
     string, record, and lookup failure of the pinned upstream text and
     obtains each value from a statically compiled function that returns
     the same source expression, ignoring an abrupt completion as upstream
-    does. Its one respelling reads `%eval%` as `globalThis.eval`, the
-    global object property that upstream's bare `eval` identifier
-    resolves to, because the profile rejects a bare `eval` identifier
-    read. A case that then calls or constructs one of the source-compiling
-    constructors the include returns still reaches the ADR 0016 boundary
-    at that call. The
-    reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
-    through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a
-    choice kept from before M5b node `globalthis-binding` admitted
-    `globalThis`. Its
+    does. Its one respelling is `%eval%`, because the profile rejects a
+    bare `eval` identifier read. Upstream's bare `eval` resolves in the
+    global environment; when no global lexical `eval` exists, that is the
+    global object record, so the lookup performs its HasProperty, its
+    `ReferenceError` on absence, and its Get on the Script's top-level
+    `this`, which is the global object in either strictness and does not
+    depend on the `globalThis` binding. The lookup does not reproduce a
+    non-strict Script's top-level `let` or `const` named `eval`, which only
+    an identifier read can observe, and a Module's undefined top-level
+    `this` would leave `%eval%` undefined. No consumer of the include at
+    the pinned upstream revision is either, which a source test checks
+    against every pinned consumer; reading the identifier itself belongs to
+    M5c node `eval-intrinsic-value`. A case that then calls or constructs one
+    of the source-compiling constructors the include returns still reaches the
+    ADR 0016 boundary at that call. The reviewed *asyncHelpers.js* probes
+    `$DONE` with `typeof` rather than through
+    `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a choice kept
+    from before M5b node `globalthis-binding` admitted `globalThis`. Its
     `assert.throwsAsync` reports a constructor mismatch without composing a
     message from the observed value, so a rejection whose `constructor` is
     missing or exotic cannot replace the mismatch report with a thrown

@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
+import { join, relative } from "node:path";
 import test from "node:test";
 import { createContext, runInContext } from "node:vm";
 import type { Context } from "node:vm";
+import { fileURLToPath } from "node:url";
 import { parse, parseExpression } from "@babel/parser";
 
 import { runCli } from "../packages/cli/src/index.ts";
@@ -58,7 +60,9 @@ const upstreamText = await readFile(
  * Evaluate one harness copy as its own Script in `context` and return its
  * two definitions. The wrapper function keeps the two copies' top-level
  * `const` and function declarations apart while every name the copies
- * read still resolves through the context's global environment.
+ * read still resolves through the context's global environment, and its
+ * call passes the Script's own `this`, the global object, as the copy's
+ * top-level `this`.
  */
 function loadHarness(
   context: Context,
@@ -73,7 +77,7 @@ function loadHarness(
       "lookup: getWellKnownIntrinsicObject, " +
       "failure: function (key) { try { getWellKnownIntrinsicObject(key); } " +
       "catch (error) { return String(error.message); } " +
-      'return "no failure"; } };\n})()',
+      'return "no failure"; } };\n}).call(this)',
     context,
   ) as HarnessApi;
 }
@@ -81,9 +85,10 @@ function loadHarness(
 function harnessContext(setup = ""): Context {
   const context = createContext({});
   runInContext(
-    "globalThis.Test262Error = class Test262Error extends Error {};\n" + setup,
+    "globalThis.Test262Error = class Test262Error extends Error {};",
     context,
   );
+  runInContext(setup, context);
   return context;
 }
 
@@ -188,6 +193,210 @@ test("missing, throwing, and shadowed globals match upstream", () => {
   }
 });
 
+test("%eval% does not depend on the globalThis binding", () => {
+  // Each setup gives globalThis a value that globalThis.eval would misread
+  // or throw on, while upstream's bare eval still reads the global object.
+  const setups = [
+    'globalThis.globalThis = { eval: "replaced" };\n',
+    "delete globalThis.globalThis;\n",
+    "Object.defineProperty(globalThis, 'globalThis', {\n" +
+      "  configurable: true,\n" +
+      "  get() { throw new Error('unavailable'); },\n" +
+      "});\n",
+    'let globalThis = "lexical";\n',
+  ];
+  for (const setup of setups) {
+    for (const strict of [false, true]) {
+      const context = harnessContext(setup);
+      const reviewed = assertSameHarness(context, strict);
+      const expected = contextValue(context, "eval");
+      assert.notEqual(expected, undefined, setup);
+      assert.equal(recordValues(reviewed).get("%eval%"), expected, setup);
+    }
+  }
+});
+
+/**
+ * Evaluate `text`, then `suffix`, as one Script in a fresh context, and
+ * return which records hold undefined and whether %eval% holds the
+ * context's own eval. Unlike {@link loadHarness}, the suffix's top-level
+ * lexical declarations are in their temporal dead zone while the include
+ * runs.
+ */
+function sameScriptOutcome(
+  text: string,
+  suffix: string,
+  strict: boolean,
+): { readonly missing: readonly string[]; readonly evalValue: boolean } {
+  const context = harnessContext();
+  runInContext(`${strict ? '"use strict";\n' : ""}${text}\n${suffix}`, context);
+  // SAFETY: the Script above declared the table as a global lexical
+  // binding, and JSON text carries the outcome out of the context's realm.
+  return JSON.parse(
+    runInContext(
+      "JSON.stringify({ missing: WellKnownIntrinsicObjects\n" +
+        "  .filter(function (record) {\n" +
+        "    return record.value === undefined;\n" +
+        "  })\n" +
+        "  .map(function (record) { return record.name; }),\n" +
+        "  evalValue: WellKnownIntrinsicObjects.find(function (record) {\n" +
+        '    return record.name === "%eval%";\n' +
+        "  }).value === Reflect.get(this, 'eval') })",
+      context,
+    ) as string,
+  ) as { readonly missing: readonly string[]; readonly evalValue: boolean };
+}
+
+test("a same-Script globalThis in its dead zone matches upstream", () => {
+  for (const strict of [false, true]) {
+    const suffix = 'let globalThis = "late";';
+    const reviewed = sameScriptOutcome(reviewedText, suffix, strict);
+    const upstream = sameScriptOutcome(upstreamText, suffix, strict);
+    assert.deepEqual(reviewed, upstream);
+    assert.equal(reviewed.evalValue, true);
+  }
+});
+
+test("a global lexical eval is the one bounded divergence", () => {
+  // Only a bare eval identifier read can see a global lexical eval, and
+  // only non-strict Script code can declare one. Upstream reads it in its
+  // dead zone and records undefined; the reviewed copy reads the global
+  // object property. The consumer scan below shows that no consumer of the
+  // include at the pinned revision declares one.
+  const suffix = "let eval = 1;";
+  const reviewed = sameScriptOutcome(reviewedText, suffix, false);
+  const upstream = sameScriptOutcome(upstreamText, suffix, false);
+  assert.equal(reviewed.evalValue, true);
+  assert.equal(upstream.evalValue, false);
+  assert.deepEqual(
+    upstream.missing.filter((name) => name !== "%eval%"),
+    reviewed.missing,
+  );
+  assert.ok(upstream.missing.includes("%eval%"));
+});
+
+/** Every name a binding pattern declares. */
+function boundNames(pattern: StructuredDataValue | undefined): string[] {
+  const node = agentSyntaxNode(pattern);
+  if (node == null) return [];
+  switch (node.type) {
+    case "Identifier":
+      return [String(node.name)];
+    case "AssignmentPattern":
+      return boundNames(node.left);
+    case "RestElement":
+      return boundNames(node.argument);
+    case "ArrayPattern":
+      return Array.isArray(node.elements)
+        ? node.elements.flatMap((element) => boundNames(element))
+        : [];
+    case "ObjectPattern":
+      return Array.isArray(node.properties)
+        ? node.properties.flatMap((property) => {
+            const item = agentSyntaxNode(property);
+            return item?.type === "RestElement"
+              ? boundNames(item.argument)
+              : boundNames(item?.value);
+          })
+        : [];
+    default:
+      return [];
+  }
+}
+
+/** The top-level lexical names one Script source declares. */
+function lexicalNames(source: string): string[] {
+  const program = agentSyntaxNode(
+    parse(source, { sourceType: "script" }).program,
+  );
+  const body = Array.isArray(program?.body) ? program.body : [];
+  return body.flatMap((statement) => {
+    const node = agentSyntaxNode(statement);
+    if (node?.type === "ClassDeclaration") {
+      return boundNames(node.id);
+    }
+    if (node?.type !== "VariableDeclaration" || node.kind === "var") {
+      return [];
+    }
+    return Array.isArray(node.declarations)
+      ? node.declarations.flatMap((declarator) =>
+          boundNames(agentSyntaxNode(declarator)?.id),
+        )
+      : [];
+  });
+}
+
+/** Every file below `directory`, as paths relative to it. */
+async function filesBelow(directory: URL): Promise<string[]> {
+  const entries = await readdir(directory, {
+    recursive: true,
+    withFileTypes: true,
+  });
+  return entries
+    .filter((entry) => entry.isFile())
+    .map((entry) =>
+      relative(fileURLToPath(directory), join(entry.parentPath, entry.name)),
+    );
+}
+
+test("no pinned consumer reaches the bounded divergence", async () => {
+  const root = new URL(import.meta.resolve("test262/package.json"));
+  const tests = new URL("test/", root);
+  const candidates = await Promise.all(
+    (await filesBelow(tests))
+      .filter((path) => path.endsWith(".js") && !path.includes("_FIXTURE"))
+      .map(
+        async (path) =>
+          [path, await readFile(new URL(path, tests), "utf8")] as const,
+      ),
+  );
+  const consumers = candidates
+    .filter(([, source]) => source.includes(include))
+    .map(
+      ([path, source]) =>
+        [
+          `test/${path}`,
+          source,
+          parseTest262Case(source, `test/${path}`, revision),
+        ] as const,
+    )
+    .filter(([, , parsed]) => parsed.case.includes.includes(include));
+  const includeNames = new Set<string>();
+  for (const [path, source, parsed] of consumers) {
+    // A Module's top-level this is undefined, and a raw case loads no
+    // include, so every consumer must be an assembled Script.
+    assert.equal(parsed.case.mode, "script", path);
+    assert.ok(!parsed.flags.includes("raw"), path);
+    assert.ok(!lexicalNames(source).includes("eval"), path);
+    for (const name of parsed.case.includes) includeNames.add(name);
+  }
+  const paths = new Set<string>(consumers.map(([path]) => path));
+  for (const path of ownedPaths) assert.ok(paths.has(path), path);
+  // Both the upstream includes the consumers name and every reviewed
+  // harness copy the runner can assemble ahead of them.
+  const reviewedHarness = new URL("test262/harness/", import.meta.url);
+  const harnessSources = await Promise.all([
+    ...Array.from(
+      includeNames,
+      async (name) =>
+        [
+          name,
+          await readFile(new URL(`harness/${name}`, root), "utf8"),
+        ] as const,
+    ),
+    ...(await filesBelow(reviewedHarness)).map(
+      async (name) =>
+        [name, await readFile(new URL(name, reviewedHarness), "utf8")] as const,
+    ),
+  ]);
+  for (const [name, text] of harnessSources) {
+    assert.ok(!lexicalNames(text).includes("eval"), name);
+  }
+  // The scan itself recognizes a declaration it must reject.
+  assert.deepEqual(lexicalNames("let [{ a: eval }] = [{}];"), ["eval"]);
+  assert.deepEqual(lexicalNames("const { ...eval } = {};"), ["eval"]);
+});
+
 /** Fields that record source positions, comments, or parentheses. */
 const layoutFields: ReadonlySet<string> = new Set([
   "comments",
@@ -282,20 +491,55 @@ test("each lookup returns its entry's source expression statically", () => {
       assert.equal(statements.length, 0, record.name);
       continue;
     }
+    if (record.source === "eval") {
+      // Only %eval% is respelled: the profile rejects a bare eval
+      // identifier, so the lookup performs the global object record's
+      // HasProperty and Get on the Script's top-level this.
+      assert.equal(syntaxSignature(statements), evalLookupSignature);
+      continue;
+    }
     assert.equal(statements.length, 1, record.name);
     const returned = agentSyntaxNode(statements[0]);
     assert.equal(returned?.type, "ReturnStatement", record.name);
-    // Only %eval% is respelled: the profile rejects a bare eval
-    // identifier, and the global object property is what upstream reads.
-    const expected =
-      record.source === "eval" ? "globalThis.eval" : record.source;
     assert.equal(
       syntaxSignature(returned?.argument),
-      syntaxSignature(agentSyntaxNode(parseExpression(expected))),
+      syntaxSignature(agentSyntaxNode(parseExpression(record.source))),
       record.name,
     );
   }
+  // The lookups run inside one function the Script calls with its own
+  // top-level this, which is the global object in either strictness.
+  // %ThrowTypeError%'s source is the one other immediately called function,
+  // and it takes no argument.
+  const calls = nodes.filter(
+    (node) =>
+      node.type === "CallExpression" &&
+      agentSyntaxNode(node.callee)?.type === "FunctionExpression" &&
+      Array.isArray(node.arguments) &&
+      node.arguments.length > 0,
+  );
+  assert.equal(calls.length, 1);
+  const outer = calls[0];
+  assert.equal(syntaxSignature(outer?.arguments), '[{type:"ThisExpression"}]');
+  assert.equal(
+    syntaxSignature(agentSyntaxNode(outer?.callee)?.params),
+    syntaxSignature(
+      agentSyntaxNode(parseExpression("function (global) {}"))?.params,
+    ),
+  );
 });
+
+/** The two statements of the reviewed %eval% lookup. */
+const evalLookupSignature = syntaxSignature(
+  agentSyntaxNode(
+    parse(
+      'if (!("eval" in global)) ' +
+        'throw new ReferenceError("eval is not defined");\n' +
+        "return global.eval;",
+      { allowReturnOutsideFunction: true, sourceType: "script" },
+    ).program,
+  )?.body,
+);
 
 test("owned cases compile with the reviewed include", async () => {
   const harnesses = {

@@ -9,10 +9,16 @@ scope:
   - "The reviewed getWellKnownIntrinsicObject helper, which returns a
     recorded value, reports an intrinsic the realm does not provide, and
     rejects an unknown name with the upstream failure text."
-  - "The one respelled source: %eval% reads the eval property of the global
-    object as globalThis.eval, which is the binding upstream's bare eval
-    identifier resolves to, because the profile rejects a bare eval
-    identifier read."
+  - "The one respelled source: because the profile rejects a bare eval
+    identifier read, %eval% performs the global object record's
+    HasProperty, ReferenceError on absence, and Get on the Script's
+    top-level this, which is what upstream's bare eval resolves to when the
+    Script declares no global lexical eval, independent of the globalThis
+    binding."
+  - "The bounded divergence: a non-strict Script's top-level let or const
+    named eval, which only an identifier read observes, and a Module, whose
+    top-level this is undefined. No consumer of the include at the pinned
+    upstream revision is either, and a source test checks every one."
 owners:
   - PLAN-M5C.md
 evidence:

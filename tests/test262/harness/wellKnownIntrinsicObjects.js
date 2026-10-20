@@ -9,11 +9,21 @@
 // gives every entry a statically compiled lookup whose returned expression is
 // that entry's source, evaluated in the same order with the same abrupt
 // completions ignored. An empty source yields undefined, as upstream's
-// "return " body does. One spelling differs: upstream resolves the bare
-// identifier eval in its global function scope, which reads the eval
-// property of the global object, and this copy reads that property as
-// globalThis.eval because the profile does not resolve a bare eval
-// identifier. A missing or throwing lookup leaves the value undefined, and
+// "return " body does.
+//
+// One source differs. Upstream's bare eval resolves in the global
+// environment, and the profile does not resolve a bare eval identifier.
+// Without a global lexical eval declaration, which the Script must be
+// non-strict to contain, that resolution is the object record of the global
+// object: HasProperty, a ReferenceError when absent, then Get. The %eval%
+// lookup performs those steps on the Script's top-level this, which is that
+// object whatever the Script's strictness and whatever the globalThis
+// binding holds. A Script that declares a top-level let or const named eval
+// is the one case it does not reproduce. A Module, whose top-level this is
+// undefined, would leave %eval% undefined. No consumer of this include at
+// the pinned upstream revision is either.
+//
+// A missing or throwing lookup leaves the value undefined, and
 // getWellKnownIntrinsicObject keeps the upstream lookup, error messages, and
 // unknown-name failure.
 // Copyright (C) 2018 the V8 project authors. All rights reserved.
@@ -389,7 +399,7 @@ const WellKnownIntrinsicObjects = [
   },
 ];
 
-(function () {
+(function (global) {
   var lookups = {
     "%AggregateError%": function () {
       return AggregateError;
@@ -455,7 +465,8 @@ const WellKnownIntrinsicObjects = [
       return Error;
     },
     "%eval%": function () {
-      return globalThis.eval;
+      if (!("eval" in global)) throw new ReferenceError("eval is not defined");
+      return global.eval;
     },
     "%EvalError%": function () {
       return EvalError;
@@ -676,7 +687,7 @@ const WellKnownIntrinsicObjects = [
 
     wkio.value = actual;
   });
-})();
+})(this);
 
 /**
  * Returns a well-known intrinsic object, if the implementation provides it.
