@@ -86,6 +86,7 @@ supportedFeatures:
   - generators
   - globalThis
   - hashbang
+  - import.meta
   - let
   - logical-assignment-operators
   - new.target

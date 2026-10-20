@@ -1,0 +1,3 @@
+version: 1
+id: import-meta
+record: docs/language-profile-m5/families/import-meta.yaml

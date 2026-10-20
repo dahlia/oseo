@@ -8223,7 +8223,13 @@ complete. The remaining gaps retain their existing owners.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
     including the Annex B constructs this grammar rejects in every mode.
- -  `import.meta`, `export var`, and namespace re-exports such as
+ -  `import.meta` in Module code evaluates to one ordinary, extensible
+    object per module whose \[\[Prototype]] is null and which has no own
+    properties; the closed module host adds none. It exists before any
+    module function initializer runs, so a cyclic dependency that calls a
+    hoisted function early reads the same object. `import.meta` in Script
+    code, escaped, or as an assignment target is an early SyntaxError.
+ -  `export var` and namespace re-exports such as
     `export * as ns from "./module.js"` remain rejected with source-located
     diagnostics. Reviewed test262 cases carrying
     `export-star-as-namespace-from-module` classify

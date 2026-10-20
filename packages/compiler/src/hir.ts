@@ -49,6 +49,12 @@ export interface HirWithBindingReference {
 export const intrinsicGlobalObjectName = "*intrinsic global object*";
 
 /**
+ * The hidden binding name of one module's `import.meta` object. Like
+ * the global-object capture it cannot collide with a source name.
+ */
+export const importMetaName = "*import.meta*";
+
+/**
  * One realm global-object property fallback behind an ordered `with`
  * object chain. An all-miss sloppy or strict write uses this fallback.
  * Sloppy PutValue creates or updates the property. Strict PutValue
@@ -1334,6 +1340,14 @@ export interface HirProgram {
    */
   readonly intrinsicGlobalObjectBindingId?: number;
   /**
+   * The hidden cell holding this module's `import.meta` object, present
+   * only when the module body reads `import.meta`. The module compiler
+   * initializes it before any module function initializer can expose a
+   * closure that reads it, so every read, including one from a hoisted
+   * function another module calls first, observes the same object.
+   */
+  readonly importMetaBindingId?: number;
+  /**
    * The resolved var-scoped top-level bindings a Script's global object
    * binds as properties, in GlobalDeclarationInstantiation order. Each
    * entry names the same binding the script statement list writes, so a
@@ -1412,12 +1426,19 @@ export interface ResolveState {
   /** The hidden realm global-object cell used by mutable intrinsic reads. */
   intrinsicGlobalObjectBinding?: Binding | undefined;
   /**
+   * The hidden cell of this module's `import.meta` object, allocated by
+   * the first read. It stays undefined outside Module code.
+   */
+  importMetaBinding?: Binding | undefined;
+  /**
    * Uninitialized cells used only when a mutable intrinsic global no longer
    * exists. Reading one preserves the ReferenceError of an unresolvable name.
    */
   readonly intrinsicReadFallbacks: Map<string, Binding>;
   /** Active labels of the function being resolved; loops accept continue. */
   readonly labels: { readonly loop: boolean; readonly name: string }[];
+  /** True while resolving one module's body rather than a Script. */
+  readonly moduleCode: boolean;
   nextFunctionId: number;
   readonly sourceId: string;
   /**

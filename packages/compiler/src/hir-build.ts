@@ -6,6 +6,7 @@ import {
 import {
   anonymousDefinition,
   errorIntrinsicName,
+  importMetaName,
   intrinsicGlobalObjectName,
   isStandardGlobalName,
   isTypedArrayIntrinsicName,
@@ -328,6 +329,55 @@ function intrinsicGlobalObjectBinding(state: ResolveState): Binding {
     state.intrinsicGlobalObjectBinding = binding;
   }
   return binding;
+}
+
+/**
+ * The hidden cell of the module's `import.meta` object. ECMA-262 2025
+ * 13.3.12.1 creates the object on the first evaluation and returns it
+ * from every later one. Oseo's closed module host contributes no
+ * HostGetImportMetaProperties entries and no HostFinalizeImportMeta
+ * step, so that creation runs no code and allocating the object before
+ * the module's first evaluation is indistinguishable from allocating it
+ * on demand.
+ */
+function importMetaBinding(state: ResolveState): Binding {
+  let binding = state.importMetaBinding;
+  if (binding == null) {
+    binding = { id: state.nextBindingId, mutable: false, name: importMetaName };
+    state.nextBindingId += 1;
+    state.importMetaBinding = binding;
+  }
+  return binding;
+}
+
+/**
+ * Create the `import.meta` object: an ordinary, extensible object whose
+ * [[Prototype]] is null and which has no own properties, because the
+ * closed module host defines no import.meta properties.
+ */
+function importMetaInitializer(
+  binding: Binding,
+  range: SourceRange,
+): HirStatement {
+  return {
+    bindingId: binding.id,
+    hint: undefined,
+    initializer: {
+      kind: "object",
+      properties: [
+        {
+          key: { kind: "string", range, value: "__proto__" },
+          kind: "definition",
+          prototypeSetter: true,
+          value: { kind: "null", range },
+        },
+      ],
+      range,
+    },
+    kind: "const",
+    name: binding.name,
+    range,
+  };
 }
 
 /** Read the realm global object captured before the source body executes. */
@@ -1352,6 +1402,22 @@ function resolveExpression(
       name: "this",
       range: expression.range,
     };
+  }
+  if (expression.kind === "import-meta") {
+    if (!state.moduleCode) {
+      // A frontend reports this before resolution; an owned program that
+      // still carries it outside Module code is the same early error.
+      state.diagnostics.push({
+        ...sourceDiagnostic(
+          state.sourceId,
+          expression,
+          "import.meta is only valid in Module code.",
+        ),
+        code: "OSEO0001",
+      });
+      return undefined;
+    }
+    return bindingExpression(importMetaBinding(state), expression.range);
   }
   if (
     expression.kind === "boolean" ||
@@ -4338,6 +4404,7 @@ export function buildSeededHir(
     intrinsicGlobalObjectBinding: undefined,
     intrinsicReadFallbacks: new Map(),
     labels: [],
+    moduleCode: seed.moduleBody === true,
     nextBindingId: seed.nextBindingId ?? 0,
     nextFunctionId: seed.nextFunctionId ?? 0,
     sourceId: program.sourceId,
@@ -4427,9 +4494,9 @@ export function buildSeededHir(
         if (state.agentTemplates == null) return undefined;
         return { agentTemplates: [...state.agentTemplates.values()] };
       }),
-      body:
-        state.intrinsicGlobalObjectBinding == null
-          ? body
+      body: [
+        ...(state.intrinsicGlobalObjectBinding == null
+          ? []
           : [
               {
                 bindingId: state.intrinsicGlobalObjectBinding.id,
@@ -4442,9 +4509,13 @@ export function buildSeededHir(
                 kind: "const",
                 name: state.intrinsicGlobalObjectBinding.name,
                 range: program.range,
-              },
-              ...body,
-            ],
+              } satisfies HirStatement,
+            ]),
+        ...(state.importMetaBinding == null
+          ? []
+          : [importMetaInitializer(state.importMetaBinding, program.range)]),
+        ...body,
+      ],
       functions: state.hirFunctions,
       globalLexicalNames: (program.globalLexicalNames ?? []).map((entry) => ({
         name: entry.name,
@@ -4468,6 +4539,10 @@ export function buildSeededHir(
         return {
           intrinsicGlobalObjectBindingId: state.intrinsicGlobalObjectBinding.id,
         };
+      }),
+      ...includePropertiesWhen(() => {
+        if (state.importMetaBinding == null) return undefined;
+        return { importMetaBindingId: state.importMetaBinding.id };
       }),
       kind: "hir-program",
       range: program.range,

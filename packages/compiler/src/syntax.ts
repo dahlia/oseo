@@ -631,6 +631,14 @@ export type SyntaxExpression =
       readonly kind: "new-target";
     })
   | (LocatedSyntax & {
+      /**
+       * The `import.meta` meta property. A frontend produces it only in
+       * Module code, where the module compiler gives each module one
+       * object that every evaluation in that module observes.
+       */
+      readonly kind: "import-meta";
+    })
+  | (LocatedSyntax & {
       readonly argument: SyntaxExpression;
       readonly kind: "unary";
       readonly operator: UnaryOperator;
