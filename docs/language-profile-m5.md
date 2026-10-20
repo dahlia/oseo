@@ -8543,8 +8543,9 @@ complete. The remaining gaps retain their existing owners.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
-    *promiseHelper.js*, and *propertyHelper.js*. *nans.js* joined that list
-    with the `math-namespace` node, whose `Math.pow` intrinsic was its only
+    *promiseHelper.js*, *propertyHelper.js*, and
+    *wellKnownIntrinsicObjects.js*. *nans.js* joined that list with the
+    `math-namespace` node, whose `Math.pow` intrinsic was its only
     unadmitted dependency, *decimalToHexString.js* with the
     `uri-handling-functions` node that its 78 reviewed cases observe, and
     *nativeFunctionMatcher.js* with the `harness-native-function-matcher`
@@ -8555,10 +8556,21 @@ complete. The remaining gaps retain their existing owners.
     reviewed copy caches the initial `globalThis` value when the harness
     loads instead. It keeps the upstream `fnGlobalObject` definition and
     its cache, compiles no source text, and also works in module cases,
-    where a top-level `this` probe would yield `undefined`. Cases in the
-    reviewed function inventory that need *wellKnownIntrinsicObjects.js*
-    classify as unsupported until that include has a reviewed
-    implementation. The
+    where a top-level `this` probe would yield `undefined`.
+    *wellKnownIntrinsicObjects.js* joined with M5c node
+    `well-known-intrinsics-harness`. Upstream obtains each intrinsic of
+    that include by passing its source string to the `Function`
+    constructor, which [ADR 0016](./adr/0016-dynamic-source-boundary.md)
+    keeps outside the profile. The reviewed copy keeps every name, source
+    string, record, and lookup failure of the pinned upstream text and
+    obtains each value from a statically compiled function that returns
+    the same source expression, ignoring an abrupt completion as upstream
+    does. Its one respelling reads `%eval%` as `globalThis.eval`, the
+    global object property that upstream's bare `eval` identifier
+    resolves to, because the profile rejects a bare `eval` identifier
+    read. A case that then calls or constructs one of the source-compiling
+    constructors the include returns still reaches the ADR 0016 boundary
+    at that call. The
     reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
     through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a
     choice kept from before M5b node `globalthis-binding` admitted

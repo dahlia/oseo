@@ -202,6 +202,10 @@ const testAtomicsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/testAtomics.js",
 );
+const wellKnownIntrinsicObjectsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/wellKnownIntrinsicObjects.js",
+);
 
 const canonicalTarget = canonicalTest262Target;
 const runnerHost = createNodeHost();
@@ -226,7 +230,6 @@ const unavailableHarnessIncludes = new Set([
   // through the Function constructor, which this profile keeps outside
   // the admitted dynamic source, so no unreviewed copy can execute them.
   "resizableArrayBufferUtils.js",
-  "wellKnownIntrinsicObjects.js",
 ]);
 
 /** Host-varying facts reported outside the canonical manifest. */
@@ -1900,6 +1903,10 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
       ["regExpUtils.js", await readFile(regexpUtilsHarnessPath, "utf8")],
       ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
       ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
+      [
+        "wellKnownIntrinsicObjects.js",
+        await readFile(wellKnownIntrinsicObjectsHarnessPath, "utf8"),
+      ],
     ]),
   };
 }
