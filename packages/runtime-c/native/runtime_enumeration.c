@@ -30,7 +30,11 @@
  * A candidate invokes [[GetOwnProperty]] only once in its processing step.
  */
 
-/* One level's own string keys in OrdinaryOwnPropertyKeys order. */
+/*
+ * One level's own string keys in [[OwnPropertyKeys]] order: the
+ * OrdinaryOwnPropertyKeys order, or a module namespace's [[Exports]]
+ * order with integer-like names in place.
+ */
 static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
@@ -98,8 +102,10 @@ static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
                 );
             }
         }
+        bool index_keys_lead =
+            !ordinary_object(frame.slots[0])->module_namespace;
         uint64_t previous = UINT64_MAX;
-        while (result.status == OSEO_STATUS_NORMAL) {
+        while (index_keys_lead && result.status == OSEO_STATUS_NORMAL) {
             OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
             size_t selected = SIZE_MAX;
             uint32_t selected_number = 0u;
@@ -151,7 +157,8 @@ static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
             index += 1u;
             uint32_t ignored = 0u;
             if (is_symbol(key) ||
-                oseo_internal_array_index(key, &ignored)) continue;
+                (index_keys_lead &&
+                 oseo_internal_array_index(key, &ignored))) continue;
             if (reserved != NULL &&
                 oseo_internal_string_is_ascii(key, reserved)) continue;
             frame.slots[2] = key;

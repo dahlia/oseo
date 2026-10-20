@@ -126,9 +126,11 @@ test("generated module graphs retain deterministic SCC order", () => {
  * Export names a generated module may use. They include the string names
  * `"*"`, `"default"`, the empty string, and a non-ASCII name, which
  * arbitrary module namespace names admit, so the model checks that none of
- * them is confused with namespace or default handling.
+ * them is confused with namespace or default handling. The array-index
+ * names `"10"` and `"2"` check that the namespace list keeps code-unit
+ * order, where an ordinary object would order them numerically.
  */
-const exportNames = ["a", "b", "default", "*", "", "☿"] as const;
+const exportNames = ["a", "b", "default", "*", "", "☿", "10", "2"] as const;
 
 /** Local binding names a generated module declares. */
 const localNames = ["first", "second"] as const;

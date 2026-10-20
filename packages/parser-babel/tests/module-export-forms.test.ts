@@ -295,6 +295,42 @@ test("creates a namespace that is only re-exported while linking", async () => {
   assert.match(lines[namespaceLine] ?? "", /"value": %b\d+, "☿": %b\d+/u);
 });
 
+test("keeps integer-like namespace names in code-unit order", async () => {
+  const graph = await graphOf({
+    "dep.js": [
+      "export let value = 1;",
+      'export { value as "2", value as "4294967294", value as "01" };',
+      'export * as "10" from "./other.js";',
+      'export * as "" from "./other.js";',
+    ].join("\n"),
+    "main.js": 'import * as names from "./dep.js";\nconsole.log(names);\n',
+    "other.js": "export const other = 0;",
+  });
+  // ECMA-262 sorts [[Exports]] by code units, so "10" precedes "2" and
+  // the array-index names are not moved ahead of the empty name.
+  const ordered = ["", "01", "10", "2", "4294967294", "value"];
+  const linked = linkModuleGraph(graph);
+  assert.deepEqual(linked.diagnostics, []);
+  assert.ok(linked.graph != null);
+  assert.deepEqual(
+    linkedModule(linked.graph, "dep.js").namespaceNames,
+    ordered,
+  );
+  const compiled = compileModuleGraph(graph);
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.hir != null);
+  const namespaceLine =
+    printHir(compiled.hir)
+      .split("\n")
+      .find((line) =>
+        line.includes("*namespace:file:///app/dep.js* = module-namespace"),
+      ) ?? "";
+  assert.deepEqual(
+    [...namespaceLine.matchAll(/"([^"]*)": %b\d+/gu)].map((match) => match[1]),
+    ordered,
+  );
+});
+
 test("initializes module var cells while linking", async () => {
   const graph = await graphOf({
     // b.js evaluates first and observes a.js before a.js evaluates: the

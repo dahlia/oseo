@@ -460,6 +460,24 @@ The native module scenario in *tests/native/scenarios/shard-2.ts* compares
 *tests/fixtures/module-export-forms/* with Node.js and Deno under both
 specialization policies and forced collection.
 
+A namespace's [[OwnPropertyKeys]] returns its sorted export names, so the
+array-index names `"10"` and `"2"` follow `""` and precede ordinary names
+in code-unit order. The runtime own-key, CopyDataProperties, and for-in
+snapshots keep that order for a namespace and still move array-index keys
+first for every other object. V8, and so both reference hosts, lists a
+namespace's array-index names first, while Bun 1.4.3 (JavaScriptCore)
+follows ECMA-262. The scenario therefore checks
+*tests/fixtures/module-export-forms/key-order.mjs* against an explicit
+expectation rather than a reference host. Its `Object.keys`,
+`Object.getOwnPropertyNames`, `Reflect.ownKeys`, Proxy, `Object.entries`,
+and `Object.assign` lines are required by ECMA-262. Its for-in line is not:
+ECMA-262 2025 section 14.7.5.9 leaves the enumeration order of a module
+namespace exotic object unspecified, so that line fixes the order Oseo
+chooses, [[OwnPropertyKeys]] order, and V8's different order there is not
+a conformance failure. A spread or rest copy rebuilds an ordinary object,
+so only the `Object.assign` line observes copy order directly. The generated
+ResolveExport model also draws `"10"` and `"2"`.
+
 
 Work graph construction
 -----------------------

@@ -17,6 +17,12 @@ scope:
     string name * is an ordinary export name and never selects a namespace
     import. Duplicate export names, lone surrogates, and a string local
     name without from are early errors."
+  - "A module namespace lists its string keys in the code-unit order of its
+    export names, array-index names such as 2 and 10 included, then
+    @@toStringTag. Own-key queries, Object.assign, and spread and rest
+    copies use that order; ordinary objects keep array-index keys first in
+    ascending numeric order. ECMA-262 leaves for-in order over a namespace
+    unspecified, and Oseo chooses the same order."
 owners:
   - PLAN-M5C.md
   - docs/adr/0009-module-identity-and-linking.md
@@ -34,6 +40,8 @@ evidence:
       - tests/fixtures/module-export-forms/cycle-b.mjs
       - tests/fixtures/module-export-forms/reexports.mjs
       - tests/fixtures/module-export-forms/values.mjs
+      - tests/fixtures/module-export-forms/key-order.mjs
+      - tests/fixtures/module-export-forms/numeric-names.mjs
       - packages/parser-babel/tests/module-export-forms.test.ts
   forced-collection:
     status: covered

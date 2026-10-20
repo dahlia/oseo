@@ -8315,7 +8315,9 @@ complete. The remaining gaps retain their existing owners.
     resolution stays ambiguous only for distinct bindings. Import and export
     names may be any well-formed string, and the string name `"*"` never
     selects a namespace import. Duplicate names, lone surrogates, and a
-    string local name without `from` are early errors. The reviewed test262
+    string local name without `from` are early errors. A namespace lists its
+    string keys in code-unit order, array-index names included, where an
+    ordinary object lists array-index keys first. The reviewed test262
     features `arbitrary-module-namespace-names` and
     `export-star-as-namespace-from-module` are admitted.
  -  The realm root now owns one collector-traced intrinsic graph, a callable

@@ -173,3 +173,8 @@ therefore reads `undefined` before the declaring module evaluates, while
 lexical bindings keep their temporal dead zones. A namespace reached only
 through `export * as` is created with the other namespace objects during
 linking.
+
+A namespace object is created with its exports in code-unit order, and the
+runtime's own-key snapshots list a namespace's string keys in that stored
+order. They do not move array-index names such as `"2"` ahead of `"10"` or
+`""`, as they do for every other object.
