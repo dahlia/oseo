@@ -194,6 +194,10 @@ const regexpUtilsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/regExpUtils.js",
 );
+const resizableArrayBufferUtilsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/resizableArrayBufferUtils.js",
+);
 const testTypedArrayHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/testTypedArray.js",
@@ -221,13 +225,7 @@ const reviewedExecutionPoolLimit = Math.min(
   availableParallelism(),
 );
 const reviewedExecutionRetryLimit = 1;
-const unavailableHarnessIncludes = new Set([
-  // The resizable-buffer utilities create their TypedArray subclasses
-  // through the Function constructor, which this profile keeps outside
-  // the admitted dynamic source, so no unreviewed copy can execute them.
-  "resizableArrayBufferUtils.js",
-  "wellKnownIntrinsicObjects.js",
-]);
+const unavailableHarnessIncludes = new Set(["wellKnownIntrinsicObjects.js"]);
 
 /** Host-varying facts reported outside the canonical manifest. */
 export interface ReviewedTest262RunMetadata {
@@ -1898,6 +1896,10 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
       ["promiseHelper.js", await readFile(promiseHarnessPath, "utf8")],
       ["proxyTrapsHelper.js", await readFile(proxyTrapsHarnessPath, "utf8")],
       ["regExpUtils.js", await readFile(regexpUtilsHarnessPath, "utf8")],
+      [
+        "resizableArrayBufferUtils.js",
+        await readFile(resizableArrayBufferUtilsHarnessPath, "utf8"),
+      ],
       ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
       ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
     ]),

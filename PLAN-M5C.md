@@ -975,3 +975,44 @@ admitted tags, so every reviewed observation should stay unchanged; the
 complete update's actual records decide. The node's two direct dependents
 are `observation-batch-32` and `m5-exit-audit`. Landing this node alone does
 not unblock batch 32, which also waits for its other prerequisite nodes.
+
+
+Resizable buffer harness
+------------------------
+
+The `resizable-array-buffer-harness` node adds a reviewed
+*tests/test262/harness/resizableArrayBufferUtils.js* and registers it with
+the reviewed runner, which no longer lists that include as unavailable. It
+changes no runtime, compiler, or feature list.
+
+The copy keeps every upstream operation except how the three subclasses are
+made. Upstream's internal `subClass` compiles
+`return class My<type> extends <type> {}` through the `Function`
+constructor, which ADR 0016 keeps outside the admitted dynamic source. That
+body runs in the global environment and only declares a class, so the copy
+declares `MyUint8Array`, `MyFloat32Array`, and `MyBigInt64Array` as `const`
+bindings of the same named class expressions, in the same order and with the
+same global heritage. This adaptation is bounded:
+
+ -  `subClass` itself is not defined. It is outside the upstream `defines`,
+    and no pinned test calls it.
+ -  Upstream's `try`/`catch` yields `undefined` only on an engine without
+    class syntax. This profile admits classes, so the three bindings always
+    hold their classes.
+ -  Both `typeof Float16Array` probes are kept verbatim, so `ctors` and
+    `floatCtors` are exactly the lists upstream selects on the host that
+    runs them. The probes are not dropped to avoid the Float16Array gap.
+
+The upstream frontmatter of 188 pinned tests includes this file. Of the
+included inventory, 168 are the reviewed paths this node owns and 17 are
+unreviewed paths of `observation-batch-32`, which stay unreviewed here.
+Three more are under *test/staging/* and outside the inventory.
+
+Before `typed-array-feature-admission` admits the Float16Array global, both
+probes are the profile-syntax rejection for `typeof` of an unadmitted
+standard global. So the manifest update that observes the 168 paths runs
+after that prerequisite is in the source the update reads. This node does
+not touch the Float16Array source. A reference run under Node.js and Deno
+on hosts that define Float16Array is evidence that the copy is equivalent
+to upstream, not an Oseo observation. The classifications come only from
+that complete update.
