@@ -473,6 +473,56 @@ export async function runNativeScenario2(
     }
   }
 
+  // Export var, `export * as`, and arbitrary string export names: var
+  // cells observed from a cycle before evaluation, namespace identity
+  // across import and re-export forms, the string name "*", and live
+  // reads through every alias, under forced collection.
+  const exportFormsEntry = [
+    root,
+    "tests/fixtures/module-export-forms/entry.mjs",
+  ].join("/");
+  const exportFormsReferences = [
+    await host.run({
+      args: [exportFormsEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", exportFormsEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of exportFormsReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeExportForms = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            exportFormsEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativeExportForms.exitStatus, 0, nativeExportForms.stderr);
+      assert.equal(nativeExportForms.stderr, "");
+      for (const reference of exportFormsReferences) {
+        assert.equal(
+          nativeExportForms.stdout,
+          reference.stdout,
+          `module export forms ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const createModuleEntry = [
     root,
     "tests/fixtures/object-create-module/entry.mjs",

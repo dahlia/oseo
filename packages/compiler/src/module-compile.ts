@@ -21,7 +21,11 @@ import {
 import type { CompilerOptions, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
 import { linkModuleGraph } from "./modules.ts";
-import type { LinkedModuleGraph, ModuleComponent } from "./modules.ts";
+import type {
+  LinkedModule,
+  LinkedModuleGraph,
+  ModuleComponent,
+} from "./modules.ts";
 import type { Diagnostic, SourceRange } from "./source.ts";
 import type {
   LocatedSyntax,
@@ -1080,6 +1084,29 @@ function moduleAwaitPoint(
   };
 }
 
+/** The link-time initializer of one module's namespace object cell. */
+function moduleNamespaceInitializer(
+  target: LinkedModule,
+  bindingId: number,
+  range: SourceRange,
+): HirStatement {
+  return {
+    bindingId,
+    hint: undefined,
+    initializer: {
+      entries: target.exports.map((entry) => ({
+        bindingId: entry.cellId,
+        name: entry.exportedName,
+      })),
+      kind: "module-namespace",
+      range,
+    },
+    kind: "const",
+    name: `*namespace:${target.canonicalId}*`,
+    range,
+  };
+}
+
 function moduleUndefined(range: SourceRange): HirExpression {
   return { kind: "undefined", range };
 }
@@ -1243,6 +1270,7 @@ export function compileModuleGraph(
   const importMetaInitializers: HirStatement[] = [];
   const jsonInitializers: HirStatement[] = [];
   const moduleBodies = new Map<string, readonly HirStatement[]>();
+  const varInitializers: HirStatement[] = [];
   let nextBindingId = linked.graph.cells.length;
   let nextFunctionId = 0;
   const namespaceBindings = new Map<string, number>();
@@ -1263,22 +1291,31 @@ export function compileModuleGraph(
       }
       namespaceBindings.set(targetId, bindingId);
       const targetRange = retainModuleSource(targetNode.syntax.range, targetId);
-      namespaceInitializers.push({
-        bindingId,
-        hint: undefined,
-        initializer: {
-          entries: target.exports.map((entry) => ({
-            bindingId: entry.cellId,
-            name: entry.exportedName,
-          })),
-          kind: "module-namespace",
-          range: targetRange,
-        },
-        kind: "const",
-        name: `*namespace:${targetId}*`,
-        range: targetRange,
-      });
+      namespaceInitializers.push(
+        moduleNamespaceInitializer(target, bindingId, targetRange),
+      );
     }
+  }
+  // An `export * as` entry can name a namespace that no module imports.
+  for (const target of linked.graph.modules) {
+    const bindingId = target.namespaceCellId;
+    if (bindingId == null || namespaceBindings.has(target.canonicalId)) {
+      continue;
+    }
+    const targetNode = nodes.get(target.canonicalId);
+    if (targetNode == null) {
+      throw new Error(
+        `Namespace module '${target.canonicalId}' is unavailable.`,
+      );
+    }
+    namespaceBindings.set(target.canonicalId, bindingId);
+    namespaceInitializers.push(
+      moduleNamespaceInitializer(
+        target,
+        bindingId,
+        retainModuleSource(targetNode.syntax.range, target.canonicalId),
+      ),
+    );
   }
 
   for (const moduleId of linked.graph.evaluationOrder) {
@@ -1352,8 +1389,16 @@ export function compileModuleGraph(
     globalBindings.push(...(result.program.globalBindings ?? []));
     globalBindings.push(...collectHirBindings(moduleBody));
     const evaluationBody: HirStatement[] = [];
+    const varNames = new Set(node.syntax.varNames);
     for (const statement of moduleBody) {
-      if (
+      if (statement.kind === "let" && varNames.has(statement.name)) {
+        // InitializeEnvironment creates each var binding as undefined
+        // while linking; the source initializers stay in evaluation.
+        if (statement.initializer.kind !== "undefined") {
+          throw new Error(`Module var '${statement.name}' is not hoisted.`);
+        }
+        varInitializers.push(statement);
+      } else if (
         statement.kind === "const" &&
         statement.bindingId === result.program.intrinsicGlobalObjectBindingId
       ) {
@@ -1644,6 +1689,7 @@ export function compileModuleGraph(
       ...importMetaInitializers,
       ...namespaceInitializers,
       ...jsonInitializers,
+      ...varInitializers,
       ...functionInitializers,
       ...moduleInitializers,
       {

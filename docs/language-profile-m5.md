@@ -608,7 +608,7 @@ current evidence assessment. Those live only in the indexed records above.
     as M5a Unit 8.5c records below, and so may a block-level function
     declaration whose block does not lexically contain the var declaration,
     as M5a Unit 8.5d records below. Deliberate boundaries, each rejected with
-    a source-located diagnostic: `export var`, ambient `declare`
+    a source-located diagnostic: ambient `declare`
     declarations, a recursive catch pattern sharing a var name, and a `var`
     that lexically shares the block declaring a same-name function, which
     stays the one collision ECMA-262's Block early errors forbid. This entry
@@ -1231,8 +1231,9 @@ current evidence assessment. Those live only in the indexed records above.
     another container shape, that subtree remains unhinted without a diagnostic
     while matching siblings continue to map. Root container mismatches and type
     annotations that require resolution remain source-located unsupported
-    boundaries. `export var` remains a module-syntax boundary; M5a Unit 8.3
-    later admits `await` inside a default, as recorded below.
+    boundaries. M5c `module-export-forms` admits `export var`, as recorded
+    below. M5a Unit 8.3 later admits `await` inside a default, as recorded
+    below.
  -  Object binding declarations. A `const` or `let` declarator
     and each declarator in a standalone `var` statement admit static,
     computed, shorthand, renamed, defaulted, and recursively nested object or
@@ -1264,7 +1265,7 @@ current evidence assessment. Those live only in the indexed records above.
     remains unhinted without a diagnostic while matching siblings continue to
     map. Root container mismatches and type annotations that require resolution
     or otherwise lack an admitted concrete syntactic shape remain source-located
-    unsupported boundaries. `export var` remains a module-syntax boundary;
+    unsupported boundaries. M5c `module-export-forms` admits `export var`.
     M5a Unit 8.3 later admits `await` inside a property name or default, as
     recorded below.
  -  Synchronous function binding-pattern, default, and rest parameters. Function
@@ -8301,12 +8302,22 @@ complete. The remaining gaps retain their existing owners.
     module function initializer runs, so a cyclic dependency that calls a
     hoisted function early reads the same object. `import.meta` in Script
     code, escaped, or as an assignment target is an early SyntaxError.
- -  `export var` and namespace re-exports such as
-    `export * as ns from "./module.js"` remain rejected with source-located
-    diagnostics. Reviewed test262 cases carrying
-    `export-star-as-namespace-from-module` classify
-    `unsupported-profile-feature`. Owner: the modules and asynchronous
-    execution stream.
+ -  Module export forms. M5c `module-export-forms` admits `export var`,
+    `export * as name from "./module.js"`, and arbitrary module namespace
+    names. `export var` exports every bound name, including declarators
+    without an initializer and binding-pattern leaves. Every module `var`
+    cell is created as `undefined` while linking, so a cyclic importer or a
+    hoisted function reads `undefined` before the declaring module
+    evaluates, while lexical bindings keep their temporal dead zones.
+    `export * as` exports the requested module's one namespace object under
+    an explicit name, including `default` or a string name; it shadows star
+    exports and shares the namespace identity of `import * as`, so star
+    resolution stays ambiguous only for distinct bindings. Import and export
+    names may be any well-formed string, and the string name `"*"` never
+    selects a namespace import. Duplicate names, lone surrogates, and a
+    string local name without `from` are early errors. The reviewed test262
+    features `arbitrary-module-namespace-names` and
+    `export-star-as-namespace-from-module` are admitted.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
     and constructible `Object` value, primitive wrappers, the
     `ArrayBuffer` constructor with its Data Block, `DataView` over that

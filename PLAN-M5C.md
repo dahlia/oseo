@@ -433,6 +433,34 @@ amendment admits any form of dynamic import. It does not widen the existing
 dynamic-source remediation reservation.
 
 
+Module export forms
+-------------------
+
+The `module-export-forms` node admits `export var`, `export * as name`,
+and arbitrary module namespace names, which owned 28 reviewed paths: 15
+gated by `arbitrary-module-namespace-names`, 7 by
+`export-star-as-namespace-from-module`, and 6 whose fixtures used
+`export var` and reported `This export is unsupported.` Eleven of the 28
+are expected parse-phase negatives: duplicate export names, lone
+surrogates, a string local name without `from`, and a missing semicolon
+after a star export. They test early errors, not a missing capability.
+ADR 0009 records the linking contract. Admitting `export var` required
+creating every module `var` cell while linking, because the previous
+evaluator-time initialization let a cyclic importer observe a temporal dead
+zone where ECMA-262 gives `undefined`. The 13 unreviewed paths that also
+need these features stay with `observation-batch-32`.
+
+*packages/testkit/tests/module-graph.property.test.ts* checks generated
+graphs of local, indirect, namespace, and star exports with string names,
+including `"*"`, `"default"`, and the empty string, against an independent
+transcription of ResolveExport and GetExportedNames. Structural tests in
+*packages/parser-babel/tests/module-export-forms.test.ts* fix the module
+records, namespace identity, ambiguity, and link-time var initialization.
+The native module scenario in *tests/native/scenarios/shard-2.ts* compares
+*tests/fixtures/module-export-forms/* with Node.js and Deno under both
+specialization policies and forced collection.
+
+
 Work graph construction
 -----------------------
 

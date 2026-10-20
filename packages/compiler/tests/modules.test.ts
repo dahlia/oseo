@@ -63,6 +63,7 @@ function testModule(sourceId: string, source: string): SyntaxModule {
     kind: "module",
     range: moduleRange,
     sourceId,
+    varNames: [],
   };
 }
 
@@ -342,6 +343,7 @@ test("links live cells, namespaces, cycles, and evaluation order", () => {
           byteRange: fromA.byteRange,
           importedName: "*",
           localName: "namespace",
+          namespace: true as const,
           range: moduleRange,
           specifier: fromA,
         },
@@ -741,6 +743,7 @@ test("creates one live namespace binding for imports and re-exports", () => {
     byteRange: specifier.byteRange,
     importedName: "*",
     localName,
+    namespace: true as const,
     range,
     specifier,
   }));

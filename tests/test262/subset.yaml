@@ -58,6 +58,7 @@ supportedFeatures:
   - WeakRef
   - WeakSet
   - align-detached-buffer-semantics-with-web-reality
+  - arbitrary-module-namespace-names
   - array-find-from-last
   - array-grouping
   - arraybuffer-transfer
@@ -83,6 +84,7 @@ supportedFeatures:
   - destructuring-binding
   - error-cause
   - exponentiation
+  - export-star-as-namespace-from-module
   - for-in-order
   - for-of
   - generators
