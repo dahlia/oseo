@@ -19,11 +19,11 @@ baseline:
   unreviewedPaths: 13193
   unsupportedProfileFeatures: 1725
 summary:
-  nodes: 83
-  ready: 76
+  nodes: 84
+  ready: 77
   blocked: 7
   parked: 0
-  landed: 24
+  landed: 26
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge
@@ -1414,3 +1414,395 @@ collisions:
       - observation-batch-08
     note: "Batch 8 and the batch 12 key-order prerequisite independently
       publish canonical observations; serialize their manifest changes."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-tolocalestring-arguments
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - destructuring-binding-target-order
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - eval-intrinsic-value
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - fn-global-object-harness
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - frontmatter-feature-tags
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - function-caller-restrictions
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - generator-dispatch-stack-charge
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - hashbang-comments
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-attributes-dynamic-coverage-remediation
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - import-meta
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - minor-feature-tag-admission
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-export-forms
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-05
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-15
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-16
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-17
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - parenthesized-assignment-function-name
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-wrapper-objects
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - promise-feature-admission
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - proper-tail-calls
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-pattern-extensions
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-harness
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-split-coverage-remediation
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - resizable-array-buffer-harness
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-host-script-bindings
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typed-array-construction-order
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typed-array-feature-admission
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typed-array-proto-coverage-remediation
+      - typed-array-tolocalestring-arguments
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typed-array-tolocalestring-arguments
+      - unhandled-rejection-observation
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typed-array-tolocalestring-arguments
+      - well-known-intrinsics-harness
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."

@@ -10,5 +10,5 @@ dependencies:
   - compound-member-assignment-key-order
   - observation-batch-plan
   - with-strict-assignment-fallback
-landed: false
+landed: true
 status: ready
