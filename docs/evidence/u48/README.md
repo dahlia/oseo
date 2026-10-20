@@ -32,12 +32,16 @@ What the run's Ubuntu jobs cost
 | `check`                             | 1    | 2.3   | 2.33    | 2.33  |
 | `macOS self-hosted availability`    | 1    | 0.4   | 0.38    | 0.38  |
 
-The `native support` family sets the side and cannot give up jobs: its
-seven shards are the partition U46 measured, and fewer of them would
-lengthen each. The six case-shard jobs exist to take two files out of the
-file shards, which U38 and U6 measured, so consolidating them restores
-what they removed. That leaves the two families whose longest job is far
-below the side.
+The rows total the forty above. The `native` family's four jobs are its
+three shards and the aggregate that collects them, and the readiness probe
+is the last row, so both are counted.
+
+The `native support` family determines Linux completion, and this change
+keeps its seven shards: they are the partition U46 measured, and fewer of
+them would lengthen the longest. The six case-shard jobs exist to take two
+files out of the file shards, which U38 and U6 measured, so consolidating
+them restores what they removed. That leaves the two families whose
+longest job is far below the Linux finish.
 
 
 What changes
@@ -56,15 +60,18 @@ against the 120-minute job timeout as the reviewed corpus grows.
 The estimates divide this run's measured work across the new totals,
 holding its runner speeds fixed. They are conditional estimates, not
 predictions: an individual Linux job's duration varies by close to a
-factor of two between runs, so a shard can land well above its mean. Even
-at twice the estimate, 62.2 and 40.8, test262 stays inside its 120-minute
-timeout, and both families stay below the `native support` shards that set
-the side.
+factor of two between runs, so a shard can land well above its mean. At
+their estimated means both families stay below the `native support` shards
+that determine Linux completion. At twice the estimates, 62.2 and 40.8,
+the Node.js suite still does but test262 would become the longest Linux
+family, and 62.2 is still inside its 120-minute timeout.
 
-The hosted Ubuntu job count falls from 40 to 35. Thirty-four started at
-once in run 39292194312, so this leaves the aggregate, which waits anyway,
-as the only job the count expects to queue. That one observation is not a
-stable slot allowance, and other runs on the account share the ceiling.
+The hosted Ubuntu job count falls from 40 to 35. Had the same thirty-four
+slots been available to this run, 35 jobs would have left only the
+aggregate queueing, and it waits for its shards anyway. One run's
+thirty-four is not a slot allowance: nothing publishes how many a run
+receives, and other runs on the account share the ceiling. Removing five
+jobs reduces how many can be made to wait, not how many will be.
 
 
 What this does not address
@@ -72,8 +79,9 @@ What this does not address
 
 The ceiling is unchanged and the account shares it, so a run that overlaps
 another can still queue whatever it has. Nothing here reduces the Linux
-work itself: the seven `native support` shards still carry 284.1 minutes of job
-time and still end the Linux side near 48 when none of them waits.
+work itself: the seven `native support` shards still carry the 284.1
+minutes of job time measured here, and excluding allocation waiting they
+ended the Linux side at 48.37 in this run.
 
 Reducing the test262 total reverses part of U6's choice for Linux only.
 U6 raised both targets from ten to twelve as insurance against the

@@ -387,14 +387,15 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // twenty-two attempts, then four more from the first run of its
   // placement, U41 refreshed every macos-aarch64 entry observed hosted
   // since b59ac914, U42 refreshed the three its own runs added, U43
-  // three after that and three more from its own run, and U44 the three
-  // its merged main run observed. See PLAN-GATE.md
-  // (U33, U40, U41, U42, U43, U44).
+  // three after that and three more from its own run, U44 the three its
+  // merged main run observed, and U49 the seven whose observed hosted
+  // median had moved by at least five percent. See PLAN-GATE.md
+  // (U33, U40, U41, U42, U43, U44, U49).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    12336,
+    12229,
   );
 });
 
@@ -1034,7 +1035,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 8288);
+  assert.equal(Math.round(modeled), 8730);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1068,8 +1069,11 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
   // lanes what they measured rather than what stale entries claimed, and
   // U45's refinement pass lowered it from 2928 by moving and exchanging
-  // single jobs after the greedy pass; see PLAN-GATE.md (U45).
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2820);
+  // single jobs after the greedy pass; see PLAN-GATE.md (U45). U49's
+  // refreshed hosted entries raised it from 2820 by charging the hosted
+  // lanes what they measured, which moved a `native support` shard off a
+  // hosted lane; see PLAN-GATE.md (U49).
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2839);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {

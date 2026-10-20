@@ -3507,23 +3507,26 @@ address.
 
 Thirty-four of run 39292194312's forty hosted Ubuntu jobs started within
 0.48 minutes and five of the rest waited, two of them the long
-`native support` shards above. A wait on a long job is added to the Linux
-side while the same wait on a short job is absorbed, so which jobs lose
-the allocation decides the side, and nothing in the workflow selects that.
+`native support` shards above. Waiting extends the Linux finish once it
+exceeds a job's slack, which a short job has and a long one does not, so
+which jobs lose the allocation decides the finish, and nothing in the
+workflow selects that.
 Summed Ubuntu allocation waiting was 26.6 job-minutes, between run
 39227927384's 5.1 and run 39244971256's 59.6.
 
-The `native support` family cannot give up jobs, because fewer of its
-seven shards lengthens each, and the six case-shard jobs exist to take two
-files out of the file shards. That leaves the two families whose longest
-job is far below the side: Linux test262 goes from twelve shards to eight
-and the Linux Node.js suite from three to two, both per-entry matrix
-totals, so macOS keeps the twelve test262 shards U6 chose for timeout
-margin. Dividing this run's measured work across the new totals estimates
-31.1 and 20.4 minutes against measured maxima of 27.27 and 16.12, and even
-at twice those estimates test262 stays inside its 120-minute timeout and
-both families stay below the shards that set the side. The hosted Ubuntu
-count falls from 40 to 35.
+U48 keeps the seven `native support` shards, because fewer of them
+lengthens the longest, and keeps the six case-shard jobs, which exist to
+take two files out of the file shards. That leaves the two families whose
+longest job is far below the finish: Linux test262 goes from twelve shards
+to eight and the Linux Node.js suite from three to two, both per-entry
+matrix totals, so macOS keeps the twelve test262 shards U6 chose for
+timeout margin. Dividing this run's measured work across the new totals
+estimates 31.1 and 20.4 minutes against measured maxima of 27.27 and
+16.12; at those means both stay below the shards that determine Linux
+completion, and at twice them test262 would be the longest Linux family
+but still inside its 120-minute timeout. The hosted Ubuntu count falls
+from 40 to 35, which reduces how many jobs can be made to wait rather
+than establishing that none will.
 
 This reverses part of U6's choice for Linux only, and the corpus
 projection is U48's rather than U6's; if the Linux shards approach the
@@ -3531,4 +3534,46 @@ timeout as the corpus grows, the slot count is what has to give. Nothing
 here reduces the Linux work itself, and the account shares the ceiling, so
 a run that overlaps another can still queue whatever it has.
 *docs/evidence/u48/README.md* records the measurements and what they do not
+address.
+
+### Charging the hosted lanes what they measured (U49)
+
+U45's refinement accepted two moves that sent
+`native support (macos-aarch64, 11/12)` and `12/12` from `oseo-mac-5` and
+`oseo-mac-2` to hosted lanes, where they measured 25.23, 17.30 and 26.07
+and 21.73, 25.00 and 25.48 minutes against 10.53, 9.95 and 9.15, 9.03 on
+the Mac lanes. The model prices hosted execution of the family higher too,
+at the 3.4 of `selfHostedFamilySpeedRatios`, and accepted the moves anyway
+under the hosted costs it carried. Reconstructing run 39292194312's hosted
+chains from the generated `needs` edges, the longest ended at 51.57, later
+than every Mac lane, carrying 50.80 minutes of work against 0.33 of
+waiting on top of the probe's 0.43, where the model gave it 42.18 from
+1,311 seconds for its Node.js shard and 1,220 for `12/12`. U44 had set that
+1,220 from two observations, 1,044 and 1,397 seconds; the three since are
+1,304, 1,500 and 1,529.
+
+U49 gives seven entries the median of their hosted observations since
+`b59ac914`, those whose median had moved by at least five percent: the two
+macOS sanitizer jobs, `native support (macos-aarch64, 11/12)` and `12/12`,
+`test (macos-latest, node, 1/4)`, and two `reflect cases` shards. The
+refinement then places `12/12` on a Mac lane and leaves `11/12` hosted at
+a modeled 47.08 against the 46.18 minutes of work that pairing measured.
+Refreshing `12/12` alone leaves it hosted, so the pair of `native support`
+entries is what the earlier placement turned on. The model's
+highest lane end rises from 47.00 to 47.31 minutes and the highest
+`macosLaneEnds` value from 2,820 to 2,839 seconds, which is the point: the
+previous maximum was reached by charging a hosted lane less than it
+measured, and an entry below its observations buys placements that do not
+hold.
+
+The refreshed values are medians, not bounds, and the hosted lanes carry
+the widest spreads, from 1,700 to 3,146 seconds on the sanitizer property
+job. Four entries rest on six or fewer observations, including both
+`native support` shards, and the two sanitizer entries separately trade
+sample size for recency. Nothing here reduces the macOS work, which the
+model now prices at 47.31 minutes at the longest across five hosted and
+six Mac lanes; a greedy pass and a first-improvement local search reached
+that placement, which is not shown to be the shortest available. This lands
+with U48 and one run cannot separate their contributions.
+*docs/evidence/u49/README.md* records the measurements and what they do not
 address.

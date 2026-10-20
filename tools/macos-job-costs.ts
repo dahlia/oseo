@@ -76,9 +76,9 @@ interface MacosJobCosts {
 
 /** Measured hosted medians used only for lane assignment. */
 export const macosJobCosts: MacosJobCosts = {
-  "host C sanitizers (macOS, native)": 2478, // 22
+  "host C sanitizers (macOS, property)": 2452, // 18
+  "host C sanitizers (macOS, native)": 2337, // 18
   "test262 (macos-aarch64, 12/12)": 2212, // 1
-  "host C sanitizers (macOS, property)": 2179, // 22
   "native support (macos-aarch64, 5/12)": 2063, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 2/12)": 2054, // 4
   "test262 (macos-aarch64, 11/12)": 1976, // 2
@@ -91,30 +91,30 @@ export const macosJobCosts: MacosJobCosts = {
   "native support (macos-aarch64, 10/12)": 1900, // 1 hosted since b59ac914
   "test262 (macos-aarch64, 5/12)": 1665, // 7
   "test262 (macos-aarch64, 10/12)": 1644, // 1
-  "native support (macos-aarch64, 11/12)": 1636, // 2 hosted since b59ac914
   "native support (macos-aarch64, 4/12)": 1630, // 3
   "test262 (macos-aarch64, 4/12)": 1599, // 3
   "native support (macos-aarch64, 6/12)": 1575, // 4
   "native support (macos-aarch64, 7/12)": 1553, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 8/12)": 1543, // 3 hosted since b59ac914
+  "native support (macos-aarch64, 11/12)": 1514, // 5 hosted since b59ac914
   "native support (macos-aarch64, 9/12)": 1475, // 3 hosted since b59ac914
   "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
+  "native support (macos-aarch64, 12/12)": 1397, // 5 hosted since b59ac914
   "test (macos-latest, node, 3/4)": 1311, // 18
   "native support (macos-aarch64, 3/12)": 1293, // 5 hosted since b59ac914
   "native (macos-aarch64, 1/3)": 1236, // 6 hosted since b59ac914
-  "native support (macos-aarch64, 12/12)": 1220, // 2 hosted since b59ac914
   "native (macos-aarch64, 2/3)": 1162, // 3 hosted since b59ac914
   "native (macos-aarch64, 3/3)": 1160, // 2 hosted since b59ac914
   "test (macos-latest, node, 2/4)": 996, // 18
   "own-key cases (macos-aarch64, 2/3)": 995, // retained
-  "test (macos-latest, node, 1/4)": 971, // 18
+  "test (macos-latest, node, 1/4)": 884, // 18
   "test (macos-latest, node, 4/4)": 864, // 18
   "own-key cases (macos-aarch64, 3/3)": 854, // retained
   "own-key cases (macos-aarch64, 1/3)": 810, // retained
-  "reflect cases (macos-aarch64, 2/3)": 696, // 1 hosted since b59ac914
   "reflect cases (macos-aarch64, 1/3)": 690, // 2 hosted since b59ac914
-  "reflect cases (macos-aarch64, 3/3)": 640, // 3 hosted since b59ac914
+  "reflect cases (macos-aarch64, 3/3)": 685, // 6 hosted since b59ac914
+  "reflect cases (macos-aarch64, 2/3)": 643, // 3 hosted since b59ac914
   "test (macos-latest, deno)": 105, // 22
 };
 
