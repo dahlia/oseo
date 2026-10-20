@@ -13,10 +13,11 @@
  * the refreshed weight for the same file. One run estimates no
  * run-to-run variation, so these values are not conservative bounds.
  *
- * Iterator-next-callability extends the destructuring-assignment family
- * beyond that source run. Its two entries instead use a local Linux
- * extended case sum and an explicitly provisional macOS estimate from
- * the historical 198/184 host ratio. See the complete U6 provenance.
+ * Two families changed after that source run. Destructuring assignment
+ * uses both hosts' case sums from CI run 39473400560 at `3170ba94`.
+ * Object binding uses a local Linux extended case sum and an explicitly
+ * provisional macOS estimate from its 122/131 host ratio in the source
+ * run. See the complete U6 provenance.
  *
  * The two entries in `caseShardedNativeFiles` are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
@@ -63,9 +64,8 @@ export const nativeShardCosts = {
     "tests/property/m5-default-parameter.property.test.ts": 89,
     "tests/property/m5-delete-super.property.test.ts": 471,
     "tests/property/m5-delete.property.test.ts": 210,
-    // Local Linux extended case sum: 916.409436758 s, rounded up.
-    // October 17, 2026; not CI or file wall time. See U6 provenance.
-    "tests/property/m5-destructuring-assignment.property.test.ts": 917,
+    // CI run 39473400560 case sum: 1,219.306454043 s, rounded up.
+    "tests/property/m5-destructuring-assignment.property.test.ts": 1220,
     "tests/property/m5-ephemeron-tracing.property.test.ts": 40,
     "tests/property/m5-export-default-class.property.test.ts": 44,
     "tests/property/m5-for-await-of.property.test.ts": 1333,
@@ -101,7 +101,9 @@ export const nativeShardCosts = {
     "tests/property/m5-module-continuation.property.test.ts": 153,
     "tests/property/m5-number-intrinsic.property.test.ts": 1050,
     "tests/property/m5-number-prototype.property.test.ts": 936,
-    "tests/property/m5-object-binding.property.test.ts": 131,
+    // Local Linux extended case sum: 234.699350840 s, rounded up.
+    // October 21, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-object-binding.property.test.ts": 235,
     "tests/property/m5-object-constructor.property.test.ts": 1163,
     "tests/property/m5-object-create.property.test.ts": 517,
     "tests/property/m5-object-define-properties.property.test.ts": 287,
@@ -203,9 +205,8 @@ export const nativeShardCosts = {
     "tests/property/m5-default-parameter.property.test.ts": 88,
     "tests/property/m5-delete-super.property.test.ts": 207,
     "tests/property/m5-delete.property.test.ts": 211,
-    // Provisional estimate: ceil(917 * 198/184) from the historical
-    // host ratio; not a current macOS observation. Refresh from CI.
-    "tests/property/m5-destructuring-assignment.property.test.ts": 987,
+    // CI run 39473400560 case sum: 605.363979249 s, rounded up.
+    "tests/property/m5-destructuring-assignment.property.test.ts": 606,
     "tests/property/m5-ephemeron-tracing.property.test.ts": 20,
     "tests/property/m5-export-default-class.property.test.ts": 35,
     "tests/property/m5-for-await-of.property.test.ts": 419,
@@ -241,7 +242,9 @@ export const nativeShardCosts = {
     "tests/property/m5-module-continuation.property.test.ts": 317,
     "tests/property/m5-number-intrinsic.property.test.ts": 301,
     "tests/property/m5-number-prototype.property.test.ts": 544,
-    "tests/property/m5-object-binding.property.test.ts": 122,
+    // Provisional estimate: ceil(235 * 122/131) from this file's host
+    // ratio in the source run; not a macOS observation. Refresh from CI.
+    "tests/property/m5-object-binding.property.test.ts": 219,
     "tests/property/m5-object-constructor.property.test.ts": 497,
     "tests/property/m5-object-create.property.test.ts": 323,
     "tests/property/m5-object-define-properties.property.test.ts": 324,
