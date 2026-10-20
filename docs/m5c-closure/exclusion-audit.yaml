@@ -4142,6 +4142,390 @@ paths:
     section: "sec-comma-operator"
     subject: "Whitespace and line terminators around the comma operator"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-1-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bb850bf59179ff94b166b42c3003497e9c50c143fc4f9a69e2d95dcfc60b\
+      f15d"
+    observationDigest: "bca45fbf41c1bcf95c9d316b31ac77163f9b653152f6d62f35a457b\
+      d6ecc68cb"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "ReferenceError is thrown if the LeftHandSideExpression of a Compound
+      Assignment operator(*=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-10-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c6001a29cf1a80c2106d4520aacc5738db77ce5eb10f31f0559dbb8f9995\
+      14cc"
+    observationDigest: "9648fd8dad0bd93570b53fdfa81d220e08373076dca87e7b4bd1fbc\
+      5b47f98ea"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "ReferenceError is thrown if the LeftHandSideExpression of a Compound
+      Assignment operator(^=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-11-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d8268662741a95bc2a6c6f021354477ed4874dbda384eec99b89bc40afbb\
+      90d4"
+    observationDigest: "3e59b423e1543b75b1909bb4558f9d5f2eb9d1b10394f98a71ba4b8\
+      261fd0879"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "ReferenceError is thrown if the LeftHandSideExpression of a Compound
+      Assignment operator(|=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-2-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e1f51ddbdc3f1d9b4a0e0e09fe9b4112656c7a28c346a457224e29d24977\
+      aa10"
+    observationDigest: "1199e7b63c9935d9eadb1e031e5788c0d10fa76053b639545f2614f\
+      ba2be7903"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(/=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-4-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0fa130b05397cbc4f6ed3cdba9d0d9c57bef70e874d1b3ecfacfe0a0f33c\
+      ac49"
+    observationDigest: "f49d760b2521385ec5d2899d39ba747aa2b577d75e5d67f01561ed1\
+      23110f9f9"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(+=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-5-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1fb79d0b9135bce17553f1854bcfb32deaa77aa029bff4ae1193c93de6f8\
+      ea85"
+    observationDigest: "94592a81b25e11477547b63fafa00d84db52277594d06debc685f3b\
+      c348b4f86"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(-=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-6-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5512efeb298132c68f78139094b10ec0ae0f11c5f1755b079b986236f304\
+      5b7c"
+    observationDigest: "329becbb089c3bb72cfa3603ce22644871d0b37f876169e879a4d64\
+      6948e484d"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(<<=) evaluates to an unresolvable
+      reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-8-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bd090dc38d7ed2e2dff444dfd49375c71baba9b96d09768f30d14b1bd972\
+      c248"
+    observationDigest: "f082ccaa38d0bda3ad46835925668681bdeb09ee7be586286d4db8e\
+      dc04a81c9"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(>>>=) evaluates to an unresolvable
+      reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/11.13.2-9-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d5eb4bea930d47fba0e931aa3b33522788a725634863b0bc74c2dfaf4ad3\
+      ef8c"
+    observationDigest: "d9e81a217b31dffd3139b2eb479d400c031ae3406178c5c8cc21430\
+      55c879329"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      "Strict Mode - ReferenceError is thrown if the LeftHandSideExpression of
+      a Compound Assignment operator(&=) evaluates to an unresolvable reference"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.10_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "663688921461b65df33e93fbe4c6af84324ed50487b0c2220deea12cf151\
+      3fe2"
+    observationDigest: "dce6a83cee29941975c368bcee773c5499379cb282d8ad2ad8d523c\
+      3ef7bbb74"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x ^= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.11_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "716d02217c839a73f8fae9f516a07401a37146e22715c53e8d17e69293bb\
+      c68b"
+    observationDigest: "811ced2ba1c2059be321d000d9b34ff75717ddcd84b64dde6481045\
+      fbaf0d2e3"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x |= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.1_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a553b08e009170f0263cc1f88541adef2f78e15852e2961950ef9c57de77\
+      7948"
+    observationDigest: "9a989aee3e68498e71a69ab08ba8b466aa98642a87219a995ff5895\
+      592b1c122"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x *= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.2_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "15e1a7f12297c0b524719fb4ba6fc5e78ae4d6b5e3c7825a06506864c9a0\
+      6afa"
+    observationDigest: "1c9456a05a099a1d9448f02ca4593194221b2ea52568a156ab98399\
+      0c4db11d7"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x /= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.3_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "632eb4b76bb421667c2301157d704d7cac4029d40a084050fc7deb7a59f5\
+      a053"
+    observationDigest: "a1f27c63f3a7e26bf791f56be721fbc7dd30c4df84b00bbfd135080\
+      a2f1e1766"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x %= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.4_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a2bc57d8ce94b0880de3d88464ba904ebe5080ffa30cc1b3e3844917bbb1\
+      cc67"
+    observationDigest: "01620ca099a5a253b0375bf1faecc109858e117206b6630c2e87c14\
+      80b803ddf"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x += y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.5_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fbc32293d12565925bf001a235bc3f2f3f62cc733c14eb12bde9d9af60d1\
+      1e05"
+    observationDigest: "7f52808e37d37b2bbed110590dd0a6531e289a206e9220134b0914f\
+      ced592352"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x -= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.6_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8a827e48c5cacb17e9992be069f908b885c7c718d5a4300bd5dd323aba2e\
+      200a"
+    observationDigest: "a9520260d4f781b0cc1af40eedb41e4c0e5a409657438d9f7247eb4\
+      f557a8675"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x <<= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.7_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "50a317b028f229eaa99e01102e43f372939b6732cbf096c9719822626763\
+      d504"
+    observationDigest: "498efa2722ee61b62efd0842a05d21203f5ed67e3305dcbd1d94165\
+      bc0ecbc22"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x >>= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.8_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e4caed881462b4903e856c0f03b8c032c5c1d8f8000814ceaf24b3367ea4\
+      f743"
+    observationDigest: "d2d642df067d745bd00aeb0863436fc329c8f1f2493e025ba6e9970\
+      9e437f465"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x >>>= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/compound-assignment/S11.13.2_A6.9_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0c8c65e0d65110166ea3705ff5fa1365a0d4025ca8b6784befe4cc84a045\
+      e889"
+    observationDigest: "e029e621500ffb7f32f68b20c6b785ca75dd28cae6894e29bdb979c\
+      65f91b26b"
+    missingDynamicTag: false
+    section: "sec-assignment-operators-runtime-semantics-evaluation"
+    subject:
+      'Evaluating LeftHandSideExpression lref returns Reference type; Reference
+      base value is an environment record and environment record kind is
+      declarative environment record. PutValue(lref, v) uses the initially
+      created Reference even if a more local binding is available. Check
+      operator is "x &= y".'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/concatenation/S9.8_A1_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6234cffa5d835290033eb2609f7864d34c11c9bf590274dbbd0ebdab19e5\
+      9b5a"
+    observationDigest: "670be974ff70029c9b38373b1e379307a3d573658f1e74cbbbe1604\
+      e7abe6d0e"
+    missingDynamicTag: false
+    section: "sec-addition-operator-plus"
+    subject:
+      'Undefined values is undefined, void 0 and eval("var x"). Use implicit
+      transformation'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/conditional/S11.12_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "39f1061c03578012e0acb3c5aed3886a83cc5c3bdd2ebddcd020bceaaa4f\
+      328e"
+    observationDigest: "3a1f4066b328a6aa8dade5cab4215b0443b4681fe0033a3f90754c1\
+      6ffa79683"
+    missingDynamicTag: false
+    section: "sec-conditional-operator"
+    subject: "Checking by using eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/delete/11.4.1-4.a-7.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "79f60c6919a48e435630e8c4a611e560513539cfa81f25975708713d5e5c\
+      3765"
+    observationDigest: "c249f55eb713ca42bfd41a3e19903495f6db455f4c66ef2625edd6c\
+      2b8d09109"
+    missingDynamicTag: false
+    section: "sec-delete-operator-runtime-semantics-evaluation"
+    subject: "delete operator inside 'eval'"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/division/S11.5.2_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "609f9978297934e0973361203ade223e851dda163dbdf52ee8ee80000756\
+      1ac4"
+    observationDigest: "d218a90a1013079c3dbd1774d5ec06e763561a6352df17208429a0b\
+      13d76dcf8"
+    missingDynamicTag: false
+    section: "sec-multiplicative-operators"
+    subject:
+      "Whitespace and line terminators around the division operator; every check
+      compiles a source string with eval to place the WhiteSpace or
+      LineTerminator code points"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/division/no-magic-asi-from-block-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b6651eba3951cb20fa36aee842636391776ce6f734becbb72c39b0d09dea\
+      232d"
+    observationDigest: "a01e3c55696b404a83d684da7e41f79b8ab0c703de3ac74c8b01c53\
+      16ace4159"
+    missingDynamicTag: false
+    section: "sec-multiplicative-operators-runtime-semantics-evaluation"
+    subject:
+      "Division after a block statement is not a RegExp literal and gets no ASI;
+      the value is read as the eval completion of '{[42]}.8/of/g'"
+    assessment: "completion-observation"
+  - path: "test/language/expressions/does-not-equals/S11.9.2_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0ef371e484fd71f2fd517a4642a2258a7afea71894b19f0844df6c6c3db6\
+      06e9"
+    observationDigest: "1f81d69b8fb41671e5331c28d32ba2c777dcccfa75ac8bd1f40e4be\
+      dbecd4b56"
+    missingDynamicTag: false
+    section: "sec-equality-operators"
+    subject:
+      "Whitespace and line terminators around the does-not-equals operator;
+      every check compiles a source string with eval to place the WhiteSpace or
+      LineTerminator code points"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/does-not-equals/S11.9.2_A6.1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "44ef1ed02c3594fb94b0dce8b77a1a1e8ae01347008416764e75df4abfcd\
+      a33b"
+    observationDigest: "0e37ec378f073968031ea271edceebef7a6423bbba2ad70e5a26538\
+      159dd41de"
+    missingDynamicTag: false
+    section: "sec-equality-operators"
+    subject:
+      'Undefined and Null equality with ''!=''; check #3 obtains undefined from
+      eval("var x")'
+    assessment: "fixture-construction"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-a\
       wait-expr.js"
@@ -5041,6 +5425,497 @@ paths:
     section: sec-equality-operators
     subject: Checking by using eval
     assessment: fixture-construction
+  - path: "test/language/expressions/equals/S11.9.1_A6.1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b4d3049544e92b8e9d13be3f41c8b4fc12556d9878baf526fc2460b62dec\
+      e32e"
+    observationDigest: "11dcc536a44680cb5720e62b07bf91e8fdfa235fd2ab45161e5c0c3\
+      d426a71dd"
+    missingDynamicTag: false
+    section: "sec-equality-operators"
+    subject:
+      'Undefined and Null equality with ''==''; check #3 obtains undefined from
+      eval("var x")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/function/eval-var-scope-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "cf5fa31bc3a7bd1b42e8451aa97dace02aad66843df66cc747211a19b959\
+      cdd0"
+    observationDigest: "57f9a45ae97e23476f3517c012cb65238991eb1faa315827bc4a11e\
+      668529bdd"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Sloppy direct eval in a function parameter initializer introducing a var
+      that conflicts with a parameter"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/function/name-eval-stricteval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "885250a51c27e1f192eb01a2342ad2973d919130f30dadde134eb1190a28\
+      8ce1"
+    observationDigest: "33a2e16afbfcdc3cdd2b83dd92f7121af26fa499420ec62663a9663\
+      e7cacc066"
+    missingDynamicTag: false
+    section: "sec-function-definitions-static-semantics-early-errors"
+    subject:
+      "SyntaxError when 'eval' is the Identifier of a FunctionExpression in
+      strict mode code; eval only carries the invalid source, whose literal 'use
+      strict' directive makes it strict"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/function/named-no-strict-reassign-fn-name-\
+      in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "aa9d803f66607367a69ec05fa58c1818692b07e551f741a5303ca2e84aa0\
+      324e"
+    observationDigest: "e635121aef8e7f0ff2075f0035bf2e0361e3cd87acb1a2f6e8e8339\
+      c1ca9cad5"
+    missingDynamicTag: false
+    section: "sec-function-definitions-runtime-semantics-evaluation"
+    subject:
+      "Reassignment of the function name binding from eval code in the body
+      (non-strict mode)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/function/named-strict-error-reassign-fn-na\
+      me-in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fc8a889f9c513f1759b18665c017a348107819b2b8ec45536cb46cd46637\
+      ffa1"
+    observationDigest: "1ba104576e1a77450e974bb2b6bcb5da7bd688c553a09b0029d2574\
+      98439d4b6"
+    missingDynamicTag: false
+    section: "sec-function-definitions-runtime-semantics-evaluation"
+    subject:
+      "Reassignment of the function name binding from eval code in the body
+      (strict mode)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/function/param-eval-stricteval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dc8bf3f7b6ab30152954760b14d88f2e25ae851f0e4913e30cca1be419c8\
+      dcb0"
+    observationDigest: "5b938bd50e3e89c83c5fe62c673e2257b3da190ae802bd2fc0bd1c1\
+      2224d3ce5"
+    missingDynamicTag: false
+    section: "sec-function-definitions-static-semantics-early-errors"
+    subject:
+      "SyntaxError when 'eval' is a FormalParameterList element in strict mode
+      code; eval only carries the invalid source, whose literal 'use strict'
+      directive makes it strict"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/function/scope-body-lex-distinct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "268af0e81ce46a00ad7124e24e4cff505318dfaecf4872561e30d5af35c4\
+      c552"
+    observationDigest: "7bcd575195d44d7c42f3a27fbc0156d1087dc7d75c48160f8a4d0c1\
+      622ddc69c"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Direct eval var declaration conflicts with a lexical binding"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/function/scope-param-elem-var-close.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d17e848f263e500ece1bd311dff485c952112a74151c907ea765bd330cd3\
+      37eb"
+    observationDigest: "dc2ca646bd45b3bdad2b596dee80d5605c905356510524a079e3d62\
+      d8a60d9f3"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Variable environments created by sloppy direct eval in function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/function/scope-param-elem-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "689470bd619e2a54b9510904d8cf2995da5b2474eee57af658fad38371fe\
+      dc6c"
+    observationDigest: "ff58a0051b2b0e50f989c1e9c2e1e2b174f6193e00c6b6cd288deb5\
+      f0474e519"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Variable environments created by sloppy direct eval in function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/function/scope-param-rest-elem-var-close.j\
+      s"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a9192db9e84a4e4826539488bd356490310b50f4560e999e99e64a6bcc1a\
+      f018"
+    observationDigest: "ee1d2d75445ea78749b0b8e6ee4d572603b41a809aa146f43e4735e\
+      4bdce0cf5"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Variable environments created by sloppy direct eval in function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/function/scope-param-rest-elem-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bd7ca36107a9987476c3497262eeed75d8cba84405a946f050d41b82b5f1\
+      2e51"
+    observationDigest: "fe307d0b77d9c428100bf65b040b1dc82ffbffdbd99bb9059cf3410\
+      46cb1a445"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Variable environments created by sloppy direct eval in function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/generators/eval-var-scope-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "55f96bc7485c947506b3aa75f8218dec5f1782cbaa8e6e641d3506319cd7\
+      c69c"
+    observationDigest: "cf445ae9671f1e4d92b834740328f9564dcf707bbe5d7c9497945c6\
+      fe83eef9e"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Sloppy direct eval in a generator function parameter initializer
+      introducing a var that conflicts with a parameter"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/generators/named-no-strict-reassign-fn-nam\
+      e-in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "422e7e2107a62b29a237b68f23254d08da3162f9cb82e6d525e806c9fddf\
+      de5b"
+    observationDigest: "d5332ad406e9f4dc58f2f372bcb6d1036567d718c30940687b22fcd\
+      4ccba8528"
+    missingDynamicTag: false
+    section: "sec-generator-function-definitions-runtime-semantics-evaluation"
+    subject:
+      "Reassignment of the generator function name binding from eval code in the
+      body (non-strict mode)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/generators/named-strict-error-reassign-fn-\
+      name-in-body-in-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dd3a0f967bfe7dfe03fec345eb665334a8f20a6a21197e03182731139117\
+      62ea"
+    observationDigest: "2ddaccb1ce2f33c835e19a8a3a4f5f77757b1dc4adc176de417bc56\
+      f26e84d21"
+    missingDynamicTag: false
+    section: "sec-generator-function-definitions-runtime-semantics-evaluation"
+    subject:
+      "Reassignment of the generator function name binding from eval code in the
+      body (strict mode)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/generators/scope-body-lex-distinct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0da4434d9f7bf93bb7baf27a74bf91e442fb8397308cc92495447059ae3c\
+      ab52"
+    observationDigest: "16a891f0c6ec7d534afb65927d7902df0a95177e028816058fd51f7\
+      2845e65db"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Direct eval var declaration conflicts with a lexical binding"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/generators/scope-param-elem-var-close.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9bea53d07efb42d8d9baaa4157cf6ffec4c7540eb7e0d366f7df0386bb8a\
+      364f"
+    observationDigest: "f0dad380e7c2111dca9fd27dc7dd718b5dd3dbc98d57f4cf30b8a36\
+      78832c949"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/generators/scope-param-elem-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "380517a34c15141824f9d4803603e0410faf2854aaacb960fea65e6045d3\
+      2ea5"
+    observationDigest: "a2d32fe5bdae16e56b95da09e7100c96ba590868c3d1e51834d40b2\
+      ff067217b"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/generators/scope-param-rest-elem-var-close\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b3bac55d5eef13591527e19e75c001e7a15604223814d2a8fdce8f71e4d0\
+      ef8c"
+    observationDigest: "103f2e52b6180a8d0e66cb421a885ee6e6f70a707e0c9091461c056\
+      341cb922f"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/generators/scope-param-rest-elem-var-open.\
+      js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4c9f0c0ac7e0feabb5a471dfe01855f3bd66e309e6f01508d5b696652cfc\
+      1406"
+    observationDigest: "44715ce906088cf678b5a45a553d5ae1529e93adbefa175b4a4f9a8\
+      9b6d1a7d6"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator function
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/greater-than-or-equal/S11.8.4_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "18e242eedf235c00e6528f340948ca0f6c24cb40037886fef8f5e7f4dbb4\
+      bb49"
+    observationDigest: "516658aa89140fd7de4a56fafeffdc975dd52df7e0423f30b0029e0\
+      9f970bed0"
+    missingDynamicTag: false
+    section: "sec-relational-operators"
+    subject: "Whitespace and line terminators around the greater-than-or-equal
+      operator; every check compiles a source string with eval to place the
+      WhiteSpace or LineTerminator code points"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/greater-than/S11.8.2_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cc7c07782db7868bd7b12f5089bb22a03e3d3239ef550d6f06d98349b577\
+      0001"
+    observationDigest: "57069913fe98c1f0b559a6e2d13a74e1b7a5649989103a1ee778bb9\
+      63528a989"
+    missingDynamicTag: false
+    section: "sec-relational-operators"
+    subject:
+      "Whitespace and line terminators around the greater-than operator; every
+      check compiles a source string with eval to place the WhiteSpace or
+      LineTerminator code points"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/grouping/S11.1.6_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "36fc75130f1e90f1f0aadc0544714f68d650635e245a688c5f89912bbe3b\
+      16de"
+    observationDigest: "4d44c25fa0f597c5509099060ca7891bdabc53726f0a87a251af275\
+      a3abdd064"
+    missingDynamicTag: false
+    section: "sec-grouping-operator"
+    subject:
+      "Whitespace and line terminators inside the grouping operator; every check
+      compiles a source string with eval"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/in/S11.8.7_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "78530cc817deb2fa76c90c8c22a7263f4213215dc4c1cd245806c5f26230\
+      f072"
+    observationDigest: "11f502441e6efe56787b0f99d1f4ae6985f1faf07d686979732b586\
+      11e3507bd"
+    missingDynamicTag: false
+    section: "sec-relational-operators"
+    subject:
+      "Whitespace and line terminators around the in operator; every check
+      compiles a source string with eval to place the WhiteSpace or
+      LineTerminator code points"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S11.8.6_A1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "45914c02cbd727cda3b5376e50a426cfc5b763237fc3bf04d454049f3a5a\
+      23e2"
+    observationDigest: "7b44c5e08083e8c4c84077e1fa4295c50768362f34e26e92c84ca2e\
+      10d504b08"
+    missingDynamicTag: false
+    section: "sec-relational-operators"
+    subject:
+      "Whitespace and line terminators around the instanceof operator; every
+      check compiles a source string with eval to place the WhiteSpace or
+      LineTerminator code points"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S11.8.6_A7_T3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d5d4714bbefb8c77a5252fde5c1a67107704cb7df30a04c876948f4ebeb9\
+      e27f"
+    observationDigest: "0854944d510252a70c5c7ea24075857bb9ffaddbda02ebfad4b8aae\
+      7c57267b2"
+    missingDynamicTag: false
+    section: "sec-instanceofoperator"
+    subject:
+      "A Function object created by new Function is instanceof Function and its
+      constructor is Function"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "57bb76d410e8659de605c9254026a6a59b94710ea792e7b30107e547b119\
+      8a62"
+    observationDigest: "f4edcff3b489c7b9aa68f22835248137d3e8c700676615db8f7de21\
+      ea5f4577b"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is number (not an object); F comes from
+      Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8b8e5b196b6e99198911c551c141179733f257faacf02ae55cf02d1d1712\
+      a673"
+    observationDigest: "182b607540ac52ed4881581c598c145af69db38c85a5071f18634fd\
+      45d38b93b"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is string (not an object); F comes from
+      Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "060dff9bbb8b6299af40d91e847848cf1da865421b5997581cd16f829413\
+      7de1"
+    observationDigest: "ca2226669c3dad86d99be8f805240e3d007d92002d45296e5f47536\
+      e97ed4c0a"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is boolean true (not an object); F comes
+      from Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bfc728150ffc233fdd3b2a8c4eb398296378ab51a866de7401c2263e3173\
+      1e5f"
+    observationDigest: "71861a6466ad8c6f6da45780f7ec29c91a07823d88cd27763e8083c\
+      238f700c8"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is boolean false (not an object); F comes
+      from Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "da990fab0b55fde45b22e71bd4c4dd88ac3b701929d100ea6d3033bc8aa7\
+      3a07"
+    observationDigest: "fd94528173dd1a5380aa9e99e27196f129c34c5ced4b1077a2e851a\
+      2883e984e"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is void 0 (not an object); F comes from
+      Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "605c514353aa5b351f929a3f6162a0678f31ea765a7db68a6d0163b79d9b\
+      28c0"
+    observationDigest: "fd20310325aef30a4cea18167e9f58221bb5e0dfef861f62cd8020d\
+      ef00f1cab"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is null (not an object); F comes from
+      Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T7.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "18414212ee734ad595d620033184c017f9f19472a8cc25b7308a467503b2\
+      3d4b"
+    observationDigest: "6a1763da60a2c420c78f18886778ff2d92c5a8fc1399225bd021c47\
+      d6a070580"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is undefined (not an object); F comes
+      from Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T8.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ec93a43c8cab45d9b00e25f8a40c49d60b5dfafb2bc032faf845acfb86c2\
+      9745"
+    observationDigest: "a9b71f04f7a22b4a6dfc101cebf3e484444f4df8f65676b376f0564\
+      d083a67bc"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      'instanceof returns false when V is an undefined variable (not an object);
+      F comes from Function("name", "this.name=name;")'
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A2_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4147bfdbe66766e3cc0246cfaa6eb33c99228fdec49d8828c1f21de7e93e\
+      b90c"
+    observationDigest: "0a3a8e5b172b5f3410cb40bd37592f4b7356cc745a383dd36cd1118\
+      7d58d61db"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject: "F.prototype is undefined and V is an empty object: TypeError"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A2_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "902f8311c84d63b78c2949d8a2a0c2a42e2ca545c9cba424ce87f84447f8\
+      1b11"
+    observationDigest: "b4cf5d595f87d10f3b17fd3b95ec01cff8d42ae1c0655902ebfea0f\
+      258bc152f"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      "F.prototype is void 0 and V is new F: TypeError; instance.constructor and
+      inherited name stay intact"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A2_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "24743ac24b670139181b9947ea2f4d08bbaf97904c3bc3955a513ed6ea77\
+      8387"
+    observationDigest: "78c657ab3f00b2ac2734ec2e720844a634feb194343421e96723157\
+      ee617b9a1"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject: "F.prototype is a string and V is a function: TypeError"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A3_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "46e223623287f7a65fa1bb3adf84ad73893925ac9aa930fc762befdbb35a\
+      b03b"
+    observationDigest: "ac143752d803d5112e09f77dcc6cf59a76fa4ace80054545f3045b6\
+      877e91075"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject: "V = new F inherits F.prototype, so instanceof is true"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/instanceof/S15.3.5.3_A3_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "99f214be746b421eca36a065491710f5bcd1863e505f7b45da68da22ce6d\
+      8735"
+    observationDigest: "57e853187372a74eb063b7619fa0a9f15a02f236669ea8dfd908861\
+      8893ebaf9"
+    missingDynamicTag: false
+    section: "sec-ordinaryhasinstance"
+    subject:
+      "instanceof follows a reassigned F.prototype (Object.prototype) for an
+      ordinary object"
+    assessment: "fixture-construction"
   - path: test/language/expressions/optional-chaining/eval-optional-call.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject

@@ -616,6 +616,43 @@ results:
   - case:
       async: false
       features:
+        - class-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/compound-assignment/left-hand-side-private-reference-readonly-accessor-property-div.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - exponentiation
       flags: []
       includes: []
@@ -628,6 +665,68 @@ results:
     classification: pass
     dependencies:
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/function/name-eval-strict-body.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/generators/dstr/ary-ptrn-rest-id-iter-step-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-properties
+      - symbols
+      - var-bindings
     execution:
       harnessIncludes:
         - base.js

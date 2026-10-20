@@ -942,6 +942,98 @@ results:
   - case:
       async: false
       features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/compound-assignment/11.13.2-10-s.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+    observation:
+      detail: "test/language/expressions/compound-assignment/11.13.2-10-s.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/compound-assignment/11.13.2-\
+        10-s.js:88:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/compound-assignment/11.13.2-25-s.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - class-fields-private
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/compound-assignment/left-hand-side-private-reference-accessor-property-srshift.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
       flags:
         - noStrict
       includes: []
@@ -962,6 +1054,72 @@ results:
           strictness: non-strict
         - specialization: enabled
           strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/function/dstr/ary-ptrn-rest-not-final-ary.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - destructuring-bindings
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - generators
+        - destructuring-binding
+        - default-parameters
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/generators/dstr/dflt-ary-ptrn-rest-obj-id.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - default-parameters
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
       passed: true
     unsupportedFeatures: []

@@ -774,6 +774,27 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/compound-assignment/sub-eval-strict.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - BigInt
         - Symbol
@@ -809,6 +830,30 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/function/dstr/ary-ptrn-rest-init-ary.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - destructuring-bindings
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false

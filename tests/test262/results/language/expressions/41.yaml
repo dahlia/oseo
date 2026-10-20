@@ -945,6 +945,196 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/compound-assignment/11.13.2-8-s.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+    observation:
+      detail: "test/language/expressions/compound-assignment/11.13.2-8-s.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/compound-assignment/11.13.2-\
+        8-s.js:89:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/compound-assignment/S11.13.2_A3.2_T2.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/conditional/S11.12_A3_T4.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/delete/11.4.1-4-a-4-s.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/division/S11.5.2_A2.4_T1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/division/S11.5.2_A4_T5.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - expression-operators
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - import-attributes
         - dynamic-import
@@ -966,6 +1156,62 @@ results:
         non-strict disabled failed (1): stdout=""
         stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-import-attributes-trailing-comma-second.js:105:20:
         error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/function/named-strict-error-reassign-fn-name-in-body-in-eval.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/expressions/function/named-strict-error-reassign\
+        -fn-name-in-body-in-eval.js strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/expressions/function/named-strict-error-\
+        reassign-fn-name-in-body-in-eval.js:93:3: error[OSEO1001]:
+        Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/in/S11.8.7_A1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - control-flow
+      - dynamic-source
+      - expression-operators
+      - functions
+      - object-properties
+    observation:
+      detail: "test/language/expressions/in/S11.8.7_A1.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/in/S11.8.7_A1.js:88:5:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

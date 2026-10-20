@@ -1,0 +1,28 @@
+version: 1
+id: typed-array-tolocalestring-arguments
+title: Repair TypedArray locale element arguments
+delivers: "Repairs the confirmed native two-argument element call in
+  %TypedArray%.prototype.toLocaleString against the ADR 0013 ECMA-262 2025
+  fallback, which calls each element's current method with no arguments.
+  Preserve the element receiver, outer argument evaluation, validation and
+  length ordering, result coercion, abrupt completion, buffer mutation
+  behavior, and collector roots. Replace the forwarding expectations in the
+  existing fixed and generated TypedArray search-and-join evidence with an
+  independent zero-argument specification model for native execution and a
+  separately labeled two-argument ECMA-402 model for Node.js and Deno.
+  Cover Number and BigInt elements, omitted and supplied outer arguments,
+  observable argument evaluation without implicit locale/options coercion,
+  and both specialization policies with collection at every safepoint.
+  Preserve existing generated domains, seeds, case budgets, guard misses,
+  and replay quality while correcting the locale-dependent observations.
+  Follow the full PLAN-M5.md evidence contract, update the normative family,
+  profile, and plan, and regenerate the complete reviewed manifest and
+  derived publication data. Preserve the inventory and the existing 41
+  related records, currently 36 pass and 5 unsupported, with the latter's
+  primitive-wrapper-objects and resizable-array-buffer-harness owners.
+  These records are regression coverage, not 41 observed semantic failures.
+  Keep the Array-only repair and Annex B no-species remediation separate."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
