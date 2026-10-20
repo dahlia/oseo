@@ -7895,14 +7895,24 @@ function, through simple, logical, or array or object destructuring
 assignment to a `let`, `var`, or sloppy `with` fallback binding with zero, one,
 or two parentheses. Logical subjects start from a value that takes the write.
 It has 10 ordinary cases and a 180-second interrupt limit. Shrinking keeps
-the strictness and each subject's form, parentheses, scope, and value. The
-independent model names a value only for a bare target, and Node.js and Deno
-must equal it. Native runs use both specialization policies with collection at
-every safepoint. The fixed `parenthesized-assignment-names` native fixture
-covers each form, nested parentheses, an implicit global, and `with`
-fallbacks next to bare controls, under both policies with forced collection.
-The repair adds no specialized path or guard, so the guard-fallback omission
-and its replacement evidence remain.
+the strictness, and with it a strict case never gains a `with` scope; it
+shortens the subject list and moves each subject's form, parentheses, scope,
+and value toward the first listed choice, so every shrunk case remains a valid
+structured input. The independent model names a value only for a bare target,
+and Node.js and Deno must equal it. Native runs use both specialization
+policies with collection at every safepoint. The fixed
+`parenthesized-assignment-names` native fixture covers each form, nested
+parentheses, an implicit global, and `with` fallbacks next to bare controls,
+under both policies with forced collection. The repair adds no specialized path
+or guard, so the guard-fallback omission and its replacement evidence remain.
+
+On Linux x86-64 with a warm lane Zig cache, the focused native run of the
+fixture alone, `mise run test:native --shard 162/280`, matched Node.js and
+Deno under both policies with forced collection and passed its
+linux-aarch64-musl cross-link. The slot `0x60000c02` registration alone, run
+with `--test-name-pattern=parenthesized`, passed its ten ordinary cases in
+7.981 seconds. These focused runs do not replace the whole ordinary and
+extended gates.
 
 This node admits *test/language/expressions/assignment/fn-name-lhs-cover.js*,
 which observation batch 08 measured as a `semantic-failure`. Its sibling

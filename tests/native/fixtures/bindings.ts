@@ -1291,6 +1291,9 @@ try {
     // IsIdentifierRef of the target is true, and it is false for every
     // ParenthesizedExpression. Each parenthesized form leaves an anonymous
     // value unnamed, while the bare controls keep the binding name.
+    // The implicit global and the top-level `with` need sloppy global
+    // Script semantics in every reference host.
+    globalScriptReference: true,
     name: "parenthesized-assignment-names",
     source: `
 const show = (label, value) => console.log(label, "[" + value.name + "]");

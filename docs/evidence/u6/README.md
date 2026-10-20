@@ -512,4 +512,16 @@ The macOS weight is also 600, an explicitly unmeasured provisional estimate
 reusing the Linux value. Neither is a CI measurement, a file wall time, or an
 isolated-file latency; replace both with native CI case sums when available.
 
+The `parenthesized-assignment-function-name` node adds slot `0x60000c02`, a
+native registration with ten ordinary cases, and one model-only registration to
+*tests/property/m5-compound-assignment.property.test.ts*. On 2026-10-20 UTC a
+focused local Linux x86-64 ordinary run of that registration alone, selected
+by `--test-name-pattern=parenthesized` with a warm lane Zig cache, measured
+7.981 seconds. The extended task runs ten times the cases, so the Linux weight
+rises by a provisional 80 seconds, from 1,838 to 1,918, and the macOS weight
+by the same unmeasured 80 seconds, from 1,242 to 1,322. Neither increment is a
+CI measurement or a conservative bound; replace both with native CI case sums
+when available. This changes no case budgets, seeds, deadlines, or shard
+totals.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906
