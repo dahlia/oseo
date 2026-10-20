@@ -4,7 +4,7 @@
 # Selectors change only through `mise run m5c:observation-batches:plan`.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 13193
+unreviewedPaths: 13192
 basis:
   supportedFeatures:
     - AggregateError
@@ -164,7 +164,7 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 93769
+  currentExecutedVariants: 93771
   currentSeconds: 5152
   finalExecutedVariants: 135471
   finalSeconds: 7443
@@ -196,7 +196,7 @@ regeneration:
       fullUpdateScheduleHours: 70.44
     - batches: 10
       largestPaths: 3900
-      largestReviewUnits: 1197
+      largestReviewUnits: 1196
       limits:
         paths: 8000
         reviewUnits: 1200
@@ -282,7 +282,7 @@ batches:
     regeneration:
       executableVariants: 1048
       scopedUpdateSeconds: 58
-      fullCorpusSeconds: 5209
+      fullCorpusSeconds: 5210
   - id: observation-batch-03
     selector:
       prerequisiteSets:
@@ -356,8 +356,8 @@ batches:
         - test/language/directive-prologue/
     dependsOn:
       - observation-batch-plan
-    paths: 387
-    reviewUnits: 335
+    paths: 386
+    reviewUnits: 334
     generatedPaths: 89
     prerequisites: {}
     dynamicSource:
@@ -365,15 +365,14 @@ batches:
       eval: 12
     flags:
       generated: 89
-      noStrict: 60
+      noStrict: 59
       onlyStrict: 6
       raw: 5
     includes:
-      compareArray.js: 22
+      compareArray.js: 21
       decimalToHexString.js: 1
       propertyHelper.js: 3
     features:
-      Proxy: 1
       Symbol: 5
       async-functions: 19
       async-iteration: 19
@@ -391,10 +390,10 @@ batches:
         - language/computed-property-names
         - language/destructuring
         - language/directive-prologue
-      files: 326
-      newFiles: 312
+      files: 325
+      newFiles: 311
     regeneration:
-      executableVariants: 862
+      executableVariants: 860
       scopedUpdateSeconds: 47
       fullCorpusSeconds: 5325
   - id: observation-batch-06

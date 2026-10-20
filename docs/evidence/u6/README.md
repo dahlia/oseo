@@ -165,6 +165,12 @@ raw output, timestamps and exit status are retained outside the
 repository under
 */data/m5c-destructuring-binding-target-order/cost-refresh-20261021/*.
 
+The scheduling table was edited after the wrapper selected this single
+file and before the measurement ended. The HEAD, property file, and
+native implementation stayed unchanged; the final working tree had one
+modified scheduling file. These durations cover the selected file and
+do not establish a clean-tree gate for the final scheduling table.
+
 The current macOS cost of this file is unmeasured. Its 219-second weight
 is the provisional estimate `ceil(235 * 122/131)`, using the file's own
 host ratio in run 39070198868. It is not a Mac observation, pass, or

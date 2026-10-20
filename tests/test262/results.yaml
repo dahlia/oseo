@@ -16119,6 +16119,9 @@ partitions:
     key: e2
     path: results/language/computed-property-names/e2.yaml
   - group: language/destructuring
+    key: 1f
+    path: results/language/destructuring/1f.yaml
+  - group: language/destructuring
     key: 4f
     path: results/language/destructuring/4f.yaml
   - group: language/destructuring
@@ -18499,7 +18502,7 @@ summary:
   expectedNegatives: 2423
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 23750
+  passes: 23751
   semanticFailures: 0
   unsupportedProfileFeatures: 1725
   dependencies:
@@ -18563,7 +18566,7 @@ summary:
       expectedNegatives: 231
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1236
+      passes: 1237
       semanticFailures: 0
       unsupportedProfileFeatures: 61
     - dependency: data-view
@@ -18591,7 +18594,7 @@ summary:
       expectedNegatives: 418
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3651
+      passes: 3652
       semanticFailures: 0
       unsupportedProfileFeatures: 7
     - dependency: dynamic-source
@@ -18612,14 +18615,14 @@ summary:
       expectedNegatives: 399
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3559
+      passes: 3560
       semanticFailures: 0
       unsupportedProfileFeatures: 86
     - dependency: functions
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8531
+      passes: 8532
       semanticFailures: 0
       unsupportedProfileFeatures: 783
     - dependency: generators
@@ -18668,7 +18671,7 @@ summary:
       expectedNegatives: 14
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1882
+      passes: 1883
       semanticFailures: 0
       unsupportedProfileFeatures: 6
     - dependency: object-own-keys
@@ -18682,7 +18685,7 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14559
+      passes: 14560
       semanticFailures: 0
       unsupportedProfileFeatures: 218
     - dependency: promise-settlement
@@ -18703,7 +18706,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 294
+      passes: 295
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: reflect-namespace
@@ -18745,7 +18748,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1819
+      passes: 1820
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - dependency: top-level-await
@@ -18808,7 +18811,7 @@ summary:
       expectedNegatives: 89
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3725
+      passes: 3726
       semanticFailures: 0
       unsupportedProfileFeatures: 70
     - dependency: weak-collections
@@ -19243,7 +19246,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2
+      passes: 3
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/eval-code
