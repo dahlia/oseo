@@ -8602,3 +8602,12 @@ extended gates.
 This node admits *test/language/expressions/assignment/fn-name-lhs-cover.js*,
 which observation batch 08 measured as a `semantic-failure`. Its sibling
 assignment paths keep their batch 08 ownership.
+
+On the clean source `0fb18ab6a4c855edc0614d1bc2bfa6c08fc34c26`,
+the complete reviewed test262 UPDATE finished with zero retries. It recorded
+27,900 paths: 23,752 passes, 2,423 expected negatives, and 1,725 unsupported
+paths, with no failure classifications. All 27,899 earlier records and
+their subset rows were retained. The only new observation is a pass for
+*test/language/expressions/assignment/fn-name-lhs-cover.js*.
+This is preparation evidence; landing and the whole ordinary and extended
+gates remain pending.
