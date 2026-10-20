@@ -3486,6 +3486,24 @@ console.log(
   accessorDescriptor.set.name,
 );
 
+const generatorForms = {
+  __proto__: null,
+  *__proto__() { yield 18; },
+  async __proto__() { return 19; },
+  async *__proto__() { yield 20; },
+};
+const generatorFormsDescriptor = Object.getOwnPropertyDescriptor(
+  generatorForms,
+  "__proto__",
+);
+console.log(
+  Object.getPrototypeOf(generatorForms) === null,
+  Object.keys(generatorForms).join(","),
+  generatorFormsDescriptor.value.name,
+  Object.getPrototypeOf(generatorFormsDescriptor.value) ===
+    Object.getPrototypeOf(async function* () {}),
+);
+
 let abruptOrder = "";
 function failPrototype() { throw new RangeError("prototype"); }
 try {

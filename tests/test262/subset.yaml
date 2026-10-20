@@ -28,6 +28,7 @@ supportedFeatures:
   - Int16Array
   - Int32Array
   - json-modules
+  - json-superset
   - Map
   - Object.fromEntries
   - Object.hasOwn
@@ -57,6 +58,7 @@ supportedFeatures:
   - WeakMap
   - WeakRef
   - WeakSet
+  - __proto__
   - align-detached-buffer-semantics-with-web-reality
   - arbitrary-module-namespace-names
   - array-find-from-last
@@ -101,6 +103,7 @@ supportedFeatures:
   - optional-chaining
   - promise-try
   - promise-with-resolvers
+  - proxy-missing-checks
   - regexp-dotall
   - regexp-duplicate-named-groups
   - regexp-lookbehind

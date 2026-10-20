@@ -160,6 +160,20 @@ observed 29 of the 30 reviewed paths as passes.
 checkpoint with `OSEO2001` and stays unsupported under node
 `unhandled-rejection-observation`.
 
+M5c node `minor-feature-tag-admission` admits the `json-superset`,
+`__proto__`, and `proxy-missing-checks` test262 features without changing
+compiler or runtime behavior. Literal U+2028 and U+2029 in a string literal
+are single code units of its value. The `__proto__` tag covers only core
+object-initializer, class, and proxy-forwarding behavior on keys named
+`__proto__`; no Annex B accessor is installed, and the existing `OSEO1001`
+rejection of a missing read at an intrinsic `Object.prototype` is unchanged.
+The existing Proxy family already enforces the `[[DefineOwnProperty]]`,
+`[[Delete]]`, and `[[GetOwnProperty]]` invariants that tag measures. The
+existing Proxy exotic object and object-literal prototype setter fixtures
+gain fixed cases for these behaviors. Observation batch 32 owns the first
+admission of the ten gated paths; the two `eval` string-literal cases reach
+the ADR 0016 boundary and gain neither a pass nor an exclusion here.
+
 
 Claim boundary
 --------------

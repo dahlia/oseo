@@ -859,6 +859,41 @@ test("normalizes invalid BigInt literal diagnostics", () => {
   assert.equal(result.diagnostics[0]?.sourceId, "invalid-bigint.js");
 });
 
+test("keeps literal U+2028 and U+2029 as string literal data", () => {
+  const lineSeparator = String.fromCharCode(0x2028);
+  const paragraphSeparator = String.fromCharCode(0x2029);
+  const result = compileSource(babelFrontend, {
+    source:
+      `console.log("${lineSeparator}" === "\\u2028", ` +
+      `'a${paragraphSeparator}b' === 'a\\u2029b');\n`,
+    sourceId: "json-superset.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const strings = result.mir.script.blocks
+    .flatMap((block) => block.operations)
+    .flatMap((operation) =>
+      operation.kind === "constant" && operation.constant?.kind === "string"
+        ? [operation.constant.value]
+        : [],
+    );
+  assert.deepEqual(strings, [
+    lineSeparator,
+    lineSeparator,
+    `a${paragraphSeparator}b`,
+    `a${paragraphSeparator}b`,
+  ]);
+
+  for (const terminator of ["\n", "\r"]) {
+    const rejected = babelFrontend.parse({
+      source: `console.log("a${terminator}b");`,
+      sourceId: "unterminated-string.js",
+    });
+    assert.ok(!rejected.parsed);
+    assert.equal(rejected.diagnostics[0]?.code, "OSEO0001");
+  }
+});
+
 test("preserves non-strict script parameter bindings", () => {
   for (const name of ["eval", "arguments"]) {
     const result = compileSource(babelFrontend, {
