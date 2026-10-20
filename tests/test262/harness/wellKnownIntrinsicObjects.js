@@ -16,9 +16,12 @@
 // Without a global lexical eval declaration, which the Script must be
 // non-strict to contain, that resolution is the object record of the global
 // object: HasProperty, a ReferenceError when absent, then Get. The %eval%
-// lookup performs those steps on the Script's top-level this, which is that
-// object whatever the Script's strictness and whatever the globalThis
-// binding holds. A Script that declares a top-level let or const named eval
+// lookup performs the HasProperty and Get on the Script's top-level this,
+// which is that object whatever the Script's strictness and whatever the
+// globalThis binding holds. When the property is absent it returns
+// undefined, the value upstream records once its outer catch discards the
+// realm's own ReferenceError; constructing one through the replaceable
+// ReferenceError global would run code upstream never calls. A Script that declares a top-level let or const named eval
 // is the one case it does not reproduce. A Module, whose top-level this is
 // undefined, would leave %eval% undefined. No consumer of this include at
 // the pinned upstream revision is either.
@@ -465,7 +468,7 @@ const WellKnownIntrinsicObjects = [
       return Error;
     },
     "%eval%": function () {
-      if (!("eval" in global)) throw new ReferenceError("eval is not defined");
+      if (!("eval" in global)) return;
       return global.eval;
     },
     "%EvalError%": function () {

@@ -15,7 +15,10 @@ import {
   parseTest262Case,
 } from "../tools/test262.ts";
 import { agentSyntaxNode } from "../tools/test262-source.ts";
-import type { AgentSyntaxNode } from "../tools/test262-source.ts";
+import type {
+  AgentSyntaxNode,
+  ParsedTest262Case,
+} from "../tools/test262-source.ts";
 
 const revision = "f2d1435644797268dca1f7988cad5a4e89ccd8d2";
 const include = "wellKnownIntrinsicObjects.js";
@@ -216,6 +219,34 @@ test("%eval% does not depend on the globalThis binding", () => {
   }
 });
 
+test("an absent eval invokes no replaceable global", () => {
+  // Upstream's absent eval raises the realm's own ReferenceError, which
+  // the outer catch discards. A lookup that constructed one through the
+  // global ReferenceError binding would run this replacement, which
+  // changes a record read after %eval%.
+  const setup =
+    "var realm = this;\n" +
+    "var constructions = 0;\n" +
+    "delete realm.eval;\n" +
+    "realm.ReferenceError = function () {\n" +
+    "  constructions += 1;\n" +
+    "  realm.Math = 0;\n" +
+    "};\n";
+  for (const strict of [false, true]) {
+    const context = harnessContext(setup);
+    const math = contextValue(context, "Math");
+    const reviewed = assertSameHarness(context, strict);
+    const values = recordValues(reviewed);
+    assert.equal(values.get("%eval%"), undefined);
+    assert.equal(values.get("%Math%"), math);
+    assert.equal(contextValue(context, "constructions"), 0);
+    assert.equal(
+      reviewed.failure("%eval%"),
+      "this implementation could not obtain %eval%",
+    );
+  }
+});
+
 /**
  * Evaluate `text`, then `suffix`, as one Script in a fresh context, and
  * return which records hold undefined and whether %eval% holds the
@@ -339,6 +370,77 @@ async function filesBelow(directory: URL): Promise<string[]> {
     );
 }
 
+/** One upstream test whose decoded frontmatter names the include. */
+interface IncludeConsumer {
+  readonly path: string;
+  readonly source: string;
+  readonly parsed: ParsedTest262Case;
+}
+
+/**
+ * The tests among `candidates` whose decoded frontmatter includes the
+ * reviewed copy. Each candidate's frontmatter is parsed as the runner
+ * parses it before any selection, so a YAML escape in the include name
+ * cannot hide a consumer, and metadata the parser rejects fails the scan
+ * rather than dropping the candidate.
+ */
+function includeConsumers(
+  candidates: readonly (readonly [string, string])[],
+): IncludeConsumer[] {
+  return candidates
+    .map(([path, source]) => ({
+      path,
+      source,
+      parsed: parseTest262Case(source, path, revision),
+    }))
+    .filter(({ parsed }) => parsed.case.includes.includes(include));
+}
+
+/**
+ * Why one consumer would reach the bounded divergence: a Module's top-level
+ * this is undefined, a raw case loads no include, and a top-level lexical
+ * eval is visible only to upstream's identifier read.
+ */
+function divergenceReasons(consumer: IncludeConsumer): string[] {
+  const reasons: string[] = [];
+  if (consumer.parsed.case.mode !== "script") reasons.push("module");
+  if (consumer.parsed.flags.includes("raw")) reasons.push("raw");
+  if (lexicalNames(consumer.source).includes("eval")) {
+    reasons.push("lexical eval");
+  }
+  return reasons;
+}
+
+test("the consumer scan decodes frontmatter before selecting", () => {
+  // The include name is spelled with a YAML escape, so the source text
+  // never contains it literally, yet the runner would load the include.
+  const escaped = "wellKnownIntrinsic\\u004fbjects.js";
+  const metadata = (flags: string): string =>
+    `/*---\nincludes: ["${escaped}"]\nflags: [${flags}]\n---*/\n`;
+  const candidates = [
+    ["test/escaped-module.js", metadata("module")],
+    ["test/escaped-lexical.js", `${metadata("")}let eval = 1;\n`],
+    ["test/escaped-clean.js", metadata("")],
+    ["test/unrelated.js", `/*---\nincludes: [compareArray.js]\n---*/\n`],
+  ] as const;
+  for (const [, source] of candidates) assert.ok(!source.includes(include));
+  assert.deepEqual(
+    includeConsumers(candidates).map(
+      (consumer) => [consumer.path, divergenceReasons(consumer)] as const,
+    ),
+    [
+      ["test/escaped-module.js", ["module"]],
+      ["test/escaped-lexical.js", ["lexical eval"]],
+      ["test/escaped-clean.js", []],
+    ],
+  );
+  // Metadata the runner cannot parse is not silently skipped.
+  assert.throws(() =>
+    includeConsumers([["test/unknown.js", "/*---\nflags: raw\n---*/\n"]]),
+  );
+  assert.throws(() => includeConsumers([["test/none.js", "let eval;\n"]]));
+});
+
 test("no pinned consumer reaches the bounded divergence", async () => {
   const root = new URL(import.meta.resolve("test262/package.json"));
   const tests = new URL("test/", root);
@@ -347,30 +449,19 @@ test("no pinned consumer reaches the bounded divergence", async () => {
       .filter((path) => path.endsWith(".js") && !path.includes("_FIXTURE"))
       .map(
         async (path) =>
-          [path, await readFile(new URL(path, tests), "utf8")] as const,
+          [
+            `test/${path}`,
+            await readFile(new URL(path, tests), "utf8"),
+          ] as const,
       ),
   );
-  const consumers = candidates
-    .filter(([, source]) => source.includes(include))
-    .map(
-      ([path, source]) =>
-        [
-          `test/${path}`,
-          source,
-          parseTest262Case(source, `test/${path}`, revision),
-        ] as const,
-    )
-    .filter(([, , parsed]) => parsed.case.includes.includes(include));
+  const consumers = includeConsumers(candidates);
   const includeNames = new Set<string>();
-  for (const [path, source, parsed] of consumers) {
-    // A Module's top-level this is undefined, and a raw case loads no
-    // include, so every consumer must be an assembled Script.
-    assert.equal(parsed.case.mode, "script", path);
-    assert.ok(!parsed.flags.includes("raw"), path);
-    assert.ok(!lexicalNames(source).includes("eval"), path);
-    for (const name of parsed.case.includes) includeNames.add(name);
+  for (const consumer of consumers) {
+    assert.deepEqual(divergenceReasons(consumer), [], consumer.path);
+    for (const name of consumer.parsed.case.includes) includeNames.add(name);
   }
-  const paths = new Set<string>(consumers.map(([path]) => path));
+  const paths = new Set<string>(consumers.map(({ path }) => path));
   for (const path of ownedPaths) assert.ok(paths.has(path), path);
   // Both the upstream includes the consumers name and every reviewed
   // harness copy the runner can assemble ahead of them.
@@ -494,7 +585,8 @@ test("each lookup returns its entry's source expression statically", () => {
     if (record.source === "eval") {
       // Only %eval% is respelled: the profile rejects a bare eval
       // identifier, so the lookup performs the global object record's
-      // HasProperty and Get on the Script's top-level this.
+      // HasProperty and Get on the Script's top-level this and returns
+      // undefined when the property is absent.
       assert.equal(syntaxSignature(statements), evalLookupSignature);
       continue;
     }
@@ -532,12 +624,10 @@ test("each lookup returns its entry's source expression statically", () => {
 /** The two statements of the reviewed %eval% lookup. */
 const evalLookupSignature = syntaxSignature(
   agentSyntaxNode(
-    parse(
-      'if (!("eval" in global)) ' +
-        'throw new ReferenceError("eval is not defined");\n' +
-        "return global.eval;",
-      { allowReturnOutsideFunction: true, sourceType: "script" },
-    ).program,
+    parse('if (!("eval" in global)) return;\nreturn global.eval;', {
+      allowReturnOutsideFunction: true,
+      sourceType: "script",
+    }).program,
   )?.body,
 );
 

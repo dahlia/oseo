@@ -8568,10 +8568,12 @@ complete. The remaining gaps retain their existing owners.
     does. Its one respelling is `%eval%`, because the profile rejects a
     bare `eval` identifier read. Upstream's bare `eval` resolves in the
     global environment; when no global lexical `eval` exists, that is the
-    global object record, so the lookup performs its HasProperty, its
-    `ReferenceError` on absence, and its Get on the Script's top-level
-    `this`, which is the global object in either strictness and does not
-    depend on the `globalThis` binding. The lookup does not reproduce a
+    global object record, so the lookup performs its HasProperty and Get
+    on the Script's top-level `this`, which is the global object in either
+    strictness and does not depend on the `globalThis` binding. An absent
+    property yields undefined, the value upstream records after discarding
+    the realm's own `ReferenceError`, without constructing one through the
+    replaceable `ReferenceError` global. The lookup does not reproduce a
     non-strict Script's top-level `let` or `const` named `eval`, which only
     an identifier read can observe, and a Module's undefined top-level
     `this` would leave `%eval%` undefined. No consumer of the include at

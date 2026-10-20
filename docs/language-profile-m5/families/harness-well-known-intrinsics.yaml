@@ -11,10 +11,11 @@ scope:
     rejects an unknown name with the upstream failure text."
   - "The one respelled source: because the profile rejects a bare eval
     identifier read, %eval% performs the global object record's
-    HasProperty, ReferenceError on absence, and Get on the Script's
-    top-level this, which is what upstream's bare eval resolves to when the
-    Script declares no global lexical eval, independent of the globalThis
-    binding."
+    HasProperty and Get on the Script's top-level this, which is what
+    upstream's bare eval resolves to when the Script declares no global
+    lexical eval, independent of the globalThis binding. An absent property
+    yields undefined, as upstream's discarded ReferenceError does, without
+    calling the replaceable ReferenceError global."
   - "The bounded divergence: a non-strict Script's top-level let or const
     named eval, which only an identifier read observes, and a Module, whose
     top-level this is undefined. No consumer of the include at the pinned
