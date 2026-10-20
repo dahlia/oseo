@@ -494,6 +494,32 @@ Promise.resolve(17)
 Promise.reject(new Error("kept"))
   .finally(function () { console.log("finally rejected ran"); })
   .catch(function (error) { console.log("finally rejected", error.message); });
+// finally passes both closures to then, but each closure ends with
+// Invoke(p, "then", « thunk »): one argument, observable as a count.
+const finallyTarget = new Promise(function () {});
+finallyTarget.then = function () {
+  console.log("finally outer then arguments", arguments.length);
+};
+finallyTarget.finally(function () {});
+for (const fulfilled of [true, false]) {
+  const settled = fulfilled ? Promise.resolve(19) : Promise.reject(20);
+  const inner = Promise.resolve(21);
+  inner.then = function (onFulfilled, onRejected) {
+    console.log(
+      "finally inner then arguments",
+      fulfilled,
+      arguments.length,
+      onRejected === undefined,
+    );
+    return Promise.prototype.then.apply(this, arguments);
+  };
+  settled
+    .finally(function () { return inner; })
+    .then(
+      function (value) { console.log("finally inner kept", value); },
+      function (reason) { console.log("finally inner kept", reason); },
+    );
+}
 `,
   },
   {

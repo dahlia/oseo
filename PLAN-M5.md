@@ -8314,3 +8314,45 @@ observation-batch-32 keeps their first admission, so no subset row is added.
 The two reviewed assignment target rows that spell `import.meta` without the
 feature tag are Script code and stay expected negative. `supportedFeatures`
 changes, so publication needs a complete manifest update.
+
+
+Promise feature admission
+-------------------------
+
+M5c node `promise-feature-admission` adds `Promise` and
+`Promise.prototype.finally` to the reviewed subset's `supportedFeatures`.
+`unsupported-ownership-audit` assigned the node 30 reviewed paths whose only
+unadmitted frontmatter features are those tags: 29 under
+*test/built-ins/Promise/prototype/finally/* and
+*test/built-ins/Object/prototype/toString/symbol-tag-promise-builtin.js*.
+Their includes, *isConstructor.js*, *propertyHelper.js*, and
+*promiseHelper.js*, are reviewed harness files, and their other tags are
+already admitted. The two *subclass-Promise.js* paths under
+*test/language/expressions/class/subclass-builtins/* and
+*test/language/statements/class/subclass-builtins/* carry the `Promise` tag
+too. They remain unreviewed and owned by node `observation-batch-32`.
+
+The implementation is the existing `promise-intrinsic` family's `finally`.
+Reading the 30 bodies against it found one defect. ECMA-262 2025 27.2.5.3
+ends both `thenFinally` and `catchFinally` with
+`Invoke(p, "then", « thunk »)`, and
+*rejected-observable-then-calls-argument.js* asserts that this call receives
+one argument. The runtime passed a trailing `undefined`. The repair adds a
+counted Invoke helper. The two closures use it with one argument, and every
+other caller keeps the two-argument form.
+
+The family record keeps its evidence classes. The fixed `promise-intrinsic`
+native differential fixture now counts the `then` arguments of `finally`
+itself (two) and of both inner closures (one), on the fulfilled and rejected
+paths. Node.js and Deno print the expected counts. The fixture runs under both
+specialization policies with collection forced at every safepoint. Its false
+hint and shape-guard miss already reach the generic fallback. The generated
+domain at seed `0x60003800` keeps its generator and budget. It already draws
+`finally` passthrough over settled values. The node adds no domain or seed,
+because a counted `then` adds no input shape for a generator to vary.
+
+The native fixture and the test262 observation of the 30 paths have not run
+during preparation. The classifications in *tests/test262/subset.yaml* stay
+`unsupported-profile-feature` until a full
+`mise run test262:update -- --accept-promotions` observes them. This section
+records no pass count before that observation.

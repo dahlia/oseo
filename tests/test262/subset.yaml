@@ -32,8 +32,10 @@ supportedFeatures:
   - Object.fromEntries
   - Object.hasOwn
   - Object.is
+  - Promise
   - Promise.allSettled
   - Promise.any
+  - Promise.prototype.finally
   - Proxy
   - Reflect
   - Reflect.construct

@@ -131,6 +131,27 @@ feature stays out of `supportedFeatures`. The accessor descriptors, the clause
 17.1 restrictions, and the absence of an own `caller` property on arguments
 objects remain inside the claim.
 
+M5c node `promise-feature-admission` admits the `Promise` and
+`Promise.prototype.finally` feature tags. The constructor and `finally`
+already existed under the indexed `promise-intrinsic` family; the admission
+lets the 30 reviewed paths whose only unadmitted frontmatter features were
+these tags execute. One of them, *rejected-observable-then-calls-argument.js*
+under *test/built-ins/Promise/prototype/finally/*, asserts that the closures
+`finally` passes to `then` end with `Invoke(p, "then", « thunk »)` and one
+argument. The runtime passed a trailing `undefined`, so `arguments.length` was
+two. Both closures now invoke `then` with one argument, while `finally` itself
+and `catch` still pass two. The fixed `promise-intrinsic` differential fixture
+checks both counts on the fulfilled and rejected paths. The generated domain at
+seed `0x60003800` already covers `finally` settlement passthrough. No generator
+models a patched `then` that counts its arguments. The fixed fixture covers
+that observation instead because generating such programs would add no new
+input shape. The runtime ABI is unchanged: no layout, entry point, or
+intrinsic changes. The two unreviewed *subclass-Promise.js* paths
+under *test/language/expressions/class/subclass-builtins/* and
+*test/language/statements/class/subclass-builtins/* stay with node
+`observation-batch-32`. Their classifications await that observation, and this
+node claims no manifest count before its update runs.
+
 
 Claim boundary
 --------------
