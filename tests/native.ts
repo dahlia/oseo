@@ -1743,13 +1743,13 @@ for (const fixture of selectedFixtures) {
             // Proxy adding one allocation in each group and Date, JSON,
             // and Set adding only their property names, because the
             // observation excludes the allocations of their intrinsic
-            // builds. The eleven concrete TypedArray constructors add
-            // eleven property-name allocations, SharedArrayBuffer and
+            // builds. The twelve concrete TypedArray constructors add
+            // twelve property-name allocations, SharedArrayBuffer and
             // Atomics add one each, WeakMap, WeakSet, WeakRef, and
             // FinalizationRegistry add four more, the global object's own
             // `globalThis` property adds its name, and so does `%eval%`'s
             // global `eval` property (ADR 0027).
-            assert.equal(native.counters.allocations, 68);
+            assert.equal(native.counters.allocations, 69);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {
