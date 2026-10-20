@@ -33,7 +33,7 @@ evidence:
       - tests/native/fixtures/objects.ts
   standards:
     status: omitted
-    reason: "Upstream positives await first admission in observation batch 32."
+    reason: "Applicable positive cases await their owning observation batches."
     replacements:
       - tests/property/m5-object-literal.property.test.ts
       - tests/native/fixtures/objects.ts
