@@ -67,6 +67,10 @@ function propertyHelperGetter(): number {
   return 1;
 }
 
+function compileSourceText(): never {
+  throw new Error("the helper must not compile source text");
+}
+
 test("parses test262 frontmatter and derives strictness", () => {
   const parsed = parseTest262Case(
     `/*---
@@ -1158,6 +1162,27 @@ test("native matcher enforces the reviewed source grammar", async () => {
   }
   for (const source of nearMisses) {
     assert.throws(() => validate(source), SyntaxError, source);
+  }
+});
+
+test("global object helper avoids compiling source text", async () => {
+  const helper = await readFile(
+    new URL("test262/harness/fnGlobalObject.js", import.meta.url),
+    "utf8",
+  );
+  for (const prologue of ["", '"use strict";\n']) {
+    // SAFETY: the script evaluates to a tuple of two global object reads
+    // and the helper's result after a case overwrites `globalThis`.
+    const [initial, beforeWrite, afterWrite] = runInNewContext(
+      `${prologue}${helper}
+var initial = globalThis;
+var beforeWrite = fnGlobalObject();
+globalThis = undefined;
+[initial, beforeWrite, fnGlobalObject()];`,
+      { Function: compileSourceText, eval: compileSourceText },
+    ) as readonly [object, unknown, unknown];
+    assert.equal(beforeWrite, initial, prologue);
+    assert.equal(afterWrite, initial, prologue);
   }
 });
 

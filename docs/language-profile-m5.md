@@ -8326,15 +8326,23 @@ complete. The remaining gaps retain their existing owners.
     capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
-    *nans.js*, *nativeFunctionMatcher.js*, *promiseHelper.js*, and
-    *propertyHelper.js*. *nans.js* joined that list with the
-    `math-namespace` node, whose `Math.pow` intrinsic was its only
+    *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
+    *promiseHelper.js*, and *propertyHelper.js*. *nans.js* joined that list
+    with the `math-namespace` node, whose `Math.pow` intrinsic was its only
     unadmitted dependency, *decimalToHexString.js* with the
     `uri-handling-functions` node that its 78 reviewed cases observe, and
     *nativeFunctionMatcher.js* with the `harness-native-function-matcher`
-    node whose function-to-string cases observe it. Cases in the reviewed
-    function inventory that need *wellKnownIntrinsicObjects.js* classify
-    as unsupported until that include has a reviewed implementation. The
+    node whose function-to-string cases observe it. *fnGlobalObject.js*
+    joined with the M5c `fn-global-object-harness` node. Upstream obtains
+    the global object by calling `Function("return this;")`, a dynamic
+    source compilation that ADR 0016 keeps outside the profile, so the
+    reviewed copy caches the initial `globalThis` value when the harness
+    loads instead. It keeps the upstream `fnGlobalObject` definition and
+    its cache, compiles no source text, and also works in module cases,
+    where a top-level `this` probe would yield `undefined`. Cases in the
+    reviewed function inventory that need *wellKnownIntrinsicObjects.js*
+    classify as unsupported until that include has a reviewed
+    implementation. The
     reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
     through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a
     choice kept from before M5b node `globalthis-binding` admitted
