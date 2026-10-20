@@ -8469,3 +8469,26 @@ path and 20 in all. It is neither a pass nor an exclusion, and this node
 changes no host rejection policy. The later full update at source
 `4c18c04b`, whose pre-start record binds that clean commit and its tree,
 observed every record again, these 30 included, and changed none.
+
+
+Minor feature tag admission
+---------------------------
+
+M5c node `minor-feature-tag-admission` admits the `json-superset`,
+`__proto__`, and `proxy-missing-checks` test262 features to the reviewed
+`supportedFeatures`. *PLAN-M5C.md* records the ten gated paths and the
+behavior each tag needs. The current profile already meets it, so no compiler
+or runtime code changes. Literal U+2028 and U+2029 stay single code units of a
+string constant. The `__proto__` paths exercise only core object-initializer,
+class-definition, and proxy-forwarding behavior, and no Annex B accessor is
+installed. The `[[DefineOwnProperty]]`, `[[Delete]]`, and `[[GetOwnProperty]]`
+post-trap invariants already belong to the `proxy-exotic-object` family.
+
+No generated domain, seed, or budget changes because no behavior changes. The
+`proxy-exotic-object` native fixture adds the three invariant violations
+beside accepted controls and a `"__proto__"` write through a proxy parent with
+computed and static keys. The `object-literal-prototype-setter` fixture adds
+generator, async, and async generator `__proto__` methods beside a prototype
+setter. A parser unit test pins the literal U+2028 and U+2029 code units and
+the unterminated raw line feed and carriage return. Observation batch 32 keeps
+the first admission of the ten paths, so this node adds no subset row.

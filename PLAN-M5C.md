@@ -900,3 +900,78 @@ other ADR owner, and every reviewed selector path needs its audit row. The
 five dynamic-source intersections do not broaden ADR 0016 and are not owned
 by it. A later observation that reaches their dynamic-source rejection, or
 that admits the `caller` feature, needs a new reviewed scope decision.
+
+
+Minor feature tag admission
+---------------------------
+
+The `minor-feature-tag-admission` node admits the `json-superset`,
+`__proto__`, and `proxy-missing-checks` frontmatter features to the reviewed
+`supportedFeatures`. Exactly ten included paths of the fixed inventory carry
+one of them. All ten are unreviewed and owned by `node:observation-batch-32`.
+This node adds no subset row: batch 32 keeps their first admission, their
+observed classification, and any exclusion-audit row or ledger owner. No
+reviewed path carries any of the three tags.
+
+Each tag is admitted because the current profile already meets what its
+included paths require. Source analysis found no defect to repair, so the node
+changes no compiler or runtime code:
+
+ -  `json-superset` gates four paths under *test/language/literals/string/*.
+    ECMA-262 16th edition String Literals let U+2028 and U+2029 appear
+    literally in a string literal. Babel accepts them, the compiler keeps each
+    as one UTF-16 code unit of the string constant, and the C backend emits
+    that constant as a code-unit array. *line-separator.js* and
+    *paragraph-separator.js* need only that literal data. Their
+    *line-separator-eval.js* and *paragraph-separator-eval.js* siblings pass
+    the feature gate and then call `eval`, so their observation reaches the
+    ADR 0016 boundary. This node claims neither a pass nor an exclusion for
+    them, and the literal behavior above does not depend on them.
+
+ -  `__proto__` gates three paths that ADR 0020 keeps in the inventory as
+    core tests merely carrying the flag.
+    *test/language/expressions/object/\_\_proto\_\_-permitted-dup.js*
+    tests the core Object Initializer early error and
+    PropertyDefinitionEvaluation that M5a Unit 8.1c admitted.
+    *test/language/expressions/class/poisoned-underscore-proto.js* defines a
+    user `__proto__` setter on `Object.prototype` and observes that
+    ClassDefinitionEvaluation sets the new prototype object's `[[Prototype]]`
+    directly.
+    *test/built-ins/Proxy/set/call-parameters-prototype-dunder-proto.js*
+    forwards OrdinarySet with the key `"__proto__"` to a proxy parent's `set`
+    trap. None reads the optional `Object.prototype.__proto__` accessor.
+    Admitting the tag installs no accessor and is not a blanket Annex B
+    exclusion: a missing `__proto__` read that reaches an intrinsic
+    `Object.prototype` still reports the `OSEO1001` rejection owned by
+    `annexb-proto-dependency-classification`.
+
+ -  `proxy-missing-checks` gates three paths under *test/built-ins/Proxy/*.
+    The `proxy-exotic-object` implementation in
+    *packages/runtime-c/native/runtime\_proxy.c* already applies the three
+    post-trap invariants those paths observe. Its `[[DefineOwnProperty]]`
+    throws a `TypeError` when the trap reports success for a descriptor with
+    a false `[[Writable]]` while the target property is non-configurable
+    writable data. Its `[[Delete]]` throws when the trap reports success for an
+    existing configurable property of a non-extensible target. Its
+    `[[GetOwnProperty]]` throws when the trap reports a non-configurable,
+    non-writable descriptor while the target property is writable.
+
+The node adds no generated domain, seed, or budget, because no runtime
+behavior changes. It extends fixed evidence of the existing families instead.
+The `proxy-exotic-object` native fixture triggers each of the three
+invariants beside an accepted control, counts the trap calls, and writes
+`"__proto__"` through a proxy parent with computed and static keys. The
+`object-literal-prototype-setter` fixture adds generator, async, and async
+generator methods named `__proto__` beside a prototype setter. A
+*packages/parser-babel/tests/basics.test.ts* case checks that literal
+U+2028 and U+2029 stay single code units of their string constants while a
+raw line feed or carriage return still leaves the literal unterminated. The
+native fixtures compare Node.js, Deno, and both native specialization
+policies with collection forced at every safepoint.
+
+Changing `supportedFeatures` requires the complete `mise run test262:update`,
+because the scoped update refuses that change. No reviewed path carries the
+admitted tags, so every reviewed observation should stay unchanged; the
+complete update's actual records decide. The node's two direct dependents
+are `observation-batch-32` and `m5-exit-audit`. Landing this node alone does
+not unblock batch 32, which also waits for its other prerequisite nodes.
