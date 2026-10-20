@@ -1804,6 +1804,14 @@ under both specialization policies with collection forced at every safepoint,
 a deliberate false-hint guard miss, and an independent model of every
 observation. The node reviews all 356 paths under its ten inventory roots.
 
+M5c node `typed-array-tolocalestring-arguments` makes `toLocaleString` call
+every element method with no arguments, as ECMA-262 specifies, instead of
+forwarding the rooted outer locales and options; the stringifier now roots
+one fewer argument slot. The generated evidence compares Node.js and Deno with
+a labeled ECMA-402 model and native output with an ECMA-262 model, and slot
+`0x60007601` adds a dedicated element argument domain. The component's
+`abiVersion` is unchanged.
+
 ### Symbol prototype and registry evidence
 
 M5b node `symbol-intrinsic` completes *runtime\_symbol.c* with `Symbol.for`,

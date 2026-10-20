@@ -164,20 +164,17 @@ console.log(
   String(new BigUint64Array([2n ** 64n - 1n])),
 );
 
+// Element arguments follow ECMA-262 here but ECMA-402 in both reference
+// hosts; the labeled models in the property file observe them.
 const originalNumberLocale = Number.prototype.toLocaleString;
 const localeCalls = [];
-Number.prototype.toLocaleString = function (locales, options) {
+Number.prototype.toLocaleString = function () {
   "use strict";
-  localeCalls.push(
-    Number(this),
-    arguments.length,
-    String(locales),
-    options === marker,
-  );
+  localeCalls.push(typeof this, Number(this));
   return "<" + this + ">";
 };
 console.log(
-  "locale forwarded",
+  "locale supplied",
   new Uint8Array([1, 2]).toLocaleString("ko", marker),
   localeCalls.join("|"),
 );

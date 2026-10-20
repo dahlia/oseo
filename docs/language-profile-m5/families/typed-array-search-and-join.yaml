@@ -9,9 +9,11 @@ scope:
     snapshot index, the empty-view answer before the fromIndex conversion,
     the ToIntegerOrInfinity fromIndex clamps, SameValueZero for includes and
     strict equality with a HasProperty test for indexOf and lastIndexOf, the
-    separator conversion after the snapshot, the ECMA-402 toLocaleString
-    call contract, and the detach, shrink, and grow observations a predicate
-    or conversion causes."
+    separator conversion after the snapshot, the ECMA-262 toLocaleString
+    element call with no arguments, which M5c node
+    typed-array-tolocalestring-arguments restored in place of ECMA-402
+    locale and options forwarding, and the detach, shrink, and grow
+    observations a predicate or conversion causes."
   - "Reviewed standards coverage is every upstream path under the node's ten
     inventory roots: test/built-ins/TypedArray/prototype/find, findIndex,
     findLast, findLastIndex, includes, indexOf, join, lastIndexOf,

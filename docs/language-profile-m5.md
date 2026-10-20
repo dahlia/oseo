@@ -7083,13 +7083,17 @@ element.
 `join` converts a defined separator with ToString after the length snapshot,
 defaulting to a comma, and renders an index a detach or shrink during that
 conversion invalidated as an empty field; a growth never extends the
-snapshot. `toLocaleString` uses a comma separator and follows the Array
-method under the ECMA-402 call contract: it reads each defined element's
-current `toLocaleString` through the element's primitive prototype, throws a
-`TypeError` when that value is not callable, calls it with the element as its
-receiver and exactly the outer locales and options arguments, forwarding two
-`undefined` values when they were omitted, and converts the result with
+snapshot. `toLocaleString` uses a comma separator and follows the ECMA-262
+2025 Array algorithm that section 23.2.3.31 applies: it reads each defined
+element's current `toLocaleString` through the element's primitive prototype,
+throws a `TypeError` when that value is not callable, calls it with the
+element as its receiver and no arguments, and converts the result with
 ToString. An abrupt completion from any of these steps propagates at once.
+The outer locales and options are evaluated by the caller but never passed
+to an element method or converted, because forwarding them is the ECMA-402
+call contract that ADR 0013 excludes; M5c node
+`typed-array-tolocalestring-arguments` removed the earlier forwarding of
+exactly two arguments.
 Both methods share Array stringification's active-receiver stack, so a
 re-entrant `join` or `toLocaleString` of a view that is already being
 stringified renders an empty string, as V8 does, instead of exhausting the
@@ -7106,9 +7110,23 @@ deliberately misses its guard and reaches the compiled generic fallback, and
 an independent model computes every callback, conversion, and result
 observation. The fixed fixture also pins method metadata and identity,
 fromIndex clamping, the empty-view short circuit, separator and locale
-conversion and their abrupt completions, locale argument forwarding, locale
+conversion and their abrupt completions, locale receivers and results, locale
 cycles, non-typed-array and detached receivers, non-callable predicates, an
 element offset, and grow and shrink through resizable buffers.
+
+Node.js and Deno implement ECMA-402, so their element methods receive the
+outer locales and options. Since M5c node
+`typed-array-tolocalestring-arguments`, the generated evidence compares the
+references with a separately labeled ECMA-402 model and native output with an
+independent ECMA-262 model. The seed `0x60007600` domain keeps its generator
+and budget. Slot `0x60007601` adds 10 ordinary cases of one to three
+`toLocaleString` calls through method, `call`, or `apply` on attached or
+detached Number and BigInt views, with up to three logged outer argument
+expressions, including a coercing locales object and a throwing expression,
+and reporting, object-returning, throwing, detaching, or non-callable element
+methods. A fixed program covers every argument shape, call form, view kind,
+and method mode under both specialization policies with collection forced at
+every safepoint.
 
 The reviewed feature list and harness are unchanged, and the dependency
 vocabulary gains `typed-array-search-and-join`. All 356 paths under the

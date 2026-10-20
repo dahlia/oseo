@@ -2484,14 +2484,15 @@ static OseoResult typed_array_index_search(
  * join and toLocaleString over the snapshotted length. join converts its
  * separator after the snapshot, so a detach or shrink during that
  * conversion leaves later indices undefined and renders them as empty
- * fields. toLocaleString follows Array.prototype.toLocaleString under the
- * ECMA-402 call contract: each element's current toLocaleString method is
- * invoked with exactly the outer locales and options arguments, and an
- * element a callback invalidated renders empty. As in Array
- * stringification, a receiver already being joined or converted on the
- * active string stack renders an empty string after the separator
- * conversion instead of recursing without bound. The pieces accumulate in
- * host memory so collection between two appends cannot move them.
+ * fields. toLocaleString follows the ECMA-262 Array.prototype.toLocaleString
+ * algorithm: each element's current toLocaleString method is invoked with no
+ * arguments, because forwarding the outer locales and options is ECMA-402,
+ * which ADR 0013 excludes, and an element a callback invalidated renders
+ * empty. As in Array stringification, a receiver already being joined or
+ * converted on the active string stack renders an empty string after the
+ * separator conversion instead of recursing without bound. The pieces
+ * accumulate in host memory so collection between two appends cannot move
+ * them.
  */
 static OseoResult typed_array_join(
     OseoContext *context,
@@ -2500,15 +2501,14 @@ static OseoResult typed_array_join(
     const OseoValue *arguments,
     bool locale
 ) {
-    OseoValue slots[6] = {
+    OseoValue slots[5] = {
         receiver,
         typed_array_argument(argument_count, arguments, 0u),
-        typed_array_argument(argument_count, arguments, 1u),
         oseo_undefined(),
         oseo_undefined(),
         oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 6u};
+    OseoRootFrame frame = {NULL, slots, 5u};
     oseo_roots_push(context, &frame);
     OseoResult result = typed_array_validate(context, slots[0]);
     size_t length = 0u;
@@ -2517,7 +2517,7 @@ static OseoResult typed_array_join(
         result = locale || tag_of(slots[1]) == OSEO_TAG_UNDEFINED
             ? oseo_internal_ascii_string(context, ",")
             : oseo_internal_value_string(context, slots[1]);
-        slots[3] = result.value;
+        slots[2] = result.value;
     }
     const OseoArrayStringAncestor *previous_string =
         context->array_string_stack;
@@ -2536,7 +2536,7 @@ static OseoResult typed_array_join(
          result.status == OSEO_STATUS_NORMAL && index < length;
          index += 1u) {
         if (index > 0u) {
-            const OseoString *separator = string_object(slots[3]);
+            const OseoString *separator = string_object(slots[2]);
             result = oseo_internal_string_builder_append(
                 context,
                 &builder,
@@ -2546,18 +2546,18 @@ static OseoResult typed_array_join(
             if (result.status != OSEO_STATUS_NORMAL) break;
         }
         result = typed_array_iteration_element(context, slots[0], index);
-        slots[4] = result.value;
+        slots[3] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (tag_of(slots[4]) == OSEO_TAG_UNDEFINED) continue;
+        if (tag_of(slots[3]) == OSEO_TAG_UNDEFINED) continue;
         if (locale) {
             result = oseo_internal_ascii_string(context, "toLocaleString");
-            slots[5] = result.value;
+            slots[4] = result.value;
             if (result.status == OSEO_STATUS_NORMAL) {
-                result = oseo_object_get(context, slots[4], slots[5]);
-                slots[5] = result.value;
+                result = oseo_object_get(context, slots[3], slots[4]);
+                slots[4] = result.value;
             }
             if (result.status == OSEO_STATUS_NORMAL &&
-                !is_callable(slots[5])) {
+                !is_callable(slots[4])) {
                 result = oseo_internal_throw_error(
                     context,
                     OSEO_ERROR_TYPE,
@@ -2567,22 +2567,22 @@ static OseoResult typed_array_join(
             if (result.status == OSEO_STATUS_NORMAL) {
                 result = oseo_call_function(
                     context,
-                    slots[5],
                     slots[4],
-                    2u,
-                    &slots[1],
+                    slots[3],
+                    0u,
+                    NULL,
                     oseo_undefined()
                 );
             }
             if (result.status != OSEO_STATUS_NORMAL) break;
-            slots[5] = result.value;
+            slots[4] = result.value;
         } else {
-            slots[5] = slots[4];
+            slots[4] = slots[3];
         }
-        result = oseo_internal_value_string(context, slots[5]);
-        slots[5] = result.value;
+        result = oseo_internal_value_string(context, slots[4]);
+        slots[4] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        const OseoString *element = string_object(slots[5]);
+        const OseoString *element = string_object(slots[4]);
         result = oseo_internal_string_builder_append(
             context,
             &builder,
