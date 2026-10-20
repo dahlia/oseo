@@ -517,11 +517,30 @@ native registration with ten ordinary cases, and one model-only registration to
 *tests/property/m5-compound-assignment.property.test.ts*. On 2026-10-20 UTC a
 focused local Linux x86-64 ordinary run of that registration alone, selected
 by `--test-name-pattern=parenthesized` with a warm lane Zig cache, measured
-7.981 seconds. The extended task runs ten times the cases, so the Linux weight
-rises by a provisional 80 seconds, from 1,838 to 1,918, and the macOS weight
-by the same unmeasured 80 seconds, from 1,242 to 1,322. Neither increment is a
-CI measurement or a conservative bound; replace both with native CI case sums
-when available. This changes no case budgets, seeds, deadlines, or shard
-totals.
+7.981 seconds.
+
+A local Linux x86-64 whole-file extended run at clean result
+`a9cbe8cd68c58858afb65ea3a8e56f2da14bf234` naturally exited zero with all
+ten registrations passing and none skipped. Their exact printed leaf
+durations sum to 576282.402279000 milliseconds (576.282402279 seconds),
+giving a Linux weight of 577 seconds after rounding up. This includes
+model-only registrations and excludes build and plugin timing. The separate
+process wall time was 577.672844 seconds.
+
+The run kept task scale 10, seed 1592590339, size `large`, one file worker,
+and the existing budgets and interrupt limits. The clean HEAD, tree and
+property SHA-256 matched before and after execution. The property digest
+was:
+`8519ee57473b05d14a4f0816aceb522bac0068b18be7555815cef8bd31f7d5f6`.
+
+Raw result, stdout, stderr and exact timing tokens remain under:
+*/data/oseo-m5c-reviews/parenthesized-function-name-focused-extended1/*.
+
+macOS remains unmeasured. Its modeled weight is 390 seconds,
+`ceil(577 * 1242 / 1838)`, using the pre-Parent whole-file host weights in main
+`dc1a00d9`, rather than the provisional 1,918/1,322 weights. This is one local
+Linux case sum and an unmeasured macOS model, not final native CI, a
+whole-suite result, or a full UPDATE. No case budget, seed, deadline or shard
+total changes.
 
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906
