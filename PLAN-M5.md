@@ -8204,3 +8204,50 @@ partitions without a change or promotion. The existing closure ledger
 remains valid. A native fixture run on the integrated source, macOS
 execution, and CI remain pending, and the 42 paths do not establish
 complete Float16 conformance.
+
+
+Hashbang comments
+-----------------
+
+M5c node `hashbang-comments` admits the test262 `hashbang` feature.
+ECMA-262 2025 12.5 defines a HashbangComment as `#!` followed by
+SingleLineCommentChars, and the InputElementHashbangOrRegExp goal of 12
+applies only at the start of a Script or Module. The comment therefore ends
+at any of the four LineTerminator code points of 12.3, a CRLF pair included,
+or at the end of input. Any preceding text is a SyntaxError, including
+WhiteSpace such as U+FEFF, a line terminator, a comment, a directive, a
+statement, or an earlier hashbang. So is `#!` inside a function body, block,
+class body, or expression. Neither character may be written with an escape.
+
+The pinned Babel parser already implements this grammar for both goals, so
+the node changes no frontend, compiler, or runtime source. Babel records the
+comment as the program's interpreter directive, which the converter never
+reads, and parse failures keep the existing source-located `OSEO0001`
+diagnostic at the misplaced `#`. A body such as `"use strict"` stays a
+comment: the following Script still admits `with`. Hashbang text inside
+`eval` or `Function` source is parsed only by a later dynamic parse.
+ADR 0016 keeps that outside the profile, and the call site reports its
+existing diagnostic.
+
+*packages/parser-babel/tests/hashbang.test.ts* enumerates the finite
+boundary domain under Node.js and Deno. It covers both goals, every line
+terminator and the end of input, comment bodies that would mean something
+outside a comment, sixteen classes of preceding text, five nested
+placements, and nine escape spellings. Every misplaced hashbang is
+rejected at the exact byte offset of its `#`, every escaped spelling on
+line 1, and code after each terminator is scanned from line 2, column 1. Owned
+syntax, HIR, and MIR for a hashbang Script equal those of the same source with
+`//` in place of `#!`, under every terminator, and a Module's converted record
+equals its line-comment twin. The comment therefore adds no runtime value,
+safepoint, guard, or specialized path. The family record names this structural
+equivalence as the replacement for native, specialization, and collection
+evidence.
+
+The 29 pinned paths under *test/language/comments/hashbang/* are this
+feature's whole inventory. Before the admission each parsed as the test
+expects in a focused frontend check: 19 are rejected, 10 are accepted.
+Observation batch 32 keeps their first canonical admission, so this node
+adds no subset row. Four of those paths reach `eval` or `Function`, and the
+batch classifies them by their observed ADR 0016 diagnostic. No reviewed
+path names `hashbang`, so adding the feature moves no reviewed row. Because
+`supportedFeatures` changes, the publication uses a complete manifest update.

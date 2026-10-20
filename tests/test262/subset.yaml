@@ -85,6 +85,7 @@ supportedFeatures:
   - for-of
   - generators
   - globalThis
+  - hashbang
   - let
   - logical-assignment-operators
   - new.target
