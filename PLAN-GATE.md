@@ -3607,3 +3607,20 @@ waiting ranged from 1.2 to 88.1 while the Linux side ranged from 48.53 to
 66.25 with 1.2 job-minutes of waiting, so the per-job runner speed factor
 moves that side on its own, and U47 and U48 address only the waiting
 component. What that is worth across runs is not yet measured.
+
+### What the two main runs measured (U48, U49)
+
+Main runs 39422744044 and 39455962104 ran the branch run's workflow and
+placement and ended at 54.00 and 50.63 minutes. The first drew slow Mac
+lanes: with each lane holding the same jobs, the lanes' summed work was
+292.0 minutes against 263.2 in the branch run and 259.6 in the second main
+run, and the `native` aggregate, which waits for the macOS case shards,
+closed it after the last Mac-lane job. Summed Ubuntu waiting stayed between
+1.4 and 2.5 job-minutes across the three runs.
+
+The earlier Linux figures in this plan took the latest Ubuntu job end, which
+includes that aggregate. Excluding aggregates, the latest Ubuntu work ended
+at 47.30 in the branch run rather than 48.00, and at 45.47 and 48.80 in the
+two main runs. A `workflow_dispatch` repeat was canceled because the
+readiness probe runs only on push events and every Mac lane fell back to the
+hosted slots. *docs/evidence/u49/README.md* records the table.
