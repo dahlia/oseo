@@ -20,5 +20,5 @@ delivers: "Closes exactly 3 newly observed paths under
   closure ledger. Already-reviewed paths may move only toward pass."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
