@@ -75,9 +75,11 @@ test("reads one null-prototype import.meta object per module", async () => {
       "return import.meta; } }\n" +
       "function* generate() { yield import.meta; }\n" +
       "async function later() { await 0; return import.meta; }\n" +
+      "const laterArrow = async () => { await 0; return import.meta; };\n" +
+      "async function* stream() { await 0; yield import.meta; }\n" +
       "await later();\n" +
       "console.log(direct === import.meta, dependencyMeta, arrow, " +
-      "nested, Reader, generate);\n",
+      "nested, Reader, generate, laterArrow, stream);\n",
     "file:///app/dependency.js":
       "export const dependencyMeta = import.meta;\n" +
       "export function read() { return import.meta; }\n",
@@ -117,9 +119,9 @@ test("reads one null-prototype import.meta object per module", async () => {
   }
   const printed = printHir(result.hir);
   const reads = importMetaReads(printed);
-  // The entry reads its object eight times and the dependency twice;
+  // The entry reads its object ten times and the dependency twice;
   // every read names one of the two initialized cells.
-  assert.equal(reads.length, 10);
+  assert.equal(reads.length, 12);
   assert.deepEqual(new Set(reads), new Set(ids));
   assert.ok(
     result.hir.globalBindings?.some(

@@ -38,11 +38,14 @@ evidence:
       - tests/native/scenarios/shard-2.ts
   generated:
     status: omitted
-    reason: "A read has no input domain: it names its module's one cell
-      whatever values flow around it. The fixed tests enumerate every
-      function kind that can enclose the read, the cyclic read before
-      module evaluation, every non-target use, and every target position
-      and goal that must be rejected, instead of sampling them."
+    reason: "A read has no input domain: it names its module's one hidden
+      binding whatever values flow around it, and every enclosing function
+      reaches that binding through the same module-level capture. The fixed
+      tests cover reads from the module body, an arrow, a function, a class
+      field and method, a generator, an async function, an async arrow, an
+      async generator, and after top-level await, plus the cyclic read
+      before module evaluation, nineteen non-target uses, and the rejected
+      goals and target positions, instead of sampling them."
     replacements:
       - packages/parser-babel/tests/import-meta.test.ts
       - tests/fixtures/import-meta/entry.mjs

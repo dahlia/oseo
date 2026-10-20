@@ -8288,19 +8288,25 @@ only by a later dynamic parse, which ADR 0016 keeps outside the profile.
 
 *packages/parser-babel/tests/import-meta.test.ts* checks the lowering under
 Node.js and Deno: one initializer per reading module with distinct
-bindings, every read from module bodies, arrows, functions, class fields and
-methods, generators, and async functions naming its module's binding, the
-initializer ordered before every function initializer in a cycle, nineteen
-admitted non-target uses, the rejected Script and target positions at their
-byte offsets, and the owned-syntax Script rejection. The native scenario in
+bindings, every read from the module body, an arrow, a function, a class
+field and method, a generator, an async function, an async arrow, and an
+async generator naming its module's binding, the initializer ordered before
+every function initializer in a cycle, nineteen admitted non-target uses,
+the rejected Script and target positions at their byte offsets, and the
+owned-syntax Script rejection. The native scenario in
 *tests/native/scenarios/shard-2.ts* runs *tests/fixtures/import-meta/* under
 both specialization policies with collection at every safepoint and compares
 the portable observations with Node.js and Deno: object type, null
-prototype, extensibility, identity across every enclosing function kind and
-a top-level await, distinct objects per module, the cyclic early read,
+prototype, extensibility, identity from the module body, an arrow, a
+function expression, a hoisted function, a class field and method, a
+generator, an async function, an async arrow, an async generator, and after
+top-level await, distinct objects per module, the cyclic early read,
 TypeError on call and construct, property and prototype mutation,
-`delete import.meta`, and freezing. A second entry requires that the native
-object has no own keys, since both references add host properties.
+`delete import.meta`, and freezing. Accessors, constructors, static blocks, and
+default parameter initializers are not exercised separately; a read there
+resolves to the same hidden module binding as the covered forms. A second entry
+requires that the native object has no own keys, since both references add host
+properties.
 
 The 23 pinned paths that carry the feature stay unreviewed;
 observation-batch-32 keeps their first admission, so no subset row is added.

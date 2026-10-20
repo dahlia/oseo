@@ -33,6 +33,24 @@ function* generate() {
   yield import.meta;
 }
 console.log("generator", generate().next().value === meta);
+async function later() {
+  await null;
+  return import.meta;
+}
+const laterArrow = async () => {
+  await null;
+  return import.meta;
+};
+async function* stream() {
+  await null;
+  yield import.meta;
+}
+console.log(
+  "async",
+  (await later()) === meta,
+  (await laterArrow()) === meta,
+  (await stream().next()).value === meta,
+);
 console.log(
   "modules",
   dependencyMeta !== meta,
