@@ -7772,11 +7772,16 @@ records retain their earlier contents. The original `4a514037` observation
 remains historical evidence; this full observation belongs to `2ad4ae77`.
 
 The historical updates above ran with uncommitted iterator changes. They
-do not establish a committed observation input and result pair for D3. The
-current clean input is `3193e30c013217c099aff475c1be578a8d9f176e`, based on
-`77616a772846395bd3cdf14fc2a74db9561d3895`. Its full
-`mise run test262:update -- --accept-promotions` observation is pending;
-no result commit or fresh totals are claimed before it finishes.
+do not establish a committed observation input and result pair. The new full
+`mise run test262:update -- --accept-promotions` run read clean input
+`3193e30c013217c099aff475c1be578a8d9f176e`, based on
+`77616a772846395bd3cdf14fc2a74db9561d3895`. It completed in 4,190.798518
+seconds (69.8466 minutes), observing all 26,640 reviewed paths and 89,579
+executed variants: 22,630 passes, 2,350 expected negatives, and 1,660
+unsupported results, with no retries or promotions. All 6,165 partitions,
+the index, subset, and parity remained byte-identical. The result commit is
+also `3193e30c013217c099aff475c1be578a8d9f176e`; no no-op commit was created.
+The exact candidate's CI run is still pending.
 
 Publication requires focused checks and local `mise run check`, independent
 review of fixed commits, and every job of the exact candidate's CI run under
