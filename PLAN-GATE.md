@@ -3577,3 +3577,33 @@ that placement, which is not shown to be the shortest available. This lands
 with U48 and one run cannot separate their contributions.
 *docs/evidence/u49/README.md* records the measurements and what they do not
 address.
+
+### What the combined run measured (U48, U49)
+
+Run 39351734495 at `57e0d6da` ended at 49.77 minutes. The Linux side ended
+at 48.00 and the hosted macOS lanes at 49.77, 1.77 minutes apart, with
+hosted macOS last. Summed Ubuntu allocation waiting was 2.5 job-minutes
+against run 39292194312's 26.6, and 33 of the 35 Ubuntu jobs started
+within 0.5 minutes. U48's two estimates held: the eight Linux test262
+shards measured a mean of 30.1 minutes against 31.1 and a longest of
+35.87, and the two Node.js shards 20.28 and 15.70 against 20.4.
+`native support (macos-aarch64, 12/12)` ran 11.50 minutes on a Mac lane against
+the 21.73 to 25.48 it had measured hosted, the 50.80-minute hosted chain is
+gone, and the Mac lanes ended at 47.68 against the model's 47.32.
+
+With these modeled costs and the current ten indivisible hosted jobs, the
+generated placement minimizes the longest hosted macOS lane: partitioning
+them across the five lanes exhaustively gives a lowest achievable maximum
+of 2,825 seconds, or 47.08 minutes, and the placement reaches it. Going
+below that needs different job costs, different job boundaries, different
+eligibility, or more concurrency, and the `test` family that holds the
+longest measured chain is not Mac-eligible.
+
+The branch merges on the placement changes and this run, not on a best
+number: 49.77 is above main's best observed 48.53. That run had 5.1
+job-minutes of Ubuntu waiting, and across the preceding eighteen runs the
+waiting ranged from 1.2 to 88.1 while the Linux side ranged from 48.53 to
+66.25. The two ranges do not pair. Run 39126360392 ended its Linux side at
+66.25 with 1.2 job-minutes of waiting, so the per-job runner speed factor
+moves that side on its own, and U47 and U48 address only the waiting
+component. What that is worth across runs is not yet measured.

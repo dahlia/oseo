@@ -114,3 +114,36 @@ not shown to be the shortest one available, and the account's five
 concurrent hosted macOS slots cap how many hosted lanes there can be.
 
 This lands with U48 and one run cannot separate their contributions.
+
+
+What the branch run measured
+----------------------------
+
+Run 39351734495 at `57e0d6da` placed `native support (macos-aarch64, 12/12)` on
+a Mac lane, where it started at 0.43 and ran 11.50 minutes against the 21.73 to
+25.48 it had measured hosted. The 50.80-minute hosted chain is gone. The hosted
+macOS side ended at 49.77 against run 39292194312's 51.57. The Mac lanes, which
+now include the returned shard, ended at 47.68 against 46.75.
+
+The Mac-lane figure is near what the refreshed table predicts: 47.68
+measured against the 2,839 seconds, or 47.32 minutes, the model gives the
+longest Mac lane. Six of the seven refreshed entries measured between 0.90
+and 1.14 times their new values. `reflect cases (macos-aarch64, 3/3)`
+measured 0.71 of its new 685 seconds, a value its six observations already
+span.
+
+The hosted chains ended at 36.00, 38.97, 40.63, 44.72 and 49.77. The
+longest holds `test (macos-latest, node)` shards 2/4, 1/4 and 4/4, with
+48.97 minutes of work and 0.42 of waiting. The model gives those three
+45.73 minutes and gives the `node 3/4` and
+`native support (macos-aarch64, 11/12)` chain 47.08, so it expects the second
+to be the longer by 1.35; measured work put the first ahead by 4.85, that
+second chain having measured 44.12.
+
+With these modeled costs and the current ten indivisible hosted jobs, the
+generated placement minimizes the longest hosted macOS lane. Partitioning
+those ten across the five lanes exhaustively gives a lowest achievable
+maximum of 2,825 seconds, or 47.08 minutes, and the placement reaches it.
+Going below that needs different job costs, different job boundaries,
+different eligibility, or more concurrency than the account's five hosted
+macOS slots and six Macs provide.

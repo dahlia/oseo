@@ -92,3 +92,30 @@ leave margin against that timeout at the current corpus, and the
 projection above is this record's, not U6's. If the Linux shards approach
 the timeout as the corpus grows, the total has to rise again, and at that
 point the slot count is what has to give.
+
+
+What the branch run measured
+----------------------------
+
+Run 39351734495 at `57e0d6da` carried U48 and U49 together and ended at
+49.77 minutes. Its 35 hosted Ubuntu jobs waited 2.5 job-minutes in total
+against run 39292194312's 26.6, the longest single wait was 1.35 minutes
+against 9.10, and 33 of the 35 started within 0.5 minutes. The Linux side
+ended at 48.00 on the `native` aggregate, against 55.92; the longest Linux
+job, `native support (linux-x86_64-gnu, 5/7)`, waited 0.03 minutes and ran
+46.88. In this run the hosted macOS side finished last, at 49.77.
+
+The estimates held. The eight Linux test262 shards measured a mean of 30.1
+minutes against the estimated 31.1 and a longest of 35.87 against the
+120-minute timeout. The two Linux Node.js shards measured 20.28 and 15.70
+against the estimated 20.4.
+
+What this run does not establish is the waiting a later run receives.
+Across the preceding eighteen runs summed Ubuntu waiting ranged from 1.2
+to 88.1 job-minutes and the Linux side from 48.53 to 66.25 minutes, and
+the two ranges do not pair: run 39126360392 ended its Linux side at 66.25
+with 1.2 job-minutes of waiting, which the per-job runner speed factor
+accounts for and this change does not touch. What the change does is put
+the job count below the 33 that started together here, leaving fewer jobs
+that can be made to wait. Whether that lowers waiting across runs needs
+more runs.
