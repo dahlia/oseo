@@ -18499,7 +18499,7 @@ summary:
   expectedNegatives: 2423
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 23747
+  passes: 23750
   semanticFailures: 0
   unsupportedProfileFeatures: 1725
   dependencies:
@@ -18507,7 +18507,7 @@ summary:
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1397
+      passes: 1400
       semanticFailures: 0
       unsupportedProfileFeatures: 58
     - dependency: array-buffer
@@ -18563,7 +18563,7 @@ summary:
       expectedNegatives: 231
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1233
+      passes: 1236
       semanticFailures: 0
       unsupportedProfileFeatures: 61
     - dependency: data-view
@@ -18591,7 +18591,7 @@ summary:
       expectedNegatives: 418
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3648
+      passes: 3651
       semanticFailures: 0
       unsupportedProfileFeatures: 7
     - dependency: dynamic-source
@@ -18605,35 +18605,35 @@ summary:
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 991
+      passes: 992
       semanticFailures: 0
       unsupportedProfileFeatures: 33
     - dependency: expression-operators
       expectedNegatives: 399
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3556
+      passes: 3559
       semanticFailures: 0
       unsupportedProfileFeatures: 86
     - dependency: functions
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8528
+      passes: 8531
       semanticFailures: 0
       unsupportedProfileFeatures: 783
     - dependency: generators
       expectedNegatives: 200
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1631
+      passes: 1634
       semanticFailures: 0
       unsupportedProfileFeatures: 25
     - dependency: iterator-protocol
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3001
+      passes: 3004
       semanticFailures: 0
       unsupportedProfileFeatures: 412
     - dependency: json-parse
@@ -18668,7 +18668,7 @@ summary:
       expectedNegatives: 14
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1879
+      passes: 1882
       semanticFailures: 0
       unsupportedProfileFeatures: 6
     - dependency: object-own-keys
@@ -18682,7 +18682,7 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14556
+      passes: 14559
       semanticFailures: 0
       unsupportedProfileFeatures: 218
     - dependency: promise-settlement
@@ -18745,7 +18745,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1816
+      passes: 1819
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - dependency: top-level-await
@@ -18808,7 +18808,7 @@ summary:
       expectedNegatives: 89
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3722
+      passes: 3725
       semanticFailures: 0
       unsupportedProfileFeatures: 70
     - dependency: weak-collections
@@ -19257,7 +19257,7 @@ summary:
       expectedNegatives: 1353
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6310
+      passes: 6313
       semanticFailures: 0
       unsupportedProfileFeatures: 290
     - group: language/function-code

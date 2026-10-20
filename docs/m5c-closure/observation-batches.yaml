@@ -4,7 +4,7 @@
 # Selectors change only through `mise run m5c:observation-batches:plan`.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 13196
+unreviewedPaths: 13193
 basis:
   supportedFeatures:
     - AggregateError
@@ -164,8 +164,8 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 93757
-  currentSeconds: 5151
+  currentExecutedVariants: 93769
+  currentSeconds: 5152
   finalExecutedVariants: 135471
   finalSeconds: 7443
   plan:
@@ -175,7 +175,7 @@ regeneration:
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 40.76
+    scheduleHours: 40.77
     fullUpdateScheduleHours: 80.26
   alternatives:
     - batches: 36
@@ -185,7 +185,7 @@ regeneration:
         paths: 2000
         reviewUnits: 300
       scheduleHours: 63.38
-      fullUpdateScheduleHours: 125.48
+      fullUpdateScheduleHours: 125.49
     - batches: 20
       largestPaths: 2408
       largestReviewUnits: 595
@@ -341,7 +341,7 @@ batches:
     regeneration:
       executableVariants: 1248
       scopedUpdateSeconds: 69
-      fullCorpusSeconds: 5277
+      fullCorpusSeconds: 5278
   - id: observation-batch-05
     selector:
       prerequisiteSets:
@@ -440,7 +440,7 @@ batches:
     regeneration:
       executableVariants: 850
       scopedUpdateSeconds: 47
-      fullCorpusSeconds: 5371
+      fullCorpusSeconds: 5372
   - id: observation-batch-08
     selector:
       prerequisiteSets:
@@ -449,15 +449,15 @@ batches:
         - test/language/expressions/assignment/
     dependsOn:
       - observation-batch-plan
-    paths: 466
-    reviewUnits: 385
-    generatedPaths: 399
+    paths: 463
+    reviewUnits: 382
+    generatedPaths: 396
     prerequisites: {}
     dynamicSource:
       Function: 1
       eval: 5
     flags:
-      generated: 399
+      generated: 396
       noStrict: 79
       onlyStrict: 39
     includes:
@@ -466,12 +466,12 @@ batches:
     features:
       Proxy: 1
       Symbol: 5
-      Symbol.iterator: 58
+      Symbol.iterator: 55
       class: 5
       const: 2
       destructuring-assignment: 90
-      destructuring-binding: 264
-      generators: 32
+      destructuring-binding: 261
+      generators: 29
       let: 7
       new.target: 2
       object-rest: 25
@@ -484,8 +484,8 @@ batches:
       files: 213
       newFiles: 0
     regeneration:
-      executableVariants: 1324
-      scopedUpdateSeconds: 73
+      executableVariants: 1312
+      scopedUpdateSeconds: 72
       fullCorpusSeconds: 5444
   - id: observation-batch-14
     selector:
