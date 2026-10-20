@@ -458,6 +458,10 @@ mise run check
 mise run test
 ~~~~
 
+An M5c landing meets the `mise run test` and extended property requirements
+with the CI run of its exact candidate commit instead, as the Gates section of
+[*PLAN-M5C.md*](./PLAN-M5C.md) describes; `mise run check` still runs locally.
+
 The `mise run test` gate already runs `test:node`, `test:deno`, `test:native`,
 and `test:test262`, so it covers the native fixtures, the cross-target links,
 and the complete reviewed test262 corpus. `test:node` runs `node --test` at
@@ -523,11 +527,25 @@ whose text differs from what the serializer emits for its parsed values.
 
 A scoped update must be rerun after any rebase or merge that brings in a
 change outside that allow-list, because its earlier observations were made
-under the previous implementation. The runner cannot detect an omitted
-rerun; the full `test:test262` gate, which `mise run test` and every CI shard
-run, compares fresh observations against the checked-in manifest byte for
-byte and rejects a manifest whose records describe two implementations.
-Never land a scoped update with that gate skipped.
+under the previous implementation. For that decision only, a changed file
+under *tools/*, or under *tests/* outside *tests/test262/*, does not count
+when the runner cannot reach it: the file lies outside the relative-import
+closure of the runner entry points *tools/test262.ts*,
+*tools/test262-fragments.ts*, and *tools/test262-incremental.ts* at both
+commits, and no module in that closure names it as data, whether through
+`new URL(..., import.meta.url)` or a repository-relative path. Absence from
+the import closure alone is not enough, because the runner also reads files
+as data. CI scheduling tools are the usual case. The scoped mode's own refusal
+stays syntactic.
+
+The runner cannot detect an omitted rerun; the full `test:test262` gate, which
+`mise run test` and every CI shard run, compares fresh observations against the
+checked-in manifest and rejects a manifest whose records describe two
+implementations. An unsharded run compares the checked-in manifest text with
+the generated text after normalizing `CRLF` line endings to `LF`. A sharded run
+compares the values of the records it selects, so it does not detect a
+partition whose text is not canonical but parses to the same records. Never
+land a scoped update with that gate skipped.
 
 `mise run test262:reindex` executes nothing. It discovers every partition
 file on disk, requires their path set to equal the reviewed subset exactly

@@ -601,6 +601,10 @@ gates outside these totals. The model is linear in executed variants;
 compile-stage rejections cost less than a full execution, and a corpus with
 more agent or module cases can cost more.
 
+These estimates count one scoped update and one complete corpus gate per
+landing. They exclude the candidate and main workflow runs of the landing
+procedure under Gates and do not estimate elapsed time.
+
 #### Result partition overlap
 
 The reviewed manifest partitions results by ADR 0013 group and a two-character
@@ -615,10 +619,21 @@ bound the files a scoped update rewrites to one group's partitions.
 Concurrency and serialization
 -----------------------------
 
-Independent analysis and implementation nodes may run in parallel. Nodes in
-one collision group do not. Manifest regeneration, the closure ledger, graph
-state, and the normative profile are serialization points and merge one at a
-time.
+Analysis, implementation, focused tests, and review may run in parallel for
+ready, unlanded nodes, regardless of their collision groups. The collision
+groups name publication files, not sources: of the 99 groups, 86 are
+*results.yaml*, 10 *exclusion-audit.yaml*, and 3 *ledger.yaml*. Applied to
+whole nodes they made every pair of the 53 ready nodes conflict, so only one
+node could progress at a time even though the longest dependency path among
+unlanded nodes is three nodes and no ready semantic node waits for another.
+
+They therefore serialize the publication phase only. One node at a time
+rebases onto main, regenerates the manifest when its observation inputs
+changed, updates the closure ledger, graph state, parity, and normative
+profile, passes its candidate verification, and merges. Two nodes that edit
+the same source file may still be prepared concurrently; the later one to
+publish rebases onto the earlier merge, and its review covers the
+overlapping files again.
 
 Every semantic node retains the evidence contract from
 [*PLAN-M5.md*](./PLAN-M5.md): focused examples, applicable generated and
@@ -639,6 +654,26 @@ Every graph change runs `mise run check:m5c-graph`. Semantic and evidence
 changes also run the ordinary repository gates and the extended property gate
 required by [*CONTRIBUTING.md*](./CONTRIBUTING.md). Manifest regeneration uses
 the canonical task and preserves the compatibility ratchet.
+
+For M5c landings, a successful run of the exact candidate commit satisfies the
+ordinary and extended test requirements in
+[*CONTRIBUTING.md*](./CONTRIBUTING.md). `mise run check` runs locally on the
+candidate after it is rebased onto main, so the ratchet compares it with the
+main head. The candidate is then pushed to a new branch, and every job of that
+workflow run must pass. The workflow runs the component suites of
+`mise run test` and both extended property tasks, partitioned across jobs on
+both native hosts, with the same case budgets and seeds as a local run, and
+adds the sanitizer lanes. Its sharded test262 jobs compare record values rather
+than manifest text, so the candidate's manifest is also checked for canonical
+text. The merge tree must equal the candidate tree. Graph state, including the
+node's `landed` field and the expectations in *tests/m5c-graph.test.ts*, is
+part of the same candidate, which avoids an additional workflow run for a
+separate graph-state commit; the candidate and main runs are both still
+required. Graph transitions recorded in the candidate take effect for
+scheduling only after the main workflow succeeds for the exact merge commit.
+Until then, newly unblocked successors are not scheduled and the landing is not
+reported as complete. The terminal audit below still runs its gates locally
+from a clean checkout.
 
 The terminal audit additionally proves:
 
