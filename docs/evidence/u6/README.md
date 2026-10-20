@@ -546,16 +546,32 @@ total changes.
 The `typed-array-construction-order` node adds slot `0x60006e01`, one fixed
 native registration, one reference-only registration, and one compile-only
 structural registration to
-*tests/property/m5-typed-array-constructors.property.test.ts*. Run
-39070198868 measured the file's one earlier native registration at 694 Linux
-and 298 macOS seconds. The new generated domain keeps that registration's
-12-case ordinary budget, both specialization policies, and forced
-collection, so both weights are doubled to 1,388 and 596 seconds. That is an
-explicitly provisional derived estimate, not a measurement: the new
-domain's programs and the fixed registration were not timed on either
-native host before preparation stopped.
-Replace both entries with actual native CI case sums from the exact
-candidate. This update changes no case budgets, seeds, deadlines or shard
-totals.
+*tests/property/m5-typed-array-constructors.property.test.ts*. A local Linux
+whole-file extended run on 2026-10-20 at source `dd61722a` naturally exited
+zero with all five registrations passing and none skipped. Their printed
+leaf durations were 259,680.754467, 989.162278, 11.824009, 21,001.860632,
+and 240,342.915425 milliseconds. The sum is 522,026.516811 milliseconds;
+rounding its seconds up gives the Linux weight of 523. Build-tool durations
+are excluded. This is one local case-duration sum, including the reference
+and structural registrations, not a native CI or whole-suite result. The
+separate process wall time was 523.791058 seconds.
+
+The command was `mise run test:property:extended:native:shard --shard 1/1`
+with this exact property file. It retained task scale 10, seed 1592590339,
+size `large`, one file worker, and the existing per-domain budgets and
+limits. The capacity profile was `generous` (`desktop-idle`), with no CPU
+quota or memory cap. The source HEAD, tree, clean worktree, and property
+SHA-256 were identical before and after the run; the property digest was
+`69e2c66eb0aac37433d468e3f330f6b7a7f0043fbebf55ce2bb5fae83390f322`.
+The raw result, stdout, stderr, and duration lines are retained under
+*/data/oseo-m5c-reviews/typed-array-construction-order-focused-extended1/*.
+
+macOS remains unmeasured. Its weight of 225 is explicitly provisional:
+`ceil(523 * 298 / 694)`, using this file's earlier measured host ratio in
+run 39070198868. These replace the earlier provisional doubled weights of
+1,388 Linux and 596 macOS seconds. Replace the macOS estimate with an actual
+matching-host case sum when available. This measurement establishes no
+final candidate CI or full test262 UPDATE result and changes no case
+budgets, seeds, deadlines, or shard totals.
 
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906
