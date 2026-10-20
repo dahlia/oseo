@@ -7685,8 +7685,11 @@ next cases. It also covers empty patterns, nested consumer cleanup, and
 matching immediate-consumer controls. The native runner requests collection
 under both specialization policies and asserts a positive collection count.
 The structural test, “suspends assignment targets before the first iterator
-step,” checks captured iterator state, suspension before stepping, and
-return-resumption cleanup under both policies.
+step,” checks captured iterator state, suspension before stepping, the close
+operation's shared done state, and a return-resumption block that records a
+return completion and jumps. It runs under both policies. The native fixture
+and structured properties separately cover the behavior of returning into
+the suspended target and closing its unstepped iterator.
 
 The existing *m5-destructuring-assignment.property.test.ts* family retains
 slot `00`'s ten-case budget and 180-second limit. New slots `0x60001001` and
@@ -7768,9 +7771,15 @@ record bodies, their 6,165 partition footers, and the three owned pass
 records retain their earlier contents. The original `4a514037` observation
 remains historical evidence; this full observation belongs to `2ad4ae77`.
 
-Publication requires focused Mac-lane checks, whole `mise run check`,
-whole `mise run test`, and `mise run test:property:extended` on the final
-source, followed by independent review. The whole ordinary gate observes
-the complete reviewed manifest again. Gate completion is recorded against
-its exact source snapshot; no historical tree or other lane supplies this
-node's final gate evidence.
+The historical updates above ran with uncommitted iterator changes. They
+do not establish a committed observation input and result pair for D3. The
+current clean input is `3193e30c013217c099aff475c1be578a8d9f176e`, based on
+`77616a772846395bd3cdf14fc2a74db9561d3895`. Its full
+`mise run test262:update -- --accept-promotions` observation is pending;
+no result commit or fresh totals are claimed before it finishes.
+
+Publication requires focused checks and local `mise run check`, independent
+review of fixed commits, and every job of the exact candidate's CI run under
+*PLAN-M5C.md*. That CI supplies the ordinary and extended suites on both
+native hosts, including the complete reviewed manifest. No historical tree
+or other lane supplies this node's final gate evidence.
