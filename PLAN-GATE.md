@@ -3329,3 +3329,281 @@ because the sanitizer shards no longer fill them and a hosted candidate is
 scored by its own lane load. These model results favor investigating the
 placement before the sharding; *docs/evidence/u44/README.md* records both
 searches and the invariants they do not respect.
+
+### Refining the placement after the greedy pass (U45)
+
+The placement assigns each macOS job to the lane with the smallest
+projected finish at the moment it is placed and never revisits a choice, so
+an assignment that looked best against the lanes loaded at the time can
+leave the modeled maximum above what the same job set admits. U45 adds
+`refineLanes`, which sweeps two neighborhoods of the greedy placement
+afterward: moving one job to another lane, and exchanging one job on a lane
+with one on another. A candidate is accepted when it is feasible and its
+`macosLaneEnds` maximum is lower, first improvement wins, and the sweeps
+repeat until one accepts nothing.
+
+At the costs U44 committed this lowers the derived maximum from 48.79 to
+47.00 minutes. The six Mac lanes end within 1.53 minutes of each other
+rather than 2.67, with the maximum on a Mac lane at 47.00 and the next two
+at 46.98; `native support (macos-aarch64, 11/12)` and `(12/12)` move onto
+hosted lanes and the three `native (macos-aarch64, k/3)` shards end up on
+the first Mac lane together.
+
+Every candidate is re-canonicalized and checked, so a refined placement
+keeps the own-key pin, the rule that a hosted lane holding a sanitizer job
+holds nothing else, the hosted-only jobs and their leading position, and
+the rule that only an entry `measuredHostedJobs` lists reaches a hosted
+lane. The same neighborhood searched without those checks reaches 46.98
+minutes, 0.02 below the checked search's 47.00; those endpoints do not
+establish the minimum achievable with or without the invariants. With the
+lane configuration and placement rules fixed, the fixed sweep order makes
+the result deterministic for a given set of cost tables, and
+`mise run generate:macos-lanes --check` takes 0.40 seconds. With no Mac
+lane the pass does not run, leaving the pure-hosted LPT partition the
+fallback documents unchanged.
+
+The 47.00-minute result is a local optimum under feasible single moves and
+pairwise exchanges; global optimality is not established. Like every
+derived maximum in these records, it is a model output over per-job
+medians. *docs/evidence/u45/README.md* records what moved and what
+the figure does not establish.
+
+### Shortening the Linux side (U46)
+
+Branch run 39206357696 and main run 39227927384 were the first two runs in
+the window whose Linux side finished last, which is the condition U44 named
+for revisiting Linux sharding. U46 changes the partitioning of three Linux
+jobs whose durations in run 39227927384 were 48.13, 43.90, and 39.20
+minutes, and two measurements decide how.
+
+Taking each `native support (linux-x86_64-gnu, k/7)` shard's fastest
+duration over the fifteen runs since `b59ac914` gives 24.93, 23.67, 23.27,
+23.20, 25.68, 25.80, and 24.28 minutes, a maximum 1.06 times the mean.
+Those minima are consistent with a balanced partition, though they come
+from different runs and do not isolate runner speed. For six of the seven
+shards the job duration is within 1.5 to 5.2 percent of that shard's summed
+test-case duration divided by its four workers, which is consistent with
+substantial parallel work. Shard one is the exception, at 46.13 against
+38.77. It carries four files on four workers whose summed test-case
+durations are 2,732, 2,239, 2,220, and 2,106 derived seconds, and the job
+took 2,768: the largest sum plus about 20 seconds of setup is 2,752, 16
+below it. File sharding does not split a file, and for every total from 7
+to 14 `selectNativeTestShard` reports the same modeled maximum of 2,647
+derived seconds.
+
+So U46 case-shards that file, *m5-globalthis-binding*, which is the
+mechanism the two heavier files already use, and does it on Linux only. The
+weight table gives it 2,647 derived seconds on Linux against 855 on macOS,
+where the heaviest file outside the case-shard list has 1,242 and jobs
+compete for the five concurrent macOS slots the account has.
+`caseShardedNativeFiles` becomes a function of the platform. The shard
+total stays at seven: with the file excluded the heaviest remaining Linux
+file has 2,239 derived seconds and the seven-shard estimate is about 38.5
+minutes in that run's measurements, which does not establish whether a
+higher total would reduce elapsed time.
+
+U46 also splits `test (ubuntu-latest, node)` three ways and
+`host C sanitizers (Linux, property)` two ways, both through Node's own
+`--test-shard`, which partitions the files it discovers so the union equals
+the unsharded set by construction. The flag precedes every positional in
+both, which Node requires: placed after one, six files ran in all three
+shards rather than two in each.
+
+The hosted job count rises from 49 to 55. Run 39227927384 peaked at 39
+concurrent hosted jobs against the account's ceiling of 40, its 965.5
+hosted job-minutes divide by 40 slots to an idealized floor of 24.1 minutes
+against a longest hosted job of 48.13, and Linux setup measured 18 to 23
+seconds per job. Those figures suggest room for shorter jobs without
+establishing what adding them costs in queueing.
+
+Branch run 39244971256 finished green, its last job completing 55.25
+minutes after its first was created against main's 48.53. The three new
+partitions divided their work: the node shards ran 12.68, 17.28 and 11.80,
+the sanitizer shards 13.40 and 25.40, and the case shards 7.42, 9.02 and
+9.38, which took `native support (linux-x86_64-gnu, 1/7)` from 46.13 to
+26.43. The estimate of about 38.5 minutes for the remaining shards did not
+hold, because it is the mean of seven shards rather than the longest, and
+because shard one is usually not the longest: over the window shard six was
+the longest in eight of the fifteen runs and shard one in three. Shard six
+has the window's highest median at 47.55 and highest maximum at 48.23, and
+it ran 47.43 in this run, where its 57 timed cases summed to 10,947
+seconds, 45.61 minutes over four workers, with no single case above 855
+seconds.
+
+Shard one's minimum of 24.93 minutes refutes reading 2,732 derived seconds
+as a fixed bound on one worker. Comparing one shard's cases between two
+runs shows the size of the variation: all nineteen cases over five seconds
+ran 1.55 to 1.73 times slower in one run, median 1.66, on the same files,
+cases, worker count and runner image, which narrows what else differed
+without identifying it. A file-duration sum from one job is therefore not a
+fixed bound for that file in another, and the per-shard minima are within
+about 6 percent of their mean, though they come from different runs. These
+observations do not establish how much a refreshed weight table could
+improve the longest shard, so U46's three `globalThis cases` jobs are
+reverted on their added job count and the absence of an observed reduction,
+while the node and sanitizer splits stay: `test (ubuntu-latest, node)` had
+been the longest Linux job in five of the six preceding runs, and every
+shard of both splits finished earlier than shard six, which ended this
+run's Linux side at 47.48.
+
+The run's 55.25 minutes belong to the macOS side, which U47 takes up. Both
+sources of variance U44 measured produced this outcome. The macOS side
+ended at 46.67, 47.72, 49.63, 50.22, 53.77 and 63.17 in the six preceding
+runs, above 47.48 in five of them, so shortening Linux below 47.48 would
+have saved 0.81 minutes once and nothing otherwise.
+*docs/evidence/u46/README.md* records the measurements and what they do not
+address.
+
+### Making the readiness probe the first stage (U47)
+
+`macOS self-hosted availability` runs for about twenty seconds and holds
+all six Mac lanes, because each lane job's `runs-on` reads one of its
+outputs. It needs a GitHub-hosted Ubuntu runner for that and, until now,
+asked for one with no prerequisites, alongside every other job. Its
+allocation wait measured 0.02 to 0.05 minutes in five runs, 2.43 in run
+39234170440 and 6.97 in run 39244971256; those two are the runs whose
+observed peak concurrent hosted jobs reached 39 against the account's
+ceiling of 40. Job count alone does not predict it, since run 39234170440
+had the same 37 hosted Ubuntu jobs as the five that did not wait. The
+probe's completion bounds every lane start, so holding the later timings
+fixed each additional minute it waits delays every lane end by a minute:
+run 39244971256's lanes all started at 7.33 against 0.42 in run
+39227927384, with overlapping lane work, 39.43 to 47.35 against 43.02 to
+46.03, and lane idle between 0.15 and 0.30 in both.
+
+Which jobs wait is not something the workflow selects, so U47 removes the
+exposure instead of ordering the queue. The generated workflow now makes
+every other job depend on the probe, directly or transitively, leaving it
+the only job in the workflow eligible for a runner when a run starts; the
+probe can still wait for capacity another run is using. A hosted lane's
+head takes the prerequisite directly while the rest of each hosted lane
+still chains to its predecessor. The jobs that take it directly without
+reading the probe's outputs also gain `if: ${{ !cancelled() }}`, so a
+failed probe cannot turn one twenty-second job into a run that tested
+nothing. With no Mac lane configured the generator emits no probe and adds
+no prerequisite.
+
+The cost is that every other job starts after the probe finishes, which in
+the five runs whose probe did not wait was 0.32 to 0.40 minutes into the
+run. The ceiling is unchanged, so jobs that do not gate the lanes still
+queue: run 39244971256 measured 59.6 job-minutes of Ubuntu allocation
+waiting over 43 jobs against 5.1 over 37, and reverting U46's case shards
+returns the count to 40 rather than below the thirty-five that run observed
+starting at once. Whether a run gains depends on whether its probe would
+have waited, which is not known in advance.
+Branch run 39292194312 measured the probe at a 0.05-minute wait and all
+six lanes starting at 0.48 against the 0.42 of run 39227927384, so in a
+run whose probe would not have waited the prerequisite cost 0.06, and lane
+work stayed ordinary at 39.72 to 46.13. The run did not get shorter,
+because the queueing moved rather than disappearing: its Linux side ended
+at 55.42 on `native support (linux-x86_64-gnu, 5/7)`, which waited 8.57
+minutes and then ran 46.42, while shard six waited 0.03 and ended at 48.37
+after 47.90 of work. No run since has saturated the ceiling, which is the
+case the change exists for.
+*docs/evidence/u47/README.md* records the measurements and what they do not
+address.
+
+### Fitting the Ubuntu jobs to the slots (U48)
+
+Thirty-four of run 39292194312's forty hosted Ubuntu jobs started within
+0.48 minutes and five of the rest waited, two of them the long
+`native support` shards above. Waiting extends the Linux finish once it
+exceeds a job's slack, which a short job has and a long one does not, so
+which jobs lose the allocation decides the finish, and nothing in the
+workflow selects that.
+Summed Ubuntu allocation waiting was 26.6 job-minutes, between run
+39227927384's 5.1 and run 39244971256's 59.6.
+
+U48 keeps the seven `native support` shards, because fewer of them
+lengthens the longest, and keeps the six case-shard jobs, which exist to
+take two files out of the file shards. That leaves the two families whose
+longest job is far below the finish: Linux test262 goes from twelve shards
+to eight and the Linux Node.js suite from three to two, both per-entry
+matrix totals, so macOS keeps the twelve test262 shards U6 chose for
+timeout margin. Dividing this run's measured work across the new totals
+estimates 31.1 and 20.4 minutes against measured maxima of 27.27 and
+16.12; at those means both stay below the shards that determine Linux
+completion, and at twice them test262 would be the longest Linux family
+but still inside its 120-minute timeout. The hosted Ubuntu count falls
+from 40 to 35, which reduces how many jobs can be made to wait rather
+than establishing that none will.
+
+This reverses part of U6's choice for Linux only, and the corpus
+projection is U48's rather than U6's; if the Linux shards approach the
+timeout as the corpus grows, the slot count is what has to give. Nothing
+here reduces the Linux work itself, and the account shares the ceiling, so
+a run that overlaps another can still queue whatever it has.
+*docs/evidence/u48/README.md* records the measurements and what they do not
+address.
+
+### Charging the hosted lanes what they measured (U49)
+
+U45's refinement accepted two moves that sent
+`native support (macos-aarch64, 11/12)` and `12/12` from `oseo-mac-5` and
+`oseo-mac-2` to hosted lanes, where they measured 25.23, 17.30 and 26.07
+and 21.73, 25.00 and 25.48 minutes against 10.53, 9.95 and 9.15, 9.03 on
+the Mac lanes. The model prices hosted execution of the family higher too,
+at the 3.4 of `selfHostedFamilySpeedRatios`, and accepted the moves anyway
+under the hosted costs it carried. Reconstructing run 39292194312's hosted
+chains from the generated `needs` edges, the longest ended at 51.57, later
+than every Mac lane, carrying 50.80 minutes of work against 0.33 of
+waiting on top of the probe's 0.43, where the model gave it 42.18 from
+1,311 seconds for its Node.js shard and 1,220 for `12/12`. U44 had set that
+1,220 from two observations, 1,044 and 1,397 seconds; the three since are
+1,304, 1,500 and 1,529.
+
+U49 gives seven entries the median of their hosted observations since
+`b59ac914`, those whose median had moved by at least five percent: the two
+macOS sanitizer jobs, `native support (macos-aarch64, 11/12)` and `12/12`,
+`test (macos-latest, node, 1/4)`, and two `reflect cases` shards. The
+refinement then places `12/12` on a Mac lane and leaves `11/12` hosted at
+a modeled 47.08 against the 46.18 minutes of work that pairing measured.
+Refreshing `12/12` alone leaves it hosted, so the pair of `native support`
+entries is what the earlier placement turned on. The model's
+highest lane end rises from 47.00 to 47.31 minutes and the highest
+`macosLaneEnds` value from 2,820 to 2,839 seconds, which is the point: the
+previous maximum was reached by charging a hosted lane less than it
+measured, and an entry below its observations buys placements that do not
+hold.
+
+The refreshed values are medians, not bounds, and the hosted lanes carry
+the widest spreads, from 1,700 to 3,146 seconds on the sanitizer property
+job. Four entries rest on six or fewer observations, including both
+`native support` shards, and the two sanitizer entries separately trade
+sample size for recency. Nothing here reduces the macOS work, which the
+model now prices at 47.31 minutes at the longest across five hosted and
+six Mac lanes; a greedy pass and a first-improvement local search reached
+that placement, which is not shown to be the shortest available. This lands
+with U48 and one run cannot separate their contributions.
+*docs/evidence/u49/README.md* records the measurements and what they do not
+address.
+
+### What the combined run measured (U48, U49)
+
+Run 39351734495 at `57e0d6da` ended at 49.77 minutes. The Linux side ended
+at 48.00 and the hosted macOS lanes at 49.77, 1.77 minutes apart, with
+hosted macOS last. Summed Ubuntu allocation waiting was 2.5 job-minutes
+against run 39292194312's 26.6, and 33 of the 35 Ubuntu jobs started
+within 0.5 minutes. U48's two estimates held: the eight Linux test262
+shards measured a mean of 30.1 minutes against 31.1 and a longest of
+35.87, and the two Node.js shards 20.28 and 15.70 against 20.4.
+`native support (macos-aarch64, 12/12)` ran 11.50 minutes on a Mac lane against
+the 21.73 to 25.48 it had measured hosted, the 50.80-minute hosted chain is
+gone, and the Mac lanes ended at 47.68 against the model's 47.32.
+
+With these modeled costs and the current ten indivisible hosted jobs, the
+generated placement minimizes the longest hosted macOS lane: partitioning
+them across the five lanes exhaustively gives a lowest achievable maximum
+of 2,825 seconds, or 47.08 minutes, and the placement reaches it. Going
+below that needs different job costs, different job boundaries, different
+eligibility, or more concurrency, and the `test` family that holds the
+longest measured chain is not Mac-eligible.
+
+The branch merges on the placement changes and this run, not on a best
+number: 49.77 is above main's best observed 48.53. That run had 5.1
+job-minutes of Ubuntu waiting, and across the preceding eighteen runs the
+waiting ranged from 1.2 to 88.1 while the Linux side ranged from 48.53 to
+66.25. The two ranges do not pair. Run 39126360392 ended its Linux side at
+66.25 with 1.2 job-minutes of waiting, so the per-job runner speed factor
+moves that side on its own, and U47 and U48 address only the waiting
+component. What that is worth across runs is not yet measured.

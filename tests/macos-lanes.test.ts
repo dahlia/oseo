@@ -255,7 +255,9 @@ test("every check name and concurrency policy is preserved", () => {
       ...nameBaseline.checkNamesObserved.filter(
         (name: string) =>
           !name.startsWith("native support (linux-x86_64-gnu,") &&
+          !name.startsWith("test262 (linux-x86_64-gnu,") &&
           name !== "test (macos-latest, node)" &&
+          name !== "test (ubuntu-latest, node)" &&
           name !== "host C sanitizers (Linux)",
       ),
       // The Linux native sanitizer fixtures are partitioned by the
@@ -265,16 +267,31 @@ test("every check name and concurrency policy is preserved", () => {
         (_, index) => `host C sanitizers (Linux, ${index + 1}/3)`,
       ),
       // The hosted macOS Node.js suite is partitioned by Node's own
-      // --test-shard; see PLAN-GATE.md (U32).
+      // --test-shard; see PLAN-GATE.md (U32), and the Linux one the same
+      // way; see PLAN-GATE.md (U46).
       ...Array.from(
         { length: 4 },
         (_, index) => `test (macos-latest, node, ${index + 1}/4)`,
       ),
       ...Array.from(
+        { length: 2 },
+        (_, index) => `test (ubuntu-latest, node, ${index + 1}/2)`,
+      ),
+      // The Linux test262 total fell from twelve to eight so that the
+      // run's Ubuntu jobs fit the slots it receives; see PLAN-GATE.md
+      // (U48). macOS keeps twelve, which U6 chose for timeout margin.
+      ...Array.from(
+        { length: 8 },
+        (_, index) => `test262 (linux-x86_64-gnu, ${index + 1}/8)`,
+      ),
+      ...Array.from(
         { length: 7 },
         (_, index) => `native support (linux-x86_64-gnu, ${index + 1}/7)`,
       ),
-      "host C sanitizers (Linux, property)",
+      ...Array.from(
+        { length: 2 },
+        (_, index) => `host C sanitizers (Linux, property, ${index + 1}/2)`,
+      ),
       // The Reflect namespace property file now runs in dedicated
       // case-shard jobs on both native hosts, outside the file shards;
       // see PLAN-GATE.md (U38).
@@ -286,7 +303,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 78);
+  assert.equal(names(after).length, 76);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -370,14 +387,15 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // twenty-two attempts, then four more from the first run of its
   // placement, U41 refreshed every macos-aarch64 entry observed hosted
   // since b59ac914, U42 refreshed the three its own runs added, U43
-  // three after that and three more from its own run, and U44 the three
-  // its merged main run observed. See PLAN-GATE.md
-  // (U33, U40, U41, U42, U43, U44).
+  // three after that and three more from its own run, U44 the three its
+  // merged main run observed, and U49 the seven whose observed hosted
+  // median had moved by at least five percent. See PLAN-GATE.md
+  // (U33, U40, U41, U42, U43, U44, U49).
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    12336,
+    12229,
   );
 });
 
@@ -450,10 +468,14 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
   const native = after.jobs.test_sanitizer!;
   const property = after.jobs.test_sanitizer_property!;
   assert.equal(native.name, "host C sanitizers (Linux, ${{ matrix.shard }}/3)");
-  assert.equal(property.name, "host C sanitizers (Linux, property)");
+  assert.equal(
+    property.name,
+    "host C sanitizers (Linux, property, ${{ matrix.shard }}/2)",
+  );
   assert.equal(native["timeout-minutes"], 45);
-  assert.equal(property["timeout-minutes"], 75);
+  assert.equal(property["timeout-minutes"], 45);
   assert.deepEqual(entries(native), [{ shard: 1 }, { shard: 2 }, { shard: 3 }]);
+  assert.deepEqual(entries(property), [{ shard: 1 }, { shard: 2 }]);
   assert.deepEqual(
     native.steps.filter((step) => step.run).map((step) => step.run),
     [
@@ -471,7 +493,12 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
   );
   assert.deepEqual(
     property.steps.filter((step) => step.run).map((step) => step.run),
-    ["mise run test:sanitizer:self", "mise run test:sanitizer:property"],
+    [
+      "mise run test:sanitizer:self",
+      "mise run test:sanitizer:property:shard " +
+        "--test-shard=${{ matrix.shard }}/2 " +
+        "tests/property/*.property.test.ts",
+    ],
   );
   assert.deepEqual(native.steps.slice(0, 3), property.steps.slice(0, 3));
   assert.equal(native["runs-on"], "ubuntu-latest");
@@ -503,7 +530,7 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
     ...nativeUpload,
     with: {
       ...parsedMapping(nativeUpload.with, "Native sanitizer artifact"),
-      name: "host-cc-sanitizer-property-failures",
+      name: "host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-2",
     },
   });
 });
@@ -668,10 +695,10 @@ test("one extra lane retains every job and aggregate dependency", () => {
   )) {
     const actual = workflow.jobs[planned.id]!;
     assert.equal(actual["runs-on"], planned.os);
-    assert.ok(
-      actual.needs == null ||
-        !JSON.stringify(actual.needs).includes("mac_ready"),
-    );
+    // A hosted lane head waits for the probe so that nothing competes with
+    // it for the first slot, but no hosted job takes its runner from the
+    // probe's outputs.
+    assert.ok(!JSON.stringify(actual).includes("mac_ready.outputs"));
   }
   assert.deepEqual(
     names(workflow).filter((name) => name !== "macOS self-hosted availability"),
@@ -1008,7 +1035,7 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 8288);
+  assert.equal(Math.round(modeled), 8730);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1040,8 +1067,13 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // Placing them last gave three lanes one Mac-eligible job each, which
   // U40 measured at 3.2 to 4.2 times its Mac wall; see PLAN-GATE.md (U40).
   // U41's refreshed Mac seconds raised this from 2610 by charging the Mac
-  // lanes what they measured rather than what stale entries claimed.
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2928);
+  // lanes what they measured rather than what stale entries claimed, and
+  // U45's refinement pass lowered it from 2928 by moving and exchanging
+  // single jobs after the greedy pass; see PLAN-GATE.md (U45). U49's
+  // refreshed hosted entries raised it from 2820 by charging the hosted
+  // lanes what they measured, which moved a `native support` shard off a
+  // hosted lane; see PLAN-GATE.md (U49).
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2839);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {
@@ -1289,12 +1321,16 @@ test("six Mac lanes route each label with its own hosted fallback", () => {
   );
   assert.match(String(probe.if), /github\.event_name == 'push'/);
   for (const [index, lane] of lanes.entries()) {
-    for (const job of lane) {
+    for (const [position, job] of lane.entries()) {
       const actual = workflow.jobs[job.id]!;
       assert.equal(actual.name, job.name);
       if (index < 5) {
         assert.equal(actual["runs-on"], job.os);
-        assert.ok(!JSON.stringify(actual.needs ?? "").includes("mac_ready"));
+        // The head waits for the probe; the rest chain in lane order.
+        assert.equal(
+          actual.needs,
+          position === 0 ? "mac_ready" : lane[position - 1]!.id,
+        );
         continue;
       }
       assert.equal(

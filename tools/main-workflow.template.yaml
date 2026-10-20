@@ -62,10 +62,9 @@ jobs:
       fail-fast: false
       matrix:
         # Explicit combinations: the hosted macOS Node.js suite runs in
-        # test_node_shard instead, so only Deno joins from macOS here.
+        # test_node_shard and the Linux one in test_node_shard_linux, so
+        # only Deno joins from either of those hosts here.
         include:
-          - os: ubuntu-latest
-            runtime: node
           - os: ubuntu-latest
             runtime: deno
           - os: macos-latest
@@ -108,6 +107,38 @@ jobs:
             total: 4
           - shard: 4
             total: 4
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node
+          --test-shard=${{ matrix.shard }}/${{ matrix.total }}
+
+  # Linux only. Over the fifteen runs since b59ac914 the unsharded job
+  # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
+  # than a workload difference: all 1,623 tests scale together and
+  # `mise run test:node` is the only step of consequence, the rest taking
+  # 16 to 23 seconds. It ended run 39206357696 at 48.52 minutes. Node's
+  # own --test-shard partitions the files it discovers, so the union of
+  # the shards equals the unsharded set by construction.
+  test_node_shard_linux:
+    name: >-
+      test (ubuntu-latest, node,
+      ${{ matrix.shard }}/${{ matrix.total }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+            total: 2
+          - shard: 2
+            total: 2
     steps:
       - uses: actions/checkout@v7
         with:
@@ -200,11 +231,17 @@ jobs:
           if-no-files-found: warn
 
   test_sanitizer_property:
-    name: host C sanitizers (Linux, property)
+    name: host C sanitizers (Linux, property, ${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
-    # Run 37999730012 measured 45.52 minutes for properties.
-    # 75 minutes leaves room for preflight, setup, and cold caches.
-    timeout-minutes: 75
+    # The full suite took 24.80 to 48.30 minutes across fifteen runs.
+    # Two shards leave slow-runner and cold-cache margin within 45 minutes.
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - shard: 1
+          - shard: 2
     steps:
       - uses: actions/checkout@v7
         with:
@@ -215,13 +252,16 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
         with:
           toolchain: host-cc
-      # Each suite retains its own instrumentation preflight.
+      # Each shard retains its own instrumentation preflight.
       - run: mise run test:sanitizer:self
-      - run: mise run test:sanitizer:property
+      - run: >-
+          mise run test:sanitizer:property:shard
+          --test-shard=${{ matrix.shard }}/2
+          tests/property/*.property.test.ts
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-property-failures
+          name: host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-2
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
@@ -291,51 +331,35 @@ jobs:
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 1
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 2
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 3
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 4
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 5
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 6
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 7
-            total: 12
+            total: 8
           - os: ubuntu-latest
             target: linux-x86_64-gnu
             shard: 8
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 9
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 10
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 11
-            total: 12
-          - os: ubuntu-latest
-            target: linux-x86_64-gnu
-            shard: 12
-            total: 12
+            total: 8
           - os: macos-15
             target: macos-aarch64
             shard: 1
