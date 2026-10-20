@@ -8346,10 +8346,15 @@ native differential fixture now counts the `then` arguments of `finally`
 itself (two) and of both inner closures (one), on the fulfilled and rejected
 paths. Node.js and Deno print the expected counts. The fixture runs under both
 specialization policies with collection forced at every safepoint. Its false
-hint and shape-guard miss already reach the generic fallback. The generated
-domain at seed `0x60003800` keeps its generator and budget. It already draws
-`finally` passthrough over settled values. The node adds no domain or seed,
-because a counted `then` adds no input shape for a generator to vary.
+hint and shape-guard miss already reach the generic fallback. The same
+fixture carries the fixed `finally` passthrough evidence: a fulfilled 17 and
+a rejected `Error` reach the next reaction unchanged, and a callback that
+returns a promise keeps the original fulfilled 19 or rejected 20. The
+generated domain at seed `0x60003800` keeps its generator and budget. Its
+chain ends in `finally` on a promise fulfilled with `undefined` and only logs
+that the callback ran, so it covers callback execution, not value or reason
+passthrough. The node adds no domain or seed, because a counted `then` adds no
+input shape for a generator to vary.
 
 The native fixture and the test262 observation of the 30 paths have not run
 during preparation. The classifications in *tests/test262/subset.yaml* stay

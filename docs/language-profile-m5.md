@@ -141,13 +141,17 @@ under *test/built-ins/Promise/prototype/finally/*, asserts that the closures
 argument. The runtime passed a trailing `undefined`, so `arguments.length` was
 two. Both closures now invoke `then` with one argument, while `finally` itself
 and `catch` still pass two. The fixed `promise-intrinsic` differential fixture
-checks both counts on the fulfilled and rejected paths. The generated domain at
-seed `0x60003800` already covers `finally` settlement passthrough. No generator
-models a patched `then` that counts its arguments. The fixed fixture covers
-that observation instead because generating such programs would add no new
-input shape. The runtime ABI is unchanged: no layout, entry point, or
-intrinsic changes. The two unreviewed *subclass-Promise.js* paths
-under *test/language/expressions/class/subclass-builtins/* and
+checks both counts on the fulfilled and rejected paths. The same fixture
+checks that `finally` passes a fulfilled value and a rejection reason through
+unchanged, including when its callback returns a promise. The generated domain
+at seed `0x60003800` covers only `finally` callback execution: its chain ends
+in `finally` on a promise fulfilled with `undefined` and observes nothing after
+it. No generator models settlement passthrough or a patched `then` that counts
+its arguments. The fixed fixture covers both observations instead because
+generating such programs would add no new input shape. The runtime ABI is
+unchanged: no layout, entry point, or intrinsic changes. The two unreviewed
+*subclass-Promise.js* paths under
+*test/language/expressions/class/subclass-builtins/* and
 *test/language/statements/class/subclass-builtins/* stay with node
 `observation-batch-32`. Their classifications await that observation, and this
 node claims no manifest count before its update runs.
