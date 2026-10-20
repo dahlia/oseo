@@ -577,3 +577,39 @@ overrides:
     transition:
       from: 2
       to: absent
+  - invariant: property-seed
+    domain:
+      one of eleven constructors, zero to eight bounded Number or BigInt inputs,
+      one iterable, array-like, buffer, or typed-array construction path, one
+      clone, one out-of-bounds conversion, one fixed or offset length-tracking
+      out-of-bounds clone, one default-chain own shadow or null-prototype
+      deferred accessor, one custom or null-prototype toStringTag lookup, live
+      and out-of-bounds element enumerability, canonical numeric misses, one
+      own, custom, or null-prototype iterator lookup, one false numeric hint,
+      and one mutable intrinsic global write and restore
+    reason: Renames the 0x60006e00 domain key from one of eleven constructors to
+      one of twelve constructors after Float16Array joined its shared Number
+      pool. Seed 0x60006e00, the 12-case budget, the 180-second limit, the
+      generator, and structured shrinking are unchanged, and every original
+      constructor remains drawable.
+    transition:
+      from: 1610640896
+      to: absent
+  - invariant: property-case-budget
+    domain:
+      one of eleven constructors, zero to eight bounded Number or BigInt inputs,
+      one iterable, array-like, buffer, or typed-array construction path, one
+      clone, one out-of-bounds conversion, one fixed or offset length-tracking
+      out-of-bounds clone, one default-chain own shadow or null-prototype
+      deferred accessor, one custom or null-prototype toStringTag lookup, live
+      and out-of-bounds element enumerability, canonical numeric misses, one
+      own, custom, or null-prototype iterator lookup, one false numeric hint,
+      and one mutable intrinsic global write and restore
+    reason: Renames the 0x60006e00 domain key from one of eleven constructors to
+      one of twelve constructors after Float16Array joined its shared Number
+      pool. Seed 0x60006e00, the 12-case budget, the 180-second limit, the
+      generator, and structured shrinking are unchanged, and every original
+      constructor remains drawable.
+    transition:
+      from: 12
+      to: absent

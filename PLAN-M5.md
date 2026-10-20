@@ -8111,31 +8111,53 @@ harness therefore also iterates Float16Array, so the complete manifest
 update observes all of them again; none is assumed to pass.
 
 The *m5-typed-array-constructors.property.test.ts* family keeps slots
-`0x60006e00` and `0x60006e01` and their eleven-constructor domains. New slot
-`0x60006e02` draws one to six binary64 operands: arbitrary doubles, doubles
-within the binary16 range or subnormal band, and signed binary16 values,
-the exact midpoints to their successors, and the adjacent binary64 values
-around those midpoints, including the 65520 overflow threshold. Each program
-stores them through array-like or Float64Array construction, element
-assignment, or DataView `setFloat16`, reads every element through the view
-and DataView, and adds the family's false numeric hint. The oracle rounds by
-exact BigInt arithmetic over the binary64 encoding, independently of
-`Math.f16round`, the runtime, and both references; a compile-free registration
-pins its boundary cases. Native runs use both specialization policies with
-collection at every safepoint and assert positive collection and, when
-enabled, guard-miss counts, with 12 ordinary cases and a 180-second limit.
-The fixed `typed-array-float16` native fixture covers the descriptors, the
-global property, `typeof`, rounding edges, every construction path, content
-type and alignment errors, DataView interop, NaN bits, sorting, search, and
-`Atomics` rejection, and joins the structural, forced-collection, and
-guard-miss lists of *tests/native.ts*.
+`0x60006e00` and `0x60006e01`, their seeds, 12-case budgets, 180-second
+limits, and structured shrinking, and appends `Float16Array` to their shared
+Number constructor pool, so both draw one of twelve constructors. The
+existing domains' construction, prototype, iterator, shadow, out-of-bounds,
+global, primitive conversion, error, detached, offset, mixed-content, and
+order cases therefore reach `Float16Array` as well, and their element
+conversion uses the binary16 oracle below. Appending keeps every earlier
+constructor's shrink position, though the larger pool changes which cases
+each seed draws. The pure reference
+registration enumerates the same 480 subjects for each of the twelve
+constructors, 5,760 in all. Because the compatibility ratchet identifies a
+generated domain by its description, the `0x60006e00` description's change
+from eleven to twelve constructors carries two reviewed overrides, a
+`property-seed` and a `property-case-budget` transition from the old
+description to `absent`. They rename the key only; the seed and budget
+are unchanged under the new description. `0x60006e01` is new since the
+ratchet baseline and needs none. New slot `0x60006e02` draws one to six binary64
+operands: arbitrary doubles, doubles within the binary16 range or subnormal
+band, and signed binary16 values, the exact midpoints to their successors, and
+the adjacent binary64 values around those midpoints, including the 65520
+overflow threshold. Each program stores them through array-like or Float64Array
+construction, element assignment, or DataView `setFloat16`, reads every element
+through the view and DataView, and adds the family's false numeric hint. The
+oracle rounds by exact BigInt arithmetic over the binary64 encoding,
+independently of `Math.f16round`, the runtime, and both references; a
+compile-free registration pins its boundary cases. Native runs use both
+specialization policies with collection at every safepoint and assert positive
+collection and, when enabled, guard-miss counts, with 12 ordinary cases and a
+180-second limit. The fixed `typed-array-float16` native fixture covers the
+descriptors, the global property, `typeof`, rounding edges, every construction
+path, content type and alignment errors, DataView interop, NaN bits, sorting,
+search, and `Atomics` rejection, and joins the structural, forced-collection,
+and guard-miss lists of *tests/native.ts*.
 
 Preparation ran no native build or execution. A syntax-only C check of
 every runtime source passed. Node.js 24.21.0 and Deno 2.9.7 produced
 identical fixture output, and 300 sampled generated programs matched the
 oracle under Node.js, with every fiftieth also under Deno; the sampled
-programs compiled under both policies. Those are reference and compile
-observations, not native evidence. The native fixture and generated domain,
+programs compiled under both policies. After `Float16Array` joined the shared
+pool, 40 sampled `0x60006e00` programs for it matched the model under both
+references, the oracle agreed with Node.js `Math.f16round` on the pool's
+constants and 200,000 sampled integers, and all 480 order subjects for it
+matched the labeled V8 models, Deno also matching the normative model for a
+`Symbol` length under a throwing bound new target. Twenty sampled programs
+for it from each of those two domains compiled under both policies with the
+asserted MIR guards. Those are reference and compile observations, not
+native evidence. The native fixture and generated domain,
 the complete `mise run test262:update -- --accept-promotions`, the derived
 ledger, batch, graph, and profile counts, and the shard weights' measurement
 remain pending. Already-reviewed paths may move only toward `pass`.

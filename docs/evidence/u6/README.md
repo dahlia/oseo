@@ -611,12 +611,13 @@ total changes.
 The `typed-array-feature-admission` node adds slot `0x60006e02`, its
 compile-free oracle registration, and the fixed `typed-array-float16` native
 fixture. The new generated domain keeps the family's 12-case ordinary
-budget, both specialization policies, and forced collection, so the file's
-weights become provisional triplings of run 39070198868's single-domain
-measurement: 2,082 Linux and 894 macOS seconds. The domain's programs are
-smaller than the first domain's, so this likely overestimates it, but no
-native host timed it before preparation stopped. Replace both entries with
-actual native CI case sums from the exact candidate. This update changes no
-case budgets, seeds, deadlines or shard totals.
+budget, both specialization policies, and forced collection. The retained
+weights, 523 Linux and 225 macOS seconds, describe the pre-Float16Array
+TypedArray constructor file: Linux was measured locally, and macOS remains
+an unmeasured estimate. The complete file with Float16Array has not yet
+been measured. Replace the retained weights after a complete native Linux
+file measurement, and disclose any macOS model as unmeasured until matching
+host evidence exists. This update changes no case budgets, seeds, deadlines,
+or shard totals.
 
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

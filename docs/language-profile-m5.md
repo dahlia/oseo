@@ -6271,13 +6271,16 @@ for every conversion and content-type check, and every `Atomics` operation
 rejects a Float16Array with `TypeError`. The global property is writable,
 non-enumerable, and configurable like the other constructors, and `typeof`
 reads it. The node also admits the frontmatter tags of the nine other
-concrete constructors that the reviewed feature list lacked. Generated
-evidence at seed `0x60006e02` checks rounding at binary16 midpoints and
-their binary64 neighbors against an exact BigInt oracle through
-construction, element assignment, and DataView, and the fixed
-`typed-array-float16` native fixture covers the constructor surface.
-Preparation ran no native build or execution and no manifest update; those
-observations are pending.
+concrete constructors that the reviewed feature list lacked. The generated
+domains at seeds `0x60006e00` and `0x60006e01` draw `Float16Array` from
+their shared Number constructor pool, so construction, prototype, iterator,
+out-of-bounds, global, primitive length, and construction-order cases cover
+it like the other eleven kinds. Generated evidence at seed `0x60006e02`
+checks rounding at binary16 midpoints and their binary64 neighbors against an
+exact BigInt oracle through construction, element assignment, and DataView,
+and the fixed `typed-array-float16` native fixture covers the constructor
+surface. Preparation ran no native build or execution and no manifest update;
+those observations are pending.
 
 The reviewed test262 subset adds 81 directly applicable paths from the node's
 736-path inventory. Fourteen BigInt constructor and prototype metadata cases

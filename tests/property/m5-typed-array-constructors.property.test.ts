@@ -29,6 +29,7 @@ const { assertAsyncProperty } = await import(
 type ConstructorName =
   | "BigInt64Array"
   | "BigUint64Array"
+  | "Float16Array"
   | "Float32Array"
   | "Float64Array"
   | "Int16Array"
@@ -67,6 +68,7 @@ const numberConstructors: readonly ConstructorName[] = [
   "Uint32Array",
   "Uint8Array",
   "Uint8ClampedArray",
+  "Float16Array",
 ];
 
 const bigintConstructors: readonly ConstructorName[] = [
@@ -329,6 +331,66 @@ void ${input};
 `;
 }
 
+/*
+ * Float16Array conversion. ECMA-262 2025 NumericToRawBytes rounds a Number
+ * once, directly from binary64, to the nearest IEEE 754-2019 binary16 value
+ * with ties to even; values at or past 65520 become signed infinity. The
+ * oracle below reaches that answer by exact BigInt arithmetic over the
+ * operand's binary64 encoding, independently of Math.f16round, the
+ * runtime's DataView encoder, and both reference engines.
+ */
+
+const float64Bits = new BigUint64Array(1);
+const float64Value = new Float64Array(float64Bits.buffer);
+
+/* Exact |value| as `significand * 2 ** exponent`, for a finite value. */
+function binary64Parts(value: number): {
+  readonly exponent: number;
+  readonly significand: bigint;
+} {
+  float64Value[0] = Math.abs(value);
+  const bits = float64Bits[0] ?? 0n;
+  const field = Number((bits >> 52n) & 0x7ffn);
+  const fraction = bits & 0xf_ffff_ffff_ffffn;
+  return field === 0
+    ? { exponent: -1074, significand: fraction }
+    : { exponent: field - 1075, significand: fraction | (1n << 52n) };
+}
+
+function binary16Value(bits: number): number {
+  const field = (bits >> 10) & 0x1f;
+  const fraction = bits & 0x3ff;
+  const magnitude =
+    field === 0 ? fraction * 2 ** -24 : (fraction + 1024) * 2 ** (field - 25);
+  return (bits & 0x8000) === 0 ? magnitude : -magnitude;
+}
+
+function roundToBinary16(value: number): number {
+  if (Number.isNaN(value) || value === 0 || !Number.isFinite(value)) {
+    return value;
+  }
+  const { exponent, significand } = binary64Parts(value);
+  const highest = significand.toString(2).length - 1 + exponent;
+  // Every subnormal shares the smallest normal's quantum, 2 ** -24.
+  const quantum = Math.max(highest, -14) - 10;
+  let units: bigint;
+  if (exponent >= quantum) {
+    units = significand << BigInt(exponent - quantum);
+  } else {
+    const shift = BigInt(quantum - exponent);
+    const truncated = significand >> shift;
+    const remainder = significand - (truncated << shift);
+    const half = 1n << (shift - 1n);
+    units =
+      remainder > half || (remainder === half && (truncated & 1n) === 1n)
+        ? truncated + 1n
+        : truncated;
+  }
+  const magnitude = Number(units) * 2 ** quantum;
+  const rounded = magnitude > 65504 ? Infinity : magnitude;
+  return value < 0 ? -rounded : rounded;
+}
+
 function integerModulo(value: number, bits: number): number {
   if (!Number.isFinite(value) || value === 0) return 0;
   const modulus = 2 ** bits;
@@ -365,6 +427,7 @@ function convert(
     }
     return unsigned;
   }
+  if (constructorName === "Float16Array") return roundToBinary16(value);
   if (constructorName === "Float32Array") return Math.fround(value);
   if (constructorName === "Float64Array") return value;
   if (constructorName === "Uint8ClampedArray") return clampUint8(value);
@@ -520,8 +583,10 @@ test(
                   host.executionHost.architecture,
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
+        // The ratchet keys domains by this text; its eleven-to-twelve
+        // rename has a reviewed override and keeps the seed and budget.
         domain:
-          "one of eleven constructors, zero to eight bounded Number or " +
+          "one of twelve constructors, zero to eight bounded Number or " +
           "BigInt inputs, one iterable, array-like, buffer, or typed-array " +
           "construction path, one clone, one out-of-bounds conversion, " +
           "one fixed or offset length-tracking out-of-bounds clone, one " +
@@ -658,6 +723,7 @@ const primitiveConversions = {
 const elementBytes = {
   BigInt64Array: 8,
   BigUint64Array: 8,
+  Float16Array: 2,
   Float32Array: 4,
   Float64Array: 8,
   Int16Array: 2,
@@ -1261,7 +1327,7 @@ test(
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
         domain:
-          "one of eleven constructors and one to four construction " +
+          "one of twelve constructors and one to four construction " +
           "subjects; each takes no argument, one of eleven primitive " +
           "lengths through a false numeric hint, a fixed, resizable, or " +
           "detached ArrayBuffer with converted offset and optional length, " +
@@ -1283,12 +1349,9 @@ test(
 );
 
 /*
- * Float16Array conversion. ECMA-262 2025 NumericToRawBytes rounds a Number
- * once, directly from binary64, to the nearest IEEE 754-2019 binary16 value
- * with ties to even; values at or past 65520 become signed infinity. The
- * oracle below reaches that answer by exact BigInt arithmetic over the
- * operand's binary64 encoding, independently of Math.f16round, the
- * runtime's DataView encoder, and both reference engines.
+ * Float16Array conversion. Slot 0x60006e02 below exercises the binary16
+ * rounding edges that the shared Number pool above reaches only through
+ * its bounded integers and fixed constants.
  */
 
 type HalfInput =
@@ -1304,57 +1367,6 @@ type HalfPath = "array-like" | "assignment" | "data-view" | "float64";
 interface HalfCase {
   readonly inputs: readonly HalfInput[];
   readonly path: HalfPath;
-}
-
-const float64Bits = new BigUint64Array(1);
-const float64Value = new Float64Array(float64Bits.buffer);
-
-/* Exact |value| as `significand * 2 ** exponent`, for a finite value. */
-function binary64Parts(value: number): {
-  readonly exponent: number;
-  readonly significand: bigint;
-} {
-  float64Value[0] = Math.abs(value);
-  const bits = float64Bits[0] ?? 0n;
-  const field = Number((bits >> 52n) & 0x7ffn);
-  const fraction = bits & 0xf_ffff_ffff_ffffn;
-  return field === 0
-    ? { exponent: -1074, significand: fraction }
-    : { exponent: field - 1075, significand: fraction | (1n << 52n) };
-}
-
-function binary16Value(bits: number): number {
-  const field = (bits >> 10) & 0x1f;
-  const fraction = bits & 0x3ff;
-  const magnitude =
-    field === 0 ? fraction * 2 ** -24 : (fraction + 1024) * 2 ** (field - 25);
-  return (bits & 0x8000) === 0 ? magnitude : -magnitude;
-}
-
-function roundToBinary16(value: number): number {
-  if (Number.isNaN(value) || value === 0 || !Number.isFinite(value)) {
-    return value;
-  }
-  const { exponent, significand } = binary64Parts(value);
-  const highest = significand.toString(2).length - 1 + exponent;
-  // Every subnormal shares the smallest normal's quantum, 2 ** -24.
-  const quantum = Math.max(highest, -14) - 10;
-  let units: bigint;
-  if (exponent >= quantum) {
-    units = significand << BigInt(exponent - quantum);
-  } else {
-    const shift = BigInt(quantum - exponent);
-    const truncated = significand >> shift;
-    const remainder = significand - (truncated << shift);
-    const half = 1n << (shift - 1n);
-    units =
-      remainder > half || (remainder === half && (truncated & 1n) === 1n)
-        ? truncated + 1n
-        : truncated;
-  }
-  const magnitude = Number(units) * 2 ** quantum;
-  const rounded = magnitude > 65504 ? Infinity : magnitude;
-  return value < 0 ? -rounded : rounded;
 }
 
 /*
