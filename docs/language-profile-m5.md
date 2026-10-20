@@ -118,6 +118,19 @@ keeps its own feature list, and no compiler or runtime behavior changes. The
 manifest keeps 28,287 reviewed paths and 24,022 passes, and moves to 2,570
 expected negatives and 1,695 unsupported profile features.
 
+M5c node `function-caller-restrictions` keeps the standard
+%ThrowTypeError% `caller` and `arguments` accessors on %Function.prototype%,
+which ordinary functions inherit, and adds no own `caller` property and no
+stack introspection. A read of a non-strict ordinary function's `caller`
+therefore reaches the inherited accessor, whose getter throws a `TypeError`.
+The 23 `noStrict` paths with the `caller` frontmatter feature require the
+optional legacy extension instead. Under
+[ADR 0028](./adr/0028-legacy-function-caller-boundary.md), they are reviewed as
+unsupported and counted as authorized exclusions, never as passes. The `caller`
+feature stays out of `supportedFeatures`. The accessor descriptors, the clause
+17.1 restrictions, and the absence of an own `caller` property on arguments
+objects remain inside the claim.
+
 
 Claim boundary
 --------------

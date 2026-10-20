@@ -8,8 +8,10 @@ import { stringify as stringifyYaml } from "yaml";
 import {
   exclusionAuditDigest,
   exclusionObservationDigest,
+  hasCallerRead,
   hasEvalCall,
   hasLookupCall,
+  legacyCallerSelector,
   validateCurrentM5cExclusionAudit,
   validateM5cExclusionAudit,
 } from "../tools/m5c-exclusion-audit.ts";
@@ -26,6 +28,7 @@ const annexRemediationOwner = "node:regexp-split-coverage-remediation";
 const protoRemediationOwner = "node:typed-array-proto-coverage-remediation";
 const lookupRemediationOwner =
   "node:class-private-accessor-lookup-coverage-remediation";
+const callerOwner = "adr:0028-legacy-function-caller-boundary";
 const source = 'eval("1");';
 const observation = {
   passed: false,
@@ -53,6 +56,7 @@ const records = new Map(
     "0013-m5-edition-and-manifest",
     "0016-dynamic-source-boundary",
     "0019-m5-claim-closure",
+    "0028-legacy-function-caller-boundary",
   ].map((stem) => [
     stem,
     readFileSync(new URL(`../docs/adr/${stem}.md`, import.meta.url), "utf8"),
@@ -62,7 +66,7 @@ const records = new Map(
 function fixture(
   remediation = false,
   sourceText = source,
-  observed = observation,
+  observed: Test262Result["observation"] = observation,
 ) {
   const recordsEvidence = Object.fromEntries(
     [...records].map(([stem, text]) => [
@@ -76,7 +80,10 @@ function fixture(
               ? "`eval` in call position, the `Function` constructor, " +
                 "`new Function`, and every constructor that compiles " +
                 "source text stay outside the M5 language profile."
-              : "ADR 0016 is such a record for the dynamic source family.",
+              : stem.startsWith("0019")
+                ? "ADR 0016 is such a record for the dynamic source family."
+                : "The optional legacy caller extension is outside the M5 " +
+                  "profile.",
         ],
         reopening: [
           stem.startsWith("0013")
@@ -86,10 +93,13 @@ function fixture(
             : stem.startsWith("0016")
               ? "a probe demonstrates staged compilation with acceptable " +
                 "code lifetime, rooting, and target coverage; or"
-              : "Evidence that a normative section inside the claim " +
-                "depends on the excluded dynamic source family for " +
-                "behavior other than source evaluation reopens the " +
-                "boundary rather than this record.",
+              : stem.startsWith("0019")
+                ? "Evidence that a normative section inside the claim " +
+                  "depends on the excluded dynamic source family for " +
+                  "behavior other than source evaluation reopens the " +
+                  "boundary rather than this record."
+                : "Evidence from target packages that caller " +
+                  "introspection is required reopens this boundary.",
         ],
       },
     ]),
@@ -786,6 +796,7 @@ function expectedAuditCounts(ledger: M5cClosureLedger) {
     missingDynamicTags: [...exclusions, ...remediation].filter(
       (entry) =>
         entry.owner !== annexOwner &&
+        entry.owner !== callerOwner &&
         entry.owner !== annexRemediationOwner &&
         entry.owner !== protoRemediationOwner &&
         entry.owner !== lookupRemediationOwner &&
@@ -1281,4 +1292,244 @@ test("failure states and mismatched observation states cannot close", () => {
       state === "pass" ? /needs its observation owner/u : /unsupported state/u,
     );
   }
+});
+
+const callerPath = "test/built-ins/Function/15.3.5.4_2-75gs.js";
+const callerSource =
+  'function f() { return g(); }\n(function() { "use strict"; f(); })();\n' +
+  "function g() { return g.caller; }\n";
+const callerObservation = {
+  passed: false,
+  detail: "Not executed: the frontmatter needs an unsupported feature.",
+};
+
+/** One reviewed ADR 0028 row over the frontmatter caller rejection. */
+function callerFixture(sourceText = callerSource) {
+  const { audit, inputs } = fixture(false, sourceText, callerObservation);
+  const assessments = {
+    ...audit.assessments,
+    caller: {
+      disposition: "exclusion",
+      normativeDependency: "legacy-caller-only",
+      reason: "The read of a non-strict function's caller was reviewed.",
+    },
+  };
+  const row = {
+    ...audit.paths[0]!,
+    path: callerPath,
+    proposedOwner: callerOwner,
+    priorCohort: "legacy-caller",
+    missingDynamicTag: false,
+    section: "sec-forbidden-extensions",
+    subject: "Optional legacy caller read on a non-strict function",
+    assessment: "caller",
+  };
+  const callerResult: Test262Result = {
+    ...result,
+    case: {
+      ...result.case,
+      features: ["caller"],
+      flags: ["noStrict"],
+      path: callerPath,
+    },
+    observation: callerObservation,
+    unsupportedFeatures: ["caller"],
+  };
+  return {
+    audit: { ...audit, assessments, paths: [row] },
+    inputs: {
+      ...inputs,
+      legacyCallerPaths: new Set([callerPath]),
+      ledger: {
+        ...inputs.ledger,
+        entries: [
+          {
+            path: callerPath,
+            owner: callerOwner,
+            prerequisites: callerResult.dependencies,
+            state: callerResult.classification,
+          },
+        ],
+      },
+      results: [callerResult],
+      sources: new Map([[callerPath, sourceText]]),
+    },
+  };
+}
+
+test("the exact caller rejection uses only the ADR 0028 owner", () => {
+  const { audit, inputs } = callerFixture();
+  assert.deepEqual(validateM5cExclusionAudit(stringifyYaml(audit), inputs), {
+    exclusions: 1,
+    remediation: 0,
+    missingDynamicTags: 0,
+  });
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        legacyCallerPaths: new Set<string>(),
+      }),
+    /exact ADR 0028 selector/u,
+  );
+  for (const change of [
+    { proposedOwner: owner },
+    { priorCohort: "source-subject" },
+  ]) {
+    const changed = callerFixture().audit;
+    Object.assign(changed.paths[0]!, change);
+    assert.throws(
+      () => validateM5cExclusionAudit(stringifyYaml(changed), inputs),
+      /exact ADR 0028 selector/u,
+    );
+  }
+  const remediation = callerFixture().audit;
+  remediation.assessments.caller = {
+    disposition: "remediation",
+    normativeDependency: "legacy-caller-only",
+    reason: "Remediation has no owner under this record.",
+  };
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(remediation), inputs),
+    /no remediation owner/u,
+  );
+});
+
+test("the caller surface rejects other features, details, and sources", () => {
+  const { audit, inputs } = callerFixture();
+  const row = inputs.results[0]!;
+  for (const changed of [
+    { ...row, unsupportedFeatures: ["caller", "cross-realm"] },
+    { ...row, unsupportedFeatures: [] },
+    { ...row, case: { ...row.case, features: [] } },
+    { ...row, case: { ...row.case, flags: ["onlyStrict"] } },
+  ]) {
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(stringifyYaml(audit), {
+          ...inputs,
+          results: [changed],
+        }),
+      /outside the record surface/u,
+    );
+  }
+  const detail = {
+    ...callerObservation,
+    detail: "Not executed: the frontmatter needs an unsupported include.",
+  };
+  const other = callerFixture();
+  other.audit.paths[0]!.observationDigest = exclusionObservationDigest(detail);
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(other.audit), {
+        ...other.inputs,
+        results: [{ ...row, observation: detail }],
+      }),
+    /outside the record surface/u,
+  );
+  const text = callerFixture('var name = "caller"; // g.caller\n');
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(text.audit), text.inputs),
+    /outside the record surface/u,
+  );
+});
+
+test("reviewed caller selector paths cannot leave the audit", () => {
+  const { audit, inputs } = callerFixture();
+  const empty = { ...audit, paths: [] };
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(empty), {
+        ...inputs,
+        ledger: {
+          ...inputs.ledger,
+          entries: inputs.ledger.entries.map((entry) => ({
+            ...entry,
+            owner: "unassigned",
+          })),
+        },
+      }),
+    /selector path lacks its audit row/u,
+  );
+  assert.deepEqual(
+    validateM5cExclusionAudit(stringifyYaml(empty), {
+      ...inputs,
+      results: [],
+      ledger: {
+        ...inputs.ledger,
+        entries: inputs.ledger.entries.map((entry) => ({
+          ...entry,
+          owner: "node:observation-batch-32",
+          prerequisites: [],
+          state: "unreviewed",
+        })),
+      },
+    }),
+    { exclusions: 0, remediation: 0, missingDynamicTags: 0 },
+  );
+  assert.deepEqual(
+    validateM5cExclusionAudit(stringifyYaml(audit), {
+      ...inputs,
+      results: inputs.results.map((entry) =>
+        Object.assign({}, entry, {
+          classification: "pass",
+          observation: { passed: true },
+          unsupportedFeatures: [],
+        }),
+      ),
+      ledger: {
+        ...inputs.ledger,
+        entries: inputs.ledger.entries.map((entry) =>
+          Object.assign({}, entry, {
+            owner: "observation",
+            prerequisites: [],
+            state: "pass" as const,
+          }),
+        ),
+      },
+    }),
+    { exclusions: 0, remediation: 0, missingDynamicTags: 0 },
+  );
+});
+
+test("caller member reads are recognized by syntax", () => {
+  for (const text of [
+    "g.caller;",
+    "arguments.callee.caller(true);",
+    "g?.caller;",
+    'g["caller"];',
+    "(g).caller;",
+  ]) {
+    assert.equal(hasCallerRead(text, "script"), true, text);
+  }
+  for (const text of [
+    '"g.caller";',
+    "// g.caller\n",
+    "var caller = 1; caller;",
+    "g[caller];",
+    "g.callers;",
+  ]) {
+    assert.equal(hasCallerRead(text, "script"), false, text);
+  }
+});
+
+test("the ADR 0028 selector is exactly the pinned caller paths", () => {
+  const record = readFileSync(
+    new URL(
+      "../docs/adr/0028-legacy-function-caller-boundary.md",
+      import.meta.url,
+    ),
+    "utf8",
+  );
+  const selector = legacyCallerSelector(record);
+  assert.equal(selector.size, 23);
+  assert.ok(selector.has("test/built-ins/Function/15.3.5.4_2-12gs.js"));
+  assert.ok(selector.has("test/language/arguments-object/10.6-13-a-3.js"));
+  assert.throws(
+    () =>
+      legacyCallerSelector(
+        record.replace("\nExact selector\n", "\nSelector\n"),
+      ),
+    /Exact selector section/u,
+  );
 });

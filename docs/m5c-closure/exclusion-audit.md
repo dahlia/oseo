@@ -203,3 +203,47 @@ rejections and records them under the `annex-b-legacy-lookup` assessment, with
 `priorCohort: annex-b` and the remediation owner above. Their private getter
 and setter assertions are not excluded, and replacement evidence and the
 maintainer accounting decision belong to the coverage remediation node.
+
+
+Legacy function caller reads
+----------------------------
+
+[ADR 0028](../adr/0028-legacy-function-caller-boundary.md) authorizes an M5
+exclusion of the optional expectation that reading a non-strict ordinary
+function's `caller` completes normally, for exactly the 23 paths in its
+Exact selector section. Those are all the paths at the pinned revision with
+the `caller` frontmatter feature. The checker parses that list from the
+accepted record and pins its digest, so adding, removing, or renaming a path
+needs a new reviewed scope decision as well as a tool change.
+
+The accepted rejection is the existing frontmatter check, recorded as
+`unsupported-profile-feature` with exactly this observation detail:
+
+~~~~ text
+Not executed: the frontmatter needs an unsupported feature.
+~~~~
+
+`caller` must be the only entry in `unsupportedFeatures`, the case must list
+`caller` in `features` and `noStrict` in `flags`, and the reviewed source must
+read a `caller` member in member syntax (`g.caller`,
+`arguments.callee.caller`, or a static computed or optional form). Another
+unsupported feature, an include or capability rejection, a compile or run-time
+diagnostic, or text that only mentions `caller` is outside the surface.
+
+Each selector path records `priorCohort: legacy-caller`,
+`proposedOwner: adr:0028-legacy-function-caller-boundary`, and the
+`legacy-caller` assessment with `disposition: exclusion` and
+`normativeDependency: legacy-caller-only`. The selector is exact in both
+directions: no other path can use that owner, cohort, or dependency, and no
+selector path can name ADR 0016 or ADR 0013. The record has no remediation
+disposition. Once a selector path is reviewed it must keep an audit row,
+even if its ledger owner changes, and a promotion to pass or expected
+negative uses the observation owner.
+
+The five paths that also call `eval` or a source-compiling `Function` form
+carry the `dynamic-source` dependency tag. ADR 0016 remains in force for
+those calls but owns none of these paths, and its audit surface is unchanged.
+Their `missingDynamicTag` is false, because the dynamic-source tag debt
+applies only to ADR 0016 rows. The %Function.prototype% accessors, the
+clause 17.1 restrictions, and the absence of an own `caller` property on
+arguments objects stay inside the claim with their own evidence.

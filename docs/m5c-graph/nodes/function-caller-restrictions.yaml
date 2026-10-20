@@ -1,9 +1,13 @@
 version: 1
 id: function-caller-restrictions
-title: Admit the caller feature tag
-delivers: "Decides the caller feature tag for the 23 unreviewed paths that
-  check strict-function caller restrictions, admitting the tag when the
-  profile already meets them or remediating the restriction first."
+title: Account for legacy caller reads
+delivers: "Accounts for the 23 noStrict paths gated by the caller feature
+  tag. They need a read of a non-strict ordinary function's caller to
+  complete normally, an optional legacy extension, not a strict-function
+  restriction. Under accepted ADR 0028, M5 keeps the standard inherited
+  %ThrowTypeError% accessors, admits exactly these paths as unsupported
+  with the ADR 0028 ledger owner, and keeps every mandatory
+  restricted-function contract inside the claim."
 dependencies:
   - observation-batch-plan
 landed: false

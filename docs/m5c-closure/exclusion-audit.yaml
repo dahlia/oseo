@@ -46,6 +46,25 @@ records:
       - Evidence that a normative section inside the claim depends on
         the excluded dynamic source family for behavior other than
         source evaluation reopens the boundary rather than this record.
+  0028-legacy-function-caller-boundary:
+    digest: 3b058cca5ed8e16d3f7d7c733239360f3504332cd92a01ecef032002b36fed1c
+    authorization:
+      - The optional legacy caller extension is outside the M5 profile.
+      - This record authorizes an M5 exclusion of the expectation that
+        reading the `caller` property of a non-strict ordinary function
+        completes normally, and only for the exact 23 paths listed under
+        “Exact selector” below.
+    reopening:
+      - Evidence from target packages that caller introspection is
+        required reopens this boundary.
+      - A reviewed runtime design that supports a useful, bounded caller
+        contract at acceptable optimization and maintenance cost reopens
+        it.
+      - A later edition or a revised claim that makes the behavior required
+        reopens it.
+      - New source evidence that one of these paths mainly tests a
+        mandatory contract this boundary would leave uncovered reopens it
+        for that path.
 assessments:
   dynamic-construction:
     disposition: exclusion
@@ -228,6 +247,20 @@ assessments:
       private accessor coverage remediation owner until replacement
       evidence and the maintainer accounting decision, without
       authorizing a whole-path exclusion.
+  legacy-caller:
+    disposition: exclusion
+    normativeDependency: legacy-caller-only
+    reason: The test calls a non-strict ordinary function and requires a read
+      of its `caller` property, or of `arguments.callee.caller`, to complete
+      normally. The 16th edition requires no such own property; without
+      one, the read reaches the %ThrowTypeError% accessor that
+      AddRestrictedFunctionProperties installs on %Function.prototype% and
+      throws. ADR 0028 excludes only that optional expectation for its exact
+      selector. The prototype accessors, the clause 17.1 restrictions, and
+      the absence of an own `caller` on arguments objects stay inside the
+      claim with their own evidence. Any `eval` or `Function` call is
+      scaffolding for the caller relationship and stays under ADR 0016,
+      which owns none of these paths.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary

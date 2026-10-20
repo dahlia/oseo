@@ -216,9 +216,10 @@ records every proposed path's normalized observation digest, source digest,
 normative section, subject, prior cohort, and boundary assessment. Shared
 assessments explain the same contract for each listed member. The record
 entries quote the authorization and applicable reopening triggers from accepted
-ADRs 0013, 0016, and 0019. ADR 0020 fixes the denominator and authorizes no new
-exclusion; ADR 0026 demonstrates ahead-of-time host adaptation without
-authorizing exclusions of other harness capabilities.
+ADRs 0013, 0016, and 0019, and from ADR 0028 since the
+`function-caller-restrictions` node. ADR 0020 fixes the denominator and
+authorizes no new exclusion; ADR 0026 demonstrates ahead-of-time host
+adaptation without authorizing exclusions of other harness capabilities.
 
 `mise run check:m5c-exclusion-audit`, included by `mise run check`, rejects
 missing assessments for ADR owners, unaccepted or changed records, stale
@@ -780,3 +781,51 @@ stderr, and admits them with their unchanged `classes` dependency tag. Their
 `annex-b-legacy-lookup` audit rows and ledger entries name the
 `node:class-private-accessor-lookup-coverage-remediation` owner, and no
 whole-path exclusion is recorded.
+
+
+Legacy function caller boundary
+-------------------------------
+
+The `function-caller-restrictions` node accounts for exactly the 23 paths
+with the `caller` frontmatter feature, all in the fixed inventory and
+previously selected by observation batch 32. They are `noStrict` tests that
+need a read of a non-strict ordinary function's `caller`, directly or as
+`arguments.callee.caller`, to complete normally. That is the optional legacy
+extension restricted by ECMA-262 clause 17.1, not the strict-function
+restriction the node's original premise described.
+
+The maintainer approved
+[ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) on 2026-10-20.
+M5 keeps the standard %ThrowTypeError% `caller` and `arguments` accessors on
+%Function.prototype% and adds neither stack introspection nor a constant own
+`caller` property. The record authorizes an M5 exclusion of the optional
+expectation for its exact selector only. The `caller` feature stays out of
+the checked-in `supportedFeatures`, so the paths keep their frontmatter
+rejection. The %Function.prototype% accessor descriptors, the clause 17.1
+restrictions on other function kinds and strict functions, and the absence of
+an own `caller` property on arguments objects stay inside the claim. So do
+the other 76 _test/built-ins/Function/15.3.5.4\_2-\*gs.js_ paths, which keep
+their observation batch.
+
+The node adds the 23 paths to the reviewed subset as
+`unsupported-profile-feature` with existing ADR 0013 tags: `functions` on
+every path, `dynamic-source` on the five that call `eval` or a
+source-compiling `Function` form, and `object-properties` on the two
+arguments tests. The dependency and classification vocabularies, the
+inventory policy, and the manifest schema are unchanged. Regeneration through
+the normal tools supplies the result records, the observation-batch counts,
+and the graph baseline. The node then assigns the ledger owner
+`adr:0028-legacy-function-caller-boundary` with a note that bounds its
+surface. Coverage reports count these 23 exclusions separately from passes
+and from remediation-owned unsupported results, against the 41,091-path
+denominator.
+
+The exclusion audit records each path under the `legacy-caller` assessment.
+`mise run check:m5c-exclusion-audit` accepts the ADR 0028 owner only for a
+selector path whose observation is the exact frontmatter rejection with
+`caller` as the only unsupported feature, whose case has the `noStrict`
+flag, and whose source reads a `caller` member. A selector path can use no
+other ADR owner, and every reviewed selector path needs its audit row. The
+five dynamic-source intersections do not broaden ADR 0016 and are not owned
+by it. A later observation that reaches their dynamic-source rejection, or
+that admits the `caller` feature, needs a new reviewed scope decision.
