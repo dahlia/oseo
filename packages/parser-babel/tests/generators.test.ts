@@ -5,6 +5,66 @@ import { compileSource, printHir, printMir } from "@oseo/compiler";
 
 import { babelFrontend } from "../src/index.ts";
 
+test("suspends assignment targets before the first iterator step", () => {
+  for (const rest of [false, true]) {
+    for (const specialization of ["disabled", "enabled"] as const) {
+      const result = compileSource(
+        babelFrontend,
+        {
+          source:
+            "function* assign(input, target) {\n" +
+            `  [${rest ? "..." : ""}target[yield "target"]] = input;\n` +
+            "}\nassign({}, {});",
+          sourceId: "iterator-target-yield.js",
+        },
+        { specialization },
+      );
+      assert.deepEqual(result.diagnostics, []);
+      const generator = result.mir?.functions.find(
+        (functionValue) => functionValue.generator === true,
+      );
+      assert.ok(generator != null);
+      const suspension = generator.blocks.find(
+        (block) => block.terminator.kind === "generator-yield",
+      );
+      assert.ok(suspension?.terminator.kind === "generator-yield");
+      const acquired = suspension.operations.find(
+        (operation) => operation.kind === "iterator-get",
+      );
+      assert.ok(acquired?.iteratorNextMethodResult != null);
+      assert.ok(acquired.iteratorDoneState != null);
+      assert.ok(
+        !suspension.operations.some(
+          (operation) => operation.kind === "iterator-next",
+        ),
+      );
+      const operations = generator.blocks.flatMap((block) => block.operations);
+      const step = operations.find(
+        (operation) => operation.kind === "iterator-next",
+      );
+      assert.deepEqual(step?.arguments, [
+        acquired.id,
+        acquired.iteratorNextMethodResult,
+      ]);
+      const close = operations.find(
+        (operation) => operation.kind === "iterator-close",
+      );
+      assert.equal(close?.iteratorDoneState, acquired.iteratorDoneState);
+      const { returnResume } = suspension.terminator;
+      const returned = generator.blocks.find(
+        (block) => block.id === returnResume,
+      );
+      assert.ok(returned != null);
+      assert.ok(
+        returned.operations.some(
+          (operation) => operation.completionKind === "return",
+        ),
+      );
+      assert.equal(returned.terminator.kind, "jump");
+    }
+  }
+});
+
 test("admits generator declarations and expressions with yield", () => {
   const result = compileSource(babelFrontend, {
     source: [

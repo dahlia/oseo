@@ -7660,3 +7660,117 @@ The 33 paths matching *S11.13.2\_A7.{1..11}\_T{1,2,4}.js* in
 before this repair and pass after it in a focused runner check; the eleven `T3`
 siblings pass before and after. Batch 12 keeps their first canonical admission,
 so this node adds no subset row.
+
+
+Iterator next callability timing
+--------------------------------
+
+M5c node `iterator-next-callability` repairs already-admitted synchronous
+iterator acquisition. `GetIterator` captures the arbitrary `next` value
+once, without testing callability. Getter errors remain acquisition errors;
+the first call from `IteratorStep` owns a non-callable value's `TypeError`.
+An array assignment target can yield before that step. Returning or throwing
+into the suspended generator then closes the iterator without calling
+`next`, even when the recorded value is absent or non-callable. Closing
+retains the `return` getter, method callability, object-result check, and
+completion precedence. Mutation after acquisition does not change the
+captured value. The runtime identity is `m5-131`; no ABI entry point, public
+layout, heap kind, code ID, or package version is added. Direct asynchronous
+iterator acquisition is outside this repair. Async-from-Sync fallback uses
+the repaired synchronous helper.
+
+The authored `iterator-next-callability` native fixture has 68 timing
+invocations, retaining the original 64 and adding four explicit `undefined`
+next cases. It also covers empty patterns, nested consumer cleanup, and
+matching immediate-consumer controls. The native runner requests collection
+under both specialization policies and asserts a positive collection count.
+The structural test, “suspends assignment targets before the first iterator
+step,” checks captured iterator state, suspension before stepping, and
+return-resumption cleanup under both policies.
+
+The existing *m5-destructuring-assignment.property.test.ts* family retains
+slot `00`'s ten-case budget and 180-second limit. New slots `0x60001001` and
+`0x60001002` each add 16 ordinary cases and a 180-second limit. Their
+structured domains vary element/rest targets, captured next values and
+getter/call failures, return/throw resumption, close-method failures and
+non-object results, and bounded integer payloads. Shrinking preserves that
+structure; the shared property harness reports the seed and replay path.
+The independent ECMA-262 2025 oracle models acquisition, stepping, closing,
+and error precedence rather than deriving expected output from native code.
+A pure reference registration enumerates 432 states against Node.js and
+Deno; these are not 432 native cases.
+
+“captured iterator next closures survive suspension and collection” adds
+six fixed native cases: element/rest targets crossed with absent, truthful,
+and false JSDoc hints. The next getter allocates a heap closure with its
+private payload, then the test replaces the getter while suspended. Both
+policies force collection before stepping the captured closure and assert
+positive collection counts. The generated domains use the same observer.
+No seed, generator budget, deadline, size, replay, or shard policy changes
+for these six examples. The existing seed block supplies slots `01` and
+`02` for the new domains; no new seed block or registry entry is needed.
+
+Four private fixed controls use the ECMA-262 2025 expected output directly:
+`Object.fromEntries` and Async-from-Sync `for-await-of`, each with a
+non-callable or throwing `next`. Their first-step failures do not close the
+iterator. Node.js 24.21.0 and Deno 2.9.7 were observed to close it in these
+four cases. These controls therefore remain separate from differential
+fixtures. Matching getter-error controls for both consumers and a matching
+Async-from-Sync done-result control remain differential. This separation
+adds no unrelated consumer repair or direct-async acquisition claim.
+
+The existing destructuring-assignment, sync-generators, and sync-iteration
+family records retain their identities and guard-fallback omissions. This
+repair changes neither a specialized iteration path nor an optimization
+guard. Their named replacement evidence remains, with the new timing
+fixture, structured property suite, and structural test added where
+applicable. The semantic callability check is not an optimization guard.
+
+The complete manifest update at `4a514037` observed all 26,640 reviewed
+paths under the matching Linux x86-64 target. Exactly the three owned paths
+below were newly admitted as passes. Each executed strict and non-strict
+variants under both specialization policies with the reviewed base harness.
+All 26,637 previously reviewed records remained byte-identical; there were
+no promotions, demotions, or removals. The observed totals are 22,630 passes,
+2,350 expected negatives, and 1,660 unsupported profile features, with no
+semantic, harness, or infrastructure failures. The fixed inventory remains
+41,091 paths; the derived ledger records 14,451 unreviewed paths, including
+463 still owned by observation batch 08. Its selector and all other owners
+are retained.
+
+The admitted paths under
+*test/language/expressions/assignment/dstr/* are
+*array-elem-iter-rtrn-close-err.js*, *array-rest-iter-rtrn-close-err.js*, and
+*array-rest-iter-rtrn-close-null.js*. Their throwing or null-returning close
+methods execute after a target-side yield and before any iterator step.
+Their original feature metadata does not replace the dependency assessment:
+the rows name actual assignment, generator, iterator, symbol, property,
+function, binding, operator, and completion behavior. The null-result row
+also names the intrinsic runtime TypeError it observes.
+
+The focused `5da4bc8` receipts cover the authored source checks, ordinary
+sanitizer properties, and selected native fixture. They remain historical
+focused evidence. The replay onto `c68c2cd1` preserved every iterator
+product/test and manifest postimage byte-for-byte. Its complete ordinary
+and extended gates passed, including all 252 native extended tests; these
+receipts describe that historical source tree.
+
+The subsequent fast-forward onto `2ad4ae77` preserved all 25 owned
+postimages and file modes exactly. Its seven incoming files change Mac CI
+configuration, generation, availability, tests, and documentation. Because
+those tool changes are outside the scoped observation allow-list, the
+publication reran the complete manifest updater on that implementation.
+The October 17, 2026 observation covered all 26,640 reviewed paths, with
+22,630 passes, 2,350 expected negatives, and 1,660 unsupported profile
+features, without retries or semantic, harness, or infrastructure failures.
+All 6,165 partitions and the index remained unchanged. The 26,637 older
+record bodies, their 6,165 partition footers, and the three owned pass
+records retain their earlier contents. The original `4a514037` observation
+remains historical evidence; this full observation belongs to `2ad4ae77`.
+
+Publication requires focused Mac-lane checks, whole `mise run check`,
+whole `mise run test`, and `mise run test:property:extended` on the final
+source, followed by independent review. The whole ordinary gate observes
+the complete reviewed manifest again. Gate completion is recorded against
+its exact source snapshot; no historical tree or other lane supplies this
+node's final gate evidence.

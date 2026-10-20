@@ -1074,6 +1074,18 @@ The `m5-125` ABI moves `Date.now()`, argumentless `Date` construction, and
 real-time clock is unavailable.” No entry point, built-in code ID, intrinsic
 slot, heap kind, or public layout is added.
 
+The `m5-131` ABI records deferred synchronous iterator-next callability.
+`oseo_iterator_get` captures the `next` property once, including an absent
+or non-callable value, and preserves getter errors as acquisition errors.
+`oseo_iterator_next` calls the recorded value through the generic call ABI;
+that call owns the first-step `TypeError`. The iterator and captured value
+remain roots across a yielded assignment target and collection. Replacing
+the property does not replace the captured value. A generator return or
+throw before the first step can close the iterator without calling `next`.
+Direct asynchronous acquisition remains unchanged; Async-from-Sync fallback
+uses synchronous acquisition. No entry point, public layout, heap kind,
+intrinsic slot, or built-in code ID is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

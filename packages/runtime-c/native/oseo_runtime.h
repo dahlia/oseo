@@ -1745,11 +1745,27 @@ OseoResult oseo_enumerate_next(
     OseoValue *key,
     bool *done
 );
+/*
+ * Acquire a synchronous iterator and read its next property once.
+ * On success, result.value is the iterator and *next_method is the
+ * captured value, which need not be callable. Getter errors propagate
+ * during acquisition; callability is checked when stepping.
+ * next_method points to a caller-owned output slot. On a normal return,
+ * no allocation occurs between storing the captured value and returning.
+ * Root the returned iterator and captured value before any subsequent
+ * allocation, suspension, or step.
+ */
 OseoResult oseo_iterator_get(
     OseoContext *context,
     OseoValue iterable,
     OseoValue *next_method
 );
+/*
+ * Step with the captured next value without rereading the property.
+ * The caller must keep next_method rooted throughout each call; this
+ * helper roots the iterator and result values, but not that captured
+ * method. Keep *value rooted if it must survive later allocations.
+ */
 OseoResult oseo_iterator_next(
     OseoContext *context,
     OseoValue iterator,
@@ -1763,14 +1779,17 @@ OseoResult oseo_iterator_close(
     bool from_error
 );
 /*
- * The asynchronous iterator protocol a `for await` head consumes. It is
- * the synchronous protocol's three entry points with an Await on every
- * result: acquisition reads Symbol.asyncIterator and wraps the
- * synchronous iterator when that method is absent, and the step and
- * close entry points accept either an asynchronous iterator or that
- * wrapper. Each one reports the same `next_method`, `value`, and `done`
- * contract as its synchronous counterpart, so one loop lowering serves
- * both heads.
+ * Acquire an asynchronous iterator through Symbol.asyncIterator, or wrap
+ * a synchronous iterator when that method is absent. On success, direct
+ * async acquisition captures a callable next_method. The sync fallback
+ * returns a wrapper and the arbitrary, possibly non-callable next value
+ * captured by oseo_iterator_get.
+ * next_method must point to a caller-owned output slot rooted before
+ * entry: the fallback allocates its wrapper after writing that slot.
+ * Keep the returned iterator and captured value rooted across later
+ * allocations, suspension, and steps. The step and close entry points
+ * accept either iterator form; steps await results and report value
+ * and done through their output parameters.
  */
 OseoResult oseo_async_iterator_get(
     OseoContext *context,

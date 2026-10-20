@@ -2389,9 +2389,11 @@ OseoResult oseo_internal_string_iterator_next(
 /*
  * GetIterator(iterable, sync): read the Symbol.iterator method and call
  * it, validating that the result is an object, then capture the
- * iterator's next method once so every later step reuses it as the
- * specification's iterator record requires. A default array with no
- * user-overridden Symbol.iterator uses the native array iterator.
+ * iterator's next value once so every later step reuses it as the
+ * specification's iterator record requires. Callability is checked by
+ * the first step's Call, not acquisition: a target can suspend and close
+ * this record before any step. Arrays follow the same Symbol.iterator
+ * lookup and call path as other iterables.
  */
 OseoResult oseo_iterator_get(
     OseoContext *context,
@@ -2448,13 +2450,6 @@ OseoResult oseo_iterator_get(
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_object_get(context, slots[1], slots[2]);
         *next_method = result.value;
-    }
-    if (result.status == OSEO_STATUS_NORMAL && !is_callable(*next_method)) {
-        result = oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "The iterator next method is not callable."
-        );
     }
     if (result.status == OSEO_STATUS_NORMAL) result.value = slots[1];
     oseo_roots_pop(context, &frame);

@@ -323,6 +323,19 @@ Ownership follows the plan's target layout:
 The iterator protocol operations `oseo_iterator_get`, `oseo_iterator_next`,
 and `oseo_iterator_close` are generated-code ABI entry points declared in
 *oseo\_runtime.h*. Promise combinators share those public operations.
+
+The `m5-131` runtime identity records a semantic change to synchronous
+acquisition: `oseo_iterator_get` reads and returns the arbitrary `next`
+value without requiring it to be callable. Getter errors still propagate
+from acquisition. `oseo_iterator_next` calls that captured value, so its
+existing generic call path owns the first-step `TypeError`. Compiler-owned
+iterator records keep the iterator and captured value rooted across target
+suspension, replacement of `next`, and collection. Closing before the first
+step does not call `next`. No entry point, public layout, heap kind, code
+ID, or package version is added. Direct asynchronous iterator acquisition
+retains its existing separate validation; Async-from-Sync acquisition shares
+the repaired synchronous helper.
+
 Array literal spread also shares iterator get and next, then calls the
 `oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations
 owned by *runtime\_array.c*. The append operations preserve monotonic own

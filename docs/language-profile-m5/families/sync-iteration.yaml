@@ -12,31 +12,42 @@ evidence:
       - tests/native/fixtures/objects.ts
       - tests/native/fixtures/object-own-keys.ts
       - tests/property/m5-object-own-keys.property.test.ts
+      - tests/native/fixtures/generators.ts
+      - tests/property/m5-destructuring-assignment.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
       - tests/native/fixtures/object-own-keys.ts
+      - tests/native/fixtures/generators.ts
+      - tests/native.ts
   forced-collection:
     status: covered
     references:
       - tests/property/m5-for-of.property.test.ts
       - tests/property/m5-object-own-keys.property.test.ts
+      - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/native.ts
   generated:
     status: covered
     references:
       - tests/property/m5-for-of.property.test.ts
       - tests/property/m5-object-own-keys.property.test.ts
+      - tests/property/m5-destructuring-assignment.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family owns no specialized path or family-specific guard."
     replacements:
       - tests/native/fixtures/objects.ts
+      - tests/native/fixtures/generators.ts
+      - tests/property/m5-destructuring-assignment.property.test.ts
   specialization:
     status: covered
     references:
       - tests/native.ts
       - tests/native/fixtures/objects.ts
+      - tests/native/fixtures/generators.ts
+      - tests/property/m5-destructuring-assignment.property.test.ts
   standards:
     status: covered
     references:
@@ -46,3 +57,4 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/statements.test.ts
+      - packages/parser-babel/tests/generators.test.ts
