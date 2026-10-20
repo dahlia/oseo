@@ -251,6 +251,14 @@ early-error family from an October 12, 2026 local Linux extended run. Run
 estimate and the reasoning that produced those values is superseded. Their
 history is in this file's Git log.
 
+M5c node `array-tolocalestring-arguments` adds fixed and generated locale
+argument tests to *tests/property/m5-array-prototype-copying.property.test.ts*.
+Its two entries are provisional estimates until a CI run measures them: run
+39070198868's weights of 326 Linux and 339 macOS seconds, each multiplied by
+the file's local Linux extended case-duration ratio of 432.75 to 215.55
+seconds and rounded up, give 655 and 681. The macOS value has no macOS
+measurement behind it.
+
 The newer main run [36312192623] at `af9bb68c` is retained as the closest
 before-run comparison.
 `git diff af9bb68c 86228614 -- packages tests tools .github mise.toml` is empty

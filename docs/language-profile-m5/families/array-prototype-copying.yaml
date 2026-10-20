@@ -5,8 +5,8 @@ scope:
   - "Array.prototype concat, flat, flatMap, join, slice, toLocaleString,
     and toString, including sparse and generic receivers, observable access
     order, Symbol.isConcatSpreadable, ArraySpeciesCreate, recursive flattening,
-    cycles, locale argument forwarding, locale result coercion, and abrupt
-    completion."
+    cycles, element locale calls without arguments, locale result coercion,
+    and abrupt completion."
   - "One divergence from the reference hosts is known and unfixed. Generic
     ToPrimitive still reaches Array text through a deferred conversion this
     family owns, selected by intrinsic prototype identity rather than by

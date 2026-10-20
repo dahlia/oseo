@@ -3966,28 +3966,28 @@ and finite depth retain their ordinary results. Cyclic or positive-infinity
 paths that exceed the admitted nesting limit reach the runtime's deterministic
 depth boundary without native stack overflow. `join` converts its separator
 after reading length and uses recursion-safe nested Array stringification.
-`toLocaleString` invokes each non-nullish element's method with the same
-receiver and exactly the outer locales and options, forwarding two `undefined`
-values when they were omitted, and converts its result. A recursive locale
-conversion of the same receiver renders an empty element. During element
-conversion, re-entry through `join`, `toString`, or `toLocaleString` on the
-same active receiver likewise renders an empty string instead of exceeding the
-call-depth boundary. `toString` calls a callable `join` property and otherwise
-delegates to `Object.prototype.toString`.
+Until M5c, `toLocaleString` invoked each non-nullish element's method with the
+same receiver and exactly the outer locales and options, forwarding two
+`undefined` values when they were omitted; it converts the method's result. A
+recursive locale conversion of the same receiver renders an empty element.
+During element conversion, re-entry through `join`, `toString`, or
+`toLocaleString` on the same active receiver likewise renders an empty string
+instead of exceeding the call-depth boundary. `toString` calls a callable
+`join` property and otherwise delegates to `Object.prototype.toString`.
 
 Fixed native and generated differential evidence at seed `0x60004700` covers
 sparse Arrays, ordinary and primitive generic receivers, observable property
 order, `Symbol.isConcatSpreadable`, every ArraySpeciesCreate default and guard
 fallback, custom species, recursive and cyclic input, locale result coercion,
-locale argument forwarding, locale cycles, oversized-length rejection,
+locale element calls, locale cycles, oversized-length rejection,
 large-length index access ordering, callback behavior, and abrupt completion.
 Both specialization policies, forced collection at every safepoint, false
 hints, deliberate guard hits and misses, and generic fallback are exercised. Of
 the 229 paths under the node's seven inventory roots, 228 are reviewed: 181
 pass and 47 retain explicit prerequisite boundaries. The pinned
 *invoke-element-tolocalestring.js* case asserts the non-ECMA-402 fallback's
-zero-argument call and is omitted because this method follows the ECMA-402
-superseding call contract; the fixed differential fixture replaces its
+zero-argument call and was omitted because this method then followed the
+ECMA-402 superseding call contract; the fixed differential fixture replaced its
 element-call evidence. No new path outside those roots is added. Two
 already-reviewed cases outside the roots move from unsupported to pass because
 they exercise the newly admitted `toString` and generic `slice` behavior. The
@@ -3997,6 +3997,37 @@ failures. The suite revision, 41,091-path inventory, manifest schema and
 vocabulary, and zero-override policy are unchanged. The admitted runtime
 checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding a
 generated-code entry point or changing the graph's orchestration state.
+
+M5c node `array-tolocalestring-arguments` supersedes that forwarding
+account. ECMA-262 2025 `Array.prototype.toLocaleString` invokes each element's
+`toLocaleString` with no arguments, and ADR 0013 excludes the ECMA-402
+replacement that forwards the outer locales and options. `toLocaleString`
+therefore calls each non-nullish element's current method with the element as
+its receiver and no arguments, whatever the outer call received. Holes,
+`undefined`, and `null` still render empty fields without a call, and receiver
+conversion, length, callability, result coercion, abrupt completion, and
+re-entry are unchanged. `%TypedArray.prototype%.toLocaleString` is separate
+code, which M5c node `typed-array-tolocalestring-arguments` already made pass no
+arguments. Node.js 24.21.0 and Deno 2.9.7 implement ECMA-402, so their element
+methods always receive the outer call's first two arguments, `undefined` when
+absent. Both also read a hole of an Array receiver as an empty string and
+invoke `String.prototype.toLocaleString` on it. The differential fixture
+therefore no longer prints element arguments. Fixed and generated cases in the
+copying property suite instead require both references to equal a labeled V8
+model that differs only in those two respects, and native output to equal the
+ECMA-262 model, under both specialization policies with collection at every
+safepoint. The fixed program covers every argument shape of the pinned upstream
+case plus a `null` locale with numeric options, through a method call, `call`,
+and `apply`, on Array and ordinary array-like receivers. Its elements are
+holes, `undefined`, `null`, own, inherited, accessor, coercing, throwing, and
+non-callable methods, number and string primitives reaching strict prototype
+methods, and nested Arrays. The generated domain at seed `0x60004701` draws one
+to three such calls in ten ordinary cases. The repair adds no specialized path
+or guard, so the guard-fallback evidence is unchanged. The unchanged upstream
+*invoke-element-tolocalestring.js* path passes in all four variants of a
+focused runner check and is admitted; the root's other eleven reviewed paths
+keep their classifications in the same check. No layout, intrinsic, helper, or
+entry point changes, so the runtime ABI is unchanged.
 
 M5b node `map-intrinsic` completes the realm-owned `%Map%` constructor
 together with SameValueZero-keyed `[[MapData]]` storage, insertion order,

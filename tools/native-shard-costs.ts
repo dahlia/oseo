@@ -42,7 +42,11 @@ export const nativeShardCosts = {
     "tests/property/m5-array-buffer.property.test.ts": 551,
     "tests/property/m5-array-constructor.property.test.ts": 674,
     "tests/property/m5-array-prototype-change-by-copy.property.test.ts": 355,
-    "tests/property/m5-array-prototype-copying.property.test.ts": 326,
+    // PROVISIONAL: run 39070198868's 326 scaled by the file's local Linux
+    // extended case-duration ratio after array-tolocalestring-arguments
+    // added its locale tests (432.75 s / 215.55 s, October 21, 2026),
+    // rounded up. Not CI evidence; refresh from the candidate run's logs.
+    "tests/property/m5-array-prototype-copying.property.test.ts": 655,
     "tests/property/m5-array-prototype-index-search.property.test.ts": 267,
     "tests/property/m5-array-prototype-iterative.property.test.ts": 492,
     "tests/property/m5-array-prototype-iterators.property.test.ts": 455,
@@ -183,7 +187,9 @@ export const nativeShardCosts = {
     "tests/property/m5-array-buffer.property.test.ts": 400,
     "tests/property/m5-array-constructor.property.test.ts": 543,
     "tests/property/m5-array-prototype-change-by-copy.property.test.ts": 265,
-    "tests/property/m5-array-prototype-copying.property.test.ts": 339,
+    // PROVISIONAL: run 39070198868's 339 scaled by the same local Linux
+    // ratio, rounded up. UNMEASURED on macOS.
+    "tests/property/m5-array-prototype-copying.property.test.ts": 681,
     "tests/property/m5-array-prototype-index-search.property.test.ts": 404,
     "tests/property/m5-array-prototype-iterative.property.test.ts": 243,
     "tests/property/m5-array-prototype-iterators.property.test.ts": 275,

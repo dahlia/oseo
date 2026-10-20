@@ -4222,10 +4222,10 @@ FlattenIntoArray skips holes, maps before testing the mapped value for Array
 flattening, and applies the requested recursive depth. Cyclic or unbounded
 input reaches the deterministic runtime call-depth boundary rather than the
 native stack. `join` converts its separator after length and safely renders
-nested Arrays. `toLocaleString` calls each non-nullish element method with the
-element as receiver, forwards the outer locales and options as exactly two
-arguments, and coerces its result. Omitted outer arguments are forwarded as two
-`undefined` values. During element conversion, re-entry through `join`,
+nested Arrays. Until M5c, `toLocaleString` called each non-nullish element
+method with the element as receiver and forwarded the outer locales and options
+as exactly two arguments, two `undefined` values when they were omitted; it
+coerces the method's result. During element conversion, re-entry through `join`,
 `toString`, or `toLocaleString` on the same active receiver renders an empty
 string. Matching Node.js and Deno, these methods and ordinary string conversion
 that reaches intrinsic Array `toString` reject lengths above `2**32 - 1` with
@@ -4239,21 +4239,52 @@ allocation, collector roots, and recursion state with the Array intrinsic.
 Fixed native and generated differential evidence at seed `0x60004700` covers
 both specialization policies, forced collection at every safepoint, sparse and
 generic receivers, side-effect order, spreadability, every species guard hit
-and miss, custom results, recursion and cycles, locale argument forwarding,
+and miss, custom results, recursion and cycles, locale element calls,
 locale coercion, cyclic locale conversion, oversized-length rejection,
 large-length index access ordering, abrupt completion, false hints, deliberate
 shape-guard misses, and generic fallback. Of the 229 paths under the node's
 seven inventory roots, 228 are reviewed: 181 pass and 47 retain explicit
 prerequisite boundaries. The pinned *invoke-element-tolocalestring.js* case
-asserts the non-ECMA-402 fallback's zero-argument call and is omitted because
-this method follows the ECMA-402 superseding call contract; the fixed
-differential fixture replaces its element-call evidence. No new path outside
+asserts the non-ECMA-402 fallback's zero-argument call and was omitted because
+this method then followed the ECMA-402 superseding call contract; the fixed
+differential fixture replaced its element-call evidence. No new path outside
 those roots is added. Two already-reviewed cases outside the roots move from
 unsupported to pass because they exercise the newly admitted `toString` and
 generic `slice` behavior. The manifest moves to 11,015 paths with 8,073 passes,
 1,364 expected negatives, and 1,578 unsupported profile features. The admitted
 runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding
 a generated-code entry point or changing the graph's orchestration state.
+
+M5c node `array-tolocalestring-arguments` supersedes that forwarding
+account. ECMA-262 2025 `Array.prototype.toLocaleString` invokes each element's
+`toLocaleString` with no arguments, and ADR 0013 excludes the ECMA-402
+replacement that forwards the outer locales and options. `toLocaleString`
+therefore calls each non-nullish element's current method with the element as
+its receiver and no arguments, whatever the outer call received. Holes,
+`undefined`, and `null` still render empty fields without a call, and receiver
+conversion, length, callability, result coercion, abrupt completion, and
+re-entry are unchanged. `%TypedArray.prototype%.toLocaleString` is separate
+code, which M5c node `typed-array-tolocalestring-arguments` already made pass no
+arguments. Node.js 24.21.0 and Deno 2.9.7 implement ECMA-402, so their element
+methods always receive the outer call's first two arguments, `undefined` when
+absent. Both also read a hole of an Array receiver as an empty string and
+invoke `String.prototype.toLocaleString` on it. The differential fixture
+therefore no longer prints element arguments. Fixed and generated cases in the
+copying property suite instead require both references to equal a labeled V8
+model that differs only in those two respects, and native output to equal the
+ECMA-262 model, under both specialization policies with collection at every
+safepoint. The fixed program covers every argument shape of the pinned upstream
+case plus a `null` locale with numeric options, through a method call, `call`,
+and `apply`, on Array and ordinary array-like receivers. Its elements are
+holes, `undefined`, `null`, own, inherited, accessor, coercing, throwing, and
+non-callable methods, number and string primitives reaching strict prototype
+methods, and nested Arrays. The generated domain at seed `0x60004701` draws one
+to three such calls in ten ordinary cases. The repair adds no specialized path
+or guard, so the guard-fallback evidence is unchanged. The unchanged upstream
+*invoke-element-tolocalestring.js* path passes in all four variants of a
+focused runner check and is admitted; the root's other eleven reviewed paths
+keep their classifications in the same check. No layout, intrinsic, helper, or
+entry point changes, so the runtime ABI is unchanged.
 
 Implemented M5b node `map-intrinsic` completes the realm-owned `%Map%`
 constructor together with SameValueZero-keyed `[[MapData]]` storage,
@@ -6671,8 +6702,10 @@ invalidated matches `undefined`, while `indexOf` and `lastIndexOf` skip an
 index HasProperty no longer reports and compare with strict equality. `join`
 converts its separator after the snapshot and renders an invalidated index as
 an empty field, and `toLocaleString` invokes each element's current method
-with the outer locales and options, as the Array method does under the
-ECMA-402 call contract. Both stringifiers share Array stringification's
+with the outer locales and options under the ECMA-402 call contract, as the
+Array method then did. M5c nodes `typed-array-tolocalestring-arguments` and
+`array-tolocalestring-arguments` later made both methods pass no arguments, as
+ECMA-262 2025 requires. Both stringifiers share Array stringification's
 active-receiver stack, so a re-entrant conversion of the same view renders an
 empty string. The methods take nine code IDs in the existing TypedArray range
 and add no realm intrinsic slot, heap kind, component, or generated-code entry
