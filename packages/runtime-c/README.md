@@ -1086,6 +1086,17 @@ Direct asynchronous acquisition remains unchanged; Async-from-Sync fallback
 uses synchronous acquisition. No entry point, public layout, heap kind,
 intrinsic slot, or built-in code ID is added.
 
+The `m5-132` ABI orders TypedArray construction from a primitive first
+argument as ECMA-262 does. A concrete constructor still rejects an undefined
+new target first. It then runs ToIndex on that argument before
+AllocateTypedArray reads the new target's `prototype`, so a Symbol or BigInt
+`TypeError` and an index `RangeError` win over a throwing prototype getter or
+Proxy `get` trap. A length the host cannot allocate still fails after the
+prototype read. Zero arguments, `ArrayBuffer`, TypedArray, iterable, and
+array-like sources keep reading the prototype before any argument
+conversion, iteration, or element read. No entry point, public layout, heap
+kind, intrinsic slot, or built-in code ID is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

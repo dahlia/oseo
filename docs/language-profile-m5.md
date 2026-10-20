@@ -6231,6 +6231,22 @@ reported the owning boundary instead of silently observing an absent
 property, and deletion aimed at one stopped at the same boundary before any
 mutation.
 
+M5c node `typed-array-construction-order` fixes the observable construction
+order of ECMA-262 2025 23.2.5.1. Calling a concrete constructor without a new
+target throws `TypeError` before anything else. A primitive first argument
+runs ToIndex before AllocateTypedArray reads the new target's `prototype`:
+a Symbol or BigInt argument throws `TypeError`, and a negative or infinite
+index throws `RangeError`, without invoking a `prototype` getter or Proxy
+`get` trap. A valid index reads that prototype next, and a length the host
+cannot allocate fails only after the read. With no argument, or with an
+`ArrayBuffer`, TypedArray, iterable, or array-like argument, the prototype
+read still precedes every offset or length conversion, iterator lookup and
+step, `length` read, element read, detachment check, and content-type check.
+Node.js 24.21.0 still reads the prototype before converting a primitive, and
+Node.js and Deno 2.9.7 both read an iterable's iterator and drain it, or read
+an array-like's `length`, before the prototype. These are reference
+discrepancies, not oracles.
+
 Fixed native and generated differential evidence at property seed
 `0x60006e00` covers all eleven element kinds, length, buffer, iterable,
 array-like, and typed-array construction, shared-buffer observation, cloning,

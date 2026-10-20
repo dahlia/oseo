@@ -18,6 +18,10 @@ scope:
   - "TypedArray-to-TypedArray cloning ignores an ArrayBuffer subclass
     constructor and species; the fresh buffer has the intrinsic ArrayBuffer
     prototype and constructor, observed through core reflection."
+  - "Construction order: an undefined new target throws first; a primitive
+    first argument runs ToIndex before the new target's prototype read, and
+    zero arguments and every object source read that prototype before any
+    argument conversion, iteration, or element read."
 owners:
   - PLAN-M5.md
   - PLAN-M5C.md
@@ -33,6 +37,7 @@ evidence:
       - tests/native/fixtures/typed-array-constructors.ts
       - tests/native.ts
       - tests/native/scenarios/shard-2.ts
+      - tests/property/m5-typed-array-constructors.property.test.ts
   forced-collection:
     status: covered
     references:
@@ -67,3 +72,4 @@ evidence:
       - packages/runtime-c/tests/intrinsic-graph.test.ts
       - packages/runtime-c/native/runtime_typed_array.c
       - packages/runtime-c/native/runtime_memory.c
+      - tests/property/m5-typed-array-constructors.property.test.ts

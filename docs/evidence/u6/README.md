@@ -543,4 +543,19 @@ Linux case sum and an unmeasured macOS model, not final native CI, a
 whole-suite result, or a full UPDATE. No case budget, seed, deadline or shard
 total changes.
 
+The `typed-array-construction-order` node adds slot `0x60006e01`, one fixed
+native registration, one reference-only registration, and one compile-only
+structural registration to
+*tests/property/m5-typed-array-constructors.property.test.ts*. Run
+39070198868 measured the file's one earlier native registration at 694 Linux
+and 298 macOS seconds. The new generated domain keeps that registration's
+12-case ordinary budget, both specialization policies, and forced
+collection, so both weights are doubled to 1,388 and 596 seconds. That is an
+explicitly provisional derived estimate, not a measurement: the new
+domain's programs and the fixed registration were not timed on either
+native host before preparation stopped.
+Replace both entries with actual native CI case sums from the exact
+candidate. This update changes no case budgets, seeds, deadlines or shard
+totals.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

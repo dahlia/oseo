@@ -19,6 +19,10 @@
  * provisional macOS estimate from its 122/131 host ratio in the source
  * run. See the complete U6 provenance.
  *
+ * Typed-array-construction-order adds a second generated domain to the
+ * TypedArray constructor family. Its two entries are explicitly
+ * provisional doublings of the source run's weights, not measurements.
+ *
  * The two entries in `caseShardedNativeFiles` are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
  * not observe them here; they still weigh other wrapper invocations and
@@ -151,7 +155,7 @@ export const nativeShardCosts = {
     "tests/property/m5-symbol-intrinsic.property.test.ts": 365,
     "tests/property/m5-tagged-template.property.test.ts": 184,
     "tests/property/m5-top-level-this.property.test.ts": 573,
-    "tests/property/m5-typed-array-constructors.property.test.ts": 694,
+    "tests/property/m5-typed-array-constructors.property.test.ts": 1388,
     "tests/property/m5-typed-array-core.property.test.ts": 494,
     "tests/property/m5-typed-array-iterative.property.test.ts": 212,
     "tests/property/m5-typed-array-mutation.property.test.ts": 401,
@@ -292,7 +296,7 @@ export const nativeShardCosts = {
     "tests/property/m5-symbol-intrinsic.property.test.ts": 406,
     "tests/property/m5-tagged-template.property.test.ts": 158,
     "tests/property/m5-top-level-this.property.test.ts": 306,
-    "tests/property/m5-typed-array-constructors.property.test.ts": 298,
+    "tests/property/m5-typed-array-constructors.property.test.ts": 596,
     "tests/property/m5-typed-array-core.property.test.ts": 213,
     "tests/property/m5-typed-array-iterative.property.test.ts": 214,
     "tests/property/m5-typed-array-mutation.property.test.ts": 224,

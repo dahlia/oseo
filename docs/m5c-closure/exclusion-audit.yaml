@@ -134,7 +134,7 @@ assessments:
       tests/native/fixtures/typed-array-constructors.ts: "\
         44b36f7a8e551ea63ba572d843a34ddfac51812f2f7e75c6f5af86dbea4d15ef"
       tests/property/m5-typed-array-constructors.property.test.ts: "\
-        a001303e4df1a760981ff310a7928e9aaefbab6666200e2d930d8736f6ae318b"
+        69e2c66eb0aac37433d468e3f330f6b7a7f0043fbebf55ce2bb5fae83390f322"
     reason: The only observed failure is the excluded Annex B __proto__
       read. The source also requires TypedArray-to-TypedArray cloning to
       ignore an ArrayBuffer subclass constructor and species, and checks
