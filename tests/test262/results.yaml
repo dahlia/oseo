@@ -19453,12 +19453,12 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 2570
+  expectedNegatives: 2581
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 24023
+  passes: 24069
   semanticFailures: 0
-  unsupportedProfileFeatures: 1718
+  unsupportedProfileFeatures: 1661
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 6
@@ -19622,12 +19622,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: module-linking
-      expectedNegatives: 185
+      expectedNegatives: 196
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 48
+      passes: 65
       semanticFailures: 0
-      unsupportedProfileFeatures: 93
+      unsupportedProfileFeatures: 65
     - dependency: object-literals
       expectedNegatives: 17
       harnessFailures: 0
@@ -19646,16 +19646,16 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14628
+      passes: 14629
       semanticFailures: 0
-      unsupportedProfileFeatures: 217
+      unsupportedProfileFeatures: 216
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1688
+      passes: 1716
       semanticFailures: 0
-      unsupportedProfileFeatures: 59
+      unsupportedProfileFeatures: 31
     - dependency: property-enumeration
       expectedNegatives: 67
       harnessFailures: 0
@@ -19983,16 +19983,16 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3304
+      passes: 3305
       semanticFailures: 0
-      unsupportedProfileFeatures: 20
+      unsupportedProfileFeatures: 19
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 564
+      passes: 592
       semanticFailures: 0
-      unsupportedProfileFeatures: 56
+      unsupportedProfileFeatures: 28
     - group: built-ins/Proxy
       expectedNegatives: 0
       harnessFailures: 0
@@ -20295,12 +20295,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/module-code
-      expectedNegatives: 179
+      expectedNegatives: 190
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 45
+      passes: 62
       semanticFailures: 0
-      unsupportedProfileFeatures: 29
+      unsupportedProfileFeatures: 1
     - group: language/rest-parameters
       expectedNegatives: 1
       harnessFailures: 0

@@ -8394,3 +8394,14 @@ during preparation. The classifications in *tests/test262/subset.yaml* stay
 `unsupported-profile-feature` until a full
 `mise run test262:update -- --accept-promotions` observes them. This section
 records no pass count before that observation.
+
+The full manifest update at source `05ba44c9` then observed the 30 paths.
+Twenty-nine move from unsupported to pass, including
+*rejected-observable-then-calls-argument.js*.
+*subclass-species-constructor-reject-count.js* now executes and stays
+`unsupported-profile-feature`: no handler is attached to its rejected
+promise, so the native host stops at the unhandled-rejection checkpoint with
+`OSEO2001` and records the `unhandled-rejection-policy` capability. Node
+`unhandled-rejection-observation`, which owns that capability, now owns the
+path and 20 in all. It is neither a pass nor an exclusion, and this node
+changes no host rejection policy.

@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26593
-openPaths: 14498
+closedPaths: 26650
+openPaths: 14441
 states:
-  expected-negative: 2570
+  expected-negative: 2581
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 24023
+  pass: 24069
   semantic-failure: 0
   unreviewed: 12780
-  unsupported-profile-feature: 1718
+  unsupported-profile-feature: 1661
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -145,11 +145,6 @@ owners:
       reaches the ADR 0016 boundary through another realm's Function
       (1); 393 paths.
     paths: 393
-  node:module-export-forms:
-    note: arbitrary-module-namespace-names (15),
-      export-star-as-namespace-from-module (7), or This export is
-      unsupported (6).
-    paths: 28
   node:module-top-level-await-patterns:
     note: "Observed OSEO1001: Await inside a module top-level binding or
       assignment pattern is unsupported. The dynamic-import observe-only
@@ -272,10 +267,6 @@ owners:
   node:primitive-wrapper-objects:
     note: Runtime capability primitive-wrapper; 36 paths.
     paths: 36
-  node:promise-feature-admission:
-    note: Unsupported frontmatter features are only Promise or
-      Promise.prototype.finally; 30 paths.
-    paths: 30
   node:proper-tail-calls:
     note: Gated by tail-call-optimization; no accepted record excludes
       proper tail calls; 2 paths.
@@ -305,8 +296,8 @@ owners:
   node:typed-array-proto-coverage-remediation:
     paths: 1
   node:unhandled-rejection-observation:
-    note: Runtime capability unhandled-rejection-policy; 19 paths.
-    paths: 19
+    note: Runtime capability unhandled-rejection-policy; 20 paths.
+    paths: 20
   node:well-known-intrinsics-harness:
     note: "harness-include: wellKnownIntrinsicObjects.js; 6 paths."
     paths: 6
@@ -314,7 +305,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26593
+    paths: 26650
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -10673,7 +10664,7 @@ paths:
   test/built-ins/Object/prototype/toString/symbol-tag-override-bigint.js: [pass, observation]
   test/built-ins/Object/prototype/toString/symbol-tag-override-instances.js: [pass, observation]
   test/built-ins/Object/prototype/toString/symbol-tag-override-primitives.js: [pass, observation]
-  test/built-ins/Object/prototype/toString/symbol-tag-promise-builtin.js: [unsupported-profile-feature, node:promise-feature-admission, [object-properties]]
+  test/built-ins/Object/prototype/toString/symbol-tag-promise-builtin.js: [pass, observation]
   test/built-ins/Object/prototype/toString/symbol-tag-set-builtin.js: [unsupported-profile-feature, node:iterator-helpers, [object-properties]]
   test/built-ins/Object/prototype/toString/symbol-tag-str.js: [pass, observation]
   test/built-ins/Object/prototype/toString/symbol-tag-string-builtin.js: [unsupported-profile-feature, node:iterator-helpers, [object-properties]]
@@ -11168,35 +11159,35 @@ paths:
   test/built-ins/Promise/prototype/catch/this-value-then-not-callable.js: [pass, observation]
   test/built-ins/Promise/prototype/catch/this-value-then-poisoned.js: [pass, observation]
   test/built-ins/Promise/prototype/catch/this-value-then-throws.js: [pass, observation]
-  test/built-ins/Promise/prototype/finally/invokes-then-with-function.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/invokes-then-with-non-function.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/is-a-function.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/is-a-method.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/length.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/name.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/not-a-constructor.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/prop-desc.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/rejected-observable-then-calls-PromiseResolve.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/rejected-observable-then-calls-argument.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/rejected-observable-then-calls.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/rejection-reason-no-fulfill.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/rejection-reason-override-with-throw.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/resolution-value-no-override.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/resolved-observable-then-calls-PromiseResolve.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/resolved-observable-then-calls-argument.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/resolved-observable-then-calls.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/species-constructor-throws.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/species-constructor.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/subclass-reject-count.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/subclass-resolve-count.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/subclass-species-constructor-reject-count.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/subclass-species-constructor-resolve-count.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/this-value-non-object.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/this-value-proxy.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/this-value-then-not-callable.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/this-value-then-poisoned.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/this-value-then-throws.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
-  test/built-ins/Promise/prototype/finally/this-value-thenable.js: [unsupported-profile-feature, node:promise-feature-admission, [promise-settlement]]
+  test/built-ins/Promise/prototype/finally/invokes-then-with-function.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/invokes-then-with-non-function.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/is-a-function.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/is-a-method.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/length.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/name.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/not-a-constructor.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/prop-desc.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/rejected-observable-then-calls-PromiseResolve.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/rejected-observable-then-calls-argument.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/rejected-observable-then-calls.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/rejection-reason-no-fulfill.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/rejection-reason-override-with-throw.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/resolution-value-no-override.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/resolved-observable-then-calls-PromiseResolve.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/resolved-observable-then-calls-argument.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/resolved-observable-then-calls.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/species-constructor-throws.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/species-constructor.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/subclass-reject-count.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/subclass-resolve-count.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/subclass-species-constructor-reject-count.js: [unsupported-profile-feature, node:unhandled-rejection-observation, [promise-settlement]]
+  test/built-ins/Promise/prototype/finally/subclass-species-constructor-resolve-count.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/this-value-non-object.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/this-value-proxy.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/this-value-then-not-callable.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/this-value-then-poisoned.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/this-value-then-throws.js: [pass, observation]
+  test/built-ins/Promise/prototype/finally/this-value-thenable.js: [pass, observation]
   test/built-ins/Promise/prototype/no-promise-state.js: [pass, observation]
   test/built-ins/Promise/prototype/prop-desc.js: [pass, observation]
   test/built-ins/Promise/prototype/proto.js: [pass, observation]
@@ -31377,13 +31368,13 @@ paths:
   test/language/module-code/comment-multi-line-html-close.js: [expected-negative, observation]
   test/language/module-code/comment-single-line-html-close.js: [expected-negative, observation]
   test/language/module-code/comment-single-line-html-open.js: [expected-negative, observation]
-  test/language/module-code/early-dup-export-as-star-as.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/early-dup-export-as-star-as.js: [expected-negative, observation]
   test/language/module-code/early-dup-export-decl.js: [expected-negative, observation]
   test/language/module-code/early-dup-export-dflt-id.js: [expected-negative, observation]
   test/language/module-code/early-dup-export-dflt.js: [expected-negative, observation]
   test/language/module-code/early-dup-export-id-as.js: [expected-negative, observation]
   test/language/module-code/early-dup-export-id.js: [expected-negative, observation]
-  test/language/module-code/early-dup-export-star-as-dflt.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/early-dup-export-star-as-dflt.js: [expected-negative, observation]
   test/language/module-code/early-dup-lables.js: [expected-negative, observation]
   test/language/module-code/early-dup-lex.js: [expected-negative, observation]
   test/language/module-code/early-dup-top-function-async-generator.js: [expected-negative, observation]
@@ -31391,7 +31382,7 @@ paths:
   test/language/module-code/early-dup-top-function-generator.js: [expected-negative, observation]
   test/language/module-code/early-dup-top-function.js: [expected-negative, observation]
   test/language/module-code/early-export-global.js: [expected-negative, observation]
-  test/language/module-code/early-export-ill-formed-string.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/early-export-ill-formed-string.js: [expected-negative, observation]
   test/language/module-code/early-export-unresolvable.js: [expected-negative, observation]
   test/language/module-code/early-import-arguments.js: [expected-negative, observation]
   test/language/module-code/early-import-as-arguments.js: [expected-negative, observation]
@@ -31448,20 +31439,20 @@ paths:
   test/language/module-code/export-default-generator-declaration-binding-exists.js: [expected-negative, observation]
   test/language/module-code/export-default-generator-declaration-binding.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/export-expname-binding-index.js: [unreviewed, node:observation-batch-32]
-  test/language/module-code/export-expname-binding-string.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-as-unpaired-surrogate.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-binding-string.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-star-string.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-star-unpaired-surrogate.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-star.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-string-binding.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-string-string.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-string.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-from-unpaired-surrogate.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-import-string-binding.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-import-unpaired-surrogate.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-string-binding.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/export-expname-unpaired-surrogate.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/export-expname-binding-string.js: [pass, observation]
+  test/language/module-code/export-expname-from-as-unpaired-surrogate.js: [expected-negative, observation]
+  test/language/module-code/export-expname-from-binding-string.js: [pass, observation]
+  test/language/module-code/export-expname-from-star-string.js: [pass, observation]
+  test/language/module-code/export-expname-from-star-unpaired-surrogate.js: [expected-negative, observation]
+  test/language/module-code/export-expname-from-star.js: [pass, observation]
+  test/language/module-code/export-expname-from-string-binding.js: [pass, observation]
+  test/language/module-code/export-expname-from-string-string.js: [pass, observation]
+  test/language/module-code/export-expname-from-string.js: [pass, observation]
+  test/language/module-code/export-expname-from-unpaired-surrogate.js: [expected-negative, observation]
+  test/language/module-code/export-expname-import-string-binding.js: [pass, observation]
+  test/language/module-code/export-expname-import-unpaired-surrogate.js: [expected-negative, observation]
+  test/language/module-code/export-expname-string-binding.js: [expected-negative, observation]
+  test/language/module-code/export-expname-unpaired-surrogate.js: [expected-negative, observation]
   test/language/module-code/export-star-as-dflt.js: [unreviewed, node:observation-batch-32]
   test/language/module-code/import-attributes/allow-nlt-before-with.js: [expected-negative, observation]
   test/language/module-code/import-attributes/early-dup-attribute-key-export.js: [expected-negative, observation]
@@ -31489,8 +31480,8 @@ paths:
   test/language/module-code/instn-iee-err-not-found-as.js: [expected-negative, observation]
   test/language/module-code/instn-iee-err-not-found.js: [expected-negative, observation]
   test/language/module-code/instn-iee-iee-cycle.js: [unreviewed, node:observation-batch-20]
-  test/language/module-code/instn-iee-star-cycle.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/instn-iee-trlng-comma.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/instn-iee-star-cycle.js: [pass, observation]
+  test/language/module-code/instn-iee-trlng-comma.js: [pass, observation]
   test/language/module-code/instn-local-bndng-cls.js: [unreviewed, node:observation-batch-32]
   test/language/module-code/instn-local-bndng-const.js: [unreviewed, node:observation-batch-32]
   test/language/module-code/instn-local-bndng-export-cls.js: [unreviewed, node:observation-batch-32]
@@ -31528,8 +31519,8 @@ paths:
   test/language/module-code/instn-named-err-not-found.js: [expected-negative, observation]
   test/language/module-code/instn-named-id-name.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/instn-named-iee-cycle.js: [unreviewed, node:observation-batch-20]
-  test/language/module-code/instn-named-star-cycle.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/instn-once.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/instn-named-star-cycle.js: [pass, observation]
+  test/language/module-code/instn-once.js: [pass, observation]
   test/language/module-code/instn-resolve-empty-export.js: [expected-negative, observation]
   test/language/module-code/instn-resolve-empty-import.js: [expected-negative, observation]
   test/language/module-code/instn-resolve-err-syntax-1.js: [expected-negative, observation]
@@ -31537,7 +31528,7 @@ paths:
   test/language/module-code/instn-resolve-order-depth.js: [expected-negative, observation]
   test/language/module-code/instn-resolve-order-src.js: [expected-negative, observation]
   test/language/module-code/instn-same-global.js: [unreviewed, node:observation-batch-32]
-  test/language/module-code/instn-star-as-props-dflt-skip.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/instn-star-as-props-dflt-skip.js: [pass, observation]
   test/language/module-code/instn-star-binding.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/instn-star-equality.js: [pass, observation]
   test/language/module-code/instn-star-err-not-found.js: [expected-negative, observation]
@@ -31545,12 +31536,12 @@ paths:
   test/language/module-code/instn-star-iee-cycle.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/instn-star-iee-multi-cycle-same-name.js: [pass, observation]
   test/language/module-code/instn-star-iee-single-cycle-same-name.js: [pass, observation]
-  test/language/module-code/instn-star-props-circular.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/instn-star-props-circular.js: [pass, observation]
   test/language/module-code/instn-star-props-dflt-keep-indirect.js: [pass, observation]
   test/language/module-code/instn-star-props-dflt-keep-local.js: [pass, observation]
-  test/language/module-code/instn-star-props-dflt-skip.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/instn-star-props-nrml.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/instn-star-star-cycle.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/instn-star-props-dflt-skip.js: [pass, observation]
+  test/language/module-code/instn-star-props-nrml.js: [pass, observation]
+  test/language/module-code/instn-star-star-cycle.js: [pass, observation]
   test/language/module-code/instn-uniq-env-rec.js: [unreviewed, node:observation-batch-20]
   test/language/module-code/invalid-private-names-call-expression-bad-reference.js: [expected-negative, observation]
   test/language/module-code/invalid-private-names-call-expression-this.js: [expected-negative, observation]
@@ -31690,8 +31681,8 @@ paths:
   test/language/module-code/parse-err-invoke-anon-gen-decl.js: [expected-negative, observation]
   test/language/module-code/parse-err-return.js: [expected-negative, observation]
   test/language/module-code/parse-err-semi-dflt-expr.js: [expected-negative, observation]
-  test/language/module-code/parse-err-semi-export-star.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
-  test/language/module-code/parse-err-semi-name-space-export.js: [unsupported-profile-feature, node:module-export-forms, [module-linking]]
+  test/language/module-code/parse-err-semi-export-star.js: [expected-negative, observation]
+  test/language/module-code/parse-err-semi-name-space-export.js: [expected-negative, observation]
   test/language/module-code/parse-err-semi-named-export-from.js: [expected-negative, observation]
   test/language/module-code/parse-err-semi-named-export.js: [expected-negative, observation]
   test/language/module-code/parse-err-syntax-1.js: [expected-negative, observation]

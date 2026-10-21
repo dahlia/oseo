@@ -12,14 +12,35 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-props-circular-a_FIXTURE.js
+            - test/language/module-code/instn-star-props-circular-b_FIXTURE.js
+          id: test/language/module-code/instn-star-props-circular.js
+          sourceHash: fnv1a64:587a566f35acfe7a
+        - dependencies:
+            - test/language/module-code/instn-star-props-circular-b_FIXTURE.js
+          id: test/language/module-code/instn-star-props-circular-a_FIXTURE.js
+          sourceHash: fnv1a64:870e3bf92b83249e
+        - dependencies:
+            - test/language/module-code/instn-star-props-circular-a_FIXTURE.js
+          id: test/language/module-code/instn-star-props-circular-b_FIXTURE.js
+          sourceHash: fnv1a64:811a45144141dfaa
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-star-props-circular-a_FIXTURE.\
-        js:5:8: error[OSEO1001]: This export is unsupported."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

@@ -30308,7 +30308,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-promise-builtin.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/prototype/toString/symbol-tag-set-builtin.js
     expectedClassification: unsupported-profile-feature
@@ -31766,91 +31766,91 @@ tests:
     expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/invokes-then-with-function.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/invokes-then-with-non-function.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/is-a-function.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/is-a-method.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/length.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/name.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/not-a-constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/prop-desc.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/rejected-observable-then-calls-PromiseResolve.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/rejected-observable-then-calls-argument.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/rejected-observable-then-calls.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/rejection-reason-no-fulfill.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/rejection-reason-override-with-throw.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/resolution-value-no-override.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/resolved-observable-then-calls-PromiseResolve.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/resolved-observable-then-calls-argument.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/resolved-observable-then-calls.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/species-constructor-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/species-constructor.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/subclass-reject-count.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/subclass-resolve-count.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/subclass-species-constructor-reject-count.js
     expectedClassification: unsupported-profile-feature
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/subclass-species-constructor-resolve-count.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/this-value-non-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/this-value-proxy.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/this-value-then-not-callable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/this-value-then-poisoned.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/this-value-then-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/finally/this-value-thenable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [promise-settlement]
   - path: test/built-ins/Promise/prototype/no-promise-state.js
     expectedClassification: pass
@@ -116869,37 +116869,37 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-binding-string.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-as-unpaired-surrogate.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-binding-string.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-star-string.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-star-unpaired-surrogate.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-star.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-string-binding.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-string-string.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-string.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-from-unpaired-surrogate.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-import-string-binding.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/export-expname-import-unpaired-surrogate.js
     expectedClassification: expected-negative
@@ -116977,10 +116977,10 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-star-cycle.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-trlng-comma.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-bndng-const.js
     expectedClassification: pass
@@ -117019,10 +117019,10 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-star-cycle.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-once.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-resolve-empty-export.js
     expectedClassification: expected-negative
@@ -117043,7 +117043,7 @@ tests:
     expectedClassification: expected-negative
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-as-props-dflt-skip.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-equality.js
     expectedClassification: pass
@@ -117058,7 +117058,7 @@ tests:
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-props-circular.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-props-dflt-keep-indirect.js
     expectedClassification: pass
@@ -117067,13 +117067,13 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators, module-linking]
   - path: test/language/module-code/instn-star-props-dflt-skip.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-props-nrml.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-star-cycle.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/invalid-private-names-call-expression-bad-reference.js
     expectedClassification: expected-negative

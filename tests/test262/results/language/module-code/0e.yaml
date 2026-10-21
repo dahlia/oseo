@@ -38,14 +38,16 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - module-linking
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: "test/language/module-code/parse-err-semi-name-space-export.js:\
+        103:67: error[OSEO0001]: Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - export-star-as-namespace-from-module
+    unsupportedFeatures: []
   - case:
       async: true
       features:

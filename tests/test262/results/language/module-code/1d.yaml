@@ -35,13 +35,40 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-props-dflt-skip-star-named_FIXTURE.js
+            - test/language/module-code/instn-star-props-dflt-skip-star-prod_FIXTURE.js
+          id: test/language/module-code/instn-star-props-dflt-skip.js
+          sourceHash: fnv1a64:d81581e32b2710c0
+        - dependencies:
+            - test/language/module-code/instn-star-props-dflt-skip-named_FIXTURE.js
+          id: test/language/module-code/instn-star-props-dflt-skip-star-named_FIXTURE.js
+          sourceHash: fnv1a64:05fda62cbadfbf57
+        - dependencies: []
+          id: test/language/module-code/instn-star-props-dflt-skip-named_FIXTURE.js
+          sourceHash: fnv1a64:9054686a08de087a
+        - dependencies:
+            - test/language/module-code/instn-star-props-dflt-skip-prod_FIXTURE.js
+          id: test/language/module-code/instn-star-props-dflt-skip-star-prod_FIXTURE.js
+          sourceHash: fnv1a64:f51cd02c51ed3099
+        - dependencies: []
+          id: test/language/module-code/instn-star-props-dflt-skip-prod_FIXTURE.js
+          sourceHash: fnv1a64:c1cee552fb5d112d
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-star-props-dflt-skip-named_FIX\
-        TURE.js:5:8: error[OSEO1001]: This export is unsupported."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

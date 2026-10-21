@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 145
+M5a is complete. The normative family records described below inventory 146
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -154,7 +154,11 @@ unchanged: no layout, entry point, or intrinsic changes. The two unreviewed
 *test/language/expressions/class/subclass-builtins/* and
 *test/language/statements/class/subclass-builtins/* stay with node
 `observation-batch-32`. Their classifications await that observation, and this
-node claims no manifest count before its update runs.
+node claims no manifest count before its update runs. The full update then
+observed 29 of the 30 reviewed paths as passes.
+*subclass-species-constructor-reject-count.js* stops at the unhandled-rejection
+checkpoint with `OSEO2001` and stays unsupported under node
+`unhandled-rejection-observation`.
 
 
 Claim boundary
@@ -184,8 +188,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,287 reviewed cases: 24,022 passes, 2,570
-expected negatives, and 1,695 unsupported profile features. It records no
+The current manifest contains 28,311 reviewed cases: 24,069 passes, 2,581
+expected negatives, and 1,661 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 

@@ -13,14 +13,31 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/export-expname-from-star-string.js
+            - test/language/module-code/export-expname_FIXTURE.js
+          id: test/language/module-code/export-expname-from-star-string.js
+          sourceHash: fnv1a64:4fdf72f3650383af
+        - dependencies: []
+          id: test/language/module-code/export-expname_FIXTURE.js
+          sourceHash: fnv1a64:711e14c825b19f18
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
-      passed: false
-    unsupportedFeatures:
-      - arbitrary-module-namespace-names
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       expectedErrorType: SyntaxError

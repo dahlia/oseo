@@ -12,13 +12,33 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-star-cycle-2_FIXTURE.js
+          id: test/language/module-code/instn-named-star-cycle.js
+          sourceHash: fnv1a64:870b3bc0b2577708
+        - dependencies:
+            - test/language/module-code/instn-named-star-cycle-indirect-x_FIXTURE.js
+          id: test/language/module-code/instn-named-star-cycle-2_FIXTURE.js
+          sourceHash: fnv1a64:54fe6492b0c55e1e
+        - dependencies:
+            - test/language/module-code/instn-named-star-cycle-2_FIXTURE.js
+          id: test/language/module-code/instn-named-star-cycle-indirect-x_FIXTURE.js
+          sourceHash: fnv1a64:50fd90655bbbcfaa
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "test/language/module-code/instn-named-star-cycle-indirect-x_FI\
-        XTURE.js:8:8: error[OSEO1001]: This export is unsupported."
-      passed: false
-      unsupportedCapability: profile-syntax
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
