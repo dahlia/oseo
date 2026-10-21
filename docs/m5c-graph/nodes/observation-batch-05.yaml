@@ -12,5 +12,5 @@ delivers: "Observes the 386 unreviewed paths that
 dependencies:
   - destructuring-binding-target-order
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

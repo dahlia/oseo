@@ -8,5 +8,5 @@ delivers: "Admits the concrete TypedArray constructor feature tags and the
   global-object profile."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

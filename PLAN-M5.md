@@ -8196,8 +8196,11 @@ records of that integrated base and replaces only the 44 records the
 `ef8b56e2` update changed:
 24,022 passes, 2,566 expected negatives, and 1,699 unsupported profile
 features. The closure ledger, observation-batch statistics, graph baseline,
-and profile counts are derived from that union. These are observations of
-two earlier sources, not of the integrated source. A complete manifest
-update and native fixture run on the integrated source, macOS execution, and
-CI remain pending, and the 42 paths do not establish complete Float16
-conformance.
+and profile counts are derived from that union. A complete
+`mise run test262:update -- --accept-promotions` on the integrated source
+then exited zero after 4,530.5 seconds with no retries. It observed all
+28,287 reviewed paths and reproduced every record, all 6,477 result
+partitions without a change or promotion. The existing closure ledger
+remains valid. A native fixture run on the integrated source, macOS
+execution, and CI remain pending, and the 42 paths do not establish
+complete Float16 conformance.

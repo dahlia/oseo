@@ -6311,10 +6311,11 @@ as passes and changed no other classification. Two TypedArray
 `calls.push(this)` site, now reported six harness lines later. A later
 local Linux run of the fixed native fixture passed on the same source.
 Rebased onto the TypedArray `toLocaleString` argument change, which edits
-the `join` helper the fixture calls, the node's manifest carries
-those records rather than a fresh observation; a complete manifest update
-and native fixture run on that integrated source, macOS execution, and CI
-remain pending. These 42 paths do not show complete Float16 conformance.
+the `join` helper the fixture calls, the node's manifest first carried
+those records forward. A complete manifest update on that integrated source
+then reproduced all 28,287 records without a change. A native fixture run
+on that source, macOS execution, and CI remain pending. These 42 paths do
+not show complete Float16 conformance.
 
 The reviewed test262 subset adds 81 directly applicable paths from the node's
 736-path inventory. Fourteen BigInt constructor and prototype metadata cases
