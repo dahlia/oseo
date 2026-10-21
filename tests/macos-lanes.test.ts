@@ -680,10 +680,15 @@ test("one extra lane retains every job and aggregate dependency", () => {
   assert.throws(() => macosLanes(7));
   const rendered = generateMacosWorkflow(template, 1);
   if (process.platform !== "win32") {
+    // Two macOS candidate runs on 2026-10-21 stalled here for over an hour
+    // with an orphaned jactionlint and no output, although this whole test
+    // normally finishes in about 2.5 seconds. Bound the child so a stall
+    // fails this test with ETIMEDOUT instead of holding the job until a
+    // person cancels it.
     const lint = spawnSync(
       "jactionlint",
       ["--stdin-filename", ".github/workflows/main.yaml", "-"],
-      { input: rendered },
+      { input: rendered, timeout: 120_000, killSignal: "SIGKILL" },
     );
     assert.equal(lint.error, undefined);
     assert.equal(lint.status, 0, lint.stderr.toString());
