@@ -4022,6 +4022,25 @@ Differential evidence for the non-terminating cases asserts the reparsed
 magnitude on all three engines instead of the spelling, because the
 reference engines do not agree with each other's exact digits either.
 
+Radix 10, `ToString`, free-precision `toExponential`, `toPrecision`
+without a precision, and the canonical numeric index test a TypedArray
+applies to string keys share one decimal digit selection: the fewest
+significant digits that read back as the double, and among those the
+decimal closest to it, the even one on a tie, as ECMA-262 2025
+Number::toString step 5 requires. At each digit count the runtime takes
+the correctly rounded decimal and, for a normal power of two above the
+smallest normal, also the next decimal up, because the interval of decimals
+that read back as a power of two reaches twice as far above it as below.
+Until M5c node `typed-array-feature-admission` the runtime tried only the
+closest decimal, so 46 of the 2,098 positive powers of two printed 17
+digits where 16 suffice, such as `5.9604644775390625e-8` for 2^-24 instead
+of `5.960464477539063e-8`, and the canonical numeric index test treated the
+wrong spelling as canonical. The `number-prototype` native fixture pins
+2^-24, 2^-1017, 2^-140, 2^89, and 2^976 through each consumer, and
+generated evidence at seed `0x60004901` checks powers of two and their
+neighbors across the binary16, binary32, and binary64 exponent ranges
+against an exact BigInt Number::toString oracle.
+
 `toFixed`, `toExponential`,
 and `toPrecision` round through the same bignum numerator-over-denominator
 representation rather than repeated floating-point arithmetic, so every
@@ -6280,7 +6299,11 @@ checks rounding at binary16 midpoints and their binary64 neighbors against an
 exact BigInt oracle through construction, element assignment, and DataView,
 and the fixed `typed-array-float16` native fixture covers the constructor
 surface. Preparation ran no native build or execution and no manifest update;
-those observations are pending.
+those observations are pending. The Float16 conversion domain drew binary16
+bits 1, which is 2^-24, and its stored bits were exact, but the runtime
+printed the Number with 17 digits instead of 16; the node fixes that shared
+decimal digit selection, described with the `number-prototype` node above,
+rather than the binary16 conversion.
 
 The reviewed test262 subset adds 81 directly applicable paths from the node's
 736-path inventory. Fourteen BigInt constructor and prototype metadata cases

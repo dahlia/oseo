@@ -432,6 +432,120 @@ static size_t format_shortest_decimal(
     return (size_t)snprintf(output, capacity, "%s", formatted);
 }
 
+/*
+ * True when value is a normal power of two above the smallest normal: its
+ * next-lower double lies half as far away as its next-higher one, so the
+ * decimal strings that read back as value reach twice as far above it as
+ * below. Every other finite double, including the smallest normal (whose
+ * lower neighbor is a subnormal at the same spacing) and every subnormal,
+ * sits in a symmetric interval. Zero, infinities, and NaN are excluded by
+ * the biased exponent bounds.
+ */
+static bool rounding_interval_is_asymmetric(double value) {
+    uint64_t bits = double_bits(value);
+    uint64_t biased_exponent = (bits >> 52) & 0x7ffu;
+    return (bits & 0xfffffffffffffu) == 0u &&
+        biased_exponent > 1u &&
+        biased_exponent < 0x7ffu;
+}
+
+static bool candidate_round_trips(const char *candidate, double value) {
+    char *end;
+    double parsed = strtod(candidate, &end);
+    return *end == '\0' && double_bits(parsed) == double_bits(value);
+}
+
+/*
+ * Writes the precision-digit decimal one unit in the last place above
+ * value's correctly rounded precision-digit decimal, in magnitude, with
+ * value's sign, in "%e" form without trailing zeros. A carry out of the
+ * leading digit becomes a new leading 1 and raises the exponent. Returns
+ * false only when the "%e" text does not have the expected shape.
+ */
+static bool decimal_successor_candidate(
+    double value,
+    int precision,
+    char candidate[64]
+) {
+    char nearest[64];
+    int written = snprintf(
+        nearest,
+        sizeof(nearest),
+        "%.*e",
+        precision - 1,
+        fabs(value)
+    );
+    if (written <= 0 || (size_t)written >= sizeof(nearest)) return false;
+    char digits[17];
+    size_t count = 0u;
+    const char *cursor = nearest;
+    for (; *cursor != '\0' && *cursor != 'e'; cursor += 1) {
+        if (*cursor == '.') continue;
+        if (*cursor < '0' || *cursor > '9' || count == sizeof(digits)) {
+            return false;
+        }
+        digits[count] = *cursor;
+        count += 1u;
+    }
+    if (*cursor != 'e' || count != (size_t)precision) return false;
+    long exponent = strtol(cursor + 1, NULL, 10);
+    bool carry = true;
+    for (size_t index = count; carry && index > 0u; index -= 1u) {
+        if (digits[index - 1u] == '9') {
+            digits[index - 1u] = '0';
+        } else {
+            digits[index - 1u] = (char)(digits[index - 1u] + 1);
+            carry = false;
+        }
+    }
+    if (carry) {
+        digits[0] = '1';
+        exponent += 1;
+    }
+    while (count > 1u && digits[count - 1u] == '0') count -= 1u;
+    size_t length = 0u;
+    if (signbit(value)) {
+        append_character(candidate, 64u, &length, '-');
+    }
+    append_character(candidate, 64u, &length, digits[0]);
+    if (count > 1u) append_character(candidate, 64u, &length, '.');
+    for (size_t index = 1u; index < count; index += 1u) {
+        append_character(candidate, 64u, &length, digits[index]);
+    }
+    written = snprintf(candidate + length, 64u - length, "e%+ld", exponent);
+    return written > 0 && (size_t)written < 64u - length;
+}
+
+/*
+ * Number::toString's digit selection (6.1.6.1.20 step 5): the fewest
+ * significant digits that read back as value, and among those the
+ * decimal closest to value, the even one on a tie. value must be finite
+ * and nonzero; candidate receives "%g"-family text with value's sign.
+ *
+ * At each digit count the correctly rounded "%.*g" decimal is the closest
+ * one, and printf rounds an exact tie to even. In a symmetric interval no
+ * farther decimal can read back when the closest does not. Above a power
+ * of two the interval reaches twice as far upward, so a closest decimal
+ * below value can miss while the next one up, the only candidate that
+ * can still fit, reads back: 2^-24 needs 5.960464477539063e-8, not the
+ * tie-to-even 5.960464477539062e-8. Assumes the C locale's '.' radix and
+ * the default round-to-nearest mode, which the runtime never changes, so
+ * snprintf and strtod are correctly rounded.
+ */
+static void shortest_round_trip_candidate(double value, char candidate[64]) {
+    bool asymmetric = rounding_interval_is_asymmetric(value);
+    for (int precision = 1; precision <= 17; precision += 1) {
+        (void)snprintf(candidate, 64u, "%.*g", precision, value);
+        if (candidate_round_trips(candidate, value)) return;
+        if (asymmetric &&
+            decimal_successor_candidate(value, precision, candidate) &&
+            candidate_round_trips(candidate, value)) {
+            return;
+        }
+    }
+    (void)snprintf(candidate, 64u, "%.17g", value);
+}
+
 size_t oseo_internal_number_text(double value, char *output, size_t capacity) {
     if (isnan(value)) return (size_t)snprintf(output, capacity, "NaN");
     if (isinf(value)) {
@@ -442,24 +556,9 @@ size_t oseo_internal_number_text(double value, char *output, size_t capacity) {
         );
     }
     if (value == 0.0) return (size_t)snprintf(output, capacity, "0");
-    for (int precision = 1; precision <= 17; precision += 1) {
-        char candidate[64];
-        (void)snprintf(
-            candidate,
-            sizeof(candidate),
-            "%.*g",
-            precision,
-            value
-        );
-        char *end;
-        double parsed = strtod(candidate, &end);
-        if (*end == '\0' && double_bits(parsed) == double_bits(value)) {
-            return format_shortest_decimal(candidate, output, capacity);
-        }
-    }
-    char fallback[64];
-    (void)snprintf(fallback, sizeof(fallback), "%.17g", value);
-    return format_shortest_decimal(fallback, output, capacity);
+    char candidate[64];
+    shortest_round_trip_candidate(value, candidate);
+    return format_shortest_decimal(candidate, output, capacity);
 }
 
 /*
@@ -492,7 +591,7 @@ static void trim_insignificant_zeros(
 }
 
 /*
- * Same round-trip precision search as oseo_internal_number_text, but
+ * Same round-trip digit selection as oseo_internal_number_text, but
  * returns the parsed significant digits and decimal exponent instead of a
  * formatted string. value must be finite, nonzero, and non-negative.
  * At most 17 significant digits round-trip a double, so the trimmed result
@@ -506,28 +605,10 @@ void oseo_internal_number_shortest_digits(
 ) {
     char parsed_digits[32];
     size_t count = 0u;
-    for (int precision = 1; precision <= 17; precision += 1) {
-        char candidate[64];
-        (void)snprintf(candidate, sizeof(candidate), "%.*g", precision, value);
-        char *end;
-        double parsed = strtod(candidate, &end);
-        if (*end == '\0' && double_bits(parsed) == double_bits(value)) {
-            decimal_candidate_digits(
-                candidate,
-                parsed_digits,
-                &count,
-                decimal_exponent
-            );
-            trim_insignificant_zeros(parsed_digits, &count, decimal_exponent);
-            *digit_count = count;
-            memcpy(digits, parsed_digits, count);
-            return;
-        }
-    }
-    char fallback[64];
-    (void)snprintf(fallback, sizeof(fallback), "%.17g", value);
+    char candidate[64];
+    shortest_round_trip_candidate(value, candidate);
     decimal_candidate_digits(
-        fallback,
+        candidate,
         parsed_digits,
         &count,
         decimal_exponent
