@@ -229,7 +229,6 @@ const reviewedExecutionPoolLimit = Math.min(
   availableParallelism(),
 );
 const reviewedExecutionRetryLimit = 1;
-const unavailableHarnessIncludes = new Set<string>();
 
 /** Host-varying facts reported outside the canonical manifest. */
 export interface ReviewedTest262RunMetadata {
@@ -1671,25 +1670,6 @@ export async function executeTest262Case(
         detail: `Not executed: ${hostCapability.detail}`,
         passed: false,
         unsupportedCapability: hostCapability.capability,
-      },
-      observedFeatures,
-      evidence,
-    );
-  }
-  const unsupportedInclude = parsed.flags.includes("raw")
-    ? undefined
-    : parsed.case.includes.find(
-        (include) =>
-          unavailableHarnessIncludes.has(include) &&
-          !harnesses.includes.has(include),
-      );
-  if (unsupportedInclude != null) {
-    return classifyTest262(
-      parsed.case,
-      {
-        detail: `Not executed: unsupported harness ${unsupportedInclude}.`,
-        passed: false,
-        unsupportedCapability: "harness-include",
       },
       observedFeatures,
       evidence,

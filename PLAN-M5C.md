@@ -985,6 +985,16 @@ The `resizable-array-buffer-harness` node adds a reviewed
 the reviewed runner, which no longer lists that include as unavailable. It
 changes no runtime, compiler, or feature list.
 
+With `well-known-intrinsics-harness`, which registers
+*wellKnownIntrinsicObjects.js*, the runner's list of unavailable harness
+includes becomes empty. The runner therefore no longer has that list or the
+branch that classified a case naming a listed include as unsupported with the
+`harness-include` capability. A case that names an include the reviewed
+harness does not implement still fails as a harness defect. The 174
+checked-in records that report `harness-include`, 168 owned here and 6 owned
+by `well-known-intrinsics-harness`, describe the earlier source until the
+complete manifest update observes them.
+
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles
 `return class My<type> extends <type> {}` through the `Function`
@@ -1008,10 +1018,11 @@ included inventory, 168 are the reviewed paths this node owns and 17 are
 unreviewed paths of `observation-batch-32`, which stay unreviewed here.
 Three more are under *test/staging/* and outside the inventory.
 
-Before `typed-array-feature-admission` admits the Float16Array global, both
-probes are the profile-syntax rejection for `typeof` of an unadmitted
-standard global. So the manifest update that observes the 168 paths runs
-after that prerequisite is in the source the update reads. This node does
+The source this node is now prepared on contains
+`typed-array-feature-admission`, which admits the Float16Array global.
+Without that admission both probes would be the profile-syntax rejection
+for `typeof` of an unadmitted standard global, so the manifest update that
+observes the 168 paths must read a source that contains it. This node does
 not touch the Float16Array source. A reference run under Node.js and Deno
 on hosts that define Float16Array is evidence that the copy is equivalent
 to upstream, not an Oseo observation. The classifications come only from
