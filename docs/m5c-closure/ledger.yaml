@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26588
-openPaths: 14503
+closedPaths: 26592
+openPaths: 14499
 states:
-  expected-negative: 2566
+  expected-negative: 2570
   harness-failure: 0
   infrastructure-failure: 0
   pass: 24022
   semantic-failure: 0
   unreviewed: 12804
-  unsupported-profile-feature: 1699
+  unsupported-profile-feature: 1695
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -116,13 +116,6 @@ owners:
       and brand subjects stay inside the claim; a later observation that
       reaches the source-compilation rejection must reassess them."
     paths: 33
-  node:frontmatter-feature-tags:
-    note: The 4 test/language/global-code/super-*.js parse negatives are
-      gated only by the super frontmatter tag, which their sources do
-      not need. The catch-parameter case moved to
-      node:module-top-level-await-patterns after the dynamic-import
-      observe-only change exposed its actual rejection.
-    paths: 4
   node:import-attributes-dynamic-coverage-remediation:
     note: Exactly the 64 pinned ImportExpression-rejected paths reserved in
       docs/m5c-graph/import-attributes-dynamic-coverage.md. Runtime
@@ -305,7 +298,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26588
+    paths: 26592
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -30449,10 +30442,10 @@ paths:
   test/language/global-code/script-decl-var-collision.js: [unsupported-profile-feature, node:test262-host-script-bindings, [dynamic-source, lexical-bindings, var-bindings]]
   test/language/global-code/script-decl-var-err.js: [unsupported-profile-feature, node:test262-host-script-bindings, [dynamic-source, object-properties, var-bindings]]
   test/language/global-code/script-decl-var.js: [unsupported-profile-feature, node:test262-host-script-bindings, [dynamic-source, object-properties, var-bindings]]
-  test/language/global-code/super-call-arrow.js: [unsupported-profile-feature, node:frontmatter-feature-tags, [classes, functions]]
-  test/language/global-code/super-call.js: [unsupported-profile-feature, node:frontmatter-feature-tags, [classes]]
-  test/language/global-code/super-prop-arrow.js: [unsupported-profile-feature, node:frontmatter-feature-tags, [classes, functions]]
-  test/language/global-code/super-prop.js: [unsupported-profile-feature, node:frontmatter-feature-tags, [classes]]
+  test/language/global-code/super-call-arrow.js: [expected-negative, observation]
+  test/language/global-code/super-call.js: [expected-negative, observation]
+  test/language/global-code/super-prop-arrow.js: [expected-negative, observation]
+  test/language/global-code/super-prop.js: [expected-negative, observation]
   test/language/global-code/switch-case-decl-strict.js: [pass, observation]
   test/language/global-code/switch-dflt-decl-strict.js: [pass, observation]
   test/language/global-code/unscopables-ignored.js: [pass, observation]

@@ -112,8 +112,8 @@ inside an arrow function, where the existing parser already rejects it with
 unsupported to expected negative and keep their dependency tags. No other
 reviewed row lists `super`, the recorded observation-batch planning basis
 keeps its own feature list, and no compiler or runtime behavior changes. The
-manifest keeps 26,637 reviewed paths and 22,627 passes, and moves to 2,354
-expected negatives and 1,656 unsupported profile features.
+manifest keeps 28,287 reviewed paths and 24,022 passes, and moves to 2,570
+expected negatives and 1,695 unsupported profile features.
 
 
 Claim boundary

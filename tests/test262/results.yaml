@@ -19432,12 +19432,12 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 2566
+  expectedNegatives: 2570
   harnessFailures: 0
   infrastructureFailures: 0
   passes: 24022
   semanticFailures: 0
-  unsupportedProfileFeatures: 1699
+  unsupportedProfileFeatures: 1695
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 6
@@ -19489,12 +19489,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: classes
-      expectedNegatives: 956
+      expectedNegatives: 960
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 4027
       semanticFailures: 0
-      unsupportedProfileFeatures: 118
+      unsupportedProfileFeatures: 114
     - dependency: control-flow
       expectedNegatives: 267
       harnessFailures: 0
@@ -19552,12 +19552,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 86
     - dependency: functions
-      expectedNegatives: 577
+      expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 8662
       semanticFailures: 0
-      unsupportedProfileFeatures: 788
+      unsupportedProfileFeatures: 786
     - dependency: generators
       expectedNegatives: 219
       harnessFailures: 0
@@ -20232,12 +20232,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/global-code
-      expectedNegatives: 9
+      expectedNegatives: 13
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 13
       semanticFailures: 0
-      unsupportedProfileFeatures: 17
+      unsupportedProfileFeatures: 13
     - group: language/identifier-resolution
       expectedNegatives: 1
       harnessFailures: 0

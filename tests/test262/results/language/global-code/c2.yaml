@@ -16,13 +16,13 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: expected-negative
     dependencies:
       - classes
       - functions
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      errorType: SyntaxError
+      failedPhase: parse
       passed: false
-    unsupportedFeatures:
-      - super
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
