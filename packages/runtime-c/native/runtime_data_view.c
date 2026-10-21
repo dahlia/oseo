@@ -206,6 +206,14 @@ static uint64_t number_to_raw_bytes(
     return number_to_wrapped(value, data_view_element_size[element]);
 }
 
+uint16_t oseo_internal_float16_bits(double value) {
+    return (uint16_t)encode_ieee(value, 10u, 5u);
+}
+
+double oseo_internal_float16_number(uint16_t bits) {
+    return decode_ieee(bits, 10u, 5u);
+}
+
 /* RawBytesToNumeric for every element type whose value is a Number. */
 static double raw_bytes_to_number(
     uint64_t bits,

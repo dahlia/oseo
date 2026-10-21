@@ -131,8 +131,8 @@ identity assertions execute. Their ledger owner is
 `node:import-attributes-dynamic-coverage-remediation`. This reservation
 adds no exclusions and did not widen the original 178-path
 `dynamic-source-coverage-remediation` cohort. Observation batches 11, 12,
-and 13 later added 19, 23, and 30 paths to that owner, whose current
-contract is 250 paths.
+13, and 05 later added 19, 23, 30, and 5 paths to that owner, whose current
+contract is 255 paths.
 
 Each path retains its original normative subject, source digest, and fresh
 observation digest. Its assessment uses `disposition: remediation`,

@@ -230,7 +230,7 @@ Ownership follows the plan's target layout:
     storage, SameValueZero lookup, the core prototype methods, the seven
     composition methods over GetSetRecord, and the live
     `%SetIteratorPrototype%` cursor;
- -  *runtime\_typed\_array.c*: `%TypedArray%`, the eleven concrete
+ -  *runtime\_typed\_array.c*: `%TypedArray%`, the twelve concrete
     constructor and prototype pairs, construction from lengths, buffers,
     iterables, array-like objects, and typed arrays, element conversion,
     the backing-buffer view record, the integer-indexed element operations
@@ -506,6 +506,8 @@ the `oseo_internal_` prefix, has exactly one declaration in
 | `oseo_internal_data_view_builtin_dispatch`          | *runtime\_data\_view.c*       |
 | `oseo_internal_data_view_intrinsic`                 | *runtime\_data\_view.c*       |
 | `oseo_internal_install_data_view_global`            | *runtime\_data\_view.c*       |
+| `oseo_internal_float16_bits`                        | *runtime\_data\_view.c*       |
+| `oseo_internal_float16_number`                      | *runtime\_data\_view.c*       |
 | `oseo_internal_date_builtin_dispatch`               | *runtime\_date.c*             |
 | `oseo_internal_date_intrinsic`                      | *runtime\_date.c*             |
 | `oseo_internal_install_date_global`                 | *runtime\_date.c*             |
@@ -1588,6 +1590,18 @@ across that conversion. The undefined new target check stays first, and the
 zero-argument and object branches still allocate the view before they
 convert, iterate, or read the argument, as AllocateTypedArray requires. The
 change adds no code ID, intrinsic, heap kind, or entry point.
+
+M5c node `typed-array-feature-admission` moves `abiVersion` to `m5-133` and
+adds `Float16Array` to *runtime\_typed\_array.c*'s kind tables, with an
+appended element kind, two appended realm slots, and one appended
+constructor code ID. Element reads and writes call
+`oseo_internal_float16_bits` and `oseo_internal_float16_number`, which
+*runtime\_data\_view.c* exports from its existing exact encoder, so a
+TypedArray and a DataView never round one value differently.
+`typed_array_construct` is unchanged: it finds the new kind through the
+constructor code table. *runtime\_function.c* routes the appended slots
+to the cluster, and *runtime\_atomics.c* rejects the kind in
+ValidateIntegerTypedArray. No heap kind or entry point is added.
 
 ### Clock and wakeup evidence
 

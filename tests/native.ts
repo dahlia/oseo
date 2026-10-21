@@ -59,6 +59,7 @@ import * as setComposition from "./native/fixtures/set-composition-methods.ts";
 import { setIntrinsicFixtures } from "./native/fixtures/set-intrinsic.ts";
 import * as stringFixtures from "./native/fixtures/string-intrinsic.ts";
 import * as typedArrays from "./native/fixtures/typed-array-constructors.ts";
+import * as typedArrayFloat16 from "./native/fixtures/typed-array-float16.ts";
 import * as typedArrayCore from "./native/fixtures/typed-array-core.ts";
 import * as atomics from "./native/fixtures/atomics-single-agent.ts";
 import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
@@ -217,6 +218,7 @@ const fixtures: readonly Fixture[] = [
   ...arrayPrototypeSortFixtures,
   ...arrayPrototypeSpeciesMappingFixtures,
   ...typedArrays.typedArrayConstructorFixtures,
+  ...typedArrayFloat16.typedArrayFloat16Fixtures,
   ...typedArrayCore.typedArrayCoreFixtures,
   ...atomics.atomicsSingleAgentFixtures,
   ...agentFixtures.atomicsAndSharedMemoryFixtures,
@@ -1025,6 +1027,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-prototype-and-exec" ||
     fixture.name === "regexp-symbol-methods" ||
     fixture.name === "typed-array-constructors" ||
+    fixture.name === "typed-array-float16" ||
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
@@ -1151,6 +1154,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
+    fixture.name === "typed-array-float16" ||
     fixture.name === "typed-array-core" ||
     fixture.name === "shared-array-buffer" ||
     fixture.name === "atomics-single-agent" ||
@@ -1439,6 +1443,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
             fixture.name === "typed-array-constructors" ||
+            fixture.name === "typed-array-float16" ||
             fixture.name === "typed-array-core" ||
             fixture.name === "shared-array-buffer" ||
             fixture.name === "atomics-single-agent" ||
@@ -1738,13 +1743,13 @@ for (const fixture of selectedFixtures) {
             // Proxy adding one allocation in each group and Date, JSON,
             // and Set adding only their property names, because the
             // observation excludes the allocations of their intrinsic
-            // builds. The eleven concrete TypedArray constructors add
-            // eleven property-name allocations, SharedArrayBuffer and
+            // builds. The twelve concrete TypedArray constructors add
+            // twelve property-name allocations, SharedArrayBuffer and
             // Atomics add one each, WeakMap, WeakSet, WeakRef, and
             // FinalizationRegistry add four more, the global object's own
             // `globalThis` property adds its name, and so does `%eval%`'s
             // global `eval` property (ADR 0027).
-            assert.equal(native.counters.allocations, 68);
+            assert.equal(native.counters.allocations, 69);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

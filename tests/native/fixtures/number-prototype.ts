@@ -269,6 +269,39 @@ console.log(
   denormalBits.charAt(denormalBits.length - 1),
   denormalBits.charAt(0),
 );
+/*
+ * Above a power of two the decimals that read back reach twice as far up
+ * as down, so the closest 16-digit decimal to 2^-24 (a tie rounded to the
+ * even ...062) misses while ...063 reads back. The Float16 counterexample
+ * that found it stored binary16 bits 1, which is 2^-24. Shortest digits
+ * feed ToString, toString, toExponential, toPrecision, and the canonical
+ * numeric index test a TypedArray applies to string keys.
+ */
+let binadeLow = 1;
+for (let step = 0; step < 24; step += 1) binadeLow = binadeLow / 2;
+console.log(
+  "binade shortest",
+  String(binadeLow),
+  binadeLow.toString(),
+  \`\${-binadeLow}\`,
+  binadeLow.toExponential(),
+  binadeLow.toPrecision(),
+  [binadeLow, -binadeLow].join(),
+);
+for (const exponent of [-1017, -140, 89, 976]) {
+  console.log("binade power", exponent, String(2 ** exponent));
+}
+const halfBits = new Uint16Array(1);
+halfBits[0] = 1;
+console.log(
+  "binade float16",
+  String(new Float16Array(halfBits.buffer)[0]),
+  String(new Float32Array([binadeLow])[0]),
+);
+const binadeKeys = new Float64Array(1);
+binadeKeys["5.960464477539063e-8"] = 1;
+binadeKeys["5.9604644775390625e-8"] = 2;
+console.log("binade keys", Object.keys(binadeKeys).join("|"));
 
 /** @param {number} value */
 function hinted(value) { return value.toString(); }

@@ -33,6 +33,7 @@ export const test262DependencyVocabulary: ReadonlySet<string> = new Set([
   "json-parse",
   "json-stringify",
   "lexical-bindings",
+  "lexical-grammar",
   "module-linking",
   "object-literals",
   "object-own-keys",

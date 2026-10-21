@@ -1383,9 +1383,42 @@ test("populates the realm-owned TypedArray constructor cluster", () => {
     "FLOAT64_ARRAY",
     "BIGINT64_ARRAY",
     "BIGUINT64_ARRAY",
+    "FLOAT16_ARRAY",
   ]) {
     assert.match(header, new RegExp(`OSEO_INTRINSIC_${intrinsic}`, "u"));
   }
+  // Float16Array was admitted after the other eleven, so its pair takes
+  // the next realm slots and leaves every older slot where it was. The
+  // last-built constructor is the cluster's in-progress marker.
+  assert.match(header, /OSEO_INTRINSIC_BIGUINT64_ARRAY = 237/u);
+  assert.match(header, /OSEO_INTRINSIC_FLOAT16_ARRAY_PROTOTYPE = 271/u);
+  assert.match(header, /OSEO_INTRINSIC_FLOAT16_ARRAY = 272/u);
+  assert.match(
+    typedArrays,
+    new RegExp(
+      String.raw`OseoValue \*marker =\s*&context->realm->` +
+        String.raw`intrinsics\[OSEO_INTRINSIC_FLOAT16_ARRAY\];`,
+      "u",
+    ),
+  );
+  // Both element directions reuse DataView's exact binary16 conversion.
+  assert.match(
+    typedArrays,
+    new RegExp(
+      String.raw`case OSEO_TYPED_ARRAY_FLOAT16: \{\s*` +
+        String.raw`uint16_t stored = oseo_internal_float16_bits\(number\);`,
+      "u",
+    ),
+  );
+  assert.match(
+    typedArrays,
+    new RegExp(
+      String.raw`case OSEO_TYPED_ARRAY_FLOAT16: \{\s*uint16_t stored;\s*` +
+        String.raw`memcpy\(&stored, source, sizeof\(stored\)\);\s*` +
+        String.raw`return oseo_internal_float16_number\(stored\);`,
+      "u",
+    ),
+  );
   assert.match(typedArrays, /typed_array_from_buffer/u);
   assert.match(typedArrays, /typed_array_from_iterable/u);
   assert.match(typedArrays, /typed_array_from_typed_array/u);
@@ -1425,6 +1458,16 @@ test("installs the core TypedArray prototype surface", () => {
   );
   // The failure path of the cluster clears only its own slots.
   assert.match(typedArrays, /index <= OSEO_INTRINSIC_BIGUINT64_ARRAY;/u);
+  assert.match(
+    typedArrays,
+    new RegExp(
+      String.raw`intrinsics\[OSEO_INTRINSIC_FLOAT16_ARRAY_PROTOTYPE\] =\s*` +
+        String.raw`oseo_undefined\(\);\s*context->realm->` +
+        String.raw`intrinsics\[OSEO_INTRINSIC_FLOAT16_ARRAY\] =\s*` +
+        String.raw`oseo_undefined\(\);`,
+      "u",
+    ),
+  );
   assert.match(descriptors, /oseo_internal_typed_array_define_index\(/u);
   assert.match(iterators, /oseo_internal_typed_array_iteration_length\(/u);
   assert.doesNotMatch(typedArrays, /typed_array_deferred_accessor/u);
@@ -1844,7 +1887,7 @@ test("populates the realm-owned weak collection intrinsic cluster", () => {
     header,
     /OSEO_INTRINSIC_FINALIZATION_REGISTRY_UNREGISTER = 260/u,
   );
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 271/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 273/u);
   for (const property of [
     "WeakMap",
     "WeakSet",
@@ -2657,7 +2700,19 @@ test("populates the single-agent shared memory clusters", () => {
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER = 240/u);
   assert.match(header, /OSEO_INTRINSIC_SHARED_ARRAY_BUFFER_SPECIES = 241/u);
   assert.match(header, /OSEO_INTRINSIC_ATOMICS = 242/u);
-  assert.match(header, /OSEO_INTRINSIC_COUNT = 271/u);
+  assert.match(header, /OSEO_INTRINSIC_COUNT = 273/u);
+  // ValidateIntegerTypedArray rejects every floating element type,
+  // including Float16, before any index conversion.
+  assert.match(
+    atomicsSource,
+    new RegExp(
+      String.raw`kind != OSEO_TYPED_ARRAY_UINT8_CLAMPED &&\s*` +
+        String.raw`kind != OSEO_TYPED_ARRAY_FLOAT16 &&\s*` +
+        String.raw`kind != OSEO_TYPED_ARRAY_FLOAT32 &&\s*` +
+        String.raw`kind != OSEO_TYPED_ARRAY_FLOAT64;`,
+      "u",
+    ),
+  );
   assert.match(internalHeader, /OSEO_HEAP_ATOMICS_WAITER = 35/u);
   // A SharedArrayBuffer is the ArrayBuffer record with the shared brand,
   // so views, DataView, and the collector reach both kinds through one

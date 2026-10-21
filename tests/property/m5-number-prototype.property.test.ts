@@ -448,3 +448,270 @@ test(
     );
   },
 );
+
+/*
+ * A power of two is the one place a double's round-trip interval is
+ * asymmetric: its next-lower double lies half as far away as its
+ * next-higher one. The shortest-decimal domain below draws powers of two
+ * across the binary16, binary32, and binary64 exponent ranges, with the
+ * neighboring doubles one unit in the last place away as symmetric
+ * controls.
+ */
+type Neighbor = "above" | "below" | "exact";
+
+interface ShortestDecimalCase {
+  readonly exponent: number;
+  readonly negative: boolean;
+  readonly neighbor: Neighbor;
+}
+
+const shortestDecimalArbitrary: fc.Arbitrary<ShortestDecimalCase> = fc.record({
+  exponent: fc.oneof(
+    fc.integer({ max: 15, min: -24 }),
+    fc.integer({ max: 127, min: -149 }),
+    fc.integer({ max: 1023, min: -1074 }),
+  ),
+  negative: fc.boolean(),
+  neighbor: fc.constantFrom<Neighbor>("below", "exact", "above"),
+});
+
+/** Bit pattern of the generated positive double. */
+function shortestDecimalBits(testCase: ShortestDecimalCase): bigint {
+  const view = new DataView(new ArrayBuffer(8));
+  view.setFloat64(0, 2 ** testCase.exponent);
+  const exact = view.getBigUint64(0);
+  /*
+   * The double below the smallest denormal is zero, whose formatting is
+   * not a shortest-decimal search, so that one draw keeps the power.
+   */
+  if (testCase.neighbor === "below" && exact > 1n) return exact - 1n;
+  if (testCase.neighbor === "above") return exact + 1n;
+  return exact;
+}
+
+function shortestDecimalValue(testCase: ShortestDecimalCase): number {
+  const view = new DataView(new ArrayBuffer(8));
+  view.setBigUint64(0, shortestDecimalBits(testCase));
+  const magnitude = view.getFloat64(0);
+  return testCase.negative ? -magnitude : magnitude;
+}
+
+const doubleScale = 1n << 1076n;
+
+/** Significant digits without trailing zeros and the decimal point position. */
+interface ShortestDecimal {
+  readonly digits: string;
+  readonly n: number;
+}
+
+/** A k-digit significand and its scaled distance from the double. */
+interface DecimalCandidate {
+  readonly distance: bigint;
+  readonly s: bigint;
+}
+
+/**
+ * Number::toString's digit selection (6.1.6.1.20 step 5) by exact
+ * rational arithmetic over 2^1076, independent of the runtime's
+ * printf/strtod search: the fewest digits whose decimal lies in the
+ * double's round-trip interval (closed when its significand is even),
+ * then the closest such decimal, the even one on a tie. Returns the
+ * digits without trailing zeros and n, the decimal point position.
+ */
+function shortestDecimal(bits: bigint): ShortestDecimal {
+  const biased = Number((bits >> 52n) & 0x7ffn);
+  const fraction = bits & ((1n << 52n) - 1n);
+  const significand = biased === 0 ? fraction : fraction | (1n << 52n);
+  const binaryExponent = (biased === 0 ? 1 : biased) - 1075;
+  const scaled = significand << BigInt(binaryExponent + 1076);
+  const above = 1n << BigInt(binaryExponent + 1076);
+  const below = fraction === 0n && biased > 1 ? above / 2n : above;
+  const low = scaled - below / 2n;
+  const high = scaled + above / 2n;
+  const closed = significand % 2n === 0n;
+  const atLeastPower = (q: number) =>
+    q >= 0
+      ? scaled >= 10n ** BigInt(q) * doubleScale
+      : scaled * 10n ** BigInt(-q) >= doubleScale;
+  let q = Math.floor(
+    Math.log10(Number(significand)) + binaryExponent * Math.log10(2),
+  );
+  while (!atLeastPower(q)) q -= 1;
+  while (atLeastPower(q + 1)) q += 1;
+  for (let k = 1; k <= 17; k += 1) {
+    const shift = k - 1 - q;
+    const base =
+      shift >= 0
+        ? (scaled * 10n ** BigInt(shift)) / doubleScale
+        : scaled / (doubleScale * 10n ** BigInt(-shift));
+    let best: DecimalCandidate | null = null;
+    for (const s of [base, base + 1n]) {
+      if (s <= 0n) continue;
+      /* s * 10^-shift as numerator / denominator over 2^1076. */
+      const numerator =
+        shift >= 0 ? s * doubleScale : s * 10n ** BigInt(-shift) * doubleScale;
+      const denominator = shift >= 0 ? 10n ** BigInt(shift) : 1n;
+      const inside = closed
+        ? numerator >= low * denominator && numerator <= high * denominator
+        : numerator > low * denominator && numerator < high * denominator;
+      if (!inside) continue;
+      const target = scaled * denominator;
+      const distance =
+        numerator > target ? numerator - target : target - numerator;
+      if (
+        best == null ||
+        distance < best.distance ||
+        (distance === best.distance && s % 2n === 0n)
+      ) {
+        best = { distance, s };
+      }
+    }
+    if (best == null) continue;
+    const text = best.s.toString();
+    return {
+      digits: text.replace(/0+$/u, ""),
+      n: q + 1 + (text.length > k ? 1 : 0),
+    };
+  }
+  throw new Error("no 17-digit decimal reads back");
+}
+
+function expectedNumberToString(bits: bigint, negative: boolean): string {
+  const { digits, n } = shortestDecimal(bits);
+  const k = digits.length;
+  let body: string;
+  if (k <= n && n <= 21) body = digits + "0".repeat(n - k);
+  else if (n > 0 && n <= 21) body = `${digits.slice(0, n)}.${digits.slice(n)}`;
+  else if (n > -6 && n <= 0) body = `0.${"0".repeat(-n)}${digits}`;
+  else body = assembleExponential(digits, n - 1);
+  return (negative ? "-" : "") + body;
+}
+
+function expectedFreeExponential(bits: bigint, negative: boolean): string {
+  const { digits, n } = shortestDecimal(bits);
+  return (negative ? "-" : "") + assembleExponential(digits, n - 1);
+}
+
+function printShortestDecimalCase(testCase: ShortestDecimalCase): string {
+  return `
+const value = ${shortestDecimalValue(testCase)};
+console.log("String", String(value));
+console.log("toString", value.toString());
+console.log("template", \`\${value}\`);
+console.log("toExponential", value.toExponential());
+console.log("toPrecision", value.toPrecision());
+/** @param {number} input */
+function hinted(input) { return input.toString(); }
+console.log("hint", hinted(value));
+console.log("false hint", hinted(new Number(value)));
+console.log("guard", hinted(value));
+Number.prototype.hintMarker = 1;
+console.log("guard", hinted(value));
+`;
+}
+
+function expectedShortestDecimalObservation(testCase: ShortestDecimalCase) {
+  const bits = shortestDecimalBits(testCase);
+  const text = expectedNumberToString(bits, testCase.negative);
+  return {
+    exitStatus: 0,
+    stderr: "",
+    stdout: [
+      `String ${text}`,
+      `toString ${text}`,
+      `template ${text}`,
+      `toExponential ${expectedFreeExponential(bits, testCase.negative)}`,
+      `toPrecision ${text}`,
+      `hint ${text}`,
+      `false hint ${text}`,
+      `guard ${text}`,
+      `guard ${text}`,
+      "",
+    ].join("\n"),
+  };
+}
+
+test(
+  "generated shortest Number decimals match ECMA-262 2025",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "Number::toString picks the closest shortest round-trip decimal",
+      fc.asyncProperty(shortestDecimalArbitrary, async (testCase) => {
+        const source = printShortestDecimalCase(testCase);
+        const expected = expectedShortestDecimalObservation(testCase);
+        assertMatchingObservations([expected, ...(await references(source))]);
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-number-shortest.ts" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const mir = printMir(compiled.mir);
+          if (specialization === "enabled") {
+            assert.match(mir, /guard-object/u);
+            assert.match(mir, /guard-shape/u);
+            assert.match(mir, /property-get generic/u);
+          } else {
+            assert.doesNotMatch(mir, /guard-(?:object|shape)/u);
+          }
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: nativeToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expected, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "enabled") {
+                  assert.ok(native.counters.guardMisses > 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "a power of two 2^e with e drawn from the binary16 -24..15, " +
+          "binary32 -149..127, or binary64 -1074..1023 exponent range, " +
+          "the double one unit in the last place below or above it as a " +
+          "symmetric-interval control (the power itself when the one " +
+          "below would be zero), and a sign; omitted-argument decimal " +
+          "formatting through String, toString, a template, " +
+          "toExponential, and toPrecision, a false hint, and a " +
+          "shape-guard miss, against an exact-rational Number::toString " +
+          "oracle. toLocaleString is left out because the reference " +
+          "engines format it through ECMA-402.",
+        numRuns: 16,
+        profile: "M5 Number shortest decimal",
+        seed: 0x6000_4901,
+        sizeLimit:
+          "one exponent, one neighbor offset, one sign, five format " +
+          "observations, two hint classes, and one prototype shape change",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

@@ -208,6 +208,45 @@ test("admits only reviewed dependency tags from the vocabulary", () => {
   );
 });
 
+test("admits lexical-grammar beside other reviewed dependency tags", () => {
+  const admitted = parseReviewedSubset(
+    JSON.stringify({
+      suiteRevision: revision,
+      supportedFeatures: [],
+      tests: [
+        {
+          dependencies: ["control-flow", "lexical-grammar"],
+          expectedClassification: "pass",
+          path: "test/a.js",
+        },
+      ],
+    }),
+  );
+  assert.deepEqual(admitted.tests[0]?.dependencies, [
+    "control-flow",
+    "lexical-grammar",
+  ]);
+  for (const dependency of ["lexical", "lexical-grammars", "Lexical-Grammar"]) {
+    assert.throws(
+      () =>
+        parseReviewedSubset(
+          JSON.stringify({
+            suiteRevision: revision,
+            supportedFeatures: [],
+            tests: [
+              {
+                dependencies: [dependency],
+                expectedClassification: "pass",
+                path: "test/a.js",
+              },
+            ],
+          }),
+        ),
+      new RegExp(`unreviewed dependency tag ${dependency}\\.`, "u"),
+    );
+  }
+});
+
 function reviewedSubset(paths: readonly string[]): ReviewedTest262Subset {
   return {
     suiteRevision: revision,

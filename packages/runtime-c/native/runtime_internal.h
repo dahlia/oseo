@@ -922,6 +922,8 @@
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 48u)
 #define OSEO_TYPED_ARRAY_OF_CODE_ID \
     (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 49u)
+#define OSEO_FLOAT16_ARRAY_CONSTRUCTOR_CODE_ID \
+    (OSEO_TYPED_ARRAY_CODE_ID_RANGE_LAST - 50u)
 
 #define OSEO_ATOMICS_CODE_ID_RANGE_INDEX ((size_t)25u)
 #define OSEO_ATOMICS_CODE_ID_RANGE_FIRST \
@@ -1820,7 +1822,11 @@ typedef struct {
     bool track_length;
 } OseoDataView;
 
-/* The eleven element representations admitted by the constructor node. */
+/*
+ * The twelve element representations of ECMA-262 2025 Table 73. Float16
+ * was admitted after the other eleven, so it takes the next value and the
+ * existing values stay stable.
+ */
 typedef enum {
     OSEO_TYPED_ARRAY_INT8 = 0,
     OSEO_TYPED_ARRAY_UINT8 = 1,
@@ -1833,6 +1839,7 @@ typedef enum {
     OSEO_TYPED_ARRAY_FLOAT64 = 8,
     OSEO_TYPED_ARRAY_BIGINT64 = 9,
     OSEO_TYPED_ARRAY_BIGUINT64 = 10,
+    OSEO_TYPED_ARRAY_FLOAT16 = 11,
 } OseoTypedArrayKind;
 
 /*
@@ -4154,6 +4161,14 @@ OseoResult oseo_internal_install_date_global(
     OseoContext *context,
     OseoValue global
 );
+/*
+ * NumericToRawBytes and RawBytesToNumeric for Float16: the exact
+ * roundTiesToEven binary16 encoding DataView's setFloat16 stores, and the
+ * exact Number one binary16 encoding denotes. TypedArray elements share
+ * them so the two views of one Data Block agree bit for bit.
+ */
+uint16_t oseo_internal_float16_bits(double value);
+double oseo_internal_float16_number(uint16_t bits);
 /* Materializes %DataView% together with %DataView.prototype% and every
  * own property ECMA-262 gives them, and returns the constructor. */
 OseoResult oseo_internal_data_view_intrinsic(OseoContext *context);

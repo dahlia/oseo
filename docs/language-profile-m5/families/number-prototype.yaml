@@ -17,6 +17,10 @@ scope:
     engines do not produce the exact digits themselves; binade-boundary
     cases are pinned by exact reparse and terminating radices digit for
     digit."
+  - "Radix 10 and the other omitted-precision decimal formatters choose the
+    fewest round-trip digits and then the closest decimal, ties to even,
+    including the decimal above the closest one at a power of two, whose
+    round-trip interval reaches twice as far up as down."
 owners:
   - PLAN-M5.md
 evidence:
@@ -62,4 +66,5 @@ evidence:
     references:
       - packages/runtime-c/native/runtime_internal.h
       - packages/runtime-c/native/runtime_number.c
+      - packages/runtime-c/native/runtime_primitive.c
       - packages/runtime-c/tests/intrinsic-graph.test.ts

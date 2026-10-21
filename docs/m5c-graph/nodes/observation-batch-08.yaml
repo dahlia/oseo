@@ -8,6 +8,7 @@ delivers: "Observes the 462 unreviewed paths that
   result an owner."
 dependencies:
   - iterator-next-callability
+  - observation-batch-05
   - observation-batch-plan
   - parenthesized-assignment-function-name
   - with-strict-assignment-fallback

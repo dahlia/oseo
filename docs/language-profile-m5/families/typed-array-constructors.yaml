@@ -2,12 +2,15 @@ version: 1
 id: typed-array-constructors
 title: "TypedArray constructors"
 scope:
-  - "The abstract %TypedArray% constructor and eleven concrete constructor
+  - "The abstract %TypedArray% constructor and twelve concrete constructor
     and prototype pairs, including their realm-global, name, length,
     prototype, constructor, and BYTES_PER_ELEMENT descriptors."
   - "Construction from an element length, ArrayBuffer with byte offset and
     optional element length, iterable, array-like object, or TypedArray,
     including Number, BigInt, clamped, integer, and floating conversion."
+  - "Float16Array stores round once from binary64 to binary16 with ties to
+    even through the encoder DataView's setFloat16 uses, so both views of
+    one buffer agree bit for bit; Atomics rejects a Float16Array."
   - "The ViewedArrayBuffer ownership and collector edge, indexed reads and
     writes needed to observe constructor results, ArrayBuffer.isView, new
     target prototype selection, and Number-versus-BigInt content rejection."
@@ -72,4 +75,6 @@ evidence:
       - packages/runtime-c/tests/intrinsic-graph.test.ts
       - packages/runtime-c/native/runtime_typed_array.c
       - packages/runtime-c/native/runtime_memory.c
+      - packages/runtime-c/native/runtime_data_view.c
+      - packages/parser-babel/tests/statements.test.ts
       - tests/property/m5-typed-array-constructors.property.test.ts

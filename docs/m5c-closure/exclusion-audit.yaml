@@ -2,7 +2,7 @@ version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 records:
   0013-m5-edition-and-manifest:
-    digest: 323e83e1a84e1b87363505324ebac5420af8a3566aabcccaa1c7cc3fb9eb7070
+    digest: 3922cee52d1c86ce8b5f5c7d5f7969b7d5983863a9865f3588fd6663cace8bf0
     authorization:
       - Annex B legacy web semantics are excluded from the claim.
       - Annex B behavior is reported as unsupported when a test inside
@@ -134,7 +134,7 @@ assessments:
       tests/native/fixtures/typed-array-constructors.ts: "\
         44b36f7a8e551ea63ba572d843a34ddfac51812f2f7e75c6f5af86dbea4d15ef"
       tests/property/m5-typed-array-constructors.property.test.ts: "\
-        69e2c66eb0aac37433d468e3f330f6b7a7f0043fbebf55ce2bb5fae83390f322"
+        ef8f8b1f2d88099bbbcd0ae35de4953f4a932f3242e6503a3a2b59909e3ee20d"
     reason: The only observed failure is the excluded Annex B __proto__
       read. The source also requires TypedArray-to-TypedArray cloning to
       ignore an ArrayBuffer subclass constructor and species, and checks
@@ -2360,6 +2360,218 @@ paths:
     section: sec-undefined
     subject: Use typeof, isNaN, isFinite
     assessment: fixture-construction
+  - path: "test/language/arguments-object/10.5-1-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0f76c3b17d80ce0eda9e03d85ff72a51d4e6969a5485ecbc096decab2882\
+      63f7"
+    observationDigest: "cc85aae73f22ed42845b44afd5f88785c368c076d6595452b879807\
+      b0ddc94b2"
+    missingDynamicTag: false
+    section: "sec-identifiers-static-semantics-early-errors"
+    subject:
+      "Assignment to arguments in strict function code is an early SyntaxError;
+      eval only carries the assignment as source so the error surfaces at run
+      time"
+    assessment: "fixture-construction"
+  - path: "test/language/arguments-object/10.5-7-b-1-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "c7836a6b0e824b885d0be4f000abed54140a8a347fcfc9c63e751df2c211\
+      c6be"
+    observationDigest: "5614a3ada2a0614ec3d5a20b4ada1120a62bdd1a7ffa8e1275c59eb\
+      44089670e"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject:
+      "Direct eval called from strict code evaluates strict eval code, so an
+      assignment to arguments inside a function that the eval source declares is
+      an early SyntaxError"
+    assessment: "eval-semantics"
+  - path: "test/language/block-scope/leave/outermost-binding-updated-in-catch-b\
+      lock-nested-block-let-declaration-unseen-outside-of-block.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e032d1e4fccf1d1466d12c4933edeee7c47dfa5e0a5c40628dbdabf2c82b\
+      ef41"
+    observationDigest: "b7eee681ad905457f4696b42ef3cc872d2a40bf50bc2fba3fe0d144\
+      ac81f1441"
+    missingDynamicTag: false
+    section: "sec-block-runtime-semantics-evaluation"
+    subject:
+      "A let binding of a block left by a throw is removed from the environment
+      chain; eval('xx') is only the probe that must throw ReferenceError"
+    assessment: "fixture-construction"
+  - path: "test/language/comments/S7.4_A5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "750e81132560c5ab7915bfca83e7afea4d458455ea476fc20873e37debfa\
+      8ec1"
+    observationDigest: "4de15c0298289e2495519dcc22cde0aa436f2e8aff4c33d1d2e8050\
+      cc5fcf25f"
+    missingDynamicTag: false
+    section: "sec-comments"
+    subject:
+      "A single-line comment ends only at a LineTerminator code point; eval only
+      compiles each probe source that places one BMP code unit in the comment"
+    assessment: "fixture-construction"
+  - path: "test/language/comments/S7.4_A6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8d89c2b5ebb2410a9f0d06b30b31f72b727a8e079080ee4457c5bdf33e49\
+      66a6"
+    observationDigest: "db58800feb4c9ce67cbf8e89fe3218e0c0a419baec14e4ba67f2299\
+      74f13db89"
+    missingDynamicTag: false
+    section: "sec-comments"
+    subject:
+      "A multi-line comment can contain any code unit; eval only compiles each
+      probe source that places one code unit in the comment"
+    assessment: "fixture-construction"
+  - path: "test/language/comments/mongolian-vowel-separator-single-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ebf52648c9fc76e9992dd2d8f7581e40c89803a42309add33fc49676a08c\
+      e7ef"
+    observationDigest: "7c063c4df4a6a519b4f0f42ea56423caeec2cb26a76334a7606eb47\
+      0c0a7fb1e"
+    missingDynamicTag: false
+    section: "sec-unicode-format-control-characters"
+    subject:
+      "U+180E may appear in a single-line comment; eval only compiles the probe
+      source that contains it"
+    assessment: "fixture-construction"
+  - path: "test/language/directive-prologue/10.1.1-11-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "d205bdef92f022ab6d449c266223c4b66419ee3ac4817cdb5e343bbd17d8\
+      af95"
+    observationDigest: "c5ce44da8cf794c82cf66138deef8afc3ddb3a8746c83093fa1cdfa\
+      a59bce616"
+    missingDynamicTag: false
+    section: "sec-strict-mode-code"
+    subject:
+      "Eval code that begins with a Use Strict Directive is strict, so its var
+      public declaration is an early SyntaxError and declares no binding"
+    assessment: "eval-semantics"
+  - path: "test/language/directive-prologue/10.1.1-12-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "86f32adba1eaa1cfecde07207b04e7cdf8256f362f944834b81efafa8154\
+      d525"
+    observationDigest: "b305d8e5d1945e2fb6bd0a94909518a02ba88a7a369ab1b412afff9\
+      04dcd8131"
+    missingDynamicTag: false
+    section: "sec-strict-mode-code"
+    subject:
+      "A 'use strict' string in the middle of eval code is not a directive, so
+      the eval code stays non-strict and declares public"
+    assessment: "eval-semantics"
+  - path: "test/language/directive-prologue/10.1.1-13-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "07b03b00a60001d983c473c8f95d551c8831d69198e7c2efd0a4d610c852\
+      2a22"
+    observationDigest: "b6c3d0a6f2a047a7c639ff1b1cd2ac68c10099844c0b25623b165fd\
+      dabe6b466"
+    missingDynamicTag: false
+    section: "sec-strict-mode-code"
+    subject:
+      "A 'use strict' string at the end of eval code is not a directive, so the
+      eval code stays non-strict and declares public"
+    assessment: "eval-semantics"
+  - path: "test/language/directive-prologue/10.1.1-14-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "d069ae1bf3cee431462f4a324bdb81256831e40853d9568df00f7eafd6f4\
+      5d73"
+    observationDigest: "8f4c34c42d61033887cae206dea7864c3ea9d755f1437c78ded216a\
+      cef64e9ab"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject:
+      "Direct eval called from a strict function evaluates strict eval code, so
+      var public in the eval source is an early SyntaxError"
+    assessment: "eval-semantics"
+  - path: "test/language/directive-prologue/10.1.1-29-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "b99bf3876269864e4ed29ff3a8e53d2a2711707d0c3060e84f8fa76e3ba1\
+      d99c"
+    observationDigest: "da68f2e9ec3257c7588f84e169b415cd835017f1d1a59ff7b1817e2\
+      19afb86b3"
+    missingDynamicTag: false
+    section: "sec-createdynamicfunction"
+    subject:
+      "A function the Function constructor creates in strict code does not
+      inherit strictness, so eval in its body assigns public as non-strict code"
+    assessment: "dynamic-construction"
+  - path: "test/language/directive-prologue/10.1.1-30-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "733b2cced50c57ee26b7afbe098228acf32e1826259914070028bf1038da\
+      3019"
+    observationDigest: "d5818e3f51c4e26c1098d417f17839fb2f992d2805b09294d4e3892\
+      a3ccf6f49"
+    missingDynamicTag: false
+    section: "sec-createdynamicfunction"
+    subject:
+      "A Function constructor body that begins with a Use Strict Directive is
+      strict, so the eval of public = 1 in it is an early SyntaxError"
+    assessment: "dynamic-construction"
+  - path: "test/language/directive-prologue/10.1.1-31-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0935bc4ea0ac8ba3b6303c29bb5970dfe076af425981e660b4cff3c641ab\
+      abdd"
+    observationDigest: "5d6b4cf95dd79824775e47feab06d2ccc75f32fa6c16ed5fd62b7b5\
+      509d28a15"
+    missingDynamicTag: false
+    section: "sec-createdynamicfunction"
+    subject:
+      "A 'use strict' string in the middle of a Function constructor body is not
+      a directive, so the body stays non-strict"
+    assessment: "dynamic-construction"
+  - path: "test/language/directive-prologue/10.1.1-32-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "baef0883b80956c8e941a62ba59e60a08fcff5df826537d2e3f95525950c\
+      fcb9"
+    observationDigest: "8adc04893538460a0e28b28a95639662b325954bb634ca73037d1e9\
+      353640065"
+    missingDynamicTag: false
+    section: "sec-createdynamicfunction"
+    subject:
+      "A 'use strict' string at the end of a Function constructor body is not a
+      directive, so the body stays non-strict"
+    assessment: "dynamic-construction"
+  - path: "test/language/directive-prologue/10.1.1-5-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5202481d0d72a153b2facc424aa36067b232587aa14490245811419ca0bc\
+      7133"
+    observationDigest: "3f294b7f0fa78ab300d88dfa57bc7e3df34797cd20a720dde19bbf3\
+      591b3876a"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject:
+      "Direct eval called from a function whose directive prologue begins with
+      'use strict' evaluates strict eval code, so var public is an early
+      SyntaxError"
+    assessment: "eval-semantics"
+  - path: "test/language/directive-prologue/10.1.1-8-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "4bea426e515e2ab3c3c6a39cc101ada275d965f656cbae7f2c05ac3deb31\
+      0708"
+    observationDigest: "3777bf5bf692b415005c979cf6d3c654e0c4d8eedd22636ee75426e\
+      8b7e4c1bb"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject:
+      "Direct eval called from a function whose directive prologue repeats 'use
+      strict' evaluates strict eval code, so var public is an early SyntaxError"
+    assessment: "eval-semantics"
   - path: "test/language/eval-code/direct/block-decl-eval-source-is-strict-nost\
       rict.js"
     proposedOwner: adr:0016-dynamic-source-boundary

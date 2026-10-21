@@ -131,8 +131,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 27,901 reviewed cases: 23,753 passes, 2,423
-expected negatives, and 1,725 unsupported profile features. It records no
+The current manifest contains 28,287 reviewed cases: 24,022 passes, 2,566
+expected negatives, and 1,699 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -243,10 +243,12 @@ current evidence assessment. Those live only in the indexed records above.
     the Unit 8.1b identifier delete records. A name the profile has
     since materialized, such as `Object`, `Number`, `Promise`, `String`,
     `Math`, `encodeURI`, or `globalThis`, reads the realm global object's
-    property instead. The same rejection covers the two other global
-    names ECMA-262 clause 19 requires of the pinned ECMAScript 2025 realm
-    that this profile has not admitted as values, `eval` and
-    `Float16Array`; Annex B additions such as `escape` stay excluded from
+    property instead. The same rejection covers `eval`, the one other
+    global name ECMA-262 clause 19 requires of the pinned ECMAScript 2025
+    realm that this profile has not admitted as a value; M5c node
+    `typed-array-feature-admission` admits `Float16Array`, which now reads
+    its global object property like the other concrete TypedArray
+    constructors. Annex B additions such as `escape` stay excluded from
     the claim and remain ordinary unresolvable names. HIR and MIR
     structural tests, fixed native differential fixtures, generated
     property suites with seeds `0x60002d00` and `0x60007e00`, and the
@@ -4020,6 +4022,25 @@ Differential evidence for the non-terminating cases asserts the reparsed
 magnitude on all three engines instead of the spelling, because the
 reference engines do not agree with each other's exact digits either.
 
+Radix 10, `ToString`, free-precision `toExponential`, `toPrecision`
+without a precision, and the canonical numeric index test a TypedArray
+applies to string keys share one decimal digit selection: the fewest
+significant digits that read back as the double, and among those the
+decimal closest to it, the even one on a tie, as ECMA-262 2025
+Number::toString step 5 requires. At each digit count the runtime takes
+the correctly rounded decimal and, for a normal power of two above the
+smallest normal, also the next decimal up, because the interval of decimals
+that read back as a power of two reaches twice as far above it as below.
+Until M5c node `typed-array-feature-admission` the runtime tried only the
+closest decimal, so 46 of the 2,098 positive powers of two printed 17
+digits where 16 suffice, such as `5.9604644775390625e-8` for 2^-24 instead
+of `5.960464477539063e-8`, and the canonical numeric index test treated the
+wrong spelling as canonical. The `number-prototype` native fixture pins
+2^-24 through each consumer and additionally checks `String` for 2^-1017,
+2^-140, 2^89, and 2^976, and generated evidence at seed `0x60004901`
+checks powers of two and their neighbors across the binary16, binary32, and
+binary64 exponent ranges against an exact BigInt Number::toString oracle.
+
 `toFixed`, `toExponential`,
 and `toPrecision` round through the same bignum numerator-over-denominator
 representation rather than repeated floating-point arithmetic, so every
@@ -6258,6 +6279,44 @@ The collector traces the backing-buffer reference, while the view never owns
 or caches the buffer's native Data Block; a store reacquires the buffer after
 conversion before touching bytes.
 
+M5c node `typed-array-feature-admission` adds `Float16Array`, the twelfth
+concrete constructor of ECMA-262 2025 Table 73, with element size 2 and
+element type Float16. A store rounds the converted Number once, directly
+from binary64, to binary16 with ties to even; magnitudes of 65520 and above
+become signed infinity, and a NaN stores the canonical quiet NaN. Reads
+return the exact Number a binary16 encoding denotes, so a Float16Array and a
+DataView over one buffer agree bit for bit. Float16 is a Number content type
+for every conversion and content-type check, and every `Atomics` operation
+rejects a Float16Array with `TypeError`. The global property is writable,
+non-enumerable, and configurable like the other constructors, and `typeof`
+reads it. The node also admits the frontmatter tags of the nine other
+concrete constructors that the reviewed feature list lacked. The generated
+domains at seeds `0x60006e00` and `0x60006e01` draw `Float16Array` from
+their shared Number constructor pool, so construction, prototype, iterator,
+out-of-bounds, global, primitive length, and construction-order cases cover
+it like the other eleven kinds. Generated evidence at seed `0x60006e02`
+checks rounding at binary16 midpoints and their binary64 neighbors against an
+exact BigInt oracle through construction, element assignment, and DataView,
+and the fixed `typed-array-float16` native fixture covers the constructor
+surface. Preparation ran no native build or execution and no manifest update.
+A later local Linux run of the Float16 conversion domain drew binary16
+bits 1, which is 2^-24, and its stored bits were exact, but the runtime
+printed the Number with 17 digits instead of 16; the node fixes that shared
+decimal digit selection, described with the `number-prototype` node above,
+rather than the binary16 conversion. After that fix, local Linux whole-file
+extended runs of the constructor and Number prototype property files passed.
+The complete reviewed test262 update then observed all 42 paths the node owns
+as passes and changed no other classification. Two TypedArray
+`toLocaleString` paths keep their `primitive-wrapper` boundary at the same
+`calls.push(this)` site, now reported six harness lines later. A later
+local Linux run of the fixed native fixture passed on the same source.
+Rebased onto the TypedArray `toLocaleString` argument change, which edits
+the `join` helper the fixture calls, the node's manifest first carried
+those records forward. A complete manifest update on that integrated source
+then reproduced all 28,287 records without a change. A native fixture run
+on that source, macOS execution, and CI remain pending. These 42 paths do
+not show complete Float16 conformance.
+
 The reviewed test262 subset adds 81 directly applicable paths from the node's
 736-path inventory. Fourteen BigInt constructor and prototype metadata cases
 pass. The other 67 retain an explicit `unsupported-profile-feature` boundary:
@@ -8163,7 +8222,7 @@ complete. The remaining gaps retain their existing owners.
     `ArrayBuffer` constructor with its Data Block, `DataView` over that
     block, the `Date` constructor with its statics and prototype, `Set`
     with its insertion-ordered element vector, `%TypedArray%`, the
-    eleven concrete TypedArray constructors, and `WeakMap`, `WeakSet`,
+    twelve concrete TypedArray constructors, and `WeakMap`, `WeakSet`,
     `WeakRef`, and `FinalizationRegistry`. The remaining standard
     constructors stay assigned to their dependency-ordered M5b nodes.
     `ArrayBuffer.isView` reports `true` for each admitted `DataView` or
@@ -8182,17 +8241,15 @@ complete. The remaining gaps retain their existing owners.
     admitted standard globals as replaceable properties of the same object,
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
     other unresolved global reference through it at run time. Three
-    boundaries remain. First, a reference to `eval` or `Float16Array`, the
-    two clause 19 standard global names this profile has not admitted as
-    identifier references, stays a source-located rejection. Every realm's
-    global object holds the `%eval%` value of
+    boundaries remain. First, a reference to `eval`, the one clause 19
+    standard global name this profile has not admitted as an identifier
+    reference, stays a source-located rejection. Every realm's global
+    object holds the `%eval%` value of
     [ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md), so a Script
-    top-level `var eval` keeps it; it does not bind `Float16Array`, so a
-    top-level `var` declaration of that name creates the fresh
-    undefined-initialized property GlobalDeclarationInstantiation prescribes
-    for an absent name, and the window before its first assignment, where a
-    conforming realm would still expose the standard value, is part of this
-    gap. The runtime-owned call targets `console`, `setTimeout`, and
+    top-level `var eval` keeps it. M5c node `typed-array-feature-admission`
+    installs `Float16Array` as a replaceable global object property, so a
+    top-level `var Float16Array` keeps the standard value as well. The
+    runtime-owned call targets `console`, `setTimeout`, and
     `clearTimeout` likewise keep hidden cells rather than global properties,
     so `typeof` and `delete` of them stay rejected. Second, an all-miss
     `with` chain admits sloppy and strict simple, compound, logical, or
