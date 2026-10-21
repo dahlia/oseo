@@ -16,6 +16,7 @@ results:
     classification: pass
     dependencies:
       - classes
+      - object-own-keys
       - object-properties
     execution:
       harnessIncludes:

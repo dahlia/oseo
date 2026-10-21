@@ -17,6 +17,7 @@ results:
     dependencies:
       - generators
       - object-literals
+      - object-own-keys
       - object-properties
     execution:
       harnessIncludes:

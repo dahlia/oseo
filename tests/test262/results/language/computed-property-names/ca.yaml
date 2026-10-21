@@ -17,6 +17,7 @@ results:
     dependencies:
       - functions
       - object-literals
+      - object-own-keys
       - object-properties
     execution:
       harnessIncludes:
@@ -83,6 +84,7 @@ results:
     dependencies:
       - functions
       - object-literals
+      - object-own-keys
       - object-properties
       - symbols
     execution:

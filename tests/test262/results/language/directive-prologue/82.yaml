@@ -16,6 +16,7 @@ results:
     dependencies:
       - error-intrinsics
       - functions
+      - lexical-grammar
     execution:
       harnessIncludes:
         - base.js

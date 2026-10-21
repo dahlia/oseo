@@ -17,6 +17,7 @@ results:
     classification: expected-negative
     dependencies:
       - functions
+      - lexical-grammar
       - var-bindings
     observation:
       errorType: SyntaxError

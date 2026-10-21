@@ -15,6 +15,7 @@ results:
     classification: pass
     dependencies:
       - functions
+      - lexical-grammar
     execution:
       harnessIncludes:
         - base.js

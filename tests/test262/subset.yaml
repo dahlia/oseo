@@ -56205,13 +56205,16 @@ tests:
     dependencies: [lexical-grammar]
   - path: test/language/computed-property-names/basics/number.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties]
   - path: test/language/computed-property-names/basics/string.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties]
   - path: test/language/computed-property-names/basics/symbol.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties, symbols]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties, symbols]
   - path: test/language/computed-property-names/class/accessor/getter-duplicates.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -56247,16 +56250,17 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/computed-property-names/class/method/generator.js
     expectedClassification: pass
-    dependencies: [classes, generators, object-properties]
+    dependencies: [classes, generators, object-own-keys, object-properties]
   - path: test/language/computed-property-names/class/method/number.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties]
+    dependencies: [classes, functions, object-own-keys, object-properties]
   - path: test/language/computed-property-names/class/method/string.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties]
+    dependencies: [classes, functions, object-own-keys, object-properties]
   - path: test/language/computed-property-names/class/method/symbol.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, symbols]
+    dependencies:
+      [classes, functions, object-own-keys, object-properties, symbols]
   - path: test/language/computed-property-names/class/static/generator-constructor.js
     expectedClassification: pass
     dependencies: [classes, generators, object-properties]
@@ -56274,25 +56278,25 @@ tests:
     dependencies: [classes, object-properties]
   - path: test/language/computed-property-names/class/static/method-number-order.js
     expectedClassification: pass
-    dependencies: [classes, object-properties]
+    dependencies: [classes, object-own-keys, object-properties]
   - path: test/language/computed-property-names/class/static/method-number.js
     expectedClassification: pass
-    dependencies: [classes, object-properties]
+    dependencies: [classes, object-own-keys, object-properties]
   - path: test/language/computed-property-names/class/static/method-prototype.js
     expectedClassification: pass
     dependencies: [classes, error-intrinsics, object-properties]
   - path: test/language/computed-property-names/class/static/method-string-order.js
     expectedClassification: pass
-    dependencies: [classes, object-properties]
+    dependencies: [classes, object-own-keys, object-properties]
   - path: test/language/computed-property-names/class/static/method-string.js
     expectedClassification: pass
-    dependencies: [classes, object-properties]
+    dependencies: [classes, object-own-keys, object-properties]
   - path: test/language/computed-property-names/class/static/method-symbol-order.js
     expectedClassification: pass
-    dependencies: [classes, object-properties, symbols]
+    dependencies: [classes, object-own-keys, object-properties, symbols]
   - path: test/language/computed-property-names/class/static/method-symbol.js
     expectedClassification: pass
-    dependencies: [classes, object-properties, symbols]
+    dependencies: [classes, object-own-keys, object-properties, symbols]
   - path: test/language/computed-property-names/class/static/setter-constructor.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -56319,34 +56323,40 @@ tests:
     dependencies: [object-literals, object-properties, symbols]
   - path: test/language/computed-property-names/object/method/generator.js
     expectedClassification: pass
-    dependencies: [generators, object-literals, object-properties]
+    dependencies:
+      [generators, object-literals, object-own-keys, object-properties]
   - path: test/language/computed-property-names/object/method/number.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties]
   - path: test/language/computed-property-names/object/method/string.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties]
   - path: test/language/computed-property-names/object/method/super.js
     expectedClassification: pass
     dependencies: [functions, object-literals, object-properties]
   - path: test/language/computed-property-names/object/method/symbol.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties, symbols]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties, symbols]
   - path: test/language/computed-property-names/object/property/number-duplicates.js
     expectedClassification: pass
     dependencies: [object-literals, object-properties]
   - path: test/language/computed-property-names/to-name-side-effects/class.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties]
+    dependencies: [classes, functions, object-own-keys, object-properties]
   - path: test/language/computed-property-names/to-name-side-effects/numbers-class.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties]
+    dependencies: [classes, functions, object-own-keys, object-properties]
   - path: test/language/computed-property-names/to-name-side-effects/numbers-object.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties]
   - path: test/language/computed-property-names/to-name-side-effects/object.js
     expectedClassification: pass
-    dependencies: [functions, object-literals, object-properties]
+    dependencies:
+      [functions, object-literals, object-own-keys, object-properties]
   - path: test/language/destructuring/binding/initialization-requires-object-coercible-null.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, error-intrinsics, functions]
@@ -56438,7 +56448,7 @@ tests:
     dependencies: [dynamic-source, functions]
   - path: test/language/directive-prologue/10.1.1-2gs.js
     expectedClassification: expected-negative
-    dependencies: [var-bindings]
+    dependencies: [lexical-grammar, var-bindings]
   - path: test/language/directive-prologue/10.1.1-3-s.js
     expectedClassification: pass
     dependencies: [functions, var-bindings]
@@ -56483,19 +56493,19 @@ tests:
     dependencies: [functions]
   - path: test/language/directive-prologue/14.1-11-s.js
     expectedClassification: pass
-    dependencies: [functions]
+    dependencies: [functions, lexical-grammar]
   - path: test/language/directive-prologue/14.1-12-s.js
     expectedClassification: pass
-    dependencies: [functions]
+    dependencies: [functions, lexical-grammar]
   - path: test/language/directive-prologue/14.1-13-s.js
     expectedClassification: pass
-    dependencies: [functions]
+    dependencies: [functions, lexical-grammar]
   - path: test/language/directive-prologue/14.1-14-s.js
     expectedClassification: pass
-    dependencies: [functions]
+    dependencies: [functions, lexical-grammar]
   - path: test/language/directive-prologue/14.1-15-s.js
     expectedClassification: pass
-    dependencies: [functions]
+    dependencies: [functions, lexical-grammar]
   - path: test/language/directive-prologue/14.1-16-s.js
     expectedClassification: pass
     dependencies: [functions]
@@ -56543,10 +56553,10 @@ tests:
     dependencies: [error-intrinsics, functions]
   - path: test/language/directive-prologue/func-decl-no-semi-parse.js
     expectedClassification: expected-negative
-    dependencies: [functions, var-bindings]
+    dependencies: [functions, lexical-grammar, var-bindings]
   - path: test/language/directive-prologue/func-decl-no-semi-runtime.js
     expectedClassification: pass
-    dependencies: [error-intrinsics, functions]
+    dependencies: [error-intrinsics, functions, lexical-grammar]
   - path: test/language/directive-prologue/func-decl-not-first-runtime.js
     expectedClassification: pass
     dependencies: [functions]
@@ -56567,10 +56577,10 @@ tests:
     dependencies: [error-intrinsics, functions]
   - path: test/language/directive-prologue/func-expr-no-semi-parse.js
     expectedClassification: expected-negative
-    dependencies: [functions, var-bindings]
+    dependencies: [functions, lexical-grammar, var-bindings]
   - path: test/language/directive-prologue/func-expr-no-semi-runtime.js
     expectedClassification: pass
-    dependencies: [error-intrinsics, functions]
+    dependencies: [error-intrinsics, functions, lexical-grammar]
   - path: test/language/directive-prologue/func-expr-not-first-runtime.js
     expectedClassification: pass
     dependencies: [functions]

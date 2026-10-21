@@ -18,6 +18,7 @@ results:
     dependencies:
       - functions
       - object-literals
+      - object-own-keys
       - object-properties
       - symbols
     execution:

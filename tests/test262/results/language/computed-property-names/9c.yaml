@@ -18,6 +18,7 @@ results:
     dependencies:
       - classes
       - functions
+      - object-own-keys
       - object-properties
       - symbols
     execution:

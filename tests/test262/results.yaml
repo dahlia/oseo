@@ -19594,10 +19594,10 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 23
     - dependency: lexical-grammar
-      expectedNegatives: 41
+      expectedNegatives: 44
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 81
+      passes: 88
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - dependency: module-linking
@@ -19618,7 +19618,7 @@ summary:
       expectedNegatives: 6
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 338
+      passes: 359
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: object-properties
