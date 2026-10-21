@@ -6698,6 +6698,45 @@ ratchet moves from 150 to 151 domains and seeds and from 5,719 to 5,731
 ordinary cases, and the evidence inventory moves from 128 to 129 families. The
 runtime ABI moves to `m5-114`.
 
+M5c node `typed-array-tolocalestring-arguments` repairs the element call in
+`%TypedArray%.prototype.toLocaleString`. ECMA-262 2025 section 23.2.3.31
+applies the Array algorithm of section 23.1.3.32 after ValidateTypedArray,
+with TypedArrayLength replacing the length read, and without ECMA-402 that
+algorithm invokes each element's current `toLocaleString` with no arguments.
+ADR 0013 excludes ECMA-402, so the native method now calls every Number and
+BigInt element method with zero arguments instead of forwarding the outer
+locales and options. Outer argument expressions are still evaluated before
+the call, and a locales or options object is never received or converted.
+Receiver validation before the length snapshot, the comma separator, the
+element read, the callability `TypeError`, result ToString, abrupt
+completion, detach and shrink observations, the active-receiver recursion
+stack, and host-memory accumulation are unchanged; the method roots one
+fewer argument slot. No code ID, intrinsic slot, heap kind, layout, or ABI
+entry point changes, so the runtime identity stays `m5-131`.
+
+Node.js 24.21.0 and Deno 2.9.7 implement ECMA-402 and forward exactly two
+arguments, so they remain differential references only against a separately
+labeled ECMA-402 model. Native output must equal an independent ECMA-262
+model. The fixed fixture no longer prints element argument observations.
+The existing generated domain at seed `0x60007600` keeps its generator, 12
+ordinary cases, size bound, 180-second limit, six fixed mutation cases, and
+false-hint guard miss, and its expected output now comes from both models.
+A new domain at slot `0x60007601` in the family's existing seed block adds
+10 ordinary cases and a 180-second limit. It draws one to three calls
+through method, `call`, or `apply` on attached or detached Int8, Uint8,
+Float64, BigInt64, or BigUint64 views of up to four elements, with up to
+three logged outer argument expressions, including a coercing locales object
+and a throwing expression, and reporting, object-returning, throwing,
+detaching, or non-callable element methods. A fixed program covers every
+argument shape, call form, view kind, and method mode. Both run under both
+specialization policies with collection forced at every safepoint. The 41
+reviewed paths under the two `toLocaleString` roots keep their records and
+owners: 36 pass, two need primitive wrapper objects, and three need the
+resizable-buffer harness. None of them inspects element arguments. Against
+base `dc1a00d9`, the property ratchet moves from 182 to 183 domains and seeds
+and from 6,551 to 6,561 ordinary cases; the evidence inventory stays at 143
+families.
+
 Implemented M5b node `symbol-intrinsic` completes the realm-owned `Symbol`
 intrinsic with ordinary `for` and `keyFor` functions and completes
 `%Symbol.prototype%` with `constructor`, `toString`, `valueOf`, the

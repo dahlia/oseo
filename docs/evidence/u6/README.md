@@ -574,4 +574,38 @@ matching-host case sum when available. This measurement establishes no
 final candidate CI or full test262 UPDATE result and changes no case
 budgets, seeds, deadlines, or shard totals.
 
+The TypedArray search-and-join property file now includes fixed and
+generated toLocaleString element-argument coverage alongside its existing
+search, join, and mutation cases.
+
+A local Linux x86-64 whole-file extended run at clean source
+`47d2d685fd3b06f0adb98bd96bec7d82df2bfac9` naturally exited zero with all
+five registrations passing and none skipped, cancelled, or failed. Their
+exact printed leaf durations sum to 285353.510650000 milliseconds
+(285.353510650 seconds), giving a Linux weight of 286 seconds after rounding
+up. That sum excludes build and plugin timing. The separate process wall
+time was 286.831809 seconds.
+
+The run kept task scale 10, seed 1592590339, size `large`, one file worker,
+and all existing budgets and interrupt limits. Clean HEAD, tree, and
+property SHA-256 matched before and after execution. The property digest
+was:
+`3090fae024d2e6736c5d3694cc911074d1af56ea308b866da326196ead3173f9`.
+
+Raw result, stdout, stderr and exact timing tokens remain in
+*/data/oseo-m5c-reviews/*, under
+*typed-array-tolocalestring-arguments-focused-extended1/*
+and its *actual-47d2d685/* child directory.
+
+macOS remains unmeasured for this source. Its provisional weight is 135
+seconds, the ceiling of the rounded Linux weight 286 times 174/369. That
+ratio comes from the prechange file weights (macOS 174, Linux 369) in CI run
+39070198868 at c78d9df1, as recorded by the checked-in table header. It
+models the changed file from the earlier host ratio; it is neither a current
+macOS measurement nor a conservative upper bound. Replace it with an actual
+matching-host CI case sum when available. This is one local Linux whole-file
+case sum, not final candidate CI, the fixed native fixture run, a
+whole-suite gate, or a full UPDATE. No case budget, seed, deadline, or shard
+total changes.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

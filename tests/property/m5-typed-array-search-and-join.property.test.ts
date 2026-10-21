@@ -51,8 +51,9 @@ type Mutation = "detach" | "none" | "shrink";
  * How the case supplies the method's optional second input: nothing, a
  * plain value, or an object whose conversion performs the case's mutation.
  * The input is the fromIndex for index search, the separator for join, and
- * the forwarded locales for toLocaleString; the predicate searches and
- * toString ignore it.
+ * the outer locales for toLocaleString; the predicate searches and toString
+ * ignore it. ECMA-262 never passes the locales to an element method, so
+ * only the ECMA-402 reference model converts a coerced locales object.
  */
 type Input =
   | { readonly kind: "absent" }
@@ -225,8 +226,9 @@ function printCase(testCase: SearchCase): string {
     else if (input.kind === "plain") {
       call = 'view.toLocaleString("ko", marker)';
     } else {
-      // The element method's own String(locales) runs this conversion, so
-      // it observes the forwarded object's identity rather than a copy.
+      // Under ECMA-402 the element method's own String(locales) runs this
+      // conversion, so it observes the forwarded object's identity rather
+      // than a copy. Under ECMA-262 the element method never receives it.
       call =
         'view.toLocaleString({ toString() { console.log("convert"); ' +
         `if (!mutated) { mutated = true; ${mutation} } return "ko"; } }, ` +
@@ -290,7 +292,16 @@ function integerOrInfinity(value: number): number {
   return Math.trunc(value) + 0;
 }
 
-function expected(testCase: SearchCase): string {
+/**
+ * Which toLocaleString element call contract a model follows. `ecma262` is
+ * the ADR 0013 edition that native execution must satisfy: each element
+ * method receives no arguments. `ecma402` is the labeled reference model for
+ * Node.js and Deno, which forward the outer locales and options as exactly
+ * two arguments. The two differ only in toLocaleString observations.
+ */
+type LocaleModel = "ecma262" | "ecma402";
+
+function expected(testCase: SearchCase, model: LocaleModel): string {
   const name = testCase.constructorName;
   const values = testCase.values.map((value) => store(name, value));
   const snapshot = values.length;
@@ -379,13 +390,15 @@ function expected(testCase: SearchCase): string {
         pieces.push("");
         continue;
       }
-      const locales = input.kind === "absent" ? "undefined" : "ko";
-      if (input.kind === "coerced") {
+      const forwarded = model === "ecma402" && input.kind !== "absent";
+      const locales = forwarded ? "ko" : "undefined";
+      if (forwarded && input.kind === "coerced") {
         lines.push("convert");
         mutate();
       }
       lines.push(
-        `locale ${String(value)} 2 ${locales} ${input.kind !== "absent"}`,
+        `locale ${String(value)} ${model === "ecma402" ? 2 : 0} ${locales} ` +
+          String(forwarded),
       );
       mutate();
       pieces.push(`<${String(value)}>`);
@@ -458,10 +471,10 @@ async function assertCase(testCase: SearchCase): Promise<void> {
   const expectedObservation = {
     exitStatus: 0,
     stderr: "",
-    stdout: expected(testCase),
+    stdout: expected(testCase, "ecma262"),
   };
   assertMatchingObservations([
-    expectedObservation,
+    { exitStatus: 0, stderr: "", stdout: expected(testCase, "ecma402") },
     ...(await references(source)),
   ]);
   for (const specialization of ["disabled", "enabled"] as const) {
@@ -550,8 +563,9 @@ test(
  * observable conversion invalidates an index the method still visits:
  * includes matching undefined after a detach, indexOf and lastIndexOf
  * skipping a shrunk index, join rendering empty fields, a predicate and
- * toLocaleString seeing a later element disappear, and a forwarded locales
- * object whose conversion detaches the view. These fixed cases
+ * toLocaleString seeing a later element disappear, and a locales object
+ * whose conversion detaches the view under the ECMA-402 reference model
+ * while the ECMA-262 element call detaches it natively. These fixed cases
  * keep each of them exercised on every run.
  */
 test(
@@ -609,5 +623,520 @@ test(
       },
     ];
     for (const testCase of cases) await assertCase(testCase);
+  },
+);
+
+/*
+ * %TypedArray%.prototype.toLocaleString element arguments. ECMA-262 2025
+ * applies the Array.prototype.toLocaleString algorithm after
+ * ValidateTypedArray, and that algorithm invokes each element's current
+ * toLocaleString with no arguments, whatever the outer call received.
+ * ECMA-402 replaces the step with a call forwarding the outer locales and
+ * options, and both reference hosts implement ECMA-402, so their element
+ * methods always receive exactly two arguments. ADR 0013 excludes ECMA-402,
+ * so the references must equal a labeled ECMA-402 model while native output
+ * must equal the independent ECMA-262 model. Every outer argument expression
+ * is still evaluated before the call in both, and a locales object that
+ * logs its own conversion shows that only the forwarding model converts it.
+ */
+type LocaleView =
+  | "BigInt64Array"
+  | "BigUint64Array"
+  | "Float64Array"
+  | "Int8Array"
+  | "Uint8Array";
+type LocaleArgument =
+  | "ar"
+  | "coercing"
+  | "null"
+  | "throwing"
+  | "undefined"
+  | "unique"
+  | "zero"
+  | "zh";
+type LocaleMethod = "detach" | "noncallable" | "object" | "report" | "throw";
+type LocaleForm = "apply" | "call" | "method";
+
+interface LocaleSubject {
+  readonly args: readonly LocaleArgument[];
+  readonly detached: boolean;
+  readonly form: LocaleForm;
+  readonly method: LocaleMethod;
+  readonly values: readonly number[];
+  readonly view: LocaleView;
+}
+
+interface LocaleCase {
+  readonly subjects: readonly LocaleSubject[];
+}
+
+const localeViews: readonly LocaleView[] = [
+  "BigInt64Array",
+  "BigUint64Array",
+  "Float64Array",
+  "Int8Array",
+  "Uint8Array",
+];
+const localeArguments: readonly LocaleArgument[] = [
+  "ar",
+  "coercing",
+  "null",
+  "throwing",
+  "undefined",
+  "unique",
+  "zero",
+  "zh",
+];
+const localeMethods: readonly LocaleMethod[] = [
+  "detach",
+  "noncallable",
+  "object",
+  "report",
+  "throw",
+];
+const localeForms: readonly LocaleForm[] = ["apply", "call", "method"];
+
+const localeCaseArbitrary: fc.Arbitrary<LocaleCase> = fc.record({
+  subjects: fc.array(
+    fc.record({
+      args: fc.array(fc.constantFrom(...localeArguments), { maxLength: 3 }),
+      detached: fc.boolean(),
+      form: fc.constantFrom(...localeForms),
+      method: fc.constantFrom(...localeMethods),
+      values: fc.array(fc.integer({ max: 9, min: 0 }), { maxLength: 4 }),
+      view: fc.constantFrom(...localeViews),
+    }),
+    { maxLength: 3, minLength: 1 },
+  ),
+});
+
+function isBigIntView(view: LocaleView): boolean {
+  return view === "BigInt64Array" || view === "BigUint64Array";
+}
+
+/** Mirrors the generated program's `describe`, including its conversion. */
+const localeArgumentDescription = {
+  ar: "'ar'",
+  coercing: "coercing:zh",
+  null: "null",
+  throwing: "unreachable",
+  undefined: "undefined",
+  unique: "unique",
+  zero: "0",
+  zh: "'zh'",
+} satisfies Record<LocaleArgument, string>;
+
+function localeArgumentSource(
+  arg: LocaleArgument,
+  subject: number,
+  index: number,
+): string {
+  if (arg === "throwing") return `fail(${subject}, ${index})`;
+  const value = {
+    ar: '"ar"',
+    coercing: "coercing",
+    null: "null",
+    undefined: "undefined",
+    unique: "unique",
+    zero: "0",
+    zh: '"zh"',
+  }[arg];
+  return `arg(${subject}, ${index}, ${value})`;
+}
+
+function localeMethodSource(method: LocaleMethod, view: string): string {
+  switch (method) {
+    case "detach":
+      return `function () {
+  "use strict";
+  report(typeof this + ":" + this, arguments);
+  if (calls === 0) ${view}.buffer.transfer();
+  calls = calls + 1;
+  return "e" + this;
+}`;
+    case "noncallable":
+      return "1";
+    case "object":
+      return `function () {
+  "use strict";
+  const label = typeof this + ":" + this;
+  report(label, arguments);
+  return {
+    toString() {
+      console.log("coerce result", label);
+      return "o";
+    },
+  };
+}`;
+    case "report":
+      return `function () {
+  "use strict";
+  report(typeof this + ":" + this, arguments);
+  return "e" + this;
+}`;
+    case "throw":
+      return `function () {
+  "use strict";
+  report(typeof this + ":" + this, arguments);
+  calls = calls + 1;
+  if (calls === 2) throw new RangeError("element");
+  return "e" + this;
+}`;
+  }
+}
+
+function printLocaleCase(testCase: LocaleCase): string {
+  const subjects = testCase.subjects.map((subject, index) => {
+    const view = `view${index}`;
+    const bigint = isBigIntView(subject.view);
+    const owner = bigint ? "BigInt" : "Number";
+    const elements = subject.values
+      .map((value) => (bigint ? `${value}n` : String(value)))
+      .join(", ");
+    const args = subject.args.map((arg, position) =>
+      localeArgumentSource(arg, index, position),
+    );
+    let invocation: string;
+    switch (subject.form) {
+      case "apply":
+        invocation =
+          `TypedArrayPrototype.toLocaleString.apply(` +
+          `${view}, [${args.join(", ")}])`;
+        break;
+      case "call":
+        invocation = `TypedArrayPrototype.toLocaleString.call(${[
+          view,
+          ...args,
+        ].join(", ")})`;
+        break;
+      case "method":
+        invocation = `${view}.toLocaleString(${args.join(", ")})`;
+        break;
+    }
+    return `const ${view} = new ${subject.view}([${elements}]);
+${subject.detached ? `${view}.buffer.transfer();\n` : ""}calls = 0;
+${owner}.prototype.toLocaleString = ${localeMethodSource(subject.method, view)};
+try {
+  console.log("result", ${index}, ${invocation});
+} catch (error) {
+  console.log("abrupt", ${index}, error.name);
+}
+`;
+  });
+  return `const TypedArray = Object.getPrototypeOf(Int8Array);
+const TypedArrayPrototype = TypedArray.prototype;
+const unique = { toString() { return "<sentinel object>"; } };
+const coercing = {
+  toString() {
+    console.log("coerce locales");
+    return "zh";
+  },
+};
+function arg(subject, index, value) {
+  console.log("evaluate", subject, index);
+  return value;
+}
+function fail(subject, index) {
+  console.log("evaluate", subject, index);
+  throw new RangeError("argument");
+}
+function describe(value) {
+  if (value === unique) return "unique";
+  if (value === coercing) return "coercing:" + String(value);
+  return typeof value === "string" ? "'" + value + "'" : String(value);
+}
+function report(label, received) {
+  const described = Array.prototype.map.call(received, describe);
+  console.log("call", label, received.length, described.join("|"));
+}
+let calls = 0;
+${subjects.join("")}`;
+}
+
+/**
+ * The expected stdout. Under `ecma402` every element method receives the
+ * outer call's first two arguments, `undefined` when absent, and describing
+ * the coercing locales object converts it before the call is logged. Under
+ * `ecma262` every element method receives no arguments, so nothing converts
+ * that object. Both evaluate every argument expression before the receiver
+ * is validated, and a throwing expression prevents the call.
+ */
+function modelLocaleCase(testCase: LocaleCase, model: LocaleModel): string {
+  const lines: string[] = [];
+  for (const [subjectIndex, subject] of testCase.subjects.entries()) {
+    let abrupt: string | null = null;
+    for (const [position, arg] of subject.args.entries()) {
+      lines.push(`evaluate ${subjectIndex} ${position}`);
+      if (arg === "throwing") {
+        abrupt = "RangeError";
+        break;
+      }
+    }
+    if (abrupt == null && subject.detached) abrupt = "TypeError";
+    const received: readonly LocaleArgument[] =
+      model === "ecma402"
+        ? [0, 1].map((position) => subject.args[position] ?? "undefined")
+        : [];
+    const kind = isBigIntView(subject.view) ? "bigint" : "number";
+    const pieces: string[] = [];
+    let calls = 0;
+    let detached = false;
+    for (const value of subject.values) {
+      if (abrupt != null) break;
+      if (detached) {
+        pieces.push("");
+        continue;
+      }
+      if (subject.method === "noncallable") {
+        abrupt = "TypeError";
+        break;
+      }
+      const label = `${kind}:${value}`;
+      for (const arg of received) {
+        if (arg === "coercing") lines.push("coerce locales");
+      }
+      const described = received.map((arg) => localeArgumentDescription[arg]);
+      lines.push(`call ${label} ${received.length} ${described.join("|")}`);
+      switch (subject.method) {
+        case "detach":
+          if (calls === 0) detached = true;
+          calls += 1;
+          pieces.push(`e${value}`);
+          break;
+        case "object":
+          lines.push(`coerce result ${label}`);
+          pieces.push("o");
+          break;
+        case "report":
+          pieces.push(`e${value}`);
+          break;
+        case "throw":
+          calls += 1;
+          if (calls === 2) abrupt = "RangeError";
+          else pieces.push(`e${value}`);
+          break;
+      }
+    }
+    lines.push(
+      abrupt == null
+        ? `result ${subjectIndex} ${pieces.join(",")}`
+        : `abrupt ${subjectIndex} ${abrupt}`,
+    );
+  }
+  lines.push("");
+  return lines.join("\n");
+}
+
+/**
+ * Every outer argument shape, including explicit undefined, extra
+ * arguments, a coercing locales object as locales and as options, and a
+ * throwing expression between two others, through every call form on a
+ * Number view; then each element method mode, each view kind, a detached
+ * receiver, and an empty view. One program keeps this to one native
+ * compilation per specialization policy.
+ */
+const fixedLocaleCase: LocaleCase = {
+  subjects: [
+    ...(
+      [
+        [],
+        ["undefined"],
+        ["ar"],
+        ["unique"],
+        ["coercing"],
+        ["zh", "coercing"],
+        ["coercing", "unique", "coercing"],
+        ["null", "zero"],
+        ["ar", "throwing", "zh"],
+      ] as const
+    ).flatMap((args) =>
+      localeForms.map((form) => ({
+        args,
+        detached: false,
+        form,
+        method: "report" as const,
+        values: [1, 2],
+        view: "Uint8Array" as const,
+      })),
+    ),
+    ...localeViews.flatMap((view) =>
+      localeMethods.map((method) => ({
+        args: ["coercing", "unique"] as const,
+        detached: false,
+        form: "method" as const,
+        method,
+        values: [3, 0, 7],
+        view,
+      })),
+    ),
+    ...(["Int8Array", "BigUint64Array"] as const).flatMap((view) =>
+      ([[], ["ar"]] as const).map((args) => ({
+        args,
+        detached: true,
+        form: "call" as const,
+        method: "report" as const,
+        values: [5],
+        view,
+      })),
+    ),
+    {
+      args: ["coercing"],
+      detached: false,
+      form: "apply",
+      method: "noncallable",
+      values: [],
+      view: "Float64Array",
+    },
+  ],
+};
+
+/** Both specialization policies, each with collection at every safepoint. */
+async function assertNativeLocaleCase(
+  source: string,
+  stdout: string,
+): Promise<void> {
+  const expectedObservation = { exitStatus: 0, stderr: "", stdout };
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source, sourceId: "generated-m5-typed-array-locale-arguments.ts" },
+      { observeSpecialization: true, specialization },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    assert.ok(compiled.mir != null);
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      await withNativeFixture(
+        {
+          backend: cBackend,
+          host,
+          input: compiled.mir,
+          operation: "execute",
+          runtime: cRuntimeProvider,
+          target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+          toolchain: nativeToolchain,
+        },
+        (native) => {
+          assertMatchingObservations([expectedObservation, native]);
+          assert.ok(native.counters?.collections != null);
+          assert.ok(native.counters.collections > 0);
+          if (specialization === "disabled") {
+            assert.equal(native.counters.guardHits, 0);
+            assert.equal(native.counters.guardMisses, 0);
+          }
+        },
+      );
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+}
+
+/**
+ * Requires both references to equal the labeled ECMA-402 model and native
+ * output to equal the ECMA-262 model.
+ */
+async function assertLocaleCase(testCase: LocaleCase): Promise<void> {
+  const source = printLocaleCase(testCase);
+  assertMatchingObservations([
+    { exitStatus: 0, stderr: "", stdout: modelLocaleCase(testCase, "ecma402") },
+    ...(await references(source)),
+  ]);
+  await assertNativeLocaleCase(source, modelLocaleCase(testCase, "ecma262"));
+}
+
+test("TypedArray locale models differ only in element arguments", () => {
+  const testCase: LocaleCase = {
+    subjects: [
+      {
+        args: ["ar", "coercing", "zh"],
+        detached: false,
+        form: "method",
+        method: "report",
+        values: [1],
+        view: "BigInt64Array",
+      },
+      {
+        args: [],
+        detached: false,
+        form: "call",
+        method: "detach",
+        values: [4, 5],
+        view: "Int8Array",
+      },
+    ],
+  };
+  assert.equal(
+    modelLocaleCase(testCase, "ecma262"),
+    "evaluate 0 0\nevaluate 0 1\nevaluate 0 2\n" +
+      "call bigint:1 0 \nresult 0 e1\n" +
+      "call number:4 0 \nresult 1 e4,\n",
+  );
+  assert.equal(
+    modelLocaleCase(testCase, "ecma402"),
+    "evaluate 0 0\nevaluate 0 1\nevaluate 0 2\n" +
+      "coerce locales\ncall bigint:1 2 'ar'|coercing:zh\nresult 0 e1\n" +
+      "call number:4 2 undefined|undefined\nresult 1 e4,\n",
+  );
+  const search: SearchCase = {
+    constructorName: "Int8Array",
+    input: { kind: "coerced", value: 0 },
+    method: "toLocaleString",
+    mutation: "none",
+    target: undefined,
+    values: [2],
+  };
+  assert.equal(
+    expected(search, "ecma262"),
+    "locale 2 0 undefined false\nresult string <2>\nhint 5 23\n",
+  );
+  assert.equal(
+    expected(search, "ecma402"),
+    "convert\nlocale 2 2 ko true\nresult string <2>\nhint 5 23\n",
+  );
+});
+
+test(
+  "fixed TypedArray locale arguments follow the ECMA-262 model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertLocaleCase(fixedLocaleCase);
+  },
+);
+
+test(
+  "generated TypedArray locale arguments are never forwarded",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "TypedArray toLocaleString invokes element methods without arguments",
+      fc.asyncProperty(localeCaseArbitrary, assertLocaleCase),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one to three %TypedArray%.prototype.toLocaleString calls through " +
+          "method, call, or apply on attached or detached Int8, Uint8, " +
+          "Float64, BigInt64, or BigUint64 views of zero to four elements, " +
+          "with zero to three logged outer argument expressions drawn from " +
+          "undefined, null, 0, two strings, an identity object, a coercing " +
+          "locales object, and a throwing expression, and a reporting, " +
+          "object-returning, throwing, detaching, or non-callable element " +
+          "method",
+        numRuns: 10,
+        profile: "M5 TypedArray toLocaleString element arguments",
+        seed: 0x6000_7601,
+        sizeLimit:
+          "three calls, three outer arguments, and four elements per call",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
   },
 );
