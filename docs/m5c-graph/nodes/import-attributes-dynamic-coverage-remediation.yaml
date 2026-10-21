@@ -16,5 +16,5 @@ delivers: "Accounts for exactly the 64 pinned ImportExpression-rejected paths
 dependencies:
   - dynamic-import
   - import-attributes
-landed: false
+landed: true
 status: ready
