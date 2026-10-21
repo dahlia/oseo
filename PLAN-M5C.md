@@ -995,21 +995,44 @@ harness does not implement still fails as a harness defect.
 The complete manifest update that read this source observed the 174 records
 that had reported `harness-include`, 168 owned here and 6 owned by
 `well-known-intrinsics-harness`. No other record changed. Of the 168, 163
-move to pass. Five stay `unsupported-profile-feature` under this node with
-their actual rejections: the grow and shrink
-_user-provided-tolocalestring-\*.js_ cases of `Array.prototype.toLocaleString`
-and `%TypedArray%.prototype.toLocaleString` report the `primitive-wrapper`
-capability, and
-*TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports the
-`OSEO1001` rejection of the Annex B `Object.prototype.__proto__` accessor. Of
-the 6, *Function/prototype/arguments/prop-desc.js*,
+move to pass. Five stay `unsupported-profile-feature` with their actual
+rejections, and their ownership moves to existing nodes as active coverage
+debt, not exclusions:
+
+ -  The grow and shrink _user-provided-tolocalestring-\*.js_ cases of
+    `Array.prototype.toLocaleString` and `%TypedArray%.prototype.toLocaleString`
+    report the `primitive-wrapper` capability. Their replacement
+    `Number.prototype.toLocaleString` and `BigInt.prototype.toLocaleString`
+    call the saved original with a non-strict `this`, which boxes the element.
+    The first observed variant stops at that call, so their remaining
+    assertions have not run. `primitive-wrapper-objects` owns these four,
+    which raises its contract from 36 to 40 paths.
+ -  *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports
+    the `OSEO1001` rejection of the Annex B `Object.prototype.__proto__`
+    accessor, which rejects the whole program. Its core subject, that
+    fixed-length views over a resizable and a fixed-length buffer share the new
+    target's prototype, does not depend on Annex B.
+    `typed-array-proto-coverage-remediation` owns it beside *no-species.js*
+    under a separate bounded audit assessment. Replacement evidence is the
+    `typed-array-constructors` native fixture's case for every constructor
+    the harness lists, including its three class subclasses, and the
+    construction order property's fixed resizable and fixed buffer cases. The
+    maintainer accounting decision is still required, and ADR 0013 is not
+    widened.
+
+Of the 6, *Function/prototype/arguments/prop-desc.js*,
 *Function/prototype/caller/prop-desc.js*, and
 *Function/prototype/toString/built-in-function-object.js* move to pass. The
 *is-a-constructor.js* cases of `AsyncFunction`, `AsyncGeneratorFunction`, and
-`GeneratorFunction` stay unsupported under `well-known-intrinsics-harness` with
-the `OSEO1001` rejection of a constructor that compiles source text. Each test
-checks IsConstructor before its `new` call, so these three remain active
-coverage debt, not whole-path ADR 0016 exclusions.
+`GeneratorFunction` stay unsupported with the `OSEO1001` rejection of a
+constructor that compiles source text. Each test checks IsConstructor before
+its `new` call, but the compiler rejects the whole program at that call, so
+the IsConstructor prefix has no native evidence. These three remain active
+coverage debt, not whole-path ADR 0016 exclusions, and
+`dynamic-source-coverage-remediation` owns them under a reviewed remediation
+assessment, which raises its contract from 255 to 258 paths. Neither harness
+node therefore leaves its original cohort without unsupported paths; each
+delivers the observation, and the remaining debt has an owner.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles

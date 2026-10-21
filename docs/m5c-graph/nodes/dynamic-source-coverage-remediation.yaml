@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 255 reviewed unsupported paths assigned to
+delivers: "Resolves the 258 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure ledger.
   Select exactly those owners and their exclusion-audit path assessments:
   the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
@@ -50,7 +50,13 @@ delivers: "Resolves the 255 reviewed unsupported paths assigned to
   scope exit probe; test/language/comments/S7.4_A5.js and S7.4_A6.js,
   comment code unit probes; and
   test/language/comments/mongolian-vowel-separator-single-eval.js, a U+180E
-  comment probe.
+  comment probe, and 3 from well-known-intrinsics-harness:
+  test/built-ins/AsyncFunction/is-a-constructor.js,
+  test/built-ins/AsyncGeneratorFunction/is-a-constructor.js, and
+  test/built-ins/GeneratorFunction/is-a-constructor.js, whose IsConstructor
+  assertion on the intrinsic precedes a new call that the compiler rejects
+  for the whole program, so that constructibility prefix has no native
+  evidence.
   Their eval or source constructor rejection is authorized, but non-source
   subject coverage remains unresolved.
   Obtain the maintainer accounting decision in

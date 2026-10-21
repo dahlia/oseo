@@ -3,7 +3,21 @@ id: primitive-wrapper-objects
 title: Admit primitive wrapper objects
 delivers: "Admits Boolean, Number, String, Symbol, and BigInt wrapper objects
   at the runtime boundary that currently reports primitive-wrapper, so the
-  36 reviewed paths with that unsupported capability are observed."
+  40 reviewed paths with that unsupported capability are observed: the
+  original 36 and four that resizable-array-buffer-harness transferred,
+  test/built-ins/Array/prototype/toLocaleString/\
+  user-provided-tolocalestring-grow.js,
+  test/built-ins/Array/prototype/toLocaleString/\
+  user-provided-tolocalestring-shrink.js,
+  test/built-ins/TypedArray/prototype/toLocaleString/\
+  user-provided-tolocalestring-grow.js,
+  and
+  test/built-ins/TypedArray/prototype/toLocaleString/\
+  user-provided-tolocalestring-shrink.js.
+  Their replacement Number.prototype.toLocaleString and
+  BigInt.prototype.toLocaleString call the saved original with a non-strict
+  this, which boxes the element. Only the first variant of each was
+  observed, so their remaining assertions must still be observed."
 dependencies:
   - unsupported-ownership-audit
 landed: false

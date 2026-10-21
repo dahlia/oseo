@@ -4,7 +4,10 @@ title: Admit the intrinsics harness
 delivers: "Reviews the wellKnownIntrinsicObjects.js harness include, whose
   upstream lookup compiles source with new Function, and admits a reviewed
   form, so the 6 reviewed paths recorded as harness-include unsupported for
-  that include are observed."
+  that include are observed. The complete update observed all 6: 3 pass,
+  and the 3 is-a-constructor.js cases transferred to
+  dynamic-source-coverage-remediation, which owns their remaining
+  unsupported coverage."
 dependencies:
   - unsupported-ownership-audit
 landed: false

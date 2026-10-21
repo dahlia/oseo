@@ -6,7 +6,14 @@ delivers: "Resolves exactly
   __proto__ dependency is classified. Own the still-unsupported mixed path
   in the ledger, retain its original path and assertions, and preserve its
   core no-species buffer construction, prototype, and constructor coverage
-  through an approved replacement observation. Follow the full PLAN-M5.md
+  through an approved replacement observation. Also resolves
+  test/built-ins/TypedArray/prototype/\
+  resizable-and-fixed-have-same-prototype.js,
+  which resizable-array-buffer-harness transferred: retain its path and
+  assertions and preserve, through an approved replacement observation,
+  its core coverage that fixed-length views over a resizable and a
+  fixed-length buffer share the new target's prototype for every
+  constructor the resizable buffer harness lists. Follow the full PLAN-M5.md
   evidence contract and obtain the maintainer accounting decision in
   PLAN-M5C.md before assigning an exclusion. Update the exclusion audit,
   ledger, and applicable normative profile records, and regenerate the

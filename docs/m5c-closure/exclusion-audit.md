@@ -119,6 +119,32 @@ properties supply generated constructor, clone, and buffer coverage.
 Replacement evidence supports the core contract; assigning an exclusion still
 requires the remediation node's maintainer accounting decision.
 
+The `resizable-array-buffer-harness` node transferred
+*test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js*
+to the same owner under its own `annex-b-resizable-typed-array-prototype`
+assessment, with the same exact rejection and disposition. The rejection
+covers the whole program, so no original assertion ran. The
+`typed-array-constructors` native fixture constructs fixed-length views over a
+resizable and a fixed-length buffer for every constructor the resizable buffer
+harness lists, including its three class subclasses, and compares both
+prototypes through `Object.getPrototypeOf` with each other and with the
+constructor's prototype. The construction order property's fixed case adds
+length-tracking resizable and fixed buffer views of `Float64Array` and
+`BigInt64Array` under own, bound, and Proxy new targets. Both files are bound
+by digest; the shared fixture file's digest in the *no-species.js* assessment
+changed with it, while that assessment's reason and coverage are unchanged.
+
+The `well-known-intrinsics-harness` node transferred the
+*is-a-constructor.js* cases of `AsyncFunction`, `AsyncGeneratorFunction`, and
+`GeneratorFunction` to `node:dynamic-source-coverage-remediation` under the
+`source-constructor-constructibility` assessment. Each reaches the accepted
+run-time constructor boundary of ADR 0016 at its `new` call, but the compiler
+rejects the whole program there, so its preceding IsConstructor assertion
+never runs. The assessment keeps `disposition: remediation` and
+`normativeDependency: not-demonstrated`: constructibility is behavior other
+than source evaluation, and the `new` call itself stays at the ADR 0016
+boundary.
+
 
 Dynamic import attributes and JSON identity
 -------------------------------------------
@@ -132,7 +158,8 @@ identity assertions execute. The
 remediation; Git history keeps that assessment. The reservation never widened
 the original 178-path `dynamic-source-coverage-remediation` cohort. Observation
 batches 11, 12, 13, and 05 later added 19, 23, 30, and 5 paths to that owner,
-whose current contract is 255 paths.
+and `well-known-intrinsics-harness` transferred 3, so its current contract is
+258 paths.
 
 The maintainer accounting decision of 2026-10-22 accounts for the 64 paths
 under ADR 0016 instead. Their ledger owner is
