@@ -194,6 +194,59 @@ export async function runNativeScenario2(
     }
   }
 
+  // Each module has one import.meta object with a null [[Prototype]],
+  // created before any of its code can run, so a hoisted function that a
+  // cyclic dependency calls before its module evaluates already reads it.
+  // The property set is host-defined, so the references compare only the
+  // portable observations and the native build alone reports no keys.
+  const importMetaEntry = `${root}/tests/fixtures/import-meta/entry.mjs`;
+  const importMetaReferences = [
+    await host.run({
+      args: [importMetaEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", importMetaEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of importMetaReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      for (const [entry, references] of [
+        [importMetaEntry, importMetaReferences.map(({ stdout }) => stdout)],
+        [`${root}/tests/fixtures/import-meta/own-keys.mjs`, ["[]\n"]],
+      ] as const) {
+        const nativeImportMeta = await runNativeCli(
+          {
+            args: [
+              ...(specialization === "disabled" ? ["--no-specialization"] : []),
+              entry,
+            ],
+            version: "0.1.0",
+          },
+          host,
+        );
+        assert.equal(nativeImportMeta.exitStatus, 0, nativeImportMeta.stderr);
+        assert.equal(nativeImportMeta.stderr, "");
+        for (const reference of references) {
+          assert.equal(
+            nativeImportMeta.stdout,
+            reference,
+            `import.meta ${entry} ${specialization}`,
+          );
+        }
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   // Module var declarations are hoisted outside the catch environment,
   // while the same-name initializer still resolves to the catch cell.
   const catchVarModule = `${root}/tests/fixtures/catch-var-module.mjs`;

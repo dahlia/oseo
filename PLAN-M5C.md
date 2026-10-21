@@ -373,15 +373,15 @@ different rejection, retain its actual classification and identify the owner
 of that separate gap. Do not force it into either dynamic-source owner or
 invent an exclusion-audit record outside the accepted diagnostic surface.
 
-The full re-observation changed only
+The earlier dynamic-import re-observation changed only
 *test/language/module-code/top-level-await/syntax/catch-parameter.js*: its
 frontmatter gate became `OSEO1001`, with the message “Await inside a module
 top-level binding or assignment pattern is unsupported.” It remains
 unsupported and has no `import()` call. The
-`module-top-level-await-patterns` node now owns that separate gap, while
-`frontmatter-feature-tags` retains the four `super` parse negatives. No
-classification total changed, and this path has no dynamic-source exclusion
-audit record.
+`module-top-level-await-patterns` node owns that separate gap. The later
+`frontmatter-feature-tags` admission closes the four `super` parse negatives
+as expected-negative observations. The catch-parameter case keeps its
+classification and has no dynamic-source exclusion audit record.
 
 Use `adr:0016-dynamic-source-boundary` only when `import()` itself is the
 normative subject and the reviewed assessment bounds the assertions to source

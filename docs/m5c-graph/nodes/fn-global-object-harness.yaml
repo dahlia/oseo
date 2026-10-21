@@ -7,5 +7,5 @@ delivers: "Adds a reviewed fnGlobalObject.js harness that returns the global
   include it can be observed."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

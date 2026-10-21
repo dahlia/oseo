@@ -67,6 +67,10 @@ function propertyHelperGetter(): number {
   return 1;
 }
 
+function compileSourceText(): never {
+  throw new Error("the helper must not compile source text");
+}
+
 test("parses test262 frontmatter and derives strictness", () => {
   const parsed = parseTest262Case(
     `/*---
@@ -1161,6 +1165,27 @@ test("native matcher enforces the reviewed source grammar", async () => {
   }
 });
 
+test("global object helper avoids compiling source text", async () => {
+  const helper = await readFile(
+    new URL("test262/harness/fnGlobalObject.js", import.meta.url),
+    "utf8",
+  );
+  for (const prologue of ["", '"use strict";\n']) {
+    // SAFETY: the script evaluates to a tuple of two global object reads
+    // and the helper's result after a case overwrites `globalThis`.
+    const [initial, beforeWrite, afterWrite] = runInNewContext(
+      `${prologue}${helper}
+var initial = globalThis;
+var beforeWrite = fnGlobalObject();
+globalThis = undefined;
+[initial, beforeWrite, fnGlobalObject()];`,
+      { Function: compileSourceText, eval: compileSourceText },
+    ) as readonly [object, unknown, unknown];
+    assert.equal(beforeWrite, initial, prologue);
+    assert.equal(afterWrite, initial, prologue);
+  }
+});
+
 test("property helper checks behavior beyond reported flags", async () => {
   const helper = await readFile(
     new URL("test262/harness/propertyHelper.js", import.meta.url),
@@ -1871,6 +1896,53 @@ test("an observe-only feature tag without import syntax can pass", async () => {
   assert.equal(result.observation.passed, true);
   assert.deepEqual(result.case.features, ["dynamic-import"]);
   assert.deepEqual(result.unsupportedFeatures, []);
+});
+
+test("admitted super tag exposes the global-code parse negatives", async () => {
+  const subset = parseReviewedSubset(
+    await readFile(new URL("./test262/subset.yaml", import.meta.url), "utf8"),
+  );
+  const supported = new Set(subset.supportedFeatures);
+  const suite = new URL("./", import.meta.resolve("test262/package.json"));
+  const entries = subset.tests.filter((entry) =>
+    entry.path.startsWith("test/language/global-code/super-"),
+  );
+  assert.deepEqual(
+    entries.map((entry) => entry.path),
+    [
+      "test/language/global-code/super-call-arrow.js",
+      "test/language/global-code/super-call.js",
+      "test/language/global-code/super-prop-arrow.js",
+      "test/language/global-code/super-prop.js",
+    ],
+  );
+  await Promise.all(
+    entries.map(async (entry) => {
+      const source = await readFile(new URL(entry.path, suite), "utf8");
+      const parsed = parseTest262Case(source, entry.path, subset.suiteRevision);
+      assert.ok(parsed.case.features.includes("super"));
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        supported,
+        harnesses,
+        {
+          async execute() {
+            return assert.fail("a parse negative must not execute");
+          },
+        },
+        entry.dependencies,
+      );
+      assert.equal(result.classification, "expected-negative", entry.path);
+      assert.equal(result.classification, entry.expectedClassification);
+      assert.deepEqual(result.observation, {
+        errorType: "SyntaxError",
+        failedPhase: "parse",
+        passed: false,
+      });
+      assert.deepEqual(result.unsupportedFeatures, []);
+    }),
+  );
 });
 
 test("classifies reviewed missing includes as unsupported", async () => {

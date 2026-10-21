@@ -8,5 +8,5 @@ delivers: "Observes the 4 reviewed test/language/global-code/super-*.js parse
   observe-only change exposed its actual module-pattern await rejection."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

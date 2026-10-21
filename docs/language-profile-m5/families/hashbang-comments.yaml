@@ -1,0 +1,55 @@
+version: 1
+id: hashbang-comments
+title: "Hashbang comments"
+scope:
+  - "A #! comment at the start of Script or Module source, ended by any
+    line terminator or the end of input, and the early SyntaxError for
+    #! anywhere else or spelled with an escape."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: omitted
+    reason: "The comment produces no owned syntax. Its Script and Module
+      conversions equal those of a same-length line comment, so execution
+      is that of an already admitted program."
+    replacements:
+      - packages/parser-babel/tests/hashbang.test.ts
+  fixed:
+    status: covered
+    references:
+      - packages/parser-babel/tests/hashbang.test.ts
+  forced-collection:
+    status: omitted
+    reason: "The comment allocates nothing and adds no safepoint or root."
+    replacements:
+      - packages/parser-babel/tests/hashbang.test.ts
+  generated:
+    status: omitted
+    reason: "The lexical domain is finite at its boundaries. The fixed test
+      enumerates every goal, line terminator, body class, preceding-text
+      class, nested placement, and escape spelling instead of sampling."
+    replacements:
+      - packages/parser-babel/tests/hashbang.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard."
+    replacements:
+      - packages/parser-babel/tests/hashbang.test.ts
+  specialization:
+    status: omitted
+    reason: "HIR and MIR equal those of the line-comment twin, so neither
+      specialization policy can observe the comment."
+    replacements:
+      - packages/parser-babel/tests/hashbang.test.ts
+  standards:
+    status: omitted
+    reason: "The node admits the hashbang feature only. Its 29 pinned
+      test262 paths remain unreviewed until observation-batch-32, which
+      owns their first observation."
+    replacements:
+      - packages/parser-babel/tests/hashbang.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/hashbang.test.ts

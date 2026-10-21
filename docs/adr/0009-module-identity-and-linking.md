@@ -129,3 +129,23 @@ source evaluator, or bootstrap runtime in the native artifact.
 
 This amendment authorizes only static JSON modules. Revisit it before another
 non-source kind, import phase, or runtime source-loading policy is admitted.
+
+
+The import.meta object
+----------------------
+
+M5c node `import-meta` admits `import.meta` in Module code. Each module that
+reads it owns one hidden cell, initialized with a new ordinary object
+during graph-wide instantiation, before any module function initializer
+runs. ECMA-262 2025 creates the object on the first evaluation instead, but
+the closed module host defines no HostGetImportMetaProperties entries and no
+HostFinalizeImportMeta step, so creation runs no code and its timing is not
+observable. Creating it early keeps a hoisted function that a cyclic
+dependency calls before its own module evaluates on the same object.
+
+The object is extensible, its \[\[Prototype]] is null, and it has no own
+properties. The canonical URL stays a build-time identity: Oseo does not
+expose it, a file path, or a resolution function through `import.meta`,
+because a native executable has no module URL that a running program could
+load from. Adding a host property is a host contract change and amends this
+decision.

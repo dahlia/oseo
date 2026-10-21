@@ -1,0 +1,3 @@
+version: 1
+id: hashbang-comments
+record: docs/language-profile-m5/families/hashbang-comments.yaml

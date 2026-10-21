@@ -8204,3 +8204,112 @@ partitions without a change or promotion. The existing closure ledger
 remains valid. A native fixture run on the integrated source, macOS
 execution, and CI remain pending, and the 42 paths do not establish
 complete Float16 conformance.
+
+
+Hashbang comments
+-----------------
+
+M5c node `hashbang-comments` admits the test262 `hashbang` feature.
+ECMA-262 2025 12.5 defines a HashbangComment as `#!` followed by
+SingleLineCommentChars, and the InputElementHashbangOrRegExp goal of 12
+applies only at the start of a Script or Module. The comment therefore ends
+at any of the four LineTerminator code points of 12.3, a CRLF pair included,
+or at the end of input. Any preceding text is a SyntaxError, including
+WhiteSpace such as U+FEFF, a line terminator, a comment, a directive, a
+statement, or an earlier hashbang. So is `#!` inside a function body, block,
+class body, or expression. Neither character may be written with an escape.
+
+The pinned Babel parser already implements this grammar for both goals, so
+the node changes no frontend, compiler, or runtime source. Babel records the
+comment as the program's interpreter directive, which the converter never
+reads, and parse failures keep the existing source-located `OSEO0001`
+diagnostic at the misplaced `#`. A body such as `"use strict"` stays a
+comment: the following Script still admits `with`. Hashbang text inside
+`eval` or `Function` source is parsed only by a later dynamic parse.
+ADR 0016 keeps that outside the profile, and the call site reports its
+existing diagnostic.
+
+*packages/parser-babel/tests/hashbang.test.ts* enumerates the finite
+boundary domain under Node.js and Deno. It covers both goals, every line
+terminator and the end of input, comment bodies that would mean something
+outside a comment, sixteen classes of preceding text, five nested
+placements, and nine escape spellings. Every misplaced hashbang is
+rejected at the exact byte offset of its `#`, every escaped spelling on
+line 1, and code after each terminator is scanned from line 2, column 1. Owned
+syntax, HIR, and MIR for a hashbang Script equal those of the same source with
+`//` in place of `#!`, under every terminator, and a Module's converted record
+equals its line-comment twin. The comment therefore adds no runtime value,
+safepoint, guard, or specialized path. The family record names this structural
+equivalence as the replacement for native, specialization, and collection
+evidence.
+
+The 29 pinned paths under *test/language/comments/hashbang/* are this
+feature's whole inventory. Before the admission each parsed as the test
+expects in a focused frontend check: 19 are rejected, 10 are accepted.
+Observation batch 32 keeps their first canonical admission, so this node
+adds no subset row. Four of those paths reach `eval` or `Function`, and the
+batch classifies them by their observed ADR 0016 diagnostic. No reviewed
+path names `hashbang`, so adding the feature moves no reviewed row. Because
+`supportedFeatures` changes, the publication uses a complete manifest update.
+
+
+The import.meta meta property
+-----------------------------
+
+M5c node `import-meta` admits the test262 `import.meta` feature. ECMA-262
+2025 makes `import.meta` an early SyntaxError unless the goal symbol is
+Module, and an ImportMeta is never a valid simple assignment target. Its
+evaluation returns the active module's \[\[ImportMeta]] object, creating it
+on first use from HostGetImportMetaProperties and HostFinalizeImportMeta.
+
+The pinned Babel parser reports every early error of the feature with
+a source-located `OSEO0001` diagnostic: `import.meta` in Script code at any
+nesting depth, an escaped `import` or `meta`, another property name after
+`import.`, and `import.meta` as the target of an assignment, compound or
+logical assignment, update, array or object destructuring element or rest,
+or for-in, for-of, or for-await-of head. The converter maps the remaining
+Module occurrences to an owned `import-meta` expression. HIR resolution
+admits that expression only in a module body; owned syntax that carries it
+into a Script resolution gets the same early-error code.
+
+In a module body each read becomes a read of one hidden immutable binding
+per module. The module compiler initializes it, before every module function
+initializer, with an object literal whose only entry sets \[\[Prototype]] to
+null, so the object is ordinary, extensible, and has no own properties. The
+host hooks contribute nothing, which makes this creation unobservable and
+lets a hoisted function that a cyclic dependency calls before its module
+evaluates read the same object;
+[*ADR 0009*](./docs/adr/0009-module-identity-and-linking.md) records the
+host contract. Calling or constructing the object, adding, deleting, and
+reading properties, changing its prototype, and freezing it use the generic
+paths. A module that never reads `import.meta` gets no binding and no
+object. `import.meta` inside `eval` or `Function` source text is parsed
+only by a later dynamic parse, which ADR 0016 keeps outside the profile.
+
+*packages/parser-babel/tests/import-meta.test.ts* checks the lowering under
+Node.js and Deno: one initializer per reading module with distinct
+bindings, every read from the module body, an arrow, a function, a class
+field and method, a generator, an async function, an async arrow, and an
+async generator naming its module's binding, the initializer ordered before
+every function initializer in a cycle, nineteen admitted non-target uses,
+the rejected Script and target positions at their byte offsets, and the
+owned-syntax Script rejection. The native scenario in
+*tests/native/scenarios/shard-2.ts* runs *tests/fixtures/import-meta/* under
+both specialization policies with collection at every safepoint and compares
+the portable observations with Node.js and Deno: object type, null
+prototype, extensibility, identity from the module body, an arrow, a
+function expression, a hoisted function, a class field and method, a
+generator, an async function, an async arrow, an async generator, and after
+top-level await, distinct objects per module, the cyclic early read,
+TypeError on call and construct, property and prototype mutation,
+`delete import.meta`, and freezing. Accessors, constructors, static blocks, and
+default parameter initializers are not exercised separately; a read there
+resolves to the same hidden module binding as the covered forms. A second entry
+requires that the native object has no own keys, since both references add host
+properties.
+
+The 23 pinned paths that carry the feature stay unreviewed;
+observation-batch-32 keeps their first admission, so no subset row is added.
+The two reviewed assignment target rows that spell `import.meta` without the
+feature tag are Script code and stay expected negative. `supportedFeatures`
+changes, so publication needs a complete manifest update.

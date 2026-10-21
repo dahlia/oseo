@@ -1,0 +1,76 @@
+version: 1
+id: import-meta
+title: "import.meta in Module code"
+scope:
+  - "import.meta in Module code, at any depth of function, arrow, class,
+    generator, or async nesting, evaluates to one object per module. The
+    module compiler creates it before any module function initializer, so
+    a hoisted function that a cyclic dependency calls before its module
+    evaluates reads the same object as the module body."
+  - "The object is ordinary and extensible, its [[Prototype]] is null, and
+    it has no own properties: the closed module host defines no
+    HostGetImportMetaProperties entries and no HostFinalizeImportMeta
+    step. Calling or constructing it throws TypeError through the generic
+    call and construct paths."
+  - "import.meta in Script code, an escaped import or meta, another meta
+    property name after import, and import.meta in any assignment, update,
+    destructuring, or for-in/of target position are early SyntaxErrors
+    located at the offending token. eval and Function source text keeps
+    its ADR 0016 boundary."
+owners:
+  - PLAN-M5.md
+  - docs/adr/0009-module-identity-and-linking.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-2.ts
+      - tests/fixtures/import-meta/entry.mjs
+      - tests/fixtures/import-meta/dependency.mjs
+  fixed:
+    status: covered
+    references:
+      - packages/parser-babel/tests/import-meta.test.ts
+      - tests/fixtures/import-meta/own-keys.mjs
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-2.ts
+  generated:
+    status: omitted
+    reason: "A read has no input domain: it names its module's one hidden
+      binding whatever values flow around it, and every enclosing function
+      reaches that binding through the same module-level capture. The fixed
+      tests cover reads from the module body, an arrow, a function, a class
+      field and method, a generator, an async function, an async arrow, an
+      async generator, and after top-level await, plus the cyclic read
+      before module evaluation, nineteen non-target uses, and the rejected
+      goals and target positions, instead of sampling them."
+    replacements:
+      - packages/parser-babel/tests/import-meta.test.ts
+      - tests/fixtures/import-meta/entry.mjs
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard.
+      A read is an ordinary const binding read, and operations on the
+      object use the generic property, call, and construct paths."
+    replacements:
+      - tests/native/scenarios/shard-2.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-2.ts
+  standards:
+    status: omitted
+    reason: "The node admits the import.meta feature only. Its 23 pinned
+      test262 paths remain unreviewed until observation-batch-32, which
+      owns their first observation. The two reviewed assignment target
+      rows without the feature tag are Script code and stay expected
+      negative."
+    replacements:
+      - packages/parser-babel/tests/import-meta.test.ts
+      - tests/native/scenarios/shard-2.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/import-meta.test.ts

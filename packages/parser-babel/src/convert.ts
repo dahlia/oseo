@@ -705,6 +705,16 @@ export function expression(
   if (value.type === "MetaProperty") {
     const meta = node(value.meta);
     const property = node(value.property);
+    // Babel reports import.meta outside Module code, an escaped `import`
+    // or `meta`, and every assignment target position as parse errors.
+    if (
+      meta != null &&
+      property != null &&
+      identifierName(meta) === "import" &&
+      identifierName(property) === "meta"
+    ) {
+      return { ...located, kind: "import-meta" };
+    }
     if (
       meta == null ||
       property == null ||

@@ -85,6 +85,8 @@ supportedFeatures:
   - for-of
   - generators
   - globalThis
+  - hashbang
+  - import.meta
   - let
   - logical-assignment-operators
   - new.target
@@ -109,6 +111,7 @@ supportedFeatures:
   - stable-array-sort
   - stable-typedarray-sort
   - string-trimming
+  - super
   - Symbol
   - Symbol.asyncIterator
   - Symbol.hasInstance
@@ -116412,16 +116415,16 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, object-properties, var-bindings]
   - path: test/language/global-code/super-call-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [classes, functions]
   - path: test/language/global-code/super-call.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [classes]
   - path: test/language/global-code/super-prop-arrow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [classes, functions]
   - path: test/language/global-code/super-prop.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: expected-negative
     dependencies: [classes]
   - path: test/language/global-code/switch-case-decl-strict.js
     expectedClassification: pass

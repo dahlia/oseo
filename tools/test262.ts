@@ -177,6 +177,10 @@ const detachArrayBufferHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/detachArrayBuffer.js",
 );
+const fnGlobalObjectHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/fnGlobalObject.js",
+);
 const nansHarnessPath = join(repositoryRoot, "tests/test262/harness/nans.js");
 const nativeFunctionMatcherHarnessPath = join(
   repositoryRoot,
@@ -1882,6 +1886,7 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
         "detachArrayBuffer.js",
         await readFile(detachArrayBufferHarnessPath, "utf8"),
       ],
+      ["fnGlobalObject.js", await readFile(fnGlobalObjectHarnessPath, "utf8")],
       ["isConstructor.js", await readFile(isConstructorHarnessPath, "utf8")],
       ["nans.js", await readFile(nansHarnessPath, "utf8")],
       [

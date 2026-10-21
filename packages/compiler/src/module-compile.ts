@@ -1240,6 +1240,7 @@ export function compileModuleGraph(
   const functions: HirFunction[] = [];
   const globalBindings: HirGlobalBinding[] = [];
   const intrinsicInitializers: HirStatement[] = [];
+  const importMetaInitializers: HirStatement[] = [];
   const jsonInitializers: HirStatement[] = [];
   const moduleBodies = new Map<string, readonly HirStatement[]>();
   let nextBindingId = linked.graph.cells.length;
@@ -1357,6 +1358,11 @@ export function compileModuleGraph(
         statement.bindingId === result.program.intrinsicGlobalObjectBindingId
       ) {
         intrinsicInitializers.push(statement);
+      } else if (
+        statement.kind === "const" &&
+        statement.bindingId === result.program.importMetaBindingId
+      ) {
+        importMetaInitializers.push(statement);
       } else if (statement.kind === "function-init") {
         functionInitializers.push(statement);
       } else {
@@ -1632,6 +1638,10 @@ export function compileModuleGraph(
   const hir: HirProgram = {
     body: [
       ...intrinsicInitializers,
+      // Each module's import.meta object exists before any function
+      // initializer, so a hoisted function that a cyclic dependency calls
+      // before its own module evaluates still reads that module's object.
+      ...importMetaInitializers,
       ...namespaceInitializers,
       ...jsonInitializers,
       ...functionInitializers,

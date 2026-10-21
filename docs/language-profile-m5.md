@@ -103,6 +103,18 @@ results, reviewed exclusion-audit rows, and ledger owner
 batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
 remain mixed coverage debt.
 
+M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
+list. The tag was the only unmet prerequisite of the four reviewed
+`super-*.js` parse negatives under *test/language/global-code/*. Each places a
+`super()` call or a `super.property` reference in global code, directly or
+inside an arrow function, where the existing parser already rejects it with
+`OSEO0001` at the `super` token in both strictness modes. All four move from
+unsupported to expected negative and keep their dependency tags. No other
+reviewed row lists `super`, the recorded observation-batch planning basis
+keeps its own feature list, and no compiler or runtime behavior changes. The
+manifest keeps 28,287 reviewed paths and 24,022 passes, and moves to 2,570
+expected negatives and 1,695 unsupported profile features.
+
 
 Claim boundary
 --------------
@@ -131,8 +143,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,287 reviewed cases: 24,022 passes, 2,566
-expected negatives, and 1,699 unsupported profile features. It records no
+The current manifest contains 28,287 reviewed cases: 24,022 passes, 2,570
+expected negatives, and 1,695 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -8211,7 +8223,13 @@ complete. The remaining gaps retain their existing owners.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
     including the Annex B constructs this grammar rejects in every mode.
- -  `import.meta`, `export var`, and namespace re-exports such as
+ -  `import.meta` in Module code evaluates to one ordinary, extensible
+    object per module whose \[\[Prototype]] is null and which has no own
+    properties; the closed module host adds none. It exists before any
+    module function initializer runs, so a cyclic dependency that calls a
+    hoisted function early reads the same object. `import.meta` in Script
+    code, escaped, or as an assignment target is an early SyntaxError.
+ -  `export var` and namespace re-exports such as
     `export * as ns from "./module.js"` remain rejected with source-located
     diagnostics. Reviewed test262 cases carrying
     `export-star-as-namespace-from-module` classify
@@ -8284,15 +8302,13 @@ complete. The remaining gaps retain their existing owners.
     recorded above. The same positions stay rejected with a source-located
     diagnostic at module top level. Its private traced frame can suspend an
     ordinary expression, but module construction still rejects a pattern that
-    contains `await` before that frame is built. No reviewed test262 case
-    exercises the module form on
-    its own; the one upstream case that does,
-    *top-level-await/syntax/catch-parameter.js*, is reviewed and classifies
-    `unsupported-profile-feature` for its declared `dynamic-import` feature
-    before it reaches this diagnostic. Package tests in
+    contains `await` before that frame is built. The reviewed test262 case
+    *top-level-await/syntax/catch-parameter.js* reaches this diagnostic and
+    records `unsupported-profile-feature` with `profile-syntax`, rather than
+    a frontmatter feature rejection. Package tests in
     *packages/parser-babel/tests/bindings.test.ts* and
-    *packages/compiler/tests/modules.test.ts* prove the diagnostic and its
-    location. Owner: the modules and asynchronous execution stream.
+    *packages/compiler/tests/modules.test.ts* also prove the diagnostic and
+    its location. Owner: `module-top-level-await-patterns`.
  -  `%AsyncFromSyncIteratorPrototype%` is not materialized. ECMA-262 never
     exposes an AsyncFromSyncIterator object to a program, so no
     `Object.getPrototypeOf` route reaches it and the unreachable internal
@@ -8326,15 +8342,23 @@ complete. The remaining gaps retain their existing owners.
     capability.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
-    *nans.js*, *nativeFunctionMatcher.js*, *promiseHelper.js*, and
-    *propertyHelper.js*. *nans.js* joined that list with the
-    `math-namespace` node, whose `Math.pow` intrinsic was its only
+    *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
+    *promiseHelper.js*, and *propertyHelper.js*. *nans.js* joined that list
+    with the `math-namespace` node, whose `Math.pow` intrinsic was its only
     unadmitted dependency, *decimalToHexString.js* with the
     `uri-handling-functions` node that its 78 reviewed cases observe, and
     *nativeFunctionMatcher.js* with the `harness-native-function-matcher`
-    node whose function-to-string cases observe it. Cases in the reviewed
-    function inventory that need *wellKnownIntrinsicObjects.js* classify
-    as unsupported until that include has a reviewed implementation. The
+    node whose function-to-string cases observe it. *fnGlobalObject.js*
+    joined with the M5c `fn-global-object-harness` node. Upstream obtains
+    the global object by calling `Function("return this;")`, a dynamic
+    source compilation that ADR 0016 keeps outside the profile, so the
+    reviewed copy caches the initial `globalThis` value when the harness
+    loads instead. It keeps the upstream `fnGlobalObject` definition and
+    its cache, compiles no source text, and also works in module cases,
+    where a top-level `this` probe would yield `undefined`. Cases in the
+    reviewed function inventory that need *wellKnownIntrinsicObjects.js*
+    classify as unsupported until that include has a reviewed
+    implementation. The
     reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
     through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a
     choice kept from before M5b node `globalthis-binding` admitted
