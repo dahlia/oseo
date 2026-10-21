@@ -7994,13 +7994,25 @@ The row is admitted as `pass` with the batch's dependency assessment: abrupt
 completion, functions, object properties, the Reflect namespace, symbols, and
 TypedArray constructors.
 
-Preparation stopped before any native execution. The native fixed and
-generated registrations, the complete manifest update, the derived ledger,
-batch, graph, and profile counts, and the shard weights' measurement have
-not run. The subset row is therefore not yet in the manifest, and the
-weights are provisional doublings recorded in *docs/evidence/u6/README.md*.
+A focused Linux extended run of the complete property file at `dd61722a`
+passed all five registrations. Their case durations sum to 522,026.516811
+milliseconds, giving a 523-second Linux weight. The 225-second macOS
+weight remains an unmeasured estimate; *docs/evidence/u6/README.md* records
+its method and the raw Linux evidence. That run preceded integration with
+the parenthesized-target source and does not certify the combined tree.
+
 Publication requires a complete
-`mise run test262:update -- --accept-promotions` on the clean committed source,
-focused native checks, local `mise run check`, independent review of fixed
-commits, and every job of the exact candidate's CI run under *PLAN-M5C.md*.
+`mise run test262:update -- --accept-promotions` on clean committed integrated
+source, reconciliation of the manifest and derived closure records, focused
+native checks, local `mise run check`, independent review of fixed commits,
+and every job of the exact candidate's CI run under *PLAN-M5C.md*.
 Already-reviewed paths may move only toward `pass`.
+
+The full manifest update at source `b66e3266` ended with exit 0.
+Its 27901 observations contain 23753 passes,
+2423 expected negatives, and
+1725 unsupported results. All 27,900 inherited
+records remain unchanged; the only added record is the owned TypedArray
+construction-order case, observed as `pass`.
+This records preparation evidence. Local checks, candidate CI, and
+publication closure remain separate gates.

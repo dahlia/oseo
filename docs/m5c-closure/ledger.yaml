@@ -5,15 +5,15 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26175
-openPaths: 14916
+closedPaths: 26176
+openPaths: 14915
 states:
   expected-negative: 2423
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 23752
+  pass: 23753
   semantic-failure: 0
-  unreviewed: 13191
+  unreviewed: 13190
   unsupported-profile-feature: 1725
 owners:
   adr:0016-dynamic-source-boundary:
@@ -152,7 +152,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-03. The batch observes them; no
       classification is assumed before it does.
-    paths: 314
+    paths: 313
   node:observation-batch-05:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-05. The batch observes them; no
@@ -308,7 +308,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26175
+    paths: 26176
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -17441,7 +17441,7 @@ paths:
   test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/same-ctor-returns-new-cloned-typedarray.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/src-typedarray-big-throws.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/src-typedarray-resizable-buffer.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/throw-type-error-before-custom-proto-access.js: [unreviewed, node:observation-batch-03]
+  test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/throw-type-error-before-custom-proto-access.js: [pass, observation]
   test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/undefined-newtarget-throws.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/use-custom-proto-if-object.js: [unreviewed, node:observation-batch-03]
   test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/use-default-proto-if-custom-proto-is-not-object.js: [unreviewed, node:observation-batch-03]

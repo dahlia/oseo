@@ -1,9 +1,9 @@
 version: 1
 id: observation-batch-03
 title: Observe built-ins/TypedArrayConstructors/BigInt64Array/ and 13 more
-delivers: "Observes the 315 unreviewed paths that
+delivers: "Observes the 313 unreviewed paths that
   docs/m5c-closure/observation-batches.yaml selects for observation-batch-03
-  (315 review units): admits them to the reviewed subset with dependency tags,
+  (313 review units): admits them to the reviewed subset with dependency tags,
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
