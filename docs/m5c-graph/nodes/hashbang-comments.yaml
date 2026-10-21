@@ -6,5 +6,5 @@ delivers: "Admits the hashbang feature: #! comments at the start of Script and
   that need it can be observed."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
