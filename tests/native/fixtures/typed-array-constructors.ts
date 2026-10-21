@@ -609,6 +609,33 @@ try {
 } catch (error) {
   console.log("symbol length", error instanceof TypeError);
 }
+// Fixed-length views over a resizable and a fixed-length buffer get their
+// prototype from the new target alone, for every resizable buffer harness
+// constructor, including its three class subclasses.
+class MyUint8Array extends Uint8Array {}
+class MyFloat32Array extends Float32Array {}
+class MyBigInt64Array extends BigInt64Array {}
+const prototypeResizableBuffer = new ArrayBuffer(40, { maxByteLength: 80 });
+const prototypeFixedBuffer = new ArrayBuffer(80);
+for (const Constructor of [
+  Uint8Array, Int8Array, Uint16Array, Int16Array, Uint32Array, Int32Array,
+  Float32Array, Float64Array, Uint8ClampedArray, Float16Array,
+  BigUint64Array, BigInt64Array, MyUint8Array, MyFloat32Array,
+  MyBigInt64Array,
+]) {
+  const resizableView = new Constructor(prototypeResizableBuffer, 0, 3);
+  const fixedView = new Constructor(prototypeFixedBuffer, 0, 3);
+  console.log(
+    "resizable and fixed prototype",
+    Constructor.name,
+    Object.getPrototypeOf(resizableView) === Object.getPrototypeOf(fixedView),
+    Object.getPrototypeOf(resizableView) === Constructor.prototype,
+    resizableView.buffer.resizable,
+    fixedView.buffer.resizable,
+    resizableView.length,
+    fixedView.length,
+  );
+}
 let discarded = 0;
 for (let index = 0; index < 64; index = index + 1) {
   const temporary = new Uint32Array([index, index + 1, index + 2]);

@@ -155,7 +155,7 @@ assessments:
     remediationOwner: node:typed-array-proto-coverage-remediation
     replacementEvidence:
       tests/native/fixtures/typed-array-constructors.ts: "\
-        44b36f7a8e551ea63ba572d843a34ddfac51812f2f7e75c6f5af86dbea4d15ef"
+        0fda23dff34deff74f9b8938bf5e2e19910343fe56ea863316236f42e342f1ec"
       tests/property/m5-typed-array-constructors.property.test.ts: "\
         ef8f8b1f2d88099bbbcd0ae35de4953f4a932f3242e6503a3a2b59909e3ee20d"
     reason: The only observed failure is the excluded Annex B __proto__
