@@ -47,11 +47,14 @@ modules remain unsupported and receive an entry-specific diagnostic.
 The pinned prerequisite selector contains 89 paths: 24 static subjects and
 65 dynamic-boundary subjects. Dynamic import and runtime options remain
 outside admission under ADR 0016. The separately bounded
-`import-attributes-dynamic-coverage-remediation` node owns the 64 actual
-`ImportExpression` rejections; none is a newly approved exclusion. The
-indexed import-attributes family records fixed, generated, structural,
-differential, specialization, guard-fallback, collection, and standards
-evidence in *tests/property/m5-import-attributes.property.test.ts* and
+`import-attributes-dynamic-coverage-remediation` node accounts for the 64
+actual `ImportExpression` rejections as bounded ADR 0016 exclusions under the
+maintainer accounting decision of 2026-10-22. Their subjects are ImportCall
+syntax and evaluation and the dynamic import site of JSON module identity;
+static JSON identity stays inside the profile. The indexed import-attributes
+family records fixed, generated, structural, differential, specialization,
+guard-fallback, collection, and standards evidence in
+*tests/property/m5-import-attributes.property.test.ts* and
 *tests/fixtures/import-attributes/*.
 
 M5c node `annexb-proto-dependency-classification` makes only a missing

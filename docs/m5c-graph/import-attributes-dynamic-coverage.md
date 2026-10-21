@@ -4,15 +4,40 @@ Import attribute dynamic coverage reservation
 This exact 64-path reservation uses test262 revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
 The import-attributes node observed each path as unsupported through the
-existing ImportExpression rejection. These paths retain active owner
-`node:import-attributes-dynamic-coverage-remediation`. No exclusion is
-requested, and the existing dynamic-source remediation scope is unchanged.
+existing ImportExpression rejection. It first reserved them for remediation
+by `node:import-attributes-dynamic-coverage-remediation`; Git history keeps
+that assessment.
 
-Static JSON support does not execute dynamic import options, enumerate
-attributes, settle its promises, or prove static/dynamic JSON identity.
-The owner preserves every original assertion until a separately accepted
-finite-set dynamic-import admission and full semantic evidence cover it.
-The historical batch reservations remain part of the observation history.
+The maintainer accounting decision of 2026-10-22 accounts for the 64 paths
+under the accepted [ADR 0016](../adr/0016-dynamic-source-boundary.md)
+boundary instead. Each path contains an
+ImportCall, and its subject is ImportCall syntax or evaluation: forwarding of
+the Yield, Await, and In parameters, options evaluation and abrupt completions,
+the `with` lookup and its enumeration, rejection of invalid options, promise
+settlement, trailing-comma calls, or the dynamic import site of JSON module
+identity. Twenty generated syntax cases only parse the call inside a function
+that is never called. That behavior is reachable only through `import()`, which
+ADR 0016 keeps rejected at parse time. Their ledger owner is
+`adr:0016-dynamic-source-boundary`, and each reviewed exclusion-audit row binds
+the pinned source and the observed rejection. The paths stay in the 41,091-path
+inventory and never count as passes.
+
+Three paths compute their specifier at run time and would stay outside even
+the build-time literal subset of
+[*docs/dynamic-import-staged-plan.md*](../dynamic-import-staged-plan.md):
+*2nd-param-evaluation-sequence.js*, *2nd-param-trailing-comma-reject.js*, and
+*trailing-comma-reject.js*. In *json-idempotency.js*, the two static default
+imports and the indirect static import do not depend on dynamic import. Static
+JSON identity evidence from the import-attributes node covers them, and the
+exclusion is bounded to the `import()` site.
+
+The exclusion reopens when an accepted ADR 0016 amendment admits any form of
+dynamic import, including that literal subset. A later pass or expected
+negative takes the observation owner, and a still unsupported path needs a
+fresh assessment against the amended record. This decision approves no
+dynamic import implementation and does not widen the
+`dynamic-source-coverage-remediation` reservation. The historical batch
+reservations remain part of the observation history.
 
 The source digests below bind the reservation to the pinned subjects. The
 path set, sorted with one final newline, has SHA256

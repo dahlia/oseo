@@ -4,11 +4,13 @@ title: Reconcile the original import attribute reservation
 delivers: "Audits the exact original 65 path/source identities retained in
   docs/m5c-graph/import-attributes-reservation-reconciliation.md after their
   first admission by import-attributes. Verifies one parse expected negative
-  and 64 active remediation observations against canonical manifest and
-  ledger records, and records the remaining runtime attribute and JSON
-  identity coverage debt. The reservation has zero remaining unreviewed
-  paths; this node performs no duplicate first admission, claims no new
-  pass or automatic closure, and authorizes no exclusion."
+  and 64 unsupported observations against canonical manifest and ledger
+  records. Those 64 are bounded ADR 0016 exclusions owned by
+  adr:0016-dynamic-source-boundary under the maintainer accounting decision of
+  2026-10-22, which an accepted ADR 0016 amendment admitting any form of
+  dynamic import reopens. The reservation has zero remaining unreviewed paths;
+  this node performs no duplicate first admission, claims no new pass or
+  automatic closure, and authorizes no exclusion itself."
 dependencies:
   - dynamic-import
   - import-attributes

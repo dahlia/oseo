@@ -22,7 +22,11 @@ records:
         rejection, and reviewed subset entries name the gap with the
         `dynamic-source` dependency tag so coverage summaries can total
         it.
+      - Dynamic import remains rejected at parse time.
     reopening:
+      - Admitting the build-time-resolvable subset requires a separate
+        reviewed plan and an update to this record, following alternative
+        3.
       - the compatibility laboratory shows that packages Oseo targets
         cannot run without `eval`, `Function`, or unrestricted dynamic
         import;
@@ -146,16 +150,68 @@ assessments:
       and buffer evidence. These core algorithms do not normatively
       require Annex B; retain bounded remediation until the maintainer
       accounting decision, without authorizing a whole-path exclusion.
-  import-attributes-dynamic-boundary:
-    disposition: remediation
-    normativeDependency: not-demonstrated
-    remediationOwner: node:import-attributes-dynamic-coverage-remediation
-    reason: Dynamic import is rejected before runtime option evaluation,
-      enumeration, abrupt completion, promises, or JSON identity assertions
-      execute. These original mixed subjects remain open under the exact
-      separately approved reservation; no source-evaluation-only exclusion is
-      claimed and the original 178-path dynamic-source-coverage-remediation
-      cohort is unchanged by this reservation.
+  import-call-attributes:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The subject is ImportCall itself under
+      sec-import-call-runtime-semantics-evaluation, with a string-literal
+      specifier. The source asserts how ImportCall forwards the Yield,
+      Await, and In parameters to its arguments, how EvaluateImportCall
+      treats the options argument (abrupt return and throw completions,
+      the with getter, EnumerableOwnPropertyNames enumeration, rejection of
+      non-object options and non-string values, and promise settlement),
+      or that an ImportCall with a trailing comma is valid syntax in a
+      given context. Twenty of those generated syntax cases place the call
+      in a function that is never called, so only the parse is at issue;
+      the others also evaluate the call. Each assertion of the runtime
+      cases observes an ImportCall evaluation or its promise. The syntax
+      cases assert nothing beyond a successful parse, except the two
+      with-expression cases, which also check that the call returns a
+      promise. ADR 0016 keeps import(), part of its dynamic source family,
+      rejected at parse time. The maintainer accounting
+      decision of 2026-10-22 accepts this bounded exclusion of these
+      reserved paths. It reopens
+      when an accepted ADR 0016 amendment admits any form of dynamic
+      import, including the build-time literal subset of
+      docs/dynamic-import-staged-plan.md, which admits no options.
+  import-call-attributes-computed-specifier:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The subject is ImportCall itself under
+      sec-import-call-runtime-semantics-evaluation. The source asserts the
+      order in which the specifier and options arguments are evaluated, or
+      the rejection produced when ToString of an object specifier throws,
+      with and without an options argument, each call followed by a
+      trailing comma. Every assertion runs through
+      import(), which ADR 0016 keeps rejected at parse time. The specifier
+      is computed at run time, so these paths stay outside even the
+      build-time literal subset of docs/dynamic-import-staged-plan.md. The
+      maintainer accounting decision of 2026-10-22 accepts this bounded
+      exclusion; an accepted ADR 0016 amendment that admits any form of
+      dynamic import reopens it for reassessment.
+  json-module-dynamic-site-identity:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/fixtures/import-attributes/cycle.mjs: "\
+        b9c59034c52fac5ce3507ad75cdeb7b55d097ef6f3d965ce0fec836d487d7c35"
+      tests/fixtures/import-attributes/entry.mjs: "\
+        86f0cc52c67ba959156355fffdbf252e7c404c351483457ab98078000fc8faf9"
+      tests/property/m5-import-attributes.property.test.ts: "\
+        36ae672a0e4761633f067e97d8e8110e9596eb4495c8c1b1d380b659839248f8"
+    reason: The subject is that every import site of one JSON module
+      receives the same object, and the import sites include a dynamic
+      import() call. Its static sites do not depend on dynamic import. The
+      bound fixture graph imports one JSON module through two static
+      default imports and an indirect module, and the static JSON identity
+      properties assert both identities natively and under Node.js and
+      Deno. The only assertion that evidence cannot replace compares the
+      import() site, which runs only through ImportCall, and ADR 0016
+      keeps import() rejected at parse time. The exclusion is bounded to
+      that dynamic site; static JSON module identity stays inside the
+      claim. The maintainer accounting decision of 2026-10-22 accepts it,
+      and an accepted ADR 0016 amendment that admits any form of dynamic
+      import reopens it.
   annex-b-legacy-lookup:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -4752,7 +4808,7 @@ paths:
     subject:
       "ImportCall parameter list forwards the Await production parameter -
       AwaitExpression"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-a\
       wait-ident.js"
@@ -4767,7 +4823,7 @@ paths:
     subject:
       "ImportCall parameter list forwards the Await production parameter -
       IdentifierReference"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-e\
       valuation-abrupt-return.js"
@@ -4780,7 +4836,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: 'Forwards "return" completion when evaluating second parameter'
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-e\
       valuation-abrupt-throw.js"
@@ -4793,7 +4849,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: 'Forwards "throw" completion when evaluating second parameter'
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-e\
       valuation-sequence.js"
@@ -4806,7 +4862,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Evaluates parameters in correct sequence"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes-computed-specifier"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-g\
       et-with-error.js"
@@ -4819,7 +4875,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: 'Rejects promise when accessing "assert" property throws an error'
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-i\
       n.js"
@@ -4832,7 +4888,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall parameter list enables the Yield production parameter"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-n\
       on-object.js"
@@ -4847,7 +4903,7 @@ paths:
     subject:
       "Rejects promise when the second argument is neither undefined nor an
       object"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-t\
       railing-comma-fulfill.js"
@@ -4861,7 +4917,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall parameter list supports an optional trailing comma
       (fulfillment semantics)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-t\
       railing-comma-reject.js"
@@ -4875,7 +4931,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall parameter list supports an optional trailing comma
       (rejection semantics)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes-computed-specifier"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
       ith-enumeration-abrupt.js"
@@ -4888,7 +4944,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Reports abrupt completions produced by attributes enumeration"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
       ith-enumeration-enumerable.js"
@@ -4902,7 +4958,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Follows the semantics of the EnumerableOwnPropertyNames abstract
       operation during attributes enumeration"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
       ith-enumeration.js"
@@ -4916,7 +4972,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Follows the semantics of the EnumerableOwnPropertyNames abstract
       operation during attributes enumeration"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
       ith-non-object.js"
@@ -4931,7 +4987,7 @@ paths:
     subject:
       "Rejects promise when the `assert` property of the second argument is
       neither undefined nor an object"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
       ith-undefined.js"
@@ -4945,7 +5001,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Accepts undefined for the `assert` property of the second argumen\
       t"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
       ith-value-abrupt.js"
@@ -4959,7 +5015,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Rejects promise when retrieving a value of the `assert` object
       produces an abrupt completion"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-w\
       ith-value-non-string.js"
@@ -4973,7 +5029,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Rejects promise when any property of the `assert` object is not a
       string"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-y\
       ield-expr.js"
@@ -4988,7 +5044,7 @@ paths:
     subject:
       "ImportCall parameter list forwards the Yield production parameter -
       YieldExpression"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/2nd-param-y\
       ield-ident-valid.js"
@@ -5003,7 +5059,7 @@ paths:
     subject:
       "ImportCall parameter list forwards the Yield production parameter -
       valid IdentifierReference"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/trailing-co\
       mma-fulfill.js"
@@ -5017,7 +5073,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall parameter list supports an optional trailing comma
       (fulfillment semantics)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/import-attributes/trailing-co\
       mma-reject.js"
@@ -5031,7 +5087,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall parameter list supports an optional trailing comma
       (rejection semantics)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes-computed-specifier"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-ass\
       ignment-expression-import-attributes-trailing-comma-first.js"
@@ -5045,7 +5101,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-ass\
       ignment-expression-import-attributes-trailing-comma-second.js"
@@ -5059,7 +5115,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-imp\
       ort-attributes-trailing-comma-first.js"
@@ -5073,7 +5129,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-imp\
       ort-attributes-trailing-comma-second.js"
@@ -5087,7 +5143,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
       ow-function-await-import-attributes-trailing-comma-first.js"
@@ -5102,7 +5158,7 @@ paths:
     subject:
       "ImportCall trailing comma following first parameter (nested in async
       arrow function)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
       ow-function-await-import-attributes-trailing-comma-second.js"
@@ -5116,7 +5172,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested in
       async arrow function)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
       ow-function-return-await-import-attributes-trailing-comma-first.js"
@@ -5131,7 +5187,7 @@ paths:
     subject:
       "ImportCall trailing comma following first parameter (nested in async
       arrow function, returned)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-arr\
       ow-function-return-await-import-attributes-trailing-comma-second.js"
@@ -5145,7 +5201,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested in
       async arrow function, returned)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
       ction-await-import-attributes-trailing-comma-first.js"
@@ -5159,7 +5215,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
       ction-await-import-attributes-trailing-comma-second.js"
@@ -5173,7 +5229,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
       ction-import-attributes-trailing-comma-first.js"
@@ -5187,7 +5243,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
       ction-import-attributes-trailing-comma-second.js"
@@ -5201,7 +5257,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
       ction-return-await-import-attributes-trailing-comma-first.js"
@@ -5215,7 +5271,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-fun\
       ction-return-await-import-attributes-trailing-comma-second.js"
@@ -5229,7 +5285,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested arrow
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-gen\
       -await-import-attributes-trailing-comma-first.js"
@@ -5244,7 +5300,7 @@ paths:
     subject:
       "ImportCall trailing comma following first parameter (nested in async
       generator, awaited)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-async-gen\
       -await-import-attributes-trailing-comma-second.js"
@@ -5258,7 +5314,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested in
       async generator, awaited)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-block-imp\
       ort-attributes-trailing-comma-first.js"
@@ -5272,7 +5328,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested block
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-block-imp\
       ort-attributes-trailing-comma-second.js"
@@ -5286,7 +5342,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested block
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-block-lab\
       eled-import-attributes-trailing-comma-first.js"
@@ -5300,7 +5356,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested block
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-block-lab\
       eled-import-attributes-trailing-comma-second.js"
@@ -5314,7 +5370,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested block
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-do-while-\
       import-attributes-trailing-comma-first.js"
@@ -5329,7 +5385,7 @@ paths:
     subject:
       "ImportCall trailing comma following first parameter (nested do while
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-do-while-\
       import-attributes-trailing-comma-second.js"
@@ -5343,7 +5399,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested do
       while syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-else-brac\
       eless-import-attributes-trailing-comma-first.js"
@@ -5357,7 +5413,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested else
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-else-brac\
       eless-import-attributes-trailing-comma-second.js"
@@ -5371,7 +5427,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested else
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-else-impo\
       rt-attributes-trailing-comma-first.js"
@@ -5385,7 +5441,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested else
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-else-impo\
       rt-attributes-trailing-comma-second.js"
@@ -5399,7 +5455,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested else
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
       import-attributes-trailing-comma-first.js"
@@ -5414,7 +5470,7 @@ paths:
     subject:
       "ImportCall trailing comma following first parameter (nested function
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
       import-attributes-trailing-comma-second.js"
@@ -5428,7 +5484,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested
       function syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
       return-import-attributes-trailing-comma-first.js"
@@ -5443,7 +5499,7 @@ paths:
     subject:
       "ImportCall trailing comma following first parameter (nested function
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-function-\
       return-import-attributes-trailing-comma-second.js"
@@ -5457,7 +5513,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested
       function syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-if-bracel\
       ess-import-attributes-trailing-comma-first.js"
@@ -5471,7 +5527,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested if sy\
       ntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-if-bracel\
       ess-import-attributes-trailing-comma-second.js"
@@ -5485,7 +5541,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested if s\
       yntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-if-import\
       -attributes-trailing-comma-first.js"
@@ -5499,7 +5555,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested if sy\
       ntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-if-import\
       -attributes-trailing-comma-second.js"
@@ -5513,7 +5569,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested if s\
       yntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-while-imp\
       ort-attributes-trailing-comma-first.js"
@@ -5527,7 +5583,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested while
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-while-imp\
       ort-attributes-trailing-comma-second.js"
@@ -5541,7 +5597,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested while
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-with-expr\
       ession-import-attributes-trailing-comma-first.js"
@@ -5555,7 +5611,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested with
       syntax in the expression position)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-with-expr\
       ession-import-attributes-trailing-comma-second.js"
@@ -5569,7 +5625,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested with
       syntax in the expression position)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-with-impo\
       rt-attributes-trailing-comma-first.js"
@@ -5583,7 +5639,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (nested with
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/nested-with-impo\
       rt-attributes-trailing-comma-second.js"
@@ -5597,7 +5653,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (nested with
       syntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/top-level-import\
       -attributes-trailing-comma-first.js"
@@ -5611,7 +5667,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following first parameter (top level sy\
       ntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path:
       "test/language/expressions/dynamic-import/syntax/valid/top-level-import\
       -attributes-trailing-comma-second.js"
@@ -5625,7 +5681,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall trailing comma following second parameter (top level s\
       yntax)"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "import-call-attributes"
   - path: test/language/expressions/equals/S11.9.1_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -6276,7 +6332,7 @@ paths:
     missingDynamicTag: false
     section: "sec-parse-json-module"
     subject: "The same object representation is returned to all import sites"
-    assessment: "import-attributes-dynamic-boundary"
+    assessment: "json-module-dynamic-site-identity"
   - path: test/language/statements/async-generator/eval-var-scope-syntax-err.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject

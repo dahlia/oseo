@@ -1,14 +1,18 @@
 version: 1
 id: import-attributes-dynamic-coverage-remediation
-title: Preserve dynamic import attribute coverage
-delivers: "Remediates exactly the 64 pinned ImportExpression-rejected paths
-  reserved in docs/m5c-graph/import-attributes-dynamic-coverage.md. Preserves
-  original option evaluation, enumeration, abrupt completion, promise and
-  static/dynamic JSON identity assertions until a separately reviewed and
-  accepted finite-set dynamic-import admission and full semantic evidence
-  cover them. Admits no dynamic execution under the current ADR 0016,
-  authorizes no exclusions, and does not widen the existing 178-path
-  dynamic-source-coverage-remediation contract."
+title: Account dynamic import attribute coverage
+delivers: "Accounts for exactly the 64 pinned ImportExpression-rejected paths
+  reserved in docs/m5c-graph/import-attributes-dynamic-coverage.md under the
+  accepted ADR 0016 boundary, as the maintainer accounting decision of
+  2026-10-22 approves. Each subject is ImportCall syntax or evaluation, or the
+  dynamic import site of JSON module identity, reachable only through
+  import(); its reviewed exclusion-audit assessment binds the pinned source
+  and the observed rejection, and the exclusion checker requires that bounded
+  exclusion for every reserved path and rejects the superseded remediation
+  owner. Keeps all 41,091 inventory paths and counts none as a pass. Admits no
+  dynamic execution, changes no staged proposal, and does not widen the
+  existing dynamic-source-coverage-remediation contract. An accepted ADR 0016
+  amendment admitting any form of dynamic import reopens the exclusion."
 dependencies:
   - dynamic-import
   - import-attributes
