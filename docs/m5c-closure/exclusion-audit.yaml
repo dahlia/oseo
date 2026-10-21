@@ -2,7 +2,7 @@ version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 records:
   0013-m5-edition-and-manifest:
-    digest: 323e83e1a84e1b87363505324ebac5420af8a3566aabcccaa1c7cc3fb9eb7070
+    digest: 3922cee52d1c86ce8b5f5c7d5f7969b7d5983863a9865f3588fd6663cace8bf0
     authorization:
       - Annex B legacy web semantics are excluded from the claim.
       - Annex B behavior is reported as unsupported when a test inside

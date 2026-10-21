@@ -561,6 +561,26 @@ rather than storing into a validated view. The reviewed rows
 under the node's four inventory roots carry it, and no reviewed row outside
 those roots gains or loses a tag.
 
+The M5c `observation-batch-05` node extends the vocabulary with
+`lexical-grammar`. The tag identifies the source lexical grammar of the
+16th edition's clause 12 as the subject a case observes: white space, line
+terminators, comments, the line-terminator effect of a multi-line comment,
+token boundaries, and automatic semicolon insertion. A case carries it only
+when tokenization or semicolon insertion is what it tests; the mere presence
+of white space or comments does not tag a case. It adds to the case's other
+tags, such as `control-flow` or `var-bindings` for the statement an inserted
+semicolon terminates, and never replaces them. The selected HTML-like comment
+parse negatives place intervening non-whitespace text after the multi-line
+comment, or place `;` before `-->` without a line terminator. Both programs
+remain invalid with or without Annex B's HTML-like comment extension.
+Classifying these subjects admits no positive Annex B capability and
+authorizes no exclusion. The tag is
+distinct from `lexical-bindings`, which names `let`, `const`, and `class`
+declarations, and from `control-flow`, which names statement-level control
+flow. The `hashbang` frontmatter feature keeps its own admission. No
+reviewed row gains or loses a tag through this admission; the schema and the
+classification vocabulary are unchanged.
+
 
 Alternatives considered
 -----------------------

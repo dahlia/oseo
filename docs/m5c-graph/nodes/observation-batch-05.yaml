@@ -5,7 +5,10 @@ delivers: "Observes the 386 unreviewed paths that
   docs/m5c-closure/observation-batches.yaml selects for observation-batch-05
   (334 review units): admits them to the reviewed subset with dependency tags,
   regenerates the manifest and the ledger, and assigns every unsupported
-  result an owner."
+  result an owner. Admits the lexical-grammar dependency tag for comment,
+  line-terminator, tokenization, and automatic semicolon insertion subjects.
+  This source change requires a full manifest update and a standalone
+  publication outside an observation-only train."
 dependencies:
   - destructuring-binding-target-order
   - observation-batch-plan
