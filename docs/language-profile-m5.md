@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 146
+M5a is complete. The normative family records described below inventory 147
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -202,8 +202,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,311 reviewed cases: 24,069 passes, 2,581
-expected negatives, and 1,661 unsupported profile features. It records no
+The current manifest contains 28,311 reviewed cases: 24,235 passes, 2,581
+expected negatives, and 1,495 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 

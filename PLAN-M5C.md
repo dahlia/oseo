@@ -990,10 +990,26 @@ With `well-known-intrinsics-harness`, which registers
 includes becomes empty. The runner therefore no longer has that list or the
 branch that classified a case naming a listed include as unsupported with the
 `harness-include` capability. A case that names an include the reviewed
-harness does not implement still fails as a harness defect. The 174
-checked-in records that report `harness-include`, 168 owned here and 6 owned
-by `well-known-intrinsics-harness`, describe the earlier source until the
-complete manifest update observes them.
+harness does not implement still fails as a harness defect.
+
+The complete manifest update that read this source observed the 174 records
+that had reported `harness-include`, 168 owned here and 6 owned by
+`well-known-intrinsics-harness`. No other record changed. Of the 168, 163
+move to pass. Five stay `unsupported-profile-feature` under this node with
+their actual rejections: the grow and shrink
+_user-provided-tolocalestring-\*.js_ cases of `Array.prototype.toLocaleString`
+and `%TypedArray%.prototype.toLocaleString` report the `primitive-wrapper`
+capability, and
+*TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports the
+`OSEO1001` rejection of the Annex B `Object.prototype.__proto__` accessor. Of
+the 6, *Function/prototype/arguments/prop-desc.js*,
+*Function/prototype/caller/prop-desc.js*, and
+*Function/prototype/toString/built-in-function-object.js* move to pass. The
+*is-a-constructor.js* cases of `AsyncFunction`, `AsyncGeneratorFunction`, and
+`GeneratorFunction` stay unsupported under `well-known-intrinsics-harness` with
+the `OSEO1001` rejection of a constructor that compiles source text. Each test
+checks IsConstructor before its `new` call, so these three remain active
+coverage debt, not whole-path ADR 0016 exclusions.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles
