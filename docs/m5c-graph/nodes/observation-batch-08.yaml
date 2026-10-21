@@ -12,4 +12,4 @@ dependencies:
   - parenthesized-assignment-function-name
   - with-strict-assignment-fallback
 landed: false
-status: blocked
+status: ready
