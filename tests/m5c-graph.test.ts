@@ -382,7 +382,7 @@ test("the checked-in M5c work graph is valid", () => {
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 36);
-  assert.equal(summary.parked, 2);
+  assert.equal(summary.parked, 0);
 });
 
 interface NodeContract extends PublicationNode {
@@ -406,7 +406,7 @@ test("import attribute accounting retains its bounded graph contract", () => {
     "import-attributes-dynamic-coverage-remediation",
   );
   assert.equal(owner.landed, false);
-  assert.equal(owner.status, "parked");
+  assert.equal(owner.status, "ready");
   assert.deepEqual(owner.dependencies, ["dynamic-import", "import-attributes"]);
   assert.match(owner.delivers, /exactly the 64 pinned/u);
   assert.match(owner.delivers, /under the\s+accepted ADR 0016 boundary/u);
