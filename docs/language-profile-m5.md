@@ -4029,9 +4029,10 @@ non-callable methods, number and string primitives reaching strict prototype
 methods, and nested Arrays. The generated domain at seed `0x60004701` draws one
 to three such calls in ten ordinary cases. The repair adds no specialized path
 or guard, so the guard-fallback evidence is unchanged. The unchanged upstream
-*invoke-element-tolocalestring.js* path passes in all four variants of a
-focused runner check and is admitted; the root's other eleven reviewed paths
-keep their classifications in the same check. No layout, intrinsic, helper, or
+*invoke-element-tolocalestring.js* path passes in all four variants of the
+focused observation at source `28d30410` and of the full manifest update at
+`05ba44c9`, and is admitted; in that full update the root's other eleven
+reviewed paths keep their classifications. No layout, intrinsic, helper, or
 entry point changes, so the runtime ABI is unchanged.
 
 M5b node `map-intrinsic` completes the realm-owned `%Map%` constructor
