@@ -13,5 +13,5 @@ delivers: "Closes exactly 1 newly observed path:
   paths affected by the repair may move only toward pass."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

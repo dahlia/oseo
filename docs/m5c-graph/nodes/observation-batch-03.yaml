@@ -11,4 +11,4 @@ dependencies:
   - observation-batch-plan
   - typed-array-construction-order
 landed: false
-status: blocked
+status: ready
