@@ -3439,11 +3439,15 @@ literal method needs the M5b `Object.prototype`. A statically unresolved
 ordinary read or strict unresolved write needs the M5b global binding model
 to distinguish absent names from the realm's standard and mutable global
 properties; this includes the reviewed block- and switch-scope cases that
-expect a runtime `ReferenceError`. `import.meta`, `export var`, namespace
-re-exports such as `export * as ns from "./module.js"`, and module top-level
-pattern-position `await` remain with the modules and asynchronous execution
-stream. TypeScript-only syntax is outside the ECMA-262 claim, and dynamic
-source remains owned by ADR 0016.
+expect a runtime `ReferenceError`. At that audit, `import.meta`, `export var`,
+namespace re-exports such as `export * as ns from "./module.js"`, and module
+top-level pattern-position `await` remained with the modules and asynchronous
+execution stream. M5c later admits the first three: node `import-meta` admits
+`import.meta` in Module code, and node `module-export-forms` admits
+`export var` and `export * as` namespace re-exports, as their sections
+record. Pattern-position `await` is still rejected and is owned by node
+`module-top-level-await-patterns`. TypeScript-only syntax is outside the
+ECMA-262 claim, and dynamic source remains owned by ADR 0016.
 
 At Unit 8.5n, the audit therefore kept the M5a checkpoint open for the
 separate optional private read and call evidence unit without changing the
@@ -8390,11 +8394,12 @@ that the callback ran, so it covers callback execution, not value or reason
 passthrough. The node adds no domain or seed, because a counted `then` adds no
 input shape for a generator to vary.
 
-The native fixture and the test262 observation of the 30 paths have not run
-during preparation. The classifications in *tests/test262/subset.yaml* stay
-`unsupported-profile-feature` until a full
-`mise run test262:update -- --accept-promotions` observes them. This section
-records no pass count before that observation.
+Preparation ran neither the native fixture nor the test262 observation of
+the 30 paths, so their classifications in *tests/test262/subset.yaml* stayed
+`unsupported-profile-feature` and this section recorded no pass count until a
+full `mise run test262:update -- --accept-promotions` observed them. No
+native run of the fixture is recorded at this source; the counts above are
+the Node.js and Deno reference outputs.
 
 The full manifest update at source `05ba44c9` then observed the 30 paths.
 Twenty-nine move from unsupported to pass, including

@@ -150,6 +150,7 @@ test("reports duplicate and ill-formed export names before linking", () => {
     'export * as twice from "./a.js";\nexport * as twice from "./b.js";\n',
     'export { Moon as "\\uD83C" };\nfunction Moon() {}\n',
     'import { "\\uD83D" as foo } from "./dep.js";\n',
+    'export * as "\\uD83D" from "./dep.js";\n',
     'export { "foo" as "bar" };\nfunction foo() {}\n',
     'export * as space from "./dep.js" null;\n',
   ];
@@ -168,6 +169,22 @@ test("reports duplicate and ill-formed export names before linking", () => {
   assert.match(
     duplicate.diagnostics[0]?.message ?? "",
     /Duplicate export 'z'/u,
+  );
+});
+
+test("accepts a surrogate pair as a namespace export name", () => {
+  const result = babelModuleFrontend.parseModule({
+    source: 'export * as "\\uD83D\\uDE00" from "./dep.js";\n',
+    sourceId: "file:///app/pair.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.module != null);
+  assert.deepEqual(
+    result.module.exports.map((entry) => [
+      entry.kind,
+      "exportedName" in entry ? entry.exportedName : undefined,
+    ]),
+    [["namespace", "\u{1F600}"]],
   );
 });
 

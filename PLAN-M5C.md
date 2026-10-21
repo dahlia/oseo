@@ -444,6 +444,21 @@ gated by `arbitrary-module-namespace-names`, 7 by
 are expected parse-phase negatives: duplicate export names, lone
 surrogates, a string local name without `from`, and a missing semicolon
 after a star export. They test early errors, not a missing capability.
+Four of the five lone-surrogate cases reject at the ill-formed string
+itself: *export-expname-unpaired-surrogate.js* at a local export alias,
+*export-expname-from-unpaired-surrogate.js* and
+*export-expname-from-as-unpaired-surrogate.js* at a re-export specifier name,
+and *export-expname-import-unpaired-surrogate.js* at an import specifier name.
+The fifth, *export-expname-from-star-unpaired-surrogate.js*, spells the star
+as the string `"*"`, which ExportFromClause does not accept. Its observed
+`OSEO0001` points at that quoted star, before the surrogate is read, so the
+case proves only that earlier syntax rejection; it is still a correct
+expected negative. The ill-formed name in `export * as "\uD83D" from` is
+covered instead by a structural case in
+*packages/parser-babel/tests/module-export-forms.test.ts*, beside a
+well-formed surrogate pair that parses as a namespace export name. That test
+proves the parser rule under Node.js and Deno; it is not a test262
+observation or a native execution.
 ADR 0009 records the linking contract. Admitting `export var` required
 creating every module `var` cell while linking, because the previous
 evaluator-time initialization let a cyclic importer observe a temporal dead

@@ -636,9 +636,11 @@ including `object?.#method()`, now have native and differential evidence for
 nullish short circuit, valid-brand access, invalid-brand `TypeError`, and
 method receiver preservation under both specialization policies and forced
 collection. The profile is the test, not a work queue. Genuine remaining
-rejections, including namespace re-exports, keep their M5b intrinsic and
-global-object, module and asynchronous execution, standards harness, host, or
-accepted dynamic-source owners.
+rejections at M5a completion, including namespace re-exports, kept their M5b
+intrinsic and global-object, module and asynchronous execution, standards
+harness, host, or accepted dynamic-source owners. M5c node
+`module-export-forms` later admits namespace re-exports and `export var`, and
+node `import-meta` admits `import.meta` in Module code.
 
 M5a also publishes the complete applicable-test inventory that
 [ADR 0013](./docs/adr/0013-m5-edition-and-manifest.md) requires, because that

@@ -8211,6 +8211,41 @@ code range index 29 for `%eval%` and `createRealm`, the realm record heap kind,
 and the context's initial and running realm.
 
 
+The import.meta meta property
+-----------------------------
+
+M5c node `import-meta` admits the test262 `import.meta` feature. `import.meta`
+in Module code evaluates to one ordinary, extensible object per module whose
+`[[Prototype]]` is null and which has no own properties; the closed module host
+adds none. It exists before any module function initializer runs, so a cyclic
+dependency that calls a hoisted function early reads the same object.
+`import.meta` in Script code, escaped, or as an assignment target is an early
+SyntaxError.
+
+
+Module export forms
+-------------------
+
+M5c node `module-export-forms` admits `export var`,
+`export * as name from "./module.js"`, and arbitrary module namespace
+names. `export var` exports every bound name, including declarators
+without an initializer and binding-pattern leaves. Every module `var`
+cell is created as `undefined` while linking, so a cyclic importer or a
+hoisted function reads `undefined` before the declaring module
+evaluates, while lexical bindings keep their temporal dead zones.
+`export * as` exports the requested module's one namespace object under
+an explicit name, including `default` or a string name; it shadows star
+exports and shares the namespace identity of `import * as`, so star
+resolution stays ambiguous only for distinct bindings. Import and export
+names may be any well-formed string, and the string name `"*"` never
+selects a namespace import. Duplicate names, lone surrogates, and a
+string local name without `from` are early errors. A namespace lists its
+string keys in code-unit order, array-index names included, where an
+ordinary object lists array-index keys first. The reviewed test262
+features `arbitrary-module-namespace-names` and
+`export-star-as-namespace-from-module` are admitted.
+
+
 Known gaps inside the claim
 ---------------------------
 
@@ -8301,30 +8336,6 @@ complete. The remaining gaps retain their existing owners.
     [*regexp-inventory.md*](./regexp-inventory.md) records the clause,
     directory, flag, prototype, symbol, Unicode, and diagnostic inventory,
     including the Annex B constructs this grammar rejects in every mode.
- -  `import.meta` in Module code evaluates to one ordinary, extensible
-    object per module whose \[\[Prototype]] is null and which has no own
-    properties; the closed module host adds none. It exists before any
-    module function initializer runs, so a cyclic dependency that calls a
-    hoisted function early reads the same object. `import.meta` in Script
-    code, escaped, or as an assignment target is an early SyntaxError.
- -  Module export forms. M5c `module-export-forms` admits `export var`,
-    `export * as name from "./module.js"`, and arbitrary module namespace
-    names. `export var` exports every bound name, including declarators
-    without an initializer and binding-pattern leaves. Every module `var`
-    cell is created as `undefined` while linking, so a cyclic importer or a
-    hoisted function reads `undefined` before the declaring module
-    evaluates, while lexical bindings keep their temporal dead zones.
-    `export * as` exports the requested module's one namespace object under
-    an explicit name, including `default` or a string name; it shadows star
-    exports and shares the namespace identity of `import * as`, so star
-    resolution stays ambiguous only for distinct bindings. Import and export
-    names may be any well-formed string, and the string name `"*"` never
-    selects a namespace import. Duplicate names, lone surrogates, and a
-    string local name without `from` are early errors. A namespace lists its
-    string keys in code-unit order, array-index names included, where an
-    ordinary object lists array-index keys first. The reviewed test262
-    features `arbitrary-module-namespace-names` and
-    `export-star-as-namespace-from-module` are admitted.
  -  The realm root now owns one collector-traced intrinsic graph, a callable
     and constructible `Object` value, primitive wrappers, the
     `ArrayBuffer` constructor with its Data Block, `DataView` over that
@@ -8460,10 +8471,14 @@ complete. The remaining gaps retain their existing owners.
     [*PLAN-M5.md*](../PLAN-M5.md).
  -  The native host fails an executable with an unhandled rejection, as
     the M4 event-loop profile requires, while the upstream test262 host
-    contract tolerates one. Cases that deliberately leave a rejection
-    unhandled stay out of the reviewed subset until a host-profile
-    decision reconciles the two. Owner: the modules and asynchronous
-    execution stream.
+    contract tolerates one. Twenty reviewed paths stop at that checkpoint
+    and stay `unsupported-profile-feature` with the
+    `unhandled-rejection-policy` capability; node
+    `unhandled-rejection-observation` owns them, and none is a pass or an
+    exclusion. Cases whose unhandled reason is an error instance stay out
+    of the reviewed subset, as recorded above. Both remain until a
+    host-profile decision reconciles the two contracts. Owner: the modules
+    and asynchronous execution stream.
  -  Large intrinsic tables and built-in families land in the owned
     runtime components recorded in
     [*runtime-components.md*](./runtime-components.md).
