@@ -49840,6 +49840,15 @@ tests:
   - path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
     expectedClassification: unsupported-profile-feature
     dependencies: [array-buffer, object-properties, typed-array-constructors]
+  - path: test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/throw-type-error-before-custom-proto-access.js
+    expectedClassification: pass
+    dependencies:
+      - abrupt-completion
+      - functions
+      - object-properties
+      - reflect-namespace
+      - symbols
+      - typed-array-constructors
   - path: test/built-ins/TypedArrayConstructors/internals/DefineOwnProperty/BigInt/desc-value-throws.js
     expectedClassification: pass
     dependencies:

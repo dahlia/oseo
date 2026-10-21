@@ -7926,3 +7926,93 @@ their subset rows were retained. The only new observation is a pass for
 *test/language/expressions/assignment/fn-name-lhs-cover.js*.
 This is preparation evidence; landing and the whole ordinary and extended
 gates remain pending.
+
+
+TypedArray construction order
+-----------------------------
+
+M5c node `typed-array-construction-order` repairs the already-admitted
+concrete TypedArray constructors. ECMA-262 2025 23.2.5.1 rejects an undefined
+NewTarget first. For a primitive first argument it then runs ToIndex
+(7.1.22) and only afterward calls AllocateTypedArray, whose
+GetPrototypeFromConstructor reads the new target's `prototype`. The runtime
+read that prototype before converting every argument form. A bound function
+or Proxy new target whose `prototype` read throws therefore replaced a
+Symbol or BigInt `TypeError`, or a negative or infinite index `RangeError`,
+with its own error. `typed_array_construct` now keeps the new target check
+first, converts a primitive argument, then allocates the view and its
+buffer. A valid index still reads the prototype before a length the host
+cannot allocate fails. The zero-argument form and the `ArrayBuffer`,
+TypedArray, iterable, and array-like forms keep allocating the view before
+any offset or length conversion, iterator lookup or step, `length` or element
+read, detachment check, or content-type check, as AllocateTypedArray
+requires. The new target and the argument stay rooted across the conversion.
+The runtime identity is `m5-132`; no ABI entry point, public layout, heap
+kind, code ID, intrinsic slot, or package version is added. Construction
+from species, `from`, and `of` reaches the same constructor path.
+
+Node.js 24.21.0 still reads the prototype before converting a primitive.
+Node.js and Deno 2.9.7 both read an iterable's iterator and drain it, and
+read an array-like's `length`, before the prototype; ECMA-262 2025 reads
+both afterward. Those are reference discrepancies, not oracles. The
+*m5-typed-array-constructors.property.test.ts* family therefore compares
+native output with an independent ECMA-262 2025 model and each reference
+with a labeled V8 model that differs from it only by those orders. A pure
+reference registration enumerates 480 subjects for each of the eleven
+constructors: every argument form the generated domain draws under a
+direct call, an own new target, and bound and Proxy new targets whose
+prototype read returns an object or primitive or throws. Both Node.js and
+Deno matched their labeled models in a focused local run. These 5,280
+subjects are reference observations, not native cases.
+
+The family's slot `0x60006e00` keeps its domain, 12-case budget, and
+180-second limit. New slot `0x60006e01` draws one to four subjects per
+program from that form and target space, for one of the eleven
+constructors, with 12 ordinary cases and a 180-second limit. Shrinking
+preserves the structured subjects. Every primitive passes through a
+numeric JSDoc hint that is false for its non-Number values, and each program
+adds the family's deliberate guard miss. Native runs use both specialization
+policies with collection at every safepoint and assert positive collection and,
+when enabled, guard-miss counts. The fixed registration “TypedArray argument
+conversion precedes the prototype lookup” checks 19 argument forms under all
+eight targets for `Float64Array` and `BigInt64Array`, including the test262
+shape, against the ECMA-262 2025 model under both policies with forced
+collection. The compile-only structural registration “TypedArray construction
+lowers to the generic paths” asserts that `new` and `Reflect.construct` reach
+the runtime through the generic construct and call operations under both
+policies, so no specialized path or guard owns this order. The existing seed
+block supplies the new slot; no seed block or registry entry is added. The
+family record keeps its identity and adds this file to its fixed and structural
+evidence.
+
+The owned row under
+*test/built-ins/TypedArrayConstructors/ctors/typedarray-arg/* is
+*throw-type-error-before-custom-proto-access.js*.
+Observation batch 03 observed it as `semantic-failure`: the bound new target's
+prototype getter threw `Test262Error` before the Symbol argument's `TypeError`.
+The row is admitted as `pass` with the batch's dependency assessment: abrupt
+completion, functions, object properties, the Reflect namespace, symbols, and
+TypedArray constructors.
+
+A focused Linux extended run of the complete property file at `dd61722a`
+passed all five registrations. Their case durations sum to 522,026.516811
+milliseconds, giving a 523-second Linux weight. The 225-second macOS
+weight remains an unmeasured estimate; *docs/evidence/u6/README.md* records
+its method and the raw Linux evidence. That run preceded integration with
+the parenthesized-target source and does not certify the combined tree.
+
+Publication requires a complete
+`mise run test262:update -- --accept-promotions` on clean committed integrated
+source, reconciliation of the manifest and derived closure records, focused
+native checks, local `mise run check`, independent review of fixed commits,
+and every job of the exact candidate's CI run under *PLAN-M5C.md*.
+Already-reviewed paths may move only toward `pass`.
+
+The full manifest update at source `b66e3266` ended with exit 0.
+Its 27901 observations contain 23753 passes,
+2423 expected negatives, and
+1725 unsupported results. All 27,900 inherited
+records remain unchanged; the only added record is the owned TypedArray
+construction-order case, observed as `pass`.
+This records preparation evidence. Local checks, candidate CI, and
+publication closure remain separate gates.

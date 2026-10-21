@@ -18502,7 +18502,7 @@ summary:
   expectedNegatives: 2423
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 23752
+  passes: 23753
   semanticFailures: 0
   unsupportedProfileFeatures: 1725
   dependencies:
@@ -18510,7 +18510,7 @@ summary:
       expectedNegatives: 5
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1400
+      passes: 1401
       semanticFailures: 0
       unsupportedProfileFeatures: 58
     - dependency: array-buffer
@@ -18622,7 +18622,7 @@ summary:
       expectedNegatives: 504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 8533
+      passes: 8534
       semanticFailures: 0
       unsupportedProfileFeatures: 783
     - dependency: generators
@@ -18685,7 +18685,7 @@ summary:
       expectedNegatives: 579
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14561
+      passes: 14562
       semanticFailures: 0
       unsupportedProfileFeatures: 218
     - dependency: promise-settlement
@@ -18713,7 +18713,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 314
+      passes: 315
       semanticFailures: 0
       unsupportedProfileFeatures: 6
     - dependency: regular-expressions
@@ -18748,7 +18748,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1820
+      passes: 1821
       semanticFailures: 0
       unsupportedProfileFeatures: 40
     - dependency: top-level-await
@@ -18762,7 +18762,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 85
+      passes: 86
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: typed-array-core
@@ -19120,7 +19120,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 395
+      passes: 396
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - group: built-ins/WeakMap

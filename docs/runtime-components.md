@@ -1580,6 +1580,15 @@ outside that root, twenty-four ArrayBuffer transfer cases, one DataView
 receiver case, and eleven `Object.seal` cases, move to pass because the
 constructors they need now exist.
 
+M5c node `typed-array-construction-order` moves `abiVersion` to `m5-132`.
+For a primitive first argument, `typed_array_construct` now runs ToIndex
+before the new target's `prototype` read and allocates the view and its
+buffer only after both succeed. The new target and the argument stay rooted
+across that conversion. The undefined new target check stays first, and the
+zero-argument and object branches still allocate the view before they
+convert, iterate, or read the argument, as AllocateTypedArray requires. The
+change adds no code ID, intrinsic, heap kind, or entry point.
+
 ### Clock and wakeup evidence
 
 M5b node `nio-clock-wakeup-checkpoint` adds *runtime\_clock.c* and

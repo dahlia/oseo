@@ -4,7 +4,7 @@
 # Selectors change only through `mise run m5c:observation-batches:plan`.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 13191
+unreviewedPaths: 13190
 basis:
   supportedFeatures:
     - AggregateError
@@ -164,7 +164,7 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 93775
+  currentExecutedVariants: 93779
   currentSeconds: 5152
   finalExecutedVariants: 135471
   finalSeconds: 7443
@@ -196,7 +196,7 @@ regeneration:
       fullUpdateScheduleHours: 70.44
     - batches: 10
       largestPaths: 3900
-      largestReviewUnits: 1196
+      largestReviewUnits: 1195
       limits:
         paths: 8000
         reviewUnits: 1200
@@ -304,8 +304,8 @@ batches:
         - test/built-ins/TypedArrayConstructors/from/
     dependsOn:
       - observation-batch-plan
-    paths: 314
-    reviewUnits: 314
+    paths: 313
+    reviewUnits: 313
     generatedPaths: 0
     prerequisites: {}
     dynamicSource: {}
@@ -318,18 +318,18 @@ batches:
       detachArrayBuffer.js: 6
       isConstructor.js: 11
       nans.js: 1
-      testTypedArray.js: 294
+      testTypedArray.js: 293
     features:
       Array.prototype.values: 3
       BigInt: 141
-      Reflect: 24
+      Reflect: 23
       Reflect.construct: 11
       SharedArrayBuffer: 48
       Symbol: 20
       Symbol.iterator: 19
       Symbol.species: 6
       Symbol.toPrimitive: 4
-      TypedArray: 311
+      TypedArray: 310
       generators: 1
       resizable-arraybuffer: 1
     negatives: {}
@@ -339,8 +339,8 @@ batches:
       files: 185
       newFiles: 34
     regeneration:
-      executableVariants: 1248
-      scopedUpdateSeconds: 69
+      executableVariants: 1244
+      scopedUpdateSeconds: 68
       fullCorpusSeconds: 5278
   - id: observation-batch-05
     selector:

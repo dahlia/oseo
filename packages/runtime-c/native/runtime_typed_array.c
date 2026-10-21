@@ -190,18 +190,16 @@ static size_t typed_array_length(const OseoTypedArray *view) {
     return view->array_length;
 }
 
+/*
+ * AllocateTypedArray without its buffer: GetPrototypeFromConstructor reads
+ * `prototype` from the new target, which a getter or Proxy can observe, so
+ * callers order this read against argument conversion as ECMA-262 does.
+ */
 static OseoResult typed_array_allocate_object(
     OseoContext *context,
     OseoTypedArrayKind kind,
     OseoValue new_target
 ) {
-    if (!function_is_constructible(new_target)) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "TypedArray constructor requires new."
-        );
-    }
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
@@ -777,23 +775,24 @@ OseoResult oseo_internal_typed_array_iteration_length(
     return normal(oseo_undefined());
 }
 
+/*
+ * AllocateTypedArrayBuffer for an element length that ToIndex already
+ * produced. A length the host cannot represent is the RangeError that
+ * CreateByteDataBlock reports after the prototype lookup.
+ */
 static OseoResult typed_array_from_length(
     OseoContext *context,
     OseoValue view_value,
-    OseoValue value
+    double requested
 ) {
-    double requested = 0.0;
-    OseoResult result = typed_array_to_index(context, value, &requested);
     size_t length = 0u;
-    if (result.status == OSEO_STATUS_NORMAL &&
-        !typed_array_size(requested, &length)) {
-        result = oseo_internal_throw_error(
+    if (!typed_array_size(requested, &length)) {
+        return oseo_internal_throw_error(
             context,
             OSEO_ERROR_RANGE,
             "TypedArray length is too large."
         );
     }
-    if (result.status != OSEO_STATUS_NORMAL) return result;
     return typed_array_allocate_buffer(context, view_value, length);
 }
 
@@ -1293,17 +1292,43 @@ static OseoResult typed_array_construct(
     if (!typed_array_kind_for_code(code_id, &kind)) {
         return failure(context, "OSEO2001", "Unknown TypedArray constructor.");
     }
-    OseoResult result =
-        typed_array_allocate_object(context, kind, new_target);
-    if (result.status != OSEO_STATUS_NORMAL) return result;
-    OseoValue slots[2] = {result.value, oseo_undefined()};
-    OseoRootFrame frame = {NULL, slots, 2u};
+    if (!function_is_constructible(new_target)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "TypedArray constructor requires new."
+        );
+    }
+    OseoValue slots[3] = {
+        oseo_undefined(),
+        argument_count != 0u ? arguments[0] : oseo_undefined(),
+        new_target,
+    };
+    OseoRootFrame frame = {NULL, slots, 3u};
     oseo_roots_push(context, &frame);
-    if (argument_count == 0u) {
-        result = typed_array_allocate_buffer(context, slots[0], 0u);
+    OseoResult result = normal(oseo_undefined());
+    if (argument_count != 0u && !is_object(slots[1])) {
+        /* A primitive first argument runs ToIndex before AllocateTypedArray
+         * reads the new target's prototype, so its TypeError or RangeError
+         * wins over a throwing prototype getter or Proxy trap. */
+        double requested = 0.0;
+        result = typed_array_to_index(context, slots[1], &requested);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = typed_array_allocate_object(context, kind, slots[2]);
+            slots[0] = result.value;
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = typed_array_from_length(context, slots[0], requested);
+        }
     } else {
-        slots[1] = arguments[0];
-        if (is_array_buffer(slots[1])) {
+        /* No argument, or an object one: AllocateTypedArray reads the
+         * prototype before any argument conversion or iteration. */
+        result = typed_array_allocate_object(context, kind, slots[2]);
+        slots[0] = result.value;
+        if (result.status == OSEO_STATUS_NORMAL && argument_count == 0u) {
+            result = typed_array_allocate_buffer(context, slots[0], 0u);
+        } else if (result.status == OSEO_STATUS_NORMAL &&
+                   is_array_buffer(slots[1])) {
             result = typed_array_from_buffer(
                 context,
                 slots[0],
@@ -1311,10 +1336,8 @@ static OseoResult typed_array_construct(
                 argument_count,
                 arguments
             );
-        } else if (is_object(slots[1])) {
+        } else if (result.status == OSEO_STATUS_NORMAL) {
             result = typed_array_from_object(context, slots[0], slots[1]);
-        } else {
-            result = typed_array_from_length(context, slots[0], slots[1]);
         }
     }
     oseo_roots_pop(context, &frame);
