@@ -143,8 +143,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,287 reviewed cases: 24,022 passes, 2,566
-expected negatives, and 1,699 unsupported profile features. It records no
+The current manifest contains 28,287 reviewed cases: 24,022 passes, 2,570
+expected negatives, and 1,695 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -8302,15 +8302,13 @@ complete. The remaining gaps retain their existing owners.
     recorded above. The same positions stay rejected with a source-located
     diagnostic at module top level. Its private traced frame can suspend an
     ordinary expression, but module construction still rejects a pattern that
-    contains `await` before that frame is built. No reviewed test262 case
-    exercises the module form on
-    its own; the one upstream case that does,
-    *top-level-await/syntax/catch-parameter.js*, is reviewed and classifies
-    `unsupported-profile-feature` for its declared `dynamic-import` feature
-    before it reaches this diagnostic. Package tests in
+    contains `await` before that frame is built. The reviewed test262 case
+    *top-level-await/syntax/catch-parameter.js* reaches this diagnostic and
+    records `unsupported-profile-feature` with `profile-syntax`, rather than
+    a frontmatter feature rejection. Package tests in
     *packages/parser-babel/tests/bindings.test.ts* and
-    *packages/compiler/tests/modules.test.ts* prove the diagnostic and its
-    location. Owner: the modules and asynchronous execution stream.
+    *packages/compiler/tests/modules.test.ts* also prove the diagnostic and
+    its location. Owner: `module-top-level-await-patterns`.
  -  `%AsyncFromSyncIteratorPrototype%` is not materialized. ECMA-262 never
     exposes an AsyncFromSyncIterator object to a program, so no
     `Object.getPrototypeOf` route reaches it and the unreachable internal
