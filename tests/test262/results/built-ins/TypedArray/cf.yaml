@@ -206,7 +206,7 @@ results:
     observation:
       detail: 'test/built-ins/TypedArray/prototype/toLocaleString/BigInt/calls-tolocalestring-from-each-value.js
         non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/TypedArray/prototype/toLocaleString/BigInt/calls-tolocalestring-from-each-value.js:627:14:
+        stderr="test/built-ins/TypedArray/prototype/toLocaleString/BigInt/calls-tolocalestring-from-each-value.js:633:14:
         error[OSEO2001]: Primitive wrapper objects are not admitted
         yet.\n"'
       passed: false

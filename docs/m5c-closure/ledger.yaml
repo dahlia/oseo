@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26546
-openPaths: 14545
+closedPaths: 26588
+openPaths: 14503
 states:
   expected-negative: 2566
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 23980
+  pass: 24022
   semantic-failure: 0
   unreviewed: 12804
-  unsupported-profile-feature: 1741
+  unsupported-profile-feature: 1699
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -293,11 +293,6 @@ owners:
     note: "host-binding: $262.evalScript (13) or print (1). ADR 0016 does
       not name host bindings."
     paths: 14
-  node:typed-array-feature-admission:
-    note: Unsupported frontmatter features are only concrete TypedArray
-      constructors (40), or typeof Float16Array is outside the
-      global-object profile (2).
-    paths: 42
   node:typed-array-proto-coverage-remediation:
     paths: 1
   node:unhandled-rejection-observation:
@@ -310,7 +305,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26546
+    paths: 26588
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -549,7 +544,7 @@ paths:
   test/built-ins/Array/prototype/concat/Array.prototype.concat_sloppy-arguments-throws.js: [pass, observation]
   test/built-ins/Array/prototype/concat/Array.prototype.concat_sloppy-arguments-with-dupes.js: [pass, observation]
   test/built-ins/Array/prototype/concat/Array.prototype.concat_sloppy-arguments.js: [pass, observation]
-  test/built-ins/Array/prototype/concat/Array.prototype.concat_small-typed-array.js: [unsupported-profile-feature, node:typed-array-feature-admission, [functions, object-properties]]
+  test/built-ins/Array/prototype/concat/Array.prototype.concat_small-typed-array.js: [pass, observation]
   test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-boolean-wrapper.js: [pass, observation]
   test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-function.js: [pass, observation]
   test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-getter-throws.js: [pass, observation]
@@ -1249,9 +1244,9 @@ paths:
   test/built-ins/Array/prototype/flat/target-array-non-extensible.js: [pass, observation]
   test/built-ins/Array/prototype/flat/target-array-with-non-configurable-property.js: [pass, observation]
   test/built-ins/Array/prototype/flat/target-array-with-non-writable-property.js: [pass, observation]
-  test/built-ins/Array/prototype/flatMap/array-like-objects-nested.js: [unsupported-profile-feature, node:typed-array-feature-admission, [functions, object-properties]]
+  test/built-ins/Array/prototype/flatMap/array-like-objects-nested.js: [pass, observation]
   test/built-ins/Array/prototype/flatMap/array-like-objects-poisoned-length.js: [pass, observation]
-  test/built-ins/Array/prototype/flatMap/array-like-objects-typedarrays.js: [unsupported-profile-feature, node:typed-array-feature-admission, [functions, object-properties]]
+  test/built-ins/Array/prototype/flatMap/array-like-objects-typedarrays.js: [pass, observation]
   test/built-ins/Array/prototype/flatMap/array-like-objects.js: [pass, observation]
   test/built-ins/Array/prototype/flatMap/bound-function-argument.js: [pass, observation]
   test/built-ins/Array/prototype/flatMap/call-with-boolean.js: [pass, observation]
@@ -3375,7 +3370,7 @@ paths:
   test/built-ins/ArrayBuffer/prototype/byteLength/name.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/byteLength/prop-desc.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/byteLength/return-bytelength.js: [pass, observation]
-  test/built-ins/ArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer]]
+  test/built-ins/ArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/byteLength/this-is-not-object.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/byteLength/this-is-sharedarraybuffer.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/constructor.js: [pass, observation]
@@ -3386,7 +3381,7 @@ paths:
   test/built-ins/ArrayBuffer/prototype/detached/length.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/detached/name.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/detached/prop-desc.js: [pass, observation]
-  test/built-ins/ArrayBuffer/prototype/detached/this-has-no-arraybufferdata-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer]]
+  test/built-ins/ArrayBuffer/prototype/detached/this-has-no-arraybufferdata-internal.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/detached/this-is-not-object.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer-resizable.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/detached/this-is-sharedarraybuffer.js: [pass, observation]
@@ -3398,7 +3393,7 @@ paths:
   test/built-ins/ArrayBuffer/prototype/maxByteLength/prop-desc.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/maxByteLength/return-maxbytelength-non-resizable.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/maxByteLength/return-maxbytelength-resizable.js: [pass, observation]
-  test/built-ins/ArrayBuffer/prototype/maxByteLength/this-has-no-arraybufferdata-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer]]
+  test/built-ins/ArrayBuffer/prototype/maxByteLength/this-has-no-arraybufferdata-internal.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-not-object.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-sharedarraybuffer.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/resizable/detached-buffer.js: [pass, observation]
@@ -3408,7 +3403,7 @@ paths:
   test/built-ins/ArrayBuffer/prototype/resizable/name.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/resizable/prop-desc.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/resizable/return-resizable.js: [pass, observation]
-  test/built-ins/ArrayBuffer/prototype/resizable/this-has-no-arraybufferdata-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer]]
+  test/built-ins/ArrayBuffer/prototype/resizable/this-has-no-arraybufferdata-internal.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/resizable/this-is-not-object.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/resizable/this-is-sharedarraybuffer.js: [pass, observation]
   test/built-ins/ArrayBuffer/prototype/resize/coerced-new-length-detach.js: [pass, observation]
@@ -3776,7 +3771,7 @@ paths:
   test/built-ins/Atomics/notify/name.js: [pass, observation]
   test/built-ins/Atomics/notify/negative-count.js: [pass, observation]
   test/built-ins/Atomics/notify/negative-index-throws.js: [pass, observation]
-  test/built-ins/Atomics/notify/non-int32-typedarray-throws.js: [unsupported-profile-feature, node:typed-array-feature-admission, [atomics-single-agent]]
+  test/built-ins/Atomics/notify/non-int32-typedarray-throws.js: [pass, observation]
   test/built-ins/Atomics/notify/non-shared-bufferdata-count-evaluation-throws.js: [pass, observation]
   test/built-ins/Atomics/notify/non-shared-bufferdata-index-evaluation-throws.js: [pass, observation]
   test/built-ins/Atomics/notify/non-shared-bufferdata-non-shared-int-views-throws.js: [pass, observation]
@@ -3901,7 +3896,7 @@ paths:
   test/built-ins/Atomics/wait/no-spurious-wakeup-on-store.js: [pass, observation]
   test/built-ins/Atomics/wait/no-spurious-wakeup-on-sub.js: [pass, observation]
   test/built-ins/Atomics/wait/no-spurious-wakeup-on-xor.js: [pass, observation]
-  test/built-ins/Atomics/wait/non-int32-typedarray-throws.js: [unsupported-profile-feature, node:typed-array-feature-admission, [atomics-single-agent]]
+  test/built-ins/Atomics/wait/non-int32-typedarray-throws.js: [pass, observation]
   test/built-ins/Atomics/wait/non-shared-bufferdata-throws.js: [pass, observation]
   test/built-ins/Atomics/wait/not-a-typedarray-throws.js: [pass, observation]
   test/built-ins/Atomics/wait/not-an-object-throws.js: [pass, observation]
@@ -3950,7 +3945,7 @@ paths:
   test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-store.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-sub.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/bigint/no-spurious-wakeup-on-xor.js: [pass, observation]
-  test/built-ins/Atomics/waitAsync/bigint/non-bigint64-typedarray-throws.js: [unsupported-profile-feature, node:typed-array-feature-admission, [atomics-single-agent]]
+  test/built-ins/Atomics/waitAsync/bigint/non-bigint64-typedarray-throws.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/bigint/non-shared-bufferdata-throws.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/bigint/not-a-typedarray-throws.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/bigint/not-an-object-throws.js: [pass, observation]
@@ -3998,7 +3993,7 @@ paths:
   test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-store.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-sub.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/no-spurious-wakeup-on-xor.js: [pass, observation]
-  test/built-ins/Atomics/waitAsync/non-int32-typedarray-throws.js: [unsupported-profile-feature, node:typed-array-feature-admission, [atomics-single-agent]]
+  test/built-ins/Atomics/waitAsync/non-int32-typedarray-throws.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/non-shared-bufferdata-throws.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/not-a-typedarray-throws.js: [pass, observation]
   test/built-ins/Atomics/waitAsync/not-an-object-throws.js: [pass, observation]
@@ -4177,7 +4172,7 @@ paths:
   test/built-ins/Boolean/prototype/valueOf/not-a-constructor.js: [pass, observation]
   test/built-ins/Boolean/symbol-coercion.js: [pass, observation]
   test/built-ins/DataView/buffer-does-not-have-arraybuffer-data-throws-sab.js: [pass, observation]
-  test/built-ins/DataView/buffer-does-not-have-arraybuffer-data-throws.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/buffer-does-not-have-arraybuffer-data-throws.js: [pass, observation]
   test/built-ins/DataView/buffer-not-object-throws.js: [pass, observation]
   test/built-ins/DataView/buffer-reference-sab.js: [pass, observation]
   test/built-ins/DataView/buffer-reference.js: [pass, observation]
@@ -4234,7 +4229,7 @@ paths:
   test/built-ins/DataView/prototype/buffer/return-buffer-sab.js: [pass, observation]
   test/built-ins/DataView/prototype/buffer/return-buffer.js: [pass, observation]
   test/built-ins/DataView/prototype/buffer/this-has-no-dataview-internal-sab.js: [pass, observation]
-  test/built-ins/DataView/prototype/buffer/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/buffer/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/buffer/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/byteLength/detached-buffer.js: [pass, observation]
   test/built-ins/DataView/prototype/byteLength/instance-has-detached-buffer.js: [pass, observation]
@@ -4248,7 +4243,7 @@ paths:
   test/built-ins/DataView/prototype/byteLength/return-bytelength-sab.js: [pass, observation]
   test/built-ins/DataView/prototype/byteLength/return-bytelength.js: [pass, observation]
   test/built-ins/DataView/prototype/byteLength/this-has-no-dataview-internal-sab.js: [pass, observation]
-  test/built-ins/DataView/prototype/byteLength/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/byteLength/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/byteLength/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/byteOffset/detached-buffer.js: [pass, observation]
   test/built-ins/DataView/prototype/byteOffset/invoked-as-accessor.js: [pass, observation]
@@ -4261,7 +4256,7 @@ paths:
   test/built-ins/DataView/prototype/byteOffset/return-byteoffset-sab.js: [pass, observation]
   test/built-ins/DataView/prototype/byteOffset/return-byteoffset.js: [pass, observation]
   test/built-ins/DataView/prototype/byteOffset/this-has-no-dataview-internal-sab.js: [pass, observation]
-  test/built-ins/DataView/prototype/byteOffset/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/byteOffset/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/byteOffset/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigInt64/detached-buffer-after-toindex-byteoffset.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigInt64/detached-buffer-before-outofrange-byteoffset.js: [pass, observation]
@@ -4277,7 +4272,7 @@ paths:
   test/built-ins/DataView/prototype/getBigInt64/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigInt64/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigInt64/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getBigInt64/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, bigint-primitive, data-view, functions]]
+  test/built-ins/DataView/prototype/getBigInt64/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigInt64/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigInt64/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigInt64/toindex-byteoffset-errors.js: [pass, observation]
@@ -4298,7 +4293,7 @@ paths:
   test/built-ins/DataView/prototype/getBigUint64/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigUint64/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigUint64/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getBigUint64/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, bigint-primitive, data-view, functions]]
+  test/built-ins/DataView/prototype/getBigUint64/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigUint64/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigUint64/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getBigUint64/toindex-byteoffset-errors.js: [pass, observation]
@@ -4322,7 +4317,7 @@ paths:
   test/built-ins/DataView/prototype/getFloat16/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat16/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat16/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getFloat16/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getFloat16/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat16/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat16/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat16/toindex-byteoffset.js: [pass, observation]
@@ -4343,7 +4338,7 @@ paths:
   test/built-ins/DataView/prototype/getFloat32/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat32/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat32/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getFloat32/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getFloat32/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat32/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat32/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat32/toindex-byteoffset.js: [pass, observation]
@@ -4364,7 +4359,7 @@ paths:
   test/built-ins/DataView/prototype/getFloat64/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat64/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat64/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getFloat64/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getFloat64/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat64/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat64/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getFloat64/toindex-byteoffset.js: [pass, observation]
@@ -4382,7 +4377,7 @@ paths:
   test/built-ins/DataView/prototype/getInt16/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt16/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt16/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getInt16/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getInt16/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt16/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt16/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt16/toindex-byteoffset.js: [pass, observation]
@@ -4408,7 +4403,7 @@ paths:
   test/built-ins/DataView/prototype/getInt32/return-values-sab.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt32/return-values.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt32/this-has-no-dataview-internal-sab.js: [pass, observation]
-  test/built-ins/DataView/prototype/getInt32/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getInt32/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt32/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt32/to-boolean-littleendian-sab.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt32/to-boolean-littleendian.js: [pass, observation]
@@ -4428,7 +4423,7 @@ paths:
   test/built-ins/DataView/prototype/getInt8/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt8/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt8/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getInt8/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getInt8/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt8/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getInt8/toindex-byteoffset.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint16/detached-buffer-after-toindex-byteoffset.js: [pass, observation]
@@ -4445,7 +4440,7 @@ paths:
   test/built-ins/DataView/prototype/getUint16/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint16/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint16/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getUint16/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getUint16/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint16/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint16/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint16/toindex-byteoffset.js: [pass, observation]
@@ -4463,7 +4458,7 @@ paths:
   test/built-ins/DataView/prototype/getUint32/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint32/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint32/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getUint32/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getUint32/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint32/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint32/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint32/toindex-byteoffset.js: [pass, observation]
@@ -4481,7 +4476,7 @@ paths:
   test/built-ins/DataView/prototype/getUint8/return-value-clean-arraybuffer.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint8/return-values-custom-offset.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint8/return-values.js: [pass, observation]
-  test/built-ins/DataView/prototype/getUint8/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/getUint8/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint8/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/getUint8/toindex-byteoffset.js: [pass, observation]
   test/built-ins/DataView/prototype/setBigInt64/detached-buffer-after-bigint-value.js: [pass, observation]
@@ -4528,7 +4523,7 @@ paths:
   test/built-ins/DataView/prototype/setFloat16/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat16/set-values-little-endian-order.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat16/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setFloat16/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setFloat16/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat16/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat16/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat16/toindex-byteoffset.js: [pass, observation]
@@ -4551,7 +4546,7 @@ paths:
   test/built-ins/DataView/prototype/setFloat32/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat32/set-values-little-endian-order.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat32/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setFloat32/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setFloat32/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat32/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat32/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat32/toindex-byteoffset.js: [pass, observation]
@@ -4574,7 +4569,7 @@ paths:
   test/built-ins/DataView/prototype/setFloat64/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat64/set-values-little-endian-order.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat64/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setFloat64/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setFloat64/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat64/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat64/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/setFloat64/toindex-byteoffset.js: [pass, observation]
@@ -4597,7 +4592,7 @@ paths:
   test/built-ins/DataView/prototype/setInt16/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt16/set-values-little-endian-order.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt16/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setInt16/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setInt16/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt16/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt16/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt16/toindex-byteoffset.js: [pass, observation]
@@ -4620,7 +4615,7 @@ paths:
   test/built-ins/DataView/prototype/setInt32/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt32/set-values-little-endian-order.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt32/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setInt32/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setInt32/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt32/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt32/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt32/toindex-byteoffset.js: [pass, observation]
@@ -4642,7 +4637,7 @@ paths:
   test/built-ins/DataView/prototype/setInt8/return-abrupt-from-tonumber-value-symbol.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt8/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt8/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setInt8/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setInt8/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt8/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setInt8/toindex-byteoffset.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint16/detached-buffer-after-number-value.js: [pass, observation]
@@ -4664,7 +4659,7 @@ paths:
   test/built-ins/DataView/prototype/setUint16/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint16/set-values-little-endian-order.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint16/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setUint16/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setUint16/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint16/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint16/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint16/toindex-byteoffset.js: [pass, observation]
@@ -4687,7 +4682,7 @@ paths:
   test/built-ins/DataView/prototype/setUint32/return-abrupt-from-tonumber-value.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint32/set-values-little-endian-order.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint32/set-values-return-undefined.js: [pass, observation]
-  test/built-ins/DataView/prototype/setUint32/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setUint32/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint32/this-is-not-object.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint32/to-boolean-littleendian.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint32/toindex-byteoffset.js: [pass, observation]
@@ -4696,11 +4691,11 @@ paths:
   test/built-ins/DataView/prototype/setUint8/detached-buffer-before-outofrange-byteoffset.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/detached-buffer.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/index-check-before-value-conversion.js: [pass, observation]
-  test/built-ins/DataView/prototype/setUint8/index-is-out-of-range.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setUint8/index-is-out-of-range.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/length.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/name.js: [pass, observation]
-  test/built-ins/DataView/prototype/setUint8/negative-byteoffset-throws.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
-  test/built-ins/DataView/prototype/setUint8/no-value-arg.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setUint8/negative-byteoffset-throws.js: [pass, observation]
+  test/built-ins/DataView/prototype/setUint8/no-value-arg.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/not-a-constructor.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/range-check-after-value-conversion.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/resizable-buffer.js: [pass, observation]
@@ -4708,10 +4703,10 @@ paths:
   test/built-ins/DataView/prototype/setUint8/return-abrupt-from-tonumber-byteoffset.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/return-abrupt-from-tonumber-value-symbol.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/return-abrupt-from-tonumber-value.js: [pass, observation]
-  test/built-ins/DataView/prototype/setUint8/set-values-return-undefined.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
-  test/built-ins/DataView/prototype/setUint8/this-has-no-dataview-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setUint8/set-values-return-undefined.js: [pass, observation]
+  test/built-ins/DataView/prototype/setUint8/this-has-no-dataview-internal.js: [pass, observation]
   test/built-ins/DataView/prototype/setUint8/this-is-not-object.js: [pass, observation]
-  test/built-ins/DataView/prototype/setUint8/toindex-byteoffset.js: [unsupported-profile-feature, node:typed-array-feature-admission, [array-buffer, data-view]]
+  test/built-ins/DataView/prototype/setUint8/toindex-byteoffset.js: [pass, observation]
   test/built-ins/DataView/return-abrupt-tonumber-bytelength-sab.js: [pass, observation]
   test/built-ins/DataView/return-abrupt-tonumber-bytelength-symbol-sab.js: [pass, observation]
   test/built-ins/DataView/return-abrupt-tonumber-bytelength-symbol.js: [pass, observation]
@@ -14245,7 +14240,7 @@ paths:
   test/built-ins/SharedArrayBuffer/prototype/byteLength/name.js: [pass, observation]
   test/built-ins/SharedArrayBuffer/prototype/byteLength/prop-desc.js: [pass, observation]
   test/built-ins/SharedArrayBuffer/prototype/byteLength/return-bytelength.js: [pass, observation]
-  test/built-ins/SharedArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js: [unsupported-profile-feature, node:typed-array-feature-admission, [atomics-single-agent]]
+  test/built-ins/SharedArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js: [pass, observation]
   test/built-ins/SharedArrayBuffer/prototype/byteLength/this-is-arraybuffer.js: [pass, observation]
   test/built-ins/SharedArrayBuffer/prototype/byteLength/this-is-not-object.js: [pass, observation]
   test/built-ins/SharedArrayBuffer/prototype/constructor.js: [pass, observation]
@@ -16730,7 +16725,7 @@ paths:
   test/built-ins/TypedArray/prototype/set/typedarray-arg-offset-tointeger.js: [pass, observation]
   test/built-ins/TypedArray/prototype/set/typedarray-arg-return-abrupt-from-tointeger-offset-symbol.js: [pass, observation]
   test/built-ins/TypedArray/prototype/set/typedarray-arg-return-abrupt-from-tointeger-offset.js: [pass, observation]
-  test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-conversions-sab.js: [unsupported-profile-feature, node:typed-array-feature-admission, [typed-array-core]]
+  test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-conversions-sab.js: [pass, observation]
   test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-conversions.js: [pass, observation]
   test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-sab.js: [pass, observation]
   test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type.js: [pass, observation]

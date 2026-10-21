@@ -131,8 +131,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,287 reviewed cases: 23,980 passes, 2,566
-expected negatives, and 1,741 unsupported profile features. It records no
+The current manifest contains 28,287 reviewed cases: 24,022 passes, 2,566
+expected negatives, and 1,699 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -6298,12 +6298,19 @@ it like the other eleven kinds. Generated evidence at seed `0x60006e02`
 checks rounding at binary16 midpoints and their binary64 neighbors against an
 exact BigInt oracle through construction, element assignment, and DataView,
 and the fixed `typed-array-float16` native fixture covers the constructor
-surface. Preparation ran no native build or execution and no manifest update;
-those observations are pending. The Float16 conversion domain drew binary16
+surface. Preparation ran no native build or execution and no manifest update.
+A later local Linux run of the Float16 conversion domain drew binary16
 bits 1, which is 2^-24, and its stored bits were exact, but the runtime
 printed the Number with 17 digits instead of 16; the node fixes that shared
 decimal digit selection, described with the `number-prototype` node above,
-rather than the binary16 conversion.
+rather than the binary16 conversion. After that fix, local Linux whole-file
+extended runs of the constructor and Number prototype property files passed.
+The complete reviewed test262 update then observed all 42 paths the node owns
+as passes and changed no other classification. Two TypedArray
+`toLocaleString` paths keep their `primitive-wrapper` boundary at the same
+`calls.push(this)` site, now reported six harness lines later. The native
+fixture, macOS execution, and CI are not part of that evidence, and these 42
+paths do not show complete Float16 conformance.
 
 The reviewed test262 subset adds 81 directly applicable paths from the node's
 736-path inventory. Fourteen BigInt constructor and prototype metadata cases

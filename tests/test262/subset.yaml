@@ -807,7 +807,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_small-typed-array.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/Array.prototype.concat_spreadable-boolean-wrapper.js
     expectedClassification: pass
@@ -2895,13 +2895,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flatMap/array-like-objects-nested.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flatMap/array-like-objects-poisoned-length.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flatMap/array-like-objects-typedarrays.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/flatMap/array-like-objects.js
     expectedClassification: pass
@@ -9240,7 +9240,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/byteLength/this-is-not-object.js
     expectedClassification: pass
@@ -9273,7 +9273,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/detached/this-has-no-arraybufferdata-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/detached/this-is-not-object.js
     expectedClassification: pass
@@ -9309,7 +9309,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/this-has-no-arraybufferdata-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/maxByteLength/this-is-not-object.js
     expectedClassification: pass
@@ -9339,7 +9339,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/resizable/this-has-no-arraybufferdata-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer]
   - path: test/built-ins/ArrayBuffer/prototype/resizable/this-is-not-object.js
     expectedClassification: pass
@@ -10425,7 +10425,7 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/notify/non-int32-typedarray-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/notify/non-shared-bufferdata-count-evaluation-throws.js
     expectedClassification: pass
@@ -10800,7 +10800,7 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/wait/non-int32-typedarray-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/wait/non-shared-bufferdata-throws.js
     expectedClassification: pass
@@ -10947,7 +10947,7 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/bigint/non-bigint64-typedarray-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/bigint/non-shared-bufferdata-throws.js
     expectedClassification: pass
@@ -11091,7 +11091,7 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent, atomics-and-shared-memory]
   - path: test/built-ins/Atomics/waitAsync/non-int32-typedarray-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/Atomics/waitAsync/non-shared-bufferdata-throws.js
     expectedClassification: pass
@@ -11628,7 +11628,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/buffer-does-not-have-arraybuffer-data-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/buffer-not-object-throws.js
     expectedClassification: pass
@@ -11799,7 +11799,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/buffer/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/buffer/this-is-not-object.js
     expectedClassification: pass
@@ -11841,7 +11841,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteLength/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteLength/this-is-not-object.js
     expectedClassification: pass
@@ -11880,7 +11880,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteOffset/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/byteOffset/this-is-not-object.js
     expectedClassification: pass
@@ -11929,7 +11929,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view]
   - path: test/built-ins/DataView/prototype/getBigInt64/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view, functions]
   - path: test/built-ins/DataView/prototype/getBigInt64/this-is-not-object.js
     expectedClassification: pass
@@ -11994,7 +11994,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view]
   - path: test/built-ins/DataView/prototype/getBigUint64/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, bigint-primitive, data-view, functions]
   - path: test/built-ins/DataView/prototype/getBigUint64/this-is-not-object.js
     expectedClassification: pass
@@ -12067,7 +12067,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getFloat16/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getFloat16/this-is-not-object.js
     expectedClassification: pass
@@ -12130,7 +12130,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getFloat32/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getFloat32/this-is-not-object.js
     expectedClassification: pass
@@ -12193,7 +12193,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getFloat64/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getFloat64/this-is-not-object.js
     expectedClassification: pass
@@ -12247,7 +12247,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt16/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt16/this-is-not-object.js
     expectedClassification: pass
@@ -12325,7 +12325,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt32/this-is-not-object.js
     expectedClassification: pass
@@ -12385,7 +12385,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt8/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getInt8/this-is-not-object.js
     expectedClassification: pass
@@ -12436,7 +12436,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getUint16/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getUint16/this-is-not-object.js
     expectedClassification: pass
@@ -12490,7 +12490,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getUint32/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getUint32/this-is-not-object.js
     expectedClassification: pass
@@ -12544,7 +12544,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getUint8/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/getUint8/this-is-not-object.js
     expectedClassification: pass
@@ -12685,7 +12685,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setFloat16/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setFloat16/this-is-not-object.js
     expectedClassification: pass
@@ -12754,7 +12754,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setFloat32/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setFloat32/this-is-not-object.js
     expectedClassification: pass
@@ -12823,7 +12823,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setFloat64/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setFloat64/this-is-not-object.js
     expectedClassification: pass
@@ -12892,7 +12892,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setInt16/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setInt16/this-is-not-object.js
     expectedClassification: pass
@@ -12961,7 +12961,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setInt32/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setInt32/this-is-not-object.js
     expectedClassification: pass
@@ -13027,7 +13027,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setInt8/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setInt8/this-is-not-object.js
     expectedClassification: pass
@@ -13093,7 +13093,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint16/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint16/this-is-not-object.js
     expectedClassification: pass
@@ -13162,7 +13162,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint32/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint32/this-is-not-object.js
     expectedClassification: pass
@@ -13189,7 +13189,7 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/index-is-out-of-range.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/length.js
     expectedClassification: pass
@@ -13198,10 +13198,10 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/negative-byteoffset-throws.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/no-value-arg.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/not-a-constructor.js
     expectedClassification: pass
@@ -13225,16 +13225,16 @@ tests:
     expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/set-values-return-undefined.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/this-has-no-dataview-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/prototype/setUint8/this-is-not-object.js
     expectedClassification: pass
     dependencies: [array-buffer, data-view, symbols]
   - path: test/built-ins/DataView/prototype/setUint8/toindex-byteoffset.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [array-buffer, data-view]
   - path: test/built-ins/DataView/return-abrupt-tonumber-bytelength-sab.js
     expectedClassification: pass
@@ -41054,7 +41054,7 @@ tests:
     expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/this-has-no-typedarrayname-internal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [atomics-single-agent]
   - path: test/built-ins/SharedArrayBuffer/prototype/byteLength/this-is-arraybuffer.js
     expectedClassification: pass
@@ -48509,7 +48509,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-conversions-sab.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-set-values-diff-buffer-other-type-conversions.js
     expectedClassification: pass

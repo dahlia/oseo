@@ -8157,7 +8157,30 @@ matched the labeled V8 models, Deno also matching the normative model for a
 `Symbol` length under a throwing bound new target. Twenty sampled programs
 for it from each of those two domains compiled under both policies with the
 asserted MIR guards. Those are reference and compile observations, not
-native evidence. The native fixture and generated domain,
-the complete `mise run test262:update -- --accept-promotions`, the derived
-ledger, batch, graph, and profile counts, and the shard weights' measurement
-remain pending. Already-reviewed paths may move only toward `pass`.
+native evidence. Already-reviewed paths may move only toward `pass`.
+
+Later native evidence is local to Linux x86-64. A first whole-file extended
+run of the constructor property file at `e911ff73` failed on a native Number
+formatting counterexample and set no weight; the shared shortest-decimal
+repair is described with the `number-prototype` node in
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md). At
+`9085fef6` whole-file extended runs of the constructor and Number prototype
+property files passed. *docs/evidence/u6/README.md* records their measured
+Linux weights of 658 and 415 seconds and the unmeasured macOS estimates of
+283 and 242 seconds.
+
+The complete `mise run test262:update -- --accept-promotions` at
+`ef8b56e2` exited zero after 4,002.7 seconds with no retries. It observed all
+27,901 reviewed paths: 23,795 passes, 2,423 expected negatives, and 1,683
+unsupported profile features, with no failures and no new subset path. All 42
+owned paths moved from `unsupported-profile-feature` to `pass`, and no other
+path changed classification. The ordinary and BigInt
+*calls-tolocalestring-from-each-value.js* paths under
+*test/built-ins/TypedArray/prototype/toLocaleString/* remain unsupported with
+`OSEO2001` for a primitive wrapper at the same `calls.push(this)` site; their
+recorded position moved from line 627 to 633 because the harness gained four
+constructor-probe lines and two precision-probe lines. The closure ledger,
+observation-batch statistics, graph baseline, and profile counts were derived
+from that manifest. The `typed-array-float16` native fixture, macOS
+execution, and CI are not part of this evidence and remain pending, and the
+42 paths do not establish complete Float16 conformance.
