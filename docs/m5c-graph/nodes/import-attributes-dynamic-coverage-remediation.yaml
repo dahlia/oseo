@@ -17,4 +17,8 @@ dependencies:
   - dynamic-import
   - import-attributes
 landed: false
-status: ready
+status: parked
+reason: "Awaiting additional internal review allowance. The five internal
+  review starts are spent; the last full review found one assessment
+  wording defect, now fixed in the preserved target 098d0207. Its
+  re-review is not yet authorized, so no clean final review exists."
