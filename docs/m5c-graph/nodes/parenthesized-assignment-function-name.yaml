@@ -16,5 +16,5 @@ delivers: "Closes exactly 1 newly observed path,
   ledger. Already-reviewed paths may move only toward pass."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

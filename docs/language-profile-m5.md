@@ -755,29 +755,29 @@ current evidence assessment. Those live only in the indexed records above.
     their corresponding binary semantics after one checked read. The `&&=`,
     `||=`, and `??=` forms branch on the retained current value, evaluate and
     write the right operand only on the selected path, and preserve anonymous
-    function-name inference for identifier targets. Property targets leave
-    anonymous functions unnamed. Member assignments evaluate the object and
-    key expression once. An arithmetic member assignment then applies the
-    `ToObject` check of ECMA-262 2025 `GetValue`, so a null or undefined
-    base throws `TypeError` before the key is converted or the right
-    operand runs, converts the key once, and reuses that key for the
-    write. A logical member assignment still converts the retained key
-    before its base check, then converts it again after the right operand
-    on the taken write path; a short-circuited one skips that second
-    conversion. That logical order is retained behavior, not a conforming
-    one, and *Compound member key order* below records it. Plain
-    `=` assignment to a computed member likewise retains the raw key and
-    converts it only after the right operand, as `PutValue` specifies, so
-    a key whose `toString` is observable runs after that operand. Immutable
-    and imported targets retain their catchable write errors. Native
-    differential fixtures and a generated property with seed `0x60000c00`
-    cover all 15 operators, both target forms, short-circuiting, reference and
-    conversion counts, both specialization policies, and forced collection;
-    seed `0x60000c01` covers member reference order.
-    An ordinary asynchronous function retains the reference and current value
-    in its traced frame when the right operand awaits. Module top level uses
-    its private traced frame for the same position; only the pattern-position
-    module await gap recorded below remains.
+    function-name inference for identifier targets. Property targets and
+    parenthesized identifier targets leave anonymous functions unnamed; see
+    *Parenthesized assignment targets* below. Member assignments evaluate the
+    object and key expression once. An arithmetic member assignment then
+    applies the `ToObject` check of ECMA-262 2025 `GetValue`, so a null or
+    undefined base throws `TypeError` before the key is converted or the right
+    operand runs, converts the key once, and reuses that key for the write. A
+    logical member assignment still converts the retained key before its base
+    check, then converts it again after the right operand on the taken write
+    path; a short-circuited one skips that second conversion. That logical
+    order is retained behavior, not a conforming one, and *Compound member key
+    order* below records it. Plain `=` assignment to a computed member likewise
+    retains the raw key and converts it only after the right operand, as
+    `PutValue` specifies, so a key whose `toString` is observable runs after
+    that operand. Immutable and imported targets retain their catchable write
+    errors. Native differential fixtures and a generated property with seed
+    `0x60000c00` cover all 15 operators, both target forms, short-circuiting,
+    reference and conversion counts, both specialization policies, and forced
+    collection; seed `0x60000c01` covers member reference order. An ordinary
+    asynchronous function retains the reference and current value in its traced
+    frame when the right operand awaits. Module top level uses its private
+    traced frame for the same position; only the pattern-position module await
+    gap recorded below remains.
  -  Prefix and postfix `++` and `--` for identifiers and static or computed
     member references. Each form reads once, coerces through the admitted
     Number path, adds or subtracts one, and performs a checked write. Prefix
@@ -8547,3 +8547,67 @@ canonical admission.
 
 [keyed binding case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
 [assignment-pattern twin]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/expressions/assignment/destructuring/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
+
+
+Parenthesized assignment targets
+--------------------------------
+
+M5c node `parenthesized-assignment-function-name` repairs NamedEvaluation
+through a parenthesized identifier target. ECMA-262 2025 13.15.2 names an
+anonymous function, arrow, or class assigned by `=`, `&&=`, `||=`, or `??=`
+only when IsIdentifierRef of the LeftHandSideExpression is true, and
+13.15.5.5 names an AssignmentElement initializer only when IsIdentifierRef of
+its DestructuringAssignmentTarget is true. IsIdentifierRef is false for every
+ParenthesizedExpression, so `(f) = function () {}`, `((f)) ??= class {}`,
+`[(f) = () => 0] = []`, and `({ key: (f) = function () {} } = {})` leave
+the value's name empty. Before this repair, the Babel frontend removed the
+parentheses before building the binding write or pattern leaf, and HIR
+construction named the value after the binding.
+
+The frontend now records a parenthesized identifier target on the simple or
+logical `binding-set` and `binding-update` syntax, and on an array element or
+object property of a destructuring assignment pattern. HIR construction skips
+NamedEvaluation for those writes on every resolution path: lexical and var
+bindings, implicit global object properties, and `with` fallbacks. The flag
+does not reach HIR, and the reference, evaluation order, conversions, and
+write are unchanged. Bare identifier targets, shorthand properties, and
+declarations keep their names. A named function keeps its own name either way.
+
+The existing *m5-compound-assignment.property.test.ts* family adds slot
+`0x60000c02`, which generates one to four subjects in sloppy or strict code.
+Each subject assigns an anonymous function, arrow, or class, or a named
+function, through simple, logical, or array or object destructuring
+assignment to a `let`, `var`, or sloppy `with` fallback binding with zero, one,
+or two parentheses. Logical subjects start from a value that takes the write.
+It has 10 ordinary cases and a 180-second interrupt limit. Shrinking keeps
+the strictness, and with it a strict case never gains a `with` scope; it
+shortens the subject list and moves each subject's form, parentheses, scope,
+and value toward the first listed choice, so every shrunk case remains a valid
+structured input. The independent model names a value only for a bare target,
+and Node.js and Deno must equal it. Native runs use both specialization
+policies with collection at every safepoint. The fixed
+`parenthesized-assignment-names` native fixture covers each form, nested
+parentheses, an implicit global, and `with` fallbacks next to bare controls,
+under both policies with forced collection. The repair adds no specialized path
+or guard, so the guard-fallback omission and its replacement evidence remain.
+
+On Linux x86-64 with a warm lane Zig cache, the focused native run of the
+fixture alone, `mise run test:native --shard 162/280`, matched Node.js and
+Deno under both policies with forced collection and passed its
+linux-aarch64-musl cross-link. The slot `0x60000c02` registration alone, run
+with `--test-name-pattern=parenthesized`, passed its ten ordinary cases in
+7.981 seconds. These focused runs do not replace the whole ordinary and
+extended gates.
+
+This node admits *test/language/expressions/assignment/fn-name-lhs-cover.js*,
+which observation batch 08 measured as a `semantic-failure`. Its sibling
+assignment paths keep their batch 08 ownership.
+
+On the clean source `0fb18ab6a4c855edc0614d1bc2bfa6c08fc34c26`,
+the complete reviewed test262 UPDATE finished with zero retries. It recorded
+27,900 paths: 23,752 passes, 2,423 expected negatives, and 1,725 unsupported
+paths, with no failure classifications. All 27,899 earlier records and
+their subset rows were retained. The only new observation is a pass for
+*test/language/expressions/assignment/fn-name-lhs-cover.js*.
+This is preparation evidence; landing and the whole ordinary and extended
+gates remain pending.

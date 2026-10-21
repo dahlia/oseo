@@ -1287,6 +1287,74 @@ try {
 `,
   },
   {
+    // ECMA-262 2025 13.15.2 and 13.15.5.5 apply NamedEvaluation only when
+    // IsIdentifierRef of the target is true, and it is false for every
+    // ParenthesizedExpression. Each parenthesized form leaves an anonymous
+    // value unnamed, while the bare controls keep the binding name.
+    // The implicit global and the top-level `with` need sloppy global
+    // Script semantics in every reference host.
+    globalScriptReference: true,
+    name: "parenthesized-assignment-names",
+    source: `
+const show = (label, value) => console.log(label, "[" + value.name + "]");
+var simple;
+(simple) = function () {};
+show("simple", simple);
+let nested;
+((nested)) = class {};
+show("nested-class", nested);
+let arrow;
+(arrow) = () => 0;
+show("arrow", arrow);
+let andTarget = 1;
+(andTarget) &&= function () {};
+show("and", andTarget);
+let orTarget = 0;
+(orTarget) ||= function () {};
+show("or", orTarget);
+let nullishTarget = null;
+(nullishTarget) ??= function () {};
+show("nullish", nullishTarget);
+let ownName;
+(ownName) = function own() {};
+show("own-name", ownName);
+(implicitGlobal) = function () {};
+show("implicit-global", implicitGlobal);
+var withSet;
+var withLogical = null;
+with ({}) {
+  (withSet) = function () {};
+  (withLogical) ??= function () {};
+}
+show("with-set", withSet);
+show("with-logical", withLogical);
+let element;
+let property;
+[(element) = function () {}] = [];
+({ key: (property) = class {} } = {});
+show("element", element);
+show("property", property);
+
+let bare;
+bare = function () {};
+let bareLogical = null;
+bareLogical ??= () => 0;
+var bareWith;
+with ({}) {
+  bareWith = function () {};
+}
+let bareElement;
+let bareProperty;
+[bareElement = class {}] = [];
+({ key: bareProperty = function () {} } = {});
+show("bare", bare);
+show("bare-logical", bareLogical);
+show("bare-with", bareWith);
+show("bare-element", bareElement);
+show("bare-property", bareProperty);
+`,
+  },
+  {
     name: "update-expressions",
     source: `
 let binding = "1";

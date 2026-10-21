@@ -933,6 +933,14 @@ function resolveExpression(
     expression.kind === "binding-set" ||
     expression.kind === "binding-update"
   ) {
+    // The parenthesized-target flag only decides NamedEvaluation here, so
+    // the HIR nodes below name their fields rather than spreading the
+    // syntax node and carrying the flag along.
+    const assignment = { ...locatedOf(expression), name: expression.name };
+    const named = (assigned: HirExpression, name: string): HirExpression =>
+      expression.parenthesizedTarget === true
+        ? assigned
+        : inferFunctionName(assigned, name);
     const resolution = resolveName(scopes, state, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
     if (
@@ -946,7 +954,7 @@ function resolveExpression(
         expression.operator === "&&" ||
         expression.operator === "??" ||
         expression.operator === "||"
-          ? inferFunctionName(value, expression.name)
+          ? named(value, expression.name)
           : value;
       const reference = intrinsicGlobalPropertyRead(
         expression.name,
@@ -1020,16 +1028,16 @@ function resolveExpression(
       };
       if (expression.kind === "binding-set") {
         return {
-          ...expression,
+          ...assignment,
           fallback,
           globalReference: intrinsicGlobalReference(expression.name, state),
           kind: "with-set",
           objectBindingIds: resolution.objectBindingIds,
-          value: inferFunctionName(value, expression.name),
+          value: named(value, expression.name),
         };
       }
       return {
-        ...expression,
+        ...assignment,
         fallback: {
           ...fallback,
           read: intrinsicGlobalIdentifierRead(
@@ -1041,11 +1049,12 @@ function resolveExpression(
         globalReference: intrinsicGlobalReference(expression.name, state),
         kind: "with-update",
         objectBindingIds: resolution.objectBindingIds,
+        operator: expression.operator,
         value:
           expression.operator === "&&" ||
           expression.operator === "??" ||
           expression.operator === "||"
-            ? inferFunctionName(value, expression.name)
+            ? named(value, expression.name)
             : value,
       };
     }
@@ -1076,7 +1085,7 @@ function resolveExpression(
       expression.operator === "&&" ||
       expression.operator === "??" ||
       expression.operator === "||"
-        ? inferFunctionName(value, binding.name)
+        ? named(value, binding.name)
         : value;
     if (resolution.objectBindingIds.length > 0) {
       const fallback = {
@@ -1098,7 +1107,7 @@ function resolveExpression(
       };
       if (expression.kind === "binding-set") {
         return {
-          ...expression,
+          ...assignment,
           fallback,
           globalReference: intrinsicGlobalReference(expression.name, state),
           kind: "with-set",
@@ -1107,16 +1116,20 @@ function resolveExpression(
         };
       }
       return {
-        ...expression,
+        ...assignment,
         fallback,
         globalReference: intrinsicGlobalReference(expression.name, state),
         kind: "with-update",
         objectBindingIds: resolution.objectBindingIds,
+        operator: expression.operator,
         value: inferred,
       };
     }
     return {
-      ...expression,
+      ...assignment,
+      ...(expression.kind === "binding-set"
+        ? { kind: expression.kind }
+        : { kind: expression.kind, operator: expression.operator }),
       bindingId: binding.id,
       ...includePropertiesWhen(() => {
         if (!(binding.functionNameBinding === true)) return undefined;
@@ -3148,11 +3161,13 @@ function resolveBindingPattern(
           ? undefined
           : resolveExpression(property.initializer, scopes, state);
       const inferredName =
-        resolvedPattern?.kind === "binding-identifier"
-          ? resolvedPattern.name
-          : resolvedPattern?.kind === "assignment-member"
-            ? resolvedPattern.inferredName
-            : undefined;
+        property.parenthesizedTarget === true
+          ? undefined
+          : resolvedPattern?.kind === "binding-identifier"
+            ? resolvedPattern.name
+            : resolvedPattern?.kind === "assignment-member"
+              ? resolvedPattern.inferredName
+              : undefined;
       if (initializer != null && inferredName != null) {
         initializer = inferFunctionName(initializer, inferredName);
       }
@@ -3233,11 +3248,13 @@ function resolveBindingPattern(
         ? undefined
         : resolveExpression(element.initializer, scopes, state);
     const inferredName =
-      resolvedPattern?.kind === "binding-identifier"
-        ? resolvedPattern.name
-        : resolvedPattern?.kind === "assignment-member"
-          ? resolvedPattern.inferredName
-          : undefined;
+      element.parenthesizedTarget === true
+        ? undefined
+        : resolvedPattern?.kind === "binding-identifier"
+          ? resolvedPattern.name
+          : resolvedPattern?.kind === "assignment-member"
+            ? resolvedPattern.inferredName
+            : undefined;
     if (initializer != null && inferredName != null) {
       initializer = inferFunctionName(initializer, inferredName);
     }

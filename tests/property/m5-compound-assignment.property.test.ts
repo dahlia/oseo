@@ -623,12 +623,13 @@ async function scriptReferences(source: string) {
 async function assertNativeMemberReference(
   source: string,
   stdout: string,
+  sourceId = "generated-m5-compound-member-reference.js",
 ): Promise<void> {
   const expectedObservation = { exitStatus: 0, stderr: "", stdout };
   for (const specialization of ["disabled", "enabled"] as const) {
     const compiled = compileSource(
       babelFrontend,
-      { source, sourceId: "generated-m5-compound-member-reference.js" },
+      { source, sourceId },
       { observeSpecialization: true, specialization },
     );
     assert.deepEqual(compiled.diagnostics, []);
@@ -982,5 +983,194 @@ test(
       observations,
     );
     await assertNativeMemberReference(bigintMemberSource, stdout);
+  },
+);
+
+/**
+ * An assignment form whose target decides NamedEvaluation: simple and
+ * logical assignment (ECMA-262 2025 13.15.2) and an array or object
+ * destructuring AssignmentElement with an initializer (13.15.5.5).
+ */
+type NamingForm = "&&=" | "=" | "??=" | "[=]" | "{=}" | "||=";
+
+/** The stored value: three anonymous definitions or a named function. */
+type NamingValue = "arrow" | "class" | "function" | "own";
+
+/** Where the target binding lives; `with` resolves through a fallback. */
+type NamingScope = "let" | "var" | "with";
+
+/** One assignment to a fresh binding whose stored value prints its name. */
+interface NamingSubject {
+  readonly form: NamingForm;
+  /** Zero for a bare IdentifierReference, else nested parentheses. */
+  readonly parentheses: 0 | 1 | 2;
+  readonly scope: NamingScope;
+  readonly value: NamingValue;
+}
+
+/** A sloppy or strict Script; strict code has no `with` scope. */
+interface NamingCase {
+  readonly strict: boolean;
+  readonly subjects: readonly NamingSubject[];
+}
+
+const namingForms: readonly NamingForm[] = [
+  "=",
+  "&&=",
+  "||=",
+  "??=",
+  "[=]",
+  "{=}",
+];
+
+function namingSubjectArbitrary(
+  scopes: readonly NamingScope[],
+): fc.Arbitrary<NamingSubject> {
+  return fc.record({
+    form: fc.constantFrom(...namingForms),
+    parentheses: fc.constantFrom<0 | 1 | 2>(0, 1, 2),
+    scope: fc.constantFrom(...scopes),
+    value: fc.constantFrom<NamingValue>("function", "arrow", "class", "own"),
+  });
+}
+
+const namingCaseArbitrary: fc.Arbitrary<NamingCase> = fc.oneof(
+  fc.record({
+    strict: fc.constant(false),
+    subjects: fc.array(namingSubjectArbitrary(["let", "var", "with"]), {
+      maxLength: 4,
+      minLength: 1,
+    }),
+  }),
+  fc.record({
+    strict: fc.constant(true),
+    subjects: fc.array(namingSubjectArbitrary(["let", "var"]), {
+      maxLength: 4,
+      minLength: 1,
+    }),
+  }),
+);
+
+/** The initial value that makes each logical form take its write. */
+function namingInitialValue(form: NamingForm): string {
+  if (form === "&&=") return "1";
+  if (form === "||=") return "0";
+  if (form === "??=") return "null";
+  return "undefined";
+}
+
+function printNamingSubject(subject: NamingSubject, index: number): string {
+  const name = `t${index}`;
+  const target =
+    "(".repeat(subject.parentheses) + name + ")".repeat(subject.parentheses);
+  const value = {
+    arrow: "() => 0",
+    class: "class {}",
+    function: "function () {}",
+    own: "function own() {}",
+  }[subject.value];
+  const assignment =
+    subject.form === "[=]"
+      ? `[${target} = ${value}] = [];`
+      : subject.form === "{=}"
+        ? `({ key: ${target} = ${value} } = {});`
+        : `${target} ${subject.form} ${value};`;
+  const declaration =
+    `${subject.scope === "let" ? "let" : "var"} ${name} = ` +
+    `${namingInitialValue(subject.form)};`;
+  const statement =
+    subject.scope === "with" ? `with ({}) { ${assignment} }` : assignment;
+  return `${declaration}
+${statement}
+console.log(${index}, "[" + ${name}.name + "]");`;
+}
+
+function printNamingCase(testCase: NamingCase): string {
+  const subjects = testCase.subjects.map(printNamingSubject);
+  return `${testCase.strict ? '"use strict";\n' : ""}${subjects.join("\n")}\n`;
+}
+
+/**
+ * The independent observation of one subject. IsIdentifierRef is true
+ * only for a bare IdentifierReference, never for a ParenthesizedExpression,
+ * and NamedEvaluation applies only to an anonymous function or class.
+ */
+function modelNamingSubject(subject: NamingSubject, index: number): string {
+  const name =
+    subject.value === "own"
+      ? "own"
+      : subject.parentheses === 0
+        ? `t${index}`
+        : "";
+  return `${index} [${name}]\n`;
+}
+
+function modelNamingCase(testCase: NamingCase): string {
+  return testCase.subjects.map(modelNamingSubject).join("");
+}
+
+test("assignment naming model names only bare identifier targets", () => {
+  const subject: NamingSubject = {
+    form: "??=",
+    parentheses: 0,
+    scope: "let",
+    value: "class",
+  };
+  assert.equal(modelNamingSubject(subject, 3), "3 [t3]\n");
+  assert.equal(modelNamingSubject({ ...subject, parentheses: 2 }, 3), "3 []\n");
+  assert.equal(
+    modelNamingSubject({ ...subject, parentheses: 1, value: "own" }, 3),
+    "3 [own]\n",
+  );
+  assert.equal(
+    printNamingSubject({ ...subject, form: "{=}", parentheses: 1 }, 0),
+    "let t0 = undefined;\n" +
+      "({ key: (t0) = class {} } = {});\n" +
+      'console.log(0, "[" + t0.name + "]");',
+  );
+});
+
+test(
+  "generated parenthesized assignment targets leave values unnamed",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "only a bare identifier target names an anonymous assigned value",
+      fc.asyncProperty(namingCaseArbitrary, async (testCase) => {
+        const source = printNamingCase(testCase);
+        const stdout = modelNamingCase(testCase);
+        assertMatchingObservations([
+          { exitStatus: 0, stderr: "", stdout },
+          ...(await scriptReferences(source)),
+        ]);
+        await assertNativeMemberReference(
+          source,
+          stdout,
+          "generated-m5-assignment-naming.js",
+        );
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one to four simple, logical, or array or object destructuring " +
+          "assignments in sloppy or strict code to let, var, or with " +
+          "fallback bindings through zero, one, or two parentheses, " +
+          "storing an anonymous function, arrow, or class or a named " +
+          "function",
+        numRuns: 10,
+        profile: "M5 parenthesized assignment naming",
+        seed: 0x6000_0c02,
+        sizeLimit: "four subjects and two nested parentheses",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
   },
 );

@@ -15,6 +15,13 @@ scope:
     conversion order. A logical member write still converts its key twice
     and converts it before a nullish base throws; that retained behavior is
     not claimed as conforming."
+  - "A simple or logical assignment applies NamedEvaluation to an anonymous
+    function, arrow, or class only when IsIdentifierRef of its target is
+    true, as ECMA-262 2025 13.15.2 requires. A parenthesized identifier
+    target, as in (f) = function () {}, is a ParenthesizedExpression, so the
+    value keeps an empty name; the bare target still names it. Lexical, var,
+    implicit global, and with fallback bindings follow the same rule, and the
+    reference, evaluation order, and write are unchanged."
 owners:
   - PLAN-M5.md
 evidence:

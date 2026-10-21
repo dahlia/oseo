@@ -955,6 +955,12 @@ export function expression(
     const left = unparenthesizedExpression(value.left);
     const right = node(value.right);
     if (left == null || right == null) return unsupported(context, value);
+    const parenthesizedTarget = includePropertiesWhen(() => {
+      if (node(value.left)?.type !== "ParenthesizedExpression") {
+        return undefined;
+      }
+      return { parenthesizedTarget: true as const };
+    });
     if (value.operator !== "=") {
       const operator = compoundAssignmentOperators.get(value.operator);
       if (operator == null) {
@@ -969,6 +975,7 @@ export function expression(
           kind: "binding-update",
           name,
           operator,
+          ...parenthesizedTarget,
           value: assigned,
         };
       }
@@ -1002,7 +1009,13 @@ export function expression(
       const assigned = expression(context, right);
       return assigned == null
         ? undefined
-        : { ...located, kind: "binding-set", name, value: assigned };
+        : {
+            ...located,
+            kind: "binding-set",
+            name,
+            ...parenthesizedTarget,
+            value: assigned,
+          };
     }
     if (left.type === "ArrayPattern" || left.type === "ObjectPattern") {
       const pattern = bindingPattern(context, left, true);
@@ -1551,6 +1564,10 @@ export function bindingPattern(
           };
         }),
         key,
+        ...includePropertiesWhen(() => {
+          if (left.type !== "ParenthesizedExpression") return undefined;
+          return { parenthesizedTarget: true as const };
+        }),
         pattern,
       });
     }
@@ -1606,6 +1623,10 @@ export function bindingPattern(
       ...includePropertiesWhen(() => {
         if (initializer == null) return undefined;
         return { initializer };
+      }),
+      ...includePropertiesWhen(() => {
+        if (left.type !== "ParenthesizedExpression") return undefined;
+        return { parenthesizedTarget: true as const };
       }),
       pattern,
     });

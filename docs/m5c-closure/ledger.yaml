@@ -5,15 +5,15 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26174
-openPaths: 14917
+closedPaths: 26175
+openPaths: 14916
 states:
   expected-negative: 2423
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 23751
+  pass: 23752
   semantic-failure: 0
-  unreviewed: 13192
+  unreviewed: 13191
   unsupported-profile-feature: 1725
 owners:
   adr:0016-dynamic-source-boundary:
@@ -167,7 +167,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-08. The batch observes them; no
       classification is assumed before it does.
-    paths: 463
+    paths: 462
   node:observation-batch-14:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-14. The batch observes them; no
@@ -308,7 +308,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26174
+    paths: 26175
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -20302,7 +20302,7 @@ paths:
   test/language/expressions/assignment/fn-name-cover.js: [unreviewed, node:observation-batch-08]
   test/language/expressions/assignment/fn-name-fn.js: [unreviewed, node:observation-batch-08]
   test/language/expressions/assignment/fn-name-gen.js: [unreviewed, node:observation-batch-08]
-  test/language/expressions/assignment/fn-name-lhs-cover.js: [unreviewed, node:observation-batch-08]
+  test/language/expressions/assignment/fn-name-lhs-cover.js: [pass, observation]
   test/language/expressions/assignment/fn-name-lhs-member.js: [unreviewed, node:observation-batch-08]
   test/language/expressions/assignment/id-arguments-strict.js: [expected-negative, observation]
   test/language/expressions/assignment/id-eval-strict.js: [unreviewed, node:observation-batch-08]
