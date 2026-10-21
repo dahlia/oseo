@@ -54203,9 +54203,15 @@ tests:
   - path: test/built-ins/undefined/prop-desc.js
     expectedClassification: pass
     dependencies: [object-properties]
+  - path: test/language/arguments-object/10.5-1-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, functions]
   - path: test/language/arguments-object/10.5-1gs.js
     expectedClassification: expected-negative
     dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.5-7-b-1-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, functions]
   - path: test/language/arguments-object/10.5-7-b-2-s.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -54224,13 +54230,25 @@ tests:
   - path: test/language/arguments-object/10.6-10-c-ii-2.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-11-b-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-12-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-12-2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-13-a-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-13-c-1-s.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-13-c-2-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-13-c-3-s.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-14-c-1-s.js
@@ -54240,6 +54258,9 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-2gs.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-5-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-6-1.js
@@ -54260,12 +54281,24 @@ tests:
   - path: test/language/arguments-object/10.6-6-4.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/10.6-7-1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/language/arguments-object/S10.1.6_A1_T2.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/S10.6_A1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A3_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A3_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, property-enumeration]
   - path: test/language/arguments-object/S10.6_A3_T3.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
@@ -54275,6 +54308,12 @@ tests:
   - path: test/language/arguments-object/S10.6_A4.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/arguments-object/S10.6_A5_T1.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/S10.6_A5_T2.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, property-enumeration]
   - path: test/language/arguments-object/S10.6_A5_T3.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -55321,10 +55360,435 @@ tests:
   - path: test/language/arguments-object/unmapped/via-strict.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/language/asi/S7.9.2_A1_T1.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9.2_A1_T2.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9.2_A1_T3.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9.2_A1_T4.js
+    expectedClassification: pass
+    dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        lexical-grammar,
+        var-bindings,
+      ]
+  - path: test/language/asi/S7.9.2_A1_T5.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9.2_A1_T6.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9.2_A1_T7.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A1.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A10_T1.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, expression-operators, lexical-grammar, object-literals]
+  - path: test/language/asi/S7.9_A10_T10.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A10_T11.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A10_T12.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A10_T2.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, expression-operators, lexical-grammar, object-literals]
+  - path: test/language/asi/S7.9_A10_T3.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, expression-operators, lexical-grammar, object-literals]
+  - path: test/language/asi/S7.9_A10_T4.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, expression-operators, lexical-grammar, object-literals]
+  - path: test/language/asi/S7.9_A10_T5.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, expression-operators, lexical-grammar, object-literals]
+  - path: test/language/asi/S7.9_A10_T6.js
+    expectedClassification: expected-negative
+    dependencies:
+      [control-flow, expression-operators, lexical-grammar, object-literals]
+  - path: test/language/asi/S7.9_A10_T7.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A10_T8.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A10_T9.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A11_T1.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T10.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T11.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T2.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T3.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T4.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A11_T5.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T6.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T7.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A11_T8.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A11_T9.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A2.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A3.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-grammar]
+  - path: test/language/asi/S7.9_A4.js
+    expectedClassification: expected-negative
+    dependencies: [abrupt-completion, lexical-grammar]
+  - path: test/language/asi/S7.9_A5.1_T1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.2_T1.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.3_T1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.4_T1.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.5_T1.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.5_T2.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.5_T3.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.5_T4.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.5_T5.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, functions, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.6_T1.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.6_T2.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.7_T1.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.8_T1.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A5.9_T1.js
+    expectedClassification: pass
+    dependencies: [expression-operators, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A6.1_T1.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T10.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T11.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T12.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T13.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T2.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T3.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T4.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T5.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T6.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T7.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T8.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.1_T9.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T1.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T10.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T2.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T3.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T4.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T5.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T6.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T7.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T8.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.2_T9.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.3_T1.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.3_T2.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.3_T3.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.3_T4.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.3_T5.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.3_T6.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.3_T7.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.4_T1.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A6.4_T2.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A7_T1.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T2.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T3.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T4.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T5.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T6.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T7.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T8.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A7_T9.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/asi/S7.9_A8_T1.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A8_T2.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A8_T3.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A8_T4.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A8_T5.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A9_T1.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A9_T2.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A9_T5.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A9_T6.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A9_T7.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A9_T8.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/S7.9_A9_T9.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar]
+  - path: test/language/asi/do-while-same-line.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-grammar, var-bindings]
+  - path: test/language/block-scope/leave/finally-block-let-declaration-only-shadows-outer-parameter-value-1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/finally-block-let-declaration-only-shadows-outer-parameter-value-2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/for-loop-block-let-declaration-only-shadows-outer-parameter-value-1.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/leave/for-loop-block-let-declaration-only-shadows-outer-parameter-value-2.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/leave/nested-block-let-declaration-only-shadows-outer-parameter-value-1.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/nested-block-let-declaration-only-shadows-outer-parameter-value-2.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/outermost-binding-updated-in-catch-block-nested-block-let-declaration-unseen-outside-of-block.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        var-bindings,
+      ]
+  - path: test/language/block-scope/leave/try-block-let-declaration-only-shadows-outer-parameter-value-1.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/try-block-let-declaration-only-shadows-outer-parameter-value-2.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/verify-context-in-finally-block.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/verify-context-in-for-loop-block.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/leave/verify-context-in-labelled-block.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/verify-context-in-try-block.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, lexical-bindings]
+  - path: test/language/block-scope/leave/x-after-break-to-label.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/block-scope/leave/x-before-continue.js
+    expectedClassification: pass
+    dependencies: [control-flow, lexical-bindings]
+  - path: test/language/block-scope/return-from/block-const.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, expression-operators, functions, lexical-bindings]
+  - path: test/language/block-scope/return-from/block-let.js
+    expectedClassification: pass
+    dependencies:
+      [control-flow, expression-operators, functions, lexical-bindings]
+  - path: test/language/block-scope/shadowing/catch-parameter-shadowing-catch-parameter.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, var-bindings]
+  - path: test/language/block-scope/shadowing/catch-parameter-shadowing-function-parameter-name.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions]
+  - path: test/language/block-scope/shadowing/catch-parameter-shadowing-let-declaration.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, lexical-bindings]
+  - path: test/language/block-scope/shadowing/catch-parameter-shadowing-var-variable.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, var-bindings]
+  - path: test/language/block-scope/shadowing/const-declaration-shadowing-catch-parameter.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/shadowing/const-declarations-shadowing-parameter-name-let-const-and-var-variables.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
   - path: test/language/block-scope/shadowing/dynamic-lookup-from-closure.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/shadowing/dynamic-lookup-in-and-through-block-contexts.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/shadowing/hoisting-var-declarations-out-of-blocks.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/block-scope/shadowing/let-declaration-shadowing-catch-parameter.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, lexical-bindings]
+  - path: test/language/block-scope/shadowing/let-declarations-shadowing-parameter-name-let-const-and-var.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
   - path: test/language/block-scope/shadowing/lookup-from-closure.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/shadowing/lookup-in-and-through-block-contexts.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/shadowing/parameter-name-shadowing-catch-parameter.js
+    expectedClassification: pass
+    dependencies: [abrupt-completion, functions, var-bindings]
+  - path: test/language/block-scope/shadowing/parameter-name-shadowing-parameter-name-let-const-and-var.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings, var-bindings]
   - path: test/language/block-scope/syntax/for-in/acquire-properties-from-array.js
@@ -55351,24 +55815,403 @@ tests:
   - path: test/language/block-scope/syntax/for-in/mixed-values-in-iteration.js
     expectedClassification: pass
     dependencies: [control-flow, lexical-bindings, property-enumeration]
+  - path: test/language/block-scope/syntax/function-declarations/in-statement-position-case-expression-statement-list.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/function-declarations/in-statement-position-default-statement-list.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/function-declarations/in-statement-position-do-statement-while-expression.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions]
+  - path: test/language/block-scope/syntax/function-declarations/in-statement-position-for-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions]
+  - path: test/language/block-scope/syntax/function-declarations/in-statement-position-if-expression-statement-else-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions]
+  - path: test/language/block-scope/syntax/function-declarations/in-statement-position-if-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions]
+  - path: test/language/block-scope/syntax/function-declarations/in-statement-position-while-expression-statement.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, functions]
+  - path: test/language/block-scope/syntax/redeclaration-global/allowed-to-declare-function-with-function-declaration.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/block-scope/syntax/redeclaration-global/allowed-to-redeclare-function-declaration-with-var.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration-global/allowed-to-redeclare-var-with-function-declaration.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, classes, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-function-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, classes, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/async-generator-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, classes, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, classes, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/class-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/const-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
   - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-function.js
     expectedClassification: expected-negative
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/fn-scope-var-name-redeclaration-attempt-with-var.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
   - path: test/language/block-scope/syntax/redeclaration/function-declaration-attempt-to-redeclare-with-var-declaration-nested-in-function.js
     expectedClassification: expected-negative
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/function-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/generator-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
   - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-function.js
     expectedClassification: expected-negative
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-name-redeclaration-attempt-with-var.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-const.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
   - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-function.js
     expectedClassification: expected-negative
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/inner-block-var-redeclaration-attempt-after-let.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-function.js
+    expectedClassification: expected-negative
+    dependencies: [functions, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/let-name-redeclaration-attempt-with-var.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-const.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
   - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-function.js
     expectedClassification: expected-negative
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-let.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-name-redeclaration-attempt-with-var.js
+    expectedClassification: pass
+    dependencies: [var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-async-function.js
+    expectedClassification: expected-negative
+    dependencies: [async-functions, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-async-generator.js
+    expectedClassification: expected-negative
+    dependencies: [async-iteration, functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-class.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-const.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
   - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-function.js
     expectedClassification: expected-negative
     dependencies: [functions, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-generator.js
+    expectedClassification: expected-negative
+    dependencies: [functions, generators, lexical-bindings, var-bindings]
+  - path: test/language/block-scope/syntax/redeclaration/var-redeclaration-attempt-after-let.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-bindings, var-bindings]
+  - path: test/language/comments/S7.4_A1_T1.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, lexical-grammar, object-properties, var-bindings]
+  - path: test/language/comments/S7.4_A1_T2.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A2_T1.js
+    expectedClassification: pass
+    dependencies:
+      [expression-operators, lexical-grammar, object-properties, var-bindings]
+  - path: test/language/comments/S7.4_A2_T2.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A3.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A4_T1.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A4_T2.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A4_T3.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A4_T4.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A4_T5.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A4_T6.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A4_T7.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/S7.4_A5.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-grammar, var-bindings]
+  - path: test/language/comments/S7.4_A6.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-grammar, var-bindings]
+  - path: test/language/comments/mongolian-vowel-separator-multi.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/mongolian-vowel-separator-single-eval.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, lexical-grammar]
+  - path: test/language/comments/mongolian-vowel-separator-single.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/multi-line-asi-carriage-return.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/multi-line-asi-line-feed.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/multi-line-asi-line-separator.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/multi-line-asi-paragraph-separator.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/multi-line-html-close-extra.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/comments/single-line-html-close-without-lt.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/computed-property-names/basics/number.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/basics/string.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/basics/symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, symbols]
   - path: test/language/computed-property-names/class/accessor/getter-duplicates.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -55381,12 +56224,138 @@ tests:
   - path: test/language/computed-property-names/class/accessor/setter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/method/constructor-can-be-generator.js
+    expectedClassification: pass
+    dependencies: [classes, generators, object-properties]
   - path: test/language/computed-property-names/class/method/constructor-can-be-getter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
   - path: test/language/computed-property-names/class/method/constructor-can-be-setter.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/method/constructor-duplicate-1.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/method/constructor-duplicate-2.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/method/constructor-duplicate-3.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/method/constructor.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/method/generator.js
+    expectedClassification: pass
+    dependencies: [classes, generators, object-properties]
+  - path: test/language/computed-property-names/class/method/number.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/computed-property-names/class/method/string.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/computed-property-names/class/method/symbol.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties, symbols]
+  - path: test/language/computed-property-names/class/static/generator-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, generators, object-properties]
+  - path: test/language/computed-property-names/class/static/generator-prototype.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, generators, object-properties]
+  - path: test/language/computed-property-names/class/static/getter-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/static/getter-prototype.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, object-properties]
+  - path: test/language/computed-property-names/class/static/method-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/static/method-number-order.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/static/method-number.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/static/method-prototype.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, object-properties]
+  - path: test/language/computed-property-names/class/static/method-string-order.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/static/method-string.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/static/method-symbol-order.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties, symbols]
+  - path: test/language/computed-property-names/class/static/method-symbol.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties, symbols]
+  - path: test/language/computed-property-names/class/static/setter-constructor.js
+    expectedClassification: pass
+    dependencies: [classes, object-properties]
+  - path: test/language/computed-property-names/class/static/setter-prototype.js
+    expectedClassification: pass
+    dependencies: [classes, error-intrinsics, object-properties]
+  - path: test/language/computed-property-names/object/accessor/getter-duplicates.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties]
+  - path: test/language/computed-property-names/object/accessor/getter-super.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/object/accessor/getter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, symbols]
+  - path: test/language/computed-property-names/object/accessor/setter-duplicates.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties]
+  - path: test/language/computed-property-names/object/accessor/setter-super.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/object/accessor/setter.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties, symbols]
+  - path: test/language/computed-property-names/object/method/generator.js
+    expectedClassification: pass
+    dependencies: [generators, object-literals, object-properties]
+  - path: test/language/computed-property-names/object/method/number.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/object/method/string.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/object/method/super.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/object/method/symbol.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, symbols]
+  - path: test/language/computed-property-names/object/property/number-duplicates.js
+    expectedClassification: pass
+    dependencies: [object-literals, object-properties]
+  - path: test/language/computed-property-names/to-name-side-effects/class.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/computed-property-names/to-name-side-effects/numbers-class.js
+    expectedClassification: pass
+    dependencies: [classes, functions, object-properties]
+  - path: test/language/computed-property-names/to-name-side-effects/numbers-object.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/computed-property-names/to-name-side-effects/object.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties]
+  - path: test/language/destructuring/binding/initialization-requires-object-coercible-null.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, error-intrinsics, functions]
+  - path: test/language/destructuring/binding/initialization-requires-object-coercible-undefined.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, error-intrinsics, functions]
+  - path: test/language/destructuring/binding/initialization-returns-normal-completion-for-empty-objects.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
   - path: test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
     expectedClassification: pass
     dependencies:
@@ -55401,12 +56370,234 @@ tests:
         symbols,
         var-bindings,
       ]
+  - path: test/language/destructuring/binding/syntax/array-elements-with-initializer.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/array-elements-with-object-patterns.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/array-elements-without-initializer.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/array-pattern-with-elisions.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/array-pattern-with-no-elements.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/array-rest-elements.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
   - path: test/language/destructuring/binding/syntax/destructuring-array-parameters-function-arguments-length.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, functions, object-properties]
   - path: test/language/destructuring/binding/syntax/destructuring-object-parameters-function-arguments-length.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, functions, object-properties]
+  - path: test/language/destructuring/binding/syntax/object-pattern-with-no-property-list.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/property-list-bindings-elements.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/property-list-followed-by-a-single-comma.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/property-list-single-name-bindings.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/property-list-with-property-list.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/destructuring/binding/syntax/recursive-array-and-object-patterns.js
+    expectedClassification: pass
+    dependencies: [destructuring-bindings, functions]
+  - path: test/language/directive-prologue/10.1.1-1-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-10-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-11-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-12-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-13-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-14-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-28-s.js
+    expectedClassification: pass
+    dependencies: [functions, object-literals, object-properties, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-29-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/language/directive-prologue/10.1.1-2gs.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]
+  - path: test/language/directive-prologue/10.1.1-3-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-30-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, functions]
+  - path: test/language/directive-prologue/10.1.1-31-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/language/directive-prologue/10.1.1-32-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/language/directive-prologue/10.1.1-4-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-5-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-5gs.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]
+  - path: test/language/directive-prologue/10.1.1-6-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-7-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-8-s.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, error-intrinsics, functions, var-bindings]
+  - path: test/language/directive-prologue/10.1.1-8gs.js
+    expectedClassification: expected-negative
+    dependencies: [var-bindings]
+  - path: test/language/directive-prologue/10.1.1-9-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/14.1-1-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-10-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-11-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-12-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-13-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-14-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-15-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-16-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-17-s.js
+    expectedClassification: pass
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/14.1-2-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-3-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-4-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-4gs.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/directive-prologue/14.1-5-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-5gs.js
+    expectedClassification: expected-negative
+    dependencies: [expression-operators]
+  - path: test/language/directive-prologue/14.1-6-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-7-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-8-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/14.1-9-s.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/func-decl-final-runtime.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/func-decl-inside-func-decl-parse.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/func-decl-inside-func-decl-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions]
+  - path: test/language/directive-prologue/func-decl-no-semi-parse.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/func-decl-no-semi-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions]
+  - path: test/language/directive-prologue/func-decl-not-first-runtime.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/func-decl-parse.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/func-decl-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions]
+  - path: test/language/directive-prologue/func-expr-final-runtime.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/func-expr-inside-func-decl-parse.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/func-expr-inside-func-decl-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions]
+  - path: test/language/directive-prologue/func-expr-no-semi-parse.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/func-expr-no-semi-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions]
+  - path: test/language/directive-prologue/func-expr-not-first-runtime.js
+    expectedClassification: pass
+    dependencies: [functions]
+  - path: test/language/directive-prologue/func-expr-parse.js
+    expectedClassification: expected-negative
+    dependencies: [functions, var-bindings]
+  - path: test/language/directive-prologue/func-expr-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions]
+  - path: test/language/directive-prologue/get-accsr-inside-func-expr-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, object-properties, var-bindings]
+  - path: test/language/directive-prologue/get-accsr-not-first-runtime.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/directive-prologue/get-accsr-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, object-properties, var-bindings]
+  - path: test/language/directive-prologue/set-accsr-inside-func-expr-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, object-properties, var-bindings]
+  - path: test/language/directive-prologue/set-accsr-not-first-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, object-properties, var-bindings]
+  - path: test/language/directive-prologue/set-accsr-runtime.js
+    expectedClassification: pass
+    dependencies: [error-intrinsics, functions, object-properties, var-bindings]
   - path: test/language/eval-code/direct/block-decl-eval-source-is-strict-nostrict.js
     expectedClassification: unsupported-profile-feature
     dependencies:

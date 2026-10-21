@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 250 reviewed unsupported paths assigned to
+delivers: "Resolves the 255 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure ledger.
   Select exactly those owners and their exclusion-audit path assessments:
   the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
@@ -26,7 +26,7 @@ delivers: "Resolves the 250 reviewed unsupported paths assigned to
   whose third check reads the result of eval of var x; the whitespace probe
   test/language/expressions/conditional/S11.12_A1.js; and
   test/language/expressions/delete/11.4.1-4.a-7.js, which deletes a global
-  var inside eval code, and 30 from batch 13 that use eval or the Function
+  var inside eval code, 30 from batch 13 that use eval or the Function
   constructor only as test scaffolding under test/language/expressions/:
   the whitespace probes division/S11.5.2_A1.js,
   does-not-equals/S11.9.2_A1.js, greater-than/S11.8.2_A1.js,
@@ -42,7 +42,15 @@ delivers: "Resolves the 250 reviewed unsupported paths assigned to
   ordinary strict mode function early error; and instanceof/S11.8.6_A7_T3.js
   and instanceof/S15.3.5.3_AN.js for AN in 1_T1 through 1_T8, 2_T2, 2_T5,
   2_T6, 3_T1, and 3_T2, which obtain their constructor from the Function
-  constructor.
+  constructor, and 5 from batch 05 that use eval only as a vehicle:
+  test/language/arguments-object/10.5-1-s.js, a strict arguments
+  assignment early error;
+  test/language/block-scope/leave/outermost-binding-updated-in-catch-\
+  block-nested-block-let-declaration-unseen-outside-of-block.js, a block
+  scope exit probe; test/language/comments/S7.4_A5.js and S7.4_A6.js,
+  comment code unit probes; and
+  test/language/comments/mongolian-vowel-separator-single-eval.js, a U+180E
+  comment probe.
   Their eval or source constructor rejection is authorized, but non-source
   subject coverage remains unresolved.
   Obtain the maintainer accounting decision in
