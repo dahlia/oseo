@@ -4036,10 +4036,10 @@ closest decimal, so 46 of the 2,098 positive powers of two printed 17
 digits where 16 suffice, such as `5.9604644775390625e-8` for 2^-24 instead
 of `5.960464477539063e-8`, and the canonical numeric index test treated the
 wrong spelling as canonical. The `number-prototype` native fixture pins
-2^-24, 2^-1017, 2^-140, 2^89, and 2^976 through each consumer, and
-generated evidence at seed `0x60004901` checks powers of two and their
-neighbors across the binary16, binary32, and binary64 exponent ranges
-against an exact BigInt Number::toString oracle.
+2^-24 through each consumer and additionally checks `String` for 2^-1017,
+2^-140, 2^89, and 2^976, and generated evidence at seed `0x60004901`
+checks powers of two and their neighbors across the binary16, binary32, and
+binary64 exponent ranges against an exact BigInt Number::toString oracle.
 
 `toFixed`, `toExponential`,
 and `toPrecision` round through the same bignum numerator-over-denominator
