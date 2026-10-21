@@ -8659,6 +8659,9 @@ tests:
   - path: test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A3_T1.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - path: test/built-ins/Array/prototype/toLocaleString/invoke-element-tolocalestring.js
+    expectedClassification: pass
+    dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toLocaleString/length.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
@@ -15221,6 +15224,69 @@ tests:
   - path: test/built-ins/FinalizationRegistry/unnaffected-by-poisoned-cleanupCallback.js
     expectedClassification: pass
     dependencies: [weak-collections]
+  - path: test/built-ins/Function/15.3.5.4_2-12gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/15.3.5.4_2-14gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/15.3.5.4_2-75gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-76gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/15.3.5.4_2-77gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/15.3.5.4_2-78gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [dynamic-source, functions]
+  - path: test/built-ins/Function/15.3.5.4_2-79gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-80gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-81gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-82gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-83gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-84gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-85gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-86gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-87gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-88gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-89gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-90gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-91gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-92gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
+  - path: test/built-ins/Function/15.3.5.4_2-93gs.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions]
   - path: test/built-ins/Function/S15.3_A2_T1.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -54255,6 +54321,12 @@ tests:
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-13-a-1.js
     expectedClassification: pass
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-13-a-2.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [functions, object-properties]
+  - path: test/language/arguments-object/10.6-13-a-3.js
+    expectedClassification: unsupported-profile-feature
     dependencies: [functions, object-properties]
   - path: test/language/arguments-object/10.6-13-c-1-s.js
     expectedClassification: pass

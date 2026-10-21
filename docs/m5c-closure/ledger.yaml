@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26592
-openPaths: 14499
+closedPaths: 26593
+openPaths: 14498
 states:
   expected-negative: 2570
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 24022
+  pass: 24023
   semantic-failure: 0
-  unreviewed: 12804
-  unsupported-profile-feature: 1695
+  unreviewed: 12780
+  unsupported-profile-feature: 1718
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -61,6 +61,18 @@ owners:
       accepted ADR 0016 amendment admitting any dynamic import form
       reopens them."
     paths: 246
+  adr:0028-legacy-function-caller-boundary:
+    note: ADR 0028 authorizes "an M5 exclusion of the expectation that
+      reading the `caller` property of a non-strict ordinary function
+      completes normally, and only for the exact 23 paths listed under
+      “Exact selector”." Its selector is exactly the 23 pinned noStrict
+      paths with the caller frontmatter feature, each observed as the
+      frontmatter rejection with caller as its only unsupported feature.
+      The standard %ThrowTypeError% accessors and every mandatory
+      restricted-function contract stay inside the claim. The five paths
+      that also call eval or Function are not owned by ADR 0016, which
+      this record does not broaden; 23 paths.
+    paths: 23
   node:class-private-accessor-lookup-coverage-remediation:
     note: Observation-batch-11 admits the two class-elements tests that call
       Object.prototype.__lookupGetter__ or __lookupSetter__ before their
@@ -151,7 +163,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-01. The batch observes them; no
       classification is assumed before it does.
-    paths: 306
+    paths: 305
   node:observation-batch-03:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-03. The batch observes them; no
@@ -256,7 +268,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-32. The batch observes them; no
       classification is assumed before it does.
-    paths: 222
+    paths: 199
   node:primitive-wrapper-objects:
     note: Runtime capability primitive-wrapper; 36 paths.
     paths: 36
@@ -302,7 +314,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26592
+    paths: 26593
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -3171,7 +3183,7 @@ paths:
   test/built-ins/Array/prototype/splice/throws-if-integer-limit-exceeded.js: [pass, observation]
   test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A1_T1.js: [pass, observation]
   test/built-ins/Array/prototype/toLocaleString/S15.4.4.3_A3_T1.js: [pass, observation]
-  test/built-ins/Array/prototype/toLocaleString/invoke-element-tolocalestring.js: [unreviewed, node:observation-batch-01]
+  test/built-ins/Array/prototype/toLocaleString/invoke-element-tolocalestring.js: [pass, observation]
   test/built-ins/Array/prototype/toLocaleString/length.js: [pass, observation]
   test/built-ins/Array/prototype/toLocaleString/name.js: [pass, observation]
   test/built-ins/Array/prototype/toLocaleString/not-a-constructor.js: [pass, observation]
@@ -5414,9 +5426,9 @@ paths:
   test/built-ins/Function/15.3.5-2gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-10gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-11gs.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/15.3.5.4_2-12gs.js: [unreviewed, node:observation-batch-32]
+  test/built-ins/Function/15.3.5.4_2-12gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [dynamic-source, functions]]
   test/built-ins/Function/15.3.5.4_2-13gs.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/15.3.5.4_2-14gs.js: [unreviewed, node:observation-batch-32]
+  test/built-ins/Function/15.3.5.4_2-14gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [dynamic-source, functions]]
   test/built-ins/Function/15.3.5.4_2-15gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-16gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-17gs.js: [unreviewed, node:observation-batch-01]
@@ -5483,27 +5495,27 @@ paths:
   test/built-ins/Function/15.3.5.4_2-72gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-73gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-74gs.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/15.3.5.4_2-75gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-76gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-77gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-78gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-79gs.js: [unreviewed, node:observation-batch-32]
+  test/built-ins/Function/15.3.5.4_2-75gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-76gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/15.3.5.4_2-77gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/15.3.5.4_2-78gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [dynamic-source, functions]]
+  test/built-ins/Function/15.3.5.4_2-79gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
   test/built-ins/Function/15.3.5.4_2-7gs.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/15.3.5.4_2-80gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-81gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-82gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-83gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-84gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-85gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-86gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-87gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-88gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-89gs.js: [unreviewed, node:observation-batch-32]
+  test/built-ins/Function/15.3.5.4_2-80gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-81gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-82gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-83gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-84gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-85gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-86gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-87gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-88gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-89gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
   test/built-ins/Function/15.3.5.4_2-8gs.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Function/15.3.5.4_2-90gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-91gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-92gs.js: [unreviewed, node:observation-batch-32]
-  test/built-ins/Function/15.3.5.4_2-93gs.js: [unreviewed, node:observation-batch-32]
+  test/built-ins/Function/15.3.5.4_2-90gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-91gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-92gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
+  test/built-ins/Function/15.3.5.4_2-93gs.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions]]
   test/built-ins/Function/15.3.5.4_2-94gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-95gs.js: [unreviewed, node:observation-batch-01]
   test/built-ins/Function/15.3.5.4_2-96gs.js: [unreviewed, node:observation-batch-01]
@@ -18410,8 +18422,8 @@ paths:
   test/language/arguments-object/10.6-12-1.js: [pass, observation]
   test/language/arguments-object/10.6-12-2.js: [pass, observation]
   test/language/arguments-object/10.6-13-a-1.js: [pass, observation]
-  test/language/arguments-object/10.6-13-a-2.js: [unreviewed, node:observation-batch-32]
-  test/language/arguments-object/10.6-13-a-3.js: [unreviewed, node:observation-batch-32]
+  test/language/arguments-object/10.6-13-a-2.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions, object-properties]]
+  test/language/arguments-object/10.6-13-a-3.js: [unsupported-profile-feature, adr:0028-legacy-function-caller-boundary, [functions, object-properties]]
   test/language/arguments-object/10.6-13-c-1-s.js: [pass, observation]
   test/language/arguments-object/10.6-13-c-2-s.js: [pass, observation]
   test/language/arguments-object/10.6-13-c-3-s.js: [pass, observation]

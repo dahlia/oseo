@@ -4,6 +4,27 @@ results:
   - case:
       async: false
       features:
+        - caller
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Function/15.3.5.4_2-78gs.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+    observation:
+      detail: "Not executed: the frontmatter needs an unsupported feature."
+      passed: false
+    unsupportedFeatures:
+      - caller
+  - case:
+      async: false
+      features:
         - class
       flags: []
       includes: []
