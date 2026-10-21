@@ -6308,9 +6308,13 @@ extended runs of the constructor and Number prototype property files passed.
 The complete reviewed test262 update then observed all 42 paths the node owns
 as passes and changed no other classification. Two TypedArray
 `toLocaleString` paths keep their `primitive-wrapper` boundary at the same
-`calls.push(this)` site, now reported six harness lines later. The native
-fixture, macOS execution, and CI are not part of that evidence, and these 42
-paths do not show complete Float16 conformance.
+`calls.push(this)` site, now reported six harness lines later. A later
+local Linux run of the fixed native fixture passed on the same source.
+Rebased onto the TypedArray `toLocaleString` argument change, which edits
+the `join` helper the fixture calls, the node's manifest carries
+those records rather than a fresh observation; a complete manifest update
+and native fixture run on that integrated source, macOS execution, and CI
+remain pending. These 42 paths do not show complete Float16 conformance.
 
 The reviewed test262 subset adds 81 directly applicable paths from the node's
 736-path inventory. Fourteen BigInt constructor and prototype metadata cases

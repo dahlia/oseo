@@ -8122,19 +8122,20 @@ constructor's shrink position, though the larger pool changes which cases
 each seed draws. The pure reference
 registration enumerates the same 480 subjects for each of the twelve
 constructors, 5,760 in all. Because the compatibility ratchet identifies a
-generated domain by its description, the `0x60006e00` description's change
-from eleven to twelve constructors carries two reviewed overrides, a
+generated domain by its description, the change from eleven to twelve
+constructors in the `0x60006e00` and `0x60006e01` descriptions, both present
+at the ratchet baseline, carries two overrides for each domain, a
 `property-seed` and a `property-case-budget` transition from the old
-description to `absent`. They rename the key only; the seed and budget
-are unchanged under the new description. `0x60006e01` is new since the
-ratchet baseline and needs none. New slot `0x60006e02` draws one to six binary64
-operands: arbitrary doubles, doubles within the binary16 range or subnormal
-band, and signed binary16 values, the exact midpoints to their successors, and
-the adjacent binary64 values around those midpoints, including the 65520
-overflow threshold. Each program stores them through array-like or Float64Array
-construction, element assignment, or DataView `setFloat16`, reads every element
-through the view and DataView, and adds the family's false numeric hint. The
-oracle rounds by exact BigInt arithmetic over the binary64 encoding,
+description to `absent`. They rename the key only; the seed, budget, and
+interrupt limit are unchanged under the new description, while the larger
+pool changes which cases each seed draws. New slot `0x60006e02` draws one to
+six binary64 operands: arbitrary doubles, doubles within the binary16 range
+or subnormal band, and signed binary16 values, the exact midpoints to their
+successors, and the adjacent binary64 values around those midpoints, including
+the 65520 overflow threshold. Each program stores them through array-like or
+Float64Array construction, element assignment, or DataView `setFloat16`, reads
+every element through the view and DataView, and adds the family's false numeric
+hint. The oracle rounds by exact BigInt arithmetic over the binary64 encoding,
 independently of `Math.f16round`, the runtime, and both references; a
 compile-free registration pins its boundary cases. Native runs use both
 specialization policies with collection at every safepoint and assert positive
@@ -8181,6 +8182,22 @@ path changed classification. The ordinary and BigInt
 recorded position moved from line 627 to 633 because the harness gained four
 constructor-probe lines and two precision-probe lines. The closure ledger,
 observation-batch statistics, graph baseline, and profile counts were derived
-from that manifest. The `typed-array-float16` native fixture, macOS
-execution, and CI are not part of this evidence and remain pending, and the
-42 paths do not establish complete Float16 conformance.
+from that manifest.
+
+A later local Linux x86-64 `mise run test:native --shard 76/282` run, whose
+only selected fixture is `typed-array-float16`, exited zero at `417810e9`
+after 35.6 seconds. Node.js, Deno, and the `linux-x86_64-gnu` build produced
+matching output, and the `linux-aarch64-musl` cross-link passed. That source
+predates two later changes: the TypedArray `toLocaleString` argument change,
+which edits the `join` helper the fixture calls, and observation batch 05.
+
+The node is now prepared on top of both. Its manifest keeps the 28,287
+records of that integrated base and replaces only the 44 records the
+`ef8b56e2` update changed:
+24,022 passes, 2,566 expected negatives, and 1,699 unsupported profile
+features. The closure ledger, observation-batch statistics, graph baseline,
+and profile counts are derived from that union. These are observations of
+two earlier sources, not of the integrated source. A complete manifest
+update and native fixture run on the integrated source, macOS execution, and
+CI remain pending, and the 42 paths do not establish complete Float16
+conformance.

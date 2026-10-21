@@ -590,8 +590,10 @@ overrides:
     reason: Renames the 0x60006e00 domain key from one of eleven constructors to
       one of twelve constructors after Float16Array joined its shared Number
       pool. Seed 0x60006e00, the 12-case budget, the 180-second limit, the
-      generator, and structured shrinking are unchanged, and every original
-      constructor remains drawable.
+      generator structure, and structured shrinking are unchanged. The pool
+      only gains Float16Array at its end, so every original constructor
+      remains drawable at its shrink position, but the larger pool changes
+      which cases the seed draws.
     transition:
       from: 1610640896
       to: absent
@@ -608,8 +610,54 @@ overrides:
     reason: Renames the 0x60006e00 domain key from one of eleven constructors to
       one of twelve constructors after Float16Array joined its shared Number
       pool. Seed 0x60006e00, the 12-case budget, the 180-second limit, the
-      generator, and structured shrinking are unchanged, and every original
-      constructor remains drawable.
+      generator structure, and structured shrinking are unchanged. The pool
+      only gains Float16Array at its end, so every original constructor
+      remains drawable at its shrink position, but the larger pool changes
+      which cases the seed draws.
+    transition:
+      from: 12
+      to: absent
+  - invariant: property-seed
+    domain:
+      one of eleven constructors and one to four construction subjects; each
+      takes no argument, one of eleven primitive lengths through a false numeric
+      hint, a fixed, resizable, or detached ArrayBuffer with converted offset
+      and optional length, a same, other, or mixed content TypedArray that may
+      be detached, or an iterable or array-like of zero to two converted
+      elements, and is called, constructed directly, or constructed through a
+      bound function or Proxy whose prototype read returns an object or
+      primitive or throws
+    reason: Renames the 0x60006e01 domain key from one of eleven constructors to
+      one of twelve constructors after Float16Array joined the shared Number
+      pool of the construction-order domain. The new key is this whole
+      description with "one of twelve constructors" in place of "one of eleven
+      constructors". Seed 0x60006e01, the 12-case budget, the 180-second
+      limit, the generator structure, and structured shrinking are unchanged.
+      The pool only gains Float16Array at its end, so every original
+      constructor remains drawable at its shrink position, but the larger
+      pool changes which cases the seed draws.
+    transition:
+      from: 1610640897
+      to: absent
+  - invariant: property-case-budget
+    domain:
+      one of eleven constructors and one to four construction subjects; each
+      takes no argument, one of eleven primitive lengths through a false numeric
+      hint, a fixed, resizable, or detached ArrayBuffer with converted offset
+      and optional length, a same, other, or mixed content TypedArray that may
+      be detached, or an iterable or array-like of zero to two converted
+      elements, and is called, constructed directly, or constructed through a
+      bound function or Proxy whose prototype read returns an object or
+      primitive or throws
+    reason: Renames the 0x60006e01 domain key from one of eleven constructors to
+      one of twelve constructors after Float16Array joined the shared Number
+      pool of the construction-order domain. The new key is this whole
+      description with "one of twelve constructors" in place of "one of eleven
+      constructors". Seed 0x60006e01, the 12-case budget, the 180-second
+      limit, the generator structure, and structured shrinking are unchanged.
+      The pool only gains Float16Array at its end, so every original
+      constructor remains drawable at its shrink position, but the larger
+      pool changes which cases the seed draws.
     transition:
       from: 12
       to: absent
