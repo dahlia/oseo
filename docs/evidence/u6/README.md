@@ -611,13 +611,69 @@ total changes.
 The `typed-array-feature-admission` node adds slot `0x60006e02`, its
 compile-free oracle registration, and the fixed `typed-array-float16` native
 fixture. The new generated domain keeps the family's 12-case ordinary
-budget, both specialization policies, and forced collection. The retained
-weights, 523 Linux and 225 macOS seconds, describe the pre-Float16Array
-TypedArray constructor file: Linux was measured locally, and macOS remains
-an unmeasured estimate. The complete file with Float16Array has not yet
-been measured. Replace the retained weights after a complete native Linux
-file measurement, and disclose any macOS model as unmeasured until matching
-host evidence exists. This update changes no case budgets, seeds, deadlines,
+budget, both specialization policies, and forced collection. Until this
+node's measurement, the file kept the weights above, 523 Linux and 225 macOS
+seconds, which describe the pre-Float16Array file at source `dd61722a`.
+
+A first local Linux whole-file extended run of this file at source
+`e911ff73` exited 1 after 536.077 seconds of process wall time: six of its
+seven registrations passed, and the generated Float16Array conversion
+registration failed on a native Number formatting counterexample. That run
+produced no accepted case sum and set no weight. Its raw result, stdout, and
+stderr are retained under
+*/data/oseo-m5c-reviews/f16-on-typed-R-focused-extended1/*.
+
+The repair changed the shared shortest-decimal formatter. It added slot
+`0x60004901` to *tests/property/m5-number-prototype.property.test.ts*: powers
+of two and their one-ulp neighbors across the binary16, binary32, and
+binary64 exponent ranges, checked against an independent exact BigInt
+Number::toString oracle, with a 16-case ordinary budget. The existing
+`0x60004900` domain, the Float16Array property, and every other domain keep
+their draws, seeds, budgets, and limits.
+
+At clean source `9085fef649cb3d034a589a7cd6bc528587255b20`, tree
+`81497a11ffd3ad336866b9c8a617a388b3dddb4e`, both files were then run on local
+Linux x86-64, each once through
+`mise run test:property:extended:native:shard --shard 1/1` with that exact
+property file. Each run kept task scale 10, seed 1592590339, size `large`,
+the default Zig toolchain, one file worker, and the existing budgets and
+interrupt limits. The capacity profile was `generous` (`desktop-idle`), with
+no CPU quota or memory cap. Both exited zero naturally, with every
+registration passing and none failed, skipped, or cancelled. The source HEAD,
+tree, clean worktree, and the SHA-256 of each property file and runner were
+identical before and after each run.
+
+In *tests/property/m5-typed-array-constructors.property.test.ts* the seven
+printed leaf durations were 238,215.316583, 1,121.824991, 14.123737,
+20,937.132678, 260,192.567362, 0.981388, and 137,356.727887 milliseconds.
+Their sum is 657,838.674626 milliseconds, so the Linux weight is 658 seconds
+after rounding up. The property digest was
+`ef8f8b1f2d88099bbbcd0ae35de4953f4a932f3242e6503a3a2b59909e3ee20d`.
+
+In *tests/property/m5-number-prototype.property.test.ts* the two printed leaf
+durations were 268,059.162287 and 146,054.989313 milliseconds. Their sum is
+414,114.151600 milliseconds, so the Linux weight is 415 seconds after
+rounding up. The property digest was
+`30ca2e403cd207593193dd8fcc1e07aab2793d3b6750166740676c7a557b0ae0`.
+
+The constructor sum includes its reference-only, compile-only structural,
+and oracle registrations. Both sums exclude build, setup, and plugin timing.
+They are not file wall times: the separate process wall times were 659.230165
+and 415.788884 seconds. The raw result, per-file stdout and stderr, and
+duration lines are retained in *run-actual-9085-20261021T0318/* under
+*/data/m5c-f16-fixed-657-whole-file-measurement-preparation/*.
+
+macOS remains unmeasured for both files. Their weights of 283 and 242
+seconds are explicitly provisional, `ceil(658 * 298 / 694)` and
+`ceil(415 * 544 / 936)`. Each ratio comes from that file's actual
+complete-host case sums in run 39070198868 at `c78d9df1`, retained in
+*ci-39070198868.json.txt*: the constructor file measured 693,527.437126
+milliseconds on Linux and 297,143.357 on macOS, and the Number prototype
+file 935,677.973483 and 543,173.108125. The table checked into that source
+commit is superseded and was not used. Replace both macOS estimates with
+actual matching-host case sums when available. These are local Linux case
+sums and unmeasured macOS models, not native CI, a whole-suite result, or a
+full test262 UPDATE. This update changes no case budgets, seeds, deadlines,
 or shard totals.
 
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

@@ -19,10 +19,12 @@
  * provisional macOS estimate from its 122/131 host ratio in the source
  * run. See the complete U6 provenance.
  *
- * Typed-array-construction-order adds a second generated domain to the
- * TypedArray constructor family. Its Linux entry uses a local extended
- * five-registration case sum; macOS remains an unmeasured provisional
- * estimate using the historical 298/694 host ratio. See U6 provenance.
+ * Typed-array-feature-admission adds Float16Array to the TypedArray
+ * constructor file and a shortest-decimal domain to the Number prototype
+ * file. Their Linux entries use local extended whole-file case sums of
+ * seven and two registrations; macOS remains an unmeasured provisional
+ * estimate using each file's 298/694 and 544/936 host ratios in the source
+ * run. See U6 provenance.
  *
  * The two entries in `caseShardedNativeFiles` are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
@@ -105,7 +107,7 @@ export const nativeShardCosts = {
     "tests/property/m5-math-namespace.property.test.ts": 1140,
     "tests/property/m5-module-continuation.property.test.ts": 153,
     "tests/property/m5-number-intrinsic.property.test.ts": 1050,
-    "tests/property/m5-number-prototype.property.test.ts": 936,
+    "tests/property/m5-number-prototype.property.test.ts": 415,
     // Local Linux extended case sum: 234.699350840 s, rounded up.
     // October 21, 2026; not CI or file wall time. See U6 provenance.
     "tests/property/m5-object-binding.property.test.ts": 235,
@@ -156,7 +158,7 @@ export const nativeShardCosts = {
     "tests/property/m5-symbol-intrinsic.property.test.ts": 365,
     "tests/property/m5-tagged-template.property.test.ts": 184,
     "tests/property/m5-top-level-this.property.test.ts": 573,
-    "tests/property/m5-typed-array-constructors.property.test.ts": 523,
+    "tests/property/m5-typed-array-constructors.property.test.ts": 658,
     "tests/property/m5-typed-array-core.property.test.ts": 494,
     "tests/property/m5-typed-array-iterative.property.test.ts": 212,
     "tests/property/m5-typed-array-mutation.property.test.ts": 401,
@@ -246,7 +248,7 @@ export const nativeShardCosts = {
     "tests/property/m5-math-namespace.property.test.ts": 321,
     "tests/property/m5-module-continuation.property.test.ts": 317,
     "tests/property/m5-number-intrinsic.property.test.ts": 301,
-    "tests/property/m5-number-prototype.property.test.ts": 544,
+    "tests/property/m5-number-prototype.property.test.ts": 242,
     // Provisional estimate: ceil(235 * 122/131) from this file's host
     // ratio in the source run; not a macOS observation. Refresh from CI.
     "tests/property/m5-object-binding.property.test.ts": 219,
@@ -297,7 +299,7 @@ export const nativeShardCosts = {
     "tests/property/m5-symbol-intrinsic.property.test.ts": 406,
     "tests/property/m5-tagged-template.property.test.ts": 158,
     "tests/property/m5-top-level-this.property.test.ts": 306,
-    "tests/property/m5-typed-array-constructors.property.test.ts": 225,
+    "tests/property/m5-typed-array-constructors.property.test.ts": 283,
     "tests/property/m5-typed-array-core.property.test.ts": 213,
     "tests/property/m5-typed-array-iterative.property.test.ts": 214,
     "tests/property/m5-typed-array-mutation.property.test.ts": 224,
