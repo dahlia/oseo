@@ -21,8 +21,11 @@ continuation functions before compiler lowering.
 M5 synchronous `for-of` heads admit one identifier, array, or object
 declaration, an existing binding or member target, or an array or object
 assignment pattern whose leaves are existing targets. Classic `for`
-declarations admit the same array and object binding patterns. `for-in` and
-`for-await-of` remain owned profile failures.
+declarations admit the same array and object binding patterns. `for-in`
+heads convert the same declaration and target forms, and `for-await-of`
+heads, which occur only inside an async function or a module body, use the
+`for-of` head conversion. In these `for-of`, `for-in`, and `for-await-of`
+heads, a declaration initializer or a second declarator remains rejected.
 Array literals, call arguments, and constructor
 arguments retain spread entries at the owned syntax boundary.
 Functions, constructors, and arrows admit recursive array and object
@@ -105,7 +108,7 @@ target, a computed property name, and a default may each contain `await`; the
 frontend converts them unchanged and the compiler decides whether the enclosing
 body owns a suspension frame for them. `for-await-of` heads reuse the same
 declaration and assignment target conversion. Pattern type annotations on
-assignment, `for-of`, and catch targets, and `for-in` heads remain explicit
+assignment, `for-of`, `for-in`, and catch targets remain explicit
 boundaries.
 Compound assignment converts every arithmetic, exponentiation, bitwise, shift,
 and logical form into an owned identifier or member update. Await inside that
