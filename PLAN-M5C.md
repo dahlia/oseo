@@ -1052,11 +1052,12 @@ branch that classified a case naming a listed include as unsupported with the
 `harness-include` capability. A case that names an include the reviewed
 harness does not implement still fails as a harness defect.
 
-The complete manifest update that read this source observed the 174 records
-that had reported `harness-include`, 168 owned here and 6 owned by
-`well-known-intrinsics-harness`. No other record changed. Of the 168, 163
-move to pass. Five stay `unsupported-profile-feature` with their actual
-rejections, and their ownership moves to existing nodes as active coverage
+The complete manifest update that read this source, recorded in `73f1a74e`,
+observed the 174 records that had reported `harness-include`, 168 owned here
+and 6 owned by `well-known-intrinsics-harness`. No other record changed. Of
+the 168, 163 moved to pass in that update and in the one recorded in
+`615d9d3b`. Five stayed `unsupported-profile-feature` with their actual
+rejections, and their ownership moved to existing nodes as active coverage
 debt, not exclusions:
 
  -  The grow and shrink _user-provided-tolocalestring-\*.js_ cases of
@@ -1084,6 +1085,14 @@ debt, not exclusions:
     construction order property's fixed resizable and fixed buffer cases. The
     maintainer accounting decision is still required, and ADR 0013 is not
     widened.
+
+The latest complete update, on the clean source `09745af3` and recorded in
+`e7228e8f`, changed one of the 163 passes. Under the `__proto__` write guard
+of the incidental Annex B prototype write dependency section,
+*TypedArray/out-of-bounds-behaves-like-detached.js* is now
+`unsupported-profile-feature`. Of the 168, 162 pass and six are unsupported.
+`typed-array-proto-coverage-remediation` also owns the sixth, so it owns two
+paths of this cohort and three in all with *no-species.js*.
 
 Of the 6, *Function/prototype/arguments/prop-desc.js*,
 *Function/prototype/caller/prop-desc.js*, and
@@ -1119,8 +1128,11 @@ and 10 `eval` boundaries, and 2 Annex B `__proto__` and 2 legacy lookup
 method rejections, all `unsupported-profile-feature` with `profile-syntax`.
 Their classification, observation, case, and dependencies are unchanged, no
 record was added or removed, and the 457 compile-stage `OSEO1001` records
-still carry no execution evidence. The derived current executed-variant count
-in *docs/m5c-closure/observation-batches.yaml* is 95,676.
+still carry no execution evidence. That update set the derived executed-variant
+count in *docs/m5c-closure/observation-batches.yaml* to 95,676. The latest
+complete update, recorded in `e7228e8f`, changed only the
+*out-of-bounds-behaves-like-detached.js* record, and the current count is
+95,673.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles

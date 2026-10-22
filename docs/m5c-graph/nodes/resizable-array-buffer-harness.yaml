@@ -4,10 +4,13 @@ title: Admit the resizable buffer harness
 delivers: "Reviews and admits the resizableArrayBufferUtils.js harness
   include and any resizable ArrayBuffer and TypedArray behavior it reaches,
   so the 168 reviewed paths recorded as harness-include unsupported for that
-  include are observed. The complete update observed all 168: 163 pass,
-  four transferred to primitive-wrapper-objects, and one to
-  typed-array-proto-coverage-remediation, which own that remaining
-  unsupported coverage."
+  include are observed. The complete update recorded in 615d9d3b observed
+  all 168: 163 pass, four transferred to primitive-wrapper-objects, and one
+  to typed-array-proto-coverage-remediation. The latest complete update,
+  recorded in e7228e8f, observes 162 pass: the __proto__ write guard makes
+  TypedArray/out-of-bounds-behaves-like-detached.js unsupported, and
+  typed-array-proto-coverage-remediation owns it too. Those two nodes own
+  the remaining unsupported coverage."
 dependencies:
   - unsupported-ownership-audit
 landed: false
