@@ -40,8 +40,10 @@ export interface Test262FragmentInput {
 }
 
 /**
- * Operational counts outside the manifest. Executed excludes the same owned
- * compile-stage diagnostics as the reviewed runner, not merely process starts.
+ * Operational counts outside the manifest. Executed counts the observations
+ * whose compiled executable started, the same CLI `executed` fact from which
+ * the reviewed runner takes execution evidence; a compile, toolchain, or
+ * host stop before that is an attempt only.
  */
 export interface FragmentBuildCounts {
   readonly attempts: Record<string, number>;
@@ -236,13 +238,9 @@ export function createTest262FragmentExecutor(
   async function observe(reason: string, execute: () => Promise<CliResult>) {
     counts.attempts[reason] = (counts.attempts[reason] ?? 0) + 1;
     const result = await execute();
-    const code = /^.+?:\d+:\d+: error\[(OSEO\d{4})\]/mu.exec(
-      result.stderr,
-    )?.[1];
-    if (
-      result.exitStatus === 0 ||
-      (code !== "OSEO0001" && code !== "OSEO1001" && code !== "OSEO3001")
-    ) {
+    // The CLI reports whether the executable started; the printed text
+    // cannot, since a running program may itself print a diagnostic.
+    if (result.executed === true) {
       counts.executed[reason] = (counts.executed[reason] ?? 0) + 1;
     }
     return result;

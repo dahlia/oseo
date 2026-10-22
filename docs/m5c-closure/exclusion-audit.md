@@ -122,8 +122,11 @@ requires the remediation node's maintainer accounting decision.
 The `resizable-array-buffer-harness` node transferred
 *test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-prototype.js*
 to the same owner under its own `annex-b-resizable-typed-array-prototype`
-assessment, with the same exact rejection and disposition. The rejection
-covers the whole program, so no original assertion ran. The
+assessment, with the same exact rejection and disposition. The program
+compiles and runs the harness, both buffer allocations, and the first listed
+constructor's two views. The runtime then reports the excluded `__proto__`
+read of the first view, the first operand of the first prototype comparison,
+as `OSEO1001`, so no prototype assertion of the original source ran. The
 `typed-array-constructors` native fixture constructs fixed-length views over a
 resizable and a fixed-length buffer for every constructor the resizable buffer
 harness lists, including its three class subclasses, and compares both
@@ -137,13 +140,17 @@ changed with it, while that assessment's reason and coverage are unchanged.
 The `well-known-intrinsics-harness` node transferred the
 *is-a-constructor.js* cases of `AsyncFunction`, `AsyncGeneratorFunction`, and
 `GeneratorFunction` to `node:dynamic-source-coverage-remediation` under the
-`source-constructor-constructibility` assessment. Each reaches the accepted
-run-time constructor boundary of ADR 0016 at its `new` call, but the compiler
-rejects the whole program there, so its preceding IsConstructor assertion
-never runs. The assessment keeps `disposition: remediation` and
-`normativeDependency: not-demonstrated`: constructibility is behavior other
-than source evaluation, and the `new` call itself stays at the ADR 0016
-boundary.
+`source-constructor-constructibility` assessment. Each program compiles and
+runs. Its IsConstructor assertion executes first and passes, because
+*isConstructor.js* uses the intrinsic only as the `newTarget` of
+`Reflect.construct`. The following `new` call then reaches the accepted
+run-time constructor boundary of ADR 0016, which the runtime reports as
+`OSEO1001` from the intrinsic's `[[Construct]]`; the recorded diagnostic is
+located at that call in the first observed variant. The assessment keeps
+`disposition: remediation` and `normativeDependency: not-demonstrated`: the
+executed constructibility predicate is behavior other than source evaluation,
+the `new` call itself stays at the ADR 0016 boundary, and accounting for this
+mixed subject still needs the maintainer decision.
 
 
 Dynamic import attributes and JSON identity

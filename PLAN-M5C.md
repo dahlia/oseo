@@ -961,8 +961,8 @@ behavior changes. It extends fixed evidence of the existing families instead.
 The `proxy-exotic-object` native fixture triggers each of the three
 invariants beside an accepted control, counts the trap calls, and writes
 `"__proto__"` through a proxy parent with computed and static keys. The
-`object-literal-prototype-setter` fixture adds generator, async, and async
-generator methods named `__proto__` beside a prototype setter. A
+*tests/native/fixtures/objects.ts* native fixture adds generator, async, and
+async generator methods named `__proto__` beside a prototype setter. A
 *packages/parser-babel/tests/basics.test.ts* case checks that literal
 U+2028 and U+2029 stay single code units of their string constants while a
 raw line feed or carriage return still leaves the literal unterminated. The
@@ -1008,8 +1008,11 @@ debt, not exclusions:
     assertions have not run. `primitive-wrapper-objects` owns these four,
     which raises its contract from 36 to 40 paths.
  -  *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports
-    the `OSEO1001` rejection of the Annex B `Object.prototype.__proto__`
-    accessor, which rejects the whole program. Its core subject, that
+    the run-time `OSEO1001` rejection of the Annex B
+    `Object.prototype.__proto__` accessor. The program runs both buffer
+    allocations and the first listed constructor's two views, then stops at
+    the first view's `__proto__` read, before any prototype comparison
+    completes. Its core subject, that
     fixed-length views over a resizable and a fixed-length buffer share the new
     target's prototype, does not depend on Annex B.
     `typed-array-proto-coverage-remediation` owns it beside *no-species.js*
@@ -1025,14 +1028,29 @@ Of the 6, *Function/prototype/arguments/prop-desc.js*,
 *Function/prototype/toString/built-in-function-object.js* move to pass. The
 *is-a-constructor.js* cases of `AsyncFunction`, `AsyncGeneratorFunction`, and
 `GeneratorFunction` stay unsupported with the `OSEO1001` rejection of a
-constructor that compiles source text. Each test checks IsConstructor before
-its `new` call, but the compiler rejects the whole program at that call, so
-the IsConstructor prefix has no native evidence. These three remain active
+constructor that compiles source text. Each program compiles and runs: its
+IsConstructor assertion executes and passes, and the following `new` call
+then reaches the run-time ADR 0016 boundary, which the runtime reports from
+the constructor's `[[Construct]]`. Accounting for that executed prefix beside
+the boundary is a mixed subject the maintainer decision still bounds. These
+three remain active
 coverage debt, not whole-path ADR 0016 exclusions, and
 `dynamic-source-coverage-remediation` owns them under a reviewed remediation
 assessment, which raises its contract from 255 to 258 paths. Neither harness
 node therefore leaves its original cohort without unsupported paths; each
 delivers the observation, and the remaining debt has an owner.
+
+These four records, like every record whose deciding variant stopped at a
+run-time `OSEO1001` boundary, were written without execution evidence: the
+runner took every `OSEO1001` exit for a compile-stage rejection, although
+ADR 0013 omits execution evidence only for a variant that ran no native
+program. The CLI result now carries an `executed` fact that only a started
+executable sets, and the runner treats an observation as compile-stage only
+without it. Classifications do not change. The next complete manifest update
+adds the executed variant to each such record; at R2 the manifest held 86, all
+`unsupported-profile-feature` with `profile-syntax`: 40 `Function`, 32
+generator and async constructor, and 10 `eval` boundaries, and 2 Annex B
+`__proto__` and 2 legacy lookup method rejections.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles

@@ -54,9 +54,8 @@ delivers: "Resolves the 258 reviewed unsupported paths assigned to
   test/built-ins/AsyncFunction/is-a-constructor.js,
   test/built-ins/AsyncGeneratorFunction/is-a-constructor.js, and
   test/built-ins/GeneratorFunction/is-a-constructor.js, whose IsConstructor
-  assertion on the intrinsic precedes a new call that the compiler rejects
-  for the whole program, so that constructibility prefix has no native
-  evidence.
+  assertion on the intrinsic executes and passes before a new call reaches
+  the run-time ADR 0016 boundary of that source-compiling constructor.
   Their eval or source constructor rejection is authorized, but non-source
   subject coverage remains unresolved.
   Obtain the maintainer accounting decision in

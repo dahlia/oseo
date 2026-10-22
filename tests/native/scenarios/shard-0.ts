@@ -293,6 +293,7 @@ export async function runNativeScenario0(
     host,
   );
   assert.deepEqual(cli, {
+    executed: true,
     exitStatus: 0,
     stderr: "",
     stdout: "cli-native\n",
