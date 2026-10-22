@@ -18,6 +18,14 @@ results:
     dependencies:
       - async-iteration
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/AsyncGeneratorFunction/instance-length.js
         non-strict disabled failed (1): stdout=""

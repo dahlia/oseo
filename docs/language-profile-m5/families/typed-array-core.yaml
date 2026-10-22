@@ -22,8 +22,9 @@ scope:
     nodes, which the typed-array-statics node completes."
   - "Reviewed standards coverage is all 337 upstream paths under the node's
     thirteen inventory roots, through the reviewed testTypedArray.js
-    harness. Paths that need resizableArrayBufferUtils.js or
-    SharedArrayBuffer retain explicit boundaries."
+    harness. The reviewed resizableArrayBufferUtils.js include now has
+    recorded observations, with remaining gaps recorded per path.
+    SharedArrayBuffer retains its explicit boundary."
 owners:
   - PLAN-M5.md
 evidence:
@@ -64,6 +65,7 @@ evidence:
   standards:
     status: covered
     references:
+      - tests/test262/harness/resizableArrayBufferUtils.js
       - tests/test262/harness/testTypedArray.js
       - tests/test262/subset.yaml
       - tests/test262/results.yaml

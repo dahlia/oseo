@@ -899,12 +899,11 @@ restores its subset expectation from `pass` to `unsupported-profile-feature`,
 because the reviewed runner refuses a pass-to-unsupported change as a demotion
 rather than recording it.
 
-That earlier update observed the assignment's owned `OSEO1001` at 272:1,
-before any assertion. Its mixed Annex B subject remains coverage debt, with
-the `typed-array-core` fixture as replacement evidence. This source preserves
-the successful main manifest, subset expectations, and ownership. A fresh
-complete update must observe it before the audit and ledger can assign it to
-`node:typed-array-proto-coverage-remediation`; no exclusion is recorded here.
+The complete update on clean source `2e3d973f` again observes the assignment's
+owned `OSEO1001` before any assertion. Its mixed Annex B subject remains
+coverage debt, with the `typed-array-core` fixture as replacement evidence. The
+audit binds the observed rejection and fixture, and the ledger assigns the path
+to `node:typed-array-proto-coverage-remediation`; no exclusion is recorded.
 
 
 Legacy function caller boundary
@@ -1093,12 +1092,18 @@ it. The runner retains that variant as execution evidence when a run-time
 Compile-stage rejections and failures before program start have no execution
 fact. This contract does not depend on the intrinsics harness.
 
-A fresh complete update of this source must preserve all 24,069 main passes
-and all 28,311 reviewed paths in the 41,091-path inventory. The checked-in
-results, subset expectations, ledger, observation batches, and graph baseline
-still describe successful main. The only supported-feature changes are the
-three Minor tags above. No earlier combined-update promotion, ownership
-transfer, or exclusion is adopted by this source commit.
+The complete `mise run test262:update -- --accept-promotions` on clean source
+`2e3d973f` ended with natural exit 0. Its manifest records 28,311 reviewed
+cases: 24,231 passes, 2,581 expected negatives, and 1,499 unsupported profile
+features. It preserves every one of the 24,069 successful main passes and all
+28,311 reviewed paths in the 41,091-path inventory, with no semantic, harness,
+or infrastructure failures. Of the original 168 RAB paths, 162 pass and 6
+remain unsupported. The ledger assigns 4 of those to
+`primitive-wrapper-objects` and 2 to `typed-array-proto-coverage-remediation`
+as active coverage debt, without exclusions. The six WKI paths retain exactly
+main's harness-include observations and owners. The records, promotions, and
+derived counts come from this complete update, not an earlier combined-update
+snapshot.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles

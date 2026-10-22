@@ -396,10 +396,22 @@ results:
     dependencies:
       - functions
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+        - resizableArrayBufferUtils.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: unsupported harness resizableArrayBufferUtils.js."
+      detail: 'test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-shrink.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-shrink.js:299:50:
+        error[OSEO2001]: Primitive wrapper objects are not admitted
+        yet.\n"'
       passed: false
-      unsupportedCapability: harness-include
+      unsupportedCapability: primitive-wrapper
     unsupportedFeatures: []
   - case:
       async: false

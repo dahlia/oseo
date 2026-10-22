@@ -248,3 +248,16 @@ applies only to ADR 0016 rows. The %Function.prototype% accessors, the
 clause 17.1 restrictions, and the absence of an own `caller` property on
 arguments objects stay inside the claim with their own evidence or
 remediation owners.
+
+
+Resizable buffer harness observations
+-------------------------------------
+
+The complete update on clean source `2e3d973f` observes the RAB harness cohort.
+4 remaining rejections report `primitive-wrapper` and belong to
+`primitive-wrapper-objects`. The 2 mixed Annex B prototype subjects remain
+owned by `typed-array-proto-coverage-remediation`, with their original paths
+and assertions retained. The new assessments bind their actual rejection
+observations and the reviewed constructor/prototype and out-of-bounds native
+replacement evidence. They authorize no exclusion. WKI paths, dynamic-source
+ownership, import64, and Caller23 remain unchanged.

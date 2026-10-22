@@ -17,8 +17,9 @@ scope:
   - "Reviewed standards coverage is every upstream path under the node's ten
     inventory roots: test/built-ins/TypedArray/prototype/find, findIndex,
     findLast, findLastIndex, includes, indexOf, join, lastIndexOf,
-    toLocaleString, and toString. Paths that need the unreviewed
-    resizableArrayBufferUtils.js include retain explicit boundaries."
+    toLocaleString, and toString. The reviewed
+    resizableArrayBufferUtils.js include is observed;
+    remaining unsupported subjects retain their recorded owners."
 owners:
   - PLAN-M5.md
 evidence:
@@ -58,6 +59,7 @@ evidence:
   standards:
     status: covered
     references:
+      - tests/test262/harness/resizableArrayBufferUtils.js
       - tests/test262/subset.yaml
       - tests/test262/results.yaml
   structural:

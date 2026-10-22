@@ -17,6 +17,13 @@ results:
     dependencies:
       - async-iteration
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/AsyncGeneratorFunction/has-instance.js
         non-strict disabled failed (1): stdout=""
@@ -43,6 +50,14 @@ results:
     dependencies:
       - async-iteration
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/AsyncGeneratorFunction/instance-prototype.js
         non-strict disabled failed (1): stdout=""
