@@ -309,10 +309,10 @@ assessments:
       observes both prototypes through Object.getPrototypeOf instead of
       the accessor, and compares them with each other and with the
       constructor's prototype. The construction order property's fixed
-      case adds fixed and length-tracking resizable buffer views of
-      Float64Array and BigInt64Array under own, bound, and Proxy new
-      targets. These core algorithms do not normatively require Annex B;
-      retain bounded remediation until the maintainer accounting
+      case adds fixed-buffer views and length-tracking resizable-buffer
+      views of Float64Array and BigInt64Array under own, bound, and
+      Proxy new targets. These core algorithms do not normatively require
+      Annex B; retain bounded remediation until the maintainer accounting
       decision, without authorizing a whole-path exclusion.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js

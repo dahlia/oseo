@@ -13,10 +13,9 @@ scope:
     reduceRight accumulator selection when no initial value is supplied."
   - "Reviewed standards coverage is every upstream path under the node's
     seven inventory roots: test/built-ins/TypedArray/prototype/every,
-    filter, forEach, map, reduce, reduceRight, and some. Paths that need
-    ArrayBuffer.prototype.transferToFixedLength retain explicit boundaries.
-    The reviewed resizableArrayBufferUtils.js include is observed; remaining
-    unsupported subjects retain their recorded owners."
+    filter, forEach, map, reduce, reduceRight, and some. All 23 paths using
+    the reviewed resizableArrayBufferUtils.js include pass in the current
+    complete observations."
 owners:
   - PLAN-M5.md
 evidence:

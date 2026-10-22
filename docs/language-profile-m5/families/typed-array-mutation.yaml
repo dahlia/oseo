@@ -21,8 +21,8 @@ scope:
   - "Reviewed standards coverage is every upstream path under the node's six
     inventory roots: test/built-ins/TypedArray/prototype/copyWithin, fill,
     reverse, slice, toReversed, and with. The reviewed
-    resizableArrayBufferUtils.js include is observed;
-    remaining unsupported subjects retain their recorded owners."
+    resizableArrayBufferUtils.js include is observed, and all ten paths
+    using it pass in the current complete observations."
 owners:
   - PLAN-M5.md
 evidence:

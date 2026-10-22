@@ -1055,7 +1055,8 @@ rejections and were assigned as active coverage debt:
     call the saved original with a non-strict `this`, which boxes the element.
     The first observed variant stops at that call, so their remaining
     assertions did not run. The earlier update assigned these four to
-    `primitive-wrapper-objects`; the transfers await a fresh observation here.
+    `primitive-wrapper-objects`; the current complete update below confirms
+    those observations and ownership assignments.
  -  *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports
     the run-time `OSEO1001` rejection of the Annex B
     `Object.prototype.__proto__` accessor. The program runs both buffer
@@ -1071,8 +1072,10 @@ rejections and were assigned as active coverage debt:
     under a separate bounded audit assessment. Replacement evidence is the
     `typed-array-constructors` native fixture's case for every constructor
     the harness lists, including its three class subclasses, and the
-    construction order property's fixed resizable and fixed buffer cases. The
-    maintainer accounting decision is still required, and ADR 0013 is not
+    construction order property's fixed-buffer and length-tracking
+    resizable-buffer cases. The native fixture covers the fixed-length view
+    pairs over both buffer kinds; the property covers complementary shapes.
+    The maintainer accounting decision is still required, and ADR 0013 is not
     widened.
 
 The earlier complete update, on the clean source `09745af3` and recorded in
@@ -1082,8 +1085,9 @@ of the incidental Annex B prototype write dependency section,
 `unsupported-profile-feature`. That update recorded 162 passes and six
 unsupported results among the 168. It assigned the sixth to
 `typed-array-proto-coverage-remediation` too. Those observations and ownership
-transfers are historical evidence; this source retains main data until a fresh
-complete update observes it.
+transfers are historical evidence. Clean source `2e3d973f` retained main data
+until the complete update below; its actual records and assignments are now
+recorded in `fbdb0824`.
 
 The CLI's `executed` fact is shared infrastructure needed by this node's
 runtime `__proto__` boundaries. Only starting the compiled executable sets
@@ -1093,7 +1097,8 @@ Compile-stage rejections and failures before program start have no execution
 fact. This contract does not depend on the intrinsics harness.
 
 The complete `mise run test262:update -- --accept-promotions` on clean source
-`2e3d973f` ended with natural exit 0. Its manifest records 28,311 reviewed
+`2e3d973f` ended with natural exit 0 and is recorded in `fbdb0824`.
+Its manifest records 28,311 reviewed
 cases: 24,231 passes, 2,581 expected negatives, and 1,499 unsupported profile
 features. It preserves every one of the 24,069 successful main passes and all
 28,311 reviewed paths in the 41,091-path inventory, with no semantic, harness,
@@ -1128,11 +1133,11 @@ included inventory, 168 are the reviewed paths this node owns and 17 are
 unreviewed paths of `observation-batch-32`, which stay unreviewed here.
 Three more are under *test/staging/* and outside the inventory.
 
-The source this node is now prepared on contains
+The clean source `2e3d973f` used by the complete update contains
 `typed-array-feature-admission`, which admits the Float16Array global.
 Without that admission both probes would be the profile-syntax rejection
-for `typeof` of an unadmitted standard global, so the manifest update that
-observes the 168 paths must read a source that contains it. This node does
+for `typeof` of an unadmitted standard global; that update observed all
+168 paths with the admission present. This node does
 not touch the Float16Array source. A reference run under Node.js and Deno
 on hosts that define Float16Array is evidence that the copy is equivalent
 to upstream, not an Oseo observation. The classifications come only from

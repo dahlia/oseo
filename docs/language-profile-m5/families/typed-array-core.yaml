@@ -21,10 +21,10 @@ scope:
     reflection step for the constructor and prototype belong to later M5b
     nodes, which the typed-array-statics node completes."
   - "Reviewed standards coverage is all 337 upstream paths under the node's
-    thirteen inventory roots, through the reviewed testTypedArray.js
-    harness. The reviewed resizableArrayBufferUtils.js include now has
-    recorded observations, with remaining gaps recorded per path.
-    SharedArrayBuffer retains its explicit boundary."
+    thirteen inventory roots, through the reviewed harness set including
+    testTypedArray.js and resizableArrayBufferUtils.js. Of the 28 paths
+    using the latter, 27 pass and one remains unsupported with active owner
+    typed-array-proto-coverage-remediation."
 owners:
   - PLAN-M5.md
 evidence:
