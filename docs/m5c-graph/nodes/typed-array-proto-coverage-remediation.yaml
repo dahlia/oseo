@@ -13,7 +13,13 @@ delivers: "Resolves exactly
   assertions and preserve, through an approved replacement observation,
   its core coverage that fixed-length views over a resizable and a
   fixed-length buffer share the new target's prototype for every
-  constructor the resizable buffer harness lists. Follow the full PLAN-M5.md
+  constructor the resizable buffer harness lists. Also resolves
+  test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js, whose
+  __proto__ write the resizable-array-buffer-harness write guard reports:
+  retain its path and assertions and preserve, through an approved
+  replacement observation, its core coverage that an out-of-bounds view
+  answers Get and HasProperty for an index without consulting a prototype
+  that has that index. Follow the full PLAN-M5.md
   evidence contract and obtain the maintainer accounting decision in
   PLAN-M5C.md before assigning an exclusion. Update the exclusion audit,
   ledger, and applicable normative profile records, and regenerate the

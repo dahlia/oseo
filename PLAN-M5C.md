@@ -887,8 +887,9 @@ regrowing. Focused native runs at `3e42e4c3` passed:
 *tests/annexb-proto-boundary.test.ts* (all four tests, guarded and answered
 writes under both specialization policies) and the fixture through
 `mise run test:native --shard 77/282` (Node.js, Deno, and native outputs match;
-the AArch64 musl cross-link builds). The complete manifest update has not run
-on this source.
+the AArch64 musl cross-link builds). The complete
+`mise run test262:update -- --accept-promotions` on the clean source
+`09745af3` ended with natural exit 0, and this section records its result.
 
 The path is unsupported in the reviewed `main` manifest. A static scan of
 spelled `__proto__` keys finds no guard candidate among the `main` passes
@@ -896,13 +897,21 @@ that mention it, but it cannot see computed keys, so the complete manifest
 update of this source must preserve every `main` pass. Commit `3e42e4c3`
 restores its subset expectation from `pass` to `unsupported-profile-feature`,
 because the reviewed runner refuses a pass-to-unsupported change as a demotion
-rather than recording it. Until a complete manifest update replaces it, its
-result record keeps the pass that `615d9d3b` observed; no record, audit row, or
-ledger entry is edited before that observation. Recording the observed
-classification, a mixed Annex B audit row and assessment, and the path's ledger
-entry under `node:typed-array-proto-coverage-remediation`, beside its two
-existing paths and their replacement evidence, follows that observation. Until
-then no accounting change is claimed.
+rather than recording it.
+
+That update changed exactly one record. The path is now
+`unsupported-profile-feature` with `profile-syntax`, decided by its
+non-strict, specialization-disabled variant, which reports the owned
+`OSEO1001` at 272:1, the `i8a.__proto__` assignment, before any assertion. No
+other reviewed record changed, and every pass of the reviewed `main` manifest
+at `833fb4d0` is still a pass. The manifest records 28,311 reviewed cases:
+24,234 passes, 2,581 expected negatives, and 1,496 unsupported results. The
+path's audit row uses the new mixed Annex B assessment
+`annex-b-out-of-bounds-prototype-setup`, with the `typed-array-core` fixture
+bound by digest as replacement evidence, and its ledger entry names
+`node:typed-array-proto-coverage-remediation`, which now owns three paths.
+No exclusion is recorded, and the maintainer accounting decision is still
+required.
 
 
 Legacy function caller boundary

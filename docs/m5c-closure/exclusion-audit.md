@@ -139,6 +139,21 @@ length-tracking resizable and fixed buffer views of `Float64Array` and
 by digest; the shared fixture file's digest in the *no-species.js* assessment
 changed with it, while that assessment's reason and coverage are unchanged.
 
+The same node's write guard gives the owner a third path,
+*test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js*, under the
+`annex-b-out-of-bounds-prototype-setup` assessment. Its
+`i8a.__proto__ = { 2: 'wrong value' }` assignment needs the omitted Annex B
+setter, so the complete update on the clean source `09745af3` recorded the
+owned `OSEO1001` at 272:1 from the non-strict, specialization-disabled
+variant, after the harness, the resizable buffer, and the view ran and before
+any assertion. The `typed-array-core` native fixture, bound by digest,
+installs an index-bearing prototype that inherits from `Int8Array.prototype`
+with `Object.setPrototypeOf` on a fixed-length and a length-tracking view,
+witnesses its identity and an inherited label, and checks `Get` and `in`
+before shrinking, out of bounds, and after regrowing. The assessment keeps
+`disposition: remediation` and `normativeDependency: not-demonstrated`; no
+exclusion is recorded.
+
 The `well-known-intrinsics-harness` node transferred the
 *is-a-constructor.js* cases of `AsyncFunction`, `AsyncGeneratorFunction`, and
 `GeneratorFunction` to `node:dynamic-source-coverage-remediation` under the
