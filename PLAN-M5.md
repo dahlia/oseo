@@ -5939,7 +5939,7 @@ applicable inventory, ADR 0013 vocabulary, inventory policy, forced-collection
 policy, and zero-override policy are unchanged.
 
 Implemented M5b node `runtime-error-observation` gives an unhandled thrown
-value that is not a recognized intrinsic error a rendered identity and
+object that reaches the generic path described below a rendered identity and
 message. The identity is the `name` of the value's `constructor`, read with
 ordinary property access, which is the only identity ECMAScript gives a user
 error class such as the test262 harness `Test262Error`. The message is the
@@ -5956,6 +5956,21 @@ reached gives its recognized kind, as `error_instance_kind` computes it. A
 current-realm intrinsic error prototype object itself therefore matches, and
 an error created in another realm matches only when its chain reaches one.
 
+`oseo_context_print_thrown` chooses among the report's paths in this order. A
+pending host diagnostic, or a value that is neither recognized nor an object,
+is reported as the stored diagnostic alone, with no identity read and no
+marker. Otherwise a value that is not recognized reaches the generic path only
+when the stored diagnostic message is the unhandled-throw diagnostic
+(`OSEO_UNHANDLED_THROW_MESSAGE`), which `oseo_context_clear_language_error`
+selects for an explicit JavaScript `throw` completion; the C backend emits that
+call for every `throw`. An error the runtime creates through
+`oseo_internal_throw_error` keeps its own stored message instead, so when it is
+not recognized, as when a built-in created it in its own realm before the
+caller's realm was restored, the report is that stored diagnostic alone, with
+no identity read and no marker. A recognized intrinsic error that is not a
+rejection reason renders through `Error.prototype.toString` and prints its
+recognized kind marker.
+
 The marker is one whitespace-free token on its own line, so an identity
 outside the ASCII identifier shape has no representation there. Such a value,
 a value whose `constructor` or `name` lookup is abrupt or reaches a non-object
@@ -5963,9 +5978,9 @@ or a non-string, and a thrown primitive all keep the untyped-throw diagnostic
 and print no marker; the human diagnostic and the marker of an unidentified
 value therefore appear together or not at all. A recognized intrinsic error
 keeps its existing name-and-message rendering and its recognized kind marker,
-and that marker is independent of the mutable `name` property; any other
-thrown object, including an unrecognized error from another realm, takes the
-generic constructor-name identity above. Reading the identity and
+and that marker is independent of the mutable `name` property; the generic
+identity of an object on the generic path follows its mutable `constructor`.
+Reading the identity and
 converting the message run user JavaScript after the program has already
 completed abruptly, so the throw or rejection site is restored around them
 and the thrown value stays collector-rooted. Neither nested completion
@@ -8419,7 +8434,8 @@ the 30 paths, so their classifications in *tests/test262/subset.yaml* stayed
 `unsupported-profile-feature` and this section recorded no pass count until a
 full `mise run test262:update -- --accept-promotions` observed them. No
 native run of the fixture is recorded for this node, at its preparation
-commit `938b3105` or since; the counts above are the Node.js and Deno
+commit `938b3105`, which the published history carries as its replay
+`014f2518`, or since; the counts above are the Node.js and Deno
 reference outputs.
 
 The full manifest update that the coordinator's log records as reading the

@@ -899,9 +899,22 @@ current evidence assessment. Those live only in the indexed records above.
     first such prototype reached gives its recognized kind. That is what
     `error_instance_kind` computes, not where the value was created: a
     current-realm intrinsic error prototype object itself matches, and an
-    error from another realm matches only when its chain reaches one. An
-    unhandled thrown value that is not a recognized intrinsic error
-    renders the identity and message it exposes. The identity is the
+    error from another realm matches only when its chain reaches one.
+    `oseo_context_print_thrown` chooses among the unhandled-throw paths in
+    this order. A pending host diagnostic, or a value that is neither
+    recognized nor an object, is reported as the stored diagnostic alone,
+    with no identity read and no marker. Otherwise a value that is not
+    recognized reaches the generic path only when the stored diagnostic
+    message is the unhandled-throw diagnostic, which
+    `oseo_context_clear_language_error` selects for an explicit
+    JavaScript `throw` completion; the C backend emits that call for every
+    `throw`. An error the runtime creates through
+    `oseo_internal_throw_error` keeps its own stored message instead, so
+    when it is not recognized, as when a built-in created it in its own
+    realm before the caller's realm was restored, the report is that
+    stored diagnostic alone, with no identity read and no marker. An
+    object on the generic path renders the identity and message it
+    exposes. The identity is the
     `name` of the value's `constructor`, read with ordinary property
     access, which is the only identity ECMAScript gives a user error class
     such as the test262 harness `Test262Error`; the message is the value's
@@ -924,10 +937,9 @@ current evidence assessment. Those live only in the indexed records above.
     untyped-throw diagnostic and prints no marker, while an abrupt message
     read or conversion keeps the identity already established and renders
     it alone. A recognized intrinsic error keeps its existing
-    name-and-message rendering and its recognized kind marker; any other
-    thrown object, including an unrecognized error from another realm,
-    takes the generic constructor-name identity, which its mutable
-    `constructor` can change.
+    name-and-message rendering, which is `Error.prototype.toString`, and
+    its recognized kind marker; the generic identity of an object on the
+    generic path follows its mutable `constructor`.
     The rendering applies to the unhandled-throw diagnostic only. An
     unhandled rejection is a separate reviewed host-policy boundary,
     reported by its own text rather than by the rejected value, so a
@@ -8446,8 +8458,11 @@ complete. The remaining gaps retain their existing owners.
     carries the marker of the first such prototype reached; any other
     reason gets the boundary text alone. The predicate is that chain, not
     where the reason was created. When the entry script, a timer callback,
-    or a finalization callback ends with an uncaught throw, the runtime
-    still drains pending jobs and runs that checkpoint, but reports the
+    or a finalization callback ends with an uncaught JavaScript throw, the
+    runtime drains pending promise jobs and runs that checkpoint only if
+    the drain completes normally. A timer or finalization turn that an
+    internal await drives drains only until the awaited promise settles
+    and skips the checkpoint once it has. The runtime then reports the
     throw unless that work produced a host diagnostic.
     *Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js* and
     *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* leave a

@@ -7,4 +7,10 @@ delivers: "Admits Promise.prototype.finally and the Promise feature tag, so
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: ready
+status: parked
+reason: "Awaiting additional review allowance. All ten internal review starts
+  are spent. The tenth found two blocking claims in the unhandled-throw and
+  rejection-checkpoint text: the generic identity path needs no pending host
+  diagnostic and the unhandled-throw diagnostic, and the timer and
+  finalization checkpoint is conditional. The documentation fix is pending
+  review."

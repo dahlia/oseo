@@ -33,4 +33,6 @@ dependencies:
   - typed-array-feature-admission
   - well-known-intrinsics-harness
 landed: false
-status: blocked
+status: parked
+reason: "Awaiting the additional review allowance and closure of the parked
+  promise-feature-admission prerequisite."

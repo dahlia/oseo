@@ -8,8 +8,20 @@ scope:
     first such prototype reached gives its recognized kind, whatever realm
     created the value. A current-realm intrinsic error prototype object
     itself therefore matches."
+  - "The unhandled-throw report chooses among its paths in this order. A
+    pending host diagnostic, or a value that is neither recognized nor an
+    object, is reported as the stored diagnostic alone, with no identity
+    read and no marker. Otherwise a value that is not recognized reaches
+    the generic path only when the stored diagnostic message is the
+    unhandled-throw diagnostic, which an explicit JavaScript `throw`
+    completion selects; an error the runtime creates keeps its own stored
+    message, so when it is not recognized, as when a built-in created it in
+    its own realm before the caller's realm was restored, the report is
+    that stored diagnostic alone, with no identity read and no marker. A
+    recognized intrinsic error renders through `Error.prototype.toString`
+    and prints its recognized kind marker."
   - "The owned diagnostic and machine-readable marker an unhandled thrown
-    value that is not a recognized intrinsic error produces. The identity is
+    object on the generic path produces. The identity is
     the `name` of the value's `constructor`, read with ordinary property
     access, so a user error class such as the test262 harness
     `Test262Error` reports the only identity ECMAScript exposes for it. The
@@ -25,9 +37,9 @@ scope:
     diagnostic and the marker of a value that is not a recognized intrinsic
     error therefore appear together or not at all. A recognized intrinsic
     error keeps its existing name-and-message rendering and its recognized
-    kind marker, which is independent of the mutable `name` property; any
-    other thrown object, including an unrecognized error from another
-    realm, takes the generic constructor-name identity."
+    kind marker, which is independent of the mutable `name` property; the
+    generic identity of an object on the generic path follows its mutable
+    `constructor`."
   - "The rendering applies to the unhandled-throw diagnostic only. An
     unhandled rejection is a separate reviewed host-policy boundary,
     reported by its own text rather than by the rejected value, so a
