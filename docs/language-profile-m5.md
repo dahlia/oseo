@@ -904,18 +904,28 @@ current evidence assessment. Those live only in the indexed records above.
     this order. A pending host diagnostic, or a value that is neither
     recognized nor an object, is reported as the stored diagnostic alone,
     with no identity read and no marker. Otherwise a value that is not
-    recognized reaches the generic path only when the stored diagnostic
-    message is the unhandled-throw diagnostic, which
-    `oseo_context_clear_language_error` selects for an explicit
-    JavaScript `throw` completion; the C backend emits that call for every
-    `throw`. An error the runtime creates through
-    `oseo_internal_throw_error` keeps its own stored message instead, so
-    when it is not recognized, as when a built-in created it in its own
-    realm before the caller's realm was restored, the report is that
-    stored diagnostic alone, with no identity read and no marker. An
-    object on the generic path renders the identity and message it
-    exposes. The identity is the
-    `name` of the value's `constructor`, read with ordinary property
+    recognized reaches the generic path only when the context's current
+    diagnostic message is the unhandled-throw diagnostic. That message
+    belongs to the context, not to the thrown value, and is distinct from
+    any error object's `message` property.
+    `oseo_context_clear_language_error` installs it: the C backend emits
+    that call for every explicit JavaScript `throw` completion, and
+    runtime code calls it too after it takes over a language throw, as the
+    IteratorClose helpers do before they close an iterator after an abrupt
+    completion and rethrow the original value. `oseo_internal_throw_error`
+    installs the native message of the error it creates as the current
+    diagnostic, but a later explicit `throw` or runtime rethrow of that
+    error can replace it with the unhandled-throw diagnostic. The report
+    therefore depends on the diagnostic current when the value reaches it,
+    not on where the value was created: an object that is not recognized,
+    such as an error a built-in created in its own realm before the
+    caller's realm was restored, takes the generic path once the current
+    diagnostic is the unhandled-throw diagnostic, and is reported as the
+    stored diagnostic alone, with no identity read and no marker, only
+    while the current diagnostic is still another message, such as the
+    native message `oseo_internal_throw_error` installed. An object on the
+    generic path renders the identity and message it exposes. The identity
+    is the `name` of the value's `constructor`, read with ordinary property
     access, which is the only identity ECMAScript gives a user error class
     such as the test262 harness `Test262Error`; the message is the value's
     `message` property converted through the admitted generic string
@@ -937,8 +947,10 @@ current evidence assessment. Those live only in the indexed records above.
     untyped-throw diagnostic and prints no marker, while an abrupt message
     read or conversion keeps the identity already established and renders
     it alone. A recognized intrinsic error keeps its existing
-    name-and-message rendering, which is `Error.prototype.toString`, and
-    its recognized kind marker; the generic identity of an object on the
+    name-and-message rendering, the `Error.prototype.toString` algorithm,
+    which `oseo_internal_error_to_string` applies directly rather than by
+    looking up or calling a `toString` method, and its recognized kind
+    marker; the generic identity of an object on the
     generic path follows its mutable `constructor`.
     The rendering applies to the unhandled-throw diagnostic only. An
     unhandled rejection is a separate reviewed host-policy boundary,
@@ -8457,7 +8469,8 @@ complete. The remaining gaps retain their existing owners.
     real only if a later edition exposed the wrapper. Owner: the intrinsics
     and built-in objects stream.
  -  A rejected promise that no reaction ever handles ends the program at the
-    next rejection checkpoint, which reports the owned
+    next rejection checkpoint, except under an internal await as described
+    below, and that checkpoint reports the owned
     `unhandled-rejection-policy` boundary text for any reason. When the
     reason itself or an object on its stored prototype chain is one of the
     current context realm's intrinsic error prototypes, the report also
@@ -8468,8 +8481,16 @@ complete. The remaining gaps retain their existing owners.
     runtime drains pending promise jobs and runs that checkpoint only if
     the drain completes normally. A timer or finalization turn that an
     internal await drives drains only until the awaited promise settles
-    and skips the checkpoint once it has. The runtime then reports the
-    throw unless that work produced a host diagnostic.
+    and skips the checkpoint once it has. For the entry script and for a
+    timer or finalization turn of the outer event loop, the runtime then
+    reports the throw unless that work produced a host diagnostic. An
+    internal await reports nothing itself: a throw kept that way in a turn
+    it drives, or a rejection that a checkpoint finds during that await,
+    becomes the await's throw completion, with no host diagnostic, for the
+    iterator operation that awaited. That operation handles it like any
+    other throw completion; it may close the iterator and propagate it,
+    turn it into a rejected promise, or, when it already holds a throw
+    completion of its own, keep that completion instead.
     *Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js* and
     *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* leave a
     rejection with an intrinsic `Error` unhandled, and the three

@@ -12,14 +12,24 @@ scope:
     pending host diagnostic, or a value that is neither recognized nor an
     object, is reported as the stored diagnostic alone, with no identity
     read and no marker. Otherwise a value that is not recognized reaches
-    the generic path only when the stored diagnostic message is the
-    unhandled-throw diagnostic, which an explicit JavaScript `throw`
-    completion selects; an error the runtime creates keeps its own stored
-    message, so when it is not recognized, as when a built-in created it in
-    its own realm before the caller's realm was restored, the report is
-    that stored diagnostic alone, with no identity read and no marker. A
-    recognized intrinsic error renders through `Error.prototype.toString`
-    and prints its recognized kind marker."
+    the generic path only when the context's current diagnostic message,
+    which is distinct from any error object's `message` property, is the
+    unhandled-throw diagnostic. An explicit JavaScript `throw` completion
+    installs it, and so does runtime code that takes over a language
+    throw, such as an IteratorClose helper that closes an iterator after an
+    abrupt completion and rethrows the original value. An error the
+    runtime creates installs its native message as the current diagnostic,
+    but a later explicit `throw` or runtime rethrow of it can replace that
+    message. An object that is not recognized, such as an error a built-in
+    created in its own realm before the caller's realm was restored,
+    therefore takes the generic path once the current diagnostic is the
+    unhandled-throw diagnostic, and is reported as the stored diagnostic
+    alone, with no identity read and no marker, only while the current
+    diagnostic is still another message, such as that native message. A
+    recognized intrinsic error renders through the
+    `Error.prototype.toString` algorithm, applied directly rather than by
+    looking up or calling a `toString` method, and prints its recognized
+    kind marker."
   - "The owned diagnostic and machine-readable marker an unhandled thrown
     object on the generic path produces. The identity is
     the `name` of the value's `constructor`, read with ordinary property

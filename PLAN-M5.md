@@ -5966,16 +5966,27 @@ an error created in another realm matches only when its chain reaches one.
 pending host diagnostic, or a value that is neither recognized nor an object,
 is reported as the stored diagnostic alone, with no identity read and no
 marker. Otherwise a value that is not recognized reaches the generic path only
-when the stored diagnostic message is the unhandled-throw diagnostic
-(`OSEO_UNHANDLED_THROW_MESSAGE`), which `oseo_context_clear_language_error`
-selects for an explicit JavaScript `throw` completion; the C backend emits that
-call for every `throw`. An error the runtime creates through
-`oseo_internal_throw_error` keeps its own stored message instead, so when it is
-not recognized, as when a built-in created it in its own realm before the
-caller's realm was restored, the report is that stored diagnostic alone, with
-no identity read and no marker. A recognized intrinsic error that is not a
-rejection reason renders through `Error.prototype.toString` and prints its
-recognized kind marker.
+when the context's current diagnostic message is the unhandled-throw diagnostic
+(`OSEO_UNHANDLED_THROW_MESSAGE`). That message belongs to the context, not to
+the thrown value, and is distinct from any error object's `message` property.
+`oseo_context_clear_language_error` installs it. The C backend emits that call
+for every explicit JavaScript `throw` completion, and runtime code calls it too
+after it takes over a language throw, as the IteratorClose helpers do before
+they close an iterator after an abrupt completion and rethrow the original
+value. `oseo_internal_throw_error` installs the native message of the error it
+creates as the current diagnostic, but a later explicit `throw` or runtime
+rethrow of that error can replace it with the unhandled-throw diagnostic. The
+report therefore depends on the diagnostic current when the value reaches it,
+not on where the value was created: an object that is not recognized, such as
+an error a built-in created in its own realm before the caller's realm was
+restored, takes the generic path once the current diagnostic is the
+unhandled-throw diagnostic, and is reported as the stored diagnostic alone,
+with no identity read and no marker, only while the current diagnostic is still
+another message, such as the native message `oseo_internal_throw_error`
+installed. A recognized intrinsic error that is not a rejection reason renders
+through the `Error.prototype.toString` algorithm, which
+`oseo_internal_error_to_string` applies directly rather than by looking up or
+calling a `toString` method, and prints its recognized kind marker.
 
 The marker is one whitespace-free token on its own line, so an identity
 outside the ASCII identifier shape has no representation there. Such a value,
