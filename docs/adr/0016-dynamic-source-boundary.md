@@ -76,15 +76,20 @@ Decision
  -  `eval` in call position, the `Function` constructor, `new Function`,
     and every constructor that compiles source text stay outside the M5
     language profile. The frontend and resolver reject them with owned
-    `OSEO1001` diagnostics; no runtime helper approximates them.
+    `OSEO1001` diagnostics; no runtime helper approximates them. Since
+    [ADR 0027](./0027-realms-beyond-the-initial-realm.md), a
+    source-compiling constructor or `%eval%` reached as a value instead
+    reports the same owned `OSEO1001` diagnostic from the native runtime
+    when it is invoked, after the program's earlier statements have run.
  -  Dynamic import remains rejected at parse time. Admitting the
     build-time-resolvable subset requires a separate reviewed plan and an
     update to this record, following alternative 3.
  -  Affected test262 cases are classified `unsupported-profile-feature`
-    through the existing compile-stage rejection, and reviewed subset
-    entries name the gap with the `dynamic-source` dependency tag so
-    coverage summaries can total it. They never count as passes, expected
-    negatives, or semantic failures.
+    through the owned `OSEO1001` rejection, whether the frontend reports it
+    before execution or the runtime reports it at the invocation, and
+    reviewed subset entries name the gap with the `dynamic-source`
+    dependency tag so coverage summaries can total it. They never count as
+    passes, expected negatives, or semantic failures.
  -  While this boundary stands, no Oseo release uses an unqualified
     ECMA-262 conformance label. Releases publish measured coverage with
     the dynamic source gap named, as the honest-reporting rule in
