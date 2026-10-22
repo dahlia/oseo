@@ -71,10 +71,20 @@ const dynamicImportRejection = new RegExp(
     "(?=$|\\r?\\n|\\\\n)",
   "u",
 );
+/**
+ * ADR 0028 excludes only the optional legacy caller expectation, only for
+ * its exact selector, and only through the frontmatter rejection of the
+ * `caller` feature. Its paths have no other ADR owner.
+ */
+const callerOwner = "adr:0028-legacy-function-caller-boundary";
+const callerRecordStem = "0028-legacy-function-caller-boundary";
+const callerRejectionDetail =
+  "Not executed: the frontmatter needs an unsupported feature.";
 const recordStems = [
   "0013-m5-edition-and-manifest",
   "0016-dynamic-source-boundary",
   "0019-m5-claim-closure",
+  callerRecordStem,
 ] as const;
 
 /** Snapshot digest binds a human assessment to its reviewed input. */
@@ -217,10 +227,63 @@ export function hasLookupCall(
   return false;
 }
 
+/**
+ * Require a `caller` member read, `o.caller`, `o?.caller`, or the static
+ * computed forms, rather than text in a string or comment. Like hasEvalCall
+ * this is not reference resolution or proof of execution.
+ */
+export function hasCallerRead(
+  source: string,
+  mode: Test262Result["case"]["mode"],
+): boolean {
+  const tree = syntaxNode(parseBabel(source, { sourceType: mode }));
+  const pending: StructuredDataInput[] = [tree];
+  while (pending.length > 0) {
+    const value = pending.pop();
+    if (Array.isArray(value)) {
+      pending.push(...value);
+      continue;
+    }
+    const node = syntaxNode(value);
+    if (node == null) continue;
+    if (lookupCallee(node, "caller")) return true;
+    pending.push(...Object.values(node));
+  }
+  return false;
+}
+
+/**
+ * Read the exhaustive path list under the Exact selector heading of the
+ * accepted caller record. The audit digest of that record already binds the
+ * text; this parse only turns the list into the set the checker enforces.
+ */
+export function legacyCallerSelector(record: string): ReadonlySet<string> {
+  const lines = record.split("\n");
+  const heading = lines.findIndex(
+    (line, index) =>
+      line === "Exact selector" && /^-+$/u.test(lines[index + 1] ?? ""),
+  );
+  if (heading < 0) {
+    throw new Error("ADR 0028 needs its Exact selector section.");
+  }
+  const paths: string[] = [];
+  for (const line of lines.slice(heading + 2)) {
+    if (/^-+$/u.test(line)) break;
+    const match = /^ -  \*(test\/[^*]+)\*(?: \(dynamic source\))?$/u.exec(line);
+    if (match != null) paths.push(match[1]!.replace(/\\(.)/gu, "$1"));
+  }
+  if (paths.length === 0 || new Set(paths).size !== paths.length) {
+    throw new Error("ADR 0028 selector is empty or repeats a path.");
+  }
+  return new Set(paths);
+}
+
 /** Inputs are explicit so regression tests need no corpus execution. */
 export interface M5cExclusionAuditInputs {
   /** Exact separately accepted dynamic attribute reservation. */
   readonly importAttributesDynamicPaths?: ReadonlySet<string>;
+  /** Exact ADR 0028 selector; absent means no path may use its owner. */
+  readonly legacyCallerPaths?: ReadonlySet<string>;
   readonly ledger: M5cClosureLedger;
   readonly results: readonly Test262Result[];
   readonly records: ReadonlyMap<string, string>;
@@ -288,7 +351,7 @@ export function validateM5cExclusionAudit(
     )
   ) {
     throw new Error(
-      "Audit records must name exactly ADRs 0013, 0016, and 0019.",
+      "Audit records must name exactly ADRs 0013, 0016, 0019, and 0028.",
     );
   }
   for (const stem of recordStems) {
@@ -348,7 +411,8 @@ export function validateM5cExclusionAudit(
     if (
       row.priorCohort !== "source-subject" &&
       row.priorCohort !== "incidental-scaffolding" &&
-      row.priorCohort !== "annex-b"
+      row.priorCohort !== "annex-b" &&
+      row.priorCohort !== "legacy-caller"
     ) {
       throw new Error(`Audit needs a prior ownership cohort: ${path}.`);
     }
@@ -361,19 +425,37 @@ export function validateM5cExclusionAudit(
     if (
       assessment.normativeDependency !== "source-evaluation-only" &&
       assessment.normativeDependency !== "not-demonstrated" &&
-      assessment.normativeDependency !== "annex-b-only"
+      assessment.normativeDependency !== "annex-b-only" &&
+      assessment.normativeDependency !== "legacy-caller-only"
     ) {
       throw new Error(
         `Audit needs a normative dependency assessment: ${path}.`,
       );
     }
     const proposedOwner = row.proposedOwner;
-    if (proposedOwner !== dynamicOwner && proposedOwner !== annexOwner) {
+    if (
+      proposedOwner !== dynamicOwner &&
+      proposedOwner !== annexOwner &&
+      proposedOwner !== callerOwner
+    ) {
       throw new Error(`Audit cannot authorize this proposed record: ${path}.`);
+    }
+    // The selector is exact in both directions: its paths name only this
+    // record, and only its paths may name it.
+    const callerPath = inputs.legacyCallerPaths?.has(path) ?? false;
+    if (
+      (proposedOwner === callerOwner) !== callerPath ||
+      (row.priorCohort === "legacy-caller") !== callerPath ||
+      (assessment.normativeDependency === "legacy-caller-only") !== callerPath
+    ) {
+      throw new Error(`Audit needs the exact ADR 0028 selector: ${path}.`);
     }
     const excluded = assessment.disposition === "exclusion";
     if (!excluded && assessment.disposition !== "remediation") {
       throw new Error(`Audit needs a disposition: ${path}.`);
+    }
+    if (callerPath && !excluded) {
+      throw new Error(`ADR 0028 has no remediation owner: ${path}.`);
     }
     if (excluded && assessment.normativeDependency === "not-demonstrated") {
       throw new Error(
@@ -445,10 +527,22 @@ export function validateM5cExclusionAudit(
         )) ||
       annexProtoRejection.test(accessorDetail);
     const lookupMethod = annexLookupRejection.exec(accessorDetail)?.[1];
+    // The frontmatter check runs before compilation, so caller must be the
+    // only unadmitted feature: another one would hide work behind this
+    // record. The observation digest binds the remaining fields.
+    const callerSurface =
+      detail === callerRejectionDetail &&
+      result.unsupportedFeatures.length === 1 &&
+      result.unsupportedFeatures[0] === "caller" &&
+      result.case.features.includes("caller") &&
+      result.case.flags.includes("noStrict") &&
+      hasCallerRead(source, result.case.mode);
     if (
       proposedOwner === dynamicOwner
         ? !dynamicSurface
-        : !annexSurface && lookupMethod == null
+        : proposedOwner === callerOwner
+          ? !callerSurface
+          : !annexSurface && lookupMethod == null
     ) {
       throw new Error(
         `Audit rejection is outside the record surface: ${path}.`,
@@ -566,6 +660,18 @@ export function validateM5cExclusionAudit(
       );
     }
   }
+  // A reviewed selector path cannot leave the audit by changing its owner.
+  for (const entry of inputs.ledger.entries) {
+    if (
+      inputs.legacyCallerPaths?.has(entry.path) === true &&
+      entry.state !== "unreviewed" &&
+      !seen.has(entry.path)
+    ) {
+      throw new Error(
+        `ADR 0028 selector path lacks its audit row: ${entry.path}.`,
+      );
+    }
+  }
   // The reservation is a set contract. Each reserved path keeps its reviewed
   // row, whose row checks require the bounded exclusion or an observation
   // promotion; reassigning a ledger owner cannot drop it from the audit.
@@ -634,6 +740,9 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
   }
   return validateM5cExclusionAudit(text, {
     importAttributesDynamicPaths: readImportAttributesReservation(),
+    legacyCallerPaths: readLegacyCallerSelector(
+      recordSources.get(callerRecordStem) ?? "",
+    ),
     ledger: parseM5cClosureLedger(
       readFileSync(join(repositoryRoot, m5cClosureLedgerPath), "utf8"),
     ).ledger,
@@ -642,6 +751,19 @@ export function validateCurrentM5cExclusionAudit(): M5cExclusionAuditSummary {
     sources,
     replacementEvidence,
   });
+}
+
+/** Parse the accepted caller selector and pin its exact 23 paths. */
+function readLegacyCallerSelector(record: string): ReadonlySet<string> {
+  const paths = [...legacyCallerSelector(record)].toSorted();
+  if (
+    paths.length !== 23 ||
+    exclusionAuditDigest(paths.join("\n") + "\n") !==
+      "757812f5891faa0c1ae1e0279bb3abc4b9a2def61ec7b809181264dabc62ed59"
+  ) {
+    throw new Error("ADR 0028 caller selector changed.");
+  }
+  return new Set(paths);
 }
 
 /** Read and verify the separately accepted 64-path reservation. */

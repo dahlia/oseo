@@ -1,0 +1,76 @@
+version: 1
+id: module-export-forms
+title: Module export forms and arbitrary module namespace names
+scope:
+  - "export var exports every BoundName of its VariableStatement, including
+    declarators without an initializer and binding-pattern leaves. Every
+    module var cell is created as undefined while linking, so a cyclic
+    importer or hoisted function reads undefined before the declaring
+    module evaluates; source initializers keep their evaluation position,
+    and let, const, and class bindings keep their temporal dead zones."
+  - "export * as name from a module exports that module's one namespace
+    object under an explicit name, including default and a string name.
+    It shares the namespace cell used by import * as and by re-exporting a
+    namespace import, so star exports reaching it from several paths stay
+    unambiguous while distinct namespaces under one name stay ambiguous."
+  - "Import, export, and re-export names may be any well-formed string. The
+    string name * is an ordinary export name and never selects a namespace
+    import. Duplicate export names, lone surrogates, and a string local
+    name without from are early errors."
+  - "A module namespace lists its string keys in the code-unit order of its
+    export names, array-index names such as 2 and 10 included, then
+    @@toStringTag. Own-key queries, Object.assign, and spread and rest
+    copies use that order; ordinary objects keep array-index keys first in
+    ascending numeric order. ECMA-262 leaves for-in order over a namespace
+    unspecified, and Oseo chooses the same order."
+owners:
+  - PLAN-M5C.md
+  - docs/adr/0009-module-identity-and-linking.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-2.ts
+      - tests/fixtures/module-export-forms/entry.mjs
+  fixed:
+    status: covered
+    references:
+      - tests/fixtures/module-export-forms/entry.mjs
+      - tests/fixtures/module-export-forms/cycle-a.mjs
+      - tests/fixtures/module-export-forms/cycle-b.mjs
+      - tests/fixtures/module-export-forms/reexports.mjs
+      - tests/fixtures/module-export-forms/values.mjs
+      - tests/fixtures/module-export-forms/key-order.mjs
+      - tests/fixtures/module-export-forms/numeric-names.mjs
+      - packages/parser-babel/tests/module-export-forms.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-2.ts
+  generated:
+    status: covered
+    references:
+      - tests/property-seeds.yaml
+      - packages/testkit/tests/module-graph.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family adds no specialized path or family-specific guard.
+      Its var cells and namespace objects are read through existing
+      binding and namespace operations, which the native scenario runs
+      under both specialization policies."
+    replacements:
+      - tests/native/scenarios/shard-2.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native/scenarios/shard-2.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/module-export-forms.test.ts
+      - packages/parser-babel/tests/bindings.test.ts

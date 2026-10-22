@@ -10,6 +10,12 @@ scope:
     record a foreign constructor produces."
   - "The Symbol.species accessor and the resolve, reject, withResolvers, and
     try statics with their receiver and capability semantics."
+  - "M5c node promise-feature-admission admits the Promise and
+    Promise.prototype.finally feature tags. The full manifest update
+    observes 29 of its 30 reviewed paths as passes. The rejected promise in
+    subclass-species-constructor-reject-count.js has no handler, so that
+    path stops at the unhandled-rejection checkpoint and stays unsupported
+    under node unhandled-rejection-observation."
 owners:
   - PLAN-M5.md
 evidence:

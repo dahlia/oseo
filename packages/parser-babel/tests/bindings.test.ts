@@ -1252,13 +1252,21 @@ test("reports duplicate exports as entry parse failures", () => {
   assert.match(result.diagnostics[0]?.message ?? "", /Duplicate export/u);
 });
 
-test("rejects var exports explicitly", () => {
+test("exports every name a module var statement binds", () => {
   const result = babelModuleFrontend.parseModule({
-    source: "export var value = 1;",
+    source: "export var value = 1, empty;",
     sourceId: "file:///app/export-var.js",
   });
-  assert.ok(!result.parsed);
-  assert.equal(result.diagnostics[0]?.code, "OSEO1001");
+  assert.deepEqual(result.diagnostics, []);
+  assert.deepEqual(
+    result.module?.exports.map((entry) =>
+      entry.kind === "local" ? [entry.exportedName, entry.localName] : [],
+    ),
+    [
+      ["value", "value"],
+      ["empty", "empty"],
+    ],
+  );
 });
 
 test("admits a multi-declarator lexical declaration list", () => {

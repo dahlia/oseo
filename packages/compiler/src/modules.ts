@@ -16,6 +16,13 @@ import type {
   SyntaxModule,
   SyntaxModuleSpecifier,
 } from "./syntax.ts";
+
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
+
 /** Retain each syntactic request once without merging distinct source sites. */
 function moduleSpecifiers(
   module: SyntaxModule,
@@ -23,7 +30,11 @@ function moduleSpecifiers(
   const specifiers: SyntaxModuleSpecifier[] = [];
   for (const entry of module.imports) specifiers.push(entry.specifier);
   for (const entry of module.exports) {
-    if (entry.kind === "indirect" || entry.kind === "star") {
+    if (
+      entry.kind === "indirect" ||
+      entry.kind === "namespace" ||
+      entry.kind === "star"
+    ) {
       specifiers.push(entry.specifier);
     }
   }
@@ -222,6 +233,12 @@ export interface LinkedModule {
   readonly componentId: number;
   readonly exports: readonly LinkedModuleExport[];
   readonly imports: readonly LinkedModuleImport[];
+  /**
+   * The cell holding this module's namespace object, present when an
+   * import or an `export * as` names that namespace. Every such reference
+   * shares the one cell, so namespace identity is per module.
+   */
+  readonly namespaceCellId?: number;
   readonly namespaceNames: readonly string[];
 }
 
@@ -500,6 +517,25 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
           cellId: cellFor(module.canonicalId, `*default:${index}*`),
           sourceModuleId: module.canonicalId,
         });
+      } else if (entry.kind === "namespace") {
+        // ResolveExport answers an `export * as` entry with the requested
+        // module's namespace directly, so it never waits on star
+        // resolution and no star export can shadow or make it ambiguous.
+        const targetId = resolvedModuleId(module, entry.specifier);
+        if (targetId == null || !nodes.has(targetId)) {
+          diagnostics.push(
+            linkDiagnostic(
+              module.canonicalId,
+              entry,
+              `Module '${entry.specifier.value}' was not resolved.`,
+            ),
+          );
+          continue;
+        }
+        moduleExports.set(entry.exportedName, {
+          cellId: namespaceCellFor(targetId),
+          sourceModuleId: targetId,
+        });
       }
     }
   }
@@ -526,7 +562,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
           const candidate =
             targetId == null || imported.importedName == null
               ? undefined
-              : imported.importedName === "*"
+              : imported.namespace === true
                 ? {
                     cellId: namespaceCellFor(targetId),
                     sourceModuleId: targetId,
@@ -637,7 +673,7 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
         );
         continue;
       }
-      if (entry.importedName === "*") {
+      if (entry.namespace === true) {
         imports.push({
           cellId: namespaceCellFor(targetId),
           importedName: "*",
@@ -703,6 +739,10 @@ export function linkModuleGraph(graph: ModuleGraph): ModuleLinkResult {
       componentId,
       exports,
       imports: linkedImports.get(module.canonicalId) ?? [],
+      ...includePropertiesWhen(() => {
+        const cellId = namespaceCells.get(module.canonicalId);
+        return cellId == null ? undefined : { namespaceCellId: cellId };
+      }),
       namespaceNames: exports.map((entry) => entry.exportedName),
     };
   });

@@ -473,6 +473,132 @@ export async function runNativeScenario2(
     }
   }
 
+  // Export var, `export * as`, and arbitrary string export names: var
+  // cells observed from a cycle before evaluation, namespace identity
+  // across import and re-export forms, the string name "*", and live
+  // reads through every alias, under forced collection.
+  const exportFormsEntry = [
+    root,
+    "tests/fixtures/module-export-forms/entry.mjs",
+  ].join("/");
+  const exportFormsReferences = [
+    await host.run({
+      args: [exportFormsEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", exportFormsEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of exportFormsReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeExportForms = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            exportFormsEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativeExportForms.exitStatus, 0, nativeExportForms.stderr);
+      assert.equal(nativeExportForms.stderr, "");
+      for (const reference of exportFormsReferences) {
+        assert.equal(
+          nativeExportForms.stdout,
+          reference.stdout,
+          `module export forms ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
+  // The key-order entry explains why it bypasses the reference hosts: V8
+  // lists a namespace's array-index export names first, where ECMA-262
+  // keeps the code-unit order of [[Exports]]. Bun 1.4.3 (JavaScriptCore)
+  // prints this expectation. Its for-in line is Oseo's choice rather than
+  // a requirement, because ECMA-262 leaves for-in order over a namespace
+  // unspecified.
+  const exportKeyOrderEntry = [
+    root,
+    "tests/fixtures/module-export-forms/key-order.mjs",
+  ].join("/");
+  const namespaceKeyList = [
+    "",
+    "01",
+    "10",
+    "2",
+    "4294967294",
+    "4294967295",
+    "increment",
+    "value",
+  ];
+  const namespaceKeys = JSON.stringify(namespaceKeyList);
+  const namespaceAllKeys = JSON.stringify([
+    ...namespaceKeyList,
+    "Symbol(Symbol.toStringTag)",
+  ]);
+  // A copy's ordinary result moves array-index keys first again.
+  const copiedKeys = JSON.stringify([
+    "2",
+    "10",
+    "4294967294",
+    "",
+    "01",
+    "4294967295",
+    "increment",
+    "value",
+  ]);
+  const exportKeyOrderOutput = [
+    `keys ${namespaceKeys}`,
+    `own names ${namespaceKeys}`,
+    `own keys ${namespaceAllKeys}`,
+    `proxy keys ${namespaceAllKeys}`,
+    `for-in ${namespaceKeys}`,
+    `entries ${namespaceKeys}`,
+    `assign order ${namespaceKeys}`,
+    `rest ${copiedKeys.replace(',"value"', "")}`,
+    `spread ${copiedKeys}`,
+    `ordinary ${copiedKeys}`,
+    "values 1 1 1 1 true true true",
+    "live 2 2 2 2",
+    "",
+  ].join("\n");
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeKeyOrder = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            exportKeyOrderEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativeKeyOrder.exitStatus, 0, nativeKeyOrder.stderr);
+      assert.equal(nativeKeyOrder.stderr, "");
+      assert.equal(
+        nativeKeyOrder.stdout,
+        exportKeyOrderOutput,
+        `module namespace key order ${specialization}`,
+      );
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   const createModuleEntry = [
     root,
     "tests/fixtures/object-create-module/entry.mjs",

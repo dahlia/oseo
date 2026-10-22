@@ -2,8 +2,36 @@ version: 1
 id: runtime-error-observation
 title: "Runtime negative error observation"
 scope:
+  - "A thrown value or rejection reason is a recognized intrinsic error
+    when the value itself, or an object on its stored prototype chain, is
+    one of the current context realm's intrinsic error prototypes; the
+    first such prototype reached gives its recognized kind, whatever realm
+    created the value. A current-realm intrinsic error prototype object
+    itself therefore matches."
+  - "The unhandled-throw report chooses among its paths in this order. A
+    pending host diagnostic, or a value that is neither recognized nor an
+    object, is reported as the stored diagnostic alone, with no identity
+    read and no marker. Otherwise a value that is not recognized reaches
+    the generic path only when the context's current diagnostic message,
+    which is distinct from any error object's `message` property, is the
+    unhandled-throw diagnostic. An explicit JavaScript `throw` completion
+    installs it, and so does runtime code that takes over a language
+    throw, such as an IteratorClose helper that closes an iterator after an
+    abrupt completion and rethrows the original value. An error the
+    runtime creates installs its native message as the current diagnostic,
+    but a later explicit `throw` or runtime rethrow of it can replace that
+    message. An object that is not recognized, such as an error a built-in
+    created in its own realm before the caller's realm was restored,
+    therefore takes the generic path once the current diagnostic is the
+    unhandled-throw diagnostic, and is reported as the stored diagnostic
+    alone, with no identity read and no marker, only while the current
+    diagnostic is still another message, such as that native message. A
+    recognized intrinsic error renders through the
+    `Error.prototype.toString` algorithm, applied directly rather than by
+    looking up or calling a `toString` method, and prints its recognized
+    kind marker."
   - "The owned diagnostic and machine-readable marker an unhandled thrown
-    value that is not an intrinsic error instance produces. The identity is
+    object on the generic path produces. The identity is
     the `name` of the value's `constructor`, read with ordinary property
     access, so a user error class such as the test262 harness
     `Test262Error` reports the only identity ECMAScript exposes for it. The
@@ -16,19 +44,21 @@ scope:
     there. Such a value, a value whose `constructor` or `name` lookup is
     abrupt or reaches a non-object or non-string, and a thrown primitive
     all keep the untyped-throw diagnostic and print no marker; the human
-    diagnostic and the marker of a value with no intrinsic error identity
-    therefore appear together or not at all. An intrinsic error instance
-    keeps its existing name-and-message rendering and its intrinsic kind
-    marker, which stay independent of the mutable `name` property."
+    diagnostic and the marker of a value that is not a recognized intrinsic
+    error therefore appear together or not at all. A recognized intrinsic
+    error keeps its existing name-and-message rendering and its recognized
+    kind marker, which is independent of the mutable `name` property; the
+    generic identity of an object on the generic path follows its mutable
+    `constructor`."
   - "The rendering applies to the unhandled-throw diagnostic only. An
     unhandled rejection is a separate reviewed host-policy boundary,
     reported by its own text rather than by the rejected value, so a
-    rejected value with no intrinsic error identity leaves that path
-    unchanged: the boundary text alone, with no identity read and no
-    marker. This node left a rejected intrinsic error instance with the
+    rejection reason that is not a recognized intrinsic error leaves that
+    path unchanged: the boundary text alone, with no identity read and no
+    marker. This node left a rejected recognized intrinsic error with the
     rendering and marker it already had, so it moved no reviewed row that
     classifies on the rejection boundary; M5b node globalthis-binding later
-    gave that instance the same boundary text while keeping its intrinsic
+    gave that reason the same boundary text while keeping its recognized
     kind marker."
   - "Reading the identity and converting the message run user JavaScript
     after the program's abrupt completion, so the throw or rejection site
@@ -78,8 +108,8 @@ evidence:
   standards:
     status: omitted
     reason: "The node has no inventory root and moves no reviewed row: the
-      reviewed corpus contains no runtime negative whose thrown value lacks
-      an intrinsic error identity. Its standards contract is the runner's
+      reviewed corpus contains no runtime negative whose thrown value is not
+      a recognized intrinsic error. Its standards contract is the runner's
       negative classification path, which is proved directly."
     replacements:
       - tests/test262-runner.test.ts

@@ -1047,11 +1047,10 @@ static OseoResult array_join(
     bool locale
 ) {
     OseoRootFrame frame = {NULL, NULL, 0u};
-    OseoResult result = oseo_roots_allocate(context, &frame, 6u);
+    OseoResult result = oseo_roots_allocate(context, &frame, 5u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
     frame.slots[0] = receiver;
     frame.slots[1] = builtin_argument(argument_count, arguments, 0u);
-    frame.slots[2] = builtin_argument(argument_count, arguments, 1u);
     result = oseo_internal_to_object(context, frame.slots[0]);
     frame.slots[0] = result.value;
     double length = 0.0;
@@ -1067,7 +1066,7 @@ static OseoResult array_join(
         } else {
             result = oseo_internal_value_string(context, frame.slots[1]);
         }
-        frame.slots[3] = result.value;
+        frame.slots[2] = result.value;
     }
     const OseoArrayStringAncestor *previous_string =
         context->array_string_stack;
@@ -1089,7 +1088,7 @@ static OseoResult array_join(
              index < length;
          index += 1.0) {
         if (index > 0.0) {
-            OseoString *separator = string_object(frame.slots[3]);
+            OseoString *separator = string_object(frame.slots[2]);
             result = array_string_append(
                 context,
                 &builder,
@@ -1099,42 +1098,46 @@ static OseoResult array_join(
             if (result.status != OSEO_STATUS_NORMAL) break;
         }
         result = oseo_property_key(context, oseo_number(index));
-        frame.slots[4] = result.value;
+        frame.slots[3] = result.value;
         if (result.status == OSEO_STATUS_NORMAL) {
             result = oseo_object_get(
                 context,
                 frame.slots[0],
-                frame.slots[4]
+                frame.slots[3]
             );
-            frame.slots[4] = result.value;
+            frame.slots[3] = result.value;
         }
         if (result.status != OSEO_STATUS_NORMAL) break;
-        if (is_nullish(frame.slots[4])) continue;
+        if (is_nullish(frame.slots[3])) continue;
         if (locale) {
             result = oseo_internal_ascii_string(context, "toLocaleString");
-            frame.slots[5] = result.value;
+            frame.slots[4] = result.value;
             if (result.status == OSEO_STATUS_NORMAL) {
                 result = oseo_object_get(
                     context,
-                    frame.slots[4],
-                    frame.slots[5]
+                    frame.slots[3],
+                    frame.slots[4]
                 );
-                frame.slots[5] = result.value;
+                frame.slots[4] = result.value;
             }
             if (result.status == OSEO_STATUS_NORMAL &&
-                !is_callable(frame.slots[5])) {
+                !is_callable(frame.slots[4])) {
                 result = type_error(
                     context,
                     "Element toLocaleString is not callable."
                 );
             }
+            /*
+             * ECMA-262 Invoke passes no arguments here; forwarding the
+             * outer locales and options is ECMA-402, outside the profile.
+             */
             if (result.status == OSEO_STATUS_NORMAL) {
                 result = oseo_call_function(
                     context,
-                    frame.slots[5],
                     frame.slots[4],
-                    2u,
-                    &frame.slots[1],
+                    frame.slots[3],
+                    0u,
+                    NULL,
                     oseo_undefined()
                 );
             }
@@ -1144,13 +1147,13 @@ static OseoResult array_join(
         } else {
             result = oseo_internal_array_join_element_string(
                 context,
-                frame.slots[4],
+                frame.slots[3],
                 frame.slots[0]
             );
         }
-        frame.slots[5] = result.value;
+        frame.slots[4] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
-        OseoString *element = string_object(frame.slots[5]);
+        OseoString *element = string_object(frame.slots[4]);
         result = array_string_append(
             context,
             &builder,

@@ -1571,7 +1571,9 @@ static OseoResult proxy_own_key_frame(
  * synthetic key this snapshot has to place; an array's `length` and a
  * function's `prototype` are permanently non-enumerable and the copy
  * would skip them anyway. A TypedArray's valid integer indices lead its
- * keys, as they do in the ordinary snapshot.
+ * keys, as they do in the ordinary snapshot. A module namespace keeps
+ * its export names in [[Exports]] order, integer-like names included,
+ * as it does in that snapshot.
  */
 static OseoResult snapshot_rest_keys(
     OseoContext *context,
@@ -1598,8 +1600,9 @@ static OseoResult snapshot_rest_keys(
         if (key.status != OSEO_STATUS_NORMAL) return key;
         frame->slots[3u + output] = key.value;
     }
+    bool index_keys_lead = !ordinary_object(source)->module_namespace;
     uint64_t previous = UINT64_MAX;
-    while (output < key_count) {
+    while (index_keys_lead && output < key_count) {
         OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
         size_t selected = SIZE_MAX;
         uint32_t selected_number = 0u;
@@ -1623,7 +1626,8 @@ static OseoResult snapshot_rest_keys(
         uint32_t ignored = 0u;
         OseoValue key = object->properties[index].key;
         if (is_symbol(key) ||
-            oseo_internal_array_index(key, &ignored)) continue;
+            (index_keys_lead &&
+             oseo_internal_array_index(key, &ignored))) continue;
         frame->slots[3u + output] = key;
         output += 1u;
     }
@@ -2286,7 +2290,10 @@ OseoResult oseo_object_builtin_get_own_property_descriptor(
  * OrdinaryOwnPropertyKeys (10.1.11.1) over the representations this
  * profile stores. Integer-index keys come first in ascending numeric
  * order, then the remaining string keys in creation order, then the
- * symbol keys in creation order.
+ * symbol keys in creation order. A module namespace's [[OwnPropertyKeys]]
+ * (10.4.6.11) instead lists every export name in the code-unit order its
+ * [[Exports]] list has, integer-like names included; the namespace is
+ * created with its exports in that order, so creation order is that list.
  *
  * Three own properties are not in the property vector: an array's
  * `length`, a function's `prototype`, and the untouched virtual
@@ -2318,8 +2325,9 @@ static OseoResult snapshot_own_keys(
         function_has_prototype_property(frame->slots[0]);
     bool virtual_string_iterator =
         ordinary_object(frame->slots[0])->virtual_string_iterator;
+    bool index_keys_lead = !ordinary_object(frame->slots[0])->module_namespace;
     uint64_t previous = UINT64_MAX;
-    while (output < key_count) {
+    while (index_keys_lead && output < key_count) {
         OseoOrdinaryObject *object = ordinary_object(frame->slots[0]);
         size_t selected = SIZE_MAX;
         uint32_t selected_number = 0u;
@@ -2362,7 +2370,8 @@ static OseoResult snapshot_own_keys(
         uint32_t ignored = 0u;
         OseoValue key = object->properties[index].key;
         if (is_symbol(key) ||
-            oseo_internal_array_index(key, &ignored)) continue;
+            (index_keys_lead &&
+             oseo_internal_array_index(key, &ignored))) continue;
         if (pending_prototype && string_rank == prototype_position) {
             frame->slots[3u + output] = frame->slots[2];
             output += 1u;

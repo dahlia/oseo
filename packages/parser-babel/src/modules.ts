@@ -27,6 +27,7 @@ import {
   moduleName,
   moduleSpecifier,
   patternNames,
+  rawPatternNames,
   statement,
   varScopedFunctionNames,
 } from "./convert.ts";
@@ -37,6 +38,12 @@ import {
   location,
   unsupported,
 } from "./locations.ts";
+
+function includePropertiesWhen<const Properties extends object>(
+  properties: () => Properties | undefined,
+): Properties | { [Key in keyof Properties]?: never } {
+  return properties() ?? {};
+}
 
 export function exportForDeclaration(
   declaration: SyntaxFunction | SyntaxStatement,
@@ -80,6 +87,32 @@ export function exportForDeclaration(
       range: declaration.range,
     },
   ];
+}
+
+/**
+ * Export every name a module `var` statement binds. ExportedNames of an
+ * ExportDeclaration is the BoundNames of its VariableStatement, which
+ * includes declarators without an initializer; the converted statement
+ * keeps only the assignments, so the names come from the Babel node.
+ */
+function exportForVarDeclaration(
+  context: ConvertContext,
+  declaration: BabelNode,
+): readonly SyntaxExportEntry[] {
+  const entries: SyntaxExportEntry[] = [];
+  for (const declarator of nodes(declaration.declarations)) {
+    const target = node(declarator.id);
+    if (target == null) continue;
+    for (const name of rawPatternNames(target)) {
+      entries.push({
+        ...location(context, declarator),
+        exportedName: name,
+        kind: "local",
+        localName: name,
+      });
+    }
+  }
+  return entries;
 }
 
 /** Convert static request metadata before it leaves the parser boundary. */
@@ -166,10 +199,12 @@ export function moduleProgram(
         const local = node(rawSpecifier.local);
         const localName = local == null ? undefined : identifierName(local);
         let importedName: string | undefined;
+        let namespace = false;
         if (rawSpecifier.type === "ImportDefaultSpecifier") {
           importedName = "default";
         } else if (rawSpecifier.type === "ImportNamespaceSpecifier") {
           importedName = "*";
+          namespace = true;
         } else if (rawSpecifier.type === "ImportSpecifier") {
           const imported = node(rawSpecifier.imported);
           importedName = imported == null ? undefined : moduleName(imported);
@@ -182,6 +217,9 @@ export function moduleProgram(
           ...location(context, rawSpecifier),
           importedName,
           localName,
+          ...includePropertiesWhen(() =>
+            namespace ? { namespace: true as const } : undefined,
+          ),
           specifier,
         });
       }
@@ -191,9 +229,20 @@ export function moduleProgram(
     if (item.type === "ExportAllDeclaration") {
       const specifier = attributedSpecifier(context, item);
       if (specifier == null) break;
-      if (item.exported != null) {
-        unsupported(context, item, "Namespace re-exports are outside M4.");
-        break;
+      const exported = node(item.exported);
+      if (exported != null) {
+        const exportedName = moduleName(exported);
+        if (exportedName == null) {
+          unsupported(context, item, "This export is unsupported.");
+          break;
+        }
+        exports.push({
+          ...location(context, item),
+          exportedName,
+          kind: "namespace",
+          specifier,
+        });
+        continue;
       }
       exports.push({ ...location(context, item), kind: "star", specifier });
       continue;
@@ -214,7 +263,11 @@ export function moduleProgram(
             ? functionDeclaration(context, declarationNode)
             : statement(context, declarationNode, false);
         if (converted == null) break;
-        const exportEntries = exportForDeclaration(converted);
+        const exportEntries =
+          declarationNode.type === "VariableDeclaration" &&
+          declarationNode.kind === "var"
+            ? exportForVarDeclaration(context, declarationNode)
+            : exportForDeclaration(converted);
         if (exportEntries == null) {
           unsupported(context, declarationNode, "This export is unsupported.");
           break;
@@ -245,6 +298,25 @@ export function moduleProgram(
             "Type-only exports are outside M4.",
           );
           break;
+        }
+        if (
+          rawSpecifier.type === "ExportNamespaceSpecifier" &&
+          specifier != null
+        ) {
+          const exported = node(rawSpecifier.exported);
+          const exportedName =
+            exported == null ? undefined : moduleName(exported);
+          if (exportedName == null) {
+            unsupported(context, rawSpecifier, "This export is unsupported.");
+            break;
+          }
+          exports.push({
+            ...location(context, item),
+            exportedName,
+            kind: "namespace",
+            specifier,
+          });
+          continue;
         }
         if (rawSpecifier.type !== "ExportSpecifier") {
           unsupported(context, rawSpecifier, "This export is unsupported.");
@@ -384,6 +456,9 @@ export function moduleProgram(
     imports,
     kind: "module",
     sourceId: context.input.sourceId,
+    varNames: hoisted.flatMap((declaration) =>
+      declaration.kind === "let" ? [declaration.name] : [],
+    ),
   };
 }
 

@@ -1182,8 +1182,15 @@ export interface SyntaxImportAttribute extends LocatedSyntax {
 /** One imported binding or side-effect-only dependency. */
 export interface SyntaxImportEntry extends LocatedSyntax {
   readonly byteRange: ByteRange;
-  readonly importedName: "*" | "default" | string | undefined;
+  /**
+   * The requested export name, or `"*"` for a namespace import. A string
+   * ModuleExportName may itself be `"*"`, so only `namespace` decides
+   * whether the entry imports the module namespace object.
+   */
+  readonly importedName: string | undefined;
   readonly localName: string | undefined;
+  /** Present only on an `import * as name` entry. */
+  readonly namespace?: true;
   readonly specifier: SyntaxModuleSpecifier;
 }
 
@@ -1198,6 +1205,15 @@ export type SyntaxExportEntry =
       readonly exportedName: string;
       readonly importedName: string;
       readonly kind: "indirect";
+      readonly specifier: SyntaxModuleSpecifier;
+    })
+  | (LocatedSyntax & {
+      /**
+       * `export * as name from "m"`, which exports the namespace object of
+       * the requested module under one explicit name.
+       */
+      readonly exportedName: string;
+      readonly kind: "namespace";
       readonly specifier: SyntaxModuleSpecifier;
     })
   | (LocatedSyntax & {
@@ -1217,6 +1233,14 @@ export interface SyntaxModule extends LocatedSyntax {
   readonly imports: readonly SyntaxImportEntry[];
   readonly kind: "module";
   readonly sourceId: string;
+  /**
+   * VarDeclaredNames of the module body that are not also function
+   * declarations. The frontend hoists each to a top-level `let` initialized
+   * to `undefined`; module compilation runs those initializers while
+   * linking, so a cyclic importer or a hoisted function reads `undefined`
+   * rather than a temporal dead zone before the module evaluates.
+   */
+  readonly varNames: readonly string[];
 }
 
 /** Production frontend output for owned module syntax. */

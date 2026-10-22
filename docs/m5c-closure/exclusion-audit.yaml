@@ -46,6 +46,25 @@ records:
       - Evidence that a normative section inside the claim depends on
         the excluded dynamic source family for behavior other than
         source evaluation reopens the boundary rather than this record.
+  0028-legacy-function-caller-boundary:
+    digest: 50e92d79e587a8ef27c5b641a0c8352ee02db689af822e3d62b89e832cf23338
+    authorization:
+      - The optional legacy caller extension is outside the M5 profile.
+      - This record authorizes an M5 exclusion of the expectation that
+        reading the `caller` property of a non-strict ordinary function
+        completes normally, and only for the exact 23 paths listed under
+        “Exact selector” below.
+    reopening:
+      - Evidence from target packages that caller introspection is
+        required reopens this boundary.
+      - A reviewed runtime design that supports a useful, bounded caller
+        contract at acceptable optimization and maintenance cost reopens
+        it.
+      - A later edition or a revised claim that makes the behavior required
+        reopens it.
+      - New source evidence that one of these paths mainly tests a
+        mandatory contract this boundary would leave uncovered reopens it
+        for that path.
 assessments:
   dynamic-construction:
     disposition: exclusion
@@ -228,6 +247,20 @@ assessments:
       private accessor coverage remediation owner until replacement
       evidence and the maintainer accounting decision, without
       authorizing a whole-path exclusion.
+  legacy-caller:
+    disposition: exclusion
+    normativeDependency: legacy-caller-only
+    reason: The test calls a non-strict ordinary function and requires a read
+      of its `caller` property, or of `arguments.callee.caller`, to complete
+      normally. The 16th edition requires no such own property; without
+      one, the read reaches the %ThrowTypeError% accessor that
+      AddRestrictedFunctionProperties installs on %Function.prototype% and
+      throws. ADR 0028 excludes only that optional expectation for its exact
+      selector. The prototype accessors, the clause 17.1 restrictions, and
+      the absence of an own `caller` on arguments objects stay inside the
+      claim with their own evidence or remediation owners. Any `eval` or
+      `Function` call is scaffolding for the caller relationship and stays
+      under ADR 0016, which owns none of these paths.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -592,6 +625,258 @@ paths:
     section: sec-finalization-registry-target
     subject: Default [[Prototype]] value derived from realm of the newTarget
     assessment: fixture-construction
+  - path: test/built-ins/Function/15.3.5.4_2-12gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "632ac7bd8f22855dcee5d592cff09c3f82eab43c23a2315f03609ca5f672\
+      fd22"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function from strict code (eval
+      includes strict directive prologue)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-14gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "b4f4a348c131786262f7478d148411c7f25e4c25a09b473b30f80395db6d\
+      723e"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function from strict code
+      (indirect eval includes strict directive prologue)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-75gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "343f52254406172b2537921c280c0161d37c1720eba6d1e1f90cf560ea98\
+      7eac"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict function declaration
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-76gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "1fa88b8b73c2654090331f897221dc945c0475a23a50453f869eeda861c8\
+      eca7"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict eval
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-77gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "06cf9ab8b27c0db1953dde1c5cda0c1e1afdbf38facadccda4e2842e4d8d\
+      fae2"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function constructor
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-78gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "9ee2fc634d8cb800564d33bdeebb0e2fb0a2499df2d24bc950dcedff2a7d\
+      0ad5"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict new'ed Function constructor
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-79gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "81d382f1473aadc6a3716d9c096855fb2d8ab731e63c7a350ac3bafa7f9f\
+      d5d4"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.apply()
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-80gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "58f549eb98f0fb2e1e3b10b07a72f2f1d638bc20926bf39847fca05479f0\
+      1140"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.apply(null)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-81gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "e2329aa7461e4ed2834bb4aad8846998b040ebdc58ad38386313020eef34\
+      68dd"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.apply(undefined)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-82gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "664c493a2c51a2fc89bb0136971da4291356bc45c7f807011827e748884d\
+      52de"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.apply(someObject)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-83gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "1473d0da02466095dd20cc92109d5ff82ea98765daa79854b4ec0935c41b\
+      905b"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.apply(globalObject)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-84gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "df3f15351570797761adb50218e2b142d7f5778c19e65952d8affc523719\
+      7f4d"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.call()
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-85gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "25821254b7ddd0bedab132d2d96ed9c5111101070e16e419b1b8dd9c29f7\
+      7466"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.call(null)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-86gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "450a408abad36c99b4b94793ba778ed51ffcfeac6aa0a29e57073aec4cad\
+      fa4f"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.call(undefined)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-87gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "019575dff25bd219154596d76d2d532c29b0d66324e41c4ae71b35d3821e\
+      0a73"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.call(someObject)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-88gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "eac21d4e1a0d9a3aff969a19c4f581bcdc369b1fc1df66fce72f73180d4e\
+      44cd"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.call(globalObject)
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-89gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "050beeddbe7330ea35e89e2043dfe7c47ad747135843434d7cbaab876d92\
+      bbc1"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.bind()()
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-90gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "0e5c0ee9df6bdefd77c7d2a23a065ee1c60fd4f074f7d89cedc370dafc96\
+      799c"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.bind(null)()
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-91gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "8cc5c2884bff29bddb849e61e1195234d9f1dcefeacca6d480f93232c78e\
+      73bf"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.bind(undefined)()
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-92gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "9316d0bd80464c4517fff5b60a92532cb8a147069f82b3126b9640c2d34f\
+      f3cb"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.bind(someObject)()
+    assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-93gs.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "3afa7d90eb85b6459546248809ca8105e458a1891a8a2e32e21906edc0b8\
+      c986"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy caller read of a non-strict function through a non-strict
+      function called by strict Function.prototype.bind(globalObject)()
+    assessment: legacy-caller
   - path: test/built-ins/Function/S15.3_A2_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -2444,6 +2729,30 @@ paths:
       assignment to arguments inside a function that the eval source declares is
       an early SyntaxError"
     assessment: "eval-semantics"
+  - path: test/language/arguments-object/10.6-13-a-2.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "a1652eb684ba72d55c198e2f1a793d30c84f79598b6ea6ae567ef31dca19\
+      b8d1"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy arguments.callee.caller read and direct call from a
+      non-strict function
+    assessment: legacy-caller
+  - path: test/language/arguments-object/10.6-13-a-3.js
+    proposedOwner: adr:0028-legacy-function-caller-boundary
+    priorCohort: legacy-caller
+    sourceDigest: "10e77d9b81fb1fa8f69157a34543638db8595f0198c47a5df05f90145113\
+      9d54"
+    observationDigest: "3bda488ea766d849865209317f23bf836cb18ca66b3f8e3747a37f4\
+      5020b9970"
+    missingDynamicTag: false
+    section: sec-forbidden-extensions
+    subject: Legacy arguments.callee.caller read and indirect call from a
+      non-strict function
+    assessment: legacy-caller
   - path: "test/language/block-scope/leave/outermost-binding-updated-in-catch-b\
       lock-nested-block-let-declaration-unseen-outside-of-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

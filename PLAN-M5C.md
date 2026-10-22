@@ -216,9 +216,10 @@ records every proposed path's normalized observation digest, source digest,
 normative section, subject, prior cohort, and boundary assessment. Shared
 assessments explain the same contract for each listed member. The record
 entries quote the authorization and applicable reopening triggers from accepted
-ADRs 0013, 0016, and 0019. ADR 0020 fixes the denominator and authorizes no new
-exclusion; ADR 0026 demonstrates ahead-of-time host adaptation without
-authorizing exclusions of other harness capabilities.
+ADRs 0013, 0016, and 0019, and from ADR 0028 since the
+`function-caller-restrictions` node. ADR 0020 fixes the denominator and
+authorizes no new exclusion; ADR 0026 demonstrates ahead-of-time host
+adaptation without authorizing exclusions of other harness capabilities.
 
 `mise run check:m5c-exclusion-audit`, included by `mise run check`, rejects
 missing assessments for ADR owners, unaccepted or changed records, stale
@@ -430,6 +431,77 @@ through `import()`; static JSON identity stays inside the claim. The paths stay
 in the inventory, never count as passes, and reopen when an accepted ADR 0016
 amendment admits any form of dynamic import. It does not widen the existing
 dynamic-source remediation reservation.
+
+
+Module export forms
+-------------------
+
+The `module-export-forms` node admits `export var`, `export * as name`,
+and arbitrary module namespace names, which owned 28 reviewed paths: 15
+gated by `arbitrary-module-namespace-names`, 7 by
+`export-star-as-namespace-from-module`, and 6 whose fixtures used
+`export var` and reported `This export is unsupported.` Eleven of the 28
+are expected parse-phase negatives: two duplicate export names, six lone
+surrogates, one string local name without `from`, and two missing
+semicolons after a star export. They test early errors, not a missing
+capability. Five of the six lone-surrogate cases reject at the ill-formed
+string itself: *early-export-ill-formed-string.js* at its first export
+alias, `Moon as "\uD83C"` (`OSEO0001` at 96:17),
+*export-expname-unpaired-surrogate.js* at a local export alias,
+*export-expname-from-unpaired-surrogate.js* and
+*export-expname-from-as-unpaired-surrogate.js* at a re-export specifier name,
+and *export-expname-import-unpaired-surrogate.js* at an import specifier name.
+The sixth, *export-expname-from-star-unpaired-surrogate.js*, spells the star
+as the string `"*"`, which ExportFromClause does not accept. Its observed
+`OSEO0001` points at that quoted star, before the surrogate is read, so the
+case proves only that earlier syntax rejection; it is still a correct
+expected negative. The ill-formed name in `export * as "\uD83D" from` is
+covered instead by a structural case in
+*packages/parser-babel/tests/module-export-forms.test.ts*, beside a
+well-formed surrogate pair that parses as a namespace export name. The test
+source states that parser rule. The author's Node.js and Deno outputs list
+its nine cases passing but record no source commit, so they are not bound
+to a commit here; neither they nor the test source is a test262 observation
+or a native execution.
+ADR 0009 records the linking contract. Admitting `export var` required
+creating every module `var` cell while linking, because the previous
+evaluator-time initialization let a cyclic importer observe a temporal dead
+zone where ECMA-262 gives `undefined`. The 13 unreviewed paths that also
+need these features stay with `observation-batch-32`. The full manifest
+update that the coordinator's log records as reading the clean source
+`05ba44c9` observed the 11 negatives as expected negatives and the other 17
+paths as passes; its own run record names no commit. The full update at
+source `4c18c04b`, which corrected the runtime header comment and added the
+parser test cases, and whose pre-start record binds that clean commit and
+its tree, observed every record again and changed none.
+
+*packages/testkit/tests/module-graph.property.test.ts* checks generated
+graphs of local, indirect, namespace, and star exports with string names,
+including `"*"`, `"default"`, and the empty string, against an independent
+transcription of ResolveExport and GetExportedNames. Structural tests in
+*packages/parser-babel/tests/module-export-forms.test.ts* fix the module
+records, namespace identity, ambiguity, and link-time var initialization.
+The native module scenario in *tests/native/scenarios/shard-2.ts* compares
+*tests/fixtures/module-export-forms/* with Node.js and Deno under both
+specialization policies and forced collection.
+
+A namespace's [[OwnPropertyKeys]] returns its sorted export names, so the
+array-index names `"10"` and `"2"` follow `""` and precede ordinary names
+in code-unit order. The runtime own-key, CopyDataProperties, and for-in
+snapshots keep that order for a namespace and still move array-index keys
+first for every other object. V8, and so both reference hosts, lists a
+namespace's array-index names first, while Bun 1.4.3 (JavaScriptCore)
+follows ECMA-262. The scenario therefore checks
+*tests/fixtures/module-export-forms/key-order.mjs* against an explicit
+expectation rather than a reference host. Its `Object.keys`,
+`Object.getOwnPropertyNames`, `Reflect.ownKeys`, Proxy, `Object.entries`,
+and `Object.assign` lines are required by ECMA-262. Its for-in line is not:
+ECMA-262 2025 section 14.7.5.9 leaves the enumeration order of a module
+namespace exotic object unspecified, so that line fixes the order Oseo
+chooses, [[OwnPropertyKeys]] order, and V8's different order there is not
+a conformance failure. A spread or rest copy rebuilds an ordinary object,
+so only the `Object.assign` line observes copy order directly. The generated
+ResolveExport model also draws `"10"` and `"2"`.
 
 
 Work graph construction
@@ -780,3 +852,51 @@ stderr, and admits them with their unchanged `classes` dependency tag. Their
 `annex-b-legacy-lookup` audit rows and ledger entries name the
 `node:class-private-accessor-lookup-coverage-remediation` owner, and no
 whole-path exclusion is recorded.
+
+
+Legacy function caller boundary
+-------------------------------
+
+The `function-caller-restrictions` node accounts for exactly the 23 paths
+with the `caller` frontmatter feature, all in the fixed inventory and
+previously selected by observation batch 32. They are `noStrict` tests that
+need a read of a non-strict ordinary function's `caller`, directly or as
+`arguments.callee.caller`, to complete normally. That is the optional legacy
+extension restricted by ECMA-262 clause 17.1, not the strict-function
+restriction the node's original premise described.
+
+The maintainer approved
+[ADR 0028](./docs/adr/0028-legacy-function-caller-boundary.md) on 2026-10-20.
+M5 keeps the standard %ThrowTypeError% `caller` and `arguments` accessors on
+%Function.prototype% and adds neither stack introspection nor a constant own
+`caller` property. The record authorizes an M5 exclusion of the optional
+expectation for its exact selector only. The `caller` feature stays out of
+the checked-in `supportedFeatures`, so the paths keep their frontmatter
+rejection. The %Function.prototype% accessor descriptors, the clause 17.1
+restrictions on other function kinds and strict functions, and the absence of
+an own `caller` property on arguments objects stay inside the claim. So do
+the other 76 _test/built-ins/Function/15.3.5.4\_2-\*gs.js_ paths, which keep
+their observation batch.
+
+The node adds the 23 paths to the reviewed subset as
+`unsupported-profile-feature` with existing ADR 0013 tags: `functions` on
+every path, `dynamic-source` on the five that call `eval` or a
+source-compiling `Function` form, and `object-properties` on the two
+arguments tests. The dependency and classification vocabularies, the
+inventory policy, and the manifest schema are unchanged. Regeneration through
+the normal tools supplies the result records, the observation-batch counts,
+and the graph baseline. The node then assigns the ledger owner
+`adr:0028-legacy-function-caller-boundary` with a note that bounds its
+surface. Coverage reports count these 23 exclusions separately from passes
+and from remediation-owned unsupported results, against the 41,091-path
+denominator.
+
+The exclusion audit records each path under the `legacy-caller` assessment.
+`mise run check:m5c-exclusion-audit` accepts the ADR 0028 owner only for a
+selector path whose observation is the exact frontmatter rejection with
+`caller` as the only unsupported feature, whose case has the `noStrict`
+flag, and whose source reads a `caller` member. A selector path can use no
+other ADR owner, and every reviewed selector path needs its audit row. The
+five dynamic-source intersections do not broaden ADR 0016 and are not owned
+by it. A later observation that reaches their dynamic-source rejection, or
+that admits the `caller` feature, needs a new reviewed scope decision.

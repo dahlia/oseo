@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-25,437 reviewed cases: 21,677 passes, 2,205 expected negatives, and 1,555
+28,311 reviewed cases: 24,069 passes, 2,581 expected negatives, and 1,661
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -28,7 +28,7 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a and M5b are complete. The 143 indexed records in the normative
+M5a and M5b are complete. The 146 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
@@ -3439,11 +3439,17 @@ literal method needs the M5b `Object.prototype`. A statically unresolved
 ordinary read or strict unresolved write needs the M5b global binding model
 to distinguish absent names from the realm's standard and mutable global
 properties; this includes the reviewed block- and switch-scope cases that
-expect a runtime `ReferenceError`. `import.meta`, `export var`, namespace
-re-exports such as `export * as ns from "./module.js"`, and module top-level
-pattern-position `await` remain with the modules and asynchronous execution
-stream. TypeScript-only syntax is outside the ECMA-262 claim, and dynamic
-source remains owned by ADR 0016.
+expect a runtime `ReferenceError`. At that audit, `import.meta`, `export var`,
+namespace re-exports such as `export * as ns from "./module.js"`, and module
+top-level pattern-position `await` remained with the modules and asynchronous
+execution stream. M5c later admits the first three: node `import-meta` admits
+`import.meta` in Module code, and node `module-export-forms` admits
+`export var` and `export * as` namespace re-exports, as the import.meta
+section below and the Module export forms section of
+[*PLAN-M5C.md*](./PLAN-M5C.md) record. Pattern-position `await` is still
+rejected and is owned by node `module-top-level-await-patterns`.
+TypeScript-only syntax is outside the ECMA-262 claim, and dynamic source
+remains owned by ADR 0016.
 
 At Unit 8.5n, the audit therefore kept the M5a checkpoint open for the
 separate optional private read and call evidence unit without changing the
@@ -4222,10 +4228,10 @@ FlattenIntoArray skips holes, maps before testing the mapped value for Array
 flattening, and applies the requested recursive depth. Cyclic or unbounded
 input reaches the deterministic runtime call-depth boundary rather than the
 native stack. `join` converts its separator after length and safely renders
-nested Arrays. `toLocaleString` calls each non-nullish element method with the
-element as receiver, forwards the outer locales and options as exactly two
-arguments, and coerces its result. Omitted outer arguments are forwarded as two
-`undefined` values. During element conversion, re-entry through `join`,
+nested Arrays. Until M5c, `toLocaleString` called each non-nullish element
+method with the element as receiver and forwarded the outer locales and options
+as exactly two arguments, two `undefined` values when they were omitted; it
+coerces the method's result. During element conversion, re-entry through `join`,
 `toString`, or `toLocaleString` on the same active receiver renders an empty
 string. Matching Node.js and Deno, these methods and ordinary string conversion
 that reaches intrinsic Array `toString` reject lengths above `2**32 - 1` with
@@ -4239,21 +4245,59 @@ allocation, collector roots, and recursion state with the Array intrinsic.
 Fixed native and generated differential evidence at seed `0x60004700` covers
 both specialization policies, forced collection at every safepoint, sparse and
 generic receivers, side-effect order, spreadability, every species guard hit
-and miss, custom results, recursion and cycles, locale argument forwarding,
+and miss, custom results, recursion and cycles, locale element calls,
 locale coercion, cyclic locale conversion, oversized-length rejection,
 large-length index access ordering, abrupt completion, false hints, deliberate
 shape-guard misses, and generic fallback. Of the 229 paths under the node's
 seven inventory roots, 228 are reviewed: 181 pass and 47 retain explicit
 prerequisite boundaries. The pinned *invoke-element-tolocalestring.js* case
-asserts the non-ECMA-402 fallback's zero-argument call and is omitted because
-this method follows the ECMA-402 superseding call contract; the fixed
-differential fixture replaces its element-call evidence. No new path outside
+asserts the non-ECMA-402 fallback's zero-argument call and was omitted because
+this method then followed the ECMA-402 superseding call contract; the fixed
+differential fixture replaced its element-call evidence. No new path outside
 those roots is added. Two already-reviewed cases outside the roots move from
 unsupported to pass because they exercise the newly admitted `toString` and
 generic `slice` behavior. The manifest moves to 11,015 paths with 8,073 passes,
 1,364 expected negatives, and 1,578 unsupported profile features. The admitted
 runtime checkpoint moves the runtime ABI to `oseo-runtime-m5-69` without adding
 a generated-code entry point or changing the graph's orchestration state.
+
+M5c node `array-tolocalestring-arguments` supersedes that forwarding
+account. ECMA-262 2025 `Array.prototype.toLocaleString` invokes each element's
+`toLocaleString` with no arguments, and ADR 0013 excludes the ECMA-402
+replacement that forwards the outer locales and options. `toLocaleString`
+therefore calls each non-nullish element's current method with the element as
+its receiver and no arguments, whatever the outer call received. Holes,
+`undefined`, and `null` still render empty fields without a call, and receiver
+conversion, length, callability, result coercion, abrupt completion, and
+re-entry are unchanged. The implementation-defined list separator that
+ECMA-262 lets this method choose is the one-code-unit String `","`, U+002C
+COMMA. `%TypedArray.prototype%.toLocaleString` is separate
+code, which M5c node `typed-array-tolocalestring-arguments` already made pass no
+arguments. Node.js 24.21.0 and Deno 2.9.7 implement ECMA-402, so their element
+methods always receive the outer call's first two arguments, `undefined` when
+absent. Both also read a hole of an Array receiver as an empty string and
+invoke `String.prototype.toLocaleString` on it. The differential fixture
+therefore no longer prints element arguments. Fixed and generated cases in the
+copying property suite instead require both references to equal a labeled V8
+model that differs only in those two respects, and native output to equal the
+ECMA-262 model, under both specialization policies with collection at every
+safepoint. The fixed program covers every argument shape of the pinned upstream
+case plus a `null` locale with numeric options, through a method call, `call`,
+and `apply`, on Array and ordinary array-like receivers. Its elements are
+holes, `undefined`, `null`, own, inherited, accessor, coercing, throwing, and
+non-callable methods, number and string primitives reaching strict prototype
+methods, and nested Arrays. The generated domain at seed `0x60004701` draws one
+to three such calls in ten ordinary cases. The repair adds no specialized path
+or guard, so the guard-fallback evidence is unchanged. The unchanged upstream
+*invoke-element-tolocalestring.js* path passes in all four variants of the
+focused observation at source `28d30410` and is admitted. The full manifest
+update that the coordinator's log records as reading the clean source
+`05ba44c9` also observed it passing in all four variants, with the root's
+other eleven reviewed paths keeping their classifications; its own run record
+names no commit. The later full update at source `4c18c04b`, whose pre-start
+record binds that clean commit and its tree, observed every record again,
+these twelve included, and changed none. No layout, intrinsic, helper, or
+entry point changes, so the runtime ABI is unchanged.
 
 Implemented M5b node `map-intrinsic` completes the realm-owned `%Map%`
 constructor together with SameValueZero-keyed `[[MapData]]` storage,
@@ -5430,18 +5474,24 @@ paths under the two inventory roots are accounted for and 192 are reviewed:
 unhandled-rejection policy, three need `Object.getOwnPropertyNames`, two need
 `Reflect.construct`, and two call dynamic `eval`. Three String-iteration cases
 stay outside this node for the separate `string-iterator` owner, and three
-typed-unhandled-rejection cases stay outside the reviewed subset because the
-current host policy cannot distinguish their rejection from an unhandled
-throw. No previously reviewed path loses a pass. The manifest moves from
-16,269 to 16,461 paths and from 12,599 to 12,779 passes, keeps 1,556 expected
-negatives, and moves from 2,114 to 2,126 unsupported profile features, with
-no failures. The property ratchet moves from 121 to 122 domains and seeds and
-from 5,344 to 5,356 ordinary cases. The reviewed test262 revision,
-41,091-path applicable inventory, ADR 0013 schema and vocabulary, inventory
-policy, and zero-override policy are unchanged. The checkpoint moves the
-runtime ABI to `oseo-runtime-m5-90` and allocates two code IDs inside the
-existing Promise range without adding a generated-code entry point or
-changing the graph's orchestration state.
+typed-unhandled-rejection cases stayed outside the reviewed subset because the
+host policy at this node could not distinguish their rejection from an
+unhandled throw: *Promise/allSettled/invoke-resolve-error-close.js*,
+*Promise/any/ctx-ctor.js*, and *Promise/any/returns-promise.js*. The M5b
+`globalthis-binding` node later gave a rejected recognized intrinsic error the
+rejection boundary text, as recorded below. That dated cause is not their
+current gate: the closure ledger assigns the three, unreviewed, to node
+`observation-batch-01`, and no observation of them is recorded since. No
+previously reviewed path loses a pass. The manifest moves from 16,269 to 16,461
+paths and from 12,599 to 12,779 passes, keeps 1,556 expected negatives, and
+moves from 2,114 to 2,126 unsupported profile features, with no failures. The
+property ratchet moves from 121 to 122 domains and seeds and from 5,344 to
+5,356 ordinary cases. The reviewed test262 revision, 41,091-path applicable
+inventory, ADR 0013 schema and vocabulary, inventory policy, and zero-override
+policy are unchanged. The checkpoint moves the runtime ABI to
+`oseo-runtime-m5-90` and allocates two code IDs inside the existing Promise
+range without adding a generated-code entry point or changing the graph's
+orchestration state.
 
 Implemented M5b node `iterator-helpers-lazy` gives the realm-owned
 `%IteratorPrototype%` ordinary `map`, `filter`, `take`, `drop`, and `flatMap`
@@ -5895,7 +5945,7 @@ applicable inventory, ADR 0013 vocabulary, inventory policy, forced-collection
 policy, and zero-override policy are unchanged.
 
 Implemented M5b node `runtime-error-observation` gives an unhandled thrown
-value that is not an intrinsic error instance a rendered identity and
+object that reaches the generic path described below a rendered identity and
 message. The identity is the `name` of the value's `constructor`, read with
 ordinary property access, which is the only identity ECMAScript gives a user
 error class such as the test262 harness `Test262Error`. The message is the
@@ -5905,14 +5955,49 @@ alone when no message text renders, and the stable `OSEO_THROWN` marker line
 reports the same identity, so the test262 runner reads an observed negative
 type where it previously saw none.
 
+A thrown value or rejection reason is a recognized intrinsic error when the
+value itself, or an object on its stored prototype chain, is one of the
+current context realm's intrinsic error prototypes; the first such prototype
+reached gives its recognized kind, as `error_instance_kind` computes it. A
+current-realm intrinsic error prototype object itself therefore matches, and
+an error created in another realm matches only when its chain reaches one.
+
+`oseo_context_print_thrown` chooses among the report's paths in this order. A
+pending host diagnostic, or a value that is neither recognized nor an object,
+is reported as the stored diagnostic alone, with no identity read and no
+marker. Otherwise a value that is not recognized reaches the generic path only
+when the context's current diagnostic message is the unhandled-throw diagnostic
+(`OSEO_UNHANDLED_THROW_MESSAGE`). That message belongs to the context, not to
+the thrown value, and is distinct from any error object's `message` property.
+`oseo_context_clear_language_error` installs it. The C backend emits that call
+for every explicit JavaScript `throw` completion, and runtime code calls it too
+after it takes over a language throw, as the IteratorClose helpers do before
+they close an iterator after an abrupt completion and rethrow the original
+value. `oseo_internal_throw_error` installs the native message of the error it
+creates as the current diagnostic, but a later explicit `throw` or runtime
+rethrow of that error can replace it with the unhandled-throw diagnostic. The
+report therefore depends on the diagnostic current when the value reaches it,
+not on where the value was created: an object that is not recognized, such as
+an error a built-in created in its own realm before the caller's realm was
+restored, takes the generic path once the current diagnostic is the
+unhandled-throw diagnostic, and is reported as the stored diagnostic alone,
+with no identity read and no marker, only while the current diagnostic is still
+another message, such as the native message `oseo_internal_throw_error`
+installed. A recognized intrinsic error that is not a rejection reason renders
+through the `Error.prototype.toString` algorithm, which
+`oseo_internal_error_to_string` applies directly rather than by looking up or
+calling a `toString` method, and prints its recognized kind marker.
+
 The marker is one whitespace-free token on its own line, so an identity
 outside the ASCII identifier shape has no representation there. Such a value,
 a value whose `constructor` or `name` lookup is abrupt or reaches a non-object
 or a non-string, and a thrown primitive all keep the untyped-throw diagnostic
 and print no marker; the human diagnostic and the marker of an unidentified
-value therefore appear together or not at all. An intrinsic error instance
-keeps its existing name-and-message rendering and its intrinsic kind marker,
-both independent of the mutable `name` property. Reading the identity and
+value therefore appear together or not at all. A recognized intrinsic error
+keeps its existing name-and-message rendering and its recognized kind marker,
+and that marker is independent of the mutable `name` property; the generic
+identity of an object on the generic path follows its mutable `constructor`.
+Reading the identity and
 converting the message run user JavaScript after the program has already
 completed abruptly, so the throw or rejection site is restored around them
 and the thrown value stays collector-rooted. Neither nested completion
@@ -5922,10 +6007,11 @@ diagnostic and prints no marker, while an abrupt message read or conversion
 keeps the identity already established and renders it alone. The rendering
 applies to the unhandled-throw diagnostic only. An unhandled rejection is a
 separate reviewed host-policy boundary, reported by its own text rather than
-by the rejected value, so a rejected value with no intrinsic error identity
-leaves that path byte-identical to what it was before this node: the
-boundary text alone, with no identity read and no marker. A rejected
-intrinsic error instance keeps the rendering and marker it already had. The
+by the rejected value, so a rejection reason that is not a recognized
+intrinsic error leaves that path byte-identical to what it was before this
+node: the boundary text alone, with no identity read and no marker. At this
+node, a rejected recognized intrinsic error kept the rendering and marker it
+already had. The
 fifteen reviewed Promise combinator rows that classify on that boundary
 therefore keep their recorded classification.
 
@@ -6671,8 +6757,10 @@ invalidated matches `undefined`, while `indexOf` and `lastIndexOf` skip an
 index HasProperty no longer reports and compare with strict equality. `join`
 converts its separator after the snapshot and renders an invalidated index as
 an empty field, and `toLocaleString` invokes each element's current method
-with the outer locales and options, as the Array method does under the
-ECMA-402 call contract. Both stringifiers share Array stringification's
+with the outer locales and options under the ECMA-402 call contract, as the
+Array method then did. M5c nodes `typed-array-tolocalestring-arguments` and
+`array-tolocalestring-arguments` later made both methods pass no arguments, as
+ECMA-262 2025 requires. Both stringifiers share Array stringification's
 active-receiver stack, so a re-entrant conversion of the same view renders an
 empty string. The methods take nine code IDs in the existing TypedArray range
 and add no realm intrinsic slot, heap kind, component, or generated-code entry
@@ -7115,9 +7203,11 @@ parsed syntax, never source text: a name inside a comment or string, a
 property key, a `typeof` operand, a name inside a `with` body, whose object
 may provide it, and a name the case declares itself never withhold execution.
 The reviewed *regExpUtils.js* still omits `buildString` and
-`testPropertyEscapes`. An unhandled rejection whose reason is an intrinsic
-error instance now reports the rejection boundary text and keeps its kind
-marker, so *Promise/race/invoke-resolve-error-close.js* classifies with the
+`testPropertyEscapes`. An unhandled rejection now reports the rejection
+boundary text, followed by a kind marker only when the reason itself or an
+object on its stored prototype chain is one of the current context realm's
+intrinsic error prototypes, the first one reached giving the kind, so
+*Promise/race/invoke-resolve-error-close.js* classifies with the
 existing `unhandled-rejection-policy` capability exactly like its *Promise/all*
 sibling.
 
@@ -8314,3 +8404,68 @@ observation-batch-32 keeps their first admission, so no subset row is added.
 The two reviewed assignment target rows that spell `import.meta` without the
 feature tag are Script code and stay expected negative. `supportedFeatures`
 changes, so publication needs a complete manifest update.
+
+
+Promise feature admission
+-------------------------
+
+M5c node `promise-feature-admission` adds `Promise` and
+`Promise.prototype.finally` to the reviewed subset's `supportedFeatures`.
+`unsupported-ownership-audit` assigned the node 30 reviewed paths whose only
+unadmitted frontmatter features are those tags: 29 under
+*test/built-ins/Promise/prototype/finally/* and
+*test/built-ins/Object/prototype/toString/symbol-tag-promise-builtin.js*.
+Their includes, *isConstructor.js*, *propertyHelper.js*, and
+*promiseHelper.js*, are reviewed harness files, and their other tags are
+already admitted. The two *subclass-Promise.js* paths under
+*test/language/expressions/class/subclass-builtins/* and
+*test/language/statements/class/subclass-builtins/* carry the `Promise` tag
+too. They remain unreviewed and owned by node `observation-batch-32`.
+
+The implementation is the existing `promise-intrinsic` family's `finally`.
+Reading the 30 bodies against it found one defect. ECMA-262 2025 27.2.5.3
+ends both `thenFinally` and `catchFinally` with
+`Invoke(p, "then", « thunk »)`, and
+*rejected-observable-then-calls-argument.js* asserts that this call receives
+one argument. The runtime passed a trailing `undefined`. The repair adds a
+counted Invoke helper. The two closures use it with one argument, and every
+other caller keeps the two-argument form.
+
+The family record keeps its evidence classes. The fixed `promise-intrinsic`
+native differential fixture now counts the `then` arguments of `finally`
+itself (two) and of both inner closures (one), on the fulfilled and rejected
+paths. Node.js and Deno print the expected counts. The fixture runs under both
+specialization policies with collection forced at every safepoint. Its false
+hint and shape-guard miss already reach the generic fallback. The same
+fixture carries the fixed `finally` passthrough evidence: a fulfilled 17 and
+a rejected `Error` reach the next reaction unchanged, and a callback that
+returns a promise keeps the original fulfilled 19 or rejected 20. The
+generated domain at seed `0x60003800` keeps its generator and budget. Its
+chain ends in `finally` on a promise fulfilled with `undefined` and only logs
+that the callback ran, so it covers callback execution, not value or reason
+passthrough. The node adds no domain or seed, because a counted `then` adds no
+input shape for a generator to vary.
+
+Preparation ran neither the native fixture nor the test262 observation of
+the 30 paths, so their classifications in *tests/test262/subset.yaml* stayed
+`unsupported-profile-feature` and this section recorded no pass count until a
+full `mise run test262:update -- --accept-promotions` observed them. No
+native run of the fixture is recorded for this node, at its preparation
+commit `938b3105`, which the SourceA integration history carries as its
+replay `014f2518`, or since; the counts above are the Node.js and Deno
+reference outputs.
+
+The full manifest update that the coordinator's log records as reading the
+clean source `05ba44c9` (tree `6342c190`) then observed the 30 paths; its own
+run record names no commit.
+Twenty-nine move from unsupported to pass, including
+*rejected-observable-then-calls-argument.js*.
+*subclass-species-constructor-reject-count.js* now executes and stays
+`unsupported-profile-feature`: no handler is attached to its rejected
+promise, so the native host stops at the unhandled-rejection checkpoint with
+`OSEO2001` and records the `unhandled-rejection-policy` capability. Node
+`unhandled-rejection-observation`, which owns that capability, now owns the
+path and 20 in all. It is neither a pass nor an exclusion, and this node
+changes no host rejection policy. The later full update at source
+`4c18c04b`, whose pre-start record binds that clean commit and its tree,
+observed every record again, these 30 included, and changed none.

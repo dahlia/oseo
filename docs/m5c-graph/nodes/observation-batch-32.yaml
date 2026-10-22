@@ -1,9 +1,9 @@
 version: 1
 id: observation-batch-32
 title: Observe the small prerequisite sets
-delivers: "Observes the 222 remaining unreviewed paths that
+delivers: "Observes the 199 remaining unreviewed paths that
   docs/m5c-closure/observation-batches.yaml selects for observation-batch-32
-  (214 review units, after cross-realm-host, dynamic-import,
+  (191 review units, after cross-realm-host, dynamic-import,
   fn-global-object-harness, frontmatter-feature-tags,
   function-caller-restrictions, hashbang-comments, import-attributes,
   import-meta, minor-feature-tag-admission, module-export-forms,

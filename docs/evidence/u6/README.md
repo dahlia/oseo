@@ -251,6 +251,38 @@ early-error family from an October 12, 2026 local Linux extended run. Run
 estimate and the reasoning that produced those values is superseded. Their
 history is in this file's Git log.
 
+M5c node `array-tolocalestring-arguments` adds fixed and generated locale
+argument tests to *tests/property/m5-array-prototype-copying.property.test.ts*.
+A local Linux whole-file extended run on 2026-10-22 at source `28d30410`
+(tree `5777b8cb`) naturally exited zero with all four registrations passing
+and none skipped. Their printed leaf durations were 162,487.199058,
+0.866493, 15,456.485224, and 154,482.44049 milliseconds, for the existing
+generated domain at seed `0x60004700`, the locale model unit test, the fixed
+locale case, and the new generated locale domain at seed `0x60004701`. The
+sum is 332,426.991265 milliseconds; rounding its seconds up gives the Linux
+weight of 333. Build-tool durations are excluded. This is one local
+case-duration sum, not a native CI or whole-suite result. The separate
+process wall time was 333.811043 seconds.
+
+The command was `mise run test:property:extended:native:shard --shard 1/1`
+with this exact property file. It retained task scale 10, seed 1592590339,
+size `large`, one file worker, and the existing per-domain budgets and
+limits. The capacity profile was `generous` (`desktop-idle`), with no CPU
+quota and a 104G memory cap. The source HEAD and tree were clean before and
+after the run; the property digest was
+`b1c712195b8033f989b676d5d87964e3127776ebb991cda290b686818269db46`. The
+raw result, stdout, stderr, and duration lines are retained under
+*/data/m5c-array-caller-promise-finish-20261022/*.
+
+macOS remains unmeasured. Its weight of 347 is explicitly provisional:
+`ceil(333 * 339 / 326)`, using this file's measured host ratio in run
+39070198868. These replace the earlier provisional weights of 655 Linux and
+681 macOS seconds, which scaled that run's weights by an earlier local ratio.
+Replace the macOS estimate with an actual matching-host case sum when
+available. This measurement establishes no final candidate CI or full
+test262 UPDATE result and changes no case budgets, seeds, deadlines, or
+shard totals.
+
 The newer main run [36312192623] at `af9bb68c` is retained as the closest
 before-run comparison.
 `git diff af9bb68c 86228614 -- packages tests tools .github mise.toml` is empty

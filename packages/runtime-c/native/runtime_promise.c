@@ -36,6 +36,13 @@ static OseoResult promise_prototype_then(
     OseoValue on_fulfilled,
     OseoValue on_rejected
 );
+static OseoResult promise_invoke_then_with(
+    OseoContext *context,
+    OseoValue promise_value,
+    size_t argument_count,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+);
 static OseoResult promise_resolve_with(
     OseoContext *context,
     OseoValue constructor,
@@ -242,9 +249,12 @@ OseoResult oseo_internal_promise_builtin_dispatch(
             frame.slots[6] = result.value;
         }
         if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_promise_invoke_then(
+            /* Both closures end with Invoke(p, "then", « thunk »), one
+             * argument rather than the two `finally` itself passes. */
+            result = promise_invoke_then_with(
                 context,
                 frame.slots[5],
+                1u,
                 frame.slots[6],
                 oseo_undefined()
             );
@@ -2164,9 +2174,13 @@ OseoResult oseo_promise_all(
     );
 }
 
-OseoResult oseo_internal_promise_invoke_then(
+/* Invoke(promise, "then", arguments) with the first argument_count of
+ * the two handlers. The count is observable through `arguments.length`,
+ * so a one-argument Invoke must not pass a trailing undefined. */
+static OseoResult promise_invoke_then_with(
     OseoContext *context,
     OseoValue promise_value,
+    size_t argument_count,
     OseoValue on_fulfilled,
     OseoValue on_rejected
 ) {
@@ -2192,13 +2206,28 @@ OseoResult oseo_internal_promise_invoke_then(
             context,
             frame.slots[4],
             frame.slots[0],
-            2u,
+            argument_count,
             &frame.slots[1],
             oseo_undefined()
         );
     }
     oseo_roots_release(context, &frame);
     return result;
+}
+
+OseoResult oseo_internal_promise_invoke_then(
+    OseoContext *context,
+    OseoValue promise_value,
+    OseoValue on_fulfilled,
+    OseoValue on_rejected
+) {
+    return promise_invoke_then_with(
+        context,
+        promise_value,
+        2u,
+        on_fulfilled,
+        on_rejected
+    );
 }
 
 static OseoResult promise_finally_function_create(

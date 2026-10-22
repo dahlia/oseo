@@ -4,7 +4,7 @@
 # Selectors change only through `mise run m5c:observation-batches:plan`.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 12804
+unreviewedPaths: 12780
 basis:
   supportedFeatures:
     - AggregateError
@@ -164,10 +164,10 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 94767
-  currentSeconds: 5207
-  finalExecutedVariants: 135599
-  finalSeconds: 7450
+  currentExecutedVariants: 94922
+  currentSeconds: 5215
+  finalExecutedVariants: 135704
+  finalSeconds: 7456
   plan:
     batches: 22
     largestPaths: 2408
@@ -175,8 +175,8 @@ regeneration:
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 39.34
-    fullUpdateScheduleHours: 77.44
+    scheduleHours: 39.39
+    fullUpdateScheduleHours: 77.54
   alternatives:
     - batches: 33
       largestPaths: 1920
@@ -184,24 +184,24 @@ regeneration:
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 59.03
-      fullUpdateScheduleHours: 116.82
+      scheduleHours: 59.11
+      fullUpdateScheduleHours: 116.97
     - batches: 19
       largestPaths: 2408
       largestReviewUnits: 595
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 34.43
-      fullUpdateScheduleHours: 67.61
+      scheduleHours: 34.47
+      fullUpdateScheduleHours: 67.7
     - batches: 10
       largestPaths: 3900
       largestReviewUnits: 1188
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 19.02
-      fullUpdateScheduleHours: 36.79
+      scheduleHours: 19.04
+      fullUpdateScheduleHours: 36.83
 batches:
   - id: observation-batch-01
     selector:
@@ -222,8 +222,8 @@ batches:
         - test/built-ins/Promise/
     dependsOn:
       - observation-batch-plan
-    paths: 306
-    reviewUnits: 306
+    paths: 305
+    reviewUnits: 305
     generatedPaths: 0
     prerequisites: {}
     dynamicSource:
@@ -235,7 +235,7 @@ batches:
       onlyStrict: 31
     includes:
       asyncHelpers.js: 3
-      compareArray.js: 9
+      compareArray.js: 8
       isConstructor.js: 10
       nativeErrors.js: 1
       promiseHelper.js: 10
@@ -277,12 +277,12 @@ batches:
         - built-ins/NativeErrors
         - built-ins/Object
         - built-ins/Promise
-      files: 259
-      newFiles: 120
+      files: 258
+      newFiles: 117
     regeneration:
-      executableVariants: 1048
-      scopedUpdateSeconds: 58
-      fullCorpusSeconds: 5264
+      executableVariants: 1044
+      scopedUpdateSeconds: 57
+      fullCorpusSeconds: 5273
   - id: observation-batch-03
     selector:
       prerequisiteSets:
@@ -341,7 +341,7 @@ batches:
     regeneration:
       executableVariants: 1244
       scopedUpdateSeconds: 68
-      fullCorpusSeconds: 5333
+      fullCorpusSeconds: 5341
   - id: observation-batch-06
     selector:
       prerequisiteSets:
@@ -385,7 +385,7 @@ batches:
     regeneration:
       executableVariants: 850
       scopedUpdateSeconds: 47
-      fullCorpusSeconds: 5379
+      fullCorpusSeconds: 5388
   - id: observation-batch-08
     selector:
       prerequisiteSets:
@@ -431,7 +431,7 @@ batches:
     regeneration:
       executableVariants: 1308
       scopedUpdateSeconds: 72
-      fullCorpusSeconds: 5451
+      fullCorpusSeconds: 5460
   - id: observation-batch-14
     selector:
       prerequisiteSets:
@@ -484,7 +484,7 @@ batches:
     regeneration:
       executableVariants: 1350
       scopedUpdateSeconds: 74
-      fullCorpusSeconds: 5525
+      fullCorpusSeconds: 5534
   - id: observation-batch-15
     selector:
       prerequisiteSets:
@@ -544,7 +544,7 @@ batches:
     regeneration:
       executableVariants: 2636
       scopedUpdateSeconds: 145
-      fullCorpusSeconds: 5670
+      fullCorpusSeconds: 5679
   - id: observation-batch-16
     selector:
       prerequisiteSets:
@@ -606,7 +606,7 @@ batches:
     regeneration:
       executableVariants: 1630
       scopedUpdateSeconds: 90
-      fullCorpusSeconds: 5760
+      fullCorpusSeconds: 5768
   - id: observation-batch-17
     selector:
       prerequisiteSets:
@@ -645,7 +645,7 @@ batches:
     regeneration:
       executableVariants: 706
       scopedUpdateSeconds: 39
-      fullCorpusSeconds: 5799
+      fullCorpusSeconds: 5807
   - id: observation-batch-18
     selector:
       prerequisiteSets:
@@ -685,7 +685,7 @@ batches:
     regeneration:
       executableVariants: 704
       scopedUpdateSeconds: 39
-      fullCorpusSeconds: 5837
+      fullCorpusSeconds: 5846
   - id: observation-batch-19
     selector:
       prerequisiteSets:
@@ -720,7 +720,7 @@ batches:
     regeneration:
       executableVariants: 752
       scopedUpdateSeconds: 41
-      fullCorpusSeconds: 5879
+      fullCorpusSeconds: 5887
   - id: observation-batch-20
     selector:
       prerequisiteSets:
@@ -776,7 +776,7 @@ batches:
     regeneration:
       executableVariants: 994
       scopedUpdateSeconds: 55
-      fullCorpusSeconds: 5933
+      fullCorpusSeconds: 5941
   - id: observation-batch-21
     selector:
       prerequisiteSets:
@@ -846,7 +846,7 @@ batches:
     regeneration:
       executableVariants: 8602
       scopedUpdateSeconds: 473
-      fullCorpusSeconds: 6406
+      fullCorpusSeconds: 6414
   - id: observation-batch-22
     selector:
       prerequisiteSets:
@@ -911,7 +911,7 @@ batches:
     regeneration:
       executableVariants: 4232
       scopedUpdateSeconds: 233
-      fullCorpusSeconds: 6638
+      fullCorpusSeconds: 6647
   - id: observation-batch-23
     selector:
       prerequisiteSets:
@@ -979,7 +979,7 @@ batches:
     regeneration:
       executableVariants: 956
       scopedUpdateSeconds: 53
-      fullCorpusSeconds: 6691
+      fullCorpusSeconds: 6699
   - id: observation-batch-24
     selector:
       prerequisiteSets:
@@ -1019,7 +1019,7 @@ batches:
     regeneration:
       executableVariants: 3150
       scopedUpdateSeconds: 173
-      fullCorpusSeconds: 6864
+      fullCorpusSeconds: 6872
   - id: observation-batch-25
     selector:
       prerequisiteSets:
@@ -1109,7 +1109,7 @@ batches:
     regeneration:
       executableVariants: 2210
       scopedUpdateSeconds: 121
-      fullCorpusSeconds: 6985
+      fullCorpusSeconds: 6994
   - id: observation-batch-26
     selector:
       prerequisiteSets:
@@ -1168,7 +1168,7 @@ batches:
     regeneration:
       executableVariants: 3444
       scopedUpdateSeconds: 189
-      fullCorpusSeconds: 7175
+      fullCorpusSeconds: 7183
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -1220,7 +1220,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7270
+      fullCorpusSeconds: 7278
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -1268,7 +1268,7 @@ batches:
     regeneration:
       executableVariants: 924
       scopedUpdateSeconds: 51
-      fullCorpusSeconds: 7321
+      fullCorpusSeconds: 7329
   - id: observation-batch-29
     selector:
       prerequisiteSets:
@@ -1324,7 +1324,7 @@ batches:
     regeneration:
       executableVariants: 340
       scopedUpdateSeconds: 19
-      fullCorpusSeconds: 7339
+      fullCorpusSeconds: 7348
   - id: observation-batch-30
     selector:
       prerequisiteSets:
@@ -1375,7 +1375,7 @@ batches:
     regeneration:
       executableVariants: 1444
       scopedUpdateSeconds: 79
-      fullCorpusSeconds: 7419
+      fullCorpusSeconds: 7427
   - id: observation-batch-32
     selector:
       prerequisiteSets:
@@ -1386,7 +1386,6 @@ batches:
         - fn-global-object-harness
         - fn-global-object-harness+module-export-forms
         - frontmatter-feature-tags
-        - function-caller-restrictions
         - hashbang-comments
         - import-meta
         - minor-feature-tag-admission
@@ -1404,7 +1403,6 @@ batches:
       - dynamic-import
       - fn-global-object-harness
       - frontmatter-feature-tags
-      - function-caller-restrictions
       - hashbang-comments
       - import-meta
       - minor-feature-tag-admission
@@ -1414,8 +1412,8 @@ batches:
       - resizable-array-buffer-harness
       - typed-array-feature-admission
       - well-known-intrinsics-harness
-    paths: 222
-    reviewUnits: 214
+    paths: 199
+    reviewUnits: 191
     generatedPaths: 44
     prerequisites:
       feature:Float32Array: 2
@@ -1430,7 +1428,6 @@ batches:
       feature:Uint8ClampedArray: 2
       feature:__proto__: 3
       feature:arbitrary-module-namespace-names: 1
-      feature:caller: 23
       feature:dynamic-import: 29
       feature:export-star-as-namespace-from-module: 12
       feature:hashbang: 29
@@ -1445,13 +1442,13 @@ batches:
       harness:wellKnownIntrinsicObjects.js: 1
       host:$262.createRealm: 1
     dynamicSource:
-      Function: 4
-      eval: 23
+      Function: 2
+      eval: 20
     flags:
       async: 28
       generated: 44
       module: 45
-      noStrict: 27
+      noStrict: 4
       onlyStrict: 29
       raw: 23
     includes:
@@ -1480,7 +1477,6 @@ batches:
       arrow-function: 2
       async-functions: 2
       async-iteration: 5
-      caller: 23
       class: 1
       coalesce-expression: 2
       default-parameters: 1
@@ -1501,10 +1497,8 @@ batches:
     partitions:
       groups:
         - built-ins/Array
-        - built-ins/Function
         - built-ins/Proxy
         - built-ins/TypedArrayConstructors
-        - language/arguments-object
         - language/comments
         - language/destructuring
         - language/eval-code
@@ -1512,9 +1506,9 @@ batches:
         - language/literals
         - language/module-code
         - language/statements
-      files: 201
-      newFiles: 60
+      files: 178
+      newFiles: 53
     regeneration:
-      executableVariants: 574
-      scopedUpdateSeconds: 32
-      fullCorpusSeconds: 7450
+      executableVariants: 528
+      scopedUpdateSeconds: 29
+      fullCorpusSeconds: 7456

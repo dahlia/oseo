@@ -149,3 +149,32 @@ expose it, a file path, or a resolution function through `import.meta`,
 because a native executable has no module URL that a running program could
 load from. Adding a host property is a host contract change and amends this
 decision.
+
+
+Export forms and arbitrary names
+--------------------------------
+
+The M5c `module-export-forms` node admits `export var`, `export * as name`,
+and arbitrary module namespace names. Module records keep each form
+distinct: a namespace import carries an explicit marker, because the string
+export name `"*"` is an ordinary name, and an `export * as` entry is its own
+export kind rather than a star export. Its explicit name participates in
+duplicate-export checks and shadows star exports. It resolves to the
+requested module's namespace directly. That namespace has one traced cell
+per module, shared by `import * as`, by re-exporting a namespace import, and
+by every `export * as`. Star resolution therefore compares one binding
+identity, as ECMA-262 ResolveExport does.
+
+A module records its VarDeclaredNames. Module compilation initializes each
+var cell to `undefined` while linking, with the function initializers and
+before any evaluator starts, matching InitializeEnvironment. Source
+initializers stay in the evaluator. A cyclic importer or a hoisted function
+therefore reads `undefined` before the declaring module evaluates, while
+lexical bindings keep their temporal dead zones. A namespace reached only
+through `export * as` is created with the other namespace objects during
+linking.
+
+A namespace object is created with its exports in code-unit order, and the
+runtime's own-key snapshots list a namespace's string keys in that stored
+order. They do not move array-index names such as `"2"` ahead of `"10"` or
+`""`, as they do for every other object.

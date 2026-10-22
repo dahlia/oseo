@@ -82,5 +82,6 @@ export function jsonModuleSyntax(source: LoadedJsonModule): SyntaxModule {
     kind: "module",
     range,
     sourceId: source.sourceId,
+    varNames: [],
   };
 }

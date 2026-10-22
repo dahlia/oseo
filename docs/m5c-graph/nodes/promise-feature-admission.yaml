@@ -6,5 +6,5 @@ delivers: "Admits Promise.prototype.finally and the Promise feature tag, so
   Promise or Promise.prototype.finally are observed."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

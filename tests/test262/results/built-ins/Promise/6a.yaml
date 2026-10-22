@@ -81,9 +81,19 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - promise-settlement
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
+      detail: 'test/built-ins/Promise/prototype/finally/subclass-species-constructor-reject-count.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Promise/prototype/finally/subclass-species-constructor-reject-count.js:85:1:
+        error[OSEO2001]: Unhandled promise rejection.\n"'
       passed: false
-    unsupportedFeatures:
-      - Promise.prototype.finally
+      unsupportedCapability: unhandled-rejection-policy
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

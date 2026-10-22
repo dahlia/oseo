@@ -4326,10 +4326,14 @@ OseoResult oseo_internal_proxy_own_keys(
 );
 
 /*
- * OrdinaryOwnPropertyKeys (10.1.11.1) over an object, as one fresh
- * array in the profile's own-key order: integer indices in ascending
- * numeric order, then the remaining string keys in creation order, then
- * the symbol keys in creation order. `filter` selects which of them the
+ * An object's [[OwnPropertyKeys]] as one fresh array. For an ordinary
+ * object that is OrdinaryOwnPropertyKeys (10.1.11.1): integer indices in
+ * ascending numeric order, then the remaining string keys in creation
+ * order, then the symbol keys in creation order. A module namespace
+ * (10.4.6.11) instead lists every export name in the code-unit order of
+ * its [[Exports]] list, integer-like names included, then its symbol
+ * keys; linking creates its exports in that order. A proxy goes to
+ * oseo_internal_proxy_own_keys. `filter` selects which keys the
  * array keeps, so `Object.getOwnPropertyNames`,
  * `Object.getOwnPropertySymbols`, and `Reflect.ownKeys` share one
  * ordering rather than three.
