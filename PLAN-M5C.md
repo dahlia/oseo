@@ -889,7 +889,10 @@ writes under both specialization policies) and the fixture through
 `mise run test:native --shard 77/282` (Node.js, Deno, and native outputs match;
 the AArch64 musl cross-link builds). The complete
 `mise run test262:update -- --accept-promotions` on the clean source
-`09745af3` ended with natural exit 0, and this section records its result.
+`09745af3` ended with natural exit 0 and was recorded in `e7228e8f`.
+That earlier result is historical provenance; the current observations below
+come from the complete update on clean source `2e3d973f`, recorded in
+`fbdb0824`.
 
 The path is unsupported in the reviewed `main` manifest. A static scan of
 spelled `__proto__` keys finds no guard candidate among the `main` passes
@@ -1129,7 +1132,7 @@ same global heritage. This adaptation is bounded:
     runs them. The probes are not dropped to avoid the Float16Array gap.
 
 The upstream frontmatter of 188 pinned tests includes this file. Of the
-included inventory, 168 are the reviewed paths this node owns and 17 are
+included inventory, 168 form this node's original reviewed cohort and 17 are
 unreviewed paths of `observation-batch-32`, which stay unreviewed here.
 Three more are under *test/staging/* and outside the inventory.
 

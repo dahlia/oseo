@@ -6818,13 +6818,24 @@ three logged outer argument expressions, including a coercing locales object
 and a throwing expression, and reporting, object-returning, throwing,
 detaching, or non-callable element methods. A fixed program covers every
 argument shape, call form, view kind, and method mode. Both run under both
-specialization policies with collection forced at every safepoint. The 41
-reviewed paths under the two `toLocaleString` roots keep their records and
-owners: 36 pass, two need primitive wrapper objects, and three need the
+specialization policies with collection forced at every safepoint. At this
+node's original landing, `6f30050c`, the 41 reviewed paths under
+*TypedArray/prototype/toLocaleString/* and
+*TypedArrayConstructors/prototype/toLocaleString/* kept their records and
+owners: 36 passed, two needed primitive wrapper objects, and three needed the
 resizable-buffer harness. None of them inspects element arguments. Against
-base `dc1a00d9`, the property ratchet moves from 182 to 183 domains and seeds
-and from 6,551 to 6,561 ordinary cases; the evidence inventory stays at 143
+base `dc1a00d9`, the property ratchet moved from 182 to 183 domains and seeds
+and from 6,551 to 6,561 ordinary cases; the evidence inventory stayed at 143
 families.
+
+The complete RAB update on clean source `2e3d973f`, recorded in `fbdb0824`,
+observes 37 passes and four unsupported results across those same 41 paths.
+*TypedArray/prototype/toLocaleString/resizable-buffer.js* passes. The grow
+and shrink _user-provided-tolocalestring-\*.js_ cases now reach the
+`primitive-wrapper` rejection and have active owner
+`primitive-wrapper-objects`, alongside the existing Number and BigInt
+*calls-tolocalestring-from-each-value.js* cases. No path in these two roots
+still needs the RAB harness.
 
 Implemented M5b node `symbol-intrinsic` completes the realm-owned `Symbol`
 intrinsic with ordinary `for` and `keyFor` functions and completes

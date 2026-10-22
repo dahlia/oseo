@@ -16,7 +16,9 @@ scope:
     observations during a comparator call."
   - "Reviewed standards coverage is every upstream path under the node's two
     inventory roots: test/built-ins/TypedArray/prototype/sort and toSorted.
-    Paths that need an unreviewed harness include retain explicit boundaries."
+    All four paths in these roots using the reviewed
+    resizableArrayBufferUtils.js include pass in the current complete
+    observations."
 owners:
   - PLAN-M5.md
 evidence:
@@ -56,6 +58,7 @@ evidence:
   standards:
     status: covered
     references:
+      - tests/test262/harness/resizableArrayBufferUtils.js
       - tests/test262/subset.yaml
       - tests/test262/results.yaml
   structural:

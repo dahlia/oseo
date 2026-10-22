@@ -18,8 +18,9 @@ scope:
     inventory roots: test/built-ins/TypedArray/prototype/find, findIndex,
     findLast, findLastIndex, includes, indexOf, join, lastIndexOf,
     toLocaleString, and toString. The reviewed
-    resizableArrayBufferUtils.js include is observed: 27 of its 29 paths
-    pass, and the two user-provided-tolocalestring grow and shrink cases
+    resizableArrayBufferUtils.js include is observed: 27 of the 29 paths
+    in these roots using it pass, and the two user-provided-tolocalestring
+    grow and shrink cases
     remain unsupported with active owner primitive-wrapper-objects."
 owners:
   - PLAN-M5.md

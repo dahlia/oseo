@@ -7214,6 +7214,11 @@ IDs and the public intrinsic table gains one slot for the shared
 `Array.prototype.toString` identity, while the value representation and the
 generated-code entry points are unchanged.
 
+The current *testTypedArray.js* has since restored both upstream
+`typeof Float16Array` probes, preserving the constructor lists selected by
+an ECMAScript 2025 host. The historical adaptation above does not describe
+the current harness.
+
 The current complete RAB harness update, recorded in `fbdb0824` from clean
 source `2e3d973f`, observes 27 passes among the 28 paths in these roots that
 include *resizableArrayBufferUtils.js*. The remaining
