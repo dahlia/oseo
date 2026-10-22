@@ -7765,7 +7765,13 @@ already throw before conversion for a nullish base, but convert an object key
 twice. A `super` compound assignment also converts its key twice. These are
 retained behaviors, not conforming ones; the generated and fixed controls
 use primitive string keys, whose conversion cannot be observed, for the
-three non-arithmetic forms.
+three non-arithmetic forms. A plain computed read also converts its key
+before the base check. The unlanded M5c node
+`computed-member-reference-key-order` owns the repair of every one of these
+forms as one computed member Reference unit; until it lands they remain
+known nonconformance. The node's record,
+[*docs/m5c-graph/computed-member-reference-key-order.md*](./docs/m5c-graph/computed-member-reference-key-order.md),
+separates the observed failures from the source-only hypotheses.
 
 Node.js 24.21.0 and Deno 2.9.7 agree with ECMA-262 2025 for a nullish base,
 but both convert an arithmetic member key a second time before the write.

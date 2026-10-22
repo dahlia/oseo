@@ -3,6 +3,9 @@ id: update-expressions
 title: "Update expressions"
 scope:
   - "Prefix and postfix increment and decrement on references."
+  - "A computed member target converts an object key separately for the read
+    and the write. That retained behavior is not claimed as conforming; the
+    unlanded M5c node computed-member-reference-key-order owns its repair."
 owners:
   - PLAN-M5.md
 evidence:

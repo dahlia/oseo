@@ -14,7 +14,9 @@ scope:
     simple member assignment, and update expressions keep their earlier key
     conversion order. A logical member write still converts its key twice
     and converts it before a nullish base throws; that retained behavior is
-    not claimed as conforming."
+    not claimed as conforming. The unlanded M5c node
+    computed-member-reference-key-order owns the repair of these retained
+    forms."
   - "A simple or logical assignment applies NamedEvaluation to an anonymous
     function, arrow, or class only when IsIdentifierRef of its target is
     true, as ECMA-262 2025 13.15.2 requires. A parenthesized identifier

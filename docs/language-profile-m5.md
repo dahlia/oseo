@@ -859,7 +859,10 @@ current evidence assessment. Those live only in the indexed records above.
     order* below records it. Plain `=` assignment to a computed member likewise
     retains the raw key and converts it only after the right operand, as
     `PutValue` specifies, so a key whose `toString` is observable runs after
-    that operand. Immutable and imported targets retain their catchable write
+    that operand; it still converts that key before `PutValue`'s base check,
+    which the same section records as retained. The unlanded M5c node
+    `computed-member-reference-key-order` owns the repair of both retained
+    orders. Immutable and imported targets retain their catchable write
     errors. Native differential fixtures and a generated property with seed
     `0x60000c00` cover all 15 operators, both target forms, short-circuiting,
     reference and conversion counts, both specialization policies, and forced
@@ -874,18 +877,20 @@ current evidence assessment. Those live only in the indexed records above.
     forms produce the assigned value; postfix forms produce the coerced
     previous value. A member target evaluates its object and key expression
     once, then converts the retained raw key separately for the read and write,
-    so the conversions may select different properties. Immutable targets keep
-    their catchable write errors after coercion. Native differential fixtures
-    and a generated property with seed `0x60002e00` cover both operators,
-    both result forms, both target forms, numbers, numeric strings, booleans,
-    null, reference and conversion counts, both specialization policies, and
-    forced collection, including suppression of key conversion for a nullish
-    base. Four reviewed test262 cases cover the four forms, two expected parse
-    negatives retain strict `arguments` early errors, and the newly admitted
-    classic `for` update promotes an exponentiation case to pass. M5a Unit
-    8.5h adds four further expected negatives covering `arguments` as a
-    prefix and postfix update target in strict code. M5a Unit 8.1a extends the
-    same update path to exact BigInt values.
+    so the conversions may select different properties. That double conversion
+    is retained behavior, not a conforming one; the unlanded M5c node
+    `computed-member-reference-key-order` owns its repair. Immutable targets
+    keep their catchable write errors after coercion. Native differential
+    fixtures and a generated property with seed `0x60002e00` cover both
+    operators, both result forms, both target forms, numbers, numeric strings,
+    booleans, null, reference and conversion counts, both specialization
+    policies, and forced collection, including suppression of key conversion
+    for a nullish base. Four reviewed test262 cases cover the four forms, two
+    expected parse negatives retain strict `arguments` early errors, and the
+    newly admitted classic `for` update promotes an exponentiation case to
+    pass. M5a Unit 8.5h adds four further expected negatives covering
+    `arguments` as a prefix and postfix update target in strict code. M5a Unit
+    8.1a extends the same update path to exact BigInt values.
  -  The named error intrinsics `Error`, `AggregateError`, `EvalError`,
     `RangeError`, `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError`
     as real runtime-owned constructor values. An unshadowed reference to one
@@ -8846,7 +8851,13 @@ already throw before conversion for a nullish base, but convert an object key
 twice. A `super` compound assignment also converts its key twice. These are
 retained behaviors, not conforming ones; the generated and fixed controls
 use primitive string keys, whose conversion cannot be observed, for the
-three non-arithmetic forms.
+three non-arithmetic forms. A plain computed read also converts its key
+before the base check. The unlanded M5c node
+`computed-member-reference-key-order` owns the repair of every one of these
+forms as one computed member Reference unit; until it lands they remain
+known nonconformance. The node's record,
+[*docs/m5c-graph/computed-member-reference-key-order.md*](./m5c-graph/computed-member-reference-key-order.md),
+separates the observed failures from the source-only hypotheses.
 
 Node.js 24.21.0 and Deno 2.9.7 agree with ECMA-262 2025 for a nullish base,
 but both convert an arithmetic member key a second time before the write.

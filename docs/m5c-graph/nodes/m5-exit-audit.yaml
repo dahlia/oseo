@@ -13,6 +13,7 @@ dependencies:
   - class-duplicate-constructor-early-error
   - class-private-accessor-lookup-coverage-remediation
   - compound-member-assignment-key-order
+  - computed-member-reference-key-order
   - cross-realm-host
   - destructuring-binding-target-order
   - dynamic-import

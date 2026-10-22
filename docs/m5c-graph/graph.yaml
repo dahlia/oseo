@@ -19,9 +19,9 @@ baseline:
   unreviewedPaths: 12780
   unsupportedProfileFeatures: 1496
 summary:
-  nodes: 84
-  ready: 81
-  blocked: 3
+  nodes: 85
+  ready: 79
+  blocked: 6
   parked: 0
   landed: 44
 serializationPoints:
@@ -803,7 +803,6 @@ collisions:
       from each group because dependencies already serialize them."
   - path: tests/test262/results.yaml
     nodes:
-      - compound-member-assignment-key-order
       - iterator-next-callability
       - observation-batch-01
       - observation-batch-03
@@ -838,7 +837,6 @@ collisions:
       from each group because dependencies already serialize them."
   - path: tests/test262/results.yaml
     nodes:
-      - compound-member-assignment-key-order
       - iterator-next-callability
       - observation-batch-01
       - observation-batch-03
@@ -1832,12 +1830,6 @@ collisions:
       manifest regeneration."
   - path: tests/test262/results.yaml
     nodes:
-      - compound-member-assignment-key-order
-      - observation-batch-08
-    note: "Batch 8 and the batch 12 key-order prerequisite independently
-      publish canonical observations; serialize their manifest changes."
-  - path: tests/test262/results.yaml
-    nodes:
       - array-tolocalestring-arguments
       - typed-array-tolocalestring-arguments
     note: "These independent publishers regenerate the reviewed manifest.
@@ -2224,6 +2216,265 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - typed-array-tolocalestring-arguments
+      - well-known-intrinsics-harness
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - computed-member-reference-key-order
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - dynamic-source-coverage-remediation
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - dynamic-source-retagging
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - eval-intrinsic-value
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - generator-dispatch-stack-charge
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - iterator-helpers
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - module-top-level-await-patterns
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - non-blocking-agent
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-01
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-03
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-06
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-15
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-17
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-18
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-19
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-20
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-21
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-22
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-23
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-24
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-25
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-26
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-27
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-28
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-29
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-30
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-31
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - observation-batch-32
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - primitive-wrapper-objects
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - proper-tail-calls
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - regexp-pattern-extensions
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - regexp-property-escape-harness
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - regexp-split-coverage-remediation
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - test262-host-script-bindings
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - typed-array-proto-coverage-remediation
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - unhandled-rejection-observation
+    note: "These independent publishers regenerate the reviewed manifest.
+      Serialize their publication; analysis and implementation may run
+      concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
       - well-known-intrinsics-harness
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run

@@ -560,3 +560,36 @@ test("batch11 prerequisites retain their three-path contracts", () => {
   assert.ok(exitDependencies.includes(earlyErrorId));
   // The existing pair audit includes all three publishers without exemption.
 });
+
+test("computed member key order owns its Reference contract", () => {
+  validateCurrentM5cWorkGraph();
+  const readNode = (id: string): Batch11PrerequisiteNode =>
+    // SAFETY: graph validation checked each parsed node's shape.
+    parseYaml(
+      readFileSync(
+        new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
+        "utf8",
+      ),
+    ) as Batch11PrerequisiteNode;
+  const ownerId = "computed-member-reference-key-order";
+  const compoundId = "compound-member-assignment-key-order";
+  const owner = readNode(ownerId);
+  const compound = readNode(compoundId);
+  assert.deepEqual(owner.dependencies, [compoundId]);
+  assert.equal(owner.status, compound.landed ? "ready" : "blocked");
+  assert.match(owner.delivers, /one semantic unit/u);
+  assert.match(owner.delivers, /docs\/m5c-graph\/computed-member-reference/u);
+  assert.match(owner.delivers, /Claim\s+no test262 pass in advance/u);
+  // The owner never selects upstream paths; each batch admits its own.
+  assert.deepEqual(deliveredPaths(owner), []);
+  for (const batchId of [
+    "observation-batch-08",
+    "observation-batch-14",
+    "observation-batch-16",
+  ]) {
+    const batch = readNode(batchId);
+    assert.ok(batch.dependencies.includes(ownerId), batchId);
+    if (!owner.landed) assert.equal(batch.status, "blocked", batchId);
+  }
+  assert.ok(readNode("m5-exit-audit").dependencies.includes(ownerId));
+});
