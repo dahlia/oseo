@@ -33,7 +33,7 @@ evidence:
       - tests/native/fixtures/objects.ts
   standards:
     status: omitted
-    reason: "Positive upstream cases also require omitted Object reflection."
+    reason: "Applicable positive cases await their owning observation batches."
     replacements:
       - tests/property/m5-object-literal.property.test.ts
       - tests/native/fixtures/objects.ts

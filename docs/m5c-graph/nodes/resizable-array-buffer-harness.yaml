@@ -2,10 +2,15 @@ version: 1
 id: resizable-array-buffer-harness
 title: Admit the resizable buffer harness
 delivers: "Reviews and admits the resizableArrayBufferUtils.js harness
-  include and any resizable ArrayBuffer and TypedArray behavior it reaches,
-  so the 168 reviewed paths recorded as harness-include unsupported for that
-  include are observed."
+  include and the resizable ArrayBuffer and TypedArray behavior it
+  reaches. The full update on clean source 2e3d973f observes all 168
+  originally harness-include unsupported paths: 162 pass and 6 remain
+  unsupported. The remaining paths are active coverage debt, with 4
+  owned by primitive-wrapper-objects and 2 by
+  typed-array-proto-coverage-remediation. The source enforces the
+  existing omitted __proto__ setter boundary in both Set walks with ABI
+  m5-134 and native regression evidence; it adds no exclusion."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

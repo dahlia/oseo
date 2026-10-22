@@ -995,6 +995,13 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/language/expressions/class/subclass-builtins/subclass-Function.js
         non-strict disabled failed (1): stdout=""

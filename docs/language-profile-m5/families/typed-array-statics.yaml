@@ -22,8 +22,10 @@ scope:
     own-key boundary."
   - "Reviewed standards coverage is every upstream path under the node's
     four inventory roots: the TypedArray root files, Symbol.species, from,
-    and of. Paths that need an unreviewed harness include retain explicit
-    boundaries."
+    and of. Of the five paths in these roots using the reviewed
+    resizableArrayBufferUtils.js include, four pass and
+    out-of-bounds-behaves-like-detached.js remains unsupported with active
+    owner typed-array-proto-coverage-remediation."
 owners:
   - PLAN-M5.md
 evidence:
@@ -63,6 +65,7 @@ evidence:
   standards:
     status: covered
     references:
+      - tests/test262/harness/resizableArrayBufferUtils.js
       - tests/test262/subset.yaml
       - tests/test262/results.yaml
   structural:

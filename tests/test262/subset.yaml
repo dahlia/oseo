@@ -28,6 +28,7 @@ supportedFeatures:
   - Int16Array
   - Int32Array
   - json-modules
+  - json-superset
   - Map
   - Object.fromEntries
   - Object.hasOwn
@@ -57,6 +58,7 @@ supportedFeatures:
   - WeakMap
   - WeakRef
   - WeakSet
+  - __proto__
   - align-detached-buffer-semantics-with-web-reality
   - arbitrary-module-namespace-names
   - array-find-from-last
@@ -101,6 +103,7 @@ supportedFeatures:
   - optional-chaining
   - promise-try
   - promise-with-resolvers
+  - proxy-missing-checks
   - regexp-dotall
   - regexp-duplicate-named-groups
   - regexp-lookbehind
@@ -724,7 +727,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/at/coerced-index-resize.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/at/index-argument-tointeger.js
     expectedClassification: pass
@@ -760,7 +763,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/at/typed-array-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/concat/15.4.4.4-5-b-iii-3-b-1.js
     expectedClassification: pass
@@ -1039,7 +1042,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/copyWithin/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/copyWithin/return-abrupt-from-delete-proxy-target.js
     expectedClassification: pass
@@ -1108,13 +1111,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/entries/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/entries/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/entries/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/entries/return-abrupt-from-this.js
     expectedClassification: pass
@@ -1804,7 +1807,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/fill/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/fill/return-abrupt-from-end-as-symbol.js
     expectedClassification: pass
@@ -1834,7 +1837,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/fill/typed-array-resize.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/15.4.4.20-1-1.js
     expectedClassification: pass
@@ -2545,13 +2548,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/filter/target-array-non-extensible.js
     expectedClassification: pass
@@ -2602,13 +2605,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/find/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/find/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/find/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/find/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -2671,13 +2674,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findIndex/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findIndex/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findIndex/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findIndex/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -2743,13 +2746,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLast/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLast/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLast/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLast/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -2815,13 +2818,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLastIndex/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLastIndex/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLastIndex/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/findLastIndex/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -3535,7 +3538,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/includes/coerced-searchelement-fromindex-resize.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/includes/fromIndex-equal-or-greater-length-returns-false.js
     expectedClassification: pass
@@ -3571,10 +3574,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/includes/resizable-buffer-special-float-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/includes/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/includes/return-abrupt-get-length.js
     expectedClassification: pass
@@ -4192,10 +4195,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/coerced-searchelement-fromindex-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/coerced-searchelement-fromindex-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/fromindex-zero-conversion.js
     expectedClassification: pass
@@ -4219,10 +4222,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/resizable-buffer-special-float-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/indexOf/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/join/S15.4.4.5_A1.1_T1.js
     expectedClassification: pass
@@ -4273,10 +4276,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/join/coerced-separator-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/join/coerced-separator-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/join/length.js
     expectedClassification: pass
@@ -4291,7 +4294,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/join/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/keys/iteration-mutable.js
     expectedClassification: pass
@@ -4312,13 +4315,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/keys/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/keys/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/keys/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/keys/return-abrupt-from-this.js
     expectedClassification: pass
@@ -4894,10 +4897,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/coerced-position-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/coerced-position-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/fromindex-zero-conversion.js
     expectedClassification: pass
@@ -4921,7 +4924,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/lastIndexOf/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/length.js
     expectedClassification: pass
@@ -5557,13 +5560,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/map/target-array-non-extensible.js
     expectedClassification: pass
@@ -6496,13 +6499,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduce/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/15.4.4.22-1-1.js
     expectedClassification: pass
@@ -7276,13 +7279,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reduceRight/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reverse/S15.4.4.8_A1_T1.js
     expectedClassification: pass
@@ -7333,7 +7336,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/reverse/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/shift/S15.4.4.9_A1.1_T1.js
     expectedClassification: pass
@@ -7525,10 +7528,10 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/coerced-start-end-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/coerced-start-end-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/create-ctor-non-object.js
     expectedClassification: pass
@@ -7597,7 +7600,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/slice/target-array-non-extensible.js
     expectedClassification: pass
@@ -8320,16 +8323,16 @@ tests:
     expectedClassification: pass
     dependencies: [bigint-primitive, functions, object-properties, symbols]
   - path: test/built-ins/Array/prototype/sort/comparefn-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/sort/comparefn-nonfunction-call-throws.js
     expectedClassification: pass
     dependencies: [functions, object-properties, symbols]
   - path: test/built-ins/Array/prototype/sort/comparefn-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/sort/comparefn-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/sort/length.js
     expectedClassification: pass
@@ -8401,7 +8404,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/sort/resizable-buffer-default-comparator.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/sort/stability-11-elements.js
     expectedClassification: pass
@@ -8683,7 +8686,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toLocaleString/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-properties]
   - path: test/built-ins/Array/prototype/toLocaleString/user-provided-tolocalestring-grow.js
     expectedClassification: unsupported-profile-feature
@@ -9013,13 +9016,13 @@ tests:
     expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/values/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/values/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/values/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, iterator-protocol, object-properties, symbols]
   - path: test/built-ins/Array/prototype/values/returns-iterator-from-object.js
     expectedClassification: pass
@@ -15587,7 +15590,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/apply/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/Function/prototype/apply/this-not-callable-realm.js
     expectedClassification: pass
@@ -23924,7 +23927,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperties/typedarray-backed-by-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/15.2.3.6-0-1.js
     expectedClassification: pass
@@ -27266,10 +27269,10 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/coerced-P-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/coerced-P-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/name.js
     expectedClassification: pass
@@ -27317,7 +27320,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/defineProperty/typedarray-backed-by-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/entries/exception-during-enumeration.js
     expectedClassification: pass
@@ -27539,7 +27542,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/freeze/typedarray-backed-by-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/Object/fromEntries/empty-iterable.js
     expectedClassification: pass
@@ -45474,10 +45477,10 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArray/out-of-bounds-get-and-set.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArray/out-of-bounds-has.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArray/prototype.js
     expectedClassification: pass
@@ -45546,7 +45549,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/at/coerced-index-resize.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/at/index-argument-tointeger.js
     expectedClassification: pass
@@ -45567,7 +45570,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/at/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/at/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -45660,13 +45663,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/byteLength/resizable-buffer-assorted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/byteLength/resized-out-of-bounds-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/byteLength/resized-out-of-bounds-2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/byteLength/return-bytelength.js
     expectedClassification: pass
@@ -45714,7 +45717,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/byteOffset/resized-out-of-bounds.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/byteOffset/return-byteoffset.js
     expectedClassification: pass
@@ -45807,10 +45810,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-target-start-end-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-target-start-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/copyWithin/coerced-values-end-detached-prototype.js
     expectedClassification: pass
@@ -45885,7 +45888,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/copyWithin/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/copyWithin/return-abrupt-from-end-is-symbol.js
     expectedClassification: pass
@@ -45957,13 +45960,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/entries/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/entries/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/entries/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/entries/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -46083,13 +46086,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/every/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/every/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/every/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/every/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -46179,7 +46182,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/fill/coerced-value-start-end-resize.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/fill/detached-buffer.js
     expectedClassification: pass
@@ -46233,7 +46236,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/fill/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/fill/return-abrupt-from-end-as-symbol.js
     expectedClassification: pass
@@ -46434,13 +46437,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/filter/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/filter/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/filter/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/filter/result-does-not-share-buffer.js
     expectedClassification: pass
@@ -46602,13 +46605,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/find/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/find/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/find/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/find/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -46716,13 +46719,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findIndex/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findIndex/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findIndex/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findIndex/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -46830,13 +46833,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLast/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLast/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLast/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLast/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -46944,13 +46947,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLastIndex/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLastIndex/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLastIndex/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/findLastIndex/return-abrupt-from-predicate-call.js
     expectedClassification: pass
@@ -47073,13 +47076,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/forEach/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/forEach/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/forEach/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/forEach/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -47139,7 +47142,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/includes/coerced-searchelement-fromindex-resize.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/includes/detached-buffer-during-fromIndex-returns-false-for-zero.js
     expectedClassification: pass
@@ -47190,10 +47193,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/includes/resizable-buffer-special-float-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/includes/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/includes/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -47277,10 +47280,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/indexOf/coerced-searchelement-fromindex-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/indexOf/coerced-searchelement-fromindex-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/indexOf/detached-buffer-during-fromIndex-returns-minus-one-for-undefined.js
     expectedClassification: pass
@@ -47328,10 +47331,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/indexOf/resizable-buffer-special-float-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/indexOf/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/indexOf/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -47388,10 +47391,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/join/coerced-separator-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/join/coerced-separator-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/join/custom-separator-result-from-tostring-on-each-simple-value.js
     expectedClassification: pass
@@ -47430,7 +47433,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/join/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/join/result-from-tostring-on-each-simple-value.js
     expectedClassification: pass
@@ -47493,13 +47496,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/keys/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/keys/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/keys/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/keys/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -47556,10 +47559,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/coerced-position-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/coerced-position-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/detached-buffer-during-fromIndex-returns-minus-one-for-undefined.js
     expectedClassification: pass
@@ -47607,10 +47610,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/resizable-buffer-special-float-values.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/lastIndexOf/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -47676,13 +47679,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/length/resizable-buffer-assorted.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/length/resized-out-of-bounds-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/length/resized-out-of-bounds-2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/length/return-length.js
     expectedClassification: pass
@@ -47859,13 +47862,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/map/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/map/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/map/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/map/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -47931,10 +47934,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/map/speciesctor-resizable-buffer-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/map/speciesctor-resizable-buffer-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/map/this-is-not-object.js
     expectedClassification: pass
@@ -48066,13 +48069,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduce/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduce/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduce/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduce/result-is-last-callbackfn-return.js
     expectedClassification: pass
@@ -48216,13 +48219,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduceRight/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduceRight/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduceRight/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/reduceRight/result-is-last-callbackfn-return.js
     expectedClassification: pass
@@ -48294,7 +48297,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/reverse/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/reverse/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -48549,19 +48552,19 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/target-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/target-grow-source-length-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/target-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/target-shrink-source-length-getter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/this-backed-by-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/this-is-not-object.js
     expectedClassification: pass
@@ -48615,7 +48618,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-src-backed-by-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/set/typedarray-arg-src-byteoffset-internal.js
     expectedClassification: pass
@@ -48759,10 +48762,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/slice/coerced-start-end-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/slice/coerced-start-end-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/slice/detached-buffer-custom-ctor-other-targettype.js
     expectedClassification: pass
@@ -48810,7 +48813,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/slice/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/slice/resize-count-bytes-to-zero.js
     expectedClassification: pass
@@ -48894,7 +48897,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/slice/speciesctor-resize.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/prototype/slice/speciesctor-return-same-buffer-with-offset.js
     expectedClassification: pass
@@ -49017,13 +49020,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/some/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/some/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/some/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-iterative]
   - path: test/built-ins/TypedArray/prototype/some/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -49083,7 +49086,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/sort/comparefn-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/sort/comparefn-is-undefined.js
     expectedClassification: pass
@@ -49092,10 +49095,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/sort/comparefn-resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/sort/comparefn-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/sort/detached-buffer.js
     expectedClassification: pass
@@ -49119,7 +49122,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/sort/resizable-buffer-default-comparator.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-sort]
   - path: test/built-ins/TypedArray/prototype/sort/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -49233,10 +49236,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/coerced-begin-end-grow.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/coerced-begin-end-shrink.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/detached-buffer.js
     expectedClassification: pass
@@ -49266,7 +49269,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/subarray/result-byteOffset-from-out-of-bounds.js
     expectedClassification: pass
@@ -49428,7 +49431,7 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/toLocaleString/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-search-and-join]
   - path: test/built-ins/TypedArray/prototype/toLocaleString/return-abrupt-from-firstelement-tolocalestring.js
     expectedClassification: pass
@@ -49584,13 +49587,13 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/values/resizable-buffer-grow-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/values/resizable-buffer-shrink-mid-iteration.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/values/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-core]
   - path: test/built-ins/TypedArray/prototype/values/return-abrupt-from-this-out-of-bounds.js
     expectedClassification: pass
@@ -49671,10 +49674,10 @@ tests:
     expectedClassification: pass
     dependencies: [typed-array-mutation]
   - path: test/built-ins/TypedArray/resizable-buffer-length-tracking-1.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArray/resizable-buffer-length-tracking-2.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [typed-array-statics]
   - path: test/built-ins/TypedArrayConstructors/BigInt64Array/BYTES_PER_ELEMENT.js
     expectedClassification: pass
@@ -126506,7 +126509,7 @@ tests:
     expectedClassification: pass
     dependencies: [control-flow, property-enumeration]
   - path: test/language/statements/for-in/resizable-buffer.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [control-flow, object-properties, property-enumeration]
   - path: test/language/statements/for-in/scope-body-lex-boundary.js
     expectedClassification: pass

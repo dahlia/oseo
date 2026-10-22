@@ -19,14 +19,13 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-28,311 reviewed cases: 24,069 passes, 2,581 expected negatives, and 1,661
+28,311 reviewed cases: 24,231 passes, 2,581 expected negatives, and 1,499
 unsupported profile features with no semantic, harness, or infrastructure
-failures.
-[ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
-M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language tests
-and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
-post-edition, or Annex B paths are outside it. The compact inventory remains
-separate from the result manifest.
+failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
+the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
+tests and 18,093 built-in tests are inside the 16th edition, while 6,290
+proposal, post-edition, or Annex B paths are outside it. The compact inventory
+remains separate from the result manifest.
 
 M5a and M5b are complete. The 146 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
@@ -3901,15 +3900,16 @@ collection at every safepoint, false hints, deliberate shape-guard misses,
 generic fallback, every ToIndex conversion class, the option bag's abrupt
 orders, brand rejection, resize in both directions, both transfers over eight
 source and target shapes, fifteen slice ranges, ten species outcomes, and a
-collection-pressure loop around a survivor and a transferred store. All 192
-paths under the node's inventory root are reviewed: 128 pass and 64 retain
-explicit prerequisites for `Reflect`, `SharedArrayBuffer`, `DataView`,
-TypedArray constructors, `Object.isExtensible`, and other unadmitted standard
-globals. The manifest moves to 7,613 paths with 5,038 passes, 1,355 expected
-negatives, and 1,220 unsupported profile features. The reviewed harness gains
-`detachArrayBuffer.js` and records `resizableArrayBufferUtils.js` as
-unavailable. The new component and heap kind move the runtime ABI to
-`oseo-runtime-m5-55` without changing the graph's orchestration state.
+collection-pressure loop around a survivor and a transferred store. At the
+original M5b admission, all 192 paths under the node's inventory root were
+reviewed: 128 pass and 64 retain explicit prerequisites for `Reflect`,
+`SharedArrayBuffer`, `DataView`, TypedArray constructors,
+`Object.isExtensible`, and other unadmitted standard globals. The manifest
+moves to 7,613 paths with 5,038 passes, 1,355 expected negatives, and 1,220
+unsupported profile features. The reviewed harness gains `detachArrayBuffer.js`
+and records `resizableArrayBufferUtils.js` as unavailable. The new component
+and heap kind move the runtime ABI to `oseo-runtime-m5-55` without changing the
+graph's orchestration state.
 
 Implemented M5b node `object-integrity-levels` exposes the extensibility flag
 reserved by the intrinsic graph root and admits `Object.preventExtensions`,
@@ -6558,7 +6558,8 @@ engines' divergence from ECMA-262 for the sealed and frozen state of
 non-empty and detached views and for the `subarray` species content-type
 check.
 
-The reviewed harness gains *testTypedArray.js*, and the reviewed feature list
+At the original M5b admission, the reviewed harness gains
+*testTypedArray.js*, and the reviewed feature list
 gains `TypedArray` and `TypedArray.prototype.at`. All 337 paths under the
 node's thirteen inventory roots are reviewed: 288 pass, 28 need the
 unreviewed *resizableArrayBufferUtils.js* include, seven need
@@ -6677,15 +6678,15 @@ the seven methods over Number and BigInt kinds, default, null, and subclass
 species, present and absent reduction initial values, and no mutation, detach,
 and shrink during the first callback, with collection forced at every
 safepoint, a false numeric hint's deliberate guard miss, and an independent
-model of every callback and result. All 398 edition paths under the node's
-seven inventory roots enter the reviewed subset: 375 pass and twenty-three
-keep the unreviewed *resizableArrayBufferUtils.js* include as an explicit
-prerequisite. No reviewed path outside the roots changes classification. The
-manifest moves from 19,770 to 20,168 paths and from 16,144 to 16,519 passes,
-keeps 1,556 expected negatives, and moves from 2,070 to 2,093 unsupported
-profile features with no semantic, harness, or infrastructure failures. The
-property ratchet moves from 148 to 149 domains and seeds and from 5,695 to
-5,707 ordinary cases, and the evidence inventory moves from 126 to 127
+model of every callback and result. At the original M5b admission, all 398
+edition paths under the node's seven inventory roots enter the reviewed subset:
+375 pass and twenty-three keep the unreviewed *resizableArrayBufferUtils.js*
+include as an explicit prerequisite. No reviewed path outside the roots changes
+classification. The manifest moves from 19,770 to 20,168 paths and from 16,144
+to 16,519 passes, keeps 1,556 expected negatives, and moves from 2,070 to 2,093
+unsupported profile features with no semantic, harness, or infrastructure
+failures. The property ratchet moves from 148 to 149 domains and seeds and from
+5,695 to 5,707 ordinary cases, and the evidence inventory moves from 126 to 127
 families. The runtime ABI moves to `m5-112`.
 
 Implemented M5b node `weak-collections` exposes the ephemeron checkpoint's
@@ -6772,19 +6773,19 @@ absent, plain, infinite, fractional, and observably converted fromIndex,
 separator, and locale inputs, and no mutation, detach, and shrink during the
 first callback or conversion, with collection forced at every safepoint, a
 false numeric hint's deliberate guard miss, and an independent model of every
-callback, conversion, and result. All 356 edition paths under the node's ten
-inventory roots enter the reviewed subset: 324 pass, twenty-nine keep the
-unreviewed *resizableArrayBufferUtils.js* include as an explicit
-prerequisite, two locale cases need primitive wrapper objects, and one needs a
-TypedArray mutation method. Twenty already reviewed `set` and
-`subarray` paths outside the roots, which reached a search or join method
-through the reviewed harness, move to pass. The manifest moves from 20,417 to
-20,773 paths and from 16,789 to 17,133 passes, keeps 1,556 expected negatives,
-and moves from 2,072 to 2,084 unsupported profile features with no semantic,
-harness, or infrastructure failures. The property
-ratchet moves from 150 to 151 domains and seeds and from 5,719 to 5,731
-ordinary cases, and the evidence inventory moves from 128 to 129 families. The
-runtime ABI moves to `m5-114`.
+callback, conversion, and result. At the original M5b admission, all 356
+edition paths under the node's ten inventory roots enter the reviewed subset:
+324 pass, twenty-nine keep the unreviewed *resizableArrayBufferUtils.js*
+include as an explicit prerequisite, two locale cases need primitive wrapper
+objects, and one needs a TypedArray mutation method. Twenty already reviewed
+`set` and `subarray` paths outside the roots, which reached a search or join
+method through the reviewed harness, move to pass. The manifest moves from
+20,417 to 20,773 paths and from 16,789 to 17,133 passes, keeps 1,556 expected
+negatives, and moves from 2,072 to 2,084 unsupported profile features with no
+semantic, harness, or infrastructure failures. The property ratchet moves from
+150 to 151 domains and seeds and from 5,719 to 5,731 ordinary cases, and the
+evidence inventory moves from 128 to 129 families. The runtime ABI moves to
+`m5-114`.
 
 M5c node `typed-array-tolocalestring-arguments` repairs the element call in
 `%TypedArray%.prototype.toLocaleString`. ECMA-262 2025 section 23.2.3.31
@@ -6817,13 +6818,24 @@ three logged outer argument expressions, including a coercing locales object
 and a throwing expression, and reporting, object-returning, throwing,
 detaching, or non-callable element methods. A fixed program covers every
 argument shape, call form, view kind, and method mode. Both run under both
-specialization policies with collection forced at every safepoint. The 41
-reviewed paths under the two `toLocaleString` roots keep their records and
-owners: 36 pass, two need primitive wrapper objects, and three need the
+specialization policies with collection forced at every safepoint. At this
+node's original landing, `6f30050c`, the 41 reviewed paths under
+*TypedArray/prototype/toLocaleString/* and
+*TypedArrayConstructors/prototype/toLocaleString/* kept their records and
+owners: 36 passed, two needed primitive wrapper objects, and three needed the
 resizable-buffer harness. None of them inspects element arguments. Against
-base `dc1a00d9`, the property ratchet moves from 182 to 183 domains and seeds
-and from 6,551 to 6,561 ordinary cases; the evidence inventory stays at 143
+base `dc1a00d9`, the property ratchet moved from 182 to 183 domains and seeds
+and from 6,551 to 6,561 ordinary cases; the evidence inventory stayed at 143
 families.
+
+The complete RAB update on clean source `2e3d973f`, recorded in `fbdb0824`,
+observes 37 passes and four unsupported results across those same 41 paths.
+*TypedArray/prototype/toLocaleString/resizable-buffer.js* passes. The grow
+and shrink _user-provided-tolocalestring-\*.js_ cases now reach the
+`primitive-wrapper` rejection and have active owner
+`primitive-wrapper-objects`, alongside the existing Number and BigInt
+*calls-tolocalestring-from-each-value.js* cases. No path in these two roots
+still needs the RAB harness.
 
 Implemented M5b node `symbol-intrinsic` completes the realm-owned `Symbol`
 intrinsic with ordinary `for` and `keyFor` functions and completes
@@ -6971,24 +6983,23 @@ elements of six kinds, omitted, plain, infinite, fractional, negative, and
 observably converted relative indices and element values, and no mutation,
 detach, shrink, and grow during the first conversion, with collection forced at
 every safepoint, a false numeric hint's deliberate guard miss, and an
-independent model of every conversion, write, and result. All 258 edition
-paths under the node's six inventory roots enter the reviewed subset:
-248 pass and the remaining ten keep the unreviewed
-*resizableArrayBufferUtils.js* include as an explicit prerequisite. One
-already reviewed `lastIndexOf` path outside the roots, whose last unmet
-prerequisite was a TypedArray mutation method, moves to pass, and no
-reviewed path moves away from pass. Node.js and Deno
-resolve a negative `with` index against the length its value conversion left
-behind rather than the snapshot length, so the generated suite keeps that one
-combination out of the host comparison and the two reviewed
-*negative-index-resize* paths carry the contract, with a structural assertion
-over the runtime source pinning the same choice. The manifest moves
-from 20,898 to 21,156 paths and from 17,275 to 17,524
-passes, keeps 1,556 expected negatives, and moves from 2,067 to
-2,076 unsupported profile features with no semantic, harness, or
-infrastructure failures. The property ratchet moves from 153 to 154 domains
-and seeds and from 5,755 to 5,767 ordinary cases, and the evidence inventory
-moves from 131 to 132 families. The runtime ABI moves to `m5-117`.
+independent model of every conversion, write, and result. At the original M5b
+admission, all 258 edition paths under the node's six inventory roots enter the
+reviewed subset: 248 pass and the remaining ten keep the unreviewed
+*resizableArrayBufferUtils.js* include as an explicit prerequisite. One already
+reviewed `lastIndexOf` path outside the roots, whose last unmet prerequisite
+was a TypedArray mutation method, moves to pass, and no reviewed path moves
+away from pass. Node.js and Deno resolve a negative `with` index against the
+length its value conversion left behind rather than the snapshot length, so the
+generated suite keeps that one combination out of the host comparison and the
+two reviewed *negative-index-resize* paths carry the contract, with a
+structural assertion over the runtime source pinning the same choice. The
+manifest moves from 20,898 to 21,156 paths and from 17,275 to 17,524 passes,
+keeps 1,556 expected negatives, and moves from 2,067 to 2,076 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+property ratchet moves from 153 to 154 domains and seeds and from 5,755 to
+5,767 ordinary cases, and the evidence inventory moves from 131 to 132
+families. The runtime ABI moves to `m5-117`.
 
 Implemented M5b node `typed-array-sort` adds `sort` and `toSorted` to
 `%TypedArray.prototype%` as distinct non-constructible methods of length one.
@@ -7014,16 +7025,15 @@ stable equality, abrupt calls and comparator-result conversion, initial and
 comparator-driven detach, shrink, and grow, and in-place versus copied results,
 with both specialization policies, collection forced at every safepoint, one
 deliberate numeric-hint guard miss, and an independent stable insertion-sort
-model. All 47 edition paths under the node's two inventory roots enter the
-reviewed subset: 43 pass, while four retain the unreviewed
-*resizableArrayBufferUtils.js* harness prerequisite explicitly. The manifest
-moves from 21,265 to 21,312 paths and from 17,958 to 18,001 passes, keeps 1,556
-expected negatives, and moves from 1,751 to 1,755 unsupported profile features
-with no semantic, harness, or infrastructure failures. No reviewed path moves
-away from pass. The property ratchet moves from 159 to
-160 domains and seeds and from 5,827 to 5,839 ordinary cases, the evidence
-inventory moves from 136 to 137 families, and the runtime ABI moves to
-`m5-121`.
+model. At the original M5b admission, all 47 edition paths under the node's two
+inventory roots enter the reviewed subset: 43 pass, while four retain the
+unreviewed *resizableArrayBufferUtils.js* harness prerequisite explicitly. The
+manifest moves from 21,265 to 21,312 paths and from 17,958 to 18,001 passes,
+keeps 1,556 expected negatives, and moves from 1,751 to 1,755 unsupported
+profile features with no semantic, harness, or infrastructure failures. No
+reviewed path moves away from pass. The property ratchet moves from 159 to 160
+domains and seeds and from 5,827 to 5,839 ordinary cases, the evidence
+inventory moves from 136 to 137 families, and the runtime ABI moves to `m5-121`.
 
 Implemented M5b node `regexp-matcher-backend-selection` records the
 maintainer-selected composed owned backend in
@@ -7330,20 +7340,19 @@ detach, shrink, and grow of the result during the first mapper call or
 conversion, with both specialization policies, collection forced at every
 safepoint, one deliberate numeric-hint guard miss, and an independent model
 of every stored value and the order of reads, iterator steps, constructor and
-mapper calls, and conversions. All 42 edition paths under the node's four
-inventory roots enter the reviewed subset: 37 pass, while five retain the
-unreviewed *resizableArrayBufferUtils.js* harness prerequisite. No reviewed
-path outside the roots changes classification. The 86 unreviewed
-_TypedArrayConstructors/from/_ and _TypedArrayConstructors/of/_ paths belong
-to the constructors node's inventory and stay outside the subset; a focused
-run of them on this node observed 84 passes and two cases held by the
+mapper calls, and conversions. At the original M5b admission, all 42 edition
+paths under the node's four inventory roots enter the reviewed subset: 37 pass,
+while five retain the unreviewed *resizableArrayBufferUtils.js* harness
+prerequisite. No reviewed path outside the roots changes classification. The 86
+unreviewed _TypedArrayConstructors/from/_ and _TypedArrayConstructors/of/_
+paths belong to the constructors node's inventory and stay outside the subset;
+a focused run of them on this node observed 84 passes and two cases held by the
 unsupported `immutable-arraybuffer` feature. The manifest moves from 21,341 to
-21,383 paths and from 18,273 to 18,310 passes, keeps 1,560 expected
-negatives, and moves from 1,508 to 1,513 unsupported profile features with no
-semantic, harness, or infrastructure failures. The property ratchet moves from
-162 to 163 domains and seeds and from 5,861 to 5,873 ordinary cases, the
-evidence inventory moves from 139 to 140 families, and the runtime ABI moves
-to `m5-124`.
+21,383 paths and from 18,273 to 18,310 passes, keeps 1,560 expected negatives,
+and moves from 1,508 to 1,513 unsupported profile features with no semantic,
+harness, or infrastructure failures. The property ratchet moves from 162 to 163
+domains and seeds and from 5,861 to 5,873 ordinary cases, the evidence
+inventory moves from 139 to 140 families, and the runtime ABI moves to `m5-124`.
 
 Implemented M5b node `date-nio-clock-integration` completes the sequence
 `date-family` and `nio-clock-wakeup-checkpoint` began. *runtime\_date.c* no
@@ -8469,3 +8478,28 @@ path and 20 in all. It is neither a pass nor an exclusion, and this node
 changes no host rejection policy. The later full update at source
 `4c18c04b`, whose pre-start record binds that clean commit and its tree,
 observed every record again, these 30 included, and changed none.
+
+
+Minor feature tag admission
+---------------------------
+
+M5c node `minor-feature-tag-admission` admits the `json-superset`,
+`__proto__`, and `proxy-missing-checks` test262 features to the reviewed
+`supportedFeatures`. *PLAN-M5C.md* records the ten gated paths, seven by name
+and the three `proxy-missing-checks` paths by the invariant each observes, and
+the behavior each tag needs. The current profile already meets it, so no
+compiler or runtime code changes. Literal U+2028 and U+2029 stay single code
+units of a string constant. The `__proto__` paths exercise only core
+object-initializer, class-definition, and proxy-forwarding behavior, and no
+Annex B accessor is installed. The `[[DefineOwnProperty]]`, `[[Delete]]`, and
+`[[GetOwnProperty]]` post-trap invariants already belong to the
+`proxy-exotic-object` family.
+
+No generated domain, seed, or budget changes because no behavior changes. The
+`proxy-exotic-object` native fixture adds the three invariant violations
+beside accepted controls and a `"__proto__"` write through a proxy parent with
+computed and static keys. The *tests/native/fixtures/objects.ts* native fixture
+adds generator, async, and async generator `__proto__` methods beside a
+prototype setter. A parser unit test pins the literal U+2028 and U+2029 code
+units and the unterminated raw line feed and carriage return. Observation batch
+32 keeps the first admission of the ten paths, so this node adds no subset row.

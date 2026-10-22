@@ -20,6 +20,13 @@ results:
       - array-buffer
       - object-properties
       - typed-array-constructors
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/TypedArrayConstructors/ctors/no-species.js
         non-strict disabled failed (1): stdout=""

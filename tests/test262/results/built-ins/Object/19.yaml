@@ -281,6 +281,13 @@ results:
     dependencies:
       - dynamic-source
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/Object/seal/seal-arrowfunction.js non-strict
         disabled failed (1): stdout=""

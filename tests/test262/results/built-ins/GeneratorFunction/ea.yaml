@@ -17,6 +17,13 @@ results:
     dependencies:
       - dynamic-source
       - generators
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/GeneratorFunction/invoked-as-function-multiple-arguments.js
         non-strict disabled failed (1): stdout=""

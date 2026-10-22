@@ -9,6 +9,12 @@ scope:
   - "A missing __proto__ read reaching an intrinsic Object.prototype
     reports OSEO1001 for the excluded Annex B accessor; ordinary properties
     with that name, null prototypes, and proxy traps retain core behavior."
+  - "A __proto__ [[Set]] whose ordinary or receiver walk reaches an
+    intrinsic Object.prototype without an own or inherited user property
+    reports the same OSEO1001 for the omitted setter; user properties,
+    proxy set traps, null prototypes, typed-array numeric keys, the
+    object-literal prototype setter, and primitive bases retain their
+    behavior."
   - "A missing __lookupGetter__ or __lookupSetter__ read reaching an
     intrinsic Object.prototype reports OSEO1001 for the omitted normative
     optional legacy method (16th edition 20.1.3.9, mapped onto the ADR 0013

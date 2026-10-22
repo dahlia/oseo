@@ -854,6 +854,61 @@ stderr, and admits them with their unchanged `classes` dependency tag. Their
 whole-path exclusion is recorded.
 
 
+Incidental Annex B prototype write dependency
+---------------------------------------------
+
+The `__proto__` boundary above covered only the read. A write of
+`"__proto__"` that reaches the intrinsic `Object.prototype` without the key
+needs the same omitted normative-optional setter (16th edition 20.1.3.8.2);
+without a guard it silently creates an own data property instead, so a test
+can pass without the setup it intended. The `resizable-array-buffer-harness`
+node therefore enforces the existing ADR 0013 dependency rule for writes. It
+adds no exclusion and no policy waiver, and leaves the ADR 0013 vocabulary
+unchanged. Both of *runtime\_property.c*'s `[[Set]]` walks report the
+existing owned `OSEO1001` there, and runtime ABI `m5-134` records it. User
+properties, proxy `set` traps, null prototypes, typed-array numeric keys, and
+the object-literal prototype setter keep their behavior, and a primitive base
+keeps its existing early return. This is the boundary of those walks, not a
+complete Annex B detector.
+
+*TypedArray/out-of-bounds-behaves-like-detached.js* is the one reviewed case
+that writes `__proto__`: `i8a.__proto__ = { 2: 'wrong value' }` is meant to
+give the view a prototype that answers index 2. The complete update recorded
+in `615d9d3b` observed it as a pass before this guard, with an own
+`"__proto__"` property and the view still inheriting from
+`Int8Array.prototype`, so none of its assertions could show that an
+out-of-bounds read or `in` skips such a prototype. Its core subject remains
+active coverage debt, not an exclusion. The `typed-array-core` native fixture
+now supplies that subject with `Object.setPrototypeOf`: an index-bearing
+prototype that inherits from `Int8Array.prototype`, on a fixed-length and a
+length-tracking view, with prototype identity and an inherited label as
+witnesses, `Get` and `in` before shrinking, out of bounds, and after
+regrowing. Focused native runs at `3e42e4c3` passed:
+*tests/annexb-proto-boundary.test.ts* (all four tests, guarded and answered
+writes under both specialization policies) and the fixture through
+`mise run test:native --shard 77/282` (Node.js, Deno, and native outputs match;
+the AArch64 musl cross-link builds). The complete
+`mise run test262:update -- --accept-promotions` on the clean source
+`09745af3` ended with natural exit 0 and was recorded in `e7228e8f`.
+That earlier result is historical provenance; the current observations below
+come from the complete update on clean source `2e3d973f`, recorded in
+`fbdb0824`.
+
+The path is unsupported in the reviewed `main` manifest. A static scan of
+spelled `__proto__` keys finds no guard candidate among the `main` passes
+that mention it, but it cannot see computed keys, so the complete manifest
+update of this source must preserve every `main` pass. Commit `3e42e4c3`
+restores its subset expectation from `pass` to `unsupported-profile-feature`,
+because the reviewed runner refuses a pass-to-unsupported change as a demotion
+rather than recording it.
+
+The complete update on clean source `2e3d973f` again observes the assignment's
+owned `OSEO1001` before any assertion. Its mixed Annex B subject remains
+coverage debt, with the `typed-array-core` fixture as replacement evidence. The
+audit binds the observed rejection and fixture, and the ledger assigns the path
+to `node:typed-array-proto-coverage-remediation`; no exclusion is recorded.
+
+
 Legacy function caller boundary
 -------------------------------
 
@@ -900,3 +955,193 @@ other ADR owner, and every reviewed selector path needs its audit row. The
 five dynamic-source intersections do not broaden ADR 0016 and are not owned
 by it. A later observation that reaches their dynamic-source rejection, or
 that admits the `caller` feature, needs a new reviewed scope decision.
+
+
+Minor feature tag admission
+---------------------------
+
+The `minor-feature-tag-admission` node admits the `json-superset`,
+`__proto__`, and `proxy-missing-checks` frontmatter features to the reviewed
+`supportedFeatures`. Exactly ten included paths of the fixed inventory carry
+one of them. All ten are unreviewed and owned by `node:observation-batch-32`.
+This node adds no subset row: batch 32 keeps their first admission, their
+observed classification, and any exclusion-audit row or ledger owner. No
+reviewed path carries any of the three tags.
+
+Each tag is admitted because the current profile already meets what its
+included paths require. Source analysis found no defect to repair, so the node
+changes no compiler or runtime code:
+
+ -  `json-superset` gates four paths under *test/language/literals/string/*.
+    ECMA-262 16th edition String Literals let U+2028 and U+2029 appear
+    literally in a string literal. Babel accepts them, the compiler keeps each
+    as one UTF-16 code unit of the string constant, and the C backend emits
+    that constant as a code-unit array. *line-separator.js* and
+    *paragraph-separator.js* need only that literal data. Their
+    *line-separator-eval.js* and *paragraph-separator-eval.js* siblings pass
+    the feature gate and then call `eval`, so their observation reaches the
+    ADR 0016 boundary. This node claims neither a pass nor an exclusion for
+    them, and the literal behavior above does not depend on them.
+
+ -  `__proto__` gates three paths that ADR 0020 keeps in the inventory as
+    core tests merely carrying the flag.
+    *test/language/expressions/object/\_\_proto\_\_-permitted-dup.js*
+    tests the core Object Initializer early error and
+    PropertyDefinitionEvaluation that M5a Unit 8.1c admitted.
+    *test/language/expressions/class/poisoned-underscore-proto.js* defines a
+    user `__proto__` setter on `Object.prototype` and observes that
+    ClassDefinitionEvaluation sets the new prototype object's `[[Prototype]]`
+    directly.
+    *test/built-ins/Proxy/set/call-parameters-prototype-dunder-proto.js*
+    forwards OrdinarySet with the key `"__proto__"` to a proxy parent's `set`
+    trap. None reads the optional `Object.prototype.__proto__` accessor.
+    Admitting the tag installs no accessor and is not a blanket Annex B
+    exclusion: a missing `__proto__` read that reaches an intrinsic
+    `Object.prototype` still reports the `OSEO1001` rejection owned by
+    `annexb-proto-dependency-classification`.
+
+ -  `proxy-missing-checks` gates three paths under *test/built-ins/Proxy/*.
+    The `proxy-exotic-object` implementation in
+    *packages/runtime-c/native/runtime\_proxy.c* already applies the three
+    post-trap invariants those paths observe. Its `[[DefineOwnProperty]]`
+    throws a `TypeError` when the trap reports success for a descriptor with
+    a false `[[Writable]]` while the target property is non-configurable
+    writable data. Its `[[Delete]]` throws when the trap reports success for an
+    existing configurable property of a non-extensible target. Its
+    `[[GetOwnProperty]]` throws when the trap reports a non-configurable,
+    non-writable descriptor while the target property is writable.
+
+The node adds no generated domain, seed, or budget, because no runtime
+behavior changes. It extends fixed evidence of the existing families instead.
+The `proxy-exotic-object` native fixture triggers each of the three
+invariants beside an accepted control, counts the trap calls, and writes
+`"__proto__"` through a proxy parent with computed and static keys. The
+*tests/native/fixtures/objects.ts* native fixture adds generator, async, and
+async generator methods named `__proto__` beside a prototype setter. A
+*packages/parser-babel/tests/basics.test.ts* case checks that literal
+U+2028 and U+2029 stay single code units of their string constants while a
+raw line feed or carriage return still leaves the literal unterminated. The
+native fixtures compare Node.js, Deno, and both native specialization
+policies with collection forced at every safepoint.
+
+Changing `supportedFeatures` requires the complete `mise run test262:update`,
+because the scoped update refuses that change. No reviewed path carries the
+admitted tags, so every reviewed observation should stay unchanged; the
+complete update's actual records decide. The node's two direct dependents
+are `observation-batch-32` and `m5-exit-audit`. Landing this node alone does
+not unblock batch 32, which also waits for its other prerequisite nodes.
+
+
+Resizable buffer harness
+------------------------
+
+The `resizable-array-buffer-harness` node adds a reviewed
+*tests/test262/harness/resizableArrayBufferUtils.js* and registers it with
+the reviewed runner, which no longer lists that include as unavailable. The
+original harness admission changed no runtime, compiler, or feature list;
+the node's later `__proto__` write guard is described in the incidental
+Annex B prototype write dependency section.
+
+The unavailable-include list still contains *wellKnownIntrinsicObjects.js*.
+Its six reviewed paths keep main's `harness-include` observations and owners.
+This node admits only *resizableArrayBufferUtils.js*. An unknown include that
+the reviewed harness does not implement still fails as a harness defect.
+
+The earlier combined update recorded in `615d9d3b` observed 163 passes in
+this node's 168-path cohort. Five remained unsupported with their actual
+rejections and were assigned as active coverage debt:
+
+ -  The grow and shrink _user-provided-tolocalestring-\*.js_ cases of
+    `Array.prototype.toLocaleString` and `%TypedArray%.prototype.toLocaleString`
+    report the `primitive-wrapper` capability. Their replacement
+    `Number.prototype.toLocaleString` and `BigInt.prototype.toLocaleString`
+    call the saved original with a non-strict `this`, which boxes the element.
+    The first observed variant stops at that call, so their remaining
+    assertions did not run. The earlier update assigned these four to
+    `primitive-wrapper-objects`; the current complete update below confirms
+    those observations and ownership assignments.
+ -  *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports
+    the run-time `OSEO1001` rejection of the Annex B
+    `Object.prototype.__proto__` accessor. The program runs both buffer
+    allocations and constructs the first listed constructor's two views,
+    `ta_rab` over the resizable buffer and then `ta_ab` over the fixed-length
+    buffer. It stops at the `ta_ab.__proto__` read, recorded at 275:20 as the
+    first operand of the first prototype comparison, so no comparison
+    completes. Its core subject, that
+    fixed-length views over a resizable and a fixed-length buffer share the new
+    target's prototype, does not depend on Annex B.
+    That update assigned it to `typed-array-proto-coverage-remediation`
+    beside *no-species.js*
+    under a separate bounded audit assessment. Replacement evidence is the
+    `typed-array-constructors` native fixture's case for every constructor
+    the harness lists, including its three class subclasses, and the
+    construction order property's fixed-buffer and length-tracking
+    resizable-buffer cases. The native fixture covers the fixed-length view
+    pairs over both buffer kinds; the property covers complementary shapes.
+    The maintainer accounting decision is still required, and ADR 0013 is not
+    widened.
+
+The earlier complete update, on the clean source `09745af3` and recorded in
+`e7228e8f`, changed one of the 163 passes. Under the `__proto__` write guard
+of the incidental Annex B prototype write dependency section,
+*TypedArray/out-of-bounds-behaves-like-detached.js* was observed as
+`unsupported-profile-feature`. That update recorded 162 passes and six
+unsupported results among the 168. It assigned the sixth to
+`typed-array-proto-coverage-remediation` too. Those observations and ownership
+transfers are historical evidence. Clean source `2e3d973f` retained main data
+until the complete update below; its actual records and assignments are now
+recorded in `fbdb0824`.
+
+The CLI's `executed` fact is shared infrastructure needed by this node's
+runtime `__proto__` boundaries. Only starting the compiled executable sets
+it. The runner retains that variant as execution evidence when a run-time
+`OSEO1001` stops the program, and the fragment executor counts the same fact.
+Compile-stage rejections and failures before program start have no execution
+fact. This contract does not depend on the intrinsics harness.
+
+The complete `mise run test262:update -- --accept-promotions` on clean source
+`2e3d973f` ended with natural exit 0 and is recorded in `fbdb0824`.
+Its manifest records 28,311 reviewed
+cases: 24,231 passes, 2,581 expected negatives, and 1,499 unsupported profile
+features. It preserves every one of the 24,069 successful main passes and all
+28,311 reviewed paths in the 41,091-path inventory, with no semantic, harness,
+or infrastructure failures. Of the original 168 RAB paths, 162 pass and 6
+remain unsupported. The ledger assigns 4 of those to
+`primitive-wrapper-objects` and 2 to `typed-array-proto-coverage-remediation`
+as active coverage debt, without exclusions. The six WKI paths retain exactly
+main's harness-include observations and owners. The records, promotions, and
+derived counts come from this complete update, not an earlier combined-update
+snapshot.
+
+The copy keeps every upstream operation except how the three subclasses are
+made. Upstream's internal `subClass` compiles
+`return class My<type> extends <type> {}` through the `Function`
+constructor, which ADR 0016 keeps outside the admitted dynamic source. That
+body runs in the global environment and only declares a class, so the copy
+declares `MyUint8Array`, `MyFloat32Array`, and `MyBigInt64Array` as `const`
+bindings of the same named class expressions, in the same order and with the
+same global heritage. This adaptation is bounded:
+
+ -  `subClass` itself is not defined. It is outside the upstream `defines`,
+    and no pinned test calls it.
+ -  Upstream's `try`/`catch` yields `undefined` only on an engine without
+    class syntax. This profile admits classes, so the three bindings always
+    hold their classes.
+ -  Both `typeof Float16Array` probes are kept verbatim, so `ctors` and
+    `floatCtors` are exactly the lists upstream selects on the host that
+    runs them. The probes are not dropped to avoid the Float16Array gap.
+
+The upstream frontmatter of 188 pinned tests includes this file. Of the
+included inventory, 168 form this node's original reviewed cohort and 17 are
+unreviewed paths of `observation-batch-32`, which stay unreviewed here.
+Three more are under *test/staging/* and outside the inventory.
+
+The clean source `2e3d973f` used by the complete update contains
+`typed-array-feature-admission`, which admits the Float16Array global.
+Without that admission both probes would be the profile-syntax rejection
+for `typeof` of an unadmitted standard global; that update observed all
+168 paths with the admission present. This node does
+not touch the Float16Array source. A reference run under Node.js and Deno
+on hosts that define Float16Array is evidence that the copy is equivalent
+to upstream, not an Oseo observation. The classifications come only from
+that complete update.

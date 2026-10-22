@@ -79,6 +79,23 @@ collection at every safepoint. Native diagnostic tests pin direct, computed,
 Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI is
 `oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary stay unchanged.
 
+Runtime ABI `oseo-runtime-m5-134` adds the write half of the same boundary. A
+`[[Set]]` of `"__proto__"` whose walk reaches an intrinsic `Object.prototype`
+without finding an own property there or earlier reports the same owned
+`OSEO1001`, because only the omitted normative-optional setter (16th edition
+20.1.3.8.2) would handle that write; without the guard it would silently
+create an own data property instead. Ordinary assignment, `Reflect.set`
+(including a distinct receiver), `super` assignment, a proxy without a `set`
+trap, and `Object.assign` share the guarded walks. Own and inherited user
+data, accessor, and read-only properties, proxy `set` traps, null prototypes,
+typed-array numeric keys, and the object-literal prototype setter keep their
+behavior. A primitive base keeps its existing early return, so this is the
+boundary of these two walks, not a complete Annex B detector. Native tests in
+*tests/annexb-proto-boundary.test.ts* pin the guarded writes under both
+specialization policies with collection at every safepoint, and one program
+of answered writes whose output a reference host prints with or without the
+setter.
+
 M5c node `annexb-legacy-lookup-dependency-classification` makes only a
 missing `__lookupGetter__` or `__lookupSetter__` lookup reaching an intrinsic
 `Object.prototype` observable as `OSEO1001`. The 16th edition defines both
@@ -160,6 +177,20 @@ observed 29 of the 30 reviewed paths as passes.
 checkpoint with `OSEO2001` and stays unsupported under node
 `unhandled-rejection-observation`.
 
+M5c node `minor-feature-tag-admission` admits the `json-superset`,
+`__proto__`, and `proxy-missing-checks` test262 features without changing
+compiler or runtime behavior. Literal U+2028 and U+2029 in a string literal
+are single code units of its value. The `__proto__` tag covers only core
+object-initializer, class, and proxy-forwarding behavior on keys named
+`__proto__`; no Annex B accessor is installed, and the existing `OSEO1001`
+rejection of a missing read at an intrinsic `Object.prototype` is unchanged.
+The existing Proxy family already enforces the `[[DefineOwnProperty]]`,
+`[[Delete]]`, and `[[GetOwnProperty]]` invariants that tag measures. The
+existing Proxy exotic object and object-literal prototype setter fixtures
+gain fixed cases for these behaviors. Observation batch 32 owns the first
+admission of the ten gated paths; the two `eval` string-literal cases reach
+the ADR 0016 boundary and gain neither a pass nor an exclusion here.
+
 
 Claim boundary
 --------------
@@ -188,8 +219,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,311 reviewed cases: 24,069 passes, 2,581
-expected negatives, and 1,661 unsupported profile features. It records no
+The current manifest contains 28,311 reviewed cases: 24,231 passes, 2,581
+expected negatives, and 1,499 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3575,7 +3606,8 @@ were unobservable from ECMAScript at that checkpoint, so its zeroing and
 copying evidence was structural and sanitizer-based. The TypedArray evidence
 below subsequently observes those bytes through a view.
 
-All 192 paths under the node's inventory root are now reviewed: 128 pass and
+At the original M5b admission, all 192 paths under the node's inventory root
+were reviewed: 128 pass and
 64 record explicit prerequisites. Twenty-four reach an unadmitted standard
 global at compile time, twelve need `Reflect.construct`, nine need
 `SharedArrayBuffer`, ten need `DataView`, four need a TypedArray constructor,
@@ -7157,30 +7189,43 @@ frozen, and it skips the `subarray` species content-type check. The same
 checks pin the empty, length-tracking, and fixed-length resizable
 boundaries, and JavaScriptCore matches every integrity-level row.
 
-The reviewed test262 harness gains *testTypedArray.js*, unchanged in behavior
-except that it defines the `isPrimitive` predicate the reviewed base harness
-omits and drops the two `typeof Float16Array` probes, whose outcome is fixed
-on an ECMAScript 2025 host. The reviewed feature list gains `TypedArray` and
+At the original M5b admission, the reviewed test262 harness gains
+*testTypedArray.js*, unchanged in behavior except that it defines the
+`isPrimitive` predicate the reviewed base harness omits and drops the two
+`typeof Float16Array` probes, whose outcome is fixed on an ECMAScript 2025
+host. The reviewed feature list gains `TypedArray` and
 `TypedArray.prototype.at`, and the dependency vocabulary gains
-`typed-array-core`. All 337 paths under the node's thirteen inventory roots
-are reviewed: 288 pass, 28 need the unreviewed
-*resizableArrayBufferUtils.js* include, whose subclass factory uses the
-`Function` constructor, seven need `SharedArrayBuffer`, and fourteen reach a
-TypedArray search and join method. Ninety-two already reviewed paths outside
-the roots move to pass now that the prototype surface and harness exist: the
-67 constructor cases held at the `TypedArray` feature gate, ten Array iterator
-detachment and resize cases, nine Array prototype cases over TypedArray
-inputs, five `ArrayBuffer.isView` cases, and one built-in subclassing case. No
-reviewed path moves away from `pass`. The manifest moves from 18,768 to
-19,105 cases and from 15,226 to 15,606 passes, keeps 1,556 expected
-negatives, and moves from 1,986 to 1,943 unsupported profile features with no
-semantic, harness, or infrastructure failures. The property inventory
-reaches 146 domains and seeds with a 5,671-case ordinary budget, and the
-evidence inventory reaches 124 families. The runtime ABI moves to
-`oseo-runtime-m5-109`: the TypedArray code range gains twelve built-in code
+`typed-array-core`. All 337 paths under the node's thirteen inventory roots are
+reviewed: 288 pass, 28 need the unreviewed *resizableArrayBufferUtils.js*
+include, whose subclass factory uses the `Function` constructor, seven need
+`SharedArrayBuffer`, and fourteen reach a TypedArray search and join method.
+Ninety-two already reviewed paths outside the roots move to pass now that the
+prototype surface and harness exist: the 67 constructor cases held at the
+`TypedArray` feature gate, ten Array iterator detachment and resize cases, nine
+Array prototype cases over TypedArray inputs, five `ArrayBuffer.isView` cases,
+and one built-in subclassing case. No reviewed path moves away from `pass`. The
+manifest moves from 18,768 to 19,105 cases and from 15,226 to 15,606 passes,
+keeps 1,556 expected negatives, and moves from 1,986 to 1,943 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+property inventory reaches 146 domains and seeds with a 5,671-case ordinary
+budget, and the evidence inventory reaches 124 families. The runtime ABI moves
+to `oseo-runtime-m5-109`: the TypedArray code range gains twelve built-in code
 IDs and the public intrinsic table gains one slot for the shared
 `Array.prototype.toString` identity, while the value representation and the
 generated-code entry points are unchanged.
+
+The current *testTypedArray.js* has since restored both upstream
+`typeof Float16Array` probes, preserving the constructor lists selected by
+an ECMAScript 2025 host. The historical adaptation above does not describe
+the current harness.
+
+The current complete RAB harness update, recorded in `fbdb0824` from clean
+source `2e3d973f`, observes 27 passes among the 28 paths in these roots that
+include *resizableArrayBufferUtils.js*. The remaining
+*resizable-and-fixed-have-same-prototype.js* case is unsupported, with active
+owner `typed-array-proto-coverage-remediation`; it is not an exclusion.
+The seven SharedArrayBuffer paths above now pass under the already-admitted
+shared-buffer support. The original admission counts above are historical.
 
 
 TypedArray iteration methods
@@ -7231,16 +7276,22 @@ callback's `this`, species construction order, content-type and result-shape
 errors, non-typed-array and detached receivers, non-callable callbacks, empty
 reductions, and species reads that throw.
 
-The reviewed feature list already carries `TypedArray`, so no new feature tag
-is needed. All 398 paths under the node's seven inventory roots enter the
-reviewed subset: 375 pass and twenty-three keep the unreviewed
-*resizableArrayBufferUtils.js* include as an explicit prerequisite. No path
-outside the roots changes classification. The manifest moves from 19,770 to
-20,168 cases and from 16,144 to 16,519 passes while keeping 1,556 expected
-negatives and moving from 2,070 to 2,093 unsupported profile features with no
-semantic, harness, or infrastructure failures. The property inventory reaches
-149 domains and seeds with a 5,707-case ordinary budget, the evidence
-inventory reaches 127 families, and the runtime ABI moves to `m5-112`.
+At the original M5b admission, the reviewed feature list already carries
+`TypedArray`, so no new feature tag is needed. All 398 paths under the node's
+seven inventory roots enter the reviewed subset: 375 pass and twenty-three keep
+the unreviewed *resizableArrayBufferUtils.js* include as an explicit
+prerequisite. No path outside the roots changes classification. The manifest
+moves from 19,770 to 20,168 cases and from 16,144 to 16,519 passes while
+keeping 1,556 expected negatives and moving from 2,070 to 2,093 unsupported
+profile features with no semantic, harness, or infrastructure failures. The
+property inventory reaches 149 domains and seeds with a 5,707-case ordinary
+budget, the evidence inventory reaches 127 families, and the runtime ABI moves
+to `m5-112`.
+
+The current complete RAB harness update, recorded in `fbdb0824` from clean
+source `2e3d973f`, observes all 23 paths in these roots that include
+*resizableArrayBufferUtils.js* as passes, with ledger owner `observation`.
+None remains unsupported. The original admission counts above are historical.
 
 
 TypedArray search and joining
@@ -7327,20 +7378,27 @@ methods. A fixed program covers every argument shape, call form, view kind,
 and method mode under both specialization policies with collection forced at
 every safepoint.
 
-The reviewed feature list and harness are unchanged, and the dependency
-vocabulary gains `typed-array-search-and-join`. All 356 paths under the
-node's ten inventory roots enter the reviewed subset: 324 pass, twenty-nine
-keep the unreviewed *resizableArrayBufferUtils.js* include as an explicit
-prerequisite, two `toLocaleString` cases need primitive wrapper objects, and
-one `lastIndexOf` case needs a TypedArray mutation method. Twenty already
-reviewed `set` and `subarray` paths outside the roots, which reach a search or
-join method through the reviewed harness, move from unsupported to pass. The
-manifest moves from 20,417 to 20,773 cases and from 16,789 to 17,133 passes
-while keeping 1,556 expected negatives and moving from 2,072 to 2,084
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The property inventory reaches 151 domains and seeds with a
-5,731-case ordinary budget, the evidence inventory reaches 129 families, and
-the runtime ABI moves to `m5-114`.
+At the original M5b admission, the reviewed feature list and harness are
+unchanged, and the dependency vocabulary gains `typed-array-search-and-join`.
+All 356 paths under the node's ten inventory roots enter the reviewed subset:
+324 pass, twenty-nine keep the unreviewed *resizableArrayBufferUtils.js*
+include as an explicit prerequisite, two `toLocaleString` cases need primitive
+wrapper objects, and one `lastIndexOf` case needs a TypedArray mutation method.
+Twenty already reviewed `set` and `subarray` paths outside the roots, which
+reach a search or join method through the reviewed harness, move from
+unsupported to pass. The manifest moves from 20,417 to 20,773 cases and from
+16,789 to 17,133 passes while keeping 1,556 expected negatives and moving from
+2,072 to 2,084 unsupported profile features with no semantic, harness, or
+infrastructure failures. The property inventory reaches 151 domains and seeds
+with a 5,731-case ordinary budget, the evidence inventory reaches 129 families,
+and the runtime ABI moves to `m5-114`.
+
+The current complete RAB harness update, recorded in `fbdb0824` from clean
+source `2e3d973f`, observes 27 passes among the 29 paths in these roots that
+include *resizableArrayBufferUtils.js*. The grow and shrink
+_user-provided-tolocalestring-\*.js_ cases remain unsupported, with active
+owner `primitive-wrapper-objects`; neither is an exclusion. The original
+admission counts above are historical.
 
 
 TypedArray mutation and copying
@@ -7420,20 +7478,24 @@ that are too short or of the wrong content type, a species getter that
 throws, non-typed-array, primitive, and detached receivers, Float `NaN`
 payload preservation, and grow and shrink through resizable buffers.
 
-The reviewed feature list and harness are unchanged, and the dependency
-vocabulary gains `typed-array-mutation`. All 258 paths under the node's six
-inventory roots enter the reviewed subset: 248 pass and the remaining ten
-keep the unreviewed *resizableArrayBufferUtils.js* include as an explicit
-prerequisite. One already reviewed `lastIndexOf` path outside the roots,
-whose last unmet prerequisite was a TypedArray mutation method, moves from
-unsupported to pass, and no reviewed path moves away from pass. The manifest
-moves from 20,898 to
-21,156 cases and from 17,275 to 17,524 passes while keeping
-1,556 expected negatives and moving from 2,067 to 2,076
+At the original M5b admission, the reviewed feature list and harness are
+unchanged, and the dependency vocabulary gains `typed-array-mutation`. All 258
+paths under the node's six inventory roots enter the reviewed subset: 248 pass
+and the remaining ten keep the unreviewed *resizableArrayBufferUtils.js*
+include as an explicit prerequisite. One already reviewed `lastIndexOf` path
+outside the roots, whose last unmet prerequisite was a TypedArray mutation
+method, moves from unsupported to pass, and no reviewed path moves away from
+pass. The manifest moves from 20,898 to 21,156 cases and from 17,275 to 17,524
+passes while keeping 1,556 expected negatives and moving from 2,067 to 2,076
 unsupported profile features with no semantic, harness, or infrastructure
 failures. The property inventory reaches 154 domains and seeds with a
-5,767-case ordinary budget, the evidence inventory reaches 132
-families, and the runtime ABI moves to `m5-117`.
+5,767-case ordinary budget, the evidence inventory reaches 132 families, and
+the runtime ABI moves to `m5-117`.
+
+The current complete RAB harness update, recorded in `fbdb0824` from clean
+source `2e3d973f`, observes all ten paths in these roots that include
+*resizableArrayBufferUtils.js* as passes, with ledger owner `observation`.
+None remains unsupported. The original admission counts above are historical.
 
 
 TypedArray sorting
@@ -7482,16 +7544,21 @@ pins metadata and identities, invalid comparator and receiver ordering,
 constructor and species avoidance, and initial detached and out-of-bounds
 receivers.
 
-The dependency vocabulary gains `typed-array-sort`, and all 47 paths under
-the node's `sort` and `toSorted` inventory roots enter the reviewed subset: 43
-pass, while four retain the unreviewed *resizableArrayBufferUtils.js* harness
-prerequisite. The manifest moves from 21,265 to 21,312 paths and from 17,958
-to 18,001 passes, keeps 1,556 expected negatives, and moves from 1,751 to 1,755
-unsupported profile features with no semantic, harness, or infrastructure
-failures. No reviewed path moves away from pass. The property
-inventory reaches 160 domains and seeds with a 5,839-case ordinary budget,
-the evidence inventory reaches 137 families, and the runtime ABI moves to
-`m5-121`.
+At the original M5b admission, the dependency vocabulary gains
+`typed-array-sort`, and all 47 paths under the node's `sort` and `toSorted`
+inventory roots enter the reviewed subset: 43 pass, while four retain the
+unreviewed *resizableArrayBufferUtils.js* harness prerequisite. The manifest
+moves from 21,265 to 21,312 paths and from 17,958 to 18,001 passes, keeps 1,556
+expected negatives, and moves from 1,751 to 1,755 unsupported profile features
+with no semantic, harness, or infrastructure failures. No reviewed path moves
+away from pass. The property inventory reaches 160 domains and seeds with a
+5,839-case ordinary budget, the evidence inventory reaches 137 families, and
+the runtime ABI moves to `m5-121`.
+
+The current complete RAB harness update, recorded in `fbdb0824` from clean
+source `2e3d973f`, observes all four paths in these roots that include
+*resizableArrayBufferUtils.js* as passes, with ledger owner `observation`.
+None remains unsupported. The original admission counts above are historical.
 
 
 TypedArray statics
@@ -7552,16 +7619,23 @@ and mapper validation order, every abrupt iterator step, non-TypedArray,
 detached, too-short, bound, and Proxy constructor results, content-type
 mismatches, and deletion and restoration of `from`.
 
-The dependency vocabulary gains `typed-array-statics`, and all 42 paths under
-the node's four inventory roots enter the reviewed subset: 37 pass, while five
-retain the unreviewed *resizableArrayBufferUtils.js* harness prerequisite. No
-reviewed path outside the roots changes classification, and none moves away
-from pass. The manifest moves from 21,341 to 21,383 paths and from 18,273 to
-18,310 passes, keeps 1,560 expected negatives, and moves from 1,508 to 1,513
-unsupported profile features with no semantic, harness, or infrastructure
-failures. The property inventory reaches 163 domains and seeds with a
-5,873-case ordinary budget, the evidence inventory reaches 140 families, and
-the runtime ABI moves to `m5-124`.
+At the original M5b admission, the dependency vocabulary gains
+`typed-array-statics`, and all 42 paths under the node's four inventory roots
+enter the reviewed subset: 37 pass, while five retain the unreviewed
+*resizableArrayBufferUtils.js* harness prerequisite. No reviewed path outside
+the roots changes classification, and none moves away from pass. The manifest
+moves from 21,341 to 21,383 paths and from 18,273 to 18,310 passes, keeps 1,560
+expected negatives, and moves from 1,508 to 1,513 unsupported profile features
+with no semantic, harness, or infrastructure failures. The property inventory
+reaches 163 domains and seeds with a 5,873-case ordinary budget, the evidence
+inventory reaches 140 families, and the runtime ABI moves to `m5-124`.
+
+The current complete RAB harness update, recorded in `fbdb0824` from clean
+source `2e3d973f`, observes four passes among the five paths in these roots
+that include *resizableArrayBufferUtils.js*. The remaining
+*out-of-bounds-behaves-like-detached.js* case is unsupported, with active owner
+`typed-array-proto-coverage-remediation`; it is not an exclusion. The original
+admission counts above are historical.
 
 
 Set composition methods
@@ -8529,7 +8603,12 @@ complete. The remaining gaps retain their existing owners.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
-    *promiseHelper.js*, and *propertyHelper.js*. *nans.js* joined that list
+    *promiseHelper.js*, *propertyHelper.js*, and
+    *resizableArrayBufferUtils.js*. The RAB copy replaces only the three
+    Function-constructed subclasses with named class expressions of the same
+    global heritage, preserving both Float16Array probes and the upstream
+    constructor lists. It does not admit dynamic source construction.
+    *nans.js* joined that list
     with the `math-namespace` node, whose `Math.pow` intrinsic was its only
     unadmitted dependency, *decimalToHexString.js* with the
     `uri-handling-functions` node that its 78 reviewed cases observe, and

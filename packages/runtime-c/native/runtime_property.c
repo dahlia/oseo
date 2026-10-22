@@ -509,6 +509,19 @@ OseoResult oseo_object_set(
             }
             break;
         }
+        /* Mirror object_get: only a missing "__proto__" write reaching
+         * an intrinsic %Object.prototype% would run the excluded Annex B
+         * setter. Own or inherited user properties, proxies, null
+         * prototypes, and typed-array numeric keys were answered above. */
+        if (owner->immutable_prototype && !owner->module_namespace &&
+            oseo_internal_string_is_ascii(key, "__proto__")) {
+            return failure(
+                context,
+                "OSEO1001",
+                "The Object.prototype.__proto__ accessor is excluded "
+                "by Annex B."
+            );
+        }
         current = owner->prototype;
     }
     if (!receiver->extensible) {
@@ -633,6 +646,20 @@ OseoResult oseo_internal_set_with_receiver(
                 return normal(value);
             }
             break;
+        }
+        /* Mirror object_get: only a missing "__proto__" write reaching
+         * an intrinsic %Object.prototype% would run the excluded Annex B
+         * setter. Own or inherited user properties, proxies, null
+         * prototypes, and typed-array numeric keys were answered above. */
+        if (ordinary_object(current)->immutable_prototype &&
+            !ordinary_object(current)->module_namespace &&
+            oseo_internal_string_is_ascii(key, "__proto__")) {
+            return failure(
+                context,
+                "OSEO1001",
+                "The Object.prototype.__proto__ accessor is excluded "
+                "by Annex B."
+            );
         }
         current = ordinary_object(current)->prototype;
     }

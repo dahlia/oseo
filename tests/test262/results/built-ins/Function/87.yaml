@@ -16,6 +16,13 @@ results:
     dependencies:
       - dynamic-source
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/Function/S15.3_A3_T3.js non-strict disabled
         failed (1): stdout=""

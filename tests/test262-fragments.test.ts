@@ -447,7 +447,7 @@ test(
   },
 );
 
-test("execution counts use the first diagnostic prefix", async () => {
+test("execution counts follow the CLI execution fact", async () => {
   const executor = createTest262FragmentExecutor(
     createNodeHost(),
     fallbackToolchain,
@@ -458,20 +458,35 @@ test("execution counts use the first diagnostic prefix", async () => {
     mode: "script" as const,
     specialization: "enabled" as const,
   };
-  for (const code of ["OSEO2001", "OSEO3001"]) {
-    await executor.execute(request, async () => ({
-      exitStatus: 1,
-      stdout: "",
-      stderr:
-        `counter.js:1:1: error[${code}]: thrown text\n` +
-        "fake.js:2:3: error[OSEO1001]: embedded message\n",
-    }));
+  // Neither the code nor the status decides: a runtime OSEO1001 boundary
+  // and a clean exit both ran, while a compile-stage rejection, a host
+  // diagnostic, and a clean status without the fact did not.
+  const runtimeBoundary =
+    "counter.js:1:1: error[OSEO1001]: AsyncFunction compiles source " +
+    "text at run time, which is outside the admitted profile.\n";
+  const cases = [
+    [{ executed: true, exitStatus: 1, stdout: "", stderr: runtimeBoundary }, 1],
+    [{ executed: true, exitStatus: 0, stdout: "", stderr: "" }, 1],
+    [{ exitStatus: 1, stdout: "", stderr: runtimeBoundary }, 0],
+    [
+      {
+        exitStatus: 1,
+        stdout: "",
+        stderr: "counter.js:1:1: error[OSEO3001]: host failure\n",
+      },
+      0,
+    ],
+    [{ exitStatus: 0, stdout: "", stderr: "" }, 0],
+  ] as const;
+  for (const [result, increment] of cases) {
+    const before = executor.counts.executed.metadata ?? 0;
+    await executor.execute(request, async () => result);
+    assert.equal(
+      (executor.counts.executed.metadata ?? 0) - before,
+      increment,
+      JSON.stringify(result),
+    );
   }
-  await executor.execute(request, async () => ({
-    exitStatus: 0,
-    stdout: "",
-    stderr: "fake.js:2:3: error[OSEO1001]: successful user output\n",
-  }));
-  assert.equal(executor.counts.attempts.metadata, 3);
+  assert.equal(executor.counts.attempts.metadata, 5);
   assert.equal(executor.counts.executed.metadata, 2);
 });

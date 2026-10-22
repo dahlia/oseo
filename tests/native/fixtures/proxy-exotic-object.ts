@@ -369,6 +369,69 @@ for (const check of invariantCases) {
 }
 console.log("invariants", invariantErrors, invariantCases.length);
 
+let postTrapCalls = 0;
+function fixWritable(value, key) {
+  Object.defineProperty(value, key, { configurable: false, writable: true });
+  postTrapCalls = postTrapCalls + 1;
+}
+const postTrapCases = [
+  () => Reflect.defineProperty(new Proxy({}, {
+    defineProperty(value, key) { fixWritable(value, key); return true; },
+  }), "prop", { writable: false }),
+  () => Reflect.defineProperty(new Proxy({}, {
+    defineProperty(value, key) { fixWritable(value, key); return true; },
+  }), "prop", { writable: true }),
+  () => Reflect.deleteProperty(new Proxy({ prop: 1 }, {
+    deleteProperty(value) {
+      Object.preventExtensions(value);
+      postTrapCalls = postTrapCalls + 1;
+      return true;
+    },
+  }), "prop"),
+  () => Reflect.deleteProperty(new Proxy(Object.preventExtensions({}), {
+    deleteProperty() { postTrapCalls = postTrapCalls + 1; return true; },
+  }), "missing"),
+  () => Object.getOwnPropertyDescriptor(new Proxy({}, {
+    getOwnPropertyDescriptor(value, key) {
+      fixWritable(value, key);
+      return { configurable: false, writable: false };
+    },
+  }), "prop"),
+  () => Object.getOwnPropertyDescriptor(new Proxy({}, {
+    getOwnPropertyDescriptor(value, key) {
+      fixWritable(value, key);
+      return { configurable: false, writable: true };
+    },
+  }), "prop").writable,
+];
+const postTrapResults = [];
+for (const check of postTrapCases) {
+  try {
+    postTrapResults.push(String(check()));
+  } catch (error) {
+    postTrapResults.push(error instanceof TypeError ? "TypeError" : "other");
+  }
+}
+console.log("post-trap invariants", postTrapResults.join(","), postTrapCalls);
+
+const dunderWrites = [];
+const dunderReceiver = Object.create(new Proxy({}, {
+  set(value, key, next, receiver) {
+    dunderWrites.push(key, next === dunderValue, receiver === dunderReceiver);
+    return true;
+  },
+}));
+const dunderKey = "__proto__";
+const dunderValue = {};
+dunderReceiver[dunderKey] = dunderValue;
+dunderReceiver.__proto__ = dunderValue;
+console.log(
+  "proxy parent __proto__ set",
+  dunderWrites.join(","),
+  Object.getPrototypeOf(dunderReceiver) === dunderValue,
+  Object.hasOwn(dunderReceiver, "__proto__"),
+);
+
 const revocable = Proxy.revocable({ value: 1 }, {});
 console.log("revocable", revocable.proxy.value, typeof revocable.revoke);
 revocable.revoke();

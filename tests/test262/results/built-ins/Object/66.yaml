@@ -349,6 +349,13 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/Object/seal/seal-asyncgeneratorfunction.js
         non-strict disabled failed (1): stdout=""

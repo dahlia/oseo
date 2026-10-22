@@ -18,6 +18,13 @@ results:
     dependencies:
       - array-buffer
       - data-view
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/DataView/proto-from-ctor-realm.js non-strict
         disabled failed (1): stdout=""

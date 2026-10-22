@@ -928,6 +928,13 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - classes
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/language/expressions/class/elements/private-setter-is-not-a-own-property.js
         non-strict disabled failed (1): stdout=""

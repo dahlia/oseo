@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { runInNewContext } from "node:vm";
+import { createContext, runInContext, runInNewContext } from "node:vm";
 
 import type { CliResult } from "../packages/cli/src/index.ts";
 import { summarizeTest262 } from "../packages/testkit/src/index.ts";
@@ -13,6 +13,7 @@ import {
   asyncCompletionMarker,
   createReviewedManifest,
   executeTest262Case,
+  parseHarnessDefinitions,
   parseTest262Arguments,
   parseReviewedSubset,
   parseTest262Case,
@@ -1947,37 +1948,197 @@ test("admitted super tag exposes the global-code parse negatives", async () => {
 
 test("classifies reviewed missing includes as unsupported", async () => {
   await Promise.all(
-    ["resizableArrayBufferUtils.js", "wellKnownIntrinsicObjects.js"].map(
-      async (include) => {
-        const source = `/*---
+    ["wellKnownIntrinsicObjects.js"].map(async (include) => {
+      const source = `/*---
 includes: [${include}]
 ---*/
 `;
-        const parsed = parseTest262Case(
-          source,
-          "test/harness-gap.js",
-          revision,
-        );
-        const result = await executeTest262Case(
-          source,
-          parsed,
-          new Set(),
-          harnesses,
-          {
-            async execute() {
-              return assert.fail("unsupported harness case must not execute");
-            },
+      const parsed = parseTest262Case(source, "test/harness-gap.js", revision);
+      const result = await executeTest262Case(
+        source,
+        parsed,
+        new Set(),
+        harnesses,
+        {
+          async execute() {
+            return assert.fail("unsupported harness case must not execute");
           },
-          ["functions"],
-        );
-        assert.equal(result.classification, "unsupported-profile-feature");
-        assert.equal(
-          result.observation.unsupportedCapability,
-          "harness-include",
-        );
+        },
+        ["functions"],
+      );
+      assert.equal(result.classification, "unsupported-profile-feature");
+      assert.equal(result.observation.unsupportedCapability, "harness-include");
+    }),
+  );
+});
+
+type ComparedValue = number | readonly number[];
+
+/** Run a harness, then a probe Script in the same realm, as a test body. */
+function probeResizableBufferHarness(harness: string, probe: string): string {
+  const context = createContext({
+    assert: Object.assign(
+      (value: boolean, message: string) => assert.ok(value, message),
+      {
+        compareArray(
+          actual: readonly ComparedValue[],
+          expected: readonly ComparedValue[],
+          message: string,
+        ): void {
+          assert.deepEqual(actual, expected, message);
+        },
+        sameValue(actual: string, expected: string): void {
+          assert.equal(actual, expected);
+        },
       },
     ),
+  });
+  runInContext(harness, context);
+  const observed: unknown = runInContext(probe, context);
+  assert.ok(isString(observed));
+  return observed;
+}
+
+async function resizableBufferHarnesses(): Promise<{
+  readonly reviewed: string;
+  readonly upstream: string;
+}> {
+  return {
+    reviewed: await readFile(
+      new URL("test262/harness/resizableArrayBufferUtils.js", import.meta.url),
+      "utf8",
+    ),
+    upstream: await readFile(
+      new URL(
+        "harness/resizableArrayBufferUtils.js",
+        import.meta.resolve("test262/package.json"),
+      ),
+      "utf8",
+    ),
+  };
+}
+
+test("resizable-buffer harness keeps the upstream bindings", async () => {
+  const { reviewed, upstream } = await resizableBufferHarnesses();
+  const constantNames = [
+    "MyUint8Array",
+    "MyFloat32Array",
+    "MyBigInt64Array",
+    "builtinCtors",
+    "floatCtors",
+    "ctors",
+  ];
+  // Each probe runs as a separate Script in the harness's realm, so it sees
+  // the harness's top-level lexical bindings as a test body does.
+  const probe = `JSON.stringify({
+    ctors: ctors.map((C) => [C.name, C === globalThis[C.name]]),
+    floatCtors: floatCtors.map((C) => [C.name, C === globalThis[C.name]]),
+    subclasses: [MyUint8Array, MyFloat32Array, MyBigInt64Array].map((C) => [
+      C.name,
+      Object.getPrototypeOf(C) === globalThis[C.name.slice(2)],
+      Object.getPrototypeOf(C.prototype) ===
+        globalThis[C.name.slice(2)].prototype,
+      new C(1) instanceof C,
+    ]),
+    subclassMembers: [
+      ctors.includes(MyUint8Array),
+      ctors.includes(MyFloat32Array),
+      ctors.includes(MyBigInt64Array),
+      floatCtors.includes(MyFloat32Array),
+    ],
+    buffers: ctors.map((C) => {
+      const rab = CreateRabForTest(C);
+      return [rab.resizable, rab.byteLength, rab.maxByteLength,
+        ToNumbers(new C(rab))];
+    }),
+    collected: (() => {
+      const rab = CreateResizableArrayBuffer(4, 8);
+      const values = [];
+      CollectValuesAndResize(1n, values, rab, 2, 6);
+      CollectValuesAndResize(2, values, rab, 2, 6);
+      return [values, rab.byteLength];
+    })(),
+    iterated: (() => {
+      const rab = CreateRabForTest(Uint8Array);
+      TestIterationAndResize(new Uint8Array(rab).entries(),
+        [[0, 0], [1, 2], [2, 4], [3, 6], [4, 0], [5, 0]], rab, 2, 6);
+      return rab.byteLength;
+    })(),
+  })`;
+  assert.equal(
+    probeResizableBufferHarness(reviewed, probe),
+    probeResizableBufferHarness(upstream, probe),
   );
+  // Every upstream binding is a constant, and the reviewed copy keeps it so.
+  const constants = constantNames
+    .map(
+      (name) =>
+        `(() => { try { ${name} = null; return "written"; } ` +
+        `catch (error) { return error.constructor.name; } })()`,
+    )
+    .join(" + ',' + ");
+  for (const harness of [reviewed, upstream]) {
+    assert.equal(
+      probeResizableBufferHarness(harness, constants),
+      constantNames.map(() => "TypeError").join(","),
+    );
+    // The pinned host defines Float16Array, so both probes select it.
+    assert.equal(
+      probeResizableBufferHarness(
+        harness,
+        "floatCtors.map((C) => C.name).join()",
+      ),
+      "Float32Array,Float64Array,MyFloat32Array,Float16Array",
+    );
+  }
+  // Upstream's internal factory is the one binding the adaptation drops.
+  assert.equal(
+    probeResizableBufferHarness(upstream, "typeof subClass"),
+    "function",
+  );
+  assert.equal(
+    probeResizableBufferHarness(reviewed, "typeof subClass"),
+    "undefined",
+  );
+  assert.doesNotMatch(reviewed, /\bFunction\s*\(/u);
+});
+
+test("admits the reviewed resizable-buffer harness", async () => {
+  const { reviewed, upstream } = await resizableBufferHarnesses();
+  const definitions = parseHarnessDefinitions(
+    upstream,
+    "resizableArrayBufferUtils.js",
+  );
+  const admitted = {
+    ...harnesses,
+    includes: new Map([["resizableArrayBufferUtils.js", reviewed]]),
+    upstreamDefinitions: new Map([
+      ["resizableArrayBufferUtils.js", definitions],
+    ]),
+  };
+  const source = `/*---
+includes: [resizableArrayBufferUtils.js]
+---*/
+[${definitions.join(", ")}];
+`;
+  const parsed = parseTest262Case(source, "test/harness-rab.js", revision);
+  const requests: string[] = [];
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set(),
+    admitted,
+    {
+      async execute(request) {
+        requests.push(request.source);
+        return await Promise.resolve(successfulResult());
+      },
+    },
+    ["functions"],
+  );
+  assert.equal(result.classification, "pass");
+  assert.ok(requests.length > 0);
+  for (const request of requests) assert.ok(request.includes(reviewed));
 });
 
 test("builds a case that reads $262.agent with the test262 host", async () => {
@@ -2816,6 +2977,70 @@ test("classifies compile-stage OSEO1001 exits as unsupported", async () => {
   assert.equal(result.observation.unsupportedCapability, "profile-syntax");
   assert.deepEqual(result.dependencies, ["functions"]);
   assert.equal(result.execution, undefined);
+});
+
+test("keeps execution evidence for a runtime OSEO1001 boundary", async () => {
+  const source = "/*---\n---*/\nassert(true);\nnew AsyncFunction();\n";
+  const parsed = parseTest262Case(source, "test/boundary.js", revision);
+  const started: string[] = [];
+  const executor: Test262Executor = {
+    execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      started.push(request.specialization);
+      // The program ran its earlier statements and then reached the
+      // ADR 0016 boundary that the runtime reports with the owned code.
+      return Promise.resolve({
+        executed: true,
+        exitStatus: 1,
+        stderr:
+          "test/boundary.js:4:1: error[OSEO1001]: AsyncFunction compiles " +
+          "source text at run time, which is outside the admitted profile.\n",
+        stdout: "",
+      });
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["dynamic-source"],
+  );
+  // The classification is the same as a compile-stage rejection's, but
+  // the variant that ran is execution evidence rather than omitted.
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(result.observation.unsupportedCapability, "profile-syntax");
+  assert.deepEqual(result.dependencies, ["dynamic-source"]);
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+  ]);
+  assert.deepEqual(started, ["disabled"]);
+});
+
+test("an executed program cannot print a compile-stage rejection", async () => {
+  const source = "/*---\n---*/\nprint(1);\n";
+  const parsed = parseTest262Case(source, "test/forged.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      execute(): Promise<CliResult> {
+        return Promise.resolve({
+          executed: true,
+          exitStatus: 1,
+          stderr: "test/forged.js:1:1: error[OSEO0001]: printed text\n",
+          stdout: "",
+        });
+      },
+    },
+    ["functions"],
+  );
+  assert.equal(result.observation.failedPhase, "runtime");
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+  ]);
 });
 
 test("requires the asynchronous completion marker", async () => {
