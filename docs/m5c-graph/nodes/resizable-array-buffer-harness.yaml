@@ -13,5 +13,5 @@ delivers: "Reviews and admits the resizableArrayBufferUtils.js harness
   the remaining unsupported coverage."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

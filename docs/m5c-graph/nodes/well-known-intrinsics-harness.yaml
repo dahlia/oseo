@@ -10,5 +10,5 @@ delivers: "Reviews the wellKnownIntrinsicObjects.js harness include, whose
   unsupported coverage."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
