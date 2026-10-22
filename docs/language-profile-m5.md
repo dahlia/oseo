@@ -923,10 +923,17 @@ current evidence assessment. Those live only in the indexed records above.
     reported by its own text rather than by the rejected value, so a
     rejected value with no intrinsic error identity leaves that path
     unchanged: the boundary text alone, with no identity read and no
-    marker. Since M5b node `globalthis-binding`, a rejected intrinsic error
-    instance reports the same boundary text and keeps only its intrinsic
-    kind marker, so the boundary reads alike for every rejection reason
-    while the rejected value stays observable.
+    marker. Since M5b node `globalthis-binding`, a rejection whose reason
+    has an intrinsic error identity reports the same boundary text followed
+    only by that kind's marker, so the boundary reads alike for every
+    rejection reason while the identified kind stays observable. That
+    identity is what `error_instance_kind` computes, not where the reason
+    was created: starting at the reason itself and following stored
+    prototypes, the first object that is one of the current context
+    realm's intrinsic error prototypes gives the kind. An intrinsic error
+    prototype object itself and any object whose chain reaches one
+    therefore match; every other reason, including an error from another
+    realm whose chain reaches none of them, gets the boundary text alone.
     Fixed native evidence under both specialization policies with
     collection forced at every safepoint covers every named shape: a
     reachable, an empty, and an absent message, a null-prototype, a
@@ -8076,10 +8083,11 @@ including accessors and inherited properties. Sloppy and strict all-miss
 update writes. Global-object fallback destructuring and loop-head targets
 retain source-located rejections, as do strict all-miss simple,
 destructuring, and loop-head writes to the runtime-owned call targets
-`console`, `setTimeout`, and `clearTimeout`. An unhandled rejection whose
-reason is
-an intrinsic error instance reports the rejection boundary text and keeps the
-reason's kind marker.
+`console`, `setTimeout`, and `clearTimeout`. An unhandled rejection reports
+the rejection boundary text, followed by a kind marker only when the reason
+itself or an object on its stored prototype chain is one of the current
+context realm's intrinsic error prototypes, the first one reached giving the
+kind; the reason's origin alone does not decide it.
 
 The reviewed test262 environment installs neither the `$262` nor the `print`
 host binding. The runner classifies an uncaught `ReferenceError` whose exact
@@ -8427,13 +8435,14 @@ complete. The remaining gaps retain their existing owners.
  -  A rejected promise that no reaction ever handles ends the program at the
     next rejection checkpoint, which reports the owned
     `unhandled-rejection-policy` boundary text for any reason. When the
-    reason's prototype chain reaches one of the current realm's intrinsic
-    error prototypes, the report also carries that error kind's marker; an
-    error from another realm, like any other value, gets the boundary text
-    alone. When the entry script, a timer callback, or a finalization
-    callback ends with an uncaught throw, the runtime still drains pending
-    jobs and runs that checkpoint, but reports the throw unless that work
-    produced a host diagnostic.
+    reason itself or an object on its stored prototype chain is one of the
+    current context realm's intrinsic error prototypes, the report also
+    carries the marker of the first such prototype reached; any other
+    reason gets the boundary text alone. The predicate is that chain, not
+    where the reason was created. When the entry script, a timer callback,
+    or a finalization callback ends with an uncaught throw, the runtime
+    still drains pending jobs and runs that checkpoint, but reports the
+    throw unless that work produced a host diagnostic.
     *Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js* and
     *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* leave a
     rejection with an intrinsic `Error` unhandled, and the three

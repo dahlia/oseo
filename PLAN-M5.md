@@ -7161,9 +7161,11 @@ parsed syntax, never source text: a name inside a comment or string, a
 property key, a `typeof` operand, a name inside a `with` body, whose object
 may provide it, and a name the case declares itself never withhold execution.
 The reviewed *regExpUtils.js* still omits `buildString` and
-`testPropertyEscapes`. An unhandled rejection whose reason is an intrinsic
-error instance now reports the rejection boundary text and keeps its kind
-marker, so *Promise/race/invoke-resolve-error-close.js* classifies with the
+`testPropertyEscapes`. An unhandled rejection now reports the rejection
+boundary text, followed by a kind marker only when the reason itself or an
+object on its stored prototype chain is one of the current context realm's
+intrinsic error prototypes, the first one reached giving the kind, so
+*Promise/race/invoke-resolve-error-close.js* classifies with the
 existing `unhandled-rejection-policy` capability exactly like its *Promise/all*
 sibling.
 
