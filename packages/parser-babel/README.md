@@ -117,7 +117,8 @@ expressions so the compiler can preserve one evaluation and two observable key
 conversions.
 Direct awaited initializers resume into predeclared lexical cells or write
 hoisted `var` cells. Lexical module exports name every binding in the pattern;
-`export var` remains outside the profile.
+`export var` exports every name its declarators bind, including a declarator
+without an initializer and every binding-pattern leaf.
 
 The adapter keeps raw Babel shapes and conversion context in *babel.ts*.
 *locations.ts* owns UTF-8 indexing and source diagnostics, while *hints.ts*
