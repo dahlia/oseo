@@ -5472,7 +5472,7 @@ typed-unhandled-rejection cases stayed outside the reviewed subset because the
 host policy at this node could not distinguish their rejection from an
 unhandled throw: *Promise/allSettled/invoke-resolve-error-close.js*,
 *Promise/any/ctx-ctor.js*, and *Promise/any/returns-promise.js*. The M5b
-`globalthis-binding` node later gave a rejected intrinsic error instance the
+`globalthis-binding` node later gave a rejected recognized intrinsic error the
 rejection boundary text, as recorded below. That dated cause is not their
 current gate: the closure ledger assigns the three, unreviewed, to node
 `observation-batch-01`, and no observation of them is recorded since. No
@@ -5939,7 +5939,7 @@ applicable inventory, ADR 0013 vocabulary, inventory policy, forced-collection
 policy, and zero-override policy are unchanged.
 
 Implemented M5b node `runtime-error-observation` gives an unhandled thrown
-value that is not an intrinsic error instance a rendered identity and
+value that is not a recognized intrinsic error a rendered identity and
 message. The identity is the `name` of the value's `constructor`, read with
 ordinary property access, which is the only identity ECMAScript gives a user
 error class such as the test262 harness `Test262Error`. The message is the
@@ -5949,14 +5949,23 @@ alone when no message text renders, and the stable `OSEO_THROWN` marker line
 reports the same identity, so the test262 runner reads an observed negative
 type where it previously saw none.
 
+A thrown value or rejection reason is a recognized intrinsic error when the
+value itself, or an object on its stored prototype chain, is one of the
+current context realm's intrinsic error prototypes; the first such prototype
+reached gives its recognized kind, as `error_instance_kind` computes it. A
+current-realm intrinsic error prototype object itself therefore matches, and
+an error created in another realm matches only when its chain reaches one.
+
 The marker is one whitespace-free token on its own line, so an identity
 outside the ASCII identifier shape has no representation there. Such a value,
 a value whose `constructor` or `name` lookup is abrupt or reaches a non-object
 or a non-string, and a thrown primitive all keep the untyped-throw diagnostic
 and print no marker; the human diagnostic and the marker of an unidentified
-value therefore appear together or not at all. An intrinsic error instance
-keeps its existing name-and-message rendering and its intrinsic kind marker,
-both independent of the mutable `name` property. Reading the identity and
+value therefore appear together or not at all. A recognized intrinsic error
+keeps its existing name-and-message rendering and its recognized kind marker,
+and that marker is independent of the mutable `name` property; any other
+thrown object, including an unrecognized error from another realm, takes the
+generic constructor-name identity above. Reading the identity and
 converting the message run user JavaScript after the program has already
 completed abruptly, so the throw or rejection site is restored around them
 and the thrown value stays collector-rooted. Neither nested completion
@@ -5966,10 +5975,11 @@ diagnostic and prints no marker, while an abrupt message read or conversion
 keeps the identity already established and renders it alone. The rendering
 applies to the unhandled-throw diagnostic only. An unhandled rejection is a
 separate reviewed host-policy boundary, reported by its own text rather than
-by the rejected value, so a rejected value with no intrinsic error identity
-leaves that path byte-identical to what it was before this node: the
-boundary text alone, with no identity read and no marker. A rejected
-intrinsic error instance keeps the rendering and marker it already had. The
+by the rejected value, so a rejection reason that is not a recognized
+intrinsic error leaves that path byte-identical to what it was before this
+node: the boundary text alone, with no identity read and no marker. At this
+node, a rejected recognized intrinsic error kept the rendering and marker it
+already had. The
 fifteen reviewed Promise combinator rows that classify on that boundary
 therefore keep their recorded classification.
 

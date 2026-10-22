@@ -893,7 +893,14 @@ current evidence assessment. Those live only in the indexed records above.
     deliberate absence of a specialized guard path. Fifteen reviewed test262
     cases under the AggregateError, Error, and NativeErrors inventory roots
     pin the standards surface.
- -  An unhandled thrown value that is not an intrinsic error instance
+ -  A thrown value or rejection reason is a recognized intrinsic error
+    when the value itself, or an object on its stored prototype chain, is
+    one of the current context realm's intrinsic error prototypes; the
+    first such prototype reached gives its recognized kind. That is what
+    `error_instance_kind` computes, not where the value was created: a
+    current-realm intrinsic error prototype object itself matches, and an
+    error from another realm matches only when its chain reaches one. An
+    unhandled thrown value that is not a recognized intrinsic error
     renders the identity and message it exposes. The identity is the
     `name` of the value's `constructor`, read with ordinary property
     access, which is the only identity ECMAScript gives a user error class
@@ -916,24 +923,23 @@ current evidence assessment. Those live only in the indexed records above.
     unusable identity read leaves the value unidentified, so it keeps the
     untyped-throw diagnostic and prints no marker, while an abrupt message
     read or conversion keeps the identity already established and renders
-    it alone. An intrinsic error instance keeps its
-    existing name-and-message rendering and its intrinsic kind marker.
+    it alone. A recognized intrinsic error keeps its existing
+    name-and-message rendering and its recognized kind marker; any other
+    thrown object, including an unrecognized error from another realm,
+    takes the generic constructor-name identity, which its mutable
+    `constructor` can change.
     The rendering applies to the unhandled-throw diagnostic only. An
     unhandled rejection is a separate reviewed host-policy boundary,
     reported by its own text rather than by the rejected value, so a
-    rejected value with no intrinsic error identity leaves that path
-    unchanged: the boundary text alone, with no identity read and no
+    rejection reason that is not a recognized intrinsic error leaves that
+    path unchanged: the boundary text alone, with no identity read and no
     marker. Since M5b node `globalthis-binding`, a rejection whose reason
-    has an intrinsic error identity reports the same boundary text followed
-    only by that kind's marker, so the boundary reads alike for every
-    rejection reason while the identified kind stays observable. That
-    identity is what `error_instance_kind` computes, not where the reason
-    was created: starting at the reason itself and following stored
-    prototypes, the first object that is one of the current context
-    realm's intrinsic error prototypes gives the kind. An intrinsic error
-    prototype object itself and any object whose chain reaches one
-    therefore match; every other reason, including an error from another
-    realm whose chain reaches none of them, gets the boundary text alone.
+    is a recognized intrinsic error reports the same boundary text followed
+    only by its recognized kind's marker, so the boundary reads alike for
+    every rejection reason while the recognized kind stays observable.
+    Every other reason, including an error from another realm whose chain
+    reaches none of the current realm's intrinsic error prototypes, gets
+    the boundary text alone.
     Fixed native evidence under both specialization policies with
     collection forced at every safepoint covers every named shape: a
     reachable, an empty, and an absent message, a null-prototype, a
@@ -5695,7 +5701,7 @@ policy at this node could not distinguish that rejection from an unhandled
 throw: *Promise/allSettled/invoke-resolve-error-close.js*, which rejects with an
 `Error`, and *Promise/any/ctx-ctor.js* and *Promise/any/returns-promise.js*,
 whose empty input rejects with an `AggregateError`. The M5b
-`globalthis-binding` node later gave a rejected intrinsic error instance the
+`globalthis-binding` node later gave a rejected recognized intrinsic error the
 rejection boundary text, as recorded under globalThis binding. The closure
 ledger still assigns the three, unreviewed, to node `observation-batch-01`, and
 no observation of them is recorded since. No previously reviewed path loses a
