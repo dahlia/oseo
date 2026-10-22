@@ -382,9 +382,11 @@ OSEO_TEST262_HARNESS_REUSE=disabled \
 
 The `test262-builds` JSON log reports attempts and variants counted as
 execution evidence by build path or fallback reason, plus harness C comparisons
-and object builds and disk-cache hits. Compile-stage rejections are attempts,
-not executions; infrastructure failures are also excluded. These counters do
-not enter the manifest or alter any evidence class.
+and object builds and disk-cache hits. An attempt counts as an execution only
+when the CLI reports that its compiled executable started, the same fact the
+runner uses for execution evidence; compile-stage rejections and toolchain or
+host failures before that point are attempts only. These counters do not enter
+the manifest or alter any evidence class.
 
 On Linux, the host uses `$XDG_CACHE_HOME/oseo/harness-objects`, defaulting to
 `~/.cache/oseo/harness-objects`. On macOS it uses

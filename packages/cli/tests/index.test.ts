@@ -678,6 +678,70 @@ test("cleans temporary artifacts after native execution fails", async () => {
   assert.equal(cleanupCount, 1);
 });
 
+test("marks only a started executable as executed", async () => {
+  // A runtime ADR 0016 boundary and a compile-stage rejection print the
+  // same owned code; only the process boundary tells them apart.
+  const runtimeBoundary =
+    "fixture.ts:2:1: error[OSEO1001]: AsyncFunction compiles source " +
+    "text at run time, which is outside the admitted profile.\n";
+  const observe = async (
+    source: string,
+    outcome: "toolchain" | "start" | "program",
+  ) =>
+    await runNativeCli(
+      {
+        args: ["fixture.ts"],
+        source,
+        sourceId: "fixture.ts",
+        version: "0.0.0",
+      },
+      {
+        executionHost: { architecture: "x86_64", operatingSystem: "linux" },
+        makeTemporaryDirectory: async () => "/temporary/oseo-cli",
+        readTextFile: async () => "",
+        remove: async () => {},
+        async run(request) {
+          if (request.command === "zig") {
+            return {
+              exitStatus: outcome === "toolchain" ? 1 : 0,
+              stderr: outcome === "toolchain" ? runtimeBoundary : "",
+              stdout: "",
+            };
+          }
+          if (outcome === "start") throw new Error("spawn program ENOENT");
+          return { exitStatus: 1, stderr: runtimeBoundary, stdout: "" };
+        },
+        writeTextFile: async () => {},
+      },
+    );
+  const executed = await observe("console.log(42);", "program");
+  assert.deepEqual(executed, {
+    executed: true,
+    exitStatus: 1,
+    stderr: runtimeBoundary,
+    stdout: "",
+  });
+  const compileRejected = await observe('new Function("");', "program");
+  assert.match(compileRejected.stderr, /^fixture\.ts:1:1: error\[OSEO1001\]/u);
+  assert.equal(compileRejected.executed, undefined);
+  const parseRejected = await observe("let = ;", "program");
+  assert.match(parseRejected.stderr, /error\[OSEO0001\]/u);
+  assert.equal(parseRejected.executed, undefined);
+  // Toolchain output that imitates a runtime diagnostic is still a host
+  // stop before the program, as is an executable that never started.
+  const stopped = await Promise.all(
+    (["toolchain", "start"] as const).map(
+      async (outcome) => await observe("console.log(42);", outcome),
+    ),
+  );
+  for (const result of stopped) {
+    assert.match(result.stderr, /error\[OSEO3001\]/u);
+    assert.equal(result.executed, undefined);
+  }
+  const help = runCli({ args: ["--help"], version: "0.0.0" });
+  assert.equal(help.executed, undefined);
+});
+
 test("reuses a cached archive and preserves an explicit bypass", async () => {
   let directoryIndex = 0;
   let cached = false;
@@ -1143,7 +1207,12 @@ test("native units share the existing build and cleanup workflow", async () => {
     host,
     toolchain,
   );
-  assert.deepEqual(result, { exitStatus: 0, stderr: "", stdout: "42\n" });
+  assert.deepEqual(result, {
+    executed: true,
+    exitStatus: 0,
+    stderr: "",
+    stdout: "42\n",
+  });
   assert.equal(writes.get("/work/case.c"), "body");
   assert.equal(inputs[0]?.generatedSourcePath, "/work/launcher.c");
   assert.deepEqual(inputs[0]?.additionalGeneratedSourcePaths, ["/work/case.c"]);

@@ -1207,9 +1207,19 @@ function test262VariantDecides(
  * evidence. Its outcome is still compared against the other variants,
  * because one specialization compiling while another did not is itself
  * a divergence.
+ *
+ * The phase comes from the CLI's `executed` fact, which only the started
+ * executable sets. A runtime OSEO1001, such as the ADR 0016 boundary a
+ * source-compiling constructor reports from its `[[Construct]]`, ran the
+ * program up to that point and so stays execution evidence, as does
+ * program output that merely looks like an owned diagnostic. The code
+ * then separates an owned rejection from a host or toolchain failure
+ * among the observations that did not execute.
  */
 function test262CompileStage(observation: CliResult): boolean {
-  if (observation.exitStatus === 0) return false;
+  if (observation.exitStatus === 0 || observation.executed === true) {
+    return false;
+  }
   const code = diagnosticCode(observation.stderr);
   return code === "OSEO1001" || code === "OSEO0001";
 }
@@ -1466,10 +1476,10 @@ async function executedResult(
     // line, not any substring of a thrown message.
     const code = diagnosticCode(observation.stderr);
     const unsupportedSyntax = code === "OSEO1001";
-    // A compile-stage OSEO0001 parse or early-error rejection means no
-    // native program executed.
-    const parseRejected = code === "OSEO0001";
     const compileStage = test262CompileStage(observation);
+    // A compile-stage OSEO0001 parse or early-error rejection means no
+    // native program executed; an executed program cannot have one.
+    const parseRejected = compileStage && code === "OSEO0001";
     const runtimeCapability = unsupportedRuntimeCapability(observation.stderr);
     // A compile-stage rejection keeps its owned diagnostic phase and
     // reports execution evidence only when some other variant did run a

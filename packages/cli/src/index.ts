@@ -193,6 +193,16 @@ export interface CliRequest {
 
 /** Captured command-line output and status. */
 export interface CliResult {
+  /**
+   * `true` only when native execution started the compiled executable, so
+   * the status and both streams are that program's own. It is absent when
+   * the invocation stopped before then: argument parsing, a parse or
+   * compile diagnostic, an emit-only mode, the toolchain, or a host
+   * failure. The flag comes from the process boundary itself, never from
+   * the reported text, so a program cannot forge or hide it by printing
+   * a diagnostic.
+   */
+  readonly executed?: true;
   readonly exitStatus: number;
   readonly stderr: string;
   readonly stdout: string;
@@ -1397,6 +1407,7 @@ async function executeNativeWorkflow(
   }
   const observation = attempt;
   return {
+    executed: true,
     exitStatus: observation.exitStatus,
     stderr: observation.stderr,
     stdout: observation.stdout,

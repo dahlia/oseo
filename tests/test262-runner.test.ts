@@ -2979,6 +2979,70 @@ test("classifies compile-stage OSEO1001 exits as unsupported", async () => {
   assert.equal(result.execution, undefined);
 });
 
+test("keeps execution evidence for a runtime OSEO1001 boundary", async () => {
+  const source = "/*---\n---*/\nassert(true);\nnew AsyncFunction();\n";
+  const parsed = parseTest262Case(source, "test/boundary.js", revision);
+  const started: string[] = [];
+  const executor: Test262Executor = {
+    execute(request: Test262ExecutionRequest): Promise<CliResult> {
+      started.push(request.specialization);
+      // The program ran its earlier statements and then reached the
+      // ADR 0016 boundary that the runtime reports with the owned code.
+      return Promise.resolve({
+        executed: true,
+        exitStatus: 1,
+        stderr:
+          "test/boundary.js:4:1: error[OSEO1001]: AsyncFunction compiles " +
+          "source text at run time, which is outside the admitted profile.\n",
+        stdout: "",
+      });
+    },
+  };
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    executor,
+    ["dynamic-source"],
+  );
+  // The classification is the same as a compile-stage rejection's, but
+  // the variant that ran is execution evidence rather than omitted.
+  assert.equal(result.classification, "unsupported-profile-feature");
+  assert.equal(result.observation.unsupportedCapability, "profile-syntax");
+  assert.deepEqual(result.dependencies, ["dynamic-source"]);
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+  ]);
+  assert.deepEqual(started, ["disabled"]);
+});
+
+test("an executed program cannot print a compile-stage rejection", async () => {
+  const source = "/*---\n---*/\nprint(1);\n";
+  const parsed = parseTest262Case(source, "test/forged.js", revision);
+  const result = await executeTest262Case(
+    source,
+    parsed,
+    new Set<string>(),
+    harnesses,
+    {
+      execute(): Promise<CliResult> {
+        return Promise.resolve({
+          executed: true,
+          exitStatus: 1,
+          stderr: "test/forged.js:1:1: error[OSEO0001]: printed text\n",
+          stdout: "",
+        });
+      },
+    },
+    ["functions"],
+  );
+  assert.equal(result.observation.failedPhase, "runtime");
+  assert.deepEqual(result.execution?.variants, [
+    { specialization: "disabled", strictness: "non-strict" },
+  ]);
+});
+
 test("requires the asynchronous completion marker", async () => {
   const source = "/*---\nflags: [async]\n---*/\n$DONE();\n";
   const parsed = parseTest262Case(source, "test/async-case.js", revision);
