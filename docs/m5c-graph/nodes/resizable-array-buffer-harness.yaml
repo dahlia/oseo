@@ -4,7 +4,12 @@ title: Admit the resizable buffer harness
 delivers: "Reviews and admits the resizableArrayBufferUtils.js harness
   include and any resizable ArrayBuffer and TypedArray behavior it reaches,
   so the 168 reviewed paths recorded as harness-include unsupported for that
-  include are observed."
+  include are observed. The source also enforces the existing omitted
+  __proto__ setter boundary in both runtime Set walks, with ABI m5-134 and
+  native regression evidence. The earlier combined update e7228e8f recorded
+  162 passes and six unsupported results in this cohort; this source keeps
+  successful main data until a fresh complete update records its outcomes
+  and remaining remediation ownership."
 dependencies:
   - unsupported-ownership-audit
 landed: false

@@ -76,15 +76,23 @@ Decision
  -  `eval` in call position, the `Function` constructor, `new Function`,
     and every constructor that compiles source text stay outside the M5
     language profile. The frontend and resolver reject them with owned
-    `OSEO1001` diagnostics; no runtime helper approximates them.
+    `OSEO1001` diagnostics; no runtime helper approximates them. In the
+    current implementation, a program that reaches one of these as a value
+    the frontend cannot see is rejected by the native runtime instead, with
+    the same owned `OSEO1001` diagnostic, after its earlier statements have
+    run: on any call or construction of `%Function%`,
+    `%GeneratorFunction%`, `%AsyncFunction%`, or
+    `%AsyncGeneratorFunction%`, and on a call of `%eval%` with a String
+    argument.
  -  Dynamic import remains rejected at parse time. Admitting the
     build-time-resolvable subset requires a separate reviewed plan and an
     update to this record, following alternative 3.
  -  Affected test262 cases are classified `unsupported-profile-feature`
-    through the existing compile-stage rejection, and reviewed subset
-    entries name the gap with the `dynamic-source` dependency tag so
-    coverage summaries can total it. They never count as passes, expected
-    negatives, or semantic failures.
+    through the owned `OSEO1001` rejection, whether the frontend reports it
+    before execution or the runtime reports it at the invocation, and
+    reviewed subset entries name the gap with the `dynamic-source`
+    dependency tag so coverage summaries can total it. They never count as
+    passes, expected negatives, or semantic failures.
  -  While this boundary stands, no Oseo release uses an unqualified
     ECMA-262 conformance label. Releases publish measured coverage with
     the dynamic source gap named, as the honest-reporting rule in

@@ -887,8 +887,9 @@ regrowing. Focused native runs at `3e42e4c3` passed:
 *tests/annexb-proto-boundary.test.ts* (all four tests, guarded and answered
 writes under both specialization policies) and the fixture through
 `mise run test:native --shard 77/282` (Node.js, Deno, and native outputs match;
-the AArch64 musl cross-link builds). The complete manifest update has not run
-on this source.
+the AArch64 musl cross-link builds). The complete
+`mise run test262:update -- --accept-promotions` on the clean source
+`09745af3` ended with natural exit 0, and this section records its result.
 
 The path is unsupported in the reviewed `main` manifest. A static scan of
 spelled `__proto__` keys finds no guard candidate among the `main` passes
@@ -896,13 +897,14 @@ that mention it, but it cannot see computed keys, so the complete manifest
 update of this source must preserve every `main` pass. Commit `3e42e4c3`
 restores its subset expectation from `pass` to `unsupported-profile-feature`,
 because the reviewed runner refuses a pass-to-unsupported change as a demotion
-rather than recording it. Until a complete manifest update replaces it, its
-result record keeps the pass that `615d9d3b` observed; no record, audit row, or
-ledger entry is edited before that observation. Recording the observed
-classification, a mixed Annex B audit row and assessment, and the path's ledger
-entry under `node:typed-array-proto-coverage-remediation`, beside its two
-existing paths and their replacement evidence, follows that observation. Until
-then no accounting change is claimed.
+rather than recording it.
+
+That earlier update observed the assignment's owned `OSEO1001` at 272:1,
+before any assertion. Its mixed Annex B subject remains coverage debt, with
+the `typed-array-core` fixture as replacement evidence. This source preserves
+the successful main manifest, subset expectations, and ownership. A fresh
+complete update must observe it before the audit and ledger can assign it to
+`node:typed-array-proto-coverage-remediation`; no exclusion is recorded here.
 
 
 Legacy function caller boundary
@@ -1012,8 +1014,8 @@ behavior changes. It extends fixed evidence of the existing families instead.
 The `proxy-exotic-object` native fixture triggers each of the three
 invariants beside an accepted control, counts the trap calls, and writes
 `"__proto__"` through a proxy parent with computed and static keys. The
-`object-literal-prototype-setter` fixture adds generator, async, and async
-generator methods named `__proto__` beside a prototype setter. A
+*tests/native/fixtures/objects.ts* native fixture adds generator, async, and
+async generator methods named `__proto__` beside a prototype setter. A
 *packages/parser-babel/tests/basics.test.ts* case checks that literal
 U+2028 and U+2029 stay single code units of their string constants while a
 raw line feed or carriage return still leaves the literal unterminated. The
@@ -1033,8 +1035,70 @@ Resizable buffer harness
 
 The `resizable-array-buffer-harness` node adds a reviewed
 *tests/test262/harness/resizableArrayBufferUtils.js* and registers it with
-the reviewed runner, which no longer lists that include as unavailable. It
-changes no runtime, compiler, or feature list.
+the reviewed runner, which no longer lists that include as unavailable. The
+original harness admission changed no runtime, compiler, or feature list;
+the node's later `__proto__` write guard is described in the incidental
+Annex B prototype write dependency section.
+
+The unavailable-include list still contains *wellKnownIntrinsicObjects.js*.
+Its six reviewed paths keep main's `harness-include` observations and owners.
+This node admits only *resizableArrayBufferUtils.js*. An unknown include that
+the reviewed harness does not implement still fails as a harness defect.
+
+The earlier combined update recorded in `615d9d3b` observed 163 passes in
+this node's 168-path cohort. Five remained unsupported with their actual
+rejections and were assigned as active coverage debt:
+
+ -  The grow and shrink _user-provided-tolocalestring-\*.js_ cases of
+    `Array.prototype.toLocaleString` and `%TypedArray%.prototype.toLocaleString`
+    report the `primitive-wrapper` capability. Their replacement
+    `Number.prototype.toLocaleString` and `BigInt.prototype.toLocaleString`
+    call the saved original with a non-strict `this`, which boxes the element.
+    The first observed variant stops at that call, so their remaining
+    assertions did not run. The earlier update assigned these four to
+    `primitive-wrapper-objects`; the transfers await a fresh observation here.
+ -  *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports
+    the run-time `OSEO1001` rejection of the Annex B
+    `Object.prototype.__proto__` accessor. The program runs both buffer
+    allocations and constructs the first listed constructor's two views,
+    `ta_rab` over the resizable buffer and then `ta_ab` over the fixed-length
+    buffer. It stops at the `ta_ab.__proto__` read, recorded at 275:20 as the
+    first operand of the first prototype comparison, so no comparison
+    completes. Its core subject, that
+    fixed-length views over a resizable and a fixed-length buffer share the new
+    target's prototype, does not depend on Annex B.
+    That update assigned it to `typed-array-proto-coverage-remediation`
+    beside *no-species.js*
+    under a separate bounded audit assessment. Replacement evidence is the
+    `typed-array-constructors` native fixture's case for every constructor
+    the harness lists, including its three class subclasses, and the
+    construction order property's fixed resizable and fixed buffer cases. The
+    maintainer accounting decision is still required, and ADR 0013 is not
+    widened.
+
+The earlier complete update, on the clean source `09745af3` and recorded in
+`e7228e8f`, changed one of the 163 passes. Under the `__proto__` write guard
+of the incidental Annex B prototype write dependency section,
+*TypedArray/out-of-bounds-behaves-like-detached.js* was observed as
+`unsupported-profile-feature`. That update recorded 162 passes and six
+unsupported results among the 168. It assigned the sixth to
+`typed-array-proto-coverage-remediation` too. Those observations and ownership
+transfers are historical evidence; this source retains main data until a fresh
+complete update observes it.
+
+The CLI's `executed` fact is shared infrastructure needed by this node's
+runtime `__proto__` boundaries. Only starting the compiled executable sets
+it. The runner retains that variant as execution evidence when a run-time
+`OSEO1001` stops the program, and the fragment executor counts the same fact.
+Compile-stage rejections and failures before program start have no execution
+fact. This contract does not depend on the intrinsics harness.
+
+A fresh complete update of this source must preserve all 24,069 main passes
+and all 28,311 reviewed paths in the 41,091-path inventory. The checked-in
+results, subset expectations, ledger, observation batches, and graph baseline
+still describe successful main. The only supported-feature changes are the
+three Minor tags above. No earlier combined-update promotion, ownership
+transfer, or exclusion is adopted by this source commit.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles
@@ -1059,10 +1123,11 @@ included inventory, 168 are the reviewed paths this node owns and 17 are
 unreviewed paths of `observation-batch-32`, which stay unreviewed here.
 Three more are under *test/staging/* and outside the inventory.
 
-Before `typed-array-feature-admission` admits the Float16Array global, both
-probes are the profile-syntax rejection for `typeof` of an unadmitted
-standard global. So the manifest update that observes the 168 paths runs
-after that prerequisite is in the source the update reads. This node does
+The source this node is now prepared on contains
+`typed-array-feature-admission`, which admits the Float16Array global.
+Without that admission both probes would be the profile-syntax rejection
+for `typeof` of an unadmitted standard global, so the manifest update that
+observes the 168 paths must read a source that contains it. This node does
 not touch the Float16Array source. A reference run under Node.js and Deno
 on hosts that define Float16Array is evidence that the copy is equivalent
 to upstream, not an Oseo observation. The classifications come only from

@@ -8560,7 +8560,8 @@ complete. The remaining gaps retain their existing owners.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
-    *promiseHelper.js*, and *propertyHelper.js*. *nans.js* joined that list
+    *promiseHelper.js*, *propertyHelper.js*, and
+    *resizableArrayBufferUtils.js*. *nans.js* joined that list
     with the `math-namespace` node, whose `Math.pow` intrinsic was its only
     unadmitted dependency, *decimalToHexString.js* with the
     `uri-handling-functions` node that its 78 reviewed cases observe, and

@@ -12,16 +12,17 @@ records:
         dependency inside the boundary reopens the optional-section
         policy.
   0016-dynamic-source-boundary:
-    digest: 2a3437aeff09377c85c3c5a5d2e41bf1caefeb196acfe0fd33b0eec2b57706b9
+    digest: 0822a6b08675f8328af6cfe24cb657a57cfb713571d2139d6417018662d9bb83
     authorization:
       - "`eval` in call position, the `Function` constructor, `new
         Function`, and every constructor that compiles source text stay
         outside the M5 language profile."
       - Affected test262 cases are classified
-        `unsupported-profile-feature` through the existing compile-stage
-        rejection, and reviewed subset entries name the gap with the
-        `dynamic-source` dependency tag so coverage summaries can total
-        it.
+        `unsupported-profile-feature` through the owned `OSEO1001`
+        rejection, whether the frontend reports it before execution or
+        the runtime reports it at the invocation, and reviewed subset
+        entries name the gap with the `dynamic-source` dependency tag so
+        coverage summaries can total it.
       - Dynamic import remains rejected at parse time.
     reopening:
       - Admitting the build-time-resolvable subset requires a separate
