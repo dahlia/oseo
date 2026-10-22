@@ -7560,9 +7560,10 @@ observer-first and JSON-first request orders while shrinking retains the
 closed three-node cycle. Its stable seed family reserves
 `0x60008600` through `0x600086ff`. The pinned prerequisite selector has
 24 static and 65 dynamic-boundary subjects; observing the latter does not
-admit dynamic execution or runtime options under ADR 0016. Its unresolved
-64-path reservation has a separate active remediation owner and no new
-exclusion authority.
+admit dynamic execution or runtime options under ADR 0016. Its 64-path
+reservation of ImportCall subjects is accounted for as bounded ADR 0016
+exclusions under the maintainer accounting decision of 2026-10-22; no
+static JSON subject is excluded.
 
 
 Strict assignment through with environments

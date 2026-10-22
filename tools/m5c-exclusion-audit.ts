@@ -33,6 +33,17 @@ const importAttributesOwner =
   "node:import-attributes-dynamic-coverage-remediation";
 const importAttributesReservationPath =
   "docs/m5c-graph/import-attributes-dynamic-coverage.md";
+/** Assessments that only the reserved dynamic attribute paths may use. */
+const importAttributesAssessments: ReadonlySet<string> = new Set([
+  "import-call-attributes",
+  "import-call-attributes-computed-specifier",
+  "json-module-dynamic-site-identity",
+]);
+/** A reserved rejection ends the process stderr, as a lookup rejection does. */
+const reservedImportRejection = new RegExp(
+  "error\\[OSEO1001\\]: ImportExpression is outside the M1 profile\\.$",
+  "u",
+);
 const annexRemediationOwners = new Set([
   "node:regexp-split-coverage-remediation",
   "node:typed-array-proto-coverage-remediation",
@@ -341,8 +352,9 @@ export function validateM5cExclusionAudit(
     ) {
       throw new Error(`Audit needs a prior ownership cohort: ${path}.`);
     }
+    const assessmentName = string(row.assessment, `${path} assessment`);
     const assessment = parsedObject(
-      assessments[string(row.assessment, `${path} assessment`)],
+      assessments[assessmentName],
       `${path} assessment`,
     );
     string(assessment.reason, `${path} assessment reason`);
@@ -482,8 +494,11 @@ export function validateM5cExclusionAudit(
         `Audit needs a bounded Annex B remediation owner: ${path}.`,
       );
     }
+    // Any assessment may bind the replacement evidence its reason relies on;
+    // the TypedArray prototype owner requires it.
     if (
-      annexRemediationOwner === "node:typed-array-proto-coverage-remediation"
+      annexRemediationOwner === "node:typed-array-proto-coverage-remediation" ||
+      assessment.replacementEvidence != null
     ) {
       const replacements = parsedObject(
         assessment.replacementEvidence,
@@ -504,41 +519,33 @@ export function validateM5cExclusionAudit(
         }
       }
     }
-    let dynamicRemediationOwner = remediationOwner;
+    // The accepted accounting decision bounds the reservation to ADR 0016:
+    // each unsupported reserved path is an exclusion of the exact rejected
+    // ImportCall under a reservation assessment, those assessments cover no
+    // other path, and no row keeps the superseded remediation owner.
     const reservedDynamicAttribute =
       inputs.importAttributesDynamicPaths?.has(path) ?? false;
     if (
-      reservedDynamicAttribute &&
-      (proposedOwner !== dynamicOwner || excluded)
+      (reservedDynamicAttribute &&
+        (proposedOwner !== dynamicOwner ||
+          !excluded ||
+          !reservedImportRejection.test(accessorDetail) ||
+          !result.case.features.includes("import-attributes") ||
+          !importAttributesAssessments.has(assessmentName))) ||
+      (!reservedDynamicAttribute &&
+        importAttributesAssessments.has(assessmentName)) ||
+      assessment.remediationOwner === importAttributesOwner ||
+      entry.owner === importAttributesOwner
     ) {
       throw new Error(
         `Audit needs the exact dynamic attribute reservation: ${path}.`,
       );
     }
-    if (
-      proposedOwner === dynamicOwner &&
-      !excluded &&
-      (reservedDynamicAttribute ||
-        assessment.remediationOwner === importAttributesOwner ||
-        entry.owner === importAttributesOwner)
-    ) {
-      if (
-        assessment.remediationOwner !== importAttributesOwner ||
-        !inputs.importAttributesDynamicPaths?.has(path) ||
-        !dynamicImportRejection.test(detail) ||
-        !result.case.features.includes("import-attributes")
-      ) {
-        throw new Error(
-          `Audit needs the exact dynamic attribute reservation: ${path}.`,
-        );
-      }
-      dynamicRemediationOwner = importAttributesOwner;
-    }
     const owner = excluded
       ? proposedOwner
       : proposedOwner === annexOwner
         ? annexRemediationOwner
-        : dynamicRemediationOwner;
+        : remediationOwner;
     if (entry.owner !== owner) {
       throw new Error(`Audit requires owner ${owner} for ${path}.`);
     }
@@ -560,7 +567,7 @@ export function validateM5cExclusionAudit(
     }
   }
   // The reservation is a set contract. Each reserved path keeps its reviewed
-  // row, whose row checks require the bounded owner or an observation
+  // row, whose row checks require the bounded exclusion or an observation
   // promotion; reassigning a ledger owner cannot drop it from the audit.
   for (const reserved of inputs.importAttributesDynamicPaths ?? []) {
     if (!seen.has(reserved)) {

@@ -243,52 +243,129 @@ test("dynamic import tag debt must match the reviewed dependencies", () => {
   );
 });
 
-test("dynamic attribute remediation requires its exact reservation", () => {
-  const observed = {
-    ...observation,
-    detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
+/** Move every fixture row onto one of the reservation assessments. */
+function withReservationAssessment(
+  audit: ReturnType<typeof fixture>["audit"],
+  name = "import-call-attributes",
+) {
+  return {
+    ...audit,
+    assessments: { [name]: audit.assessments.reviewed },
+    paths: audit.paths.map((row) =>
+      Object.assign({}, row, { assessment: name }),
+    ),
   };
-  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
-  const boundedOwner = "node:import-attributes-dynamic-coverage-remediation";
-  audit.assessments.reviewed.remediationOwner = boundedOwner;
-  const bounded = {
+}
+
+const reservedImportDetail =
+  'failed (1): stdout="" stderr="test/example.js:1:1: ' +
+  'error[OSEO1001]: ImportExpression is outside the M1 profile.\\n"';
+
+test("reserved dynamic attributes require the bounded exclusion", () => {
+  const observed = { ...observation, detail: reservedImportDetail };
+  const { audit, inputs } = fixture(false, 'import("x", {});', observed);
+  const reserved = {
     ...inputs,
     importAttributesDynamicPaths: new Set([path]),
-    results: inputs.results.map((entry) => ({
-      ...entry,
-      case: {
-        ...entry.case,
-        features: ["import-attributes", "dynamic-import"],
-      },
-    })),
-    ledger: {
-      ...inputs.ledger,
-      entries: inputs.ledger.entries.map((entry) => ({
-        ...entry,
-        owner: boundedOwner,
-      })),
-    },
-  };
-  assert.equal(
-    validateM5cExclusionAudit(stringifyYaml(audit), bounded).remediation,
-    1,
-  );
-  assert.throws(
-    () =>
-      validateM5cExclusionAudit(stringifyYaml(audit), {
-        ...bounded,
-        importAttributesDynamicPaths: new Set<string>(),
+    results: inputs.results.map((entry) =>
+      Object.assign({}, entry, {
+        case: {
+          ...entry.case,
+          features: ["import-attributes", "dynamic-import"],
+        },
       }),
-    /exact dynamic attribute reservation/u,
-  );
+    ),
+  };
+  for (const name of [
+    "import-call-attributes",
+    "import-call-attributes-computed-specifier",
+    "json-module-dynamic-site-identity",
+  ]) {
+    assert.deepEqual(
+      validateM5cExclusionAudit(
+        stringifyYaml(withReservationAssessment(audit, name)),
+        reserved,
+      ),
+      { exclusions: 1, remediation: 0, missingDynamicTags: 1 },
+      name,
+    );
+  }
+  const bounded = stringifyYaml(withReservationAssessment(audit));
   assert.throws(
     () =>
-      validateM5cExclusionAudit(stringifyYaml(audit), {
-        ...bounded,
+      validateM5cExclusionAudit(bounded, {
+        ...reserved,
         results: inputs.results,
       }),
     /exact dynamic attribute reservation/u,
   );
+  // A reserved path cannot use an ordinary assessment, and no other path
+  // can use a reservation assessment.
+  assert.throws(
+    () => validateM5cExclusionAudit(stringifyYaml(audit), reserved),
+    /exact dynamic attribute reservation/u,
+  );
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(bounded, {
+        ...reserved,
+        importAttributesDynamicPaths: new Set<string>(),
+      }),
+    /exact dynamic attribute reservation/u,
+  );
+  // Another ADR 0016 rejection is outside the reserved ImportCall surface.
+  const evalCall = fixture();
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(
+        stringifyYaml(withReservationAssessment(evalCall.audit)),
+        {
+          ...evalCall.inputs,
+          importAttributesDynamicPaths: new Set([path]),
+          results: evalCall.inputs.results.map((entry) =>
+            Object.assign({}, entry, {
+              case: { ...entry.case, features: ["import-attributes"] },
+            }),
+          ),
+        },
+      ),
+    /exact dynamic attribute reservation/u,
+  );
+});
+
+test("the reserved rejection must end the process stderr", () => {
+  for (const detail of [
+    reservedImportDetail.replace(
+      '\\n"',
+      "\\nerror[OSEO1001]: Unknown binding 'eval'.\\n\"",
+    ),
+    'failed (1): stdout="error[OSEO1001]: ImportExpression is outside ' +
+      'the M1 profile.\\n" stderr="test/example.js:1:1: error[OSEO3001]: ' +
+      'The native toolchain failed.\\n"',
+  ]) {
+    const observed = { ...observation, detail };
+    const { audit, inputs } = fixture(false, 'import("x", {});', observed);
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(
+          stringifyYaml(withReservationAssessment(audit)),
+          {
+            ...inputs,
+            importAttributesDynamicPaths: new Set([path]),
+            results: inputs.results.map((entry) =>
+              Object.assign({}, entry, {
+                case: {
+                  ...entry.case,
+                  features: ["import-attributes", "dynamic-import"],
+                },
+              }),
+            ),
+          },
+        ),
+      /exact dynamic attribute reservation/u,
+      detail,
+    );
+  }
 });
 
 test("reserved dynamic attributes reject ordinary reassessment", () => {
@@ -315,28 +392,41 @@ test("reserved dynamic attributes reject ordinary reassessment", () => {
   );
 });
 
-test("reserved dynamic attributes reject exclusion reassessment", () => {
+test("the superseded dynamic attribute owner is rejected", () => {
   const observed = {
     ...observation,
     detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
   };
-  const { audit, inputs } = fixture(false, 'import("x", {});', observed);
-  assert.throws(
-    () =>
-      validateM5cExclusionAudit(stringifyYaml(audit), {
-        ...inputs,
-        importAttributesDynamicPaths: new Set([path]),
-        results: inputs.results.map((entry) =>
-          Object.assign({}, entry, {
-            case: {
-              ...entry.case,
-              features: ["import-attributes", "dynamic-import"],
-            },
-          }),
-        ),
+  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
+  const supersededOwner = "node:import-attributes-dynamic-coverage-remediation";
+  audit.assessments.reviewed.remediationOwner = supersededOwner;
+  const superseded = {
+    ...inputs,
+    results: inputs.results.map((entry) =>
+      Object.assign({}, entry, {
+        case: {
+          ...entry.case,
+          features: ["import-attributes", "dynamic-import"],
+        },
       }),
-    /exact dynamic attribute reservation/u,
-  );
+    ),
+    ledger: {
+      ...inputs.ledger,
+      entries: inputs.ledger.entries.map((entry) =>
+        Object.assign({}, entry, { owner: supersededOwner }),
+      ),
+    },
+  };
+  for (const reservation of [new Set([path]), new Set<string>()]) {
+    assert.throws(
+      () =>
+        validateM5cExclusionAudit(stringifyYaml(audit), {
+          ...superseded,
+          importAttributesDynamicPaths: reservation,
+        }),
+      /exact dynamic attribute reservation/u,
+    );
+  }
 });
 
 test("dynamic attribute audit rejects one omitted reservation", () => {
@@ -345,8 +435,7 @@ test("dynamic attribute audit rejects one omitted reservation", () => {
     detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
   };
   const sourceText = 'import("x", {});';
-  const { audit, inputs } = fixture(true, sourceText, observed);
-  const boundedOwner = "node:import-attributes-dynamic-coverage-remediation";
+  const { audit, inputs } = fixture(false, sourceText, observed);
   const second = "test/language/eval-code/second.js";
   const firstAuditPath = audit.paths[0];
   const firstResult = inputs.results[0];
@@ -354,8 +443,8 @@ test("dynamic attribute audit rejects one omitted reservation", () => {
   assert.ok(firstAuditPath);
   assert.ok(firstResult);
   assert.ok(firstLedgerEntry);
-  audit.assessments.reviewed.remediationOwner = boundedOwner;
   audit.paths.push({ ...firstAuditPath, path: second });
+  const reservedAudit = withReservationAssessment(audit);
   const bounded = {
     ...inputs,
     importAttributesDynamicPaths: new Set([path, second]),
@@ -382,7 +471,7 @@ test("dynamic attribute audit rejects one omitted reservation", () => {
     ledger: {
       ...inputs.ledger,
       entries: [path, second].map((item) => ({
-        owner: boundedOwner,
+        owner,
         path: item,
         prerequisites: firstLedgerEntry.prerequisites,
         state: firstLedgerEntry.state,
@@ -390,19 +479,36 @@ test("dynamic attribute audit rejects one omitted reservation", () => {
     },
   };
   assert.equal(
-    validateM5cExclusionAudit(stringifyYaml(audit), bounded).remediation,
+    validateM5cExclusionAudit(stringifyYaml(reservedAudit), bounded).exclusions,
     2,
   );
   for (const omitted of [path, second]) {
     const incomplete = {
-      ...audit,
-      paths: audit.paths.filter((row) => row.path !== omitted),
+      ...reservedAudit,
+      paths: reservedAudit.paths.filter((row) => row.path !== omitted),
     };
     assert.throws(
       () => validateM5cExclusionAudit(stringifyYaml(incomplete), bounded),
       /has no reviewed exclusion audit/u,
     );
   }
+});
+
+test("bound replacement evidence must stay current", () => {
+  const { audit, inputs } = fixture();
+  assert.throws(
+    () =>
+      validateM5cExclusionAudit(stringifyYaml(audit), {
+        ...inputs,
+        replacementEvidence: new Map([
+          [
+            "tests/native/fixtures/typed-array-constructors.ts",
+            "changed core fixture",
+          ],
+        ]),
+      }),
+    /replacement evidence changed/u,
+  );
 });
 
 test("unresolved non-source coverage requires remediation ownership", () => {
@@ -571,9 +677,7 @@ test("observed promotions close reserved dynamic attribute assessments", () => {
     ...observation,
     detail: "error[OSEO1001]: ImportExpression is outside the M1 profile.",
   };
-  const { audit, inputs } = fixture(true, 'import("x", {});', observed);
-  audit.assessments.reviewed.remediationOwner =
-    "node:import-attributes-dynamic-coverage-remediation";
+  const { audit, inputs } = fixture(false, 'import("x", {});', observed);
   for (const classification of ["pass", "expected-negative"] as const) {
     const promoted: M5cExclusionAuditInputs = {
       ...inputs,
@@ -672,7 +776,6 @@ function expectedAuditCounts(ledger: M5cClosureLedger) {
   const remediation = ledger.entries.filter(
     (entry) =>
       entry.owner === remediationOwner ||
-      entry.owner === "node:import-attributes-dynamic-coverage-remediation" ||
       entry.owner === annexRemediationOwner ||
       entry.owner === protoRemediationOwner ||
       entry.owner === lookupRemediationOwner,

@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 143
+M5a is complete. The normative family records described below inventory 145
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -47,11 +47,14 @@ modules remain unsupported and receive an entry-specific diagnostic.
 The pinned prerequisite selector contains 89 paths: 24 static subjects and
 65 dynamic-boundary subjects. Dynamic import and runtime options remain
 outside admission under ADR 0016. The separately bounded
-`import-attributes-dynamic-coverage-remediation` node owns the 64 actual
-`ImportExpression` rejections; none is a newly approved exclusion. The
-indexed import-attributes family records fixed, generated, structural,
-differential, specialization, guard-fallback, collection, and standards
-evidence in *tests/property/m5-import-attributes.property.test.ts* and
+`import-attributes-dynamic-coverage-remediation` node accounts for the 64
+actual `ImportExpression` rejections as bounded ADR 0016 exclusions under the
+maintainer accounting decision of 2026-10-22. Their subjects are ImportCall
+syntax and evaluation and the dynamic import site of JSON module identity;
+static JSON identity stays inside the profile. The indexed import-attributes
+family records fixed, generated, structural, differential, specialization,
+guard-fallback, collection, and standards evidence in
+*tests/property/m5-import-attributes.property.test.ts* and
 *tests/fixtures/import-attributes/*.
 
 M5c node `annexb-proto-dependency-classification` makes only a missing

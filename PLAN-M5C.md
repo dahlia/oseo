@@ -422,8 +422,14 @@ Its exact pinned selector has 89 paths, comprising 24 static subjects and
 65 dynamic-boundary subjects. Dynamic runtime options remain outside ADR
 0016 admission. The separately approved 64-path reservation in
 *docs/m5c-graph/import-attributes-dynamic-coverage.md* belongs to
-`import-attributes-dynamic-coverage-remediation`. It adds no exclusion and
-does not widen the existing dynamic-source remediation reservation.
+`import-attributes-dynamic-coverage-remediation`. Under the maintainer
+accounting decision of 2026-10-22, that node accounts for the reservation as
+bounded ADR 0016 exclusions, because each subject is ImportCall syntax or
+evaluation, or the dynamic import site of JSON module identity, reachable only
+through `import()`; static JSON identity stays inside the claim. The paths stay
+in the inventory, never count as passes, and reopen when an accepted ADR 0016
+amendment admits any form of dynamic import. It does not widen the existing
+dynamic-source remediation reservation.
 
 
 Work graph construction

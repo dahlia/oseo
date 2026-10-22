@@ -381,7 +381,7 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 36);
+  assert.ok(summary.landed >= 37);
   assert.equal(summary.parked, 0);
 });
 
@@ -400,16 +400,18 @@ function readImportAttributesNode(id: string): NodeContract {
   ) as NodeContract;
 }
 
-test("import attribute remediation retains its bounded graph contract", () => {
+test("import attribute accounting retains its bounded graph contract", () => {
   validateCurrentM5cWorkGraph();
   const owner = readImportAttributesNode(
     "import-attributes-dynamic-coverage-remediation",
   );
-  assert.equal(owner.landed, false);
+  assert.equal(owner.landed, true);
   assert.equal(owner.status, "ready");
   assert.deepEqual(owner.dependencies, ["dynamic-import", "import-attributes"]);
   assert.match(owner.delivers, /exactly the 64 pinned/u);
-  assert.match(owner.delivers, /authorizes no exclusions/u);
+  assert.match(owner.delivers, /under the\s+accepted ADR 0016 boundary/u);
+  assert.match(owner.delivers, /counts none as a pass/u);
+  assert.match(owner.delivers, /does not widen the existing/u);
   const reservation = readImportAttributesNode("observation-batch-31");
   assert.equal(reservation.landed, false);
   assert.equal(reservation.status, "ready");

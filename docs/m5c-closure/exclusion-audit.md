@@ -127,20 +127,49 @@ The separately approved reservation in
 *../m5c-graph/import-attributes-dynamic-coverage.md* contains exactly 64
 pinned paths whose actual observation rejects `ImportExpression` before
 option evaluation, enumeration, abrupt completion, promises, or JSON
-identity assertions execute. Their ledger owner is
-`node:import-attributes-dynamic-coverage-remediation`. This reservation
-adds no exclusions and did not widen the original 178-path
-`dynamic-source-coverage-remediation` cohort. Observation batches 11, 12,
-13, and 05 later added 19, 23, 30, and 5 paths to that owner, whose current
-contract is 255 paths.
+identity assertions execute. The
+`import-attributes-dynamic-coverage-remediation` node first held them as
+remediation; Git history keeps that assessment. The reservation never widened
+the original 178-path `dynamic-source-coverage-remediation` cohort. Observation
+batches 11, 12, 13, and 05 later added 19, 23, 30, and 5 paths to that owner,
+whose current contract is 255 paths.
 
-Each path retains its original normative subject, source digest, and fresh
-observation digest. Its assessment uses `disposition: remediation`,
-`normativeDependency: not-demonstrated`, and the separate `remediationOwner`.
-The audit validates that owner against the fixed reservation, the upstream
-`import-attributes` feature, and the exact accepted `ImportExpression`
-rejection. It cannot use an unrelated diagnostic or source-evaluation-only
-assertion to close the remaining runtime attribute or identity coverage.
+The maintainer accounting decision of 2026-10-22 accounts for the 64 paths
+under ADR 0016 instead. Their ledger owner is
+`adr:0016-dynamic-source-boundary`. Each row keeps its original normative
+subject, source digest, and observation digest, and uses one of three
+assessments with `disposition: exclusion` and
+`normativeDependency: source-evaluation-only`:
+
+ -  `import-call-attributes` covers the 60 ImportCall subjects with a
+    string-literal specifier: grammar parameter forwarding, options
+    evaluation and abrupt completions, the `with` lookup and enumeration,
+    rejection of invalid options, promise settlement, and trailing-comma
+    calls.
+ -  `import-call-attributes-computed-specifier` covers
+    *2nd-param-evaluation-sequence.js*, *2nd-param-trailing-comma-reject.js*,
+    and *trailing-comma-reject.js*, whose specifiers are computed at run
+    time. They stay outside even the build-time literal subset of
+    *../dynamic-import-staged-plan.md*.
+ -  `json-module-dynamic-site-identity` covers *json-idempotency.js*. Its
+    static default imports and indirect static import do not depend on
+    dynamic import. The assessment binds the static JSON identity fixtures
+    and properties as `replacementEvidence` and excludes only the `import()`
+    site.
+
+The audit requires that bounded exclusion for every unsupported reserved
+path, with the upstream `import-attributes` feature and the exact accepted
+`ImportExpression` rejection. It rejects a reserved row with any other
+disposition, owner, or diagnostic, and it rejects any row or ledger entry
+that still names `node:import-attributes-dynamic-coverage-remediation`. A
+reserved path that later passes or becomes an expected negative takes the
+observation owner and keeps its historical row. The check validates any
+assessment's `replacementEvidence` digests, not only the TypedArray owner's.
+
+The exclusion reopens when an accepted ADR 0016 amendment admits any form of
+dynamic import, including the literal subset; a still unsupported path then
+needs a fresh assessment against the amended record. The decision approves
+no dynamic import implementation and no change to the staged proposal.
 
 
 Incidental legacy accessor lookups
