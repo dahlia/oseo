@@ -12,7 +12,7 @@ records:
         dependency inside the boundary reopens the optional-section
         policy.
   0016-dynamic-source-boundary:
-    digest: dd7e88b055752d55531e6ec1f1ae318f36900f99bb152c25e61638e5bb732097
+    digest: 0822a6b08675f8328af6cfe24cb657a57cfb713571d2139d6417018662d9bb83
     authorization:
       - "`eval` in call position, the `Function` constructor, `new
         Function`, and every constructor that compiles source text stay
