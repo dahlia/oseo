@@ -5682,10 +5682,17 @@ reviewed: 180 pass and 12 retain explicit prerequisite boundaries. Five keep
 the unhandled-rejection policy, three need `Object.getOwnPropertyNames`, two
 need `Reflect.construct`, and two call dynamic `eval`. Three String-iteration
 cases stay outside this node for the separate `string-iterator` owner. Three
-cases whose result promise rejects with a typed error but installs no reaction
-stay outside the reviewed subset because the current unhandled-rejection
-policy cannot distinguish that rejection from an unhandled throw. No
-previously reviewed path loses a pass.
+cases whose result promise rejects with an intrinsic error but installs no
+reaction stayed outside the reviewed subset because the unhandled-rejection
+policy at this node could not distinguish that rejection from an unhandled
+throw: *Promise/allSettled/invoke-resolve-error-close.js*, which rejects with an
+`Error`, and *Promise/any/ctx-ctor.js* and *Promise/any/returns-promise.js*,
+whose empty input rejects with an `AggregateError`. The M5b
+`globalthis-binding` node later gave a rejected intrinsic error instance the
+rejection boundary text, as recorded under globalThis binding. The closure
+ledger still assigns the three, unreviewed, to node `observation-batch-01`, and
+no observation of them is recorded since. No previously reviewed path loses a
+pass.
 The manifest moves from 16,269 to 16,461 paths and from 12,599 to 12,779
 passes, keeps 1,556 expected negatives, and moves from 2,114 to 2,126
 unsupported profile features, with no semantic, harness, or infrastructure
@@ -8426,8 +8433,10 @@ complete. The remaining gaps retain their existing owners.
     leave a rejection with an intrinsic `Error` unhandled, are not in the
     reviewed subset. They were withheld while such a rejection was reported
     like an unhandled throw, before the M5b `globalthis-binding` node gave
-    it the boundary text; no observation of them is recorded since. Owner:
-    the modules and asynchronous execution stream.
+    it the boundary text; no observation of them is recorded since. The
+    closure ledger assigns both, unreviewed, to node `observation-batch-01`.
+    Owner of the rejection host policy: the modules and asynchronous
+    execution stream.
  -  `eval`, dynamic `Function` construction, and dynamic import stay
     explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
