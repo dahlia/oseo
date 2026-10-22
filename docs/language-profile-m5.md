@@ -7899,9 +7899,14 @@ from a later one. Each registry with queued records gets one cleanup job,
 ordered by its oldest record. The job calls the registry's callback with an
 `undefined` receiver and each record's held value in queue order, including a
 record queued while the job runs and excluding one an earlier callback
-unregistered, and promise jobs drain only after the job ends. An abrupt
-callback ends the program with that completion, exactly as an abrupt timer
-callback does. Collection itself still neither allocates nor invokes user code.
+unregistered, and promise jobs drain only after the job ends. In the outer
+event loop, an abrupt callback ends the program with that completion, exactly
+as an abrupt timer callback does. A cleanup job that an internal await drives
+does not end the program there: like a timer callback that await drives, its
+abrupt completion becomes the await's own completion for the iterator
+operation that awaited, which handles a language throw like any other throw
+completion, as the Known gaps entry on unhandled rejections describes.
+Collection itself still neither allocates nor invokes user code.
 
 Fixed Node.js, Deno, and native differential evidence covers descriptors,
 brands, object, function, Array, and symbol keys, primitives that cannot be
