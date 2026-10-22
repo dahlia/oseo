@@ -4036,7 +4036,9 @@ therefore calls each non-nullish element's current method with the element as
 its receiver and no arguments, whatever the outer call received. Holes,
 `undefined`, and `null` still render empty fields without a call, and receiver
 conversion, length, callability, result coercion, abrupt completion, and
-re-entry are unchanged. `%TypedArray.prototype%.toLocaleString` is separate
+re-entry are unchanged. The implementation-defined list separator that
+ECMA-262 lets this method choose is the one-code-unit String `","`, U+002C
+COMMA. `%TypedArray.prototype%.toLocaleString` is separate
 code, which M5c node `typed-array-tolocalestring-arguments` already made pass no
 arguments. Node.js 24.21.0 and Deno 2.9.7 implement ECMA-402, so their element
 methods always receive the outer call's first two arguments, `undefined` when
@@ -4055,9 +4057,13 @@ methods, and nested Arrays. The generated domain at seed `0x60004701` draws one
 to three such calls in ten ordinary cases. The repair adds no specialized path
 or guard, so the guard-fallback evidence is unchanged. The unchanged upstream
 *invoke-element-tolocalestring.js* path passes in all four variants of the
-focused observation at source `28d30410` and of the full manifest update at
-`05ba44c9`, and is admitted; in that full update the root's other eleven
-reviewed paths keep their classifications. No layout, intrinsic, helper, or
+focused observation at source `28d30410` and is admitted. The full manifest
+update that the coordinator's log records as reading the clean source
+`05ba44c9` also observed it passing in all four variants, with the root's
+other eleven reviewed paths keeping their classifications; its own run record
+names no commit. The later full update at source `4c18c04b`, whose pre-start
+record binds that clean commit and its tree, observed every record again,
+these twelve included, and changed none. No layout, intrinsic, helper, or
 entry point changes, so the runtime ABI is unchanged.
 
 M5b node `map-intrinsic` completes the realm-owned `%Map%` constructor

@@ -6,6 +6,7 @@ scope:
     and toString, including sparse and generic receivers, observable access
     order, Symbol.isConcatSpreadable, ArraySpeciesCreate, recursive flattening,
     cycles, element locale calls without arguments, locale result coercion,
+    the toLocaleString list separator, which is one U+002C COMMA code unit,
     and abrupt completion."
   - "One divergence from the reference hosts is known and unfixed. Generic
     ToPrimitive still reaches Array text through a deferred conversion this
