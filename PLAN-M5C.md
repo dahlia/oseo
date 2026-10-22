@@ -1010,8 +1010,10 @@ debt, not exclusions:
  -  *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js* reports
     the run-time `OSEO1001` rejection of the Annex B
     `Object.prototype.__proto__` accessor. The program runs both buffer
-    allocations and the first listed constructor's two views, then stops at
-    the first view's `__proto__` read, before any prototype comparison
+    allocations and constructs the first listed constructor's two views,
+    `ta_rab` over the resizable buffer and then `ta_ab` over the fixed-length
+    buffer. It stops at the `ta_ab.__proto__` read, recorded at 275:20 as the
+    first operand of the first prototype comparison, so no comparison
     completes. Its core subject, that
     fixed-length views over a resizable and a fixed-length buffer share the new
     target's prototype, does not depend on Annex B.
@@ -1040,17 +1042,25 @@ assessment, which raises its contract from 255 to 258 paths. Neither harness
 node therefore leaves its original cohort without unsupported paths; each
 delivers the observation, and the remaining debt has an owner.
 
-These four records, like every record whose deciding variant stopped at a
-run-time `OSEO1001` boundary, were written without execution evidence: the
-runner took every `OSEO1001` exit for a compile-stage rejection, although
-ADR 0013 omits execution evidence only for a variant that ran no native
-program. The CLI result now carries an `executed` fact that only a started
-executable sets, and the runner treats an observation as compile-stage only
-without it. Classifications do not change. The next complete manifest update
-adds the executed variant to each such record; at R2 the manifest held 86, all
-`unsupported-profile-feature` with `profile-syntax`: 40 `Function`, 32
-generator and async constructor, and 10 `eval` boundaries, and 2 Annex B
-`__proto__` and 2 legacy lookup method rejections.
+The complete manifest update on source `05b91dd1`, recorded in `73f1a74e`,
+wrote these four records, like every record whose deciding variant stopped at
+a run-time `OSEO1001` boundary, without execution evidence: the runner took
+every `OSEO1001` exit for a compile-stage rejection, although ADR 0013 omits
+execution evidence only for a variant that ran no native program. Commit
+`74787052` gave the CLI result an `executed` fact that only a started
+executable sets, and the runner now treats an observation as compile-stage
+only without it. The complete
+`mise run test262:update -- --accept-promotions` on the clean source
+`80442424` then ended with natural exit 0 and is recorded in `615d9d3b`. It
+changed exactly 86 records in 84 partitions, and only their `execution`
+block, which now lists the one executed variant, non-strict with
+specialization disabled: 40 `Function`, 32 generator and async constructor,
+and 10 `eval` boundaries, and 2 Annex B `__proto__` and 2 legacy lookup
+method rejections, all `unsupported-profile-feature` with `profile-syntax`.
+Their classification, observation, case, and dependencies are unchanged, no
+record was added or removed, and the 457 compile-stage `OSEO1001` records
+still carry no execution evidence. The derived current executed-variant count
+in *docs/m5c-closure/observation-batches.yaml* is 95,676.
 
 The copy keeps every upstream operation except how the three subclasses are
 made. Upstream's internal `subClass` compiles

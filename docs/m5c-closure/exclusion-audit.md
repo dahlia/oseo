@@ -124,9 +124,11 @@ The `resizable-array-buffer-harness` node transferred
 to the same owner under its own `annex-b-resizable-typed-array-prototype`
 assessment, with the same exact rejection and disposition. The program
 compiles and runs the harness, both buffer allocations, and the first listed
-constructor's two views. The runtime then reports the excluded `__proto__`
-read of the first view, the first operand of the first prototype comparison,
-as `OSEO1001`, so no prototype assertion of the original source ran. The
+constructor's two views, `ta_rab` over the resizable buffer and then `ta_ab`
+over the fixed-length buffer. The runtime then reports the excluded
+`ta_ab.__proto__` read, recorded at 275:20 as the first operand of the first
+prototype comparison, as `OSEO1001`, so no prototype assertion of the original
+source ran. The
 `typed-array-constructors` native fixture constructs fixed-length views over a
 resizable and a fixed-length buffer for every constructor the resizable buffer
 harness lists, including its three class subclasses, and compares both
