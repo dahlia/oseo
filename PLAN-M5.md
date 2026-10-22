@@ -8410,4 +8410,5 @@ promise, so the native host stops at the unhandled-rejection checkpoint with
 `OSEO2001` and records the `unhandled-rejection-policy` capability. Node
 `unhandled-rejection-observation`, which owns that capability, now owns the
 path and 20 in all. It is neither a pass nor an exclusion, and this node
-changes no host rejection policy.
+changes no host rejection policy. The later full update at source
+`4c18c04b` observed every record again, these 30 included, and changed none.

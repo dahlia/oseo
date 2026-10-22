@@ -465,7 +465,9 @@ evaluator-time initialization let a cyclic importer observe a temporal dead
 zone where ECMA-262 gives `undefined`. The 13 unreviewed paths that also
 need these features stay with `observation-batch-32`. The full manifest
 update at source `05ba44c9` observed the 11 negatives as expected
-negatives and the other 17 paths as passes.
+negatives and the other 17 paths as passes. The full update at source
+`4c18c04b`, which added the runtime header and parser test corrections,
+observed every record again and changed none.
 
 *packages/testkit/tests/module-graph.property.test.ts* checks generated
 graphs of local, indirect, namespace, and star exports with string names,
