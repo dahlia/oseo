@@ -854,6 +854,51 @@ stderr, and admits them with their unchanged `classes` dependency tag. Their
 whole-path exclusion is recorded.
 
 
+Incidental Annex B prototype write dependency
+---------------------------------------------
+
+The `__proto__` boundary above covered only the read. A write of
+`"__proto__"` that reaches the intrinsic `Object.prototype` without the key
+needs the same omitted normative-optional setter (16th edition 20.1.3.8.2);
+without a guard it silently creates an own data property instead, so a test
+can pass without the setup it intended. The `resizable-array-buffer-harness`
+node therefore enforces the existing ADR 0013 dependency rule for writes. It
+adds no exclusion and no policy waiver, and leaves the ADR 0013 vocabulary
+unchanged. Both of *runtime\_property.c*'s `[[Set]]` walks report the
+existing owned `OSEO1001` there, and runtime ABI `m5-134` records it. User
+properties, proxy `set` traps, null prototypes, typed-array numeric keys, and
+the object-literal prototype setter keep their behavior, and a primitive base
+keeps its existing early return. This is the boundary of those walks, not a
+complete Annex B detector.
+
+*TypedArray/out-of-bounds-behaves-like-detached.js* is the one reviewed case
+that writes `__proto__`: `i8a.__proto__ = { 2: 'wrong value' }` is meant to
+give the view a prototype that answers index 2. The complete update recorded
+in `615d9d3b` observed it as a pass before this guard, with an own
+`"__proto__"` property and the view still inheriting from
+`Int8Array.prototype`, so none of its assertions could show that an
+out-of-bounds read or `in` skips such a prototype. Its core subject remains
+active coverage debt, not an exclusion. The `typed-array-core` native fixture
+now supplies that subject with `Object.setPrototypeOf`: an index-bearing
+prototype that inherits from `Int8Array.prototype`, on a fixed-length and a
+length-tracking view, with prototype identity and an inherited label as
+witnesses, `Get` and `in` before shrinking, out of bounds, and after
+regrowing. Neither the guard nor the fixture has run natively at this source.
+
+The path is unsupported only in the reviewed `main` manifest; no `main` pass
+writes `__proto__`. Its subset entry still expects the pass that `615d9d3b`
+recorded, and this source does not change that expectation, any result
+record, the audit, or the ledger before an observation. A complete manifest
+update of this source is expected to report the path as
+`unsupported-profile-feature` with the owned rejection, which the reviewed
+runner refuses against the `pass` expectation without promoting or
+normalizing it. Recording the observed classification, a mixed Annex B audit
+row and assessment, and the path's ledger entry under
+`node:typed-array-proto-coverage-remediation`, beside its two existing paths
+and their replacement evidence, follows that observation. Until then no
+accounting change is claimed.
+
+
 Legacy function caller boundary
 -------------------------------
 

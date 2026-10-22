@@ -383,6 +383,50 @@ Object.prototype["01"] = "inherited";
 console.log("canonical prototype", String(view["-0"]), view["01"]);
 delete Object.prototype["-0"];
 delete Object.prototype["01"];
+const pollutedBuffer = new ArrayBuffer(16, { maxByteLength: 40 });
+const pollutedFixed = new Int8Array(pollutedBuffer, 0, 4);
+const pollutedTracking = new Int8Array(pollutedBuffer);
+const pollutedPrototype = {
+  __proto__: Int8Array.prototype,
+  2: "wrong value",
+  5: "wrong value",
+  label: "kept",
+};
+Object.setPrototypeOf(pollutedFixed, pollutedPrototype);
+Object.setPrototypeOf(pollutedTracking, pollutedPrototype);
+pollutedFixed[2] = 10;
+console.log(
+  "polluted prototype in bounds",
+  Object.getPrototypeOf(pollutedFixed) === pollutedPrototype,
+  pollutedFixed.label,
+  pollutedFixed[2],
+  2 in pollutedFixed,
+  String(pollutedFixed[5]),
+  5 in pollutedFixed,
+  pollutedTracking[2],
+  Object.hasOwn(pollutedFixed, "__proto__"),
+);
+pollutedBuffer.resize(0);
+console.log(
+  "polluted prototype out of bounds",
+  pollutedFixed.length,
+  String(pollutedFixed[2]),
+  2 in pollutedFixed,
+  String(pollutedFixed[0]),
+  0 in pollutedFixed,
+  pollutedTracking.length,
+  String(pollutedTracking[2]),
+  2 in pollutedTracking,
+  pollutedFixed.label,
+);
+pollutedBuffer.resize(16);
+console.log(
+  "polluted prototype restored",
+  pollutedFixed[2],
+  2 in pollutedFixed,
+  String(pollutedFixed[5]),
+  pollutedTracking.length,
+);
 view["-0"] = 5;
 view["1.5"] = 5;
 view["NaN"] = 5;
