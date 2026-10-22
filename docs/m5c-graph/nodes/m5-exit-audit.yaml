@@ -85,6 +85,4 @@ dependencies:
   - well-known-intrinsics-harness
   - with-strict-assignment-fallback
 landed: false
-status: parked
-reason: "Awaiting the additional review allowance and closure of the parked
-  promise-feature-admission prerequisite."
+status: blocked
