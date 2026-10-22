@@ -11,4 +11,4 @@ dependencies:
   - cross-realm-host
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

@@ -10,5 +10,5 @@ delivers: "Accounts for the 23 noStrict paths gated by the caller feature
   restricted-function contract inside the claim."
 dependencies:
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

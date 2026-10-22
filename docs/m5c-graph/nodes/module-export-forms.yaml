@@ -8,5 +8,5 @@ delivers: "Admits arbitrary module namespace names, export * as namespace,
   OSEO1001 diagnostic This export is unsupported."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
