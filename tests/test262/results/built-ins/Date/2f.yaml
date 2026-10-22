@@ -19,6 +19,13 @@ results:
       - date
       - functions
       - reflect-namespace
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
       detail: 'test/built-ins/Date/proto-from-ctor-realm-two.js non-strict
         disabled failed (1): stdout=""

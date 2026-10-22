@@ -170,6 +170,75 @@ assessments:
       and buffer evidence. These core algorithms do not normatively
       require Annex B; retain bounded remediation until the maintainer
       accounting decision, without authorizing a whole-path exclusion.
+  annex-b-resizable-typed-array-prototype:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    remediationOwner: node:typed-array-proto-coverage-remediation
+    replacementEvidence:
+      tests/native/fixtures/typed-array-constructors.ts: "\
+        0fda23dff34deff74f9b8938bf5e2e19910343fe56ea863316236f42e342f1ec"
+      tests/property/m5-typed-array-constructors.property.test.ts: "\
+        ef8f8b1f2d88099bbbcd0ae35de4953f4a932f3242e6503a3a2b59909e3ee20d"
+    reason: The only observed failure is the excluded Annex B __proto__
+      read. The program compiles and runs the harness, both buffer
+      allocations, and the first listed constructor's two views, ta_rab
+      over the resizable buffer and then ta_ab over the fixed-length
+      buffer; the runtime then reports OSEO1001 at the ta_ab.__proto__
+      read, recorded at 275:20 as the first operand of the first
+      prototype comparison, so no prototype assertion of the original
+      source ran. The source
+      requires fixed-length views over a resizable and a fixed-length
+      buffer to share their prototype for every constructor of the
+      resizable buffer harness, including its three class subclasses.
+      The typed-array-constructors native fixture builds each such pair,
+      observes both prototypes through Object.getPrototypeOf instead of
+      the accessor, and compares them with each other and with the
+      constructor's prototype. The construction order property's fixed
+      case adds fixed and length-tracking resizable buffer views of
+      Float64Array and BigInt64Array under own, bound, and Proxy new
+      targets. These core algorithms do not normatively require Annex B;
+      retain bounded remediation until the maintainer accounting
+      decision, without authorizing a whole-path exclusion.
+  annex-b-out-of-bounds-prototype-setup:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    remediationOwner: node:typed-array-proto-coverage-remediation
+    replacementEvidence:
+      tests/native/fixtures/typed-array-core.ts: "\
+        d56aaa14ebbd751e195d0133a1a82d4caa165909e64b85e1e724792328062c20"
+    reason: The only observed failure is the excluded Annex B __proto__
+      write. The program compiles and runs the harness, the resizable
+      buffer, and the length-4 Int8Array view, then reports OSEO1001 at
+      272:1, the i8a.__proto__ assignment that would install a prototype
+      with index 2 through the omitted setter, so no assertion of the
+      original source ran. The source requires an out-of-bounds view to
+      answer Get and HasProperty for an index as if it were detached,
+      without consulting a prototype that has that index. The
+      typed-array-core native fixture installs such a prototype,
+      inheriting from Int8Array.prototype, with Object.setPrototypeOf on a
+      fixed-length and a length-tracking view, witnesses its identity and
+      an inherited label, and checks Get and in before shrinking, out of
+      bounds, and after regrowing. These core algorithms do not
+      normatively require Annex B; retain bounded remediation until the
+      maintainer accounting decision, without authorizing a whole-path
+      exclusion.
+  source-constructor-constructibility:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The test obtains %AsyncFunction%, %AsyncGeneratorFunction%, or
+      %GeneratorFunction% through the reviewed wellKnownIntrinsicObjects.js,
+      asserts IsConstructor of it, and then constructs it with new. The
+      program compiles and runs. isConstructor.js passes the intrinsic
+      only as the newTarget of Reflect.construct, so the IsConstructor
+      assertion executes and passes; the runtime then reports the ADR
+      0016 OSEO1001 boundary from the intrinsic's [[Construct]], located
+      at the new call in the first observed variant. ADR 0016 authorizes
+      rejecting that construction, which compiles source text. The
+      executed IsConstructor predicate is behavior other than source
+      evaluation and stays inside the claim. Keep remediation until the
+      maintainer accounting decision bounds this mixed subject or
+      reviewed replacement evidence covers it; this does not exempt the
+      construction from the ADR 0016 boundary.
   import-call-attributes:
     disposition: exclusion
     normativeDependency: source-evaluation-only
@@ -353,6 +422,17 @@ paths:
     subject: Async function instances are not constructors and do not have a
       [[Construct]] slot.
     assessment: mixed-static-functions
+  - path: test/built-ins/AsyncFunction/is-a-constructor.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "0dca73a0d12d3d30549b1f824eb5c3806909c15655a316da715994245aa5\
+      fd00"
+    observationDigest: "3719ebc3893f53a7ddd9f5b09734f41d3aa7895a57ec24e47731659\
+      a78c2a0a8"
+    missingDynamicTag: false
+    section: sec-ecmascript-standard-built-in-objects
+    subject: The AsyncFunction constructor implements [[Construct]]
+    assessment: source-constructor-constructibility
   - path: test/built-ins/AsyncFunction/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -501,6 +581,17 @@ paths:
       async generator whose body is the first argument evaluated as
       source code.
     assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/is-a-constructor.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "e323ea57dbe1a09d6fdf228269d34228daef0d12bad6f8a5530d9fa35a54\
+      2977"
+    observationDigest: "a1ec1f8cecc6eb662168f3245fd9ca1d0f8a7a2b7f08b86e95cd5dd\
+      7af3d6354"
+    missingDynamicTag: false
+    section: sec-ecmascript-standard-built-in-objects
+    subject: The AsyncGeneratorFunction constructor implements [[Construct]]
+    assessment: source-constructor-constructibility
   - path: "test/built-ins/AsyncGeneratorFunction/proto-from-ctor-realm-prototyp\
       e.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2016,6 +2107,17 @@ paths:
       generator whose body is the first argument evaluated as source
       code.
     assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/is-a-constructor.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "97dc21864112f2e61d38eff7e253b945786d460675ec5ed07b3ddc77fc87\
+      57a9"
+    observationDigest: "832a883d993e3f2b36b33060953312a9c7e2a8d30abc32f79361c75\
+      e6da6639b"
+    missingDynamicTag: false
+    section: sec-ecmascript-standard-built-in-objects
+    subject: The GeneratorFunction constructor implements [[Construct]]
+    assessment: source-constructor-constructibility
   - path: test/built-ins/GeneratorFunction/proto-from-ctor-realm-prototype.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -2547,6 +2649,31 @@ paths:
     section: sec-%throwtypeerror%
     subject: "%ThrowTypeError% is defined once for each realm."
     assessment: fixture-construction
+  - path: test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js
+    proposedOwner: adr:0013-m5-edition-and-manifest
+    priorCohort: annex-b
+    sourceDigest: "82ccf0c69b512a79f19975345e0386909f601e58d9c7ba6739cdd45f58c\
+      3e486"
+    observationDigest: "259f1ae13d0b820d5e75fee5197cc62af971412a609528395f056a\
+      f98edcf2fd"
+    missingDynamicTag: false
+    section: sec-isvalidintegerindex
+    subject: TypedArrays backed by resizable buffers that are
+      out-of-bounds behave as if they were detached
+    assessment: annex-b-out-of-bounds-prototype-setup
+  - path: "test/built-ins/TypedArray/prototype/resizable-and-fixed-have-same-pr\
+      ototype.js"
+    proposedOwner: adr:0013-m5-edition-and-manifest
+    priorCohort: annex-b
+    sourceDigest: "b2bf9e753f56ed226933ba7169824f100af38ea23fe225d032c7720002f2\
+      5a38"
+    observationDigest: "daa102af9794160f65429668800b29b482ca1026e45f22be0265f17\
+      07ef8e6d9"
+    missingDynamicTag: false
+    section: sec-%typedarray%.prototype
+    subject: TypedArrays that are backed by resizable buffers have the same
+      prototypes as those backed by fixed-length buffers
+    assessment: annex-b-resizable-typed-array-prototype
   - path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
     proposedOwner: adr:0013-m5-edition-and-manifest
     priorCohort: annex-b

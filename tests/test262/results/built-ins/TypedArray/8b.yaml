@@ -17,10 +17,22 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - typed-array-statics
+    execution:
+      harnessIncludes:
+        - base.js
+        - resizableArrayBufferUtils.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "Not executed: unsupported harness resizableArrayBufferUtils.js."
+      detail: 'test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/TypedArray/out-of-bounds-behaves-like-detached.js:272:1:
+        error[OSEO1001]: The Object.prototype.__proto__ accessor is
+        excluded by Annex B.\n"'
       passed: false
-      unsupportedCapability: harness-include
+      unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
       async: false
