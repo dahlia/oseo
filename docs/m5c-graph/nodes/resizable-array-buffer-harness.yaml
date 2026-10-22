@@ -12,5 +12,5 @@ delivers: "Reviews and admits the resizableArrayBufferUtils.js harness
   m5-134 and native regression evidence; it adds no exclusion."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
