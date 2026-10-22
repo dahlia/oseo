@@ -79,6 +79,23 @@ collection at every safepoint. Native diagnostic tests pin direct, computed,
 Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI is
 `oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary stay unchanged.
 
+Runtime ABI `oseo-runtime-m5-134` adds the write half of the same boundary. A
+`[[Set]]` of `"__proto__"` whose walk reaches an intrinsic `Object.prototype`
+without finding an own property there or earlier reports the same owned
+`OSEO1001`, because only the omitted normative-optional setter (16th edition
+20.1.3.8.2) would handle that write; without the guard it would silently
+create an own data property instead. Ordinary assignment, `Reflect.set`
+(including a distinct receiver), `super` assignment, a proxy without a `set`
+trap, and `Object.assign` share the guarded walks. Own and inherited user
+data, accessor, and read-only properties, proxy `set` traps, null prototypes,
+typed-array numeric keys, and the object-literal prototype setter keep their
+behavior. A primitive base keeps its existing early return, so this is the
+boundary of these two walks, not a complete Annex B detector. Native tests in
+*tests/annexb-proto-boundary.test.ts* pin the guarded writes under both
+specialization policies with collection at every safepoint, and one program
+of answered writes whose output a reference host prints with or without the
+setter.
+
 M5c node `annexb-legacy-lookup-dependency-classification` makes only a
 missing `__lookupGetter__` or `__lookupSetter__` lookup reaching an intrinsic
 `Object.prototype` observable as `OSEO1001`. The 16th edition defines both

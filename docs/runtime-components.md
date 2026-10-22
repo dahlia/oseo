@@ -1603,6 +1603,15 @@ constructor code table. *runtime\_function.c* routes the appended slots
 to the cluster, and *runtime\_atomics.c* rejects the kind in
 ValidateIntegerTypedArray. No heap kind or entry point is added.
 
+The `resizable-array-buffer-harness` node moves `abiVersion` to `m5-134`.
+*runtime\_property.c*'s ordinary assignment walk in `oseo_object_set` and
+receiver walk in `oseo_internal_set_with_receiver` report the owned
+`OSEO1001` for a `"__proto__"` write that reaches an intrinsic
+`%Object.prototype%` without finding the key, mirroring the read in
+`object_get`. Every earlier answer on either walk is unchanged, and a
+primitive base still returns before walking. No code ID, intrinsic, heap
+kind, or entry point is added.
+
 ### Clock and wakeup evidence
 
 M5b node `nio-clock-wakeup-checkpoint` adds *runtime\_clock.c* and

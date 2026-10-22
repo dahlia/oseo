@@ -1108,6 +1108,18 @@ internally. The cluster's in-progress marker is the last constructor it
 builds, now Float16Array. `Atomics` rejects the new kind. No entry point,
 public layout, or heap kind is added.
 
+The `m5-134` ABI adds the write half of the Annex B `__proto__` boundary. A
+`[[Set]]` of `"__proto__"` whose walk reaches an intrinsic
+`%Object.prototype%`, in any realm, without finding an own property there or
+earlier reports the same owned `OSEO1001` diagnostic as the missing read,
+because only the omitted normative-optional setter could handle that write.
+Both walks, the ordinary assignment walk and the receiver walk that
+`Reflect.set` and `super` assignment use, apply it. Own and inherited user
+properties, proxy traps, null prototypes, module namespaces, typed-array
+numeric keys, and the object-literal prototype setter keep their behavior,
+and a primitive base keeps its existing early return. No entry point, public
+layout, heap kind, intrinsic slot, or built-in code ID is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
