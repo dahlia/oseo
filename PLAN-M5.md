@@ -5467,17 +5467,19 @@ unhandled-rejection policy, three need `Object.getOwnPropertyNames`, two need
 `Reflect.construct`, and two call dynamic `eval`. Three String-iteration cases
 stay outside this node for the separate `string-iterator` owner, and three
 typed-unhandled-rejection cases stay outside the reviewed subset because the
-current host policy cannot distinguish their rejection from an unhandled
-throw. No previously reviewed path loses a pass. The manifest moves from
-16,269 to 16,461 paths and from 12,599 to 12,779 passes, keeps 1,556 expected
-negatives, and moves from 2,114 to 2,126 unsupported profile features, with
-no failures. The property ratchet moves from 121 to 122 domains and seeds and
-from 5,344 to 5,356 ordinary cases. The reviewed test262 revision,
-41,091-path applicable inventory, ADR 0013 schema and vocabulary, inventory
-policy, and zero-override policy are unchanged. The checkpoint moves the
-runtime ABI to `oseo-runtime-m5-90` and allocates two code IDs inside the
-existing Promise range without adding a generated-code entry point or
-changing the graph's orchestration state.
+host policy at this node could not distinguish their rejection from an
+unhandled throw. The M5b `globalthis-binding` node later gave a rejected
+intrinsic error instance the rejection boundary text, as recorded below. No
+previously reviewed path loses a pass. The manifest moves from 16,269 to 16,461
+paths and from 12,599 to 12,779 passes, keeps 1,556 expected negatives, and
+moves from 2,114 to 2,126 unsupported profile features, with no failures. The
+property ratchet moves from 121 to 122 domains and seeds and from 5,344 to
+5,356 ordinary cases. The reviewed test262 revision, 41,091-path applicable
+inventory, ADR 0013 schema and vocabulary, inventory policy, and zero-override
+policy are unchanged. The checkpoint moves the runtime ABI to
+`oseo-runtime-m5-90` and allocates two code IDs inside the existing Promise
+range without adding a generated-code entry point or changing the graph's
+orchestration state.
 
 Implemented M5b node `iterator-helpers-lazy` gives the realm-owned
 `%IteratorPrototype%` ordinary `map`, `filter`, `take`, `drop`, and `flatMap`

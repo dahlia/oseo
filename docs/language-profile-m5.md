@@ -8418,14 +8418,16 @@ complete. The remaining gaps retain their existing owners.
     real only if a later edition exposed the wrapper. Owner: the intrinsics
     and built-in objects stream.
  -  A rejected promise that no reaction ever handles ends the program at the
-    next rejection checkpoint. A case whose reason is not a typed error
-    names the owned `unhandled-rejection-policy` boundary, but a case whose
-    reason is an error instance is indistinguishable from an unhandled
-    throw, so
+    next rejection checkpoint, which reports the owned
+    `unhandled-rejection-policy` boundary whatever the reason is; a rejected
+    intrinsic error instance also keeps its kind marker after that text.
     *Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js* and
-    *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* stay
-    outside the reviewed subset. Owner: the modules and asynchronous
-    execution stream.
+    *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js*, which
+    leave a rejection with an intrinsic `Error` unhandled, are not in the
+    reviewed subset. They were withheld while such a rejection was reported
+    like an unhandled throw, before the M5b `globalthis-binding` node gave
+    it the boundary text; no observation of them is recorded since. Owner:
+    the modules and asynchronous execution stream.
  -  `eval`, dynamic `Function` construction, and dynamic import stay
     explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
@@ -8475,9 +8477,9 @@ complete. The remaining gaps retain their existing owners.
     and stay `unsupported-profile-feature` with the
     `unhandled-rejection-policy` capability; node
     `unhandled-rejection-observation` owns them, and none is a pass or an
-    exclusion. Cases whose unhandled reason is an error instance stay out
-    of the reviewed subset, as recorded above. Both remain until a
-    host-profile decision reconciles the two contracts. Owner: the modules
+    exclusion. The two unreviewed `then` cases recorded above stay
+    outside the reviewed subset. Both remain until a host-profile decision
+    reconciles the two contracts. Owner: the modules
     and asynchronous execution stream.
  -  Large intrinsic tables and built-in families land in the owned
     runtime components recorded in
