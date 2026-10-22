@@ -890,17 +890,19 @@ writes under both specialization policies) and the fixture through
 the AArch64 musl cross-link builds). The complete manifest update has not run
 on this source.
 
-The path is unsupported in the reviewed `main` manifest, and no `main` pass
-writes `__proto__`. Commit `3e42e4c3` restores its subset expectation from
-`pass` to `unsupported-profile-feature`, because the reviewed runner refuses
-a pass-to-unsupported change as a demotion rather than recording it. Until a
-complete manifest update replaces it, its result record keeps the pass that
-`615d9d3b` observed; no record, audit row, or ledger entry is edited before
-that observation. Recording the observed classification, a mixed Annex B
-audit row and assessment, and the path's ledger entry under
-`node:typed-array-proto-coverage-remediation`, beside its two existing paths
-and their replacement evidence, follows that observation. Until then no
-accounting change is claimed.
+The path is unsupported in the reviewed `main` manifest. A static scan of
+spelled `__proto__` keys finds no guard candidate among the `main` passes
+that mention it, but it cannot see computed keys, so the complete manifest
+update of this source must preserve every `main` pass. Commit `3e42e4c3`
+restores its subset expectation from `pass` to `unsupported-profile-feature`,
+because the reviewed runner refuses a pass-to-unsupported change as a demotion
+rather than recording it. Until a complete manifest update replaces it, its
+result record keeps the pass that `615d9d3b` observed; no record, audit row, or
+ledger entry is edited before that observation. Recording the observed
+classification, a mixed Annex B audit row and assessment, and the path's ledger
+entry under `node:typed-array-proto-coverage-remediation`, beside its two
+existing paths and their replacement evidence, follows that observation. Until
+then no accounting change is claimed.
 
 
 Legacy function caller boundary
