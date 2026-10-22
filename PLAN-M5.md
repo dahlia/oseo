@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-25,437 reviewed cases: 21,677 passes, 2,205 expected negatives, and 1,555
+28,311 reviewed cases: 24,069 passes, 2,581 expected negatives, and 1,661
 unsupported profile features with no semantic, harness, or infrastructure
 failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the
@@ -28,7 +28,7 @@ and 18,093 built-in tests are inside the 16th edition, while 6,290 proposal,
 post-edition, or Annex B paths are outside it. The compact inventory remains
 separate from the result manifest.
 
-M5a and M5b are complete. The 143 indexed records in the normative
+M5a and M5b are complete. The 146 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
@@ -3444,10 +3444,12 @@ namespace re-exports such as `export * as ns from "./module.js"`, and module
 top-level pattern-position `await` remained with the modules and asynchronous
 execution stream. M5c later admits the first three: node `import-meta` admits
 `import.meta` in Module code, and node `module-export-forms` admits
-`export var` and `export * as` namespace re-exports, as their sections
-record. Pattern-position `await` is still rejected and is owned by node
-`module-top-level-await-patterns`. TypeScript-only syntax is outside the
-ECMA-262 claim, and dynamic source remains owned by ADR 0016.
+`export var` and `export * as` namespace re-exports, as the import.meta
+section below and the Module export forms section of
+[*PLAN-M5C.md*](./PLAN-M5C.md) record. Pattern-position `await` is still
+rejected and is owned by node `module-top-level-await-patterns`.
+TypeScript-only syntax is outside the ECMA-262 claim, and dynamic source
+remains owned by ADR 0016.
 
 At Unit 8.5n, the audit therefore kept the M5a checkpoint open for the
 separate optional private read and call evidence unit without changing the
@@ -5466,10 +5468,14 @@ paths under the two inventory roots are accounted for and 192 are reviewed:
 unhandled-rejection policy, three need `Object.getOwnPropertyNames`, two need
 `Reflect.construct`, and two call dynamic `eval`. Three String-iteration cases
 stay outside this node for the separate `string-iterator` owner, and three
-typed-unhandled-rejection cases stay outside the reviewed subset because the
+typed-unhandled-rejection cases stayed outside the reviewed subset because the
 host policy at this node could not distinguish their rejection from an
-unhandled throw. The M5b `globalthis-binding` node later gave a rejected
-intrinsic error instance the rejection boundary text, as recorded below. No
+unhandled throw: *Promise/allSettled/invoke-resolve-error-close.js*,
+*Promise/any/ctx-ctor.js*, and *Promise/any/returns-promise.js*. The M5b
+`globalthis-binding` node later gave a rejected intrinsic error instance the
+rejection boundary text, as recorded below. That dated cause is not their
+current gate: the closure ledger assigns the three, unreviewed, to node
+`observation-batch-01`, and no observation of them is recorded since. No
 previously reviewed path loses a pass. The manifest moves from 16,269 to 16,461
 paths and from 12,599 to 12,779 passes, keeps 1,556 expected negatives, and
 moves from 2,114 to 2,126 unsupported profile features, with no failures. The
@@ -8400,10 +8406,13 @@ Preparation ran neither the native fixture nor the test262 observation of
 the 30 paths, so their classifications in *tests/test262/subset.yaml* stayed
 `unsupported-profile-feature` and this section recorded no pass count until a
 full `mise run test262:update -- --accept-promotions` observed them. No
-native run of the fixture is recorded at this source; the counts above are
-the Node.js and Deno reference outputs.
+native run of the fixture is recorded for this node, at its preparation
+commit `938b3105` or since; the counts above are the Node.js and Deno
+reference outputs.
 
-The full manifest update at source `05ba44c9` then observed the 30 paths.
+The full manifest update that the coordinator's log records as reading the
+clean source `05ba44c9` (tree `6342c190`) then observed the 30 paths; its own
+run record names no commit.
 Twenty-nine move from unsupported to pass, including
 *rejected-observable-then-calls-argument.js*.
 *subclass-species-constructor-reject-count.js* now executes and stays
@@ -8413,4 +8422,5 @@ promise, so the native host stops at the unhandled-rejection checkpoint with
 `unhandled-rejection-observation`, which owns that capability, now owns the
 path and 20 in all. It is neither a pass nor an exclusion, and this node
 changes no host rejection policy. The later full update at source
-`4c18c04b` observed every record again, these 30 included, and changed none.
+`4c18c04b`, whose pre-start record binds that clean commit and its tree,
+observed every record again, these 30 included, and changed none.

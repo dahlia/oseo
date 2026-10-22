@@ -441,33 +441,39 @@ and arbitrary module namespace names, which owned 28 reviewed paths: 15
 gated by `arbitrary-module-namespace-names`, 7 by
 `export-star-as-namespace-from-module`, and 6 whose fixtures used
 `export var` and reported `This export is unsupported.` Eleven of the 28
-are expected parse-phase negatives: duplicate export names, lone
-surrogates, a string local name without `from`, and a missing semicolon
-after a star export. They test early errors, not a missing capability.
-Four of the five lone-surrogate cases reject at the ill-formed string
-itself: *export-expname-unpaired-surrogate.js* at a local export alias,
+are expected parse-phase negatives: two duplicate export names, six lone
+surrogates, one string local name without `from`, and two missing
+semicolons after a star export. They test early errors, not a missing
+capability. Five of the six lone-surrogate cases reject at the ill-formed
+string itself: *early-export-ill-formed-string.js* at its first export
+alias, `Moon as "\uD83C"` (`OSEO0001` at 96:17),
+*export-expname-unpaired-surrogate.js* at a local export alias,
 *export-expname-from-unpaired-surrogate.js* and
 *export-expname-from-as-unpaired-surrogate.js* at a re-export specifier name,
 and *export-expname-import-unpaired-surrogate.js* at an import specifier name.
-The fifth, *export-expname-from-star-unpaired-surrogate.js*, spells the star
+The sixth, *export-expname-from-star-unpaired-surrogate.js*, spells the star
 as the string `"*"`, which ExportFromClause does not accept. Its observed
 `OSEO0001` points at that quoted star, before the surrogate is read, so the
 case proves only that earlier syntax rejection; it is still a correct
 expected negative. The ill-formed name in `export * as "\uD83D" from` is
 covered instead by a structural case in
 *packages/parser-babel/tests/module-export-forms.test.ts*, beside a
-well-formed surrogate pair that parses as a namespace export name. That test
-proves the parser rule under Node.js and Deno; it is not a test262
-observation or a native execution.
+well-formed surrogate pair that parses as a namespace export name. The test
+source states that parser rule. The author's Node.js and Deno outputs list
+its nine cases passing but record no source commit, so they are not bound
+to a commit here; neither they nor the test source is a test262 observation
+or a native execution.
 ADR 0009 records the linking contract. Admitting `export var` required
 creating every module `var` cell while linking, because the previous
 evaluator-time initialization let a cyclic importer observe a temporal dead
 zone where ECMA-262 gives `undefined`. The 13 unreviewed paths that also
 need these features stay with `observation-batch-32`. The full manifest
-update at source `05ba44c9` observed the 11 negatives as expected
-negatives and the other 17 paths as passes. The full update at source
-`4c18c04b`, which added the runtime header and parser test corrections,
-observed every record again and changed none.
+update that the coordinator's log records as reading the clean source
+`05ba44c9` observed the 11 negatives as expected negatives and the other 17
+paths as passes; its own run record names no commit. The full update at
+source `4c18c04b`, which corrected the runtime header comment and added the
+parser test cases, and whose pre-start record binds that clean commit and
+its tree, observed every record again and changed none.
 
 *packages/testkit/tests/module-graph.property.test.ts* checks generated
 graphs of local, indirect, namespace, and star exports with string names,

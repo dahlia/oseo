@@ -8426,17 +8426,26 @@ complete. The remaining gaps retain their existing owners.
     and built-in objects stream.
  -  A rejected promise that no reaction ever handles ends the program at the
     next rejection checkpoint, which reports the owned
-    `unhandled-rejection-policy` boundary whatever the reason is; a rejected
-    intrinsic error instance also keeps its kind marker after that text.
+    `unhandled-rejection-policy` boundary text for any reason. When the
+    reason's prototype chain reaches one of the current realm's intrinsic
+    error prototypes, the report also carries that error kind's marker; an
+    error from another realm, like any other value, gets the boundary text
+    alone. When the entry script, a timer callback, or a finalization
+    callback ends with an uncaught throw, the runtime still drains pending
+    jobs and runs that checkpoint, but reports the throw unless that work
+    produced a host diagnostic.
     *Promise/prototype/then/rxn-handler-fulfilled-next-abrupt.js* and
-    *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js*, which
-    leave a rejection with an intrinsic `Error` unhandled, are not in the
-    reviewed subset. They were withheld while such a rejection was reported
-    like an unhandled throw, before the M5b `globalthis-binding` node gave
-    it the boundary text; no observation of them is recorded since. The
-    closure ledger assigns both, unreviewed, to node `observation-batch-01`.
-    Owner of the rejection host policy: the modules and asynchronous
-    execution stream.
+    *Promise/prototype/then/rxn-handler-rejected-next-abrupt.js* leave a
+    rejection with an intrinsic `Error` unhandled, and the three
+    settled-combinator cases recorded under Promise settled combinators
+    leave one with an `Error` or an `AggregateError`. None of the five is
+    in the reviewed subset, and no observation of them is recorded. The
+    two `then` cases were withheld while such a rejection was reported like
+    an unhandled throw, before the M5b `globalthis-binding` node gave it the
+    boundary text. The closure ledger assigns all five, unreviewed, to node
+    `observation-batch-01`; observing them needs no new host-policy
+    decision. Owner of the rejection host policy: the modules and
+    asynchronous execution stream.
  -  `eval`, dynamic `Function` construction, and dynamic import stay
     explicitly
     unsupported under [ADR 0016](./adr/0016-dynamic-source-boundary.md).
@@ -8486,10 +8495,11 @@ complete. The remaining gaps retain their existing owners.
     and stay `unsupported-profile-feature` with the
     `unhandled-rejection-policy` capability; node
     `unhandled-rejection-observation` owns them, and none is a pass or an
-    exclusion. The two unreviewed `then` cases recorded above stay
-    outside the reviewed subset. Both remain until a host-profile decision
-    reconciles the two contracts. Owner: the modules
-    and asynchronous execution stream.
+    exclusion. The five unreviewed cases recorded above belong to node
+    `observation-batch-01`, not to this boundary's owner. Reconciling the
+    native policy with the test262 host contract, which would change how
+    such cases classify, is a separate host-profile decision. Owner of that
+    decision: the modules and asynchronous execution stream.
  -  Large intrinsic tables and built-in families land in the owned
     runtime components recorded in
     [*runtime-components.md*](./runtime-components.md).
