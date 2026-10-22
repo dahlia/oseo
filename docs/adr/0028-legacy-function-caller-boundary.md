@@ -210,11 +210,13 @@ Consequences
 
 The reviewed subset gains the 23 paths as unsupported, with the
 `functions` tag, `dynamic-source` on the five intersections, and
-`object-properties` on the two arguments tests. Their result records, the
-closure ledger owners, and the observation batch counts come from the
-normal regeneration tools. The 41,091-path denominator, edition, inventory
-policy, manifest schema, and classification and dependency vocabularies
-stay unchanged.
+`object-properties` on the two arguments tests. Their result records and
+the observation batch counts come from the normal observation and
+regeneration tools. The node assigns the closure ledger owner of this record
+to exactly the selector's paths; normal ledger regeneration preserves that
+owner while each path keeps its state, but does not create it. The
+41,091-path denominator, edition, inventory policy, manifest schema, and
+classification and dependency vocabularies stay unchanged.
 
 `mise run check:m5c-exclusion-audit` accepts this record's owner only for a
 path in the exact selector, only with the caller frontmatter rejection as

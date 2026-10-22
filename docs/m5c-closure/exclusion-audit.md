@@ -246,4 +246,5 @@ those calls but owns none of these paths, and its audit surface is unchanged.
 Their `missingDynamicTag` is false, because the dynamic-source tag debt
 applies only to ADR 0016 rows. The %Function.prototype% accessors, the
 clause 17.1 restrictions, and the absence of an own `caller` property on
-arguments objects stay inside the claim with their own evidence.
+arguments objects stay inside the claim with their own evidence or
+remediation owners.

@@ -47,7 +47,7 @@ records:
         the excluded dynamic source family for behavior other than
         source evaluation reopens the boundary rather than this record.
   0028-legacy-function-caller-boundary:
-    digest: 3b058cca5ed8e16d3f7d7c733239360f3504332cd92a01ecef032002b36fed1c
+    digest: 50e92d79e587a8ef27c5b641a0c8352ee02db689af822e3d62b89e832cf23338
     authorization:
       - The optional legacy caller extension is outside the M5 profile.
       - This record authorizes an M5 exclusion of the expectation that
@@ -258,9 +258,9 @@ assessments:
       throws. ADR 0028 excludes only that optional expectation for its exact
       selector. The prototype accessors, the clause 17.1 restrictions, and
       the absence of an own `caller` on arguments objects stay inside the
-      claim with their own evidence. Any `eval` or `Function` call is
-      scaffolding for the caller relationship and stays under ADR 0016,
-      which owns none of these paths.
+      claim with their own evidence or remediation owners. Any `eval` or
+      `Function` call is scaffolding for the caller relationship and stays
+      under ADR 0016, which owns none of these paths.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary

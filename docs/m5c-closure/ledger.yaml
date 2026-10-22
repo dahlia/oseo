@@ -65,13 +65,13 @@ owners:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
       completes normally, and only for the exact 23 paths listed under
-      “Exact selector”." Its selector is exactly the 23 pinned noStrict
-      paths with the caller frontmatter feature, each observed as the
-      frontmatter rejection with caller as its only unsupported feature.
-      The standard %ThrowTypeError% accessors and every mandatory
-      restricted-function contract stay inside the claim. The five paths
-      that also call eval or Function are not owned by ADR 0016, which
-      this record does not broaden; 23 paths.
+      “Exact selector” below." Its selector is exactly the 23 pinned
+      noStrict paths with the caller frontmatter feature, each observed
+      as the frontmatter rejection with caller as its only unsupported
+      feature. The standard %ThrowTypeError% accessors and every
+      mandatory restricted-function contract stay inside the claim. The
+      five paths that also call eval or Function are not owned by ADR
+      0016, which this record does not broaden; 23 paths.
     paths: 23
   node:class-private-accessor-lookup-coverage-remediation:
     note: Observation-batch-11 admits the two class-elements tests that call
