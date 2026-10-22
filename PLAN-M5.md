@@ -8434,8 +8434,8 @@ the 30 paths, so their classifications in *tests/test262/subset.yaml* stayed
 `unsupported-profile-feature` and this section recorded no pass count until a
 full `mise run test262:update -- --accept-promotions` observed them. No
 native run of the fixture is recorded for this node, at its preparation
-commit `938b3105`, which the published history carries as its replay
-`014f2518`, or since; the counts above are the Node.js and Deno
+commit `938b3105`, which the SourceA integration history carries as its
+replay `014f2518`, or since; the counts above are the Node.js and Deno
 reference outputs.
 
 The full manifest update that the coordinator's log records as reading the
