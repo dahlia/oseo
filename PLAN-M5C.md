@@ -1042,8 +1042,10 @@ Resizable buffer harness
 
 The `resizable-array-buffer-harness` node adds a reviewed
 *tests/test262/harness/resizableArrayBufferUtils.js* and registers it with
-the reviewed runner, which no longer lists that include as unavailable. It
-changes no runtime, compiler, or feature list.
+the reviewed runner, which no longer lists that include as unavailable. The
+original harness admission changed no runtime, compiler, or feature list;
+the node's later `__proto__` write guard is described in the incidental
+Annex B prototype write dependency section.
 
 With `well-known-intrinsics-harness`, which registers
 *wellKnownIntrinsicObjects.js*, the runner's list of unavailable harness
