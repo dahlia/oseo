@@ -26,6 +26,13 @@ bindings and functions remain accepted. The Module converter also rejects
 the type-only check that named exports and imports already performed.
 Ordinary star and namespace exports keep their runtime records.
 
+Bodyless function signatures remain unsupported TypeScript declarations,
+including default exports. Babel represents them as `TSDeclareFunction`
+even without an explicit `declare` modifier. The Script check exempts that
+declaration alongside default interfaces. It still rejects runtime default
+exports whose expressions use assertions, `satisfies`, non-null assertions,
+or type arguments; a TypeScript expression does not make an export type-only.
+
 Dynamic `import()` retains ADR 0016's `OSEO1001` boundary. `import.meta`
 still reports `OSEO0001` in Script and remains admitted in Module code.
 Property names, comments, strings, and template text spelling `import` or
@@ -39,6 +46,11 @@ Pure evidence
 static declaration productions, nested statement and function contexts,
 Module controls, UTF-8 byte positions, CRLF source locations, unsupported
 prefixes, TypeScript boundaries, and both compiler specialization policies.
+A fixed matrix covers named and anonymous bodyless signatures, primitive
+annotations, optional and rest parameters, generic signatures, interfaces,
+and ambient declarations under both goals. Runtime functions, value and
+mixed-specifier exports, and TypeScript expression wrappers retain their
+separate grammar and unsupported boundaries.
 A 150,000-statement Script and nested block remain valid, and a static
 export following that many statements still reports its actual location.
 The traversal pushes children individually so source width cannot exceed
@@ -53,7 +65,10 @@ it. The two seed slots are `0x60008b00` and `0x60008b01`, each with 64
 ordinary cases. Shrinking keeps a declaration and the domain's required
 nesting. The source documents size tiers, preconditions, and replay through
 `OSEO_PROPERTY_SEED` and `OSEO_PROPERTY_PATH`. These are parser/compiler
-properties; they compile no native artifact and claim no native weighting.
+properties and compile no Oseo native artifact. Their file still participates
+in native extended-shard scheduling. Its Linux weight is a local measurement;
+the macOS weight is an unmeasured fallback, as *docs/evidence/u6/README.md*
+records. Neither weight establishes current CI timing.
 
 
 Pinned source audit and remaining gates

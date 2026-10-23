@@ -21,7 +21,8 @@ function typeOnlyDeclaration(value: BabelNode): boolean {
     declaration?.declare === true ||
     (value.type === "ExportNamedDeclaration" &&
       declaration?.type?.startsWith("TS") === true) ||
-    declaration?.type === "TSInterfaceDeclaration"
+    declaration?.type === "TSInterfaceDeclaration" ||
+    declaration?.type === "TSDeclareFunction"
   );
 }
 

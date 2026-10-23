@@ -304,3 +304,135 @@ test("annotations and unsupported TS-only extensions keep their policy", () => {
     "OSEO0001",
   );
 });
+
+test("type-only function signatures retain unsupported diagnostics", () => {
+  for (const declaration of [
+    "function f();",
+    "function f(): void;",
+    "function f(x: number): number;",
+    "function f(x?: number): number;",
+    "function f(...xs: number[]): number;",
+    "function f<T>(x: T): T;",
+  ]) {
+    for (const exported of ["", "export ", "export default "]) {
+      const prefix = "// λ😀\r\n  ";
+      const source = prefix + exported + declaration;
+      const input = { source, sourceId: "signature.ts" };
+      for (const result of [
+        babelFrontend.parse(input),
+        babelModuleFrontend.parseModule(input),
+      ]) {
+        assert.equal(result.parsed, false, source);
+        assert.equal(result.diagnostics.length, 1, source);
+        const diagnostic = result.diagnostics[0];
+        assert.ok(diagnostic != null);
+        assert.equal(diagnostic.code, "OSEO1001", source);
+        assert.equal(diagnostic.sourceId, input.sourceId);
+        assert.equal(diagnostic.range.start.line, 2);
+        assert.equal(diagnostic.range.end.line, 2);
+        const start = new TextEncoder().encode(prefix).length;
+        assert.ok(diagnostic.byteRange.start >= start, source);
+        assert.equal(
+          diagnostic.byteRange.start - start,
+          diagnostic.range.start.column - 3,
+          source,
+        );
+        assert.equal(
+          diagnostic.byteRange.end,
+          new TextEncoder().encode(source).length,
+          source,
+        );
+      }
+    }
+  }
+  for (const declaration of [
+    "function();",
+    "function(): void;",
+    "function(x?: number): number;",
+  ]) {
+    const prefix = "// λ😀\r\n  ";
+    const source = `${prefix}export default ${declaration}`;
+    const input = { source, sourceId: "anonymous-signature.ts" };
+    const start = new TextEncoder().encode(prefix).length;
+    const end = new TextEncoder().encode(source).length;
+    for (const [result, offset] of [
+      [babelFrontend.parse(input), 0],
+      [babelModuleFrontend.parseModule(input), 15],
+    ] as const) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics.length, 1, source);
+      const diagnostic = result.diagnostics[0];
+      assert.ok(diagnostic != null);
+      assert.equal(diagnostic.code, "OSEO1001", source);
+      assert.equal(diagnostic.sourceId, input.sourceId);
+      assert.deepEqual(diagnostic.byteRange, { end, start: start + offset });
+      assert.deepEqual(diagnostic.range, {
+        end: { column: 3 + 15 + declaration.length, line: 2 },
+        start: { column: 3 + offset, line: 2 },
+      });
+    }
+  }
+});
+
+test("interfaces and ambient declarations stay unsupported", () => {
+  for (const source of [
+    "export interface T {}",
+    "export default interface T {}",
+    "export default interface T { f(x?: number): void; }",
+    "declare function f(): void;",
+    "export declare function f(): void;",
+    "export declare function f(x?: number): number;",
+    "declare namespace N { export function f(): void; }",
+    'declare module "m" { export default function f(): void; }',
+  ]) {
+    const input = { source, sourceId: "type-declaration.ts" };
+    for (const result of [
+      babelFrontend.parse(input),
+      babelModuleFrontend.parseModule(input),
+    ]) {
+      assert.equal(result.parsed, false, source);
+      assert.equal(result.diagnostics.length, 1, source);
+      assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
+      assert.equal(result.diagnostics[0]?.sourceId, input.sourceId);
+    }
+  }
+});
+
+test("runtime exports retain Script grammar with TS extensions", () => {
+  for (const source of [
+    "export default x as any;",
+    "export default (x as any);",
+    "export default x satisfies any;",
+    "export default x!;",
+    "export default <any>x;",
+    "export default f<number>;",
+    "export default function f(x?: number): number { return 1; }",
+    'import { type T, x } from "m";',
+    'export { type T, x } from "m";',
+  ]) {
+    const prefix = "// λ😀\r\n  ";
+    const input = { source: prefix + source, sourceId: "runtime-export.ts" };
+    const script = babelFrontend.parse(input);
+    assert.equal(script.parsed, false, source);
+    assert.equal(script.diagnostics.length, 1, source);
+    assert.equal(script.diagnostics[0]?.code, "OSEO0001", source);
+    const start = new TextEncoder().encode(prefix).length;
+    assert.deepEqual(script.diagnostics[0]?.byteRange, { end: start, start });
+    assert.deepEqual(script.diagnostics[0]?.range.start, {
+      column: 3,
+      line: 2,
+    });
+    const module = babelModuleFrontend.parseModule(input);
+    assert.equal(module.parsed, false, source);
+    assert.equal(module.diagnostics[0]?.code, "OSEO1001", source);
+  }
+  const source = "declare function f(): void;\nexport default f;";
+  const input = { source, sourceId: "declared-value-export.ts" };
+  const script = babelFrontend.parse(input);
+  assert.equal(script.diagnostics[0]?.code, "OSEO0001");
+  assert.deepEqual(script.diagnostics[0]?.range.start, { column: 1, line: 2 });
+  assert.equal(
+    babelModuleFrontend.parseModule(input).diagnostics[0]?.code,
+    "OSEO1001",
+  );
+});
