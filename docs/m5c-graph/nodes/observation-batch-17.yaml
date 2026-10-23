@@ -8,5 +8,6 @@ delivers: "Observes the 287 unreviewed paths that
   result an owner."
 dependencies:
   - observation-batch-plan
+  - script-module-declaration-early-error
 landed: false
-status: ready
+status: blocked

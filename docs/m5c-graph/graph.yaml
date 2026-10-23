@@ -19,9 +19,9 @@ baseline:
   unreviewedPaths: 12780
   unsupportedProfileFeatures: 1496
 summary:
-  nodes: 87
+  nodes: 88
   ready: 79
-  blocked: 8
+  blocked: 9
   parked: 0
   landed: 44
 serializationPoints:
@@ -661,7 +661,6 @@ collisions:
       - hashbang-comments
       - import-meta
       - minor-feature-tag-admission
-      - module-export-forms
       - observation-batch-01
       - observation-batch-03
       - observation-batch-06
@@ -705,7 +704,6 @@ collisions:
       - hashbang-comments
       - import-meta
       - minor-feature-tag-admission
-      - module-export-forms
       - observation-batch-01
       - observation-batch-03
       - observation-batch-05
@@ -3004,3 +3002,249 @@ collisions:
       - regexp-pattern-extensions
     note: "Source preparation leaves both publishers unlanded; serialize
       their canonical observations during publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - computed-member-reference-key-order
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - eval-intrinsic-value
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - generator-dispatch-stack-charge
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-15
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-16
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-wrapper-objects
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - proper-tail-calls
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-pattern-extensions
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-harness
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-split-coverage-remediation
+      - script-module-declaration-early-error
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - script-module-declaration-early-error
+      - test262-host-script-bindings
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - script-module-declaration-early-error
+      - typed-array-proto-coverage-remediation
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - script-module-declaration-early-error
+      - unhandled-rejection-observation
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - script-module-declaration-early-error
+      - with-optional-call-receiver
+    note: "Script-goal repair shares canonical observation partitions
+      with this independent publisher; serialize their publication."

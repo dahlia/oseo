@@ -78,6 +78,7 @@ dependencies:
   - remediation-work-graph
   - resizable-array-buffer-harness
   - runtime-dynamic-source-classification
+  - script-module-declaration-early-error
   - test262-host-script-bindings
   - typed-array-construction-order
   - typed-array-feature-admission
