@@ -3765,8 +3765,15 @@ shadowing, both specialization policies, forced collection, and a cached
 global-object shape read that misses after the property is recreated and
 reaches the compiled generic read. Native-only checks pin the run-time
 boundary of indirect, optional, parameter, and `with`-fallback String calls.
-The reviewed test262 observation of the node's owned paths is pending the
-complete manifest update.
+The complete reviewed update on
+`edccfd292b245c80c3503a93bf1a268fc99506c7` observes 26 passes among the
+node's original 33 paths. The seven indirect-eval private-class cases now
+reach the first String call's existing `OSEO1001` source-compilation
+boundary before their private-name and brand assertions. Their source-bound
+`fixture-construction` assessments assign them to
+`dynamic-source-coverage-remediation`, with
+`normativeDependency: not-demonstrated`; the private identity and access
+subjects remain inside the claim, and no whole-path exclusion is added.
 
 ### Object.defineProperties descriptor collection
 
