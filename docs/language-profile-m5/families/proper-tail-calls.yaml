@@ -1,0 +1,57 @@
+version: 1
+id: proper-tail-calls
+title: "Proper tail calls"
+scope:
+  - "Calls in tail position of strict ordinary, arrow, method, accessor, and
+    class constructor bodies, and the PrepareForTailCall steps of
+    Function.prototype.call, Function.prototype.apply, and Reflect.apply."
+  - "Bound function and Proxy [[Call]] forwarding through the same
+    trampoline, derived constructor result rules after a tail call, and
+    the realm of errors a tail call raises."
+owners:
+  - PLAN-M5C.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/proper-tail-calls.ts
+      - tests/proper-tail-calls.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/proper-tail-calls.test.ts
+      - tests/runtime-tail-calls.test.ts
+      - tests/fixtures/runtime-tail-calls.c
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+      - tests/fixtures/runtime-tail-calls.c
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard;
+      every tail call uses the generic tail call ABI under both policies."
+    replacements:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/proper-tail-calls.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/tail-calls.test.ts
+      - packages/backend-c/tests/index.test.ts
+      - tests/proper-tail-calls-emission.test.ts
+      - tests/proper-tail-call-resources.test.ts
+      - tests/completion-target-labels.test.ts

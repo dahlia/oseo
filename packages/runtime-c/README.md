@@ -1133,6 +1133,21 @@ flags agree on `i`, `m`, `s`, `u`, and `v`; every other copy still parses
 its source dynamically. No entry point, public layout, heap kind,
 intrinsic slot, or built-in code ID is added.
 
+The `m5-136` ABI records proper tail calls. `OSEO_STATUS_TAIL_CALL` reports
+that a PrepareForTailCall site recorded the call it owes in the context.
+`oseo_tail_call` and `oseo_tail_call_derived` throw for a value that is not
+callable, as an ordinary call does, and otherwise record the callee, receiver,
+copied arguments, running realm, and, for a derived class constructor, its
+`this` binding cell. `oseo_call_function` and `oseo_call_complete` perform
+recorded calls in a loop, one rooted step at a time, so a chain of tail calls
+holds one step's native stack, call depth, frame budget, and roots.
+`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`
+record their final call, as their PrepareForTailCall steps require, and the
+[[Call]] of a bound function or a Proxy forwards the same way because it
+creates no execution context. A non-tail call through a bound function or
+Proxy therefore no longer adds a call-depth level for that wrapper.
+[[Construct]] is unchanged. The context gains one private record pointer.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

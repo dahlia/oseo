@@ -123,6 +123,21 @@ results, reviewed exclusion-audit rows, and ledger owner
 batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
 remain mixed coverage debt.
 
+M5c node `proper-tail-calls` admits `tail-call-optimization`. Every call
+that ECMA-262 15.10 places in tail position of a strict ordinary, arrow,
+method, accessor, or class constructor body discards its frame before the
+call. The same holds for the PrepareForTailCall steps of
+`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`, and
+for bound function and Proxy [[Call]] forwarding. A chain of such calls holds
+constant native stack, call depth, and roots, and its errors keep the realm
+of the call that raised them. Derived constructors apply their result rules
+to the chain's value. Calls outside tail position, non-strict code, and
+generator and async bodies keep their frames and the 256-call limit. The
+indexed proper tail call family records generated positions, forms,
+exclusions, and liveness (seeds `0x60008900` through `0x60008902`), fixed
+100,000-step chains, differential fixtures under forced collection, and the
+runtime trampoline fixture. The runtime ABI is `oseo-runtime-m5-136`.
+
 M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
 list. The tag was the only unmet prerequisite of the four reviewed
 `super-*.js` parse negatives under *test/language/global-code/*. Each places a

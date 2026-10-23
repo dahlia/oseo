@@ -31,6 +31,11 @@
  * at `ef014905`. macOS uses the Linux number only as an unmeasured
  * scheduling placeholder, not a measured host ratio. See U6 provenance.
  *
+ * Proper tail calls add a three-registration native property file. Its
+ * Linux entry uses a local extended case sum at `87aeb56b`. macOS is
+ * unmeasured and uses the unknown-file default, the upper median of the
+ * macOS table before the entry was added. See U6 provenance.
+ *
  * Computed-member-reference-key-order adds a Reference-order domain and
  * fixed cases to the compound-assignment file. Its Linux entry uses a local
  * extended whole-file case sum of seventeen registrations; macOS remains
@@ -146,6 +151,9 @@ export const nativeShardCosts = {
     "tests/property/m5-pattern-await.property.test.ts": 596,
     "tests/property/m5-promise-combine.property.test.ts": 1433,
     "tests/property/m5-promise-intrinsic.property.test.ts": 944,
+    // Local Linux extended case sum: 1725.460624494 s, rounded up.
+    // October 23, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-proper-tail-calls.property.test.ts": 1726,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 1559,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2299,
@@ -293,6 +301,8 @@ export const nativeShardCosts = {
     "tests/property/m5-pattern-await.property.test.ts": 341,
     "tests/property/m5-promise-combine.property.test.ts": 631,
     "tests/property/m5-promise-intrinsic.property.test.ts": 669,
+    // Unmeasured; the unknown-file upper-median default. See U6.
+    "tests/property/m5-proper-tail-calls.property.test.ts": 286,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 441,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2283,

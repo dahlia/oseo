@@ -1271,9 +1271,11 @@ OseoResult oseo_internal_proxy_call(
     if (result.status == OSEO_STATUS_NORMAL && is_nullish(slots[3])) {
         OseoValue target = proxy_object(slots[0])->target;
         if (!constructing) {
-            result = oseo_call_function(
-                context, target, slots[1], argument_count, arguments,
-                oseo_undefined());
+            /* [[Call]] returns the target's result unchanged and creates
+             * no execution context, so it forwards through the
+             * trampoline. */
+            result = oseo_internal_tail_call(
+                context, target, slots[1], argument_count, arguments);
         } else {
             result = oseo_internal_construct_receiver(
                 context, target, slots[2]);
@@ -1305,7 +1307,16 @@ OseoResult oseo_internal_proxy_call(
         trap_arguments[1] = slots[1];
         trap_arguments[2] = slots[4];
     }
-    if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL && !constructing) {
+        /* The apply trap's result is the [[Call]] result unchanged. */
+        result = oseo_internal_tail_call(
+            context,
+            slots[3],
+            proxy_object(slots[0])->handler,
+            trap_count,
+            trap_arguments
+        );
+    } else if (result.status == OSEO_STATUS_NORMAL) {
         result = call_trap(
             context, slots[0], slots[3], trap_count, trap_arguments);
     }

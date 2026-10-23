@@ -135,6 +135,7 @@ supportedFeatures:
   - Symbol.toStringTag
   - Symbol.unscopables
   - symbols-as-weakmap-keys
+  - tail-call-optimization
   - template
   - top-level-await
   - TypedArray

@@ -669,6 +669,18 @@ void oseo_collect(OseoContext *context) {
          index += 1u) {
         mark_value(kept_objects[index], &worklist);
     }
+    const OseoTailCall *tail_call = context->tail_call;
+    if (tail_call != NULL && tail_call->pending) {
+        mark_value(tail_call->callee, &worklist);
+        mark_value(tail_call->receiver, &worklist);
+        mark_value(tail_call->realm_record, &worklist);
+        mark_value(tail_call->this_cell, &worklist);
+        for (size_t index = 0u;
+             index < tail_call->argument_count;
+             index += 1u) {
+            mark_value(tail_call->arguments[index], &worklist);
+        }
+    }
     trace_ephemeron_fixed_point(&worklist);
     clear_dead_weak_edges(context);
     schedule_finalization(context);

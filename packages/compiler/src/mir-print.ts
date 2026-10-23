@@ -123,8 +123,14 @@ function appendMirFunction(lines: string[], functionValue: MirFunction): void {
         operation.iteratorCloseResultMode == null
           ? ""
           : ` close-mode=%${operation.iteratorCloseResultMode}`;
+      const tailText =
+        operation.tail === true
+          ? operation.tailThisBindingId == null
+            ? "tail "
+            : `tail this=%b${operation.tailThisBindingId} `
+          : "";
       lines.push(
-        `    ${resultText} = ${operation.kind} ` +
+        `    ${resultText} = ${operation.kind} ${tailText}` +
           `${operation.detail}` +
           `${argumentText === "" ? "" : ` ${argumentText}`} ` +
           `@${rangeText(operation.range)}${hintTextValue}${cacheText}` +

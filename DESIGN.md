@@ -431,6 +431,14 @@ field. `return`, `break`, and `continue` are resolved within a compiled
 function; only thrown completion crosses an ordinary call boundary. Private
 helpers that are proven not to throw may return a value directly.
 
+A proper tail call (ECMA-262 15.10) is the one other completion a generated
+body returns: `OSEO_STATUS_TAIL_CALL` reports that the body recorded the call
+it owes in the context and released its frame. Only `oseo_call_function`, the
+single generic call entry, and `oseo_call_complete` for a direct call ever
+receive it, and both perform recorded calls in a loop before returning. The
+compiler marks a tail call only where IsInTailPosition holds, so no recorded
+call can skip work its caller still owed.
+
 Cleanup regions record the destination block and cleanup depth for every
 control transfer. A `finally` clause runs only when the transfer leaves its
 protected region. A `break` from an inner `switch` and a `continue` targeting a

@@ -344,6 +344,19 @@ dynamically constructed pattern decides its group names as a literal does.
 No entry point, public layout, heap kind, intrinsic slot, or code ID is
 added.
 
+The `m5-136` runtime identity records proper tail calls.
+`OSEO_STATUS_TAIL_CALL`, `oseo_tail_call`,
+`oseo_tail_call_derived`, `oseo_tail_host_call`,
+`oseo_tail_host_call_derived`, and `oseo_call_complete` are generated-code ABI
+entry points. The context gains one private pointer to its pending tail call
+record, which the collector traces while a call is pending. The trampoline in
+`oseo_call_function` moves each record into a root frame of its own before the
+call runs, so nested calls never overwrite it, and releases that step's frame,
+realm scope, call depth, and frame budget before the next.
+`Function.prototype.call`, `Function.prototype.apply`, `Reflect.apply`, and the
+[[Call]] of bound functions and Proxies record their final call instead of
+nesting it. No heap kind, intrinsic slot, or built-in code ID is added.
+
 Array literal spread also shares iterator get and next, then calls the
 `oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations
 owned by *runtime\_array.c*. The append operations preserve monotonic own
