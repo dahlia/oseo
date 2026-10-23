@@ -7,5 +7,5 @@ delivers: "Reviews the wellKnownIntrinsicObjects.js harness include, whose
   that include are observed."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
