@@ -219,8 +219,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,311 reviewed cases: 24,234 passes, 2,581
-expected negatives, and 1,496 unsupported profile features. It records no
+The current manifest contains 28,311 reviewed cases: 24,305 passes, 2,581
+expected negatives, and 1,425 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3757,11 +3757,21 @@ The complete update on historical four-source composition
 `edccfd292b245c80c3503a93bf1a268fc99506c7` observed 26 passes among the
 node's original 33 paths and seven indirect-eval private-class cases at the
 source-compilation boundary. Those observations and their reassessments
-belong to that composition. This preparation restores successful Main's
-manifest and all original owners; all 33 paths remain unsupported under
-`eval-intrinsic-value` until a new complete update observes this source.
-The private-name and brand subjects remain inside the claim, and no
-whole-path exclusion is added.
+belong to that composition. Clean source preparation restored successful
+Main's manifest and all original owners, with all 33 paths unsupported.
+The fresh complete UPDATE on clean source `6e54c5d5` then observed 26 passes
+and seven unsupported private-class paths, recorded in `f2c30668`. Each of
+the seven passes %eval% to a helper that calls it on a class source string;
+execution reaches the existing run-time `OSEO1001` source-compilation
+rejection before the private-name or brand assertions run. Those subjects
+remain inside the claim. Their owner is now
+`dynamic-source-coverage-remediation`, whose 265 paths include these seven
+under the existing fixture-construction assessment, pending equivalent
+ahead-of-time replacement evidence or a maintainer accounting decision.
+The `dynamic-source` dependency tag authorizes no exclusion. No whole-path
+exclusion is added, and ADR 0016's boundary and reopening triggers remain.
+These observations do not land the node or establish successful full and
+extended candidate CI; affected post-observation review remains pending.
 
 ### Object.defineProperties descriptor collection
 
@@ -9297,11 +9307,12 @@ it claims no tail-forwarding execution evidence.
 
 The focused standards registration uses the exact 40-path fixture selector
 and checks every requested strictness and specialization variant. It writes
-no reviewed expectation or result. The canonical manifest still records
-these paths as unsupported at the old `primitive-wrapper` boundary until a
-later authorized complete UPDATE supplies fresh observations. This source
-preparation adds the 148th indexed family after composition without TCO;
-full and extended candidate CI,
-outer review, and landing remain pending. Zig's address and undefined flags
+no reviewed expectation or result. Clean source preparation retained Main's
+40 unsupported observations at the old `primitive-wrapper` boundary. The
+fresh complete UPDATE on clean source `6e54c5d5` observed all 40 selector
+paths as passes and promoted them in the canonical manifest recorded in
+`f2c30668`. This composition without TCO adds the 148th indexed family;
+full and extended candidate CI, affected post-observation review, and
+landing remain pending. Zig's address and undefined flags
 alone establish no ASan activity; the exact candidate's host C sanitizer
 lanes must supply that evidence.
