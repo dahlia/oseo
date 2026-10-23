@@ -45,6 +45,11 @@
  * unmeasured extended planning estimate. Its two local ordinary properties
  * summed to 41.508 seconds on Linux; this is not an extended measurement.
  * See U6 provenance before replacing either estimate with CI case sums.
+ *
+ * Script and Module declaration grammar is pure JavaScript but participates
+ * in the native extended file glob. Its Linux weight is a local extended
+ * two-registration case sum; the unmeasured macOS placeholder preserves
+ * the prior unknown-file upper median. Both await exact-candidate CI logs.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -166,6 +171,9 @@ export const nativeShardCosts = {
     "tests/property/m5-regexp-unicode-property-escapes.property.test.ts": 2,
     "tests/property/m5-rest-parameter.property.test.ts": 110,
     "tests/property/m5-runtime-error-observation.property.test.ts": 441,
+    // Local Linux extended case sum: 40.510474781 s, rounded up.
+    // October 24, 2026 KST; provisional, not CI. See U6 provenance.
+    "tests/property/m5-script-module-declarations.property.test.ts": 41,
     "tests/property/m5-set-composition-methods.property.test.ts": 406,
     "tests/property/m5-set-intrinsic.property.test.ts": 223,
     "tests/property/m5-string-intrinsic.property.test.ts": 1053,
@@ -315,6 +323,9 @@ export const nativeShardCosts = {
     "tests/property/m5-regexp-unicode-property-escapes.property.test.ts": 1,
     "tests/property/m5-rest-parameter.property.test.ts": 71,
     "tests/property/m5-runtime-error-observation.property.test.ts": 397,
+    // Unmeasured provisional placeholder: prior upper median, 286 s.
+    // Preserves the unknown-file fallback; refresh from candidate CI.
+    "tests/property/m5-script-module-declarations.property.test.ts": 286,
     "tests/property/m5-set-composition-methods.property.test.ts": 319,
     "tests/property/m5-set-intrinsic.property.test.ts": 331,
     "tests/property/m5-string-intrinsic.property.test.ts": 323,

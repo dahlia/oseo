@@ -879,3 +879,63 @@ host extended CI case sums when available. Raw commands, stdout, stderr, and
 timing metadata are under
 */data/m5c-primitive-wrapper-objects-20261023/focused-ordinary.*.
 No existing case budget, seed, deadline, or shard total changes.
+
+### Script and Module declaration grammar
+
+*tests/property/m5-script-module-declarations.property.test.ts* checks pure
+parser/compiler behavior across package boundaries. It stays in
+*tests/property/*, whose complete glob the native extended task collects.
+Its two registrations therefore need scheduling weights even though they
+build and execute no Oseo native artifact.
+
+On October 24, 2026 KST, a local Linux observation ran from clean source
+`a94d779fdb6f16bc729f21de6dc35f7688749c50`, tree
+`c1f4847e81eb959aa9215e120e00e066b6fd84d1`. It started at
+`2026-10-23T17:29:14.125586Z` and ended at
+`2026-10-23T17:29:55.242893Z`, with exit zero and both registrations passing:
+
+ -  `generated ModuleItems are admitted only by the Module goal`:
+    21,356.579799 milliseconds; and
+ -  `generated nested declarations precede unsupported conversion`:
+    19,153.894982 milliseconds.
+
+The sum is 40,510.474781 milliseconds. Rounding its seconds up gives the
+provisional Linux weight of 41. The TAP runner duration, 40,785.25627
+milliseconds, and the process wall, 40.985180203 seconds, are separate
+observations and are not the weight. This is one local single-file extended
+observation, not CI, an upper bound, or evidence of run-to-run variation.
+
+~~~~ sh
+$(oseo-capacity --prefix) env MISE_JOBS=1 MISE_TASK_JOBS=1 \
+  mise run --skip-deps test:property:extended:native:shard \
+  --test-reporter=tap \
+  tests/property/m5-script-module-declarations.property.test.ts
+~~~~
+
+The task supplied the exact CI extended parameters:
+`OSEO_PROPERTY_RUN_SCALE=10`, `OSEO_PROPERTY_SIZE=large`, and
+`OSEO_PROPERTY_SEED=1592590339`. Both domains retained 64 ordinary cases,
+giving 640 extended cases each and the existing scaled 300,000-millisecond
+interrupt limit per domain. No replay path, case shard, or time scale was
+set. There was one selected file and no file-shard flag; `--skip-deps`
+omitted the package build because these properties import source directly.
+The Node.js host was the pinned `v24.21.0` on `dorikom`, Linux x86\_64,
+with an AMD Ryzen 7 7700X and 16 logical CPUs. The fresh capacity prefix
+selected `generous`, no CPU quota, and `MemoryMax=104G`. The source tree
+stayed clean throughout the measurement.
+
+macOS is unmeasured. Before this addition its table held 135 entries;
+sorting them numerically and selecting zero-based index `floor(135/2)`
+gave the unknown-file upper median of 286 seconds. Adding an explicit
+286-second placeholder leaves that median at 286 for 136 entries and
+preserves the file's prior macOS fallback behavior. This is a provisional
+unmeasured scheduling value, with no measured host ratio or bound. Refresh
+both host entries from future exact-candidate extended CI case logs.
+
+Raw TAP, stderr, timestamps, commands, runtime/machine metadata, source
+hashes, the aggregate calculation, and the fallback calculation are retained
+under */data/m5c-script-shard-cost-20261024/* as *measurement.stdout*,
+*measurement.stderr*, *measurement.json*, *measurement-task.json*,
+*before.json*, *aggregate.json*, and *base-fallback.json*. This cost update
+changes no source, generated domain, seed, budget, deadline, shard total,
+partition rule, or canonical test262 record.
