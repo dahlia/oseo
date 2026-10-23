@@ -1047,9 +1047,13 @@ With `well-known-intrinsics-harness`, which registers
 includes becomes empty. The runner therefore no longer has that list or the
 branch that classified a case naming a listed include as unsupported with the
 `harness-include` capability. A case that names an include the reviewed
-harness does not implement still fails as a harness defect. The six WKI
-records retain their inherited `harness-include` observations and owners
-until the complete update observes the combined source.
+harness does not implement still fails as a harness defect. The complete
+update at `edcf066b` observed the combined source. Three records pass: the
+arguments and caller property descriptions and the built-in function
+`toString` case. The three `is-a-constructor` records execute their
+`IsConstructor` assertion and then report the ADR 0016 run-time
+`OSEO1001` rejection from their trailing construction. They are
+remediation-owned active coverage debt, not exclusions.
 
 The earlier combined update recorded in `615d9d3b` observed 163 passes in
 this node's 168-path cohort. Five remained unsupported with their actual

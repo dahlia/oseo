@@ -55,10 +55,11 @@ evidence:
       variant is the first admitted strictness mode with specialization
       disabled. If that probe decides an unsupported or failing result, the
       runner records only that variant and starts no other, so the result
-      claims no enabled-policy comparison. Only when the probe does not
-      decide does the runner start every remaining admitted strictness and
-      specialization combination. This candidate has no such observation
-      yet; a future full test262 UPDATE supplies it."
+      claims no enabled-policy comparison. The full update observed that
+      early stop on the three is-a-constructor paths, which report OSEO1001
+      at run time. Only when the probe does not decide does the runner
+      start every remaining admitted strictness and specialization
+      combination, as it did for the three promoted paths."
     replacements:
       - tools/test262.ts
       - tests/test262-well-known-intrinsics.test.ts
@@ -71,30 +72,17 @@ evidence:
       result. It then starts every remaining admitted variant and rejects
       any difference. A case that stops at its first variant records only
       that variant, and its result proves no enabled-policy comparison.
-      This candidate has no such observation yet; a future full test262
-      UPDATE supplies it."
+      The full update compared both policies for the three promoted paths
+      in both strictness modes, while the three is-a-constructor paths
+      stopped at their first variant with an OSEO1001 rejection."
     replacements:
       - tools/test262.ts
       - tests/test262-well-known-intrinsics.test.ts
   standards:
-    status: omitted
-    reason: "Source staging is complete, but this candidate has no canonical
-      observation of the six owned paths. Their checked-in manifest rows are
-      inherited from Main, where they still record the unsupported harness
-      include and were not executed. The bounded replacements below compare
-      the reviewed copy with the upstream copy, scan every pinned consumer,
-      admit the include to runner execution, and list the six subset
-      entries; they are not native standards passes. A future full test262
-      UPDATE, followed by independent review, supplies the canonical
-      observed rows. Its policy applies the runner's early stop: the first
-      admitted strictness mode with specialization disabled may decide the
-      result and end the scan; only otherwise does the runner execute every
-      admitted strictness mode under both specialization policies."
-    replacements:
-      - tests/test262-well-known-intrinsics.test.ts
-      - tools/test262.ts
-      - tests/test262/harness/wellKnownIntrinsicObjects.js
+    status: covered
+    references:
       - tests/test262/subset.yaml
+      - tests/test262/results.yaml
   structural:
     status: omitted
     reason: "The include is ordinary JavaScript assembled ahead of each

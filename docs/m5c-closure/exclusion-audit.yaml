@@ -150,6 +150,17 @@ assessments:
       authorize excluding static constructibility or instanceof
       behavior. Keep remediation until replacement evidence or a
       maintainer accounting decision bounds these assertions.
+  intrinsic-constructor-is-constructor:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The subject is IsConstructor of a source-compiling intrinsic
+      constructor obtained statically by the reviewed harness. The
+      isConstructor assertion passes it only as newTarget of
+      Reflect.construct and completes before the trailing zero-argument
+      construction reaches the ADR 0016 run-time boundary. The rejected
+      construction does not authorize excluding the [[Construct]]
+      presence assertion. Keep remediation until replacement evidence or
+      a maintainer accounting decision bounds it.
   annex-b-typed-array-prototype:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -405,6 +416,17 @@ paths:
     subject: Async function instances are not constructors and do not have a
       [[Construct]] slot.
     assessment: mixed-static-functions
+  - path: test/built-ins/AsyncFunction/is-a-constructor.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "0dca73a0d12d3d30549b1f824eb5c3806909c15655a316da715994245aa5\
+      fd00"
+    observationDigest: "3719ebc3893f53a7ddd9f5b09734f41d3aa7895a57ec24e47731659\
+      a78c2a0a8"
+    missingDynamicTag: false
+    section: sec-ecmascript-standard-built-in-objects
+    subject: The AsyncFunction constructor implements [[Construct]]
+    assessment: intrinsic-constructor-is-constructor
   - path: test/built-ins/AsyncFunction/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -553,6 +575,17 @@ paths:
       async generator whose body is the first argument evaluated as
       source code.
     assessment: dynamic-construction
+  - path: test/built-ins/AsyncGeneratorFunction/is-a-constructor.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "e323ea57dbe1a09d6fdf228269d34228daef0d12bad6f8a5530d9fa35a54\
+      2977"
+    observationDigest: "a1ec1f8cecc6eb662168f3245fd9ca1d0f8a7a2b7f08b86e95cd5dd\
+      7af3d6354"
+    missingDynamicTag: false
+    section: sec-ecmascript-standard-built-in-objects
+    subject: The AsyncGeneratorFunction constructor implements [[Construct]]
+    assessment: intrinsic-constructor-is-constructor
   - path: "test/built-ins/AsyncGeneratorFunction/proto-from-ctor-realm-prototyp\
       e.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2068,6 +2101,17 @@ paths:
       generator whose body is the first argument evaluated as source
       code.
     assessment: dynamic-construction
+  - path: test/built-ins/GeneratorFunction/is-a-constructor.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "97dc21864112f2e61d38eff7e253b945786d460675ec5ed07b3ddc77fc87\
+      57a9"
+    observationDigest: "832a883d993e3f2b36b33060953312a9c7e2a8d30abc32f79361c75\
+      e6da6639b"
+    missingDynamicTag: false
+    section: sec-ecmascript-standard-built-in-objects
+    subject: The GeneratorFunction constructor implements [[Construct]]
+    assessment: intrinsic-constructor-is-constructor
   - path: test/built-ins/GeneratorFunction/proto-from-ctor-realm-prototype.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
