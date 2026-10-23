@@ -861,4 +861,46 @@ CI, a whole-suite result, or a full test262 UPDATE. It changes no case
 budget, seed, deadline, or shard total. The computed-node weight of 1,230
 Linux and 832 macOS seconds is unchanged.
 
+The later computed-super destructuring correction extends the fixed
+Reference matrix from 36 to 40 programs and adds one compile-only
+structural registration to *m5-super-targets.property.test.ts*. Both
+existing generators gain null-home array and object targets. The Reference
+and super-target slots keep their 20 and 16 ordinary cases, respectively,
+with the same seeds, size limits, and 240,000-millisecond interrupt limits.
+There is no new domain or seed allocation.
+
+The prior whole-file measurements above are historical, before this
+correction. The scheduling weights remain 1,230/832 seconds for
+*m5-compound-assignment.property.test.ts* and 440/277 seconds for
+*m5-super-targets.property.test.ts*, in Linux/macOS order, with their
+original measurement or model qualifications. Comparable case sums from
+the exact candidate CI are still needed to refresh materially stale
+relative weights. Retaining these inputs is a provisional scheduling
+limitation, not evidence that the changed files have the same cost. A
+focused ordinary run cannot replace a whole-file extended measurement or
+be combined with historical components and relabeled as one. The old raw
+timings and source digests above remain preserved.
+
+A focused Linux x86-64 ordinary run on 2026-10-23 UTC, from 08:56:50 to
+09:01:47, passed four registrations with none skipped: the complete fixed
+Reference matrix, the retained primitive-receiver cases, and the Reference
+and super-target generated domains. Their leaf durations were
+242,281.450091, 990.530819, 33,752.730639, and 20,116.070493 milliseconds,
+respectively, summing to 297,140.782042 milliseconds. The runner duration
+was 297,576.478999 milliseconds and wrapper wall time was 297.645185
+seconds. This measures those registrations only, not either whole-file
+extended cost.
+
+The run used `mise exec -- node --test --test-concurrency=1` with an
+anchored alternation of those four full registration names. It kept the
+ordinary seeds, size limits, and case budgets, both policies, and forced
+collection. The capacity profile was `active` (`maintainer-present`), with
+CPUQuota 1400%, nice 5, and MemoryMax 88G. The shared heavy lock was held
+throughout; its wait was below one millisecond. The source was the
+uncommitted correction on replayed tip `c1dba333`, and both property file
+SHA-256 digests matched before and after execution. The exact command,
+digests, stdout, stderr, capacity snapshots, and wrapper timestamps remain
+under */data/m5c-four-source-property-fix-20261023/*. These focused timings
+do not change the historical whole-file weights or any case budget.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

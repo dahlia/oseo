@@ -3,6 +3,10 @@ id: super-assignment-targets
 title: "Super assignment targets"
 scope:
   - "Super property targets in patterns and iteration heads."
+  - "Computed array and object destructuring targets with a null home
+    prototype evaluate the raw key and acquire the value before the base
+    throws TypeError, suppress key conversion, and close an array iterator.
+    Generated and fixed cases distinguish this from V8's early conversion."
 owners:
   - PLAN-M5.md
 evidence:
@@ -10,10 +14,12 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/classes.ts
+      - tests/property/m5-compound-assignment.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/classes.ts
+      - tests/property/m5-compound-assignment.property.test.ts
   forced-collection:
     status: covered
     references:
@@ -32,6 +38,7 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/classes.ts
+      - tests/property/m5-compound-assignment.property.test.ts
   standards:
     status: covered
     references:

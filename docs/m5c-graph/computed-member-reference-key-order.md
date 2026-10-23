@@ -204,6 +204,17 @@ Focused evidence on the candidate tree:
     and key kind against an independent ECMA-262 2025 model under both
     policies with collection at every safepoint. The labeled V8 model adds
     the second write conversion and the early `super` key conversion.
+    Array and object `super` destructuring include null home prototypes:
+    the raw key expression precedes value acquisition, then the base throws
+    before counting or throwing key conversion. Array cases retain an
+    observable iterator `return`, including when conversion or the base
+    check throws. The fixed matrix and generated domain retain string and
+    literal keys and ordinary prototypes too.
+ -  Slot `0x60002a00` retains all earlier super target positions, elements,
+    and key forms and adds null-home array and object targets in methods,
+    getters, arrows, generators, and async methods. Its structural invariant
+    distinguishes literal keys from computed keys and orders each computed
+    target's checked base before its key conversion and store.
  -  Slots `0x60000c00`, `0x60000c01`, and `0x60002e00` keep their
     generators, seeds, and budgets.
  -  Structural MIR tests order the check before the single conversion for

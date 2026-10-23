@@ -30,7 +30,8 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   evaluation. The Proxy case
   wraps eval and calls the proxy with no arguments, so it evaluates no source
   and observes callable/nonconstructible target behavior. The actual
-  combined update on d2f19970 observes that path as a pass.
+  combined update on d2f19970 observed that path as a pass, a HISTORICAL
+  observation of that other composition, not the current source.
   Cross-realm-host installs the eval value and global descriptor in every
   realm. This node resolves the compiler's handling of the bare eval identifier
   read as a value, admitting those reads or obtaining an accepted record that
@@ -48,13 +49,18 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   direct and indirect global-env-rec-with.js paths remain unreviewed under
   observation-batch-06, and this node adds no observation for them. This
   repairs identifier lookup without admitting direct eval source evaluation.
-  That complete update observes 26 passes among the original 33 paths. The
-  seven indirect-eval class cases stop at the first aliased eval String call
-  with the profile-syntax runtime boundary; no private name or brand
-  assertion executes. They remain unsupported under
+  HISTORICAL: the complete update on d2f19970, a different composition,
+  observed 26 passes among the original 33 paths. Its seven indirect-eval
+  class cases stopped at the first aliased eval String call with the
+  profile-syntax runtime boundary, before any private name or brand
+  assertion. That composition assigned them to
   dynamic-source-coverage-remediation with fixture-construction assessments.
-  Their factory siblings pass with the same four assertion texts; this is
-  comparison evidence, not a replacement classification or an exclusion.
+  At the current source, all 33 original paths retain their current
+  checked-in observations and owners until a complete update and
+  reassessment. Those seven paths have not transferred ownership here and
+  have no current fixture-construction assessments from this source.
+  The historical factory siblings passed with the same four assertion
+  texts; that comparison replaces neither classification nor exclusion.
   The node also repairs every identifier read through a selected with
   Object Environment Record, for any name, not only eval. A value read, a
   typeof operand, and a call callee perform GetBindingValue (ECMA-262 2025

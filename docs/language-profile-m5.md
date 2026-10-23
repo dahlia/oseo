@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 147
+M5a is complete. The normative family records described below inventory 148
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 

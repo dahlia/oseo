@@ -1002,6 +1002,8 @@ type ReferenceForm =
   | "super+="
   | "super++"
   | "super-read"
+  | "super-array"
+  | "super-object"
   | "super||="
   | "x++"
   | "x--"
@@ -1028,6 +1030,8 @@ const ordinaryReferenceForms: readonly ReferenceForm[] = [
 /** The `super` forms, whose base is a null or ordinary home prototype. */
 const superReferenceForms: readonly ReferenceForm[] = [
   "super-read",
+  "super-array",
+  "super-object",
   "super+=",
   "super||=",
   "super++",
@@ -1125,6 +1129,10 @@ function referenceExpression(subject: ReferenceSubject): string {
       return `(() => { for (${target} of [right()]); return "done"; })()`;
     case "for-in":
       return `(() => { for (${target} in { p: right() }); return "done"; })()`;
+    case "super-array":
+      return `([${superTarget}] = values)`;
+    case "super-object":
+      return `({ p: ${superTarget} } = values)`;
     case "super-read":
       return superTarget;
     case "super+=":
@@ -1170,12 +1178,37 @@ function printReferenceSubject(
   const key = ${key};
   const getKey = () => { log.push("key"); return key; };
   const right = () => { log.push("right"); return ${subject.right}; };`;
+  const destructuring =
+    subject.form === "super-array"
+      ? `  const values = {
+    [Symbol.iterator]() {
+      log.push("iterator");
+      return {
+        next() {
+          log.push("next");
+          return {
+            done: false,
+            get value() { log.push("value"); return ${subject.right}; },
+          };
+        },
+        return() { log.push("close"); return {}; },
+      };
+    },
+    toString() { return "values"; },
+  };`
+      : subject.form === "super-object"
+        ? `  const values = {
+    get p() { log.push("value"); return ${subject.right}; },
+    toString() { return "values"; },
+  };`
+        : "";
   const stored =
     'typeof holder.value === "function" ? "fn" : String(holder.value)';
   if (isSuperForm(subject.form)) {
     const prototype = subject.base === "null" ? "null" : "holder";
     return `{
 ${prelude}
+${destructuring}
   const home = { run() { return ${referenceExpression(subject)}; } };
   Object.setPrototypeOf(home, ${prototype});
 ${printOutcome("home.run()")}
@@ -1278,6 +1311,19 @@ function modelReferenceSubject(
     put(value);
   };
   const evaluate = (): number | string | null | undefined => {
+    if (form === "super-array" || form === "super-object") {
+      const array = form === "super-array";
+      if (array) log.push("iterator");
+      evaluateKey();
+      if (array) log.push("next");
+      log.push("value");
+      try {
+        putValue(subject.right);
+      } finally {
+        if (array) log.push("close");
+      }
+      return "values";
+    }
     if (form === "for-of" || form === "for-in") {
       log.push("right");
       evaluateBase();
@@ -1440,6 +1486,26 @@ test("computed member Reference model orders base, key, and value", () => {
     ),
     "0 value 2 key,conversion,right 0 2",
   );
+  for (const key of ["counting", "throwing"] as const) {
+    assert.equal(
+      modelReferenceSubject(
+        { ...subject, form: "super-array", key },
+        0,
+        false,
+        false,
+      ),
+      "0 TypeError iterator,key,next,value,close 1 none",
+    );
+    assert.equal(
+      modelReferenceSubject(
+        { ...subject, form: "super-object", key },
+        0,
+        false,
+        false,
+      ),
+      "0 TypeError key,value 1 none",
+    );
+  }
 });
 
 /**
@@ -1818,7 +1884,9 @@ test(
           "prefix and postfix update, plain and optional chain links, and " +
           "for-of and for-in heads over null, undefined, number, string, " +
           "and object bases, plus super reads, +=, ||=, and ++ over a null " +
-          "or ordinary home prototype, each with counting, throwing, " +
+          "or ordinary home prototype, array and object super " +
+          "destructuring with value acquisition and iterator closing, " +
+          "each with counting, throwing, " +
           "string, or literal keys",
         numRuns: 20,
         profile: "M5 computed member Reference order",

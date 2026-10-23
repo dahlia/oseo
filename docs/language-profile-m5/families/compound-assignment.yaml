@@ -14,7 +14,8 @@ scope:
     order: plain reads and method lookup, logical member assignment, simple
     member assignment after its right operand, prefix and postfix update,
     super[key] references, plain links inside an optional chain, and for-in
-    and for-of head member targets check the base before converting the key
+    and for-of head member targets, and computed super array and object
+    destructuring targets check the base before converting the key
     once, and a write reuses the converted key. A nullish base with a key
     other than a primitive literal reports the assignment-target TypeError
     message. Global identifier references keep their literal-name lowering.

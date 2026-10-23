@@ -71,6 +71,7 @@ type SinkForm = "absent" | "data" | "setter";
 
 interface SuperTargetCase {
   readonly element: ElementForm;
+  readonly nullHome?: boolean;
   readonly key: KeyForm;
   readonly sink: SinkForm;
   readonly target: TargetForm;
@@ -136,6 +137,22 @@ const caseArbitrary: fc.Arbitrary<SuperTargetCase> = fc.oneof(
     sink: fc.constantFrom(...sinks),
     target: fc.constantFrom(...synchronousTargets),
   }),
+  fc.record({
+    element: fc.constantFrom(
+      "method" as const,
+      "getter" as const,
+      "arrow" as const,
+      "generator" as const,
+      "async-method" as const,
+    ),
+    nullHome: fc.constant(true),
+    key: fc.constantFrom(...keys),
+    sink: fc.constantFrom(...sinks),
+    target: fc.constantFrom(
+      "array-element" as const,
+      "object-property" as const,
+    ),
+  }),
   // `for await` needs an asynchronous element, so the head is drawn only
   // where the grammar admits it.
   fc.record({
@@ -164,11 +181,25 @@ function storedText(testCase: SuperTargetCase): string {
  * receiver, and any other target defines an own property of that
  * receiver while the parent keeps whatever it had.
  */
-function model(testCase: SuperTargetCase): string {
+function model(testCase: SuperTargetCase, v8 = false): string {
   if (testCase.element === "constructor-before-super") {
     return "|ReferenceError\n";
   }
   const tags: string[] = [];
+  if (testCase.nullHome) {
+    const array = testCase.target === "array-element";
+    if (array) tags.push("iterator");
+    if (testCase.key === "effect") tags.push("key");
+    if (testCase.key === "poisoned") tags.push("raw");
+    if (testCase.key === "abrupt") tags.push("abrupt");
+    else {
+      if (array) tags.push("next");
+      tags.push("value");
+      if (v8 && testCase.key === "poisoned") tags.push("toString");
+    }
+    if (array) tags.push("close");
+    return `${tags.join(" ")} |TypeError\n`;
+  }
   if (testCase.key === "effect") tags.push("key");
   if (testCase.key === "abrupt") return "abrupt |TypeError\n";
   if (testCase.key === "poisoned") tags.push("toString");
@@ -194,6 +225,28 @@ function operand(testCase: SuperTargetCase): string {
  */
 function statement(testCase: SuperTargetCase): string {
   const target = operand(testCase);
+  if (testCase.nullHome) {
+    if (testCase.target === "object-property") {
+      return `({ p: ${target} } = {
+        get p() { tag("value"); return 7; },
+      });`;
+    }
+    return `[${target}] = {
+      [Symbol.iterator]() {
+        tag("iterator");
+        return {
+          next() {
+            tag("next");
+            return {
+              done: false,
+              get value() { tag("value"); return 7; },
+            };
+          },
+          return() { tag("close"); return {}; },
+        };
+      },
+    };`;
+  }
   const statements = {
     "array-element": `[${target}] = [7];`,
     "array-rest": `[...${target}] = [7];`,
@@ -211,6 +264,7 @@ function statement(testCase: SuperTargetCase): string {
 
 function body(testCase: SuperTargetCase, parent: string): string {
   return `
+    ${testCase.nullHome ? "Object.setPrototypeOf(Probe.prototype, null);" : ""}
     try {
       ${statement(testCase)}
       report(probe(this, ${parent}));
@@ -317,6 +371,7 @@ function abrupt() {
   throw new TypeError("key failed");
 }
 function poisoned() {
+  ${testCase.nullHome ? 'tag("raw");' : ""}
   return {
     toString() {
       tag("toString");
@@ -422,6 +477,89 @@ test("the super-target model keeps every observable step ordered", () => {
   );
 });
 
+/** Pin the store's checked base and converted key within one MIR function. */
+function assertTargetStructure(mir: string, testCase: SuperTargetCase): void {
+  // Match the actual store's operands, not an unrelated check
+  // elsewhere in the function. Literal keys retain their path;
+  // other keys check the home prototype before one conversion.
+  const targetMir = mir
+    .split(/\n(?=\S)/u)
+    .find((part) => superStorePattern.test(part));
+  assert.ok(targetMir != null);
+  const lines = targetMir.split("\n");
+  const storePattern = new RegExp(
+    "property-set (?:destructuring member|for-of property) target " +
+      String.raw`(%\d+), (%\d+), `,
+    "u",
+  );
+  const store = storePattern.exec(targetMir);
+  assert.ok(store != null);
+  const [, baseId, keyId] = store;
+  const storeIndex = lines.findIndex((line) => storePattern.test(line));
+  if (testCase.key === "static" || testCase.key === "pure") {
+    assert.doesNotMatch(
+      targetMir,
+      /RequireObjectCoercible for assignment target/u,
+    );
+    const base = lines.findIndex((line) =>
+      line.trimStart().startsWith(`${baseId} = super-base `),
+    );
+    assert.ok(base >= 0 && storeIndex > base, "literal store uses super base");
+  } else {
+    const base = lines.findIndex((line) =>
+      line.trimStart().startsWith(`${baseId} = object-coercible `),
+    );
+    const key = lines.findIndex((line) =>
+      line.trimStart().startsWith(`${keyId} = property-key `),
+    );
+    assert.ok(base >= 0 && key > base, "base check before conversion");
+    assert.ok(storeIndex > key, "store reuses the converted key");
+    const convertedKey = `${keyId} = property-key `;
+    const conversions = lines.filter((line) => line.includes(convertedKey));
+    assert.equal(conversions.length, 1);
+  }
+}
+
+test("super target MIR orders computed and literal keys", () => {
+  const cases: SuperTargetCase[] = [];
+  for (const classElement of elements) {
+    for (const target of synchronousTargets) {
+      for (const key of keys) {
+        cases.push({ element: classElement, target, key, sink: "absent" });
+      }
+    }
+  }
+  for (const key of keys) {
+    for (const target of [
+      "for-await-head",
+      "for-await-pattern-head",
+    ] as const) {
+      cases.push({ element: "async-method", target, key, sink: "absent" });
+    }
+    for (const target of ["array-element", "object-property"] as const) {
+      cases.push({
+        element: "method",
+        target,
+        key,
+        sink: "absent",
+        nullHome: true,
+      });
+    }
+  }
+  for (const testCase of cases) {
+    for (const specialization of ["disabled", "enabled"] as const) {
+      const compiled = compileSource(
+        babelFrontend,
+        { source: printCase(testCase), sourceId: "super-target-order.js" },
+        { specialization },
+      );
+      assert.deepEqual(compiled.diagnostics, [], JSON.stringify(testCase));
+      assert.ok(compiled.mir != null);
+      assertTargetStructure(printMir(compiled.mir), testCase);
+    }
+  }
+});
+
 test(
   "generated super property targets match the M5 property model",
   { skip: nativeTarget == null ? "requires a supported native host" : false },
@@ -436,7 +574,10 @@ test(
           stdout: model(testCase),
         };
         const referenceResults = await references(source);
-        assertMatchingObservations([expectedObservation, ...referenceResults]);
+        assertMatchingObservations([
+          { ...expectedObservation, stdout: model(testCase, true) },
+          ...referenceResults,
+        ]);
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
             babelFrontend,
@@ -446,16 +587,7 @@ test(
           assert.deepEqual(compiled.diagnostics, []);
           assert.ok(compiled.mir != null);
           const mir = printMir(compiled.mir);
-          // The store reuses the ordinary `super` property set: a lookup
-          // that starts at the home object's prototype and a fourth
-          // receiver argument, with no RequireObjectCoercible on a base
-          // no expression produced.
-          assert.match(mir, /super-base home object prototype/u);
-          assert.match(mir, superStorePattern);
-          assert.doesNotMatch(
-            mir,
-            /RequireObjectCoercible for assignment target/u,
-          );
+          assertTargetStructure(mir, testCase);
           process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
           try {
             await withNativeFixture(
