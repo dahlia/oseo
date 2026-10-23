@@ -219,8 +219,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,311 reviewed cases: 24,305 passes, 2,581
-expected negatives, and 1,425 unsupported profile features. It records no
+The current manifest contains 29,147 reviewed cases: 24,966 passes, 2,732
+expected negatives, and 1,449 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3764,10 +3764,12 @@ and seven unsupported private-class paths, recorded in `f2c30668`. Each of
 the seven passes %eval% to a helper that calls it on a class source string;
 execution reaches the existing run-time `OSEO1001` source-compilation
 rejection before the private-name or brand assertions run. Those subjects
-remain inside the claim. Their owner is now
-`dynamic-source-coverage-remediation`, whose 265 paths include these seven
-under the existing fixture-construction assessment, pending equivalent
-ahead-of-time replacement evidence or a maintainer accounting decision.
+remain inside the claim. At `f2c30668`, their owner
+`dynamic-source-coverage-remediation` held 265 paths, including these seven
+under the existing fixture-construction assessment. B15 adds eight ordinary
+object-literal fixture subjects, bringing the current owner count to 273.
+These non-source subjects await equivalent ahead-of-time replacement
+evidence or a maintainer accounting decision.
 The `dynamic-source` dependency tag authorizes no exclusion. No whole-path
 exclusion is added, and ADR 0016's boundary and reopening triggers remain.
 These observations do not land the node or establish successful full and

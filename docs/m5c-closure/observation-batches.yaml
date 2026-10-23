@@ -4,7 +4,7 @@
 # Selectors change only through `mise run m5c:observation-batches:plan`.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 12780
+unreviewedPaths: 11944
 basis:
   supportedFeatures:
     - AggregateError
@@ -164,44 +164,44 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 95955
-  currentSeconds: 5272
-  finalExecutedVariants: 136737
-  finalSeconds: 7513
+  currentExecutedVariants: 98527
+  currentSeconds: 5413
+  finalExecutedVariants: 136673
+  finalSeconds: 7509
   plan:
-    batches: 22
+    batches: 21
     largestPaths: 2408
     largestReviewUnits: 500
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 39.74
-    fullUpdateScheduleHours: 78.23
+    scheduleHours: 38.29
+    fullUpdateScheduleHours: 75.41
   alternatives:
-    - batches: 33
+    - batches: 31
       largestPaths: 1920
       largestReviewUnits: 300
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 59.63
-      fullUpdateScheduleHours: 118.01
-    - batches: 19
+      scheduleHours: 56.62
+      fullUpdateScheduleHours: 112.07
+    - batches: 18
       largestPaths: 2408
-      largestReviewUnits: 595
+      largestReviewUnits: 597
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 34.77
-      fullUpdateScheduleHours: 68.29
-    - batches: 10
-      largestPaths: 3900
-      largestReviewUnits: 1188
+      scheduleHours: 33.3
+      fullUpdateScheduleHours: 65.43
+    - batches: 9
+      largestPaths: 4330
+      largestReviewUnits: 1187
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 19.2
-      fullUpdateScheduleHours: 37.15
+      scheduleHours: 17.56
+      fullUpdateScheduleHours: 33.95
 batches:
   - id: observation-batch-01
     selector:
@@ -282,7 +282,7 @@ batches:
     regeneration:
       executableVariants: 1044
       scopedUpdateSeconds: 57
-      fullCorpusSeconds: 5329
+      fullCorpusSeconds: 5471
   - id: observation-batch-03
     selector:
       prerequisiteSets:
@@ -341,7 +341,7 @@ batches:
     regeneration:
       executableVariants: 1244
       scopedUpdateSeconds: 68
-      fullCorpusSeconds: 5398
+      fullCorpusSeconds: 5539
   - id: observation-batch-06
     selector:
       prerequisiteSets:
@@ -385,7 +385,7 @@ batches:
     regeneration:
       executableVariants: 850
       scopedUpdateSeconds: 47
-      fullCorpusSeconds: 5444
+      fullCorpusSeconds: 5586
   - id: observation-batch-08
     selector:
       prerequisiteSets:
@@ -431,7 +431,7 @@ batches:
     regeneration:
       executableVariants: 1308
       scopedUpdateSeconds: 72
-      fullCorpusSeconds: 5516
+      fullCorpusSeconds: 5658
   - id: observation-batch-14
     selector:
       prerequisiteSets:
@@ -484,67 +484,7 @@ batches:
     regeneration:
       executableVariants: 1350
       scopedUpdateSeconds: 74
-      fullCorpusSeconds: 5590
-  - id: observation-batch-15
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/expressions/object/
-        - test/language/expressions/optional-
-    dependsOn:
-      - observation-batch-plan
-    paths: 836
-    reviewUnits: 456
-    generatedPaths: 670
-    prerequisites: {}
-    dynamicSource:
-      Function: 1
-      eval: 24
-    flags:
-      async: 212
-      generated: 670
-      module: 1
-      noStrict: 62
-      onlyStrict: 6
-    includes:
-      compareArray.js: 14
-      propertyHelper.js: 25
-    features:
-      Proxy: 7
-      Symbol: 15
-      Symbol.asyncIterator: 44
-      Symbol.iterator: 99
-      Symbol.unscopables: 1
-      arrow-function: 10
-      async-functions: 23
-      async-iteration: 297
-      class: 7
-      class-fields-public: 6
-      class-methods-private: 12
-      computed-property-names: 32
-      default-parameters: 169
-      destructuring-binding: 287
-      exponentiation: 2
-      generators: 337
-      let: 4
-      logical-assignment-operators: 3
-      object-rest: 17
-      object-spread: 9
-      optional-chaining: 1
-      rest-parameters: 12
-      top-level-await: 1
-    negatives:
-      parse: 151
-    partitions:
-      groups:
-        - language/expressions
-      files: 243
-      newFiles: 0
-    regeneration:
-      executableVariants: 2636
-      scopedUpdateSeconds: 145
-      fullCorpusSeconds: 5735
+      fullCorpusSeconds: 5732
   - id: observation-batch-16
     selector:
       prerequisiteSets:
@@ -606,7 +546,7 @@ batches:
     regeneration:
       executableVariants: 1630
       scopedUpdateSeconds: 90
-      fullCorpusSeconds: 5825
+      fullCorpusSeconds: 5821
   - id: observation-batch-17
     selector:
       prerequisiteSets:
@@ -645,7 +585,7 @@ batches:
     regeneration:
       executableVariants: 706
       scopedUpdateSeconds: 39
-      fullCorpusSeconds: 5864
+      fullCorpusSeconds: 5860
   - id: observation-batch-18
     selector:
       prerequisiteSets:
@@ -685,7 +625,7 @@ batches:
     regeneration:
       executableVariants: 704
       scopedUpdateSeconds: 39
-      fullCorpusSeconds: 5902
+      fullCorpusSeconds: 5899
   - id: observation-batch-19
     selector:
       prerequisiteSets:
@@ -720,7 +660,7 @@ batches:
     regeneration:
       executableVariants: 752
       scopedUpdateSeconds: 41
-      fullCorpusSeconds: 5944
+      fullCorpusSeconds: 5940
   - id: observation-batch-20
     selector:
       prerequisiteSets:
@@ -776,7 +716,7 @@ batches:
     regeneration:
       executableVariants: 994
       scopedUpdateSeconds: 55
-      fullCorpusSeconds: 5998
+      fullCorpusSeconds: 5995
   - id: observation-batch-21
     selector:
       prerequisiteSets:
@@ -846,7 +786,7 @@ batches:
     regeneration:
       executableVariants: 8602
       scopedUpdateSeconds: 473
-      fullCorpusSeconds: 6471
+      fullCorpusSeconds: 6467
   - id: observation-batch-22
     selector:
       prerequisiteSets:
@@ -911,7 +851,7 @@ batches:
     regeneration:
       executableVariants: 4232
       scopedUpdateSeconds: 233
-      fullCorpusSeconds: 6703
+      fullCorpusSeconds: 6700
   - id: observation-batch-23
     selector:
       prerequisiteSets:
@@ -979,7 +919,7 @@ batches:
     regeneration:
       executableVariants: 956
       scopedUpdateSeconds: 53
-      fullCorpusSeconds: 6756
+      fullCorpusSeconds: 6752
   - id: observation-batch-24
     selector:
       prerequisiteSets:
@@ -1019,7 +959,7 @@ batches:
     regeneration:
       executableVariants: 3150
       scopedUpdateSeconds: 173
-      fullCorpusSeconds: 6929
+      fullCorpusSeconds: 6925
   - id: observation-batch-25
     selector:
       prerequisiteSets:
@@ -1109,7 +1049,7 @@ batches:
     regeneration:
       executableVariants: 2210
       scopedUpdateSeconds: 121
-      fullCorpusSeconds: 7050
+      fullCorpusSeconds: 7047
   - id: observation-batch-26
     selector:
       prerequisiteSets:
@@ -1168,7 +1108,7 @@ batches:
     regeneration:
       executableVariants: 3444
       scopedUpdateSeconds: 189
-      fullCorpusSeconds: 7240
+      fullCorpusSeconds: 7236
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -1220,7 +1160,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7335
+      fullCorpusSeconds: 7331
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -1268,7 +1208,7 @@ batches:
     regeneration:
       executableVariants: 924
       scopedUpdateSeconds: 51
-      fullCorpusSeconds: 7386
+      fullCorpusSeconds: 7382
   - id: observation-batch-29
     selector:
       prerequisiteSets:
@@ -1324,7 +1264,7 @@ batches:
     regeneration:
       executableVariants: 340
       scopedUpdateSeconds: 19
-      fullCorpusSeconds: 7404
+      fullCorpusSeconds: 7401
   - id: observation-batch-30
     selector:
       prerequisiteSets:
@@ -1375,7 +1315,7 @@ batches:
     regeneration:
       executableVariants: 1444
       scopedUpdateSeconds: 79
-      fullCorpusSeconds: 7484
+      fullCorpusSeconds: 7480
   - id: observation-batch-32
     selector:
       prerequisiteSets:
@@ -1511,4 +1451,4 @@ batches:
     regeneration:
       executableVariants: 528
       scopedUpdateSeconds: 29
-      fullCorpusSeconds: 7513
+      fullCorpusSeconds: 7509
