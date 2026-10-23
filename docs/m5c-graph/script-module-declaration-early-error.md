@@ -39,8 +39,11 @@ Pure evidence
 static declaration productions, nested statement and function contexts,
 Module controls, UTF-8 byte positions, CRLF source locations, unsupported
 prefixes, TypeScript boundaries, and both compiler specialization policies.
-The existing Module export and import.meta tests retain their linking and
-owned-IR assertions.
+A 150,000-statement Script and nested block remain valid, and a static
+export following that many statements still reports its actual location.
+The traversal pushes children individually so source width cannot exceed
+its bootstrap host's argument-count limit. The existing Module export and
+import.meta tests retain their linking and owned-IR assertions.
 
 *tests/property/m5-script-module-declarations.property.test.ts* prints
 structured declaration productions with names, optional primitive hints,

@@ -82,6 +82,23 @@ const contexts: readonly (readonly [string, string])[] = [
   ["label: ", ""],
 ];
 
+test("wide statement lists preserve valid Script grammar", () => {
+  const statements = ";".repeat(150_000);
+  for (const source of [statements, `{${statements}}`]) {
+    const result = babelFrontend.parse({ source, sourceId: "wide-script.js" });
+    assert.equal(result.parsed, true);
+    assert.deepEqual(result.diagnostics, []);
+  }
+  const source = `${statements}export default null;`;
+  const result = babelFrontend.parse({ source, sourceId: "wide-export.js" });
+  assert.equal(result.parsed, false);
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  assert.deepEqual(result.diagnostics[0]?.byteRange, {
+    end: statements.length,
+    start: statements.length,
+  });
+});
+
 test("Script rejects every static declaration at its source location", () => {
   for (const declaration of declarations) {
     for (const [open, close] of contexts) {

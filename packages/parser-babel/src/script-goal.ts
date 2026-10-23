@@ -52,7 +52,8 @@ export function scriptModuleDeclarations(
     }
     for (const child of Object.values(value)) {
       if (Array.isArray(child)) {
-        pending.push(...nodes(child));
+        // A valid statement list can exceed the host's argument limit.
+        for (const childNode of nodes(child)) pending.push(childNode);
       } else {
         const childNode = node(child);
         if (childNode != null) pending.push(childNode);
