@@ -11,6 +11,16 @@ rejections such as generics, TypeScript modifiers or decorators still report
 `OSEO1001`. Static methods and computed members named `constructor` keep their
 permitted class roles. Unrelated unsupported syntax retains its `OSEO1001`
 diagnostic.
+The Script frontend rejects ECMAScript static imports and exports at any
+statement depth with source-located `OSEO0001`, before conversion of an
+earlier unsupported construct. Module code still admits them only in its
+top-level ModuleItemList. The permissive Babel option preserves parsing of
+TypeScript extensions; an owned adapter check enforces Script placement.
+Type-only import/export forms, namespaces, ambient modules, import-equals,
+and export-assignment retain their `OSEO1001` boundaries. Type-only star
+exports are unsupported too. Admitted primitive annotations are unchanged.
+Dynamic `import()` keeps its `OSEO1001` rejection; `import.meta` remains an
+early error in Script and is admitted in Module code.
 Parenthesized call and assignment targets are normalized before classification.
 The compiler then resolves `console` and `Object` lexically before admitting
 host or reflection intrinsics. M3 function values, objects, arrays, loops, and
@@ -128,6 +138,7 @@ The adapter keeps raw Babel shapes and conversion context in *babel.ts*.
 owns TypeScript and JSDoc hint extraction. The mutually recursive expression,
 pattern, statement, function, hoisting, and asynchronous conversions remain
 together in *convert.ts*. *modules.ts* owns import, export, and module-program
-conversion. *index.ts* only parses through Babel and exposes the two frontend
-factories and their unconfigured default values. These files remain
-package-private implementation paths.
+conversion. *script-goal.ts* checks ECMAScript declaration placement while
+preserving TypeScript extension boundaries. *index.ts* parses through Babel and
+exposes the two frontend factories and their unconfigured default values. These
+files remain package-private implementation paths.

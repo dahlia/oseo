@@ -23,6 +23,12 @@ scope:
     copies use that order; ordinary objects keep array-index keys first in
     ascending numeric order. ECMA-262 leaves for-in order over a namespace
     unspecified, and Oseo chooses the same order."
+  - "ECMAScript import and export declarations are ModuleItems, never
+    Script statements, including nested positions. Script placement errors
+    report source-located OSEO0001 before unsupported conversion. The
+    Module frontend accepts valid top-level forms and rejects nested ones.
+    Type-only forms, including star exports, and unsupported TypeScript
+    namespaces and ambient modules retain OSEO1001; no erasure is added."
 owners:
   - PLAN-M5C.md
   - docs/adr/0009-module-identity-and-linking.md
@@ -43,6 +49,7 @@ evidence:
       - tests/fixtures/module-export-forms/key-order.mjs
       - tests/fixtures/module-export-forms/numeric-names.mjs
       - packages/parser-babel/tests/module-export-forms.test.ts
+      - packages/parser-babel/tests/script-module-declarations.test.ts
   forced-collection:
     status: covered
     references:
@@ -52,6 +59,7 @@ evidence:
     references:
       - tests/property-seeds.yaml
       - packages/testkit/tests/module-graph.property.test.ts
+      - tests/property/m5-script-module-declarations.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family adds no specialized path or family-specific guard.
@@ -73,4 +81,5 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/module-export-forms.test.ts
+      - packages/parser-babel/tests/script-module-declarations.test.ts
       - packages/parser-babel/tests/bindings.test.ts
