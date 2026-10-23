@@ -235,12 +235,31 @@ prototype values and delegates object and null values to the existing
 `oseo_object_set_prototype` authority.
 
 The `m5-38` ABI adds `oseo_this_value`, `oseo_global_object_create`, and
-`oseo_global_binding_set`. `oseo_this_value` returns a non-nullish receiver
-unchanged and otherwise resolves the realm's global this value, which it
+`oseo_global_binding_set`. `oseo_this_value` resolves a nullish receiver
+to the realm's global this value, which it
 creates on first use as an ordinary extensible object with a null
 `[[Prototype]]`. The context permanently roots that one object, so Script
 top-level `this` and every non-strict nullish receiver observe one identity
 across collection.
+
+The M5c `primitive-wrapper-objects` unit completes the non-nullish branch
+with `ToObject`. Objects retain their identity; Boolean, Number, String,
+Symbol, and BigInt primitives produce fresh branded wrappers over the
+callee realm's intrinsic prototypes. The C backend binds and roots this
+receiver once at a non-strict function's entry, before parameter effects or
+suspension-frame creation. Repeated `this` reads and lexical arrows retain
+that identity, and the suspension record traces it across resumes. Strict
+functions receive their original values. Existing wrapper layouts, tracing,
+constructor behavior, and branded prototype methods remain authoritative;
+this unit adds no runtime entry point or heap field.
+
+`Array.from` keeps the original receiver for its `GetMethod` iterator
+lookup, then materializes one `ToObject` result for the array-like branch's
+length and indexed reads. `Object.prototype.toString` likewise reads
+`Symbol.toStringTag` from its `ToObject` result. Ordinary primitive property
+References and `Object.prototype.toLocaleString`'s `Invoke` keep their
+primitive receivers. This admission does not complete primitive inherited
+`[[Set]]`, which has its own M5c node.
 
 `oseo_global_object_create` performs GlobalDeclarationInstantiation's binding
 creation for one Script. Each named entry becomes a writable, enumerable,
@@ -1119,6 +1138,19 @@ properties, proxy traps, null prototypes, module namespaces, typed-array
 numeric keys, and the object-literal prototype setter keep their behavior,
 and a primitive base keeps its existing early return. No entry point, public
 layout, heap kind, intrinsic slot, or built-in code ID is added.
+
+The `m5-135` ABI admits Unicode group names in dynamically constructed
+patterns. *runtime\_unicode\_tables.h* gains the pinned `ID_Start` and
+`ID_Continue` inversion lists, which *runtime\_string.c* exposes as two
+internal predicates. The validator and the dynamic program builder share
+one RegExpIdentifierName decoder, so escaped and written spellings name the
+same group in duplicate checks, named references, and `groups` keys, and a
+name outside those properties is a `SyntaxError` rather than the profile
+boundary. Constructing a RegExp from a branded RegExp whose program the
+build compiled ahead of time borrows that static program when the new
+flags agree on `i`, `m`, `s`, `u`, and `v`; every other copy still parses
+its source dynamically. No entry point, public layout, heap kind,
+intrinsic slot, or built-in code ID is added.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

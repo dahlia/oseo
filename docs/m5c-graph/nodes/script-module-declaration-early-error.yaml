@@ -1,0 +1,31 @@
+version: 1
+id: script-module-declaration-early-error
+title: Reject module declarations in the Script goal
+delivers: "Repairs the Script frontend's static import and export declaration
+  early-error boundary, so the pinned observation-batch-17 subjects
+  test/language/global-code/import.js and
+  test/language/global-code/export.js report source-located OSEO0001
+  SyntaxError diagnostics rather than unsupported-conversion OSEO1001.
+  The two paths remain reserved by the batch until fresh actual admission;
+  no failure is reclassified or excluded to close this prerequisite.
+  Follow ECMA-262 ScriptBody and Module grammar and assess the complete
+  semantic unit, including nested declarations, declaration forms, valid
+  Module-goal controls, dynamic import and import.meta boundaries, and
+  the frontend's explicitly admitted TypeScript extensions. Preserve all
+  valid admitted module behavior and give every accepted or rejected form
+  a defined source-located result. Audit reviewed and reserved paths for
+  the same boundary instead of handpicking the two observed examples.
+  Keep the pinned revision, 41,091-path denominator, classification and
+  dependency vocabularies, assertions outside the corrected contract,
+  property seeds, generated domains, and case budgets. Add no exclusion
+  and drop or retag no reviewed path. Add focused parser and compiler
+  evidence under both bootstrap hosts and independent generated coverage
+  when the structured grammar domain supports it, then obtain complete
+  fresh manifest evidence and derived ledger through the normal gates.
+  The source-bound failed leading observation is preserved externally in
+  /data/m5c-b17-wrapper-leading-20261023 and Root independently reproduced
+  both OSEO1001 diagnostics through the public frontend on Main52a868c9."
+dependencies:
+  - module-export-forms
+landed: false
+status: ready

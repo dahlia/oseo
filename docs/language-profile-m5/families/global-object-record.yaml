@@ -10,6 +10,14 @@ scope:
   - "Bare identifier reads, writes, and deletes for admitted configurable
     constructor globals observe their global-object properties, while global
     declaration failures retain their exact declaration locations."
+  - "A bare eval identifier that no declaration or with object supplies
+    reads, writes, deletes, and applies typeof to the global object's eval
+    property, including through a with fallback; a tagged template with
+    that tag is an ordinary call, the ADR 0016 rejection of an unshadowed
+    eval call is unchanged, and no source is evaluated."
+  - "A with object that supplies eval but loses it before GetBindingValue
+    reads undefined in non-strict code and throws ReferenceError in strict
+    code; the with-statement family owns that lookup contract."
   - "Each independently compiled Script is validated in isolation; global
     var and lexical declaration names are not retained across successive
     Script instantiations in one realm."
@@ -25,6 +33,7 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/global-object-record.ts
+      - tests/native/fixtures/with-get-binding-value.ts
       - tests/native.ts
       - tests/fixtures/runtime-heap.c
   forced-collection:
@@ -59,5 +68,6 @@ evidence:
       - packages/backend-c/tests/index.test.ts
       - packages/compiler/tests/hir.test.ts
       - packages/parser-babel/tests/bindings.test.ts
+      - packages/parser-babel/tests/statements.test.ts
       - packages/runtime-c/native/runtime_binding.c
       - tests/fixtures/runtime-heap.c

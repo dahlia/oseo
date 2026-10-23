@@ -333,12 +333,9 @@ static OseoResult object_prototype_to_string(
         frame.slots[2] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_super_get(
-            context,
-            frame.slots[1],
-            frame.slots[2],
-            frame.slots[0]
-        );
+        /* This is Get(O, @@toStringTag) after ToObject, not GetV on the
+         * original primitive. A strict getter must receive the box. */
+        result = oseo_object_get(context, frame.slots[1], frame.slots[2]);
         frame.slots[3] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {

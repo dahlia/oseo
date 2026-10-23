@@ -1266,13 +1266,23 @@ static void test_accessor_descriptor_gc_safety(
 }
 
 static void test_this_value(OseoContext *context, OseoValue *roots) {
-    /* An object receiver stands unchanged and allocates nothing. Primitive
-     * wrapper allocation remains outside the admitted runtime. */
+    /* An object receiver stands unchanged and allocates nothing. */
     roots[0] = require_normal(oseo_object_create(context, oseo_null()));
     assert(require_normal(oseo_this_value(context, roots[0])) == roots[0]);
-    assert(
-        oseo_this_value(context, oseo_number(1.0)).status == OSEO_STATUS_THROW
-    );
+    /* Each primitive binding makes a fresh, collector-traced Number box. */
+    roots[4] = require_normal(oseo_this_value(context, oseo_number(1.0)));
+    roots[5] = require_normal(oseo_this_value(context, oseo_number(1.0)));
+    assert(roots[4] != roots[5]);
+    assert(require_normal(oseo_this_value(context, roots[4])) == roots[4]);
+    oseo_collect(context);
+    roots[0] = require_normal(oseo_object_get(
+        context, roots[4], make_text(context, "valueOf")
+    ));
+    for (size_t index = 4u; index <= 5u; index += 1u) {
+        assert(require_normal(oseo_call_function(
+            context, roots[0], roots[index], 0u, NULL, oseo_undefined()
+        )) == oseo_number(1.0));
+    }
     /* Both nullish receivers resolve to the one global this value. */
     roots[1] = require_normal(oseo_this_value(context, oseo_undefined()));
     assert(roots[1] != oseo_undefined());

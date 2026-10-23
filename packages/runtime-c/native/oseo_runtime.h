@@ -1958,9 +1958,12 @@ OseoResult oseo_symbol_intrinsic(OseoContext *context);
  * ResolveThisBinding for a this environment whose [[ThisMode]] is
  * global. A nullish receiver resolves to the realm's global this value,
  * which this call creates on first use and then keeps permanently
- * rooted; any other receiver stands unchanged. Script top level reaches
- * the same value through its own undefined receiver, so one entry point
- * serves both positions. The value is an ordinary extensible object
+ * rooted. Other receivers go through ToObject in the running callee realm:
+ * an object retains its identity and a primitive gets a fresh branded box.
+ * Generated non-strict function entries call this once before parameters
+ * and retain the result as their receiver, including across suspension.
+ * Script top level reaches the global value through its undefined receiver.
+ * The global value is an ordinary extensible object
  * whose own properties include the standard value properties, its own
  * `globalThis` self reference, and the var-scoped bindings
  * `oseo_global_object_create` installed for the running Script.

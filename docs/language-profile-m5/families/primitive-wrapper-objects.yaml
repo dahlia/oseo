@@ -1,0 +1,59 @@
+version: 1
+id: primitive-wrapper-objects
+title: "Primitive wrapper call bindings and ToObject receivers"
+scope:
+  - "One fresh Boolean, Number, String, Symbol, or BigInt wrapper per
+    non-strict call, with the existing primitive value and brand."
+  - "Repeated this reads, parameter defaults, lexical captures, call
+    forwarding, and suspension preserve the bound receiver's identity."
+  - "Array.from array-like reads and Object.prototype.toString tag reads
+    use their actual ToObject result; GetV retains primitive receivers."
+  - "The forty-path selector is fixed in the focused standards fixture.
+    Canonical reviewed observations remain unsupported until the later
+    complete UPDATE; focused evidence is not a compatibility promotion."
+  - "Node.js and Deno expose primitive receivers to strict toStringTag
+    getters in Object.prototype.toString. The tests retain a labeled V8
+    model separately from ECMA-262 2025 steps 3 and 15."
+  - "Ordinary primitive inherited Set has its own remediation node and
+    is not completed by this admission."
+owners:
+  - PLAN-M5.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/primitive-wrapper-objects.test.ts
+      - tests/property/m5-primitive-wrapper-objects.property.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/primitive-wrapper-objects.test.ts
+      - tests/fixtures/primitive-wrapper-objects/allocation.c
+  forced-collection:
+    status: covered
+    references:
+      - tests/primitive-wrapper-objects.test.ts
+      - tests/fixtures/primitive-wrapper-objects/allocation.c
+      - tests/property/m5-primitive-wrapper-objects.property.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-primitive-wrapper-objects.property.test.ts
+  guard-fallback:
+    status: covered
+    references:
+      - tests/property/m5-primitive-wrapper-objects.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/primitive-wrapper-objects.test.ts
+      - tests/property/m5-primitive-wrapper-objects.property.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/fixtures/primitive-wrapper-objects/owned-paths.txt
+      - tests/primitive-wrapper-objects.test.ts
+  structural:
+    status: covered
+    references:
+      - tests/primitive-wrapper-objects.test.ts

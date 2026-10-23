@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 147
+M5a is complete. The normative family records described below inventory 148
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -219,8 +219,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,311 reviewed cases: 24,231 passes, 2,581
-expected negatives, and 1,499 unsupported profile features. It records no
+The current manifest contains 28,311 reviewed cases: 24,305 passes, 2,581
+expected negatives, and 1,425 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -697,7 +697,12 @@ current evidence assessment. Those live only in the indexed records above.
     regular expressions; the group holds twenty-one passes since M5a Unit
     8.5l promoted its `for-in` iteration-statement case and the M5b
     `string-intrinsic` node promoted its `String` one. Optional calls through
-    `super` properties are admitted by M5a Unit 8.2 as recorded below. The
+    `super` properties are admitted by M5a Unit 8.2 as recorded below. An
+    optional call whose callee is an identifier resolved through a `with`
+    object environment does not yet pass the selected object as `this`; that
+    known defect is recorded under identifier reads through `with` below and
+    is owned by M5c node `with-optional-call-receiver`, which blocks the M5
+    exit. The
     remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
     not materialized yet.
@@ -848,22 +853,21 @@ current evidence assessment. Those live only in the indexed records above.
     function-name inference for identifier targets. Property targets and
     parenthesized identifier targets leave anonymous functions unnamed; see
     *Parenthesized assignment targets* below. Member assignments evaluate the
-    object and key expression once. An arithmetic member assignment then
-    applies the `ToObject` check of ECMA-262 2025 `GetValue`, so a null or
-    undefined base throws `TypeError` before the key is converted or the right
-    operand runs, converts the key once, and reuses that key for the write. A
-    logical member assignment still converts the retained key before its base
-    check, then converts it again after the right operand on the taken write
-    path; a short-circuited one skips that second conversion. That logical
-    order is retained behavior, not a conforming one, and *Compound member key
-    order* below records it. Plain `=` assignment to a computed member likewise
-    retains the raw key and converts it only after the right operand, as
-    `PutValue` specifies, so a key whose `toString` is observable runs after
-    that operand. Immutable and imported targets retain their catchable write
-    errors. Native differential fixtures and a generated property with seed
-    `0x60000c00` cover all 15 operators, both target forms, short-circuiting,
-    reference and conversion counts, both specialization policies, and forced
-    collection; seed `0x60000c01` covers member reference order. An ordinary
+    object and key expression once. An arithmetic or logical member
+    assignment then applies the `ToObject` check of ECMA-262 2025 `GetValue`,
+    so a null or undefined base throws `TypeError` before the key is
+    converted or the right operand runs, converts the key once, and reuses
+    that key for a write the operator takes. Plain `=` assignment to a
+    computed member retains the raw key until the right operand has run,
+    then applies `PutValue`'s base check and converts the key, so a key whose
+    `toString` is observable runs after that operand and never for a nullish
+    base. *Compound member key order* below describes the shared computed
+    member Reference order and its diagnostic. Immutable and imported targets
+    retain their catchable write errors. Native differential fixtures and a
+    generated property with seed `0x60000c00` cover all 15 operators, both
+    target forms, short-circuiting, reference and conversion counts, both
+    specialization policies, and forced collection; seeds `0x60000c01` and
+    `0x60000c03` cover member reference order. An ordinary
     asynchronous function retains the reference and current value in its traced
     frame when the right operand awaits. Module top level uses its private
     traced frame for the same position; only the pattern-position module await
@@ -873,19 +877,19 @@ current evidence assessment. Those live only in the indexed records above.
     Number path, adds or subtracts one, and performs a checked write. Prefix
     forms produce the assigned value; postfix forms produce the coerced
     previous value. A member target evaluates its object and key expression
-    once, then converts the retained raw key separately for the read and write,
-    so the conversions may select different properties. Immutable targets keep
-    their catchable write errors after coercion. Native differential fixtures
-    and a generated property with seed `0x60002e00` cover both operators,
-    both result forms, both target forms, numbers, numeric strings, booleans,
-    null, reference and conversion counts, both specialization policies, and
-    forced collection, including suppression of key conversion for a nullish
-    base. Four reviewed test262 cases cover the four forms, two expected parse
-    negatives retain strict `arguments` early errors, and the newly admitted
-    classic `for` update promotes an exponentiation case to pass. M5a Unit
-    8.5h adds four further expected negatives covering `arguments` as a
-    prefix and postfix update target in strict code. M5a Unit 8.1a extends the
-    same update path to exact BigInt values.
+    once, checks the base, converts the key once, and writes through the key
+    it read. Immutable targets
+    keep their catchable write errors after coercion. Native differential
+    fixtures and a generated property with seed `0x60002e00` cover both
+    operators, both result forms, both target forms, numbers, numeric strings,
+    booleans, null, reference and conversion counts, both specialization
+    policies, and forced collection, including suppression of key conversion
+    for a nullish base. Four reviewed test262 cases cover the four forms, two
+    expected parse negatives retain strict `arguments` early errors, and the
+    newly admitted classic `for` update promotes an exponentiation case to
+    pass. M5a Unit 8.5h adds four further expected negatives covering
+    `arguments` as a prefix and postfix update target in strict code. M5a Unit
+    8.1a extends the same update path to exact BigInt values.
  -  The named error intrinsics `Error`, `AggregateError`, `EvalError`,
     `RangeError`, `ReferenceError`, `SyntaxError`, `TypeError`, and `URIError`
     as real runtime-owned constructor values. An unshadowed reference to one
@@ -1521,7 +1525,9 @@ current evidence assessment. Those live only in the indexed records above.
     reference before an assignment evaluates its right operand. Nested
     declarative scopes stop an outer object environment from bypassing a
     nearer lexical binding. Reads, writes, method receivers, closures, nested
-    `with` statements, and abrupt exits preserve that resolution order. Strict
+    `with` statements, and abrupt exits preserve that resolution order. A
+    read, `typeof`, or call through a selected object tests that object again
+    before `Get` (see *Identifier reads through with environments*). Strict
     source keeps the required parse-time rejection. Fixed native evidence also
     covers one-time object evaluation, fallback reads and writes, captured
     object environments, nested environments, abrupt completion, and a
@@ -3711,6 +3717,62 @@ ABI moves to `oseo-runtime-m5-59` without exposing the global object or
 changing the graph's orchestration state. Compatibility classifications and
 counts do not move.
 
+M5c node `eval-intrinsic-value` adds `eval` to the property-owned names. A
+bare `eval` that no declaration or `with` object supplies reads, writes,
+deletes, and applies `typeof` to the global object's `eval` property, which
+the realm installs with %eval% (ADR 0027). An object environment that lacks
+`eval` falls back to that property rather than to an uninitialized hidden
+binding. Declarations, parameters, and `with` objects named `eval` shadow it
+as ordinary bindings. ADR 0016 still excludes the unshadowed call position,
+`eval(...)`, which ECMA-262 treats as a direct eval whenever the value is
+%eval%. The resolver rejects that call before evaluating any argument and
+keeps its original `Unknown binding 'eval'.` diagnostic text and range,
+because the exclusion audit binds each accepted direct-eval observation to
+that text. `(0, eval)(...)`, `eval?.(...)`, a call through a parameter of
+another name, and a tagged template such as ``eval`x` `` are ordinary calls
+that 13.3.6.1 never routes to PerformEval. A call written `eval(...)` inside
+a `with` body is a direct eval under 13.3.6.1 whenever the value is %eval%,
+whether the `with` object supplies the name or the lookup falls back to the
+global property, because its Reference Record has an Environment Record
+base either way. A different callable makes it an ordinary call of that
+callable, whether supplied by the `with` object, the global fallback, or
+an enclosing binding. Oseo performs no direct eval. It dispatches the
+resolved callable through the generic call path. A nonintrinsic replacement
+is invoked ordinarily with its own behavior and may itself invoke %eval%.
+If execution reaches %eval%, its String argument meets its run-time
+`OSEO1001` boundary and its non-String argument is returned unchanged.
+The intrinsic evaluates no source.
+
+The fixed `eval-intrinsic-value` native fixture and the generated domain at
+property seed `0x60003d01` cover descriptor identity, `length`, `name`,
+prototype absence, nonconstructibility directly and through a Proxy, the
+value as an Array callback receiver and Promise context, non-String indirect
+and `with`-fallback calls, tagged template calls that return the template
+object, sloppy writes, deletion and recreation, strict reads after deletion,
+shadowing, both specialization policies, forced collection, and a cached
+global-object shape read that misses after the property is recreated and
+reaches the compiled generic read. Native-only checks pin the run-time
+boundary of indirect, optional, parameter, and `with`-fallback String calls.
+The complete update on historical four-source composition
+`edccfd292b245c80c3503a93bf1a268fc99506c7` observed 26 passes among the
+node's original 33 paths and seven indirect-eval private-class cases at the
+source-compilation boundary. Those observations and their reassessments
+belong to that composition. Clean source preparation restored successful
+Main's manifest and all original owners, with all 33 paths unsupported.
+The fresh complete UPDATE on clean source `6e54c5d5` then observed 26 passes
+and seven unsupported private-class paths, recorded in `f2c30668`. Each of
+the seven passes %eval% to a helper that calls it on a class source string;
+execution reaches the existing run-time `OSEO1001` source-compilation
+rejection before the private-name or brand assertions run. Those subjects
+remain inside the claim. Their owner is now
+`dynamic-source-coverage-remediation`, whose 265 paths include these seven
+under the existing fixture-construction assessment, pending equivalent
+ahead-of-time replacement evidence or a maintainer accounting decision.
+The `dynamic-source` dependency tag authorizes no exclusion. No whole-path
+exclusion is added, and ADR 0016's boundary and reopening triggers remain.
+These observations do not land the node or establish successful full and
+extended candidate CI; affected post-observation review remains pending.
+
 ### Object.defineProperties descriptor collection
 
 M5b node `object-define-properties` admits `Object.defineProperties` over
@@ -5706,6 +5768,32 @@ property domain emits lone atoms rather than operations, and
 *tests/regexp-matcher.test.ts* records the exact cases together with the
 `\p{gc=Ll}` and binary spellings that must keep cancelling and the negation
 that must keep complementing over the folded code points.
+
+M5c node `regexp-pattern-extensions` closes the two runtime gaps the M5b node
+left behind its located boundary. A dynamically constructed pattern now
+decodes RegExpIdentifierName exactly as the compiler parser does: a `\u`
+escape always uses the unicode form, so `\u{...}` and an escaped surrogate
+pair are admitted without `u`, and a written surrogate pair joins in either
+mode while a lone surrogate never names an identifier character. The C runtime
+links the pinned Unicode 17.0 `ID_Start` and `ID_Continue` tables to classify
+the result, with the `$`, `_`, ZWNJ, and ZWJ allowances the grammar adds.
+Duplicate detection, named references, and the `groups` and `indices.groups`
+keys all compare the decoded name, so `(?<\u03C0>a)` and `(?<π>a)` declare the
+same group, and any other name is the edition's `SyntaxError` rather than the
+profile boundary.
+
+`RegExp(pattern, flags)` with a branded pattern parses its
+[[OriginalSource]] again, and that parse depends only on the text and the
+`i`, `m`, `s`, `u`, and `v` flags. When the pattern's program was compiled
+ahead of time and the new flags agree on those five, the copy borrows that
+immutable program rather than handing the literal's text to the dynamic
+compiler. Species construction in `@@matchAll` and `@@split` takes exactly
+this path, so `"𠮷a".matchAll(/\p{Script=Han}/gu)` executes the literal's
+artifact. Each copy keeps its own identity, flags string, and `lastIndex`.
+A copy with different parse flags, a copy of a dynamically compiled
+pattern, and a non-branded `IsRegExp` pattern still parse dynamically, and
+dynamic Unicode properties, class sets, unlinked case folding, and a
+non-ASCII identity escape without `u` keep their located boundary.
 
 
 Promise settled combinators
@@ -8296,10 +8384,10 @@ non-enumerable, configurable `eval` property with `length` 1 and `name`
 without parsing, and reports `OSEO1001` “eval compiles source text at run time,
 which is outside the admitted profile.” for a String, the boundary of
 [ADR 0016](./adr/0016-dynamic-source-boundary.md); it never evaluates source.
-The compiler still rejects the bare `eval` identifier, which the
-`eval-intrinsic-value` node owns. `%Function%`'s [[Call]] and [[Construct]]
-report the same boundary as `OSEO1001`, as the generator and async function
-constructors do.
+The `eval-intrinsic-value` node later admits the bare `eval` identifier as
+a value, while the unshadowed call position stays the ADR 0016 rejection.
+`%Function%`'s [[Call]] and [[Construct]] report the same boundary as
+`OSEO1001`, as the generator and async function constructors do.
 
 Six fixed native differential fixtures run through Node.js and Deno, whose
 reference `$262.createRealm` creates a `node:vm` context, and through both
@@ -8493,9 +8581,11 @@ complete. The remaining gaps retain their existing owners.
     admitted standard globals as replaceable properties of the same object,
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
     other unresolved global reference through it at run time. Three
-    boundaries remain. First, a reference to `eval`, the one clause 19
-    standard global name this profile has not admitted as an identifier
-    reference, stays a source-located rejection. Every realm's global
+    boundaries remain. First, M5c node `eval-intrinsic-value` admits a bare
+    `eval` identifier read as the global object's `eval` property, but an
+    unshadowed `eval(...)` call stays the source-located ADR 0016
+    rejection, and any other call that passes a String to `%eval%` reaches
+    its run-time `OSEO1001` boundary. Every realm's global
     object holds the `%eval%` value of
     [ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md), so a Script
     top-level `var eval` keeps it. M5c node `typed-array-feature-admission`
@@ -8630,9 +8720,10 @@ complete. The remaining gaps retain their existing owners.
     string, record, and lookup failure of the pinned upstream text and
     obtains each value from a statically compiled function that returns
     the same source expression, ignoring an abrupt completion as upstream
-    does. Its one respelling is `%eval%`, because the profile rejects a
-    bare `eval` identifier read. Upstream's bare `eval` resolves in the
-    global environment; when no global lexical `eval` exists, that is the
+    does. Its one respelling, `%eval%`, is retained from before
+    `eval-intrinsic-value` admitted bare `eval` identifier reads.
+    Upstream's bare `eval` resolves in the global environment; when no
+    global lexical `eval` exists, that is the
     global object record, so the lookup performs its HasProperty and Get
     on the Script's top-level `this`, which is the global object in either
     strictness and does not depend on the `globalThis` binding. An absent
@@ -8643,8 +8734,8 @@ complete. The remaining gaps retain their existing owners.
     an identifier read can observe, and a Module's undefined top-level
     `this` would leave `%eval%` undefined. No consumer of the include at
     the pinned upstream revision is either, which a source test checks
-    against every pinned consumer; reading the identifier itself belongs to
-    M5c node `eval-intrinsic-value`. A case that then calls or constructs one
+    against every pinned consumer. M5c node `eval-intrinsic-value` now admits
+    reading the identifier itself. A case that then calls or constructs one
     of the source-compiling constructors the include returns still reaches the
     ADR 0016 boundary at that call. The reviewed *asyncHelpers.js* probes
     `$DONE` with `typeof` rather than through
@@ -8836,30 +8927,57 @@ read finds no property, the write is ignored in sloppy code, and it throws
 `TypeError` in strict code. An inherited setter on a primitive's prototype
 chain is outside that tested case.
 
-The change is limited to that arithmetic reference. Logical member
-assignment, `super` and global identifier references, simple member
-assignment, and update expressions keep their earlier lowering. A logical
-member assignment still converts its key before a nullish base throws and
-converts it again before a taken write. A simple member assignment still
-converts the key before `PutValue`'s `ToObject` check. Update expressions
-already throw before conversion for a nullish base, but convert an object key
-twice. A `super` compound assignment also converts its key twice. These are
-retained behaviors, not conforming ones; the generated and fixed controls
-use primitive string keys, whose conversion cannot be observed, for the
-three non-arithmetic forms.
+The compound node limited its change to that arithmetic reference. Logical
+member assignment, `super` references, simple member assignment, update
+expressions, and plain computed reads kept their earlier lowering, which
+converted a key before the base check or a second time before a write; that
+node recorded them as retained behaviors, not conforming ones.
+
+M5c node `computed-member-reference-key-order` repairs those forms as one
+computed member Reference unit, following ECMA-262 2025 13.3.3, 13.3.7.1,
+GetValue, PutValue, and 14.7.5.7 ForIn/OfBodyEvaluation. A plain `base[key]`
+read, a method lookup, a logical member assignment, a simple member
+assignment after its right operand, prefix and postfix update, a
+`super[key]` read, compound assignment, update, or destructuring target, a
+plain link inside an optional chain, and a for-in or for-of head member
+target all evaluate the base and the raw key, check the base, convert the
+key once, and reuse the converted key for any write. The check is the same
+assignment-target `RequireObjectCoercible` operation, so it keeps a
+primitive base as the receiver and adds no runtime export or ABI change. A
+`super` reference applies it to the home object's prototype after the key
+expression. An optional link keeps its own nullish short circuit, which
+precedes its key. An abrupt for-of head target or PutValue still closes the
+iterator before the error propagates. A key that is a primitive literal
+converts without running user code, so its reference keeps the earlier
+lowering and the property operation's own nullish `TypeError`. Global
+identifier references, whose key is a literal name, keep their lowering.
+
+The reused check changes one diagnostic. A nullish base with any other key
+now reports `TypeError: Cannot destructure a nullish value.` from a computed
+read, call, logical, simple, `super`, optional-chain link, or for-in or
+for-of head reference, where a read previously reported
+`Cannot read properties of a nullish value.` and a write
+`Cannot set properties of a nullish or primitive value.` The error type is
+unchanged and both specialization policies report the same message. An
+inherited setter on a primitive base's prototype chain stays outside the tested
+behavior: the native primitive-base store rejects before it looks for one,
+before and after this repair. The node's record,
+[*docs/m5c-graph/computed-member-reference-key-order.md*](./m5c-graph/computed-member-reference-key-order.md),
+separates the observations that opened it from its source-only hypotheses.
 
 Node.js 24.21.0 and Deno 2.9.7 agree with ECMA-262 2025 for a nullish base,
-but both convert an arithmetic member key a second time before the write.
-That is a reference discrepancy, not an oracle. The tests run each
-reference source as a global Script through indirect `eval`, because Deno
-would otherwise load the file as a strict module, and require the references
-to equal a labeled V8 model that differs from the normative model only by
-that second conversion.
+but both convert a compound, logical, or update member key a second time
+before a taken write, and both convert a `super` key before a null home
+prototype throws. Those are reference discrepancies, not oracles. The tests run
+each reference source as a global Script through indirect `eval`, because Deno
+would otherwise load the file as a strict module, and require the references to
+equal a labeled V8 model that differs from the normative model only by those
+discrepancies.
 
 The existing *m5-compound-assignment.property.test.ts* family keeps slot
 `0x60000c00` and its generator unchanged; its native model now expects one
-conversion for an arithmetic member target and keeps the retained logical
-count, while its references must equal the labeled V8 count. Slot
+conversion for every member target, including a logical one that writes,
+while its references must equal the labeled V8 count. Slot
 `0x60000c01` generates one to four subjects in sloppy or strict code:
 arithmetic operators over null, undefined, number, string, and object bases
 with counting, throwing, or string keys, and logical, simple, and update
@@ -8877,11 +8995,48 @@ twelve operators instead of the double-converting `+=` case, which moved to
 those fixed cases. The repair adds no specialized path or guard, so the
 guard-fallback omission and its replacement evidence remain.
 
+The Reference repair adds slot `0x60000c03` to the same file. It generates
+one to four subjects in sloppy or strict code over every repaired ordinary
+form and null, undefined, number, string, and object bases, and over
+`super` reads, `+=`, `||=`, and `++` with a null or ordinary home
+prototype, each with counting, throwing, string, or literal keys. It has 20
+ordinary cases and a 240-second interrupt limit, and its independent model
+labels both V8 discrepancies separately. Fixed cases run every form over
+every admitted base, key kind, and falsy, truthy, or null current value in
+both strictness modes, plus for-of and for-in heads around an iterator whose
+`return` is observed, and primitive receivers seen by a getter and a method.
+The changing-key update subject of the `update-expressions` native fixture
+and the taken logical subject of `compound-assignments` moved there
+verbatim with fixed expected values, because both observed the V8 second
+conversion; those fixtures now use string-returning keys. Slot `0x60002e00`
+of *m5-update-expression.property.test.ts* keeps its generator and budget;
+its program also prints the slot it reads, its native model expects one
+conversion that writes the slot it read, and its references must equal the
+labeled V8 model that writes the slot a second conversion selects. Every
+native run of the Reference domain and its fixed cases uses both
+specialization policies with collection at every safepoint; the change adds no
+specialized path or guard, so the guard-fallback omission and its replacement
+evidence remain.
+
 The 33 paths matching *S11.13.2\_A7.{1..11}\_T{1,2,4}.js* in
 *test/language/expressions/compound-assignment/* observed `semantic-failure`
 before this repair and pass after it in a focused runner check; the eleven `T3`
 siblings pass before and after. Batch 12 keeps their first canonical admission,
 so this node adds no subset row.
+
+Batch 14's focused first observation on main `faa47159` found four
+`semantic-failure` results that the Reference repair addresses:
+*computed-reference-null-or-undefined.js* in
+*test/language/expressions/member-expression/* and the three
+*lgcl-{and,nullish,or}-assignment-operator-lhs-before-rhs.js* paths in
+*test/language/expressions/logical-assignment/*, each decided by its first
+non-strict, specialization-disabled variant.
+With the repair, a focused runner check through the repository's
+`executeTest262Case` executes all four variants of each path, both strictness
+modes under both policies, and classifies all four paths as `pass` with no
+retry. Batch 14 keeps their first canonical admission, and batches 8 and 16
+keep the related simple assignment and update subjects, so this node adds no
+subset row.
 
 
 Keyed pattern targets through with environments
@@ -8956,6 +9111,93 @@ canonical admission.
 [assignment-pattern twin]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/expressions/assignment/destructuring/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
 
 
+Identifier reads through with environments
+------------------------------------------
+
+M5c node `eval-intrinsic-value` makes an identifier read through a selected
+Object Environment Record perform ECMA-262 2025 GetBindingValue (9.1.1.2.6).
+HasBinding selects the nearest object whose `HasProperty` succeeds and whose
+`Symbol.unscopables` does not block the name. GetValue then calls
+GetBindingValue, which tests `HasProperty` on that object again before `Get`.
+A binding gone in between, for example deleted by a `Symbol.unscopables`
+getter or denied by a Proxy `has` trap, reads `undefined` in non-strict code
+and throws `ReferenceError` in strict code. The reference is strict when the
+code containing it is strict, so a strict function nested in a sloppy `with`
+body throws. The rule covers a value read; `typeof`, which special-cases
+only an unresolvable reference before GetValue, so a reference resolved to a
+selected object still performs GetBindingValue and propagates its strict
+`ReferenceError`; and a call callee, whose strict `ReferenceError` precedes
+argument evaluation. An ordinary call expression keeps the selected object
+as `this` whether or not the property survived. An abrupt
+second `has` propagates before any `Get`. An all-miss chain is unchanged, and
+compound, logical, and update reads already performed the second test.
+
+HIR records the read's strictness on the `with-get` reference, and MIR reuses
+the global Environment Record's GetBindingValue lowering on the selected
+object. The added `in` is a safepoint; the selected object, key, value, and
+receiver stay rooted across it.
+
+The reference hosts diverge from this algorithm. Node.js 24.21.0 (V8
+13.6.233.17) and Deno 2.9.7 (V8 15.0.245.2) skip the second `HasProperty` and
+return what `Get` yields. Node.js fails the pinned [identifier trace] and
+[call trace] cases and the [strict deletion case]. This evidence therefore
+uses no Node.js or Deno differential for the selected path. The fixed
+observation in *tests/native.ts* compiles the program in
+*tests/native/fixtures/with-get-binding-value.ts* under both specialization
+policies with collection forced at every safepoint, and requires a positive
+collection count and the exact ECMA-262 output. With specialization disabled
+it also requires zero guard hits and misses. Its 27 rows cover, in sloppy and
+strict code:
+
+ -  a binding deleted by a `Symbol.unscopables` getter, behind a global or a
+    lexical fallback, and present and inherited bindings;
+ -  `typeof` of a deleted binding and of an all-miss name;
+ -  a call after deletion with its argument trace, and a present call's
+    `this`;
+ -  the Proxy trace that the pinned test262 cases assert, a Proxy whose
+    second `has` answers `false` or throws, and a Proxy miss followed by the
+    next object.
+
+The existing *m5-global-object-record.property.test.ts* family adds slot
+`0x60003d02` with 12 ordinary cases and a 180-second interrupt limit. It
+generates one to four value, `typeof`, and call references, sloppy or in a
+nested strict function, behind a lexical or unresolvable outer binding,
+through one to three plain or Proxy objects with scripted `has` answers and
+six `Symbol.unscopables` forms. Native output under both specialization
+policies, with forced collection and a positive collection count, must equal
+an independent symbolic model of HasBinding, GetBindingValue, GetValue,
+`typeof`, and EvaluateCall; no reference host runs. With specialization
+disabled the domain also requires zero guard hits and misses. Slots
+`0x60003d00` and `0x60003d01` and their Node.js and Deno comparisons are
+unchanged. Parser and MIR structural tests check, under both policies, that a
+value read, `typeof`, and a callee test the selected object again before its
+`Get`, that only strict code reaches the missing binding's `ReferenceError`,
+that a call's receiver is the selected object, and that the path has no
+guard.
+
+The repair adds no specialized path or guard and no runtime, ABI, or heap
+change. It admits no test262 path: the four pinned GetBindingValue cases
+under *test/language/statements/with/* remain unreviewed with
+`observation-batch-28`.
+
+This correction does not cover optional calls. An optional call such as
+`with (o) { f?.() }` lowers its identifier callee as a value and passes
+`undefined` instead of the selected object as `this`. Native runs on
+`13ab5051` observed `false` for a strict `this === o` check under both
+specialization policies, where ECMA-262 and the ordinary call give `true`.
+That commit precedes this correction, which was not executed for that
+program; static analysis shows the correction leaves the optional-chain
+lowering unchanged. This is a known remaining defect, not an exclusion. Active
+remediation node `with-optional-call-receiver` owns it, and `m5-exit-audit`
+depends on that node. The
+[*with-optional-call-receiver.md*](./m5c-graph/with-optional-call-receiver.md)
+record holds the evidence and the repair contract.
+
+[identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
+[call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js
+[strict deletion case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-mutable-binding-binding-deleted-in-get-unscopables-strict-mode.js
+
+
 Parenthesized assignment targets
 --------------------------------
 
@@ -9018,3 +9260,59 @@ their subset rows were retained. The only new observation is a pass for
 *test/language/expressions/assignment/fn-name-lhs-cover.js*.
 This is preparation evidence; landing and the whole ordinary and extended
 gates remain pending.
+
+
+Primitive wrapper call bindings
+-------------------------------
+
+M5c node `primitive-wrapper-objects` admits the missing non-strict call
+boundary for all five wrapper kinds. Boolean, Number, String, Symbol, and
+BigInt use their existing internal-slot representation and branded methods.
+A generated entry binds and roots one receiver before parameters run;
+nullish arguments select the callee realm's global this value, objects keep
+their identity, and primitives get fresh wrappers over that realm's intrinsic
+prototypes. Strict functions keep primitive receivers. Repeated reads,
+lexical arrows, defaults, call forwarding, and suspension retain the bound
+object, while separate calls produce separate boxes.
+
+`Array.from` performs its iterator lookup with the original primitive and
+uses one `ToObject` result for its non-iterable branch's length and indexed
+reads. `Object.prototype.toString` likewise passes its `ToObject` result to
+an inherited `@@toStringTag` getter. Node.js 24.21.0 and Deno 2.9.7 expose
+the primitive there; the fixed and generated suites retain a labeled V8 model
+beside the ECMA-262 2025 expectation. Ordinary property References and
+`Object.prototype.toLocaleString`'s `Invoke` keep primitive receivers.
+Primitive inherited `[[Set]]` remains separately owned remediation.
+
+*tests/primitive-wrapper-objects.test.ts* covers brands, fresh identity,
+String properties, strict and non-strict calls, invalid receivers, nullish
+and object controls, abrupt calls, default order, lexical captures, and
+synchronous and asynchronous suspension, and callee-realm selection through
+foreign helpers. A public-runtime C fixture sweeps warmed boxing allocation
+failures for all five kinds, checks root balance and retry, and forces
+collection. Its structural check places the
+rooted receiver before environment and suspension initialization. Two
+structured property domains at seeds `0x60008a00` and `0x60008a01` preserve
+all five primitive kinds during shrinking. Each has 12 ordinary cases and
+compares an independent model with Node.js, Deno, and both specialization
+policies, with forced collection and positive collection and generic
+fallback counters. A String wrapper deliberately falsifies a numeric hint;
+a shape mutation exercises the property cache miss.
+
+The TCO-dependent strict tail-forwarding registration and its actual tail
+MIR and C assertions remain preserved at `22a70dd9`, pending independent
+TCO remediation. This composition retains the earlier fixed strict calls,
+bound and Proxy forwarding, defaults, captures, and five-kind assertions;
+it claims no tail-forwarding execution evidence.
+
+The focused standards registration uses the exact 40-path fixture selector
+and checks every requested strictness and specialization variant. It writes
+no reviewed expectation or result. Clean source preparation retained Main's
+40 unsupported observations at the old `primitive-wrapper` boundary. The
+fresh complete UPDATE on clean source `6e54c5d5` observed all 40 selector
+paths as passes and promoted them in the canonical manifest recorded in
+`f2c30668`. This composition without TCO adds the 148th indexed family;
+full and extended candidate CI, affected post-observation review, and
+landing remain pending. Zig's address and undefined flags
+alone establish no ASan activity; the exact candidate's host C sanitizer
+lanes must supply that evidence.

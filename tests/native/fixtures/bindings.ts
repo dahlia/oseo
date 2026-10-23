@@ -1200,31 +1200,11 @@ nullishCompound(null);
 nullishCompound(undefined);
 console.log("nullish", nullishOrder);
 
-let logicalConversionCount = 0;
-let logicalConversionOrder = "";
-const logicalChangingKey = {
-  [Symbol.toPrimitive]: function () {
-    logicalConversionCount += 1;
-    logicalConversionOrder += "key" + logicalConversionCount + " ";
-    return logicalConversionCount === 1 ? "read" : "write";
-  },
-};
-const logicalChangingHolder = { read: 0, write: 9 };
-function logicalConversionRight() {
-  logicalConversionOrder += "right ";
-  return 2;
-}
-const logicalConversionResult =
-  logicalChangingHolder[logicalChangingKey] ||= logicalConversionRight();
-console.log(
-  "logical-conversion",
-  logicalConversionResult,
-  logicalChangingHolder.read,
-  logicalChangingHolder.write,
-  logicalConversionCount,
-  logicalConversionOrder,
-);
-
+// A taken logical member write reuses the key its read converted. That
+// single conversion is a recorded V8 discrepancy, so the changing-key
+// subject this fixture carried lives verbatim, with fixed expected values,
+// in m5-compound-assignment.property.test.ts. A short-circuited write
+// converts once in every host.
 let skippedConversionCount = 0;
 const skippedChangingKey = {
   [Symbol.toPrimitive]: function () {
@@ -1382,29 +1362,24 @@ console.log(
   notANumber,
 );
 
+// The observable changing-key form of these member updates is a recorded
+// V8 discrepancy: V8 converts the key again before PutValue.
+// m5-compound-assignment.property.test.ts keeps it verbatim with fixed
+// expected values. Here the key expression is observable and its string
+// result converts without an observable step.
 let order = "";
-let conversionCount = 0;
 const holder = { read: "4", write: 99 };
-const changingKey = {
-  [Symbol.toPrimitive]: function () {
-    conversionCount += 1;
-    order += "convert ";
-    if (conversionCount % 2 === 1) return "read";
-    return "write";
-  },
-};
 function target() {
   order += "object ";
   return holder;
 }
 function key() {
   order += "key ";
-  return changingKey;
+  return "read";
 }
-console.log("member-postfix", target()[key()]--, holder.write, order);
+console.log("member-postfix", target()[key()]--, holder.read, order);
 order = "";
-console.log("member-prefix", ++target()[key()], holder.write, order);
-console.log("conversion-count", conversionCount);
+console.log("member-prefix", ++target()[key()], holder.read, order);
 
 let nullKeyConversionCount = 0;
 const nullKey = {

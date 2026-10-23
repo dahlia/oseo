@@ -1954,8 +1954,13 @@ static OseoResult array_from_array_like(
     OseoContext *context,
     OseoRootFrame *frame
 ) {
+    /* GetMethod above uses the original primitive receiver, but this
+     * branch's LengthOfArrayLike and indexed Get share one ToObject box. */
+    OseoResult result = oseo_internal_to_object(context, frame->slots[1]);
+    frame->slots[1] = result.value;
+    if (result.status != OSEO_STATUS_NORMAL) return result;
     double length = 0.0;
-    OseoResult result = array_like_length(
+    result = array_like_length(
         context,
         frame->slots[1],
         &length

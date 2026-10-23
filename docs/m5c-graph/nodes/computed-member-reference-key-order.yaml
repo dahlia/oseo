@@ -1,0 +1,47 @@
+version: 1
+id: computed-member-reference-key-order
+title: Order computed member Reference key conversion
+delivers: 'Repairs the generic computed member Reference as one semantic unit,
+  following ECMA-262 2025 13.3.2.1, 13.3.3, 13.3.7.1, 13.3.9.2, 6.2.5.5
+  GetValue, 6.2.5.6 PutValue, 13.4, 13.15.2, and 14.7.5.7: evaluate the base and
+  then the raw key expression, keep the raw key value in the Reference until
+  GetValue or PutValue, apply ToObject or the assignment-target
+  RequireObjectCoercible check before ToPropertyKey wherever the algorithm
+  orders it so while keeping a primitive base as the receiver, and store the
+  converted key in the Reference so a later PutValue reuses it instead of
+  converting it again. The unit covers plain base[key] reads and method lookup,
+  logical member assignment with &&=, ||=, and ??= including both short-circuit
+  outcomes, simple member assignment, whose right operand runs before the key is
+  converted, prefix and postfix update, super[key] compound assignment and
+  update, for-in and for-of head member targets, whose PutValue follows each
+  iteration step and whose abrupt target evaluation or PutValue still closes a
+  for-of iterator first, computed super[key] destructuring targets, and optional
+  member-chain forms under the same contract, where a nullish short circuit
+  keeps its own specified order. The base check reuses the existing
+  assignment-target RequireObjectCoercible operation, adding no runtime export
+  or ABI change, so such a nullish base reports TypeError "Cannot destructure a
+  nullish value." in both specialization policies; a primitive literal key,
+  whose conversion runs no user code, keeps the earlier lowering and diagnostic.
+  The landed compound-member-assignment-key-order arithmetic repair keeps its
+  results. The current main nonconformance, the four first-variant semantic
+  failures observed for batch 14, and the source-only hypotheses for the other
+  forms are recorded in docs/m5c-graph/computed-member-reference-key-order.md.
+  Follow the pinned algorithms, not the labeled V8 second-conversion divergence.
+  Keep optional-call receiver debt and eval admission out of this node. Follow
+  the full applicable PLAN-M5.md evidence contract: focused examples with null,
+  undefined, primitive, and object bases and counting, throwing, and string keys
+  for every form, an independent generated model extending the existing
+  assignment property generators without weakening earlier cases, seeds, or
+  budgets, both specialization policies, forced-collection and structural
+  evidence, the recorded reference divergence, and a guard miss reaching the
+  compiled generic fallback where a specialized path or guard changes.
+  Regenerate the complete reviewed manifest and derived ledger; reviewed paths
+  may move only toward pass. Claim no test262 pass in advance:
+  observation-batch-14 admits its 359 paths, including its four failing
+  subjects, and observation-batch-08 and observation-batch-16 admit the related
+  simple assignment and update subjects, each from its own actual observation.
+  Add no exclusion and remove or retag no path.'
+dependencies:
+  - compound-member-assignment-key-order
+landed: true
+status: ready

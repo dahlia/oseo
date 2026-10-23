@@ -424,6 +424,17 @@ constructors, rest parameters, and eventual host calls. Only the generic ABI is
 stable across independently compiled units. Specialized entries are private to
 the linked program and may change between builds.
 
+A non-strict function binds its receiver once before parameter evaluation.
+Nullish values select the callee realm's global this value; other primitives
+produce fresh Boolean, Number, String, Symbol, or BigInt wrappers through
+`ToObject`. The generated entry roots that value for the call, and a
+suspension record retains it across resumes. Lexical arrows capture the
+bound receiver, while strict functions preserve the original value. This
+binding is separate from a primitive property Reference: its original
+primitive still reaches an inherited getter, even when lookup uses a box.
+An algorithm that actually performs `ToObject`, such as `Array.from`'s
+array-like branch, instead uses that one object's identity for its reads.
+
 Exceptions, `return`, `break`, and `continue` are represented explicitly before
 backend lowering. A generic call returns a two-word `OseoResult` containing an
 `OseoStatus` and an `OseoValue`. Normal and thrown values use the same value

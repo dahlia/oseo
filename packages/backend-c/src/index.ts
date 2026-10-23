@@ -3563,8 +3563,16 @@ function rootCount(functionValue: MirFunction): number {
     32,
   );
   return (
-    baseRootCount + maximumArgumentCount(blocks) + completionSlotCount(blocks)
+    baseRootCount +
+    maximumArgumentCount(blocks) +
+    completionSlotCount(blocks) +
+    (needsThisBinding(functionValue) && !functionValue.generator ? 1 : 0)
   );
+}
+
+/** Script this is separate; lexical receivers arrive captured by [[Call]]. */
+function needsThisBinding(functionValue: MirFunction): boolean {
+  return functionValue.id >= 0 && functionValue.strict !== true;
 }
 
 /**
@@ -4384,6 +4392,21 @@ function emitFunction(
     lines: [],
   };
   state.usesAbrupt = fragmentUnit == null || functionValue.id >= 0;
+  if (needsThisBinding(functionValue)) {
+    // OrdinaryCallBindThis precedes parameter evaluation. Keep its one
+    // result rooted even when no MIR this read is live. An arrow receives
+    // its already-bound lexical receiver, which ToObject preserves.
+    // The initial generator frame has one slot; generator_create transfers
+    // this value into the traced suspension record before that slot changes.
+    location(state, functionValue.range);
+    line(state, "result = oseo_this_value(context, receiver);");
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+    line(
+      state,
+      `roots[${generator ? 0 : functionRootCount - 1}] = result.value;`,
+    );
+    line(state, "receiver = result.value;");
+  }
   if (generator) {
     line(
       state,

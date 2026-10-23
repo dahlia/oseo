@@ -212,7 +212,9 @@ export interface SyntaxRegExpLiteralExpression extends LocatedSyntax {
 /**
  * One template object argument synthesized for a tagged template call.
  * A missing cooked entry represents an invalid escape sequence, which
- * tagged templates admit while retaining its raw source text.
+ * tagged templates admit while retaining its raw source text. A frontend
+ * produces it only as the first argument of that call, so the resolver
+ * reads it as the mark of a tagged call, which is never a direct eval.
  */
 export interface SyntaxTemplateObject extends LocatedSyntax {
   readonly cooked: readonly (string | undefined)[];

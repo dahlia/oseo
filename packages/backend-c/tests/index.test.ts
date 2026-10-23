@@ -1669,7 +1669,7 @@ test("annotation identities do not allocate native value slots", () => {
     },
   });
   assert.match(edges.source, /roots\[2048\] = roots\[2047\]/u);
-  const callable = cBackend.emit({
+  const callableProgram: MirProgram = {
     ...program,
     functions: [{ ...script, id: 0, name: "wide" }],
     script: {
@@ -1692,13 +1692,28 @@ test("annotation identities do not allocate native value slots", () => {
         },
       ],
     },
-  });
+  };
+  const callable = cBackend.emit(callableProgram);
   assert.match(
     callable.source,
-    /oseo_roots_allocate\(context, &frame, 2050u\)/u,
+    /oseo_roots_allocate\(context, &frame, 2051u\)/u,
   );
   assert.match(
     callable.source,
+    /oseo_frame_enter\(context, OSEO_CALLABLE_FRAME_COST\(94168u\)\)/u,
+  );
+  // A non-strict call retains one real this-binding root. Annotation
+  // identities still contribute no storage, and strict calls add no root.
+  const strictCallable = cBackend.emit({
+    ...callableProgram,
+    functions: [{ ...script, id: 0, name: "wide", strict: true }],
+  });
+  assert.match(
+    strictCallable.source,
+    /oseo_roots_allocate\(context, &frame, 2050u\)/u,
+  );
+  assert.match(
+    strictCallable.source,
     /oseo_frame_enter\(context, OSEO_CALLABLE_FRAME_COST\(94167u\)\)/u,
   );
   assert.equal(script.rootSlotCount, 2047 * 46 + 5);

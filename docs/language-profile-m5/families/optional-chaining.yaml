@@ -3,6 +3,17 @@ id: optional-chaining
 title: "Optional chaining"
 scope:
   - "Optional property, computed, and call chains."
+  - "Known remaining defect: an optional call whose callee is an identifier
+    resolved through a selected with Object Environment Record, such as
+    f?.() inside with, passes undefined instead of the selected object as
+    its receiver. Native runs on 13ab5051 observed it under both
+    specialization policies. That commit precedes the eval-intrinsic-value
+    GetBindingValue correction, which was not executed for this program;
+    static analysis shows the correction leaves the optional-chain lowering
+    unchanged.
+    Active remediation node with-optional-call-receiver, recorded in
+    docs/m5c-graph/with-optional-call-receiver.md, owns it and blocks
+    m5-exit-audit. Member-call receivers are unaffected."
 owners:
   - PLAN-M5.md
 evidence:

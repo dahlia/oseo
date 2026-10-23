@@ -244,8 +244,9 @@ test("admits a function declaration that replaces a replaceable global", () => {
   }
 });
 
-test("classifies Boolean as a replaceable intrinsic global", () => {
+test("classifies replaceable and restricted intrinsic globals", () => {
   assert.equal(intrinsicGlobalKind("Boolean"), "replaceable");
+  assert.equal(intrinsicGlobalKind("eval"), "replaceable");
   assert.equal(intrinsicGlobalKind("undefined"), "restricted");
   assert.equal(intrinsicGlobalKind("BooleanLike"), undefined);
 });

@@ -725,6 +725,54 @@ updates the ledger and node state, so a clean checkout cannot describe one
 manifest while scheduling work from another.
 
 
+Source preparation after the four-source candidate
+--------------------------------------------------
+
+The four-source candidate at `cbe81ee1` did not complete its gates. Root's
+D6 decision removes the proper-tail-call implementation from the next source
+preparation while retaining that candidate and its original source and
+observation refs. The Linux extended-property liveness failure and ordinary
+native fixture timeout remain unresolved; neither a semantic counterexample
+nor a runner flake was established. No test budget or timeout changes.
+
+Eval, RegExp, and computed Reference retain their source contracts and have
+no graph dependency on `proper-tail-calls`. Their source preparation restores
+successful Main `52a868c9`'s complete canonical observation set, subset,
+closure ledger, exclusion audit, and batch accounting. Its 28,311 reviewed
+paths contain 24,234 passes, 2,581 expected negatives, and 1,496 unsupported
+results. These are Main observations, not observations of the new source.
+All original owners remain, and a new full UPDATE is required. Root later
+authorized adding the ready `primitive-wrapper-objects` source as the fourth
+unit. Its 40 paths retain Main's unsupported observations and owners. The
+TCO-specific strict tail-forwarding registration stays only in the original
+Wrapper source; every earlier wrapper assertion and property budget remains.
+At that source preparation, all four source nodes remained unlanded. The
+optional-call receiver and primitive inherited-Set contracts stay on the exit
+path with their unmet prerequisites.
+
+The complete update on clean source `6e54c5d5` finished naturally with exit 0.
+It observed all 28,311 reviewed paths: 24,305 passes, 2,581 expected negatives,
+and 1,425 unsupported results, with no failure classifications. All 24,234
+successful Main passes remain passes. The 71 promotions comprise 26 Eval-value,
+five RegExp, and 40 Wrapper paths. Another 49 unsupported observations now
+reach the existing run-time Eval source-compilation boundary: 42 retain their
+bounded ADR 0016 ownership with refreshed observation digests, and seven
+private-class subjects move to `dynamic-source-coverage-remediation` under
+the existing fixture-construction assessment. That owner now has 265 paths;
+those private name and brand subjects remain inside the claim. That update
+added no exclusion, reviewed path, feature, inventory entry, or node landing;
+it retained the source preparation's graph state with 44 landed nodes.
+Post-observation review and exact candidate CI remain pending.
+
+This publication candidate prospectively marks `eval-intrinsic-value`,
+`regexp-pattern-extensions`, `computed-member-reference-key-order`, and
+`primitive-wrapper-objects` landed, bringing its graph to 48 landed nodes.
+Successful Main `52a868c9` still has 44 landed nodes. The four candidate
+transitions take effect only after exact candidate CI succeeds, an equal-tree
+merge, and successful main CI for that exact merge commit, as the Gates
+section below requires.
+
+
 Gates
 -----
 
@@ -1153,3 +1201,32 @@ not touch the Float16Array source. A reference run under Node.js and Deno
 on hosts that define Float16Array is evidence that the copy is equivalent
 to upstream, not an Oseo observation. The classifications come only from
 that complete update.
+
+
+Dynamic RegExp pattern extensions
+---------------------------------
+
+The `regexp-pattern-extensions` node owns the five reviewed paths whose
+observation names the `regexp-pattern-extension` capability. None of them is
+a lexer, literal, flag, or harness gap: each stops at the runtime C
+validator, reached through RegExp construction at run time. Four are the
+*test/built-ins/RegExp/named-groups/* `*-property-names*.js` cases. Their
+literals already compile ahead of time, but `RegExp("(?<\\u0041>.)")`,
+`RegExp("(?<a\u{104A4}>.)", "u")`, and `new RegExp("(?<🦊>fox)")` need an
+escaped name decoded and a non-ASCII name classified, which the runtime
+refused for lack of identifier data. The fifth,
+*regexp-prototype-matchAll-v-u-flag.js* under
+*test/built-ins/String/prototype/matchAll/*, reaches `@@matchAll` species
+construction, which handed the literal `/\p{Script=Han}/gu` back to the
+dynamic compiler that deliberately has no property tables.
+
+The node links the pinned `ID_Start` and `ID_Continue` tables into the
+runtime and shares one RegExpIdentifierName decoder between the validator and
+the dynamic program builder, and it lets a copy of a branded RegExp borrow an
+ahead-of-time program when the parse flags agree. The profile record in
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) states both
+contracts. Runtime ABI `m5-135` records them. Dynamic Unicode properties,
+class sets, unlinked case folding, and the non-ASCII identity escape without
+`u` keep their located boundary, so the capability stays in the runner's
+vocabulary. No exclusion is proposed, and no dynamic source text is admitted
+beyond the pattern grammar RegExp construction already compiled.

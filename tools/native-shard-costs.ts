@@ -26,10 +26,25 @@
  * estimate using each file's 298/694 and 544/936 host ratios in the source
  * run. See U6 provenance.
  *
+ * RegExp pattern extensions now include a native generated domain.
+ * Its Linux entry uses a local extended three-registration case sum
+ * at `ef014905`. macOS uses the Linux number only as an unmeasured
+ * scheduling placeholder, not a measured host ratio. See U6 provenance.
+ *
+ * Computed-member-reference-key-order adds a Reference-order domain and
+ * fixed cases to the compound-assignment file. Its Linux entry uses a local
+ * extended whole-file case sum of seventeen registrations; macOS remains
+ * an unmeasured provisional estimate. See U6 provenance.
+ *
  * The two entries in `caseShardedNativeFiles` are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
  * not observe them here; they still weigh other wrapper invocations and
  * divide into the case-shard estimates below.
+ *
+ * Primitive wrapper objects reserves 900 seconds on each host as an
+ * unmeasured extended planning estimate. Its two local ordinary properties
+ * summed to 41.508 seconds on Linux; this is not an extended measurement.
+ * See U6 provenance before replacing either estimate with CI case sums.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -66,7 +81,9 @@ export const nativeShardCosts = {
     "tests/property/m5-catch-binding.property.test.ts": 163,
     "tests/property/m5-class-early-errors.property.test.ts": 56,
     "tests/property/m5-class.property.test.ts": 711,
-    "tests/property/m5-compound-assignment.property.test.ts": 577,
+    // Local Linux extended case sum: 1,229.239865193 s, rounded up.
+    // October 23, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-compound-assignment.property.test.ts": 1230,
     "tests/property/m5-cross-realm.property.test.ts": 186,
     "tests/property/m5-data-view.property.test.ts": 523,
     "tests/property/m5-date-family.property.test.ts": 609,
@@ -92,7 +109,9 @@ export const nativeShardCosts = {
     "tests/property/m5-generator.property.test.ts": 444,
     "tests/property/m5-generic-string-coercion.property.test.ts": 282,
     "tests/property/m5-global-numeric-functions.property.test.ts": 667,
-    "tests/property/m5-global-object-record.property.test.ts": 343,
+    // Local Linux extended case sum: 812.733362007 s, rounded up.
+    // October 23, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-global-object-record.property.test.ts": 813,
     "tests/property/m5-globalthis-binding.property.test.ts": 2647,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 590,
     "tests/property/m5-harness-promise-helper.property.test.ts": 578,
@@ -132,13 +151,15 @@ export const nativeShardCosts = {
     "tests/property/m5-pattern-await.property.test.ts": 596,
     "tests/property/m5-promise-combine.property.test.ts": 1433,
     "tests/property/m5-promise-intrinsic.property.test.ts": 944,
+    // Unmeasured extended estimate; see U6 provenance.
+    "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 1559,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2299,
     "tests/property/m5-regexp-intrinsic.property.test.ts": 223,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 438,
     "tests/property/m5-regexp-matcher.property.test.ts": 8,
-    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 1,
+    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 44,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,
     "tests/property/m5-regexp-prototype-and-exec.property.test.ts": 409,
     "tests/property/m5-regexp-symbol-methods.property.test.ts": 977,
@@ -209,7 +230,9 @@ export const nativeShardCosts = {
     "tests/property/m5-catch-binding.property.test.ts": 197,
     "tests/property/m5-class-early-errors.property.test.ts": 45,
     "tests/property/m5-class.property.test.ts": 350,
-    "tests/property/m5-compound-assignment.property.test.ts": 390,
+    // Provisional estimate: ceil(1230 * 1242/1838), the ratio the earlier
+    // 390 used; not a macOS observation. Refresh from CI.
+    "tests/property/m5-compound-assignment.property.test.ts": 832,
     "tests/property/m5-cross-realm.property.test.ts": 221,
     "tests/property/m5-data-view.property.test.ts": 296,
     "tests/property/m5-date-family.property.test.ts": 423,
@@ -235,7 +258,9 @@ export const nativeShardCosts = {
     "tests/property/m5-generator.property.test.ts": 232,
     "tests/property/m5-generic-string-coercion.property.test.ts": 246,
     "tests/property/m5-global-numeric-functions.property.test.ts": 313,
-    "tests/property/m5-global-object-record.property.test.ts": 210,
+    // Historical-ratio model: ceil(813 * 210/343); not a macOS
+    // observation. Refresh from CI.
+    "tests/property/m5-global-object-record.property.test.ts": 498,
     "tests/property/m5-globalthis-binding.property.test.ts": 855,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 479,
     "tests/property/m5-harness-promise-helper.property.test.ts": 548,
@@ -275,13 +300,15 @@ export const nativeShardCosts = {
     "tests/property/m5-pattern-await.property.test.ts": 341,
     "tests/property/m5-promise-combine.property.test.ts": 631,
     "tests/property/m5-promise-intrinsic.property.test.ts": 669,
+    // Unmeasured extended estimate; see U6 provenance.
+    "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 441,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2283,
     "tests/property/m5-regexp-intrinsic.property.test.ts": 185,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 353,
     "tests/property/m5-regexp-matcher.property.test.ts": 4,
-    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 1,
+    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 44,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,
     "tests/property/m5-regexp-prototype-and-exec.property.test.ts": 429,
     "tests/property/m5-regexp-symbol-methods.property.test.ts": 481,

@@ -10,11 +10,18 @@ scope:
     converted or the right operand runs, and the key is converted once and
     reused by the write. Both measured V8 hosts convert the key again before
     the write; that discrepancy is recorded against fixed expected values."
-  - "Logical member assignment, super and global identifier references,
-    simple member assignment, and update expressions keep their earlier key
-    conversion order. A logical member write still converts its key twice
-    and converts it before a nullish base throws; that retained behavior is
-    not claimed as conforming."
+  - "Every other computed member Reference follows the same ECMA-262 2025
+    order: plain reads and method lookup, logical member assignment, simple
+    member assignment after its right operand, prefix and postfix update,
+    super[key] references, plain links inside an optional chain, and for-in
+    and for-of head member targets, and computed super array and object
+    destructuring targets check the base before converting the key
+    once, and a write reuses the converted key. A nullish base with a key
+    other than a primitive literal reports the assignment-target TypeError
+    message. Global identifier references keep their literal-name lowering.
+    Both measured V8 hosts convert a written key again and convert a super
+    key before a null home prototype throws; those discrepancies are
+    recorded against fixed expected values."
   - "A simple or logical assignment applies NamedEvaluation to an anonymous
     function, arrow, or class only when IsIdentifierRef of its target is
     true, as ECMA-262 2025 13.15.2 requires. A parenthesized identifier

@@ -244,7 +244,6 @@ test("keeps dynamic hashbang source behind the ADR 0016 boundary", () => {
   // reports the dynamic source boundary at the call site instead.
   for (const source of [
     "eval('#!\\n');",
-    "(0, eval)('#!\\n');",
     "Function('#!\\n', '');",
     "new Function('#!');",
   ]) {
@@ -256,4 +255,14 @@ test("keeps dynamic hashbang source behind the ADR 0016 boundary", () => {
     assert.equal(result.diagnostics.length, 1, source);
     assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
   }
+  // An indirect call of the %eval% value compiles; its String argument,
+  // hashbang included, meets the ADR 0016 boundary at run time instead,
+  // which tests/native.ts observes.
+  const indirect = compileSource(babelFrontend, {
+    source: "(0, eval)('#!\\n');",
+    sourceId: "file:///dynamic.js",
+  });
+  assert.deepEqual(indirect.diagnostics, []);
+  assert.ok(indirect.mir != null);
+  assert.match(printMir(indirect.mir), /constant "#!\\n"/u);
 });

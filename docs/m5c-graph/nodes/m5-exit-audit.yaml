@@ -13,6 +13,7 @@ dependencies:
   - class-duplicate-constructor-early-error
   - class-private-accessor-lookup-coverage-remediation
   - compound-member-assignment-key-order
+  - computed-member-reference-key-order
   - cross-realm-host
   - destructuring-binding-target-order
   - dynamic-import
@@ -67,6 +68,7 @@ dependencies:
   - observation-batch-31
   - observation-batch-32
   - parenthesized-assignment-function-name
+  - primitive-receiver-inherited-set
   - primitive-wrapper-objects
   - promise-feature-admission
   - proper-tail-calls
@@ -76,6 +78,7 @@ dependencies:
   - remediation-work-graph
   - resizable-array-buffer-harness
   - runtime-dynamic-source-classification
+  - script-module-declaration-early-error
   - test262-host-script-bindings
   - typed-array-construction-order
   - typed-array-feature-admission
@@ -83,6 +86,7 @@ dependencies:
   - typed-array-tolocalestring-arguments
   - unhandled-rejection-observation
   - well-known-intrinsics-harness
+  - with-optional-call-receiver
   - with-strict-assignment-fallback
 landed: false
 status: blocked

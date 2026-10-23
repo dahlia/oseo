@@ -195,4 +195,158 @@ with ({}) {
 }
 `,
   },
+  {
+    // The bare `eval` identifier reads, writes, and deletes the global
+    // object's %eval% property like any other configurable global, while
+    // declarations and `with` objects shadow it. No String reaches %eval%
+    // here, so every observation is defined without source evaluation.
+    globalScriptReference: true,
+    name: "eval-intrinsic-value",
+    nonStrictScript: true,
+    source: `
+const intrinsic = eval;
+const descriptor = Object.getOwnPropertyDescriptor(this, "eval");
+console.log(
+  "descriptor",
+  descriptor.value === eval,
+  descriptor.writable,
+  descriptor.enumerable,
+  descriptor.configurable,
+);
+console.log(
+  "value",
+  typeof eval,
+  eval === globalThis.eval,
+  eval.length,
+  eval.name,
+  eval.prototype === undefined,
+  Object.getPrototypeOf(eval) === Function.prototype,
+  Object.keys(eval).length,
+  eval.propertyIsEnumerable("length"),
+);
+const local = {};
+console.log(
+  "non-string",
+  intrinsic(42),
+  intrinsic() === undefined,
+  intrinsic.call(null, true),
+  (0, eval)(local) === local,
+  eval?.(7),
+);
+try {
+  new eval();
+} catch (error) {
+  console.log("construct", error instanceof TypeError);
+}
+function constructible(target) {
+  try {
+    Reflect.construct(function () {}, [], target);
+    return true;
+  } catch (error) {
+    return error.name;
+  }
+}
+console.log("constructible", constructible(eval), constructible(Object));
+const proxy = new Proxy(eval, {});
+console.log("proxy", proxy(), typeof proxy, constructible(proxy));
+try {
+  new proxy();
+} catch (error) {
+  console.log("proxy-construct", error.name);
+}
+console.log(
+  "callback-this",
+  [1].map(function () {
+    return this === eval;
+  }, eval)[0],
+  [eval].indexOf(eval),
+);
+try {
+  Promise.resolve.call(eval, 1);
+} catch (error) {
+  console.log("promise-context", error.name);
+}
+function parameter(eval) {
+  return eval;
+}
+function declared() {
+  var eval = "var";
+  return eval;
+}
+{
+  let eval = "lexical";
+  console.log("shadow", parameter(3), declared(), eval);
+}
+with ({ eval: 5 }) {
+  console.log("with-hit", eval);
+}
+with ({}) {
+  console.log("with-miss", eval === intrinsic, typeof eval, eval(9));
+}
+with ({ eval(value) { return value + 1; } }) {
+  console.log("with-call", eval(1));
+}
+// A tagged template is an ordinary call, never a direct eval, so
+// %eval% receives the template object and returns it unchanged.
+function site() {
+  return eval\`a\${1}b\`;
+}
+const tagged = site();
+console.log(
+  "tagged",
+  (eval\`x\`)[0],
+  ((eval)\`y\`)[0],
+  tagged.join(),
+  tagged.raw.join(),
+  Array.isArray(tagged),
+  Object.isFrozen(tagged),
+  site() === tagged,
+);
+with ({}) {
+  console.log("with-tagged", eval\`w\`[0]);
+}
+eval = 6;
+console.log("write", eval, this.eval, globalThis.eval === 6);
+eval = intrinsic;
+console.log("restore", eval === intrinsic, this.eval === intrinsic);
+console.log("delete", delete eval, typeof eval, "eval" in this);
+try {
+  eval;
+} catch (error) {
+  console.log("missing", error.name);
+}
+console.log(
+  "strict-missing",
+  (function () {
+    "use strict";
+    try {
+      return eval;
+    } catch (error) {
+      return error.name;
+    }
+  })(),
+);
+with ({}) {
+  try {
+    eval;
+  } catch (error) {
+    console.log("with-missing", error.name);
+  }
+}
+eval = intrinsic;
+const recreated = Object.getOwnPropertyDescriptor(this, "eval");
+console.log("recreated", recreated.value === intrinsic, recreated.enumerable);
+Object.defineProperty(this, "eval", { enumerable: false });
+/** @param {number} value */
+function hinted(value) {
+  return value + 1;
+}
+console.log("guard", hinted(4), hinted("miss"));
+const survivor = { value: eval };
+for (let index = 0; index < 32; index = index + 1) {
+  Object.defineProperty({}, "item", { value: { index } });
+}
+console.log("collection", survivor.value === intrinsic);
+`,
+  },
 ];

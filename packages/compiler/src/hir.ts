@@ -120,6 +120,8 @@ export interface HirGlobalRead extends LocatedSyntax {
 /** One resolved identifier read through active `with` environments. */
 export interface HirWithReference extends LocatedSyntax {
   readonly fallback: HirExpression;
+  /** Object Environment Record checks for the selected object. */
+  readonly globalReference: HirGlobalReference;
   readonly name: string;
   readonly objectBindingIds: readonly number[];
 }
@@ -467,6 +469,7 @@ export function intrinsicGlobalKind(
     name === "decodeURIComponent" ||
     name === "encodeURI" ||
     name === "encodeURIComponent" ||
+    name === "eval" ||
     name === "globalThis" ||
     name === "isFinite" ||
     name === "isNaN" ||

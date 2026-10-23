@@ -1,0 +1,36 @@
+version: 1
+id: primitive-receiver-inherited-set
+title: Preserve primitive receivers through inherited Set
+delivers: Repair the native primitive property store exposed by the strict
+  Number inherited-setter counterexample, following ECMA-262 2025 PutValue,
+  GetThisValue, ToObject, OrdinarySetWithOwnDescriptor and
+  OrdinaryCallBindThis. Use wrapper lookup semantics without replacing the
+  original primitive receiver. Invoke inherited callable setters and preserve
+  inherited Proxy Set dispatch; retain descriptor precedence, String
+  own-property restrictions, nullish failure, strict/sloppy Set failure
+  behavior and setter abrupt completion. Keep strict setter this primitive and
+  sloppy setter this boxing in the callee realm. Cover all five non-nullish
+  primitive kinds, string/symbol keys, caller and setter strictness
+  independently, setter absence, inherited data and missing properties,
+  prototype mutation, object controls and side-effect order. Preserve the
+  existing Reference key-order and conversion-storage repair,
+  primitive-wrapper admission scope, Annex B and dynamic-source boundaries.
+  Retain the original raw failures as minimized ordinary regressions. Follow
+  the full PLAN-M5 semantic evidence contract with independent structured
+  properties, stable shrinking/replay, both specialization policies, forced
+  collection with positive counters, rooted live values, structural evidence
+  and applicable native/sanitizer lanes. Preserve old domains, seeds, budgets,
+  case counts and timeouts. If a guard changes, prove a miss reaches the
+  compiled generic fallback; otherwise retain the applicable documented
+  omission and its named replacement evidence. Update the relevant normative
+  profile, evidence records and plan with actual results. Regenerate the
+  complete reviewed manifest and derived publication data after the runtime
+  change. No predicted pass, exclusion, retagging, path deletion or ownership
+  transfer is authorized. Exact included ordinary accessor-setter coverage
+  remains unknown; the native counterexample is sufficient to retain this
+  explicit semantic work.
+dependencies:
+  - computed-member-reference-key-order
+  - primitive-wrapper-objects
+landed: false
+status: ready

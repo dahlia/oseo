@@ -341,8 +341,6 @@ typedef struct {
     OseoRegExpClassEscape class_escape;
     uint32_t code_point;
     size_t capture;
-    size_t name_start;
-    size_t name_length;
     bool named;
     bool negated;
 } OseoRegExpEscapeResult;
@@ -1031,6 +1029,179 @@ static uint32_t read_code_point(OseoRegExpCompiler *compiler) {
         ((uint32_t)trail - 0xdc00u);
 }
 
+static bool name_hex_digits(
+    const OseoString *source,
+    size_t start,
+    size_t count,
+    uint32_t *value
+) {
+    if (start > source->length || count > source->length - start) {
+        return false;
+    }
+    uint32_t result = 0u;
+    for (size_t offset = 0u; offset < count; offset += 1u) {
+        uint32_t digit = 0u;
+        if (!hex_digit(source->units[start + offset], &digit)) return false;
+        result = result * 16u + digit;
+    }
+    *value = result;
+    return true;
+}
+
+/*
+ * Read one RegExpUnicodeEscapeSequence[+UnicodeMode] after its `\u`.
+ *
+ * A group name always uses the unicode form, whatever the flags say, so
+ * a braced code point is admitted and an escaped lead surrogate joins an
+ * escaped trail surrogate that follows it. Any other lead or trail
+ * surrogate stays a lone code point, which no identifier admits.
+ */
+static bool name_unicode_escape(
+    const OseoString *source,
+    size_t *index,
+    uint32_t *code_point
+) {
+    size_t cursor = *index;
+    if (cursor < source->length && source->units[cursor] == '{') {
+        cursor += 1u;
+        uint32_t value = 0u;
+        size_t digits = 0u;
+        while (cursor < source->length && source->units[cursor] != '}') {
+            uint32_t digit = 0u;
+            if (!hex_digit(source->units[cursor], &digit) ||
+                value > (0x10ffffu - digit) / 16u) {
+                return false;
+            }
+            value = value * 16u + digit;
+            digits += 1u;
+            cursor += 1u;
+        }
+        if (digits == 0u || cursor >= source->length) return false;
+        *index = cursor + 1u;
+        *code_point = value;
+        return true;
+    }
+    uint32_t value = 0u;
+    if (!name_hex_digits(source, cursor, 4u, &value)) return false;
+    cursor += 4u;
+    uint32_t trail = 0u;
+    if (value >= 0xd800u && value <= 0xdbffu &&
+        cursor + 1u < source->length &&
+        source->units[cursor] == '\\' &&
+        source->units[cursor + 1u] == 'u' &&
+        name_hex_digits(source, cursor + 2u, 4u, &trail) &&
+        trail >= 0xdc00u && trail <= 0xdfffu) {
+        value = 0x10000u + ((value - 0xd800u) << 10u) + (trail - 0xdc00u);
+        cursor += 6u;
+    }
+    *index = cursor;
+    *code_point = value;
+    return true;
+}
+
+bool oseo_internal_regexp_group_name(
+    const OseoString *source,
+    size_t start,
+    size_t *end,
+    uint16_t *units,
+    size_t *unit_count
+) {
+    size_t index = start;
+    size_t count = 0u;
+    while (index < source->length && source->units[index] != '>') {
+        uint32_t code_point = source->units[index];
+        if (code_point == '\\') {
+            index += 1u;
+            if (index >= source->length || source->units[index] != 'u') {
+                return false;
+            }
+            index += 1u;
+            if (!name_unicode_escape(source, &index, &code_point)) {
+                return false;
+            }
+        } else {
+            index += 1u;
+            /*
+             * RegExpIdentifierStart and RegExpIdentifierPart pair a
+             * written surrogate pair in every mode, not only under `u`.
+             */
+            if (code_point >= 0xd800u && code_point <= 0xdbffu &&
+                index < source->length &&
+                source->units[index] >= 0xdc00u &&
+                source->units[index] <= 0xdfffu) {
+                code_point = 0x10000u + ((code_point - 0xd800u) << 10u) +
+                    ((uint32_t)source->units[index] - 0xdc00u);
+                index += 1u;
+            }
+        }
+        bool admitted = code_point == '$' || code_point == '_' ||
+            (count == 0u
+                ? oseo_internal_unicode_id_start(code_point)
+                : (code_point == 0x200cu || code_point == 0x200du ||
+                    oseo_internal_unicode_id_continue(code_point)));
+        if (!admitted) return false;
+        if (code_point > 0xffffu) {
+            if (units != NULL) {
+                units[count] = (uint16_t)(
+                    0xd800u + ((code_point - 0x10000u) >> 10u)
+                );
+                units[count + 1u] = (uint16_t)(
+                    0xdc00u + ((code_point - 0x10000u) & 0x3ffu)
+                );
+            }
+            count += 2u;
+        } else {
+            if (units != NULL) units[count] = (uint16_t)code_point;
+            count += 1u;
+        }
+    }
+    if (count == 0u || index >= source->length) return false;
+    *end = index;
+    if (unit_count != NULL) *unit_count = count;
+    return true;
+}
+
+/*
+ * Append the decoded name that starts at `start` to `names`.
+ *
+ * Validation already accepted the name, so a failure here is only an
+ * allocation failure. The decoded name is what `groups` reports and what
+ * a named reference compares, so an escaped spelling and a written one
+ * name the same group.
+ */
+static bool push_group_name(
+    OseoRegExpCompiler *compiler,
+    size_t start,
+    size_t *end,
+    size_t *length
+) {
+    size_t count = 0u;
+    if (!oseo_internal_regexp_group_name(
+            compiler->source,
+            start,
+            end,
+            NULL,
+            &count
+        )) {
+        return false;
+    }
+    size_t offset = compiler->names.count;
+    for (size_t index = 0u; index < count; index += 1u) {
+        if (!unit_buffer_push(compiler->context, &compiler->names, 0u)) {
+            return false;
+        }
+    }
+    oseo_internal_regexp_group_name(
+        compiler->source,
+        start,
+        end,
+        &compiler->names.values[offset],
+        &count
+    );
+    *length = count;
+    return true;
+}
+
 /*
  * The first capture index one group name names.
  *
@@ -1096,22 +1267,13 @@ static bool collect_captures(OseoRegExpCompiler *compiler) {
         record->name_offset = 0u;
         record->name_length = 0u;
         if (named) {
-            size_t start = index + 3u;
-            size_t end = start;
-            while (end < source->length && source->units[end] != '>') {
-                end += 1u;
-            }
+            size_t end = 0u;
+            size_t length = 0u;
             record->name_offset = (uint32_t)compiler->names.count;
-            record->name_length = (uint32_t)(end - start);
-            for (size_t offset = start; offset < end; offset += 1u) {
-                if (!unit_buffer_push(
-                        compiler->context,
-                        &compiler->names,
-                        source->units[offset]
-                    )) {
-                    return false;
-                }
+            if (!push_group_name(compiler, index + 3u, &end, &length)) {
+                return false;
             }
+            record->name_length = (uint32_t)length;
             index = end;
         }
         assigned += 1u;
@@ -1129,8 +1291,6 @@ static bool parse_escape(
     result->class_escape = OSEO_REGEXP_CLASS_DIGIT;
     result->code_point = 0u;
     result->capture = 0u;
-    result->name_start = 0u;
-    result->name_length = 0u;
     result->named = false;
     result->negated = false;
     compiler->index += 1u;
@@ -1278,26 +1438,26 @@ static bool parse_escape(
         return true;
     }
     if (unit == 'k' && !in_class) {
-        compiler->index += 2u;
-        size_t start = compiler->index;
-        while (!at_end(compiler) &&
-               unit_at(compiler, compiler->index) != '>') {
-            compiler->index += 1u;
+        size_t end = 0u;
+        size_t length = 0u;
+        size_t mark = compiler->names.count;
+        if (!push_group_name(compiler, compiler->index + 2u, &end, &length)) {
+            compiler_fail(compiler, OSEO_REGEXP_ALLOCATION_FAILURE);
+            return false;
         }
         size_t capture = lookup_group(
             compiler,
-            &compiler->source->units[start],
-            compiler->index - start
+            &compiler->names.values[mark],
+            length
         );
-        compiler->index += 1u;
+        compiler->names.count = mark;
+        compiler->index = end + 1u;
         if (capture == SIZE_MAX) {
             compiler_fail(compiler, OSEO_REGEXP_INVALID);
             return false;
         }
         result->kind = OSEO_REGEXP_ESCAPE_BACKREFERENCE;
         result->capture = capture;
-        result->name_start = start;
-        result->name_length = compiler->index - start - 1u;
         result->named = true;
         return true;
     }
@@ -1752,13 +1912,15 @@ static void parse_atom(OseoRegExpCompiler *compiler, bool backward) {
                  capture += 1u) {
                 const OseoRegExpCapture *record =
                     &compiler->captures[capture - 1u];
+                const OseoRegExpCapture *first =
+                    &compiler->captures[escape.capture - 1u];
                 if (escape.named &&
                     (!record->named ||
-                     record->name_length != escape.name_length ||
+                     record->name_length != first->name_length ||
                      memcmp(
                          &compiler->names.values[record->name_offset],
-                         &compiler->source->units[escape.name_start],
-                         escape.name_length * sizeof(uint16_t)
+                         &compiler->names.values[first->name_offset],
+                         first->name_length * sizeof(uint16_t)
                      ) != 0)) {
                     continue;
                 }

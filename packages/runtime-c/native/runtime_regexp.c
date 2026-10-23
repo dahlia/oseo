@@ -20,8 +20,8 @@
 
 typedef struct {
     size_t declaration;
-    size_t name_start;
-    size_t name_end;
+    size_t name_offset;
+    size_t name_length;
     size_t next;
     size_t path;
 } OseoRegExpNamedCapture;
@@ -38,11 +38,18 @@ typedef struct {
     size_t *buckets;
     OseoRegExpNamedCapture *records;
     OseoRegExpAlternativeNode *paths;
+    /*
+     * Decoded names, in declaration order, followed by room for one
+     * decoded reference. A decoded name never outgrows its source text,
+     * so twice the pattern length bounds both.
+     */
+    uint16_t *names;
+    uint16_t *reference;
+    size_t name_count;
     size_t bucket_count;
     size_t count;
     size_t path_count;
     OseoRegExpValidation duplicate_status;
-    bool has_unicode_name;
 } OseoRegExpNamedCaptureRegistry;
 
 static bool regexp_ascii_alpha(uint16_t unit) {
@@ -58,14 +65,6 @@ static bool regexp_hex_digit(uint16_t unit) {
     return regexp_ascii_digit(unit) ||
         (unit >= 'A' && unit <= 'F') ||
         (unit >= 'a' && unit <= 'f');
-}
-
-static bool regexp_name_start(uint16_t unit) {
-    return regexp_ascii_alpha(unit) || unit == '_' || unit == '$';
-}
-
-static bool regexp_name_continue(uint16_t unit) {
-    return regexp_name_start(unit) || regexp_ascii_digit(unit);
 }
 
 static uint16_t regexp_flag_bit(uint16_t unit) {
@@ -100,85 +99,13 @@ static OseoRegExpValidation regexp_validate_flags(
     return OSEO_REGEXP_VALID;
 }
 
+/* Whether one RegExpIdentifierName starts at `start`, and where it ends. */
 static bool regexp_group_name(
     const OseoString *source,
     size_t start,
     size_t *end
 ) {
-    if (start >= source->length ||
-        !regexp_name_start(source->units[start])) {
-        return false;
-    }
-    size_t index = start + 1u;
-    while (index < source->length && source->units[index] != '>') {
-        if (!regexp_name_continue(source->units[index])) return false;
-        index += 1u;
-    }
-    if (index >= source->length) return false;
-    *end = index;
-    return true;
-}
-
-static bool regexp_group_name_needs_unicode(
-    const OseoString *source,
-    size_t start
-) {
-    bool found = false;
-    for (size_t index = start;
-         index < source->length && source->units[index] != '>';
-         index += 1u) {
-        if (source->units[index] > 0x7fu) {
-            found = true;
-            continue;
-        }
-        if (source->units[index] == '\\' &&
-            index + 1u < source->length &&
-            source->units[index + 1u] == 'u') {
-            if (index + 2u < source->length &&
-                source->units[index + 2u] == '{') {
-                size_t hc = index + 3u;
-                bool has_hex = false;
-                uint32_t cp = 0u;
-                while (hc < source->length &&
-                       source->units[hc] != '}') {
-                    uint16_t ch = source->units[hc];
-                    if (!regexp_hex_digit(ch)) {
-                        return false;
-                    }
-                    uint32_t dv = ch <= '9'
-                        ? (uint32_t)(ch - '0')
-                        : ch <= 'F'
-                          ? (uint32_t)(ch - 'A' + 10u)
-                          : (uint32_t)(ch - 'a' + 10u);
-                    if (cp >
-                        (UINT32_C(0x10ffff) - dv) /
-                            UINT32_C(16)) {
-                        return false;
-                    }
-                    cp = cp * UINT32_C(16) + dv;
-                    has_hex = true;
-                    hc += 1u;
-                }
-                if (!has_hex || hc >= source->length) {
-                    return false;
-                }
-                index = hc;
-                found = true;
-                continue;
-            }
-            if (index + 5u < source->length &&
-                regexp_hex_digit(source->units[index + 2u]) &&
-                regexp_hex_digit(source->units[index + 3u]) &&
-                regexp_hex_digit(source->units[index + 4u]) &&
-                regexp_hex_digit(source->units[index + 5u])) {
-                index += 5u;
-                found = true;
-                continue;
-            }
-            return false;
-        }
-    }
-    return found;
+    return oseo_internal_regexp_group_name(source, start, end, NULL, NULL);
 }
 
 static bool regexp_control_escape_point(
@@ -197,33 +124,23 @@ static bool regexp_control_escape_point(
     }
 }
 
-static size_t regexp_name_hash(
-    const OseoString *source,
-    size_t start,
-    size_t end
-) {
+static size_t regexp_name_hash(const uint16_t *units, size_t length) {
     size_t hash = (size_t)UINT32_C(2166136261);
-    for (size_t index = start; index < end; index += 1u) {
-        hash ^= (size_t)source->units[index];
+    for (size_t index = 0u; index < length; index += 1u) {
+        hash ^= (size_t)units[index];
         hash *= (size_t)UINT32_C(16777619);
     }
     return hash;
 }
 
 static bool regexp_name_equal(
-    const OseoString *source,
-    size_t first_start,
-    size_t first_end,
-    size_t second_start,
-    size_t second_end
+    const uint16_t *first,
+    size_t first_length,
+    const uint16_t *second,
+    size_t second_length
 ) {
-    size_t first_length = first_end - first_start;
-    return first_length == second_end - second_start &&
-        memcmp(
-            source->units + first_start,
-            source->units + second_start,
-            first_length * sizeof(uint16_t)
-        ) == 0;
+    return first_length == second_length &&
+        memcmp(first, second, first_length * sizeof(uint16_t)) == 0;
 }
 
 static bool regexp_named_captures_may_coexist(
@@ -255,11 +172,13 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
     registry->buckets = NULL;
     registry->records = NULL;
     registry->paths = NULL;
+    registry->names = NULL;
+    registry->reference = NULL;
+    registry->name_count = 0u;
     registry->bucket_count = 0u;
     registry->count = 0u;
     registry->path_count = 0u;
     registry->duplicate_status = OSEO_REGEXP_VALID;
-    registry->has_unicode_name = false;
 
     size_t named_count = 0u;
     size_t path_capacity = 1u;
@@ -292,12 +211,7 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
             continue;
         }
         size_t end = 0u;
-        if (!regexp_group_name(source, index + 3u, &end)) {
-            if (regexp_group_name_needs_unicode(source, index + 3u)) {
-                registry->has_unicode_name = true;
-            }
-            continue;
-        }
+        if (!regexp_group_name(source, index + 3u, &end)) continue;
         named_count += 1u;
         index = end;
     }
@@ -317,6 +231,10 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
         return OSEO_REGEXP_LIMIT;
     }
     bytes += path_capacity * sizeof(OseoRegExpAlternativeNode);
+    if (source->length > (SIZE_MAX - bytes) / (2u * sizeof(uint16_t))) {
+        return OSEO_REGEXP_LIMIT;
+    }
+    bytes += 2u * source->length * sizeof(uint16_t);
     registry->storage = oseo_internal_allocate_heap_bytes(context, bytes);
     if (registry->storage == NULL) {
         return OSEO_REGEXP_ALLOCATION_FAILURE;
@@ -328,6 +246,8 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
     registry->paths = (OseoRegExpAlternativeNode *)(
         registry->records + named_count
     );
+    registry->names = (uint16_t *)(registry->paths + path_capacity);
+    registry->reference = registry->names + source->length;
     registry->bucket_count = bucket_count;
     for (size_t index = 0u; index < bucket_count; index += 1u) {
         registry->buckets[index] = SIZE_MAX;
@@ -378,15 +298,24 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
         if (unit != '(') continue;
 
         size_t end = 0u;
+        size_t name_offset = registry->name_count;
+        size_t name_length = 0u;
         bool named = index + 3u < source->length &&
             source->units[index + 1u] == '?' &&
             source->units[index + 2u] == '<' &&
             source->units[index + 3u] != '=' &&
             source->units[index + 3u] != '!' &&
-            regexp_group_name(source, index + 3u, &end);
+            oseo_internal_regexp_group_name(
+                source,
+                index + 3u,
+                &end,
+                registry->names + name_offset,
+                &name_length
+            );
         if (named) {
-            size_t name_start = index + 3u;
-            size_t bucket = regexp_name_hash(source, name_start, end) &
+            const uint16_t *name = registry->names + name_offset;
+            registry->name_count += name_length;
+            size_t bucket = regexp_name_hash(name, name_length) &
                 (bucket_count - 1u);
             size_t previous_same = SIZE_MAX;
             for (size_t previous = registry->buckets[bucket];
@@ -395,11 +324,10 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
                 OseoRegExpNamedCapture *record =
                     &registry->records[previous];
                 if (regexp_name_equal(
-                        source,
-                        record->name_start,
-                        record->name_end,
-                        name_start,
-                        end
+                        registry->names + record->name_offset,
+                        record->name_length,
+                        name,
+                        name_length
                     )) {
                     previous_same = previous;
                     break;
@@ -421,8 +349,8 @@ static OseoRegExpValidation regexp_named_capture_registry_create(
             OseoRegExpNamedCapture *record =
                 &registry->records[registry->count];
             record->declaration = index;
-            record->name_start = name_start;
-            record->name_end = end;
+            record->name_offset = name_offset;
+            record->name_length = name_length;
             record->next = registry->buckets[bucket];
             record->path = current_path;
             registry->buckets[bucket] = registry->count;
@@ -487,25 +415,35 @@ static OseoRegExpValidation regexp_count_captures(
     return OSEO_REGEXP_VALID;
 }
 
+/* Whether the reference name starting at `name_start` names a group. */
 static bool regexp_named_capture_exists(
     const OseoRegExpNamedCaptureRegistry *registry,
     const OseoString *source,
-    size_t name_start,
-    size_t name_end
+    size_t name_start
 ) {
     if (registry->bucket_count == 0u) return false;
-    size_t bucket = regexp_name_hash(source, name_start, name_end) &
+    size_t end = 0u;
+    size_t length = 0u;
+    if (!oseo_internal_regexp_group_name(
+            source,
+            name_start,
+            &end,
+            registry->reference,
+            &length
+        )) {
+        return false;
+    }
+    size_t bucket = regexp_name_hash(registry->reference, length) &
         (registry->bucket_count - 1u);
     for (size_t index = registry->buckets[bucket];
          index != SIZE_MAX;
          index = registry->records[index].next) {
         const OseoRegExpNamedCapture *record = &registry->records[index];
         if (regexp_name_equal(
-                source,
-                record->name_start,
-                record->name_end,
-                name_start,
-                name_end
+                registry->names + record->name_offset,
+                record->name_length,
+                registry->reference,
+                length
             )) {
             return true;
         }
@@ -629,19 +567,14 @@ static OseoRegExpValidation regexp_escape(
         }
         size_t end = 0u;
         if (!regexp_group_name(source, cursor + 2u, &end)) {
-            return regexp_group_name_needs_unicode(source, cursor + 2u)
-                ? OSEO_REGEXP_UNSUPPORTED
-                : OSEO_REGEXP_INVALID;
+            return OSEO_REGEXP_INVALID;
         }
         if (!regexp_named_capture_exists(
                 named_captures,
                 source,
-                cursor + 2u,
-                end
+                cursor + 2u
             )) {
-            return named_captures->has_unicode_name
-                ? OSEO_REGEXP_UNSUPPORTED
-                : OSEO_REGEXP_INVALID;
+            return OSEO_REGEXP_INVALID;
         }
         *index = end;
         return OSEO_REGEXP_VALID;
@@ -1036,12 +969,6 @@ static OseoRegExpValidation regexp_validate_pattern(
                     } else {
                         size_t end = 0u;
                         if (!regexp_group_name(source, index + 3u, &end)) {
-                            if (regexp_group_name_needs_unicode(
-                                    source,
-                                    index + 3u
-                                )) {
-                                return OSEO_REGEXP_UNSUPPORTED;
-                            }
                             return OSEO_REGEXP_INVALID;
                         }
                         index = end;
@@ -1350,16 +1277,98 @@ static OseoResult regexp_allocate(
     return result;
 }
 
+/*
+ * The flags that decide how a pattern parses and what its program does.
+ * `d`, `g`, and `y` only steer RegExpBuiltinExec on the object that
+ * carries them, so no compiled program depends on them.
+ */
+#define OSEO_REGEXP_PARSE_FLAGS \
+    (OSEO_REGEXP_FLAG_I | OSEO_REGEXP_FLAG_M | OSEO_REGEXP_FLAG_S | \
+     OSEO_REGEXP_FLAG_U | OSEO_REGEXP_FLAG_V)
+
+/*
+ * Whether a new matcher can borrow the program of `origin`.
+ *
+ * RegExpInitialize parses [[OriginalSource]] again, but parsing the same
+ * text under the same parse flags reaches the same early errors and the
+ * same matcher. Only a program the build compiled ahead of time is
+ * borrowed: it is immutable generated data that outlives every artifact,
+ * while a dynamic program belongs to the one artifact that compiled it.
+ */
+static bool regexp_matcher_reusable(
+    OseoValue origin,
+    OseoValue source,
+    uint16_t flag_mask
+) {
+    if (tag_of(origin) == OSEO_TAG_UNDEFINED) return false;
+    const OseoRegExpMatcher *matcher = regexp_matcher_object(origin);
+    return !matcher->owns_program && matcher->source == source &&
+        ((matcher->flag_mask ^ flag_mask) & OSEO_REGEXP_PARSE_FLAGS) == 0u;
+}
+
+/* A fresh artifact over the static program `origin` borrows. */
+static OseoResult regexp_matcher_borrow(
+    OseoContext *context,
+    OseoValue origin,
+    OseoValue source,
+    OseoValue flags,
+    uint16_t flag_mask
+) {
+    OseoValue slots[3] = {origin, source, flags};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoRegExpMatcher *matcher = oseo_internal_allocate_heap_bytes(
+        context,
+        sizeof(*matcher)
+    );
+    OseoResult result;
+    if (matcher == NULL) {
+        result = failure(
+            context,
+            "OSEO2001",
+            "RegExp matcher allocation failed."
+        );
+    } else {
+        const OseoRegExpMatcher *borrowed =
+            regexp_matcher_object(slots[0]);
+        matcher->source = slots[1];
+        matcher->flags = slots[2];
+        matcher->program = borrowed->program;
+        matcher->capture_count = borrowed->capture_count;
+        matcher->instruction_count = borrowed->instruction_count;
+        matcher->flag_mask = flag_mask;
+        matcher->owns_program = false;
+        result = oseo_internal_publish_heap(
+            context,
+            &matcher->header,
+            OSEO_HEAP_REGEXP_MATCHER
+        );
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
+}
+
 static OseoResult regexp_matcher_create(
     OseoContext *context,
     OseoValue source,
-    OseoValue flags
+    OseoValue flags,
+    OseoValue origin
 ) {
     uint16_t flag_mask = 0u;
     OseoRegExpValidation status = regexp_validate_flags(
         string_object(flags),
         &flag_mask
     );
+    if (status == OSEO_REGEXP_VALID &&
+        regexp_matcher_reusable(origin, source, flag_mask)) {
+        return regexp_matcher_borrow(
+            context,
+            origin,
+            source,
+            flags,
+            flag_mask
+        );
+    }
     if (status == OSEO_REGEXP_VALID &&
         string_object(source)->length > OSEO_REGEXP_PATTERN_LENGTH_LIMIT) {
         status = OSEO_REGEXP_LIMIT;
@@ -1372,15 +1381,17 @@ static OseoResult regexp_matcher_create(
         );
     }
     OseoRegExpNamedCaptureRegistry named_captures = {
-        NULL,
-        NULL,
-        NULL,
-        NULL,
-        0u,
-        0u,
-        0u,
-        OSEO_REGEXP_VALID,
-        false,
+        .storage = NULL,
+        .buckets = NULL,
+        .records = NULL,
+        .paths = NULL,
+        .names = NULL,
+        .reference = NULL,
+        .name_count = 0u,
+        .bucket_count = 0u,
+        .count = 0u,
+        .path_count = 0u,
+        .duplicate_status = OSEO_REGEXP_VALID,
     };
     if (status == OSEO_REGEXP_VALID) {
         status = regexp_named_capture_registry_create(
@@ -1455,21 +1466,27 @@ static OseoResult regexp_matcher_create(
     return result;
 }
 
-/* RegExpInitialize converts only after RegExpAlloc has completed. */
+/*
+ * RegExpInitialize converts only after RegExpAlloc has completed.
+ * `origin` is the matcher of the RegExp a pattern was copied from, or
+ * undefined, and only lets an equal parse borrow its program.
+ */
 static OseoResult regexp_initialize(
     OseoContext *context,
     OseoValue regexp,
     OseoValue pattern,
-    OseoValue flags
+    OseoValue flags,
+    OseoValue origin
 ) {
-    OseoValue slots[5] = {
+    OseoValue slots[6] = {
         regexp,
         pattern,
         flags,
         oseo_undefined(),
         oseo_undefined(),
+        origin,
     };
-    OseoRootFrame frame = {NULL, slots, 5u};
+    OseoRootFrame frame = {NULL, slots, 6u};
     oseo_roots_push(context, &frame);
     OseoResult result = tag_of(frame.slots[1]) == OSEO_TAG_UNDEFINED
         ? oseo_internal_ascii_string(context, "")
@@ -1485,7 +1502,8 @@ static OseoResult regexp_initialize(
         result = regexp_matcher_create(
             context,
             frame.slots[3],
-            frame.slots[4]
+            frame.slots[4],
+            frame.slots[5]
         );
         frame.slots[3] = result.value;
     }
@@ -1519,7 +1537,8 @@ OseoResult oseo_internal_regexp_create(
             context,
             slots[2],
             slots[0],
-            slots[1]
+            slots[1],
+            oseo_undefined()
         );
     }
     oseo_roots_pop(context, &frame);
@@ -1764,15 +1783,16 @@ static OseoResult regexp_construct(
     OseoValue flags = argument_count < 2u
         ? oseo_undefined()
         : arguments[1];
-    OseoValue slots[6] = {
+    OseoValue slots[7] = {
         callee,
         new_target,
         pattern,
         flags,
         oseo_undefined(),
         oseo_undefined(),
+        oseo_undefined(),
     };
-    OseoRootFrame frame = {NULL, slots, 6u};
+    OseoRootFrame frame = {NULL, slots, 7u};
     oseo_roots_push(context, &frame);
     bool called = tag_of(frame.slots[1]) == OSEO_TAG_UNDEFINED;
     if (called) frame.slots[1] = frame.slots[0];
@@ -1801,6 +1821,7 @@ static OseoResult regexp_construct(
     frame.slots[4] = frame.slots[2];
     if (result.status == OSEO_STATUS_NORMAL && is_regexp(frame.slots[2])) {
         OseoValue matcher = regexp_object(frame.slots[2])->matcher;
+        frame.slots[6] = matcher;
         frame.slots[4] = regexp_matcher_object(matcher)->source;
         if (tag_of(frame.slots[3]) == OSEO_TAG_UNDEFINED) {
             frame.slots[3] = regexp_matcher_object(matcher)->flags;
@@ -1832,7 +1853,8 @@ static OseoResult regexp_construct(
             context,
             frame.slots[5],
             frame.slots[4],
-            frame.slots[3]
+            frame.slots[3],
+            frame.slots[6]
         );
     }
     oseo_roots_pop(context, &frame);

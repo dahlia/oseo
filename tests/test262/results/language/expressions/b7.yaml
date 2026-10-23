@@ -862,13 +862,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/elements/nested-indirect-eval-\
-        contains-arguments.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/nested-indire\
-        ct-eval-contains-arguments.js:93:17: error[OSEO1001]: Unknown
-        binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/elements/nested-indirect-eval-contains-arguments.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/nested-indirect-eval-contains-arguments.js:93:13:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

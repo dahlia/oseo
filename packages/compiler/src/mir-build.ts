@@ -737,6 +737,41 @@ function lowerObjectCoercible(
   return recordRoot(builder, id, range);
 }
 
+/**
+ * A key expression whose value is a primitive fixed by the source, so
+ * ToPropertyKey of it can run no user code and cannot throw.
+ */
+function isPrimitiveLiteralKey(expression: HirExpression): boolean {
+  return (
+    expression.kind === "string" ||
+    expression.kind === "number" ||
+    expression.kind === "bigint" ||
+    expression.kind === "boolean" ||
+    expression.kind === "null" ||
+    expression.kind === "undefined"
+  );
+}
+
+/**
+ * GetValue and PutValue (ECMA-262 2025 6.2.5.5 and 6.2.5.6, step 3.a)
+ * apply ToObject to a property Reference's base before ToPropertyKey
+ * converts its stored name, so a nullish base throws `TypeError` before
+ * a key object's conversion hooks run. The assignment-target check keeps
+ * a primitive base as the receiver, which ToObject's wrapper would only
+ * forward to. A primitive literal key converts unobservably and the
+ * property operation that follows throws the same `TypeError`, so that
+ * reference keeps its earlier lowering and diagnostic.
+ */
+function lowerReferenceBase(
+  object: number,
+  keyExpression: HirExpression,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  if (isPrimitiveLiteralKey(keyExpression)) return object;
+  return lowerObjectCoercible(object, range, builder);
+}
+
 /** Reject a nullish property-delete base before converting its key. */
 function lowerDeleteObjectCoercible(
   input: number,
@@ -1266,6 +1301,13 @@ function lowerWithReference(
   };
 }
 
+/**
+ * GetValue of an identifier read through active `with` environments. A
+ * selected object performs GetBindingValue's own HasProperty before the
+ * Get, so a binding gone since HasBinding reads `undefined` or throws in
+ * strict code. A call keeps the selected object as its receiver either
+ * way, since WithBaseObject does not depend on the property.
+ */
 function lowerWithRead(
   reference: HirWithReference,
   builder: MirBuilder,
@@ -1287,9 +1329,10 @@ function lowerWithRead(
     whenTrue: propertyBlock.id,
   };
   builder.current = propertyBlock;
-  const propertyValue = lowerPropertyRead(
+  const propertyValue = lowerGlobalBindingValue(
     selected.object,
     selected.key,
+    reference.globalReference,
     reference.range,
     builder,
   );
@@ -1700,7 +1743,8 @@ function isLogicalAssignmentOperator(
  * stores the converted key in the Reference that PutValue then reuses.
  * The key is therefore converted exactly once, after the base check and
  * before the right operand. `super`, global identifier, and logical
- * assignment references keep their own lowering.
+ * assignment references share the general property-update lowering,
+ * which follows the same order for every non-global reference.
  */
 function lowerArithmeticPropertyUpdate(
   objectInput: number,
@@ -3601,7 +3645,12 @@ function lowerOptionalChain(
           );
         } else {
           const keyInput = lowerExpression(link.key, builder);
-          const lookup = lowerSuperBase(pendingSuper, builder);
+          const lookup = lowerReferenceBase(
+            lowerSuperBase(pendingSuper, builder),
+            link.key,
+            link.range,
+            builder,
+          );
           const key = convertPropertyKey(keyInput, link.key.range, builder);
           value = lowerPropertyRead(lookup, key, link.range, builder, receiver);
         }
@@ -3629,8 +3678,14 @@ function lowerOptionalChain(
         );
       } else {
         const keyInput = lowerExpression(link.key, builder);
+        // An optional link's nullish guard already short-circuited, so
+        // only a plain link inside the chain checks its base before the
+        // key is converted.
+        const object = link.optional
+          ? receiver
+          : lowerReferenceBase(receiver, link.key, link.range, builder);
         const key = convertPropertyKey(keyInput, link.key.range, builder);
-        value = lowerPropertyRead(receiver, key, link.range, builder);
+        value = lowerPropertyRead(object, key, link.range, builder);
       }
       continue;
     }
@@ -4730,7 +4785,12 @@ function lowerExpression(
             expression.object.range,
             builder,
           )
-        : reference.object;
+        : lowerReferenceBase(
+            reference.object,
+            expression.key,
+            expression.object.range,
+            builder,
+          );
     const key = convertPropertyKey(
       reference.keyInput,
       expression.key.range,
@@ -4776,7 +4836,7 @@ function lowerExpression(
     const operand = superOperand(expression.object);
     const superReceiver =
       operand == null ? undefined : lowerSuperReceiver(operand, builder);
-    const { keyInput, object } = lowerReferenceObject(
+    const { keyInput, object: referenceObject } = lowerReferenceObject(
       expression.object,
       expression.key,
       operand,
@@ -4787,15 +4847,22 @@ function lowerExpression(
     const resolved =
       expression.globalReference == null
         ? undefined
-        : lowerBinaryValues(keyInput, "in", object, expression.range, builder);
-    // PutValue converts the key, so an assignment holds the key
-    // expression's raw value until the right side has been evaluated.
+        : lowerBinaryValues(
+            keyInput,
+            "in",
+            referenceObject,
+            expression.range,
+            builder,
+          );
+    // PutValue checks the base and then converts the key, so an
+    // assignment holds the key expression's raw value until the right
+    // side has been evaluated.
     const value = lowerExpression(expression.value, builder);
-    const key = convertPropertyKey(keyInput, expression.key.range, builder);
     if (expression.globalReference != null) {
+      const key = convertPropertyKey(keyInput, expression.key.range, builder);
       return lowerGlobalReferenceWrite(
         resolved,
-        object,
+        referenceObject,
         key,
         value,
         expression.globalReference,
@@ -4803,6 +4870,13 @@ function lowerExpression(
         builder,
       );
     }
+    const object = lowerReferenceBase(
+      referenceObject,
+      expression.key,
+      expression.object.range,
+      builder,
+    );
+    const key = convertPropertyKey(keyInput, expression.key.range, builder);
     appendMirMetadata(
       builder,
       "safepoint",
@@ -4842,7 +4916,7 @@ function lowerExpression(
     const operand = superOperand(expression.object);
     const superReceiver =
       operand == null ? undefined : lowerSuperReceiver(operand, builder);
-    const { keyInput, object } = lowerReferenceObject(
+    const { keyInput, object: referenceObject } = lowerReferenceObject(
       expression.object,
       expression.key,
       operand,
@@ -4857,12 +4931,25 @@ function lowerExpression(
       !isLogicalAssignmentOperator(expression.operator)
     ) {
       return lowerArithmeticPropertyUpdate(
-        object,
+        referenceObject,
         keyInput,
         expression,
         builder,
       );
     }
+    // GetValue checks the base before it converts the key and stores the
+    // result in the Reference, so a logical or `super` member write that
+    // runs reuses that key. A global identifier's key is its literal name,
+    // whose separate read and write conversions cannot be observed.
+    const object =
+      globalReference == null
+        ? lowerReferenceBase(
+            referenceObject,
+            expression.key,
+            expression.object.range,
+            builder,
+          )
+        : referenceObject;
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
     const current =
       globalReference == null
@@ -4885,11 +4972,10 @@ function lowerExpression(
       expression.operator,
       expression.value,
       (value) => {
-        const writeKey = convertPropertyKey(
-          keyInput,
-          expression.key.range,
-          builder,
-        );
+        const writeKey =
+          globalReference == null
+            ? readKey
+            : convertPropertyKey(keyInput, expression.key.range, builder);
         return globalReference != null
           ? lowerGlobalReferenceWrite(
               undefined,
@@ -4926,13 +5012,19 @@ function lowerExpression(
     // A global identifier reaches here only after ResolveBinding found
     // it, so its read is GetBindingValue and its write SetMutableBinding.
     const globalReference = expression.globalReference;
-    // A `super` operand is the home object's prototype, which needs no
-    // RequireObjectCoercible: a nullish one reports its own TypeError
-    // from the read that follows, as the specified GetValue does.
+    // GetValue checks the base before it converts the key and stores the
+    // result in the Reference, which PutValue then reuses. A `super`
+    // operand's base is the home object's prototype, which GetValue
+    // checks the same way before a computed key is converted.
     const object =
       operand == null
         ? lowerObjectCoercible(objectInput, expression.object.range, builder)
-        : objectInput;
+        : lowerReferenceBase(
+            objectInput,
+            expression.key,
+            expression.object.range,
+            builder,
+          );
     const readKey = convertPropertyKey(keyInput, expression.key.range, builder);
     const current =
       globalReference == null
@@ -4955,11 +5047,10 @@ function lowerExpression(
       expression.operator,
       expression.prefix,
       (value) => {
-        const writeKey = convertPropertyKey(
-          keyInput,
-          expression.key.range,
-          builder,
-        );
+        const writeKey =
+          globalReference == null
+            ? readKey
+            : convertPropertyKey(keyInput, expression.key.range, builder);
         return globalReference != null
           ? lowerGlobalReferenceWrite(
               undefined,
@@ -5234,6 +5325,14 @@ function lowerExpression(
         keyInput = lowerExpression(expression.target.key, builder);
         lookup = lowerSuperBase(operand, builder);
       }
+      // The callee's GetValue checks the lookup base before converting
+      // the key; the call still receives the unchanged receiver.
+      lookup = lowerReferenceBase(
+        lookup,
+        expression.target.key,
+        expression.target.object.range,
+        builder,
+      );
       const key = convertPropertyKey(
         keyInput,
         expression.target.key.range,
@@ -5825,21 +5924,24 @@ function lowerForHeadTarget(
   const operand = superOperand(target.object);
   const superReceiver =
     operand == null ? undefined : lowerSuperReceiver(operand, builder);
-  const { keyInput, object } = lowerReferenceObject(
+  const { keyInput, object: referenceObject } = lowerReferenceObject(
     target.object,
     target.key,
     operand,
     builder,
   );
-  const resolved =
-    target.globalReference == null
-      ? undefined
-      : lowerBinaryValues(keyInput, "in", object, target.range, builder);
-  const key = convertPropertyKey(keyInput, target.key.range, builder);
   if (target.globalReference != null) {
+    const resolved = lowerBinaryValues(
+      keyInput,
+      "in",
+      referenceObject,
+      target.range,
+      builder,
+    );
+    const key = convertPropertyKey(keyInput, target.key.range, builder);
     lowerGlobalReferenceWrite(
       resolved,
-      object,
+      referenceObject,
       key,
       value,
       target.globalReference,
@@ -5848,6 +5950,15 @@ function lowerForHeadTarget(
     );
     return;
   }
+  // PutValue checks the base before it converts the key; an abrupt check
+  // is an abrupt head step like the conversion that follows it.
+  const object = lowerReferenceBase(
+    referenceObject,
+    target.key,
+    target.object.range,
+    builder,
+  );
+  const key = convertPropertyKey(keyInput, target.key.range, builder);
   appendMirMetadata(
     builder,
     "safepoint",
@@ -6335,14 +6446,18 @@ function lowerBindingTarget(
     }
     const prepared = reference;
     const superReceiver = prepared.superReceiver;
-    // A `super` reference starts at the home object's prototype, which
-    // PutValue hands to ToObject itself, so a nullish one reports the
-    // TypeError the store raises instead of a separate
-    // RequireObjectCoercible.
+    // A `super` reference starts at the home object's prototype. PutValue
+    // checks it before converting a computed key, while a literal key
+    // leaves the nullish TypeError to the store that follows.
     const object =
       superReceiver == null
         ? lowerObjectCoercible(prepared.object, pattern.object.range, builder)
-        : prepared.object;
+        : lowerReferenceBase(
+            prepared.object,
+            pattern.key,
+            pattern.object.range,
+            builder,
+          );
     const key = convertPropertyKey(prepared.key, pattern.key.range, builder);
     if (prepared.globalReference != null) {
       lowerGlobalReferenceWrite(

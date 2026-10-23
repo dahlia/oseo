@@ -78,6 +78,15 @@ function numericInput(testCase: UpdateCase): number {
   return testCase.input;
 }
 
+/** How `console.log` prints the unmodified input value. */
+function printedInput(testCase: UpdateCase): string {
+  if (testCase.inputKind === "boolean") {
+    return testCase.input % 2 === 0 ? "false" : "true";
+  }
+  if (testCase.inputKind === "null") return "null";
+  return String(testCase.input);
+}
+
 function expected(testCase: UpdateCase): UpdateModel {
   const previous = numericInput(testCase);
   const stored = previous + (testCase.operator === "++" ? 1 : -1);
@@ -130,6 +139,7 @@ console.log(
   "values",
   result,
   ${stored},
+  holder.first,
   objectCount,
   keyCount,
   conversionCount,
@@ -205,19 +215,50 @@ test(
         const modeled = expected(testCase);
         const member = testCase.targetKind !== "binding";
         const nullish = testCase.targetKind === "nullish-member";
-        const expectedObservation = {
+        const written = member && !nullish;
+        const input = printedInput(testCase);
+        // ECMA-262 2025 GetValue converts the key once and stores it in the
+        // Reference, so a member update reads and writes "first" and
+        // "second" keeps 100. Before computed-member-reference-key-order,
+        // native code converted the key again for the write, as both
+        // measured V8 hosts still do: that second conversion selects
+        // "second", which this model then expected for every host.
+        const observed = (conversions: number, writesSecond: boolean) => ({
           exitStatus: 0,
           stderr: "",
           stdout:
             `values ${nullish ? "true" : modeled.result} ` +
-            `${nullish ? 100 : modeled.stored} ` +
+            `${
+              testCase.targetKind === "binding" || (written && writesSecond)
+                ? modeled.stored
+                : 100
+            } ` +
+            `${written && !writesSecond ? modeled.stored : input} ` +
             `${member ? 1 : 0} ${member ? 1 : 0} ` +
-            `${nullish || !member ? 0 : 2}\n`,
-        };
+            `${written ? conversions : 0}\n`,
+        });
+        const expectedObservation = observed(1, false);
+        const referenceObservation = observed(2, true);
+        const referenceObservations = await references(source);
         assertMatchingObservations([
-          expectedObservation,
-          ...(await references(source)),
+          referenceObservation,
+          ...referenceObservations,
         ]);
+        if (written) {
+          for (const [index, actual] of referenceObservations.entries()) {
+            process.stdout.write(
+              JSON.stringify({
+                actual,
+                discrepancy:
+                  "V8 converts a member update key again before PutValue",
+                expected: expectedObservation,
+                host: index === 0 ? "Node.js" : "Deno",
+                kind: "reference-discrepancy-evidence",
+                testCase,
+              }) + "\n",
+            );
+          }
+        }
         for (const specialization of ["disabled", "enabled"] as const) {
           const compiled = compileSource(
             babelFrontend,

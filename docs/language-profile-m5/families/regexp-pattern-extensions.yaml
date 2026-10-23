@@ -25,6 +25,16 @@ scope:
     boundary for Unicode property escapes and class sets because the C
     runtime does not link those tables. Dynamic modifier groups need no
     Unicode table and are admitted."
+  - "The C runtime links the pinned ID_Start and ID_Continue tables, so a
+    dynamically constructed pattern decodes and classifies its group names
+    exactly as a literal does: escaped, braced, and written spellings name
+    the same group in duplicate checks, named references, and `groups`
+    keys, and any other name is a SyntaxError. Constructing a RegExp from a
+    branded RegExp whose program the build compiled ahead of time borrows
+    that immutable program when the parse flags `i`, `m`, `s`, `u`, and
+    `v` agree, which is what species construction in `@@matchAll` and
+    `@@split` reaches. Any other copy still parses its source dynamically
+    and keeps the located boundary."
   - "The generic matcher remains the semantic authority. Both native
     specialization policies execute the same generated matcher artifact,
     and a failed property-call shape guard reaches the ordinary generic
@@ -79,5 +89,7 @@ evidence:
     references:
       - packages/compiler/src/regexp-parse.ts
       - packages/compiler/src/regexp-matcher.ts
+      - packages/runtime-c/native/runtime_regexp.c
       - packages/runtime-c/native/runtime_regexp_matcher.c
+      - packages/runtime-c/native/runtime_unicode_tables.h
       - packages/unicode/src/tables.ts

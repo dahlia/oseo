@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 258 reviewed unsupported paths assigned to
+delivers: "Resolves the 265 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure ledger.
   Select exactly those owners and their exclusion-audit path assessments:
   the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
@@ -51,6 +51,24 @@ delivers: "Resolves the 258 reviewed unsupported paths assigned to
   comment code unit probes; and
   test/language/comments/mongolian-vowel-separator-single-eval.js, a U+180E
   comment probe.
+  The complete UPDATE on clean source 6e54c5d5, recorded in f2c30668,
+  adds seven observation-batch-11 paths formerly owned by
+  eval-intrinsic-value under test/language/expressions/class/:
+  private-getter-brand-check-multiple-evaluations-of-class-eval-indirect.js,
+  private-method-brand-check-multiple-evaluations-of-class-eval-indirect.js,
+  private-setter-brand-check-multiple-evaluations-of-class-eval-indirect.js,
+  private-static-field-multiple-evaluations-of-class-eval-indirect.js,
+  private-static-getter-multiple-evaluations-of-class-eval-indirect.js,
+  private-static-method-brand-check-\
+  multiple-evaluations-of-class-eval-indirect.js, and
+  private-static-setter-multiple-evaluations-of-class-eval-indirect.js.
+  Each passes the eval value to a helper that calls it on a class source
+  string to create distinct classes. The observed run-time OSEO1001
+  source-compilation rejection precedes their private name and brand
+  assertions. These non-source subjects remain inside the claim under the
+  existing fixture-construction assessment, not a whole-path exclusion.
+  The dynamic-source dependency tag grants no exclusion, and ADR 0016's
+  boundary and reopening triggers remain unchanged.
   Their eval or source constructor rejection is authorized, but non-source
   subject coverage remains unresolved.
   The 3 paths from well-known-intrinsics-harness assert AsyncFunction,

@@ -381,7 +381,7 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 44);
+  assert.ok(summary.landed >= 48);
   assert.equal(summary.parked, 0);
 });
 
@@ -559,4 +559,73 @@ test("batch11 prerequisites retain their three-path contracts", () => {
   assert.ok(exitDependencies.includes(coverageId));
   assert.ok(exitDependencies.includes(earlyErrorId));
   // The existing pair audit includes all three publishers without exemption.
+});
+
+test("the with optional-call receiver defect stays on the exit path", () => {
+  validateCurrentM5cWorkGraph();
+  const readNode = (id: string): NodeContract =>
+    // SAFETY: graph validation checked each parsed node's shape.
+    parseYaml(
+      readFileSync(
+        new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
+        "utf8",
+      ),
+    ) as NodeContract;
+  const remediationId = "with-optional-call-receiver";
+  const remediation = readNode(remediationId);
+  // GetBindingValue order comes from eval-intrinsic-value, and strict
+  // tail-position optional calls run under proper-tail-calls.
+  const prerequisites = ["eval-intrinsic-value", "proper-tail-calls"].map(
+    readNode,
+  );
+  assert.deepEqual(
+    remediation.dependencies,
+    prerequisites.map((node) => node.id),
+  );
+  assert.equal(
+    remediation.status,
+    prerequisites.every((node) => node.landed) ? "ready" : "blocked",
+  );
+  assert.match(remediation.delivers, /strict tail-position optional calls/u);
+  assert.match(
+    remediation.delivers,
+    /docs\/m5c-graph\/with-optional-call-receiver\.md/u,
+  );
+  assert.match(remediation.delivers, /owns no\s+manifest path/u);
+  assert.match(remediation.delivers, /not an eval source\s+evaluation/u);
+  assert.match(remediation.delivers, /or an exclusion/u);
+  assert.ok(readNode("m5-exit-audit").dependencies.includes(remediationId));
+});
+
+test("computed member key order owns its Reference contract", () => {
+  validateCurrentM5cWorkGraph();
+  const readNode = (id: string): Batch11PrerequisiteNode =>
+    // SAFETY: graph validation checked each parsed node's shape.
+    parseYaml(
+      readFileSync(
+        new URL(`../${m5cWorkGraphNodeDirectory}/${id}.yaml`, import.meta.url),
+        "utf8",
+      ),
+    ) as Batch11PrerequisiteNode;
+  const ownerId = "computed-member-reference-key-order";
+  const compoundId = "compound-member-assignment-key-order";
+  const owner = readNode(ownerId);
+  const compound = readNode(compoundId);
+  assert.deepEqual(owner.dependencies, [compoundId]);
+  assert.equal(owner.status, compound.landed ? "ready" : "blocked");
+  assert.match(owner.delivers, /one semantic unit/u);
+  assert.match(owner.delivers, /docs\/m5c-graph\/computed-member-reference/u);
+  assert.match(owner.delivers, /Claim\s+no test262 pass in advance/u);
+  // The owner never selects upstream paths; each batch admits its own.
+  assert.deepEqual(deliveredPaths(owner), []);
+  for (const batchId of [
+    "observation-batch-08",
+    "observation-batch-14",
+    "observation-batch-16",
+  ]) {
+    const batch = readNode(batchId);
+    assert.ok(batch.dependencies.includes(ownerId), batchId);
+    if (!owner.landed) assert.equal(batch.status, "blocked", batchId);
+  }
+  assert.ok(readNode("m5-exit-audit").dependencies.includes(ownerId));
 });

@@ -553,14 +553,7 @@ static OseoResult global_this_object(OseoContext *context) {
 
 OseoResult oseo_this_value(OseoContext *context, OseoValue receiver) {
     if (is_nullish(receiver)) return global_this_object(context);
-    if (!is_object(receiver)) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Primitive wrapper objects are not admitted yet."
-        );
-    }
-    return normal(receiver);
+    return oseo_internal_to_object(context, receiver);
 }
 
 OseoResult oseo_global_object_create(
