@@ -3,9 +3,10 @@ id: update-expressions
 title: "Update expressions"
 scope:
   - "Prefix and postfix increment and decrement on references."
-  - "A computed member target converts an object key separately for the read
-    and the write. That retained behavior is not claimed as conforming; the
-    unlanded M5c node computed-member-reference-key-order owns its repair."
+  - "A computed member target checks its base, converts the key once, and
+    writes through the key it read, following ECMA-262 2025 GetValue and
+    PutValue. Both measured V8 hosts convert the key again before the write;
+    that discrepancy is recorded against fixed expected values."
 owners:
   - PLAN-M5.md
 evidence:

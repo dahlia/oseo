@@ -26,6 +26,11 @@
  * estimate using each file's 298/694 and 544/936 host ratios in the source
  * run. See U6 provenance.
  *
+ * Computed-member-reference-key-order adds a Reference-order domain and
+ * fixed cases to the compound-assignment file. Its Linux entry uses a local
+ * extended whole-file case sum of seventeen registrations; macOS remains
+ * an unmeasured provisional estimate. See U6 provenance.
+ *
  * The two entries in `caseShardedNativeFiles` are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
  * not observe them here; they still weigh other wrapper invocations and
@@ -66,7 +71,9 @@ export const nativeShardCosts = {
     "tests/property/m5-catch-binding.property.test.ts": 163,
     "tests/property/m5-class-early-errors.property.test.ts": 56,
     "tests/property/m5-class.property.test.ts": 711,
-    "tests/property/m5-compound-assignment.property.test.ts": 577,
+    // Local Linux extended case sum: 1,229.239865193 s, rounded up.
+    // October 23, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-compound-assignment.property.test.ts": 1230,
     "tests/property/m5-cross-realm.property.test.ts": 186,
     "tests/property/m5-data-view.property.test.ts": 523,
     "tests/property/m5-date-family.property.test.ts": 609,
@@ -209,7 +216,9 @@ export const nativeShardCosts = {
     "tests/property/m5-catch-binding.property.test.ts": 197,
     "tests/property/m5-class-early-errors.property.test.ts": 45,
     "tests/property/m5-class.property.test.ts": 350,
-    "tests/property/m5-compound-assignment.property.test.ts": 390,
+    // Provisional estimate: ceil(1230 * 1242/1838), the ratio the earlier
+    // 390 used; not a macOS observation. Refresh from CI.
+    "tests/property/m5-compound-assignment.property.test.ts": 832,
     "tests/property/m5-cross-realm.property.test.ts": 221,
     "tests/property/m5-data-view.property.test.ts": 296,
     "tests/property/m5-date-family.property.test.ts": 423,

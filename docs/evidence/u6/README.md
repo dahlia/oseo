@@ -708,4 +708,44 @@ sums and unmeasured macOS models, not native CI, a whole-suite result, or a
 full test262 UPDATE. This update changes no case budgets, seeds, deadlines,
 or shard totals.
 
+The `computed-member-reference-key-order` node adds slot `0x60000c03`, four
+fixed native registrations, one native-only diagnostic registration, and one
+model-only registration to
+*tests/property/m5-compound-assignment.property.test.ts*. It also changes
+the native oracle of slot `0x60000c00` without changing its generator or
+budget. A local Linux x86-64 whole-file extended run on 2026-10-23 UTC, from
+01:12:32 to 01:33:03, exited zero with all seventeen registrations passing
+and none skipped. Their printed leaf durations sum to 1,229,239.865193
+milliseconds (1,229.239865193 seconds), giving a Linux weight of 1,230
+seconds after rounding up. That sum includes the model-only registrations
+and excludes build timing. The new domain's generated registration took
+360,068.256 milliseconds and its fixed Reference cases 225,203.202. The
+earlier registrations took 637,876.904 milliseconds in sum, against the
+576,282 of the previous whole-file measurement.
+
+The command was
+`mise run test:property:extended:native:shard --shard 1/1` with this exact
+property file. It kept task scale 10, seed 1592590339, size `large`, one file
+worker, and the existing per-domain budgets and limits. The capacity profile
+was `generous` (`desktop-idle`), with no CPU quota and MemoryMax 104G. The run
+used the node's uncommitted candidate on base `560162cd`. The property
+SHA-256 matched the frozen copy before and after the run:
+`1611ec44d2bbbb43f021f74e6d8b5a9ffa706ad7e597a0aa0d95e94159304ff0`.
+
+An earlier validation run of the same command, from 00:51:11 to 01:12:06,
+also passed all seventeen registrations, with a sum of 1,254,444
+milliseconds. It started about eleven seconds before a behavior-neutral
+lint refactor and a string split reached the file, so it does not set the
+weight. The raw result, stdout, stderr, and duration lines of both runs
+are retained under
+*/data/m5c-computed-member-reference-key-order-20261023/impl/heavy/*.
+
+macOS remains unmeasured. Its weight of 832 seconds is an explicitly
+provisional estimate, `ceil(1230 * 1242 / 1838)`, the same host ratio the
+previous 390-second estimate used. This is one local Linux case sum and an
+unmeasured macOS model, not native CI, a whole-suite result, or a full
+test262 UPDATE. The weight of *m5-update-expression.property.test.ts* is
+unchanged: its program only prints one more slot. No case budget, seed,
+deadline, or shard total changes.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

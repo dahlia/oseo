@@ -252,6 +252,20 @@ sites. On clean main the same source-only comparison reproduced all 44 old
 hashes; with the repair the other 42 hashes stay unchanged. This changes no
 runtime ABI.
 
+The `computed-member-reference-key-order` repair deliberately regenerates
+the 14 records of seven fixtures, one per specialization policy each:
+*functions/function-prototype*, *objects/object-constructor*,
+*objects/object-define-property*, *objects/object-define-properties*,
+*generators/generators*, *generators/generator-iterator-suspension*, and
+*global-object-record/global-object-record*. Their computed member
+references with non-literal keys now check the base with the
+assignment-target `RequireObjectCoercible` operation before the key is
+converted: 4, 2, 1, 2, 3, 1, and 1 added checks per policy. No key
+conversion is added or removed in these fixtures. Printed HIR is unchanged;
+MIR and C change at those sites. A source-only comparison reproduced all 44
+old hashes from a clean archive of the pre-repair commit; with the repair the
+other 30 hashes stay unchanged. This changes no runtime ABI.
+
 The initial baseline is main commit
 `779e281908622d39e2a138548058438903019046`. Direct comparison covered 318
 fixture/policy outputs from eight existing native fixture families: bindings,

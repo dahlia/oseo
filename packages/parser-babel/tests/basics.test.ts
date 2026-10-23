@@ -788,7 +788,7 @@ test("converts an arithmetic compound member key once", () => {
   }
 });
 
-test("keeps logical compound member key conversion unchanged", () => {
+test("converts a logical compound member key once", () => {
   for (const operator of ["&&", "||", "??"]) {
     const result = compileSource(babelFrontend, {
       source:
@@ -800,10 +800,175 @@ test("keeps logical compound member key conversion unchanged", () => {
     assert.deepEqual(result.diagnostics, [], operator);
     assert.ok(result.mir != null);
     const mir = printMir(result.mir);
-    // This repair covers arithmetic operators only; logical assignment
-    // retains its earlier read and write conversions.
-    assert.equal(mir.match(/= property-key /gu)?.length, 2, operator);
-    assert.equal(mir.match(/= object-coercible /gu), null, operator);
+    // Before computed-member-reference-key-order, logical assignment
+    // converted the key before any base check and again before a taken
+    // write. ECMA-262 2025 GetValue checks the base, converts once, and
+    // stores the key that PutValue reuses, so the write takes the read's
+    // key.
+    assert.equal(mir.match(/= property-key /gu)?.length, 1, operator);
+    const lines = mir.split("\n");
+    const coercible = lines.findIndex((line) =>
+      /= object-coercible /u.test(line),
+    );
+    const key = lines.findIndex((line) => /= property-key /u.test(line));
+    assert.ok(coercible >= 0 && coercible < key, operator);
+    const keyId = /%(\d+) = property-key /u.exec(lines[key] ?? "")?.[1];
+    const objectId = /%(\d+) = object-coercible /u.exec(
+      lines[coercible] ?? "",
+    )?.[1];
+    assert.match(
+      mir,
+      new RegExp(`property-get property-get %${objectId}, %${keyId} `, "u"),
+      operator,
+    );
+    assert.match(
+      mir,
+      new RegExp(`property-set property-set %${objectId}, %${keyId}, `, "u"),
+      operator,
+    );
+  }
+});
+
+/**
+ * The operations of the one MIR unit a computed-member subject compiles
+ * into: the named function when there is one, the only method that reads
+ * a home object's prototype for `"super"`, otherwise the Script body.
+ */
+function referenceOperations(source: string, functionName?: string) {
+  return (["disabled", "enabled"] as const).map((specialization) => {
+    const result = compileSource(
+      babelFrontend,
+      { source, sourceId: "computed-member-reference.js" },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+    const unit =
+      functionName == null
+        ? result.mir.script
+        : result.mir.functions.find((item) =>
+            functionName === "super"
+              ? item.blocks.some((block) =>
+                  block.operations.some(
+                    (operation) => operation.kind === "super-base",
+                  ),
+                )
+              : item.name === functionName,
+          );
+    assert.ok(unit != null, source);
+    return unit.blocks.flatMap((block) => block.operations);
+  });
+}
+
+test("checks a computed member base before its single key conversion", () => {
+  // ECMA-262 2025 GetValue and PutValue (6.2.5.5 and 6.2.5.6, step 3.a)
+  // apply ToObject to the base before ToPropertyKey converts the stored
+  // name, and a later PutValue reuses that converted key.
+  const prelude = "let b = null; let k = {}; function r() { return 1; }\n";
+  const cases: readonly {
+    readonly source: string;
+    readonly functionName?: string;
+    readonly accesses: readonly ("property-get" | "property-set")[];
+    readonly afterCall?: true;
+  }[] = [
+    { source: `${prelude}b[k];`, accesses: ["property-get"] },
+    { source: `${prelude}b[k]();`, accesses: ["property-get"] },
+    {
+      source: `${prelude}b[k] = r();`,
+      accesses: ["property-set"],
+      afterCall: true,
+    },
+    ...["&&", "||", "??"].map((operator) => ({
+      source: `${prelude}b[k] ${operator}= r();`,
+      accesses: ["property-get", "property-set"] as const,
+    })),
+    ...["b[k]++", "--b[k]"].map((update) => ({
+      source: `${prelude}${update};`,
+      accesses: ["property-get", "property-set"] as const,
+    })),
+    {
+      source: `${prelude}function f(o) { return o?.()[k]; }`,
+      functionName: "f",
+      accesses: ["property-get"],
+    },
+    {
+      source: `${prelude}function f(xs) { for (b[k] of xs); }`,
+      functionName: "f",
+      accesses: ["property-set"],
+    },
+    {
+      source: `${prelude}function f(o) { for (b[k] in o); }`,
+      functionName: "f",
+      accesses: ["property-set"],
+    },
+    ...["super[k] += 1", "super[k] ||= 1", "super[k]++"].map((form) => ({
+      source: `class A {}\nclass B extends A { m(k) { ${form}; } }`,
+      functionName: "super",
+      accesses: ["property-get", "property-set"] as const,
+    })),
+    {
+      source: "class A {}\nclass B extends A { m(k) { super[k]; } }",
+      functionName: "super",
+      accesses: ["property-get"],
+    },
+  ];
+  for (const testCase of cases) {
+    for (const operations of referenceOperations(
+      testCase.source,
+      testCase.functionName,
+    )) {
+      const context = testCase.source;
+      const keys = operations.filter(
+        (operation) => operation.kind === "property-key",
+      );
+      assert.equal(keys.length, 1, context);
+      const [key] = keys;
+      assert.ok(key != null);
+      const keyIndex = operations.indexOf(key);
+      const checkIndex = operations.findIndex(
+        (operation) => operation.kind === "object-coercible",
+      );
+      assert.ok(checkIndex >= 0 && checkIndex < keyIndex, context);
+      const check = operations[checkIndex];
+      assert.ok(check != null);
+      if (testCase.afterCall === true) {
+        const callIndex = operations.findIndex(
+          (operation) => operation.kind === "call",
+        );
+        assert.ok(callIndex >= 0 && callIndex < checkIndex, context);
+      }
+      const keyId = key.id;
+      for (const kind of testCase.accesses) {
+        const access = operations.find(
+          (operation) =>
+            operation.kind === kind && operation.arguments[1] === keyId,
+        );
+        assert.ok(access != null, `${context} ${kind}`);
+        assert.equal(access.arguments[0], check.id, `${context} ${kind}`);
+      }
+    }
+  }
+});
+
+test("keeps literal and optional member keys on their earlier path", () => {
+  // A primitive literal key converts unobservably, so the property
+  // operation keeps its own nullish TypeError. An optional link's nullish
+  // guard already short-circuits before its key is evaluated.
+  const prelude = "let b = null; let k = {}; function r() { return 1; }\n";
+  for (const source of [
+    `${prelude}b[1];`,
+    `${prelude}b["x"] = r();`,
+    `${prelude}b[null] ||= r();`,
+    `${prelude}b[true]();`,
+    `${prelude}b?.[k];`,
+    `${prelude}b?.[k]();`,
+  ]) {
+    for (const operations of referenceOperations(source)) {
+      assert.ok(
+        !operations.some((operation) => operation.kind === "object-coercible"),
+        source,
+      );
+    }
   }
 });
 
@@ -2976,13 +3141,31 @@ test("admits a super property as a destructuring assignment target", () => {
       /property-set destructuring member target %\d+, %\d+, %\d+, %\d+/u,
       source,
     );
-    // The super base is not an evaluated object expression, so PutValue
-    // reports its own TypeError instead of RequireObjectCoercible.
-    assert.doesNotMatch(
-      text,
-      /RequireObjectCoercible for assignment target/u,
-      source,
-    );
+    // A literal key leaves a nullish home object prototype to the
+    // store's own TypeError. Before computed-member-reference-key-order a
+    // computed key did too, which converted it before PutValue's base
+    // check; ECMA-262 2025 PutValue checks the base first, so that target
+    // now checks the prototype before its single conversion.
+    if (source.includes("super[k()]")) {
+      const lines = text.split("\n");
+      const store =
+        /property-set destructuring member target (%\d+), (%\d+), /u.exec(text);
+      assert.ok(store != null, source);
+      const [, objectId, keyId] = store;
+      const coercible = lines.findIndex((line) =>
+        line.trimStart().startsWith(`${objectId} = object-coercible `),
+      );
+      const key = lines.findIndex((line) =>
+        line.trimStart().startsWith(`${keyId} = property-key `),
+      );
+      assert.ok(coercible >= 0 && coercible < key, source);
+    } else {
+      assert.doesNotMatch(
+        text,
+        /RequireObjectCoercible for assignment target/u,
+        source,
+      );
+    }
   }
 });
 

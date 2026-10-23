@@ -848,25 +848,21 @@ current evidence assessment. Those live only in the indexed records above.
     function-name inference for identifier targets. Property targets and
     parenthesized identifier targets leave anonymous functions unnamed; see
     *Parenthesized assignment targets* below. Member assignments evaluate the
-    object and key expression once. An arithmetic member assignment then
-    applies the `ToObject` check of ECMA-262 2025 `GetValue`, so a null or
-    undefined base throws `TypeError` before the key is converted or the right
-    operand runs, converts the key once, and reuses that key for the write. A
-    logical member assignment still converts the retained key before its base
-    check, then converts it again after the right operand on the taken write
-    path; a short-circuited one skips that second conversion. That logical
-    order is retained behavior, not a conforming one, and *Compound member key
-    order* below records it. Plain `=` assignment to a computed member likewise
-    retains the raw key and converts it only after the right operand, as
-    `PutValue` specifies, so a key whose `toString` is observable runs after
-    that operand; it still converts that key before `PutValue`'s base check,
-    which the same section records as retained. The unlanded M5c node
-    `computed-member-reference-key-order` owns the repair of both retained
-    orders. Immutable and imported targets retain their catchable write
-    errors. Native differential fixtures and a generated property with seed
-    `0x60000c00` cover all 15 operators, both target forms, short-circuiting,
-    reference and conversion counts, both specialization policies, and forced
-    collection; seed `0x60000c01` covers member reference order. An ordinary
+    object and key expression once. An arithmetic or logical member
+    assignment then applies the `ToObject` check of ECMA-262 2025 `GetValue`,
+    so a null or undefined base throws `TypeError` before the key is
+    converted or the right operand runs, converts the key once, and reuses
+    that key for a write the operator takes. Plain `=` assignment to a
+    computed member retains the raw key until the right operand has run,
+    then applies `PutValue`'s base check and converts the key, so a key whose
+    `toString` is observable runs after that operand and never for a nullish
+    base. *Compound member key order* below describes the shared computed
+    member Reference order and its diagnostic. Immutable and imported targets
+    retain their catchable write errors. Native differential fixtures and a
+    generated property with seed `0x60000c00` cover all 15 operators, both
+    target forms, short-circuiting, reference and conversion counts, both
+    specialization policies, and forced collection; seeds `0x60000c01` and
+    `0x60000c03` cover member reference order. An ordinary
     asynchronous function retains the reference and current value in its traced
     frame when the right operand awaits. Module top level uses its private
     traced frame for the same position; only the pattern-position module await
@@ -876,10 +872,8 @@ current evidence assessment. Those live only in the indexed records above.
     Number path, adds or subtracts one, and performs a checked write. Prefix
     forms produce the assigned value; postfix forms produce the coerced
     previous value. A member target evaluates its object and key expression
-    once, then converts the retained raw key separately for the read and write,
-    so the conversions may select different properties. That double conversion
-    is retained behavior, not a conforming one; the unlanded M5c node
-    `computed-member-reference-key-order` owns its repair. Immutable targets
+    once, checks the base, converts the key once, and writes through the key
+    it read. Immutable targets
     keep their catchable write errors after coercion. Native differential
     fixtures and a generated property with seed `0x60002e00` cover both
     operators, both result forms, both target forms, numbers, numeric strings,
@@ -8841,36 +8835,57 @@ read finds no property, the write is ignored in sloppy code, and it throws
 `TypeError` in strict code. An inherited setter on a primitive's prototype
 chain is outside that tested case.
 
-The change is limited to that arithmetic reference. Logical member
-assignment, `super` and global identifier references, simple member
-assignment, and update expressions keep their earlier lowering. A logical
-member assignment still converts its key before a nullish base throws and
-converts it again before a taken write. A simple member assignment still
-converts the key before `PutValue`'s `ToObject` check. Update expressions
-already throw before conversion for a nullish base, but convert an object key
-twice. A `super` compound assignment also converts its key twice. These are
-retained behaviors, not conforming ones; the generated and fixed controls
-use primitive string keys, whose conversion cannot be observed, for the
-three non-arithmetic forms. A plain computed read also converts its key
-before the base check. The unlanded M5c node
-`computed-member-reference-key-order` owns the repair of every one of these
-forms as one computed member Reference unit; until it lands they remain
-known nonconformance. The node's record,
+The compound node limited its change to that arithmetic reference. Logical
+member assignment, `super` references, simple member assignment, update
+expressions, and plain computed reads kept their earlier lowering, which
+converted a key before the base check or a second time before a write; that
+node recorded them as retained behaviors, not conforming ones.
+
+M5c node `computed-member-reference-key-order` repairs those forms as one
+computed member Reference unit, following ECMA-262 2025 13.3.3, 13.3.7.1,
+GetValue, PutValue, and 14.7.5.7 ForIn/OfBodyEvaluation. A plain `base[key]`
+read, a method lookup, a logical member assignment, a simple member
+assignment after its right operand, prefix and postfix update, a
+`super[key]` read, compound assignment, update, or destructuring target, a
+plain link inside an optional chain, and a for-in or for-of head member
+target all evaluate the base and the raw key, check the base, convert the
+key once, and reuse the converted key for any write. The check is the same
+assignment-target `RequireObjectCoercible` operation, so it keeps a
+primitive base as the receiver and adds no runtime export or ABI change. A
+`super` reference applies it to the home object's prototype after the key
+expression. An optional link keeps its own nullish short circuit, which
+precedes its key. An abrupt for-of head target or PutValue still closes the
+iterator before the error propagates. A key that is a primitive literal
+converts without running user code, so its reference keeps the earlier
+lowering and the property operation's own nullish `TypeError`. Global
+identifier references, whose key is a literal name, keep their lowering.
+
+The reused check changes one diagnostic. A nullish base with any other key
+now reports `TypeError: Cannot destructure a nullish value.` from a computed
+read, call, logical, simple, `super`, optional-chain link, or for-in or
+for-of head reference, where a read previously reported
+`Cannot read properties of a nullish value.` and a write
+`Cannot set properties of a nullish or primitive value.` The error type is
+unchanged and both specialization policies report the same message. An
+inherited setter on a primitive base's prototype chain stays outside the tested
+behavior: the native primitive-base store rejects before it looks for one,
+before and after this repair. The node's record,
 [*docs/m5c-graph/computed-member-reference-key-order.md*](./m5c-graph/computed-member-reference-key-order.md),
-separates the observed failures from the source-only hypotheses.
+separates the observations that opened it from its source-only hypotheses.
 
 Node.js 24.21.0 and Deno 2.9.7 agree with ECMA-262 2025 for a nullish base,
-but both convert an arithmetic member key a second time before the write.
-That is a reference discrepancy, not an oracle. The tests run each
-reference source as a global Script through indirect `eval`, because Deno
-would otherwise load the file as a strict module, and require the references
-to equal a labeled V8 model that differs from the normative model only by
-that second conversion.
+but both convert a compound, logical, or update member key a second time
+before a taken write, and both convert a `super` key before a null home
+prototype throws. Those are reference discrepancies, not oracles. The tests run
+each reference source as a global Script through indirect `eval`, because Deno
+would otherwise load the file as a strict module, and require the references to
+equal a labeled V8 model that differs from the normative model only by those
+discrepancies.
 
 The existing *m5-compound-assignment.property.test.ts* family keeps slot
 `0x60000c00` and its generator unchanged; its native model now expects one
-conversion for an arithmetic member target and keeps the retained logical
-count, while its references must equal the labeled V8 count. Slot
+conversion for every member target, including a logical one that writes,
+while its references must equal the labeled V8 count. Slot
 `0x60000c01` generates one to four subjects in sloppy or strict code:
 arithmetic operators over null, undefined, number, string, and object bases
 with counting, throwing, or string keys, and logical, simple, and update
@@ -8888,11 +8903,48 @@ twelve operators instead of the double-converting `+=` case, which moved to
 those fixed cases. The repair adds no specialized path or guard, so the
 guard-fallback omission and its replacement evidence remain.
 
+The Reference repair adds slot `0x60000c03` to the same file. It generates
+one to four subjects in sloppy or strict code over every repaired ordinary
+form and null, undefined, number, string, and object bases, and over
+`super` reads, `+=`, `||=`, and `++` with a null or ordinary home
+prototype, each with counting, throwing, string, or literal keys. It has 20
+ordinary cases and a 240-second interrupt limit, and its independent model
+labels both V8 discrepancies separately. Fixed cases run every form over
+every admitted base, key kind, and falsy, truthy, or null current value in
+both strictness modes, plus for-of and for-in heads around an iterator whose
+`return` is observed, and primitive receivers seen by a getter and a method.
+The changing-key update subject of the `update-expressions` native fixture
+and the taken logical subject of `compound-assignments` moved there
+verbatim with fixed expected values, because both observed the V8 second
+conversion; those fixtures now use string-returning keys. Slot `0x60002e00`
+of *m5-update-expression.property.test.ts* keeps its generator and budget;
+its program also prints the slot it reads, its native model expects one
+conversion that writes the slot it read, and its references must equal the
+labeled V8 model that writes the slot a second conversion selects. Every
+native run of the Reference domain and its fixed cases uses both
+specialization policies with collection at every safepoint; the change adds no
+specialized path or guard, so the guard-fallback omission and its replacement
+evidence remain.
+
 The 33 paths matching *S11.13.2\_A7.{1..11}\_T{1,2,4}.js* in
 *test/language/expressions/compound-assignment/* observed `semantic-failure`
 before this repair and pass after it in a focused runner check; the eleven `T3`
 siblings pass before and after. Batch 12 keeps their first canonical admission,
 so this node adds no subset row.
+
+Batch 14's focused first observation on main `faa47159` found four
+`semantic-failure` results that the Reference repair addresses:
+*computed-reference-null-or-undefined.js* in
+*test/language/expressions/member-expression/* and the three
+*lgcl-{and,nullish,or}-assignment-operator-lhs-before-rhs.js* paths in
+*test/language/expressions/logical-assignment/*, each decided by its first
+non-strict, specialization-disabled variant.
+With the repair, a focused runner check through the repository's
+`executeTest262Case` executes all four variants of each path, both strictness
+modes under both policies, and classifies all four paths as `pass` with no
+retry. Batch 14 keeps their first canonical admission, and batches 8 and 16
+keep the related simple assignment and update subjects, so this node adds no
+subset row.
 
 
 Keyed pattern targets through with environments

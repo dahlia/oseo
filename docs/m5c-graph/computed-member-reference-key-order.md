@@ -4,8 +4,9 @@ Computed member Reference key order
 This record supports the graph node `computed-member-reference-key-order`.
 It separates four kinds of statement: the fixed ECMA-262 2025 contract, the
 actual observations that opened the node, known nonconformance on `main`
-that rests on source reading only, and the evidence a future repair must
-supply. It uses test262 revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`
+that rests on source reading only, the evidence a repair must supply, and
+the repair that the node's implementation change makes. It uses test262
+revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`
 and main `faa47159`. Nothing here is a test262 observation of the repair,
 and no path is excluded, removed, or retagged.
 
@@ -37,6 +38,14 @@ edition. A computed member Reference behaves as follows:
     Reference.
  -  An optional chain whose base is null or undefined short-circuits under
     13.3.9.1 before any key evaluation or conversion.
+ -  14.7.5.7 ForIn/OfBodyEvaluation evaluates a member head target after
+    each step that produced its value and then calls PutValue, so the
+    base check and the single conversion follow that step. An abrupt
+    target evaluation or PutValue closes a for-of iterator before the
+    error propagates; for-in has no iterator to close.
+ -  A `super[key]` reference's base is the home object's prototype, read
+    after the key expression; a null prototype throws `TypeError` from the
+    same GetValue or PutValue step 3.a before the key converts.
 
 The landed compound repair implements the base check as an assignment-target
 RequireObjectCoercible check that keeps a primitive base as the receiver,
@@ -100,6 +109,10 @@ native run tested these hypotheses.
  -  Prefix and postfix update apply the base check before conversion, but
     convert an object key twice. `super[key]` compound assignment also
     converts twice. *PLAN-M5.md* records both as retained behavior.
+ -  A for-in or for-of member head target converts its key before
+    PutValue's base check, and a computed `super[key]` read, write, or
+    destructuring target converts its key before a null home prototype
+    throws.
  -  The arithmetic compound forms repaired by
     `compound-member-assignment-key-order` follow the contract and keep
     their results.
@@ -135,6 +148,9 @@ patch for the four observed paths. It covers:
  -  simple assignment;
  -  prefix and postfix update;
  -  `super[key]` compound assignment and update;
+ -  for-in and for-of head member targets, keeping the iterator close of
+    an abrupt for-of target, and computed `super[key]` destructuring
+    targets;
  -  optional member chains, keeping their nullish short circuit.
 
 It keeps the arithmetic compound results and the separate optional-call
@@ -156,3 +172,44 @@ The repair regenerates the complete reviewed manifest; reviewed paths move
 only toward pass. Batches 14, 08, and 16 then admit their paths from their
 own observations. The four failing subjects above become a pass only
 through such an observation.
+
+
+Repair
+------
+
+The node's implementation change lowers every form above in
+*packages/compiler/src/mir-build.ts*:
+
+1.  evaluate the base and the raw key;
+2.  apply the assignment-target `RequireObjectCoercible` check to the base,
+    or to the home object's prototype for `super`;
+3.  convert the key once;
+4.  read and write through that one key.
+
+A simple assignment and a for-in or for-of head evaluate their value first.
+An optional link keeps its nullish short circuit. A primitive literal key
+keeps its earlier lowering and diagnostic, as do global identifier
+references. The check adds no runtime export, backend operation, or ABI
+change. A nullish base with any other key therefore reports
+`TypeError: Cannot destructure a nullish value.` under both specialization
+policies. *PLAN-M5.md* records that diagnostic and the unchanged
+inherited-setter limit of primitive-base stores.
+
+Focused evidence on the candidate tree:
+
+ -  The four batch 14 subjects above now pass in all four variants. Both
+    strictness modes ran under both policies through the repository's
+    `executeTest262Case`, with no retry.
+ -  Property slot `0x60000c03` and its fixed cases cover every form, base,
+    and key kind against an independent ECMA-262 2025 model under both
+    policies with collection at every safepoint. The labeled V8 model adds
+    the second write conversion and the early `super` key conversion.
+ -  Slots `0x60000c00`, `0x60000c01`, and `0x60002e00` keep their
+    generators, seeds, and budgets.
+ -  Structural MIR tests order the check before the single conversion for
+    every form, and keep literal keys and optional links on their earlier
+    path.
+
+Batches 14, 8, and 16 observe and admit their own paths after the complete
+manifest regeneration this node still needs; this record claims no test262
+pass beyond that focused check.
