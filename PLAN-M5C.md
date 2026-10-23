@@ -1235,22 +1235,27 @@ beyond the pattern grammar RegExp construction already compiled.
 Observation batch 15 current-source preparation
 -----------------------------------------------
 
-The private, unlanded preparation observes the 836 reserved paths (456 review
-units) on accepted Source4 R, f2c306680af07fea8011e6737d5b21100d9654d0. The
-actual scoped UPDATE read clean B15 input `ca53384a` and left its tree
-unchanged; that commit is both the original input U and result R. This
-preparation replays only its B15 delta onto the corrected Source4 documentation
-at `e6994838`, which changes no observation input. That historical execution
-recorded 661 passes, 151 expected negatives, and 24 unsupported profile
-features. The subset retains R's pinned revision and supported features; all
-prior 28,311 records remain unchanged. The manifest totals are 29,147 reviewed
-paths: 24,966 passes, 2,732 expected negatives, and 1,449 unsupported profile
-features, with 11,944 inventory paths still unreviewed. The 146 supported
-features are unchanged. These preparation counts do not replace the successful
-Main baseline or land any node. The corrected classes dependencies and two
-async-only iterator-protocol removals come from the preserved B15 admission
-metadata at `29d5f8fd`. Its old failed-source observations are historical and
-were not reused.
+The historical scoped UPDATE observed the 836 reserved paths (456 review
+units) from clean B15 input U,
+`ca53384ab035661df8fa8e611c9f1959da682caf`, with accepted Source4 R,
+`f2c306680af07fea8011e6737d5b21100d9654d0`, as its explicit baseline. It
+left U's tree unchanged, so the original B15 result R is also `ca53384a`.
+That execution recorded 661 passes, 151 expected negatives, and 24 unsupported
+profile features. The B15-only delta was later replayed as `0381835e` onto
+the corrected Source4 documentation at `e6994838`; that replay made no new
+observations.
+
+The current conditional preparation below adopts those B15 records onto
+Source4 candidate `8387dc9a`. All prior 28,311 records remain unchanged. The
+combined manifest totals are 29,147 reviewed paths: 24,966 passes, 2,732
+expected negatives, and 1,449 unsupported profile features, with 11,944
+inventory paths still unreviewed. The subset retains the original B15 U/R's
+pinned revision and 146 supported features. These totals are historical
+preparation accounting, not fresh observations of the combined source. They
+do not replace the successful Main baseline or land any node. The corrected
+classes dependencies and two async-only iterator-protocol removals come from
+the preserved B15 admission metadata at `29d5f8fd`. Its old failed-source
+observations are historical and were not reused.
 
 The unsupported rows retain source-bound assessments: 16 eval-semantic subjects
 retain the existing bounded ADR 0016 approval and resume conditions, while eight
@@ -1319,13 +1324,14 @@ utility harness at `98c42049`. Their original commits and observation refs
 remain preserved. The Script registration already belongs to C; its Source4
 ancestors are not replayed.
 
-The 29,147 reviewed records, including B15's 836 records and 24 bounded
-assessments, retain the historical B15 observation input and result
-`ca53384ab035661df8fa8e611c9f1959da682caf`. These are adopted records for
-preparation accounting, not fresh observations of the changed implementation.
-All 28,311 C records and 24,305 C passes remain intact. The three source
-changes require a new full UPDATE before publication; this preparation runs
-only local CHECK and short pure focused tests.
+Of the 29,147 adopted reviewed records, B15's 836 records and 24 bounded
+assessments retain the historical B15 observation input and result
+`ca53384ab035661df8fa8e611c9f1959da682caf`. The other 28,311 records come
+from C: 24,305 passes, 2,581 expected negatives, and 1,425 unsupported profile
+features, all unchanged. The combined counts are historical preparation
+accounting, not fresh observations of the changed implementation. The three
+source changes require a new full UPDATE before publication; this preparation
+runs only local CHECK and short pure focused tests.
 
 Successful Main `52a868c9` still has 44 effective landed nodes. C's 48-node
 prospective landing state is retained without changing any node's status or
