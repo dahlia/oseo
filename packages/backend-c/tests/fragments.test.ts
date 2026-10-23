@@ -107,3 +107,62 @@ test("both fragment phases charge binding access apart from heap roots", () => {
     2,
   );
 });
+
+test("fragment resumes charge original logical slots", () => {
+  const fn = {
+    ...fragment.mir.script,
+    generator: true as const,
+    id: 0,
+    rootSlotCount: 2002,
+    blocks: [
+      {
+        id: 0,
+        operations: [
+          {
+            arguments: [],
+            constant: { kind: "number" as const, value: 1 },
+            detail: "1",
+            id: 2000,
+            kind: "constant" as const,
+            range,
+          },
+        ],
+        terminator: { kind: "return" as const, value: 2000 },
+      },
+    ],
+  };
+  const result = emitScriptFragments(
+    {
+      ...harness,
+      mir: { ...harness.mir, functions: [fn] },
+      nextFunctionId: 1,
+    },
+    {
+      ...fragment,
+      mir: { ...fragment.mir, functions: [{ ...fn, id: 1 }] },
+      nextFunctionId: 2,
+    },
+    {
+      sourceId: "case.js",
+      harnessLineOffset: 0,
+      bodyLineOffset: 0,
+    },
+  );
+  for (const [unit, source] of [
+    ["harness", result.harness.source],
+    ["case", result.body.source],
+  ] as const) {
+    const resume = source.slice(source.indexOf(`oseo_${unit}_resume`));
+    assert.match(
+      resume,
+      /oseo_frame_enter\(context, OSEO_CALLABLE_FRAME_COST\(2003u\)\)/u,
+    );
+    assert.match(resume, /result = oseo_generator_body_[01]\(/u);
+    assert.match(
+      resume,
+      /oseo_frame_leave\(context, OSEO_CALLABLE_FRAME_COST\(2003u\)\)/u,
+    );
+    // Compact heap roots must not replace the conservative stack charge.
+    assert.match(source, /oseo_generator_create\(context,[\s\S]*?32u/u);
+  }
+});

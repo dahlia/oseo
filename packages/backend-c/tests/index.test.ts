@@ -1286,9 +1286,10 @@ test("emits a generator entry and a separately resumable body", () => {
   assert.match(emitted.source, /oseo_context_set_generator_dispatcher/u);
   assert.match(
     emitted.source,
-    /case 0u:\n {8}return oseo_generator_body_0\(context, generator\);/u,
+    /result = oseo_generator_body_0\(context, generator\);/u,
   );
-  // A suspended body must not release a native frame it does not own.
+  // The dispatcher releases the charge after every body exit. The body
+  // retains heap roots in its generator rather than a native root frame.
   const bodyStart = emitted.source.indexOf(
     "static OseoResult oseo_generator_body_0(\n",
   );
@@ -1778,5 +1779,20 @@ test("unenterable generator and async continuations are guarded", () => {
     );
     assert.match(body, /#if OSEO_CALLABLE_FRAME_COST\(100008u\)/u);
     assert.match(body, /\(void\)generator;/u);
+    const dispatcher = emitted.source.slice(
+      emitted.source.indexOf("static OseoResult oseo_dispatch_generator("),
+    );
+    assert.match(
+      dispatcher,
+      /oseo_frame_enter\(context, OSEO_CALLABLE_FRAME_COST\(100008u\)\)/u,
+    );
+    assert.match(
+      dispatcher,
+      /result = oseo_generator_body_0\(context, generator\);/u,
+    );
+    assert.match(
+      dispatcher,
+      /oseo_frame_leave\(context, OSEO_CALLABLE_FRAME_COST\(100008u\)\)/u,
+    );
   }
 });

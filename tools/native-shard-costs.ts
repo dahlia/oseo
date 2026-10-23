@@ -13,6 +13,11 @@
  * the refreshed weight for the same file. One run estimates no
  * run-to-run variation, so these values are not conservative bounds.
  *
+ * Continuation-dispatch nesting extends three existing generator/async
+ * families. Their weights provisionally use twice their source-run cost
+ * on each host, pending exact-candidate CI measurements. This is a planning
+ * estimate, not a measured duration or a conservative bound. See U6.
+ *
  * Two families changed after that source run. Destructuring assignment
  * uses both hosts' case sums from CI run 39473400560 at `3170ba94`.
  * Object binding uses a local Linux extended case sum and an explicitly
@@ -75,8 +80,8 @@ export const nativeShardCosts = {
     "tests/property/m5-array-prototype-species-mapping.property.test.ts": 670,
     "tests/property/m5-array-sort-stability.property.test.ts": 1637,
     "tests/property/m5-array-spread.property.test.ts": 242,
-    "tests/property/m5-async-await.property.test.ts": 321,
-    "tests/property/m5-async-generator.property.test.ts": 226,
+    "tests/property/m5-async-await.property.test.ts": 642,
+    "tests/property/m5-async-generator.property.test.ts": 452,
     "tests/property/m5-atomics-and-shared-memory.property.test.ts": 588,
     "tests/property/m5-atomics-single-agent.property.test.ts": 463,
     "tests/property/m5-bigint-intrinsic.property.test.ts": 479,
@@ -111,7 +116,7 @@ export const nativeShardCosts = {
     "tests/property/m5-generator-methods.property.test.ts": 51,
     "tests/property/m5-generator-parameter.property.test.ts": 168,
     "tests/property/m5-generator-throw.property.test.ts": 47,
-    "tests/property/m5-generator.property.test.ts": 444,
+    "tests/property/m5-generator.property.test.ts": 888,
     "tests/property/m5-generic-string-coercion.property.test.ts": 282,
     "tests/property/m5-global-numeric-functions.property.test.ts": 667,
     // Local Linux extended case sum: 812.733362007 s, rounded up.
@@ -227,8 +232,8 @@ export const nativeShardCosts = {
     "tests/property/m5-array-prototype-species-mapping.property.test.ts": 278,
     "tests/property/m5-array-sort-stability.property.test.ts": 575,
     "tests/property/m5-array-spread.property.test.ts": 197,
-    "tests/property/m5-async-await.property.test.ts": 157,
-    "tests/property/m5-async-generator.property.test.ts": 190,
+    "tests/property/m5-async-await.property.test.ts": 314,
+    "tests/property/m5-async-generator.property.test.ts": 380,
     "tests/property/m5-atomics-and-shared-memory.property.test.ts": 342,
     "tests/property/m5-atomics-single-agent.property.test.ts": 391,
     "tests/property/m5-bigint-intrinsic.property.test.ts": 374,
@@ -263,7 +268,7 @@ export const nativeShardCosts = {
     "tests/property/m5-generator-methods.property.test.ts": 64,
     "tests/property/m5-generator-parameter.property.test.ts": 138,
     "tests/property/m5-generator-throw.property.test.ts": 43,
-    "tests/property/m5-generator.property.test.ts": 232,
+    "tests/property/m5-generator.property.test.ts": 464,
     "tests/property/m5-generic-string-coercion.property.test.ts": 246,
     "tests/property/m5-global-numeric-functions.property.test.ts": 313,
     // Historical-ratio model: ceil(813 * 210/343); not a macOS

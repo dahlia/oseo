@@ -1253,8 +1253,19 @@ export const emittedC = {
     ],
     caseClause: [
       ["    case "],
-      ["u:\n        return "],
-      ["(context, generator);"],
+      [
+        "u:\n        result = oseo_frame_enter(context, ",
+        "OSEO_CALLABLE_FRAME_COST(",
+      ],
+      [
+        "u));\n        if (result.status == OSEO_STATUS_NORMAL) {\n",
+        "            result = ",
+      ],
+      [
+        "(context, generator);\n",
+        "            oseo_frame_leave(context, OSEO_CALLABLE_FRAME_COST(",
+      ],
+      ["u));\n        }\n        return result;"],
     ],
   },
   functionDispatcher: {

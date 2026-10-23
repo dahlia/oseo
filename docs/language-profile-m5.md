@@ -9318,3 +9318,32 @@ full and extended candidate CI, affected post-observation review, and
 landing remain pending. Zig's address and undefined flags
 alone establish no ASan activity; the exact candidate's host C sanitizer
 lanes must supply that evidence.
+
+
+Generator continuation stack accounting
+---------------------------------------
+
+M5c node `generator-dispatch-stack-charge` applies the existing callable
+native-frame charge to every continuation dispatch, including ordinary async
+functions, async generators, and the fragment resume entry points. A body
+must enter the aggregate budget before running. Every successful entry leaves
+its charge after the body returns a normal, throw, or suspended completion.
+A rejected entry runs no body and leaves the caller's charge unchanged.
+Suspended heap roots remain in the existing traced frame; neither its layout
+nor the runtime ABI changes. The 65,536-unit ceiling and the host C sanitizer
+multiplier remain unchanged.
+
+*tests/runtime-generator-dispatch-stack.test.ts* exercises 1,000-binding
+recursive bodies at initial and resumed dispatch under both specialization
+policies. They must report the owned `OSEO2001` native-frame diagnostic. Its
+instrumented backend also checks that the aggregate charge is zero before
+native context teardown on normal and failing runs. Repeated yield, throw,
+return, and await operations preserve cross-realm object identity with
+collection at every safepoint. The existing synchronous generator, async-await,
+and async-generator properties add bounded nested dispatch while retaining
+their original choices, shrinking, seeds, case budgets, and interrupt limits.
+
+The regression suite selects the integration toolchain, including host C
+ASan/UBSan. macOS execution and the full ordinary and extended gates remain
+exact-candidate CI obligations; this source change records no new test262
+observations.
