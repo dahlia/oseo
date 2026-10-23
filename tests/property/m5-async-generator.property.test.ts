@@ -39,6 +39,8 @@ type Guard = "catch" | "finally" | "none";
 type Source = "delegate-array" | "delegate-async" | "yields";
 
 interface AsyncGeneratorCase {
+  /** Zero preserves the original driver; other values wrap its dispatch. */
+  readonly dispatchDepth: number;
   readonly action: Action;
   readonly awaited: boolean;
   readonly guard: Guard;
@@ -57,6 +59,7 @@ const nativeTarget = targetForExecutionHost(
 );
 const large = propertySize() === "large";
 const caseArbitrary = fc.record({
+  dispatchDepth: fc.integer({ min: 0, max: 3 }),
   action: fc.constantFrom<Action>("exhaust", "return", "throw"),
   awaited: fc.boolean(),
   guard: fc.constantFrom<Guard>("catch", "finally", "none"),
@@ -148,8 +151,16 @@ function settle(promise) {
     },
   );
 }
+async function* nested(depth) {
+  if (depth > 0) return yield* nested(depth - 1);
+  return yield* generated();
+}
 async function main() {
-  const iterator = generated();
+  const iterator = ${
+    testCase.dispatchDepth === 0
+      ? "generated()"
+      : `nested(${testCase.dispatchDepth - 1})`
+  };
   let text = "";
 ${driver}  console.log(text);
   console.log("state", cleanup, caught);

@@ -376,7 +376,11 @@ barriers while the object representation and compiler ABI are still changing.
 Root slot arrays are allocated independently of generated C stack frames. A
 deterministic aggregate root-slot budget is checked before entering generated C
 so compiler spill space for wide functions cannot bypass the owned runtime
-failure boundary.
+failure boundary. Continuation dispatch charges the same conservative
+callable-frame cost before entering a generator, asynchronous function, or
+asynchronous generator body. That charge lasts only for the active native
+invocation and is released on return, throw, or suspension; the traced heap
+frame remains owned by its continuation.
 
 MIR must identify allocation and collection safepoints. Specialized raw values
 that denote heap objects must either be described to the collector or be boxed

@@ -94,7 +94,7 @@ Exceptions to the current table
 -------------------------------
 
 The current weight-source runs above observed two families before later
-changes grew them. Only these four entries override that upstream table;
+changes grew them. The exceptions described below override that upstream table;
 all other refreshed weights, including compound assignment at 1,838 Linux
 and 1,242 macOS seconds, remain intact. None of the four changes file
 inventory, seeds, case budgets, sizes, shard totals or interrupt limits.
@@ -709,3 +709,30 @@ full test262 UPDATE. This update changes no case budgets, seeds, deadlines,
 or shard totals.
 
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906
+
+
+Continuation dispatch nesting
+-----------------------------
+
+The `generator-dispatch-stack-charge` source preparation extends the existing
+synchronous generator, ordinary async-await, and asynchronous generator domains
+with zero through three nested dispatch wrappers. All previous semantic choices,
+seeds, case budgets, size modes, and interrupt limits remain present. No
+property file or seed family is added. The wrappers add compilation and
+dispatch work; their relative cost has not yet been measured in an extended CI
+run.
+
+The provisional scheduling weights are twice each file's source-run weight:
+
+| File                                  | Linux source | Linux provisional | macOS source | macOS provisional |
+| ------------------------------------- | -----------: | ----------------: | -----------: | ----------------: |
+| *m5-generator.property.test.ts*       |          444 |               888 |          232 |               464 |
+| *m5-async-await.property.test.ts*     |          321 |               642 |          157 |               314 |
+| *m5-async-generator.property.test.ts* |          226 |               452 |          190 |               380 |
+
+These are unmeasured planning estimates in seconds, not CI observations, local
+extended measurements, or conservative bounds. Replace them with each host's
+summed registration durations from the exact candidate's full extended CI run.
+Focused local ordinary results remain in
+*/data/m5c-generator-dispatch-stack-charge-20261024/* and do not stand in for
+those measurements. No shard total, input file, seed, or case budget changes.

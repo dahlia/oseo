@@ -3,6 +3,7 @@ id: async-generators
 title: "Asynchronous generators"
 scope:
   - "Async generator queues, resumption, delegation, and throw repair."
+  - "Active continuation dispatch owns the callable native-frame charge."
 owners:
   - PLAN-M5.md
 evidence:
@@ -13,10 +14,12 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/native/fixtures/async-generators.ts
   forced-collection:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/property/m5-async-generator.property.test.ts
   generated:
     status: covered
@@ -30,6 +33,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/native.ts
       - tests/native/fixtures/async-generators.ts
   standards:
@@ -40,4 +44,6 @@ evidence:
   structural:
     status: covered
     references:
+      - packages/backend-c/tests/index.test.ts
+      - packages/backend-c/tests/fragments.test.ts
       - packages/parser-babel/tests/async-generators.test.ts

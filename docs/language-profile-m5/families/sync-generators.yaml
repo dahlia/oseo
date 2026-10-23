@@ -3,6 +3,7 @@ id: sync-generators
 title: "Synchronous generators"
 scope:
   - "Generator suspension, resumption, delegation, and throw repair."
+  - "Active continuation dispatch owns the callable native-frame charge."
 owners:
   - PLAN-M5.md
 evidence:
@@ -14,11 +15,13 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/native/fixtures/generators.ts
       - tests/native.ts
   forced-collection:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/property/m5-generator.property.test.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
       - tests/native.ts
@@ -37,6 +40,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/native.ts
       - tests/native/fixtures/generators.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
@@ -48,4 +52,6 @@ evidence:
   structural:
     status: covered
     references:
+      - packages/backend-c/tests/index.test.ts
+      - packages/backend-c/tests/fragments.test.ts
       - packages/parser-babel/tests/generators.test.ts

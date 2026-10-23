@@ -1153,3 +1153,14 @@ not touch the Float16Array source. A reference run under Node.js and Deno
 on hosts that define Float16Array is evidence that the copy is equivalent
 to upstream, not an Oseo observation. The classifications come only from
 that complete update.
+
+
+Generator continuation stack source preparation
+-----------------------------------------------
+
+The existing `generator-dispatch-stack-charge` node charges resumed bodies
+through the callable native-frame model in both standalone and fragment
+emission. The contract and focused regression evidence are recorded in
+[*PLAN-M5.md*](./PLAN-M5.md#generator-continuation-stack-accounting).
+Source preparation does not mark the node landed, admit test262 paths, or
+replace source reviews, the full UPDATE, and exact-candidate CI gates.
