@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26812
-openPaths: 14279
+closedPaths: 26815
+openPaths: 14276
 states:
   expected-negative: 2581
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 24231
+  pass: 24234
   semantic-failure: 0
   unreviewed: 12780
-  unsupported-profile-feature: 1499
+  unsupported-profile-feature: 1496
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -119,8 +119,15 @@ owners:
       that use eval only as a vehicle: a strict arguments assignment
       early error, a block scope exit probe, two comment code unit
       probes, and a U+180E comment probe. Their early error, scope, and
-      lexical grammar coverage stays inside the claim."
-    paths: 255
+      lexical grammar coverage stays inside the claim. Observation of
+      the reviewed well-known-intrinsics harness adds 3
+      intrinsic-constructor IsConstructor paths: the AsyncFunction,
+      AsyncGeneratorFunction, and GeneratorFunction constructors
+      obtained statically are asserted constructible before their
+      trailing zero-argument construction reports the ADR 0016 run-time
+      rejection, so their IsConstructor subject stays inside the claim
+      pending replacement evidence or a maintainer accounting decision."
+    paths: 258
   node:eval-intrinsic-value:
     note: "Unknown binding 'eval' in 25 paths that read eval as a value
       without evaluating source; ADR 0016 excludes eval in call position
@@ -301,14 +308,11 @@ owners:
   node:unhandled-rejection-observation:
     note: Runtime capability unhandled-rejection-policy; 20 paths.
     paths: 20
-  node:well-known-intrinsics-harness:
-    note: "harness-include: wellKnownIntrinsicObjects.js; 6 paths."
-    paths: 6
   observation:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26812
+    paths: 26815
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -3593,7 +3597,7 @@ paths:
   test/built-ins/AsyncFunction/instance-has-name.js: [pass, observation]
   test/built-ins/AsyncFunction/instance-length.js: [pass, observation]
   test/built-ins/AsyncFunction/instance-prototype-property.js: [pass, observation]
-  test/built-ins/AsyncFunction/is-a-constructor.js: [unsupported-profile-feature, node:well-known-intrinsics-harness, [async-functions, dynamic-source]]
+  test/built-ins/AsyncFunction/is-a-constructor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-functions, dynamic-source]]
   test/built-ins/AsyncFunction/is-not-a-global.js: [pass, observation]
   test/built-ins/AsyncFunction/proto-from-ctor-realm.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-functions, dynamic-source]]
   test/built-ins/AsyncGeneratorFunction/extensibility.js: [pass, observation]
@@ -3608,7 +3612,7 @@ paths:
   test/built-ins/AsyncGeneratorFunction/invoked-as-function-multiple-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-iteration, dynamic-source]]
   test/built-ins/AsyncGeneratorFunction/invoked-as-function-no-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-iteration, dynamic-source]]
   test/built-ins/AsyncGeneratorFunction/invoked-as-function-single-argument.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-iteration, dynamic-source]]
-  test/built-ins/AsyncGeneratorFunction/is-a-constructor.js: [unsupported-profile-feature, node:well-known-intrinsics-harness, [async-iteration, dynamic-source]]
+  test/built-ins/AsyncGeneratorFunction/is-a-constructor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [async-iteration, dynamic-source]]
   test/built-ins/AsyncGeneratorFunction/length.js: [pass, observation]
   test/built-ins/AsyncGeneratorFunction/name.js: [pass, observation]
   test/built-ins/AsyncGeneratorFunction/proto-from-ctor-realm-prototype.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [async-iteration, dynamic-source]]
@@ -5676,7 +5680,7 @@ paths:
   test/built-ins/Function/prototype/apply/resizable-buffer.js: [pass, observation]
   test/built-ins/Function/prototype/apply/this-not-callable-realm.js: [pass, observation]
   test/built-ins/Function/prototype/apply/this-not-callable.js: [pass, observation]
-  test/built-ins/Function/prototype/arguments/prop-desc.js: [unsupported-profile-feature, node:well-known-intrinsics-harness, [functions]]
+  test/built-ins/Function/prototype/arguments/prop-desc.js: [pass, observation]
   test/built-ins/Function/prototype/bind/15.3.4.5-0-1.js: [pass, observation]
   test/built-ins/Function/prototype/bind/15.3.4.5-10-1.js: [pass, observation]
   test/built-ins/Function/prototype/bind/15.3.4.5-11-1.js: [pass, observation]
@@ -5827,7 +5831,7 @@ paths:
   test/built-ins/Function/prototype/call/name.js: [pass, observation]
   test/built-ins/Function/prototype/call/not-a-constructor.js: [pass, observation]
   test/built-ins/Function/prototype/caller-arguments/accessor-properties.js: [pass, observation]
-  test/built-ins/Function/prototype/caller/prop-desc.js: [unsupported-profile-feature, node:well-known-intrinsics-harness, [functions]]
+  test/built-ins/Function/prototype/caller/prop-desc.js: [pass, observation]
   test/built-ins/Function/prototype/constructor/S15.3.4.1_A1_T1.js: [pass, observation]
   test/built-ins/Function/prototype/length.js: [pass, observation]
   test/built-ins/Function/prototype/name.js: [pass, observation]
@@ -5862,7 +5866,7 @@ paths:
   test/built-ins/Function/prototype/toString/async-method-class-statement.js: [pass, observation]
   test/built-ins/Function/prototype/toString/async-method-object.js: [pass, observation]
   test/built-ins/Function/prototype/toString/bound-function.js: [pass, observation]
-  test/built-ins/Function/prototype/toString/built-in-function-object.js: [unsupported-profile-feature, node:well-known-intrinsics-harness, [functions]]
+  test/built-ins/Function/prototype/toString/built-in-function-object.js: [pass, observation]
   test/built-ins/Function/prototype/toString/class-declaration-complex-heritage.js: [pass, observation]
   test/built-ins/Function/prototype/toString/class-declaration-explicit-ctor.js: [pass, observation]
   test/built-ins/Function/prototype/toString/class-declaration-implicit-ctor.js: [pass, observation]
@@ -5924,7 +5928,7 @@ paths:
   test/built-ins/GeneratorFunction/invoked-as-function-multiple-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]
   test/built-ins/GeneratorFunction/invoked-as-function-no-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]
   test/built-ins/GeneratorFunction/invoked-as-function-single-argument.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]
-  test/built-ins/GeneratorFunction/is-a-constructor.js: [unsupported-profile-feature, node:well-known-intrinsics-harness, [dynamic-source, generators]]
+  test/built-ins/GeneratorFunction/is-a-constructor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, generators]]
   test/built-ins/GeneratorFunction/length.js: [pass, observation]
   test/built-ins/GeneratorFunction/name.js: [pass, observation]
   test/built-ins/GeneratorFunction/proto-from-ctor-realm-prototype.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]

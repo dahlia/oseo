@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 146
+M5a is complete. The normative family records described below inventory 147
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -8603,8 +8603,9 @@ complete. The remaining gaps retain their existing owners.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
-    *promiseHelper.js*, *propertyHelper.js*, and
-    *resizableArrayBufferUtils.js*. The RAB copy replaces only the three
+    *promiseHelper.js*, *propertyHelper.js*,
+    *resizableArrayBufferUtils.js*, and *wellKnownIntrinsicObjects.js*.
+    The RAB copy replaces only the three
     Function-constructed subclasses with named class expressions of the same
     global heritage, preserving both Float16Array probes and the upstream
     constructor lists. It does not admit dynamic source construction.
@@ -8620,14 +8621,35 @@ complete. The remaining gaps retain their existing owners.
     reviewed copy caches the initial `globalThis` value when the harness
     loads instead. It keeps the upstream `fnGlobalObject` definition and
     its cache, compiles no source text, and also works in module cases,
-    where a top-level `this` probe would yield `undefined`. Cases in the
-    reviewed function inventory that need *wellKnownIntrinsicObjects.js*
-    classify as unsupported until that include has a reviewed
-    implementation. The
-    reviewed *asyncHelpers.js* probes `$DONE` with `typeof` rather than
-    through `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a
-    choice kept from before M5b node `globalthis-binding` admitted
-    `globalThis`. Its
+    where a top-level `this` probe would yield `undefined`.
+    *wellKnownIntrinsicObjects.js* joined with M5c node
+    `well-known-intrinsics-harness`. Upstream obtains each intrinsic of
+    that include by passing its source string to the `Function`
+    constructor, which [ADR 0016](./adr/0016-dynamic-source-boundary.md)
+    keeps outside the profile. The reviewed copy keeps every name, source
+    string, record, and lookup failure of the pinned upstream text and
+    obtains each value from a statically compiled function that returns
+    the same source expression, ignoring an abrupt completion as upstream
+    does. Its one respelling is `%eval%`, because the profile rejects a
+    bare `eval` identifier read. Upstream's bare `eval` resolves in the
+    global environment; when no global lexical `eval` exists, that is the
+    global object record, so the lookup performs its HasProperty and Get
+    on the Script's top-level `this`, which is the global object in either
+    strictness and does not depend on the `globalThis` binding. An absent
+    property yields undefined, the value upstream records after discarding
+    the realm's own `ReferenceError`, without constructing one through the
+    replaceable `ReferenceError` global. The lookup does not reproduce a
+    non-strict Script's top-level `let` or `const` named `eval`, which only
+    an identifier read can observe, and a Module's undefined top-level
+    `this` would leave `%eval%` undefined. No consumer of the include at
+    the pinned upstream revision is either, which a source test checks
+    against every pinned consumer; reading the identifier itself belongs to
+    M5c node `eval-intrinsic-value`. A case that then calls or constructs one
+    of the source-compiling constructors the include returns still reaches the
+    ADR 0016 boundary at that call. The reviewed *asyncHelpers.js* probes
+    `$DONE` with `typeof` rather than through
+    `Object.prototype.hasOwnProperty.call(globalThis, "$DONE")`, a choice kept
+    from before M5b node `globalthis-binding` admitted `globalThis`. Its
     `assert.throwsAsync` reports a constructor mismatch without composing a
     message from the observed value, so a rejection whose `constructor` is
     missing or exotic cannot replace the mismatch report with a thrown

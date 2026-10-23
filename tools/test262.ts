@@ -206,6 +206,10 @@ const testAtomicsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/testAtomics.js",
 );
+const wellKnownIntrinsicObjectsHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/wellKnownIntrinsicObjects.js",
+);
 
 const canonicalTarget = canonicalTest262Target;
 const runnerHost = createNodeHost();
@@ -225,7 +229,6 @@ const reviewedExecutionPoolLimit = Math.min(
   availableParallelism(),
 );
 const reviewedExecutionRetryLimit = 1;
-const unavailableHarnessIncludes = new Set(["wellKnownIntrinsicObjects.js"]);
 
 /** Host-varying facts reported outside the canonical manifest. */
 export interface ReviewedTest262RunMetadata {
@@ -1682,25 +1685,6 @@ export async function executeTest262Case(
       evidence,
     );
   }
-  const unsupportedInclude = parsed.flags.includes("raw")
-    ? undefined
-    : parsed.case.includes.find(
-        (include) =>
-          unavailableHarnessIncludes.has(include) &&
-          !harnesses.includes.has(include),
-      );
-  if (unsupportedInclude != null) {
-    return classifyTest262(
-      parsed.case,
-      {
-        detail: `Not executed: unsupported harness ${unsupportedInclude}.`,
-        passed: false,
-        unsupportedCapability: "harness-include",
-      },
-      observedFeatures,
-      evidence,
-    );
-  }
   const structuralCapability = unsupportedStructuralCapability(
     source,
     parsed,
@@ -1912,6 +1896,10 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
       ],
       ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
       ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
+      [
+        "wellKnownIntrinsicObjects.js",
+        await readFile(wellKnownIntrinsicObjectsHarnessPath, "utf8"),
+      ],
     ]),
   };
 }

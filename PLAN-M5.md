@@ -27,7 +27,7 @@ tests and 18,093 built-in tests are inside the 16th edition, while 6,290
 proposal, post-edition, or Annex B paths are outside it. The compact inventory
 remains separate from the result manifest.
 
-M5a and M5b are complete. The 146 indexed records in the normative
+M5a and M5b are complete. The 147 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
