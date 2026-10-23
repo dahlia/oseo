@@ -1,5 +1,5 @@
 U6 shard assignment evidence
-
+============================
 
 Current weight source
 ---------------------
@@ -811,11 +811,12 @@ SHA-256 matched the frozen copy before and after the run:
 `1611ec44d2bbbb43f021f74e6d8b5a9ffa706ad7e597a0aa0d95e94159304ff0`.
 
 An earlier validation run of the same command, from 00:51:11 to 01:12:06,
-also passed all seventeen registrations, with a sum of 1,254,444
-milliseconds. It started about eleven seconds before a behavior-neutral
-lint refactor and a string split reached the file, so it does not set the
-weight. The raw result, stdout, stderr, and duration lines of both runs
-are retained under
+also passed all seventeen registrations. Its printed leaf durations sum to
+1,254,206.335035 milliseconds; the 1,254,444.403766 milliseconds in its
+summary line is the property runner's own duration, not that sum. It
+started about eleven seconds before a behavior-neutral lint refactor and a
+string split reached the file, so it does not set the weight. The raw
+result, stdout, stderr, and duration lines of both runs are retained under
 */data/m5c-computed-member-reference-key-order-20261023/impl/heavy/*.
 
 macOS remains unmeasured. Its weight of 832 seconds is an explicitly

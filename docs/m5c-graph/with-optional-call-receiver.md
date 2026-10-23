@@ -64,11 +64,14 @@ Limits:
     `0d63507b150bcbbab98a45603a1e85177205c829` was not executed natively;
     static inspection of its HIR and MIR shows the same lost receiver, so the
     defect predates `eval-intrinsic-value`.
- -  The `eval-intrinsic-value` correction on
-    `12ec5922047a305ea41584fc0bdc0471552ae6ad` was not executed for this
-    program. Static analysis of that commit shows the optional-chain lowering
-    unchanged: its only *mir-build.ts* change makes `lowerWithRead` perform
-    GetBindingValue on the selected object.
+ -  The `eval-intrinsic-value` GetBindingValue correction was not executed
+    for this program. Commit `0ae8de515734142d9140519cd20e5af95a7e36f2`
+    introduces it, and its only *mir-build.ts* change makes `lowerWithRead`
+    perform GetBindingValue on the selected object. The tree inspected was
+    `12ec5922047a305ea41584fc0bdc0471552ae6ad`, whose parent is `0ae8de51`
+    and whose own diff changes no file under *packages/*; that tree
+    therefore carries the compiler change unchanged. Static analysis of
+    that tree shows the optional-chain lowering unchanged.
  -  A textual search of the pinned test262 revision
     `f2d1435644797268dca1f7988cad5a4e89ccd8d2` finds no file under *test/*
     that contains both a `with` statement and an optional call, so no
@@ -79,8 +82,9 @@ Limits:
 Source location
 ---------------
 
-On `12ec5922`, `lowerOptionalChain` in *packages/compiler/src/mir-build.ts*
-(line 3572) lowers the chain base with `lowerExpression` (line 3580). For a
+On the tree of `12ec5922`, which carries the `0ae8de51` correction,
+`lowerOptionalChain` in *packages/compiler/src/mir-build.ts* (line 3572)
+lowers the chain base with `lowerExpression` (line 3580). For a
 `with-get` base, that reaches `lowerWithRead` with `retainReceiver` false, so
 only the value survives. A first call link with no preceding member link then
 passes a synthetic `undefined` receiver, at line 3667 for a chain-boundary call

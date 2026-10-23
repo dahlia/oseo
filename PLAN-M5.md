@@ -8684,12 +8684,29 @@ comparison of base `c249cad8` with this change over every reviewed Script
 path whose source names `eval` found byte-identical diagnostics for all 150
 reviewed call-position paths, in every strictness and both policies. The
 text is retained because the exclusion audit binds those accepted
-observations to it, not because `eval` is unknown. Every other call of the
-value is an ordinary call: `(0, eval)(...)`, `eval?.(...)`, a call through
-a parameter, and a call through a `with` object, including the fallback in
-*test/language/eval-code/direct/global-env-rec-with.js*. A String argument
-then reaches %eval%‘s run-time `OSEO1001` boundary, and any other argument
-is returned unchanged, as PerformEval does without parsing.
+observations to it, not because `eval` is unknown. `(0, eval)(...)`,
+`eval?.(...)`, and a call through a parameter of another name are ordinary
+calls that 13.3.6.1 never routes to PerformEval: the comma expression hands
+EvaluateCall a value rather than a Reference Record, the parameter's
+Reference Record is not named `eval`, and the optional chain evaluates
+through ChainEvaluation (13.3.9.2) and EvaluateCall. A call written
+`eval(...)` inside a `with` body is different. Its Reference Record has an
+Environment Record base whether the `with` object supplies `eval` or the
+lookup falls back to the global property, so IsPropertyReference (6.2.5.1)
+is false and step 6 of 13.3.6.1 makes it a direct eval whenever the value
+is %eval%, including the fallback in
+*test/language/eval-code/direct/global-env-rec-with.js*.
+Node.js 24.21.0 and Deno 2.9.7 confirm that both the with-owned and the
+fallback form read the caller's local scope while `(0, eval)`, `eval?.()`,
+and a parameter call read the global one. Only a `with` object that
+supplies a different function makes the call an ordinary call of that
+function. Oseo performs no direct eval. The resolver cannot decide the
+call statically, so it dispatches it through the generic call path, where
+a String argument reaches %eval%‘s run-time `OSEO1001` boundary and any
+other argument is returned unchanged, as PerformEval (19.2.1.1, step 2)
+does before parsing in the direct and the indirect case alike. This
+dispatch is an implementation path, not a classification of the call as
+indirect; the admitted observations and their owners do not change.
 
 A tagged template whose tag is the unshadowed `eval`, such as ``eval`x` ``
 or ``(eval)`x` ``, is also an ordinary call. ECMA-262 2025 13.3.11.1

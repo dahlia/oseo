@@ -955,9 +955,10 @@ test("reads and writes the eval global property as a value", () => {
 });
 
 test("keeps the ADR 0016 rejection of an unshadowed eval call", () => {
-  // The call position is a direct eval whenever the value is %eval%, so
-  // only the global object's property can be it, and ADR 0016 keeps that
-  // call outside the profile with the diagnostic it always had.
+  // ECMA-262 2025 13.3.6.1 makes a call a direct eval when its callee is
+  // an identifier Reference named eval, IsPropertyReference is false, and
+  // the value is %eval%. An unshadowed eval(...) is such a call, and ADR
+  // 0016 keeps it outside the profile with the diagnostic it always had.
   for (const source of [
     'eval("1");',
     "eval(1);",
@@ -983,8 +984,14 @@ test("keeps the ADR 0016 rejection of an unshadowed eval call", () => {
       source,
     );
   }
-  // A declared or `with` binding may hold any value, so its call is an
-  // ordinary call, and a String argument meets %eval%'s run-time boundary.
+  // A parameter, var, or `with` object may hold any value. A call whose
+  // Reference name is eval and whose Environment Record base yields %eval%
+  // is semantically direct; a binding or replacement function with a
+  // different callable value is an ordinary call of it. Oseo cannot decide
+  // that statically, so it compiles these calls through the generic path,
+  // where a String argument meets %eval%'s run-time boundary. The sources
+  // and expectations below exercise that existing dispatch, not a
+  // reclassification of the calls.
   for (const source of [
     "function f(eval) { return eval(1); }",
     "var eval; eval(1);",

@@ -3743,10 +3743,16 @@ as ordinary bindings. ADR 0016 still excludes the unshadowed call position,
 %eval%. The resolver rejects that call before evaluating any argument and
 keeps its original `Unknown binding 'eval'.` diagnostic text and range,
 because the exclusion audit binds each accepted direct-eval observation to
-that text. Every other call of the value, such as `(0, eval)(...)`,
-`eval?.(...)`, a call through a parameter, a call whose `with` object
-misses, or a tagged template such as ``eval`x` ``, is an ordinary call. Its
-String argument meets %eval%‘s run-time `OSEO1001` boundary, and any other
+that text. `(0, eval)(...)`, `eval?.(...)`, a call through a parameter of
+another name, and a tagged template such as ``eval`x` `` are ordinary calls
+that 13.3.6.1 never routes to PerformEval. A call written `eval(...)` inside
+a `with` body is a direct eval under 13.3.6.1 whenever the value is %eval%,
+whether the `with` object supplies the name or the lookup falls back to the
+global property, because its Reference Record has an Environment Record
+base either way; only a `with` object that supplies a different function
+makes it an ordinary call of that function. Oseo performs no direct eval.
+It dispatches such a call through the generic call path, so its String
+argument meets %eval%‘s run-time `OSEO1001` boundary, and any other
 argument is returned unchanged. No source is evaluated.
 
 The fixed `eval-intrinsic-value` native fixture and the generated domain at
