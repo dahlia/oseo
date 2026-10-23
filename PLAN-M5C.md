@@ -1230,3 +1230,31 @@ class sets, unlinked case folding, and the non-ASCII identity escape without
 `u` keep their located boundary, so the capability stays in the runner's
 vocabulary. No exclusion is proposed, and no dynamic source text is admitted
 beyond the pattern grammar RegExp construction already compiled.
+
+
+Observation batch 15 current-source preparation
+-----------------------------------------------
+
+The private, unlanded preparation observes the 836 reserved paths (456 review
+units) on accepted Source4 R, f2c306680af07fea8011e6737d5b21100d9654d0. The
+actual scoped UPDATE read clean B15 input `ca53384a` and left its tree
+unchanged; that commit is both the original input U and result R. This
+preparation replays only its B15 delta onto the corrected Source4 documentation
+at `e6994838`, which changes no observation input. Fresh execution records 661
+passes, 151 expected negatives, and 24 unsupported profile features. The subset
+retains R's pinned revision and supported features; all prior 28,311 records
+remain unchanged. The manifest totals are 29,147 reviewed paths: 24,966 passes,
+2,732 expected negatives, and 1,449 unsupported profile features, with 11,944
+inventory paths still unreviewed. The 146 supported features are unchanged.
+These preparation counts do not replace the successful Main baseline or land
+any node. The corrected classes dependencies and two async-only
+iterator-protocol removals come from the preserved B15 admission metadata at
+`29d5f8fd`. Its old failed-source observations are historical and were not
+reused.
+
+The unsupported rows retain source-bound assessments: 16 eval-semantic subjects
+retain the existing bounded ADR 0016 approval and resume conditions, while eight
+object-literal fixture subjects remain in-claim under dynamic source coverage
+remediation. Tags do not authorize exclusions. B15 remains ready and unlanded;
+Root review retention, exact candidate CI, and Main reparenting with D3
+reassessment remain publication prerequisites.

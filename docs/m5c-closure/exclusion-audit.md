@@ -261,3 +261,17 @@ and assertions retained. The new assessments bind their actual rejection
 observations and the reviewed constructor/prototype and out-of-bounds native
 replacement evidence. They authorize no exclusion. WKI paths, dynamic-source
 ownership, import64, and Caller23 remain unchanged.
+
+
+Observation batch 15
+--------------------
+
+Fresh accepted Source4 R observations add 24 source-bound path assessments. The
+16 direct-eval subjects test eval-created variable environments, binding
+conflicts, or lexical separation and retain only the existing bounded
+ADR 0016 authorization. Eight object-literal tests use eval as fixture
+construction; their getter, setter, descriptor, and duplicate-property
+subjects remain in-claim under dynamic-source-coverage-remediation. The
+derived owner total is 273; no tag creates an exclusion. Source and
+observation digests bind every assessment to the pinned source and fresh
+canonical record. Integrated formal review remains pending.
