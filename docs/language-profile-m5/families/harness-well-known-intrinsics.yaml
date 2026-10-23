@@ -38,8 +38,8 @@ evidence:
       adds no object kind, root, or collector path of its own; each value's
       collector behavior belongs to the family that owns that intrinsic."
     replacements:
+      - tests/test262-well-known-intrinsics.test.ts
       - tests/test262/harness/wellKnownIntrinsicObjects.js
-      - tests/test262/results.yaml
   generated:
     status: omitted
     reason: "The input is the fixed upstream table at the pinned revision.
@@ -51,35 +51,50 @@ evidence:
   guard-fallback:
     status: omitted
     reason: "The include adds no hint, guard, or specialized operation of
-      its own. The reviewed runner first executes a case that loads it in
-      its first admitted strictness mode with specialization disabled.
-      Only when that variant does not decide the result does the runner
-      execute every admitted strictness mode under both specialization
-      policies, so a passing case has run all of them. A case whose first
-      variant decides an unsupported or failing result records only that
-      variant, and its result is no evidence about the enabled policy."
+      its own. When a canonical observation is taken, the runner's first
+      variant is the first admitted strictness mode with specialization
+      disabled. If that probe decides an unsupported or failing result, the
+      runner records only that variant and starts no other, so the result
+      claims no enabled-policy comparison. Only when the probe does not
+      decide does the runner start every remaining admitted strictness and
+      specialization combination. This candidate has no such observation
+      yet; a future full test262 UPDATE supplies it."
     replacements:
       - tools/test262.ts
-      - tests/test262/results.yaml
+      - tests/test262-well-known-intrinsics.test.ts
   specialization:
     status: omitted
-    reason: "The include adds no specialization surface of its own. The
-      reviewed runner compares the enabled and disabled policies of a case
-      that loads it only when the case's first variant, specialization
-      disabled in its first admitted strictness mode, does not decide the
-      result. It then executes every admitted variant and rejects any
-      difference, so a passing case matched under both policies. A case
-      that stops at its first variant records only that variant, and its
-      result proves no comparison with an enabled-policy execution."
+    reason: "The include adds no specialization surface of its own. When a
+      canonical observation is taken, the runner compares the enabled and
+      disabled policies only when the first variant, specialization
+      disabled in the first admitted strictness mode, does not decide the
+      result. It then starts every remaining admitted variant and rejects
+      any difference. A case that stops at its first variant records only
+      that variant, and its result proves no enabled-policy comparison.
+      This candidate has no such observation yet; a future full test262
+      UPDATE supplies it."
     replacements:
       - tools/test262.ts
-      - tests/test262/results.yaml
+      - tests/test262-well-known-intrinsics.test.ts
   standards:
-    status: covered
-    references:
+    status: omitted
+    reason: "Source staging is complete, but this candidate has no canonical
+      observation of the six owned paths. Their checked-in manifest rows are
+      inherited from Main, where they still record the unsupported harness
+      include and were not executed. The bounded replacements below compare
+      the reviewed copy with the upstream copy, scan every pinned consumer,
+      admit the include to runner execution, and list the six subset
+      entries; they are not native standards passes. A future full test262
+      UPDATE, followed by independent review, supplies the canonical
+      observed rows. Its policy applies the runner's early stop: the first
+      admitted strictness mode with specialization disabled may decide the
+      result and end the scan; only otherwise does the runner execute every
+      admitted strictness mode under both specialization policies."
+    replacements:
+      - tests/test262-well-known-intrinsics.test.ts
+      - tools/test262.ts
       - tests/test262/harness/wellKnownIntrinsicObjects.js
       - tests/test262/subset.yaml
-      - tests/test262/results.yaml
   structural:
     status: omitted
     reason: "The include is ordinary JavaScript assembled ahead of each
