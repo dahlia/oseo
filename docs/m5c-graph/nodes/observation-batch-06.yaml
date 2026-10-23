@@ -10,4 +10,4 @@ dependencies:
   - eval-intrinsic-value
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

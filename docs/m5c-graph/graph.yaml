@@ -19,11 +19,11 @@ baseline:
   unreviewedPaths: 12780
   unsupportedProfileFeatures: 1463
 summary:
-  nodes: 86
-  ready: 79
-  blocked: 7
+  nodes: 87
+  ready: 85
+  blocked: 2
   parked: 0
-  landed: 44
+  landed: 48
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge
@@ -2752,3 +2752,237 @@ collisions:
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
       concurrently."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - generator-dispatch-stack-charge
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-15
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-16
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-17
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - primitive-receiver-inherited-set
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - regexp-property-escape-harness
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - regexp-split-coverage-remediation
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - test262-host-script-bindings
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - typed-array-proto-coverage-remediation
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - unhandled-rejection-observation
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - with-optional-call-receiver
+    note: "Independent primitive Set remediation and this publisher update
+      the manifest; serialize final publication under D2."
+  - path: docs/m5c-graph/graph.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - primitive-receiver-inherited-set
+    note: "Independent semantic remediation publishes shared graph, owner
+      or profile data; serialize final publication under D2."
+  - path: docs/m5c-closure/ledger.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - primitive-receiver-inherited-set
+    note: "Independent semantic remediation publishes shared graph, owner
+      or profile data; serialize final publication under D2."
+  - path: docs/language-profile-m5.md
+    nodes:
+      - dynamic-source-coverage-remediation
+      - primitive-receiver-inherited-set
+    note: "Independent semantic remediation publishes shared graph, owner
+      or profile data; serialize final publication under D2."

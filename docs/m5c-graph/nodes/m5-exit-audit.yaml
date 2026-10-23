@@ -68,6 +68,7 @@ dependencies:
   - observation-batch-31
   - observation-batch-32
   - parenthesized-assignment-function-name
+  - primitive-receiver-inherited-set
   - primitive-wrapper-objects
   - promise-feature-admission
   - proper-tail-calls
