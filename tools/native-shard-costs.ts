@@ -53,8 +53,10 @@
  *
  * Script and Module declaration grammar is pure JavaScript but participates
  * in the native extended file glob. Its Linux weight is a local extended
- * two-registration case sum; the unmeasured macOS placeholder preserves
- * the prior unknown-file upper median. Both await exact-candidate CI logs.
+ * two-registration case sum; its unmeasured macOS placeholder retains the
+ * historical 286-second assigned cost. The combined continuation-dispatch
+ * estimates raise unknown-file upper medians to 406 Linux/296 macOS seconds.
+ * Both Script entries await exact-candidate CI logs. See U6 provenance.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -328,8 +330,9 @@ export const nativeShardCosts = {
     "tests/property/m5-regexp-unicode-property-escapes.property.test.ts": 1,
     "tests/property/m5-rest-parameter.property.test.ts": 71,
     "tests/property/m5-runtime-error-observation.property.test.ts": 397,
-    // Unmeasured provisional placeholder: prior upper median, 286 s.
-    // Preserves the unknown-file fallback; refresh from candidate CI.
+    // Unmeasured placeholder: historical Script-only upper median, 286 s.
+    // Keeps this file's cost; combined unknown-file fallback is 296 s.
+    // Refresh from exact-candidate CI. See U6 provenance.
     "tests/property/m5-script-module-declarations.property.test.ts": 286,
     "tests/property/m5-set-composition-methods.property.test.ts": 319,
     "tests/property/m5-set-intrinsic.property.test.ts": 331,

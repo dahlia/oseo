@@ -924,13 +924,24 @@ with an AMD Ryzen 7 7700X and 16 logical CPUs. The fresh capacity prefix
 selected `generous`, no CPU quota, and `MemoryMax=104G`. The source tree
 stayed clean throughout the measurement.
 
-macOS is unmeasured. Before this addition its table held 135 entries;
-sorting them numerically and selecting zero-based index `floor(135/2)`
-gave the unknown-file upper median of 286 seconds. Adding an explicit
-286-second placeholder leaves that median at 286 for 136 entries and
-preserves the file's prior macOS fallback behavior. This is a provisional
-unmeasured scheduling value, with no measured host ratio or bound. Refresh
-both host entries from future exact-candidate extended CI case logs.
+macOS is unmeasured. At measurement source `a94d779f` and pre-composition
+base `8387dc9a`, each host's table held 135 entries. Sorting numerically and
+selecting zero-based index `floor(135/2) = 67` gave unknown-file upper
+medians of 401 Linux/286 macOS seconds. Adding only Script's explicit
+41/286 entries gives 136 entries and index `floor(136/2) = 68`, with the
+same upper medians. The macOS placeholder therefore kept this file's
+assigned cost and the unknown-file fallback at 286 in that historical
+Script-only calculation.
+
+The integrated table at `6cbc6c9f` includes the continuation-dispatch
+planning estimates below. Its 136 entries select index 68 at 406
+Linux/296 macOS seconds. The increases to three existing generator/async
+weights raise those unknown-file fallbacks; inserting the old median
+alone does not. Script's explicit entries still assign it 41 Linux/286
+macOS seconds, independently of the combined table's upper medians.
+The macOS value remains a provisional unmeasured scheduling placeholder,
+with no measured host ratio or bound. Refresh both host entries from
+future exact-candidate extended CI case logs.
 
 Raw TAP, stderr, timestamps, commands, runtime/machine metadata, source
 hashes, the aggregate calculation, and the fallback calculation are retained
