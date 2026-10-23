@@ -3601,8 +3601,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "3ab514fef0e0ee57c4569f8c0c025494bc7341ba6165c4380210a421d796\
       383b"
-    observationDigest: "23bb20470c24928de697858f8c447a03df5cb234571614da396da6f\
-      0974d3905"
+    observationDigest: "e6e35a69365422a826314d7650c688c5735ee49cfd7a3c046da50be\
+      b4b8a6430"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3614,8 +3614,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "4b5f31d182ada27e2197625331c63921c423ed5c1a9f8c4c15f6c27b1d74\
       5f0e"
-    observationDigest: "030544587b7e4a0f1d6b613cffc2264b3f35078b39e68a613287920\
-      1077f0947"
+    observationDigest: "577c2a66bb4ffcf563e1b4e5b63dc9609e55f0a78af2e745bcd17fa\
+      561790dd1"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3627,8 +3627,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "6d74ac6266494efa27e8ba179954ad7a4a0fbb27f28dbf854816b1501b68\
       d18e"
-    observationDigest: "224db0f345f8a852934e2df006dc49279fc487054bccfd4f41edb2a\
-      ecdbed6c4"
+    observationDigest: "664f35ab131ed17de614e70e357f6dc707fc56ec2e3efe19e5f3e12\
+      5cf8aff2c"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3640,8 +3640,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "4f149267d539e3a7b6c1af16da08efc83d7b7b9d9cba3ec2a5b5df8d493f\
       6fcb"
-    observationDigest: "cd9ffa99368bddcaa532ac36e54b6af07cb055bb1821fd03e6c2cfc\
-      781ac4fd4"
+    observationDigest: "72d178963528e3d79aea9c3b2f0d26cc90f4ca325ba26226f63c4c0\
+      32f0359ff"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3653,8 +3653,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "f05eca4ff87f4086a418080a400ba25cfe7fd712bdfd684c3b56da58b5c3\
       ea06"
-    observationDigest: "7e32f6a6fe9c0cac9b2e005eaf0f036c23024405b1ea2aa92dbb13d\
-      1f5459482"
+    observationDigest: "214abddc0a2c4cc157368fd974fdd788c983bb9a32360004809b49a\
+      92828bb81"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3692,8 +3692,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "bf006fa53c71e95c30f3d02aad89369bae512b0619619a8b75946c07ffa9\
       ad2a"
-    observationDigest: "dff078ace993414cb00fab0e15ddc9d469a79699555c68c852c6f6e\
-      9c059b33a"
+    observationDigest: "9cdb76ffa6f3b096537fd14f4bd3033713f72ec4d84259ecf326496\
+      59d84fc8d"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3770,8 +3770,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "e5cd50546dc5ce97b93b56f9429660b3c2871260c663cb6d7f926a80b663\
       d826"
-    observationDigest: "e0e7df5c185ba621e621ecde087e502eb3fcfde9c92ee54008beab0\
-      3dc413c7c"
+    observationDigest: "6f00de36ecd5e1c37a80e6216e80da2eb3bed33be560892dfc38d20\
+      b40340116"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3783,8 +3783,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "705531502a73b52c27d11ace4886be86d7523b5118d05ba27ae0ed5b90ac\
       3b7a"
-    observationDigest: "bddbea3d4add6a48282d282bfd673a138492c51ca4e0e5741f4cf0d\
-      75cbcdbfe"
+    observationDigest: "a2bdf29eaeb3a1f211fc0e96477dbf50cf2980dc10f4c6ab2dc01df\
+      e18346451"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3796,8 +3796,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "e1b46305531343f54f7001563c54e0a90a643eb87211f3b99b6a27c55ed8\
       8613"
-    observationDigest: "f848581df6a9622128bb221cc351db6cc9ec3e8f5311ece25a49649\
-      c2ac5ef45"
+    observationDigest: "b433cd6ec23148cc37edd76bd596d45a8bae66b7f1166813d616931\
+      d814b163f"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3809,8 +3809,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "ac3c0773db1e30b2cf1bd70e88ddbb90b707767e3941140d33a301f03b85\
       7358"
-    observationDigest: "4cd9387c0b88e2a58e90b4e422e9e49f8febf40e416d3c43f559a20\
-      f558db31e"
+    observationDigest: "aedd16ff7609fa613f093837217129db8b4d7384cdff35e279fa302\
+      542037ee8"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3822,8 +3822,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "873dace5fc6d35b754b3ecefea77ca1741703fa25611baa1fe92168e26e7\
       c12f"
-    observationDigest: "f83992125e5f12313948ccb308fac5fa939f1b35b12b865efb40318\
-      5602335a8"
+    observationDigest: "2a508211a121db962d867bf852ab34a74327e70f76fbc2deb542fe8\
+      25debb5b3"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3861,8 +3861,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "ee332160ac6fd484f83cc4e3c3a1490baaa8dab6412156eb459010d2d4a8\
       0868"
-    observationDigest: "43d17970c11bfa389a29cf4c5537cf51ba4e90ef4475866562e26f8\
-      090b1a86f"
+    observationDigest: "7d65c6fc65c323f44661777968980dcb1ff7e729f34f53407662282\
+      bbd17c531"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3939,8 +3939,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "9095a44552167aaf7b6d6ac9012224303e4a0ef97b4033428f9605cc7c9d\
       c605"
-    observationDigest: "2438939eced526e10d5113f01120fb9f71010eb02b1ae762489af30\
-      9fb2cb8eb"
+    observationDigest: "87083a5c1c2bed74922f778ad15fbb9e25f088011636020ec4cad97\
+      0b731a0ae"
     missingDynamicTag: true
     section: sec-performeval
     upstreamSection: sec-performeval-rules-in-initializer
@@ -3952,8 +3952,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "9e30a751762196b9db6113828c57ae4bff398965bc0169634f25ccc3192d\
       70d2"
-    observationDigest: "eda26914f73bff601838a25cbe4a631c781225ae702305f35568b54\
-      53253cc00"
+    observationDigest: "16f10d01055721d2a8ec4bcf5ba1772922d10b965dbfbbf1b35bfbd\
+      a189f4581"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3965,8 +3965,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "2a2af7dd4bd141846ffc86d03f7dfb12e63fce8d33980c7832fd3bfd61dc\
       edc6"
-    observationDigest: "f9b382d76c74299195588838e970c98e2fd85bc842c4a6190397028\
-      341c42e92"
+    observationDigest: "b5f1f1b5c7b279acb69817e758f5fc66e48d0ae214646fda3f1f575\
+      59b373bb9"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3978,8 +3978,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "9e9b4a2e076708b26b29c5f56d1af0f61bbb82e91964a2a567fa28ae11d9\
       3baa"
-    observationDigest: "abcb2571e482e1e929607d07fcd0576d3b5ad88c3c03d05cfef08f6\
-      cfeb5502f"
+    observationDigest: "8b885387d2b63a7532f963449cb4377b1995f4787b6054d373e3f25\
+      1c7d1dc78"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -3991,8 +3991,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "09379d1bd158e9c23bdcc874ee1a3b1a9c2c74f01e7ecbb10e39ca044578\
       8338"
-    observationDigest: "911be20475864e59498c05e7f8c246f533d7a18f8c4ebe7d922e2e1\
-      7c32a8e9e"
+    observationDigest: "c4ba28702bf1457c44c034e19c7c8a675029c3de043fb97e2f80551\
+      514dd95ac"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4030,8 +4030,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "18cd1821ea085d19c8520df3cf26e547c60f8574988365b7c261e87627a2\
       32d8"
-    observationDigest: "ceba2248ab3f8a38cf5a8c1f69a774cba8f40365450d5d519ddcabe\
-      c14bbb4c9"
+    observationDigest: "246a2d64f3a93e1403c26531b392e7a02a251f40d0c2612b7b5699c\
+      c01dc2df2"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4043,8 +4043,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "23f2e667aaffd9f90a4446daf3c0d602d6d6178596da867ac97e2c1a6e24\
       572e"
-    observationDigest: "31079d8ad06fe7fcb47f4391d4aa086e377c96d748a6b21527bd962\
-      ff7dc8521"
+    observationDigest: "c49d30b3c0c624088bb9a25a2a2b979be2229c4b1480224d127e391\
+      ae330dcac"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4121,8 +4121,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "c8fd85bd45f07c3e5c351b77384cd8524a3351db39b9c1ca170e3df04c38\
       bcb0"
-    observationDigest: "a75019a9ada070a7a4543800e35b58ae42747fc3b63c48bad97649f\
-      2062c0aad"
+    observationDigest: "ef8b908e81b62c79f61c39c5df2f84461c81a0563106561d1f42a89\
+      7c703475a"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4134,8 +4134,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "0953cde6daf07b6e4f1b8c410ca5f043adbcdac52cb577b265405003e486\
       7470"
-    observationDigest: "2c4f2b15e0e295e77c4a99cdd149cd8b685fdbb230397d6b0173085\
-      f92a459f6"
+    observationDigest: "e90c0fcf7acb21d0330fb5433902867ea45a537ca8cb57c879db939\
+      e83e39186"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4147,8 +4147,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "efb1de41adcf668bfac8f80a8f34f05d9ad8e48c9c7d28f9b593c0fc501c\
       97c7"
-    observationDigest: "bbeee65dcbf4d871dbfdfc22cf2f228e8a6fe8f0e09989a2bceb208\
-      c01b7169e"
+    observationDigest: "21bb9ea63e1bd0b3b43b9a58a64877e5d5f3453be9f9513dec05b50\
+      b127c2bad"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4160,8 +4160,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "a02b2620941ffb749dd2361f1d1c28c7cb335b8c6aa199fe7693b91c37e2\
       8b1e"
-    observationDigest: "500f04e2f70bf30117214dabad32e34f2dcec158c84f519b994e7c4\
-      d1490ec92"
+    observationDigest: "f42545fdd8843c38bcf2d996565ecc36611e2d7efbcb47a69347914\
+      8a5703e62"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4173,8 +4173,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "6949efd67ee84ba33b446be7faabe4f284c41e390b74b67193a6d9fee114\
       8506"
-    observationDigest: "450cb73f9d3ef9613aba9ee2dce532d2d2be6ac2803f6d06ca6f740\
-      e8bfa21ba"
+    observationDigest: "5c13439156533437bf95760bbb008c9347abb88a0c028194f281300\
+      17150dcb0"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4212,8 +4212,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "1c7c4f883350fb1fed509a612486b5774bab91fd330b88d2f13221ac1a6d\
       fcde"
-    observationDigest: "fe1031e0247ad4801283c5b1dd7fb1a0b7e816d3da8c0d04f92c201\
-      0414d7e22"
+    observationDigest: "04c38ad317ba96bb70deac9ef819bc3a12bfd3446e6f33cee40e7e1\
+      39a88dfe8"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4225,8 +4225,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "a57100ae0c0ac331433f28c3de4f56b884e4140bdd08a82581896221f2ec\
       7659"
-    observationDigest: "09940955c28ea6b5c821d3be87e8c96fc1ca5d70bb966b83803dc72\
-      7d41e5650"
+    observationDigest: "f22865bb29ae7c1a8fdd70f5d9e50e0bbac7e1a453f6e01067ad35c\
+      7e1457379"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4303,8 +4303,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "78be9eb96aa816f5199e901c32e0e3931b037c6c8379a3e6909093a7351d\
       fc0e"
-    observationDigest: "1e5108d99e63357fa49dccf592239cf96064b6e1fc17b58522abd3a\
-      7fb31e0ca"
+    observationDigest: "049ebe81cb104c69ff7589857ba4fb06ede9bbda007970072acb985\
+      21189c3ff"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4316,8 +4316,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "b17deeb7022e18a9f2d6a425532b9a5aa6efb101776e44bd858fccc62f8f\
       9168"
-    observationDigest: "2af340d1474548a5d986727d48c8cf5ed808be91abb10e1eb12aae6\
-      15c2b31f6"
+    observationDigest: "ee192ae61252e13a90fa74c55794b1f927b873409db553fbc126f2c\
+      ae2d075c6"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4329,8 +4329,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "1c6d2e2a747875386c07da24705f18f7631a95d202aae786209798fcc36a\
       4617"
-    observationDigest: "6961ab07bd7f25cca37718ff8dad3024de41096ebe748fe47b16701\
-      cd18aec01"
+    observationDigest: "a7b8af9053e6e542ca52e6dc3211d3775770391916820003fce7619\
+      7273ab882"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4342,8 +4342,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "4779b8ab72b3e697bff2d9233f9dfabcedb9bffd6b60b144cfe6169c0c65\
       d707"
-    observationDigest: "528322f56d1f71ce2b6e6087f50271eac225d24b2f6495a30c021c8\
-      4ceda5fc5"
+    observationDigest: "c988f436fc55e62b0a0217dea11a1ff2ea015684891dd476622c944\
+      97cd3cd2d"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4355,8 +4355,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "552c6264d31a1b100a65a30e5426d15c54cd885cf2da1e546401dc488e5a\
       3903"
-    observationDigest: "75f87bede808c43f47c4490f52eb43b19a1ee1e509ee7b539f295d9\
-      c7161dc05"
+    observationDigest: "6e9c74a8b858ed1b5a101d4fe5ce14c265743aa1e3dd9432a9d9108\
+      e399d2050"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4394,8 +4394,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "e4a248a18cef5357db29347a233eaffdc620e000b63de6677ac9c35fc12e\
       2b21"
-    observationDigest: "bfab7b30658e5b3df2f66e4d45fbf1fe6193faf5efc134a33a71a58\
-      75e5cb0b8"
+    observationDigest: "df4513bb66681d8ffcbce7a095b38e7865e51fecf8b9f190094e638\
+      abba024cd"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4407,8 +4407,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "66de3e0e3310cd3c17199f39a237dbbe412321d56e9f9bacaa00cc774afc\
       426f"
-    observationDigest: "76929b8b13c6501ebbdb4a8ba8677bb5765ab4235cac934b7577fef\
-      f4f9214fc"
+    observationDigest: "cc29a6e1fe328e059349b93a3b4aa4812b6d5c7aabe3c0dd3e5fbf0\
+      61c143709"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4485,8 +4485,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "130b9200ded5165d7bc61d672220458251c31e1534a3a0b3e223be03f4f3\
       f4f2"
-    observationDigest: "037d6af42ec4c95450265bf896a240962b85c490d4d492ffb2a0f86\
-      182c48053"
+    observationDigest: "e078b1bcde121d24e4a73b7b39be3ca5d8ba8a850418951ba799ad3\
+      c7ab3caf4"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4498,8 +4498,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "31307071500af614bd62188bc2bfce39315ea4f3e64c61859dcc6c32d336\
       590d"
-    observationDigest: "5cd57f2564c7537a8e6bbb3b3d46737be34b997c59e92c7bc6fbc50\
-      18b88db3e"
+    observationDigest: "5cda1a8ec391c8698d26cc0280c68170050b28125ada7e1e4c951c3\
+      debc9ed5c"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4511,8 +4511,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "a48e264f74f2476a804a58eeb811db5990f4c5b7572809a000cffd7be366\
       91f8"
-    observationDigest: "e5f088b1f30c7ff7c5acf63fa622b6f90a7500fb78f95883ed347b1\
-      9a46f80c2"
+    observationDigest: "5dd0a3ed6834da81dbd8965ce687b2431920c28b7c0705f33c3db06\
+      c066686a8"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4524,8 +4524,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "9855761d06ba28346ac2edc69f4d75e74a446a28e28713e64d56de5735fa\
       d54a"
-    observationDigest: "2d69a777449132b0de0594800b02519cdb0c2d4470f1c559a416f8b\
-      139e50af4"
+    observationDigest: "48dd471c219ac77347b13d71f7e317e72043ef3a6441a3f31e5caa6\
+      d89321602"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4537,8 +4537,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "268d8b08be908db886763371c611a3a2a2cd5e091c9c27e04558cb3b124a\
       f90b"
-    observationDigest: "11d956b0953c30d2dd5f7b92fe8a157a0e048b5d71b4f0039a6f599\
-      f36021ccf"
+    observationDigest: "3d42b542037da93a54358f12b669995c89d16a904f2c2ce43c53e39\
+      8e9db6eb8"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4589,8 +4589,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "27f87000668bef742f287c3699fdb237c114a9ef1f7af84c6f29eb3653be\
       82be"
-    observationDigest: "b440c6c1428393b60befb9d613b41328e114aef183db1c944ed2980\
-      3f1d97db7"
+    observationDigest: "c81d22cfd9a1f674e2996cad141463a3d140b9c5a8e30b76c4197f0\
+      f3cad5a84"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4602,8 +4602,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "1951d7beb6ff0ce49188fae6a1b2f553987d92558889e8892b5e93ad9ce9\
       8ee2"
-    observationDigest: "40ce3be51d3df18c1c827e6ed043e7751907488a10250a49a41b941\
-      0c603b6ab"
+    observationDigest: "86809c6ae6f78a59d89a71e48e320eeee91d4a6ea6e117418af26cf\
+      61ba05a24"
     missingDynamicTag: false
     section: "sec-performeval"
     upstreamSection: "sec-performeval-rules-in-initializer"
@@ -4636,6 +4636,19 @@ paths:
       a class expression)"
     assessment: "fixture-construction"
   - path: "test/language/expressions/class/private-getter-brand-check-multiple-\
+      evaluations-of-class-eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5d156b2e7c0d1e717fe115d38633799cc8f32c2f2c4539562423e35a5162\
+      7641"
+    observationDigest: "829aa52014be82dfddf96fd6ef28da90620185a8f22d19e498c7a51\
+      128c9112e"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand (privat\
+      e getter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-getter-brand-check-multiple-\
       evaluations-of-class-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -4662,6 +4675,19 @@ paths:
       (private getter)"
     assessment: "fixture-construction"
   - path: "test/language/expressions/class/private-method-brand-check-multiple-\
+      evaluations-of-class-eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5c15a6c372559f03ceae5c18510f81c2fb5f7eaefd23b9deaa46de5c97b4\
+      dde2"
+    observationDigest: "95253e9cb0722e33b62cac262fb746b71829d86bed5777bfbe4b65f\
+      fb90e3dbd"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand (privat\
+      e method)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-method-brand-check-multiple-\
       evaluations-of-class-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -4686,6 +4712,19 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a different brand
       (private method)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-setter-brand-check-multiple-\
+      evaluations-of-class-eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d781dc86ca0c015b54a5896b3cd8954b7ae42810014dd06d5ded681b5640\
+      f90d"
+    observationDigest: "516580107106ed6ab9609890cf28c6806b35231d7441dac958d6bd6\
+      aa386f0a4"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand (privat\
+      e setter)"
     assessment: "fixture-construction"
   - path: "test/language/expressions/class/private-setter-brand-check-multiple-\
       evaluations-of-class-eval.js"
@@ -4727,6 +4766,19 @@ paths:
       (private static field)"
     assessment: "fixture-construction"
   - path: "test/language/expressions/class/private-static-field-multiple-evalua\
+      tions-of-class-eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "df8d71afe00cbd480d2688a78517146ba44b374a3de6fc402b0eb0723b63\
+      a18e"
+    observationDigest: "c90f211af62caee63fa2ca8d9d1c586484b623f075db717b8c4630f\
+      03938351b"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name \
+      (private static field)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-field-multiple-evalua\
       tions-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -4750,6 +4802,19 @@ paths:
     missingDynamicTag: false
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a different Private Name
+      (private static getter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-getter-multiple-evalu\
+      ations-of-class-eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "275916b2efa6f3cc8040131190621b92aff52edf1e7b0d5d5f4a181dce72\
+      1daa"
+    observationDigest: "1294b5a0018509ad5c21d874acd5a00935ea3e23404c63e3dbf7d45\
+      05e2e4934"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name \
       (private static getter)"
     assessment: "fixture-construction"
   - path: "test/language/expressions/class/private-static-getter-multiple-evalu\
@@ -4779,6 +4844,19 @@ paths:
       (private static methods)"
     assessment: "fixture-construction"
   - path: "test/language/expressions/class/private-static-method-brand-check-mu\
+      ltiple-evaluations-of-class-eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c209abc7ef57ddb61e1b9be97e1db6e46a930647d70135f8cefdf93ef849\
+      37d6"
+    observationDigest: "dd8992272c94cd33bc9f716ffc4e767bec80ed6cc019e82a8ee7323\
+      5ebcd6e2d"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different brand (privat\
+      e static methods)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-method-brand-check-mu\
       ltiple-evaluations-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -4802,6 +4880,19 @@ paths:
     missingDynamicTag: false
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a different Private Name
+      (private static setter)"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-setter-multiple-evalu\
+      ations-of-class-eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cbf974dbc06462842f57318e5dbccc31dddbe3ee1e35c490967e659fbfe9\
+      a55e"
+    observationDigest: "5787db1a1403e163b9ad18253e70cb7e56a8af1462411d35264d4bd\
+      b4005c2b8"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different Private Name \
       (private static setter)"
     assessment: "fixture-construction"
   - path: "test/language/expressions/class/private-static-setter-multiple-evalu\
@@ -6620,8 +6711,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "8ee86992e92b85c7155b8adf6c84d6923099693407792ca0100c81d8cc62\
       6f39"
-    observationDigest: "7d152c924ca1194ed85247c42d8bf3c758419e8dd5b65579538bcdb\
-      c7fe70daa"
+    observationDigest: "4d354302a37aed72dc99a0ca2b71b2eed97f5c1f809f854885a6eaf\
+      57560d0ff"
     missingDynamicTag: false
     section: sec-optional-chaining-chain-evaluation
     subject: optional call invoked on eval function should be indirect eval.
@@ -6795,8 +6886,8 @@ paths:
     priorCohort: source-subject
     sourceDigest: "e1187384a3c619c6af4fa23631712ad34ef261b1c26784984f6394101597\
       0d59"
-    observationDigest: "b5bc944dcd9a64753355aa7d286e93f436e55410fdb7ba59e14c6d9\
-      654967f70"
+    observationDigest: "4ea0ebc063953dcbf616dec28c290c8541e91d923a71ea880b91bdd\
+      d15b80c51"
     missingDynamicTag: true
     section: sec-performeval
     upstreamSection: sec-performeval-rules-in-initializer

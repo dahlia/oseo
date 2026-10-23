@@ -52,10 +52,14 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   The historical four-source update on
   edccfd292b245c80c3503a93bf1a268fc99506c7 observed 26 passes among
   the original 33 paths and seven private-class cases at the existing
-  source-compilation boundary. This preparation restores successful Main's
-  canonical observations and owners. All 33 paths remain unsupported under
-  eval-intrinsic-value pending a new complete update and reassessment; the
-  seven paths have no current ownership transfer or new exclusion.
+  source-compilation boundary. Clean source preparation restored successful
+  Main's canonical observations and owners. The fresh complete update on
+  6e54c5d5 observes 26 passes and seven private-class cases at the existing
+  run-time source-compilation boundary. Those seven now belong to
+  dynamic-source-coverage-remediation under the existing fixture-construction
+  assessment: their private name and brand subjects stay inside the claim,
+  pending replacement evidence or a maintainer accounting decision. No
+  exclusion is added, and this node remains unlanded.
   The node also repairs every identifier read through a selected with
   Object Environment Record, for any name, not only eval. A value read, a
   typeof operand, and a call callee perform GetBindingValue (ECMA-262 2025

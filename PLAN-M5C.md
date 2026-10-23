@@ -749,6 +749,20 @@ Wrapper source; every earlier wrapper assertion and property budget remains.
 The source nodes remain unlanded; the optional-call receiver and primitive
 inherited-Set contracts stay on the exit path with their unmet prerequisites.
 
+The complete update on clean source `6e54c5d5` finished naturally with exit 0.
+It observed all 28,311 reviewed paths: 24,305 passes, 2,581 expected negatives,
+and 1,425 unsupported results, with no failure classifications. All 24,234
+successful Main passes remain passes. The 71 promotions comprise 26 Eval-value,
+five RegExp, and 40 Wrapper paths. Another 49 unsupported observations now
+reach the existing run-time Eval source-compilation boundary: 42 retain their
+bounded ADR 0016 ownership with refreshed observation digests, and seven
+private-class subjects move to `dynamic-source-coverage-remediation` under
+the existing fixture-construction assessment. That owner now has 265 paths;
+those private name and brand subjects remain inside the claim. No exclusion,
+reviewed path, feature, inventory entry, or node landing is added. The graph
+keeps all 44 landed nodes and the source preparation's statuses.
+Post-observation review and exact candidate CI remain pending.
+
 
 Gates
 -----

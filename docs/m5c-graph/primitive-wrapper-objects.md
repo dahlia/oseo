@@ -71,11 +71,14 @@ the removed TCO block is retained in its original refs. Budgets are 12
 ordinary cases and 240-second interrupt limits per domain, with both native
 policies, forced collection, and positive guard and generic fallback counters.
 
-Preparation leaves canonical observations unchanged. A focused pass neither
-promotes a manifest row nor lands the node. The coordinator sequences the
-successful Main alignment, complete UPDATE, outer review, and exact
-candidate CI; this worker
-does not run full TEST or EXT. Zig flags alone are not ASan activity evidence.
+Source preparation left successful Main's canonical observations unchanged.
+The complete UPDATE on clean source `6e54c5d5` then finished naturally with
+exit 0 and observed all 40 owned paths as passes. The preceding focused gate
+passed all eight fixed registrations, including the 40-path selector's 156
+strictness/policy variants, and both unchanged 12-case property domains.
+These observations do not land the node. Post-observation review and exact
+candidate CI remain pending; that CI owns full TEST and EXT. Zig flags alone
+are not ASan activity evidence.
 
 On the preparation host every native compilation or execution must hold
 the sole */data/oseo-heavy.lock*, check `oseo-capacity` before and after

@@ -327,7 +327,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - typed-array-search-and-join
     execution:
@@ -339,13 +339,13 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/TypedArray/prototype/toLocaleString/calls-tolocalestring-from-each-value.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/TypedArray/prototype/toLocaleString/calls-tolocalestring-from-each-value.js:633:14:
-        error[OSEO2001]: Primitive wrapper objects are not admitted
-        yet.\n"'
-      passed: false
-      unsupportedCapability: primitive-wrapper
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

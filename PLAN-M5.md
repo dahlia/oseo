@@ -8831,11 +8831,13 @@ wrapper assertions and generated budgets remain intact.
 The exact focused selector contains 40 pinned upstream paths, including the
 four resizable-buffer locale cases added after the historical 36-path audit.
 The focused runner executes every requested strictness and specialization
-variant without writing the canonical manifest. The complete UPDATE,
-affected review, and exact candidate CI remain pending. Root authorized
+variant without writing the canonical manifest. The complete UPDATE on clean
+source `6e54c5d5` observed all 40 paths as passes. Post-observation review and
+exact candidate CI remain pending. Root authorized
 composition with Eval, RegExp, and computed Reference after removing TCO.
-Canonical observations are restored from successful Main `52a868c9`:
-28,311 reviewed paths, 24,234 passes, 2,581 expected negatives,
-1,496 unsupported results, and no failure classifications, against 41,091
-included paths at revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
-These source-preparation results neither land the node nor promote a row.
+Clean source preparation restored successful Main `52a868c9` observations:
+28,311 reviewed paths, 24,234 passes, 2,581 expected negatives, and 1,496
+unsupported results, against 41,091 included paths at revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. The later complete update observed
+24,305 passes, 2,581 expected negatives, and 1,425 unsupported results with no
+failure classifications. These observations do not land the node.

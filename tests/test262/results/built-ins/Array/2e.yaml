@@ -263,7 +263,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - functions
       - object-properties
@@ -274,14 +274,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/Array/prototype/map/15.4.4.19-5-22.js non-strict
-        disabled failed (1): stdout=""
-        stderr="test/built-ins/Array/prototype/map/15.4.4.19-5-22.js:85:10:
-        error[OSEO2001]: Primitive wrapper objects are not admitted
-        yet.\n"'
-      passed: false
-      unsupportedCapability: primitive-wrapper
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

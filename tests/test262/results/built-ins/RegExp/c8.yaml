@@ -74,7 +74,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - regular-expressions
     execution:
@@ -84,14 +84,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/RegExp/named-groups/unicode-property-names-invalid.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/named-groups/unicode-property-names-invalid.js:97:12:
-        error[OSEO2001]: Regular expression pattern extension is not
-        admitted yet.\n"'
-      passed: false
-      unsupportedCapability: regexp-pattern-extension
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false
