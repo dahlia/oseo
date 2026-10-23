@@ -84,6 +84,7 @@ dependencies:
   - typed-array-tolocalestring-arguments
   - unhandled-rejection-observation
   - well-known-intrinsics-harness
+  - with-optional-call-receiver
   - with-strict-assignment-fallback
 landed: false
 status: blocked

@@ -748,4 +748,38 @@ test262 UPDATE. The weight of *m5-update-expression.property.test.ts* is
 unchanged: its program only prints one more slot. No case budget, seed,
 deadline, or shard total changes.
 
+The `eval-intrinsic-value` node keeps the existing
+*m5-global-object-record.property.test.ts* family and its slots
+`0x60003d00`, `0x60003d01`, and `0x60003d02`, with the same generators,
+case counts, and interrupt limits. A local Linux x86-64 whole-file extended
+run on 2026-10-23 UTC, from 03:45:25 to 03:59:00, exited zero with all four
+registrations passing and none skipped. Their printed leaf durations were
+177,835.926278, 1,223.549717, 236,254.023391, and 397,419.862621
+milliseconds. Their sum is 812,733.362007 milliseconds (812.733362007
+seconds), giving a Linux weight of 813 seconds after rounding up. That sum
+excludes build, setup, and plugin timing. The test runner reported
+813,032.25161 milliseconds. The mise task wall time was 814.80 seconds,
+including the build dependency.
+
+The command was
+`mise run test:property:extended:native:shard --shard 1/1` with this exact
+property file. It kept task scale 10, seed 1592590339, size `large`, one file
+worker, and the existing per-domain budgets and limits. The capacity profile
+was `generous` (`desktop-idle`), with no CPU quota and MemoryMax 104G. The
+lock wait was 0 seconds. The source commit was
+`c933f64d23b681b8f648b6d0bbc560e8904f845b`, tree
+`50a09b2c467580d4162104bf674fea855e66fe66`, and the worktree was clean
+before and after the run. The property SHA-256 matched before and after:
+`8faabc37930c40ddae37ef5a20b63db81f686bd3a0da2596d2e0ec1820d81a16`.
+
+The raw stdout, stderr, capacity, lock, and command log are retained under
+*/data/m5c-eval-computed-focused-prepare-20261023/*. macOS remains
+unmeasured. Its weight of 498 seconds is an explicitly provisional
+historical-ratio model, `ceil(813 * 210 / 343)`, using the previous Linux
+343-second and macOS 210-second entries; it is not a macOS observation.
+This is one local Linux case sum and an unmeasured macOS model, not native
+CI, a whole-suite result, or a full test262 UPDATE. It changes no case
+budget, seed, deadline, or shard total. The computed-node weight of 1,230
+Linux and 832 macOS seconds is unchanged.
+
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906

@@ -2122,11 +2122,6 @@ test("retains closed-world and early-error delete boundaries", () => {
       "OSEO1001",
       /outside the admitted global-object profile/u,
     ],
-    [
-      "with ({}) { eval = 1; delete eval; }",
-      "OSEO1001",
-      /Deleting with fallback binding 'eval'/u,
-    ],
   ];
   for (const [source, code, message] of cases) {
     const result = compileSource(babelFrontend, {
@@ -2137,6 +2132,43 @@ test("retains closed-world and early-error delete boundaries", () => {
     assert.equal(result.diagnostics[0]?.code, code, source);
     assert.match(result.diagnostics[0]?.message ?? "", message, source);
     assert.ok((result.diagnostics[0]?.range.start.column ?? 0) > 0, source);
+  }
+});
+
+test("deletes an admitted standard global through a with fallback", () => {
+  // An object environment that misses an admitted standard global falls
+  // back to the global object's property for both the write and the
+  // delete, never to an uninitialized hidden binding.
+  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  for (const name of ["eval", "Float16Array"]) {
+    const source = `with ({}) { ${name} = 1; delete ${name}; }`;
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "with-fallback-delete.js",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+    assert.ok(result.mir != null, source);
+    const hir = printHir(result.hir);
+    assert.match(
+      hir,
+      new RegExp(
+        String.raw`with\[%b\d+\] ${name} = 1 fallback ` +
+          String.raw`${object}\["${name}"\]`,
+        "u",
+      ),
+      source,
+    );
+    assert.match(
+      hir,
+      new RegExp(
+        String.raw`delete with\[%b\d+\] ${name} fallback ` +
+          String.raw`\(\("${name}" in ${object}\) ` +
+          String.raw`\? delete ${object}\["${name}"\] : true\)`,
+        "u",
+      ),
+      source,
+    );
   }
 });
 

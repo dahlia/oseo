@@ -1,0 +1,37 @@
+version: 1
+id: with-optional-call-receiver
+title: Preserve with receivers through optional calls
+delivers: "Repairs a native-confirmed defect in admitted optional calls through
+  a with Object Environment Record, recorded in
+  docs/m5c-graph/with-optional-call-receiver.md. For a non-nullish selected
+  function, f?.() must retain WithBaseObject as its receiver after
+  GetBindingValue; the lowering instead evaluates the identifier as a value
+  and passes undefined. On 13ab5051, a strict function returns false under
+  both specialization policies when checking this against the selected
+  object, while ordinary f() returns true. Cover selected, inherited,
+  unscopables-blocked, and all-miss references, nested with environments,
+  nullish short-circuiting, argument ordering, strict GetBindingValue
+  completion, and abrupt traps. Cover strict tail-position optional calls
+  through a selected with environment, such as return f?.(args()) in strict
+  code nested in a sloppy with body: normal and abrupt completion, argument
+  order, and the receiver, each beside an ordinary strict tail call
+  control, with forced collection evidence that the tail call trampoline
+  keeps the receiver, callee, and arguments rooted and live. Depends on
+  proper-tail-calls, whose unlanded execution contract runs these admitted
+  tail calls. Preserve ordinary identifier calls, optional
+  member calls, and lexical and global fallback behavior. Follow the
+  PLAN-M5.md semantic evidence contract with fixed native examples, an
+  independent generated oracle, both specialization policies, forced
+  collection, structural evidence, and the optional-chaining and
+  with-statement family records and profile. Extend existing generators
+  without weakening old domains or budgets. No test262 path at the pinned
+  suite revision combines with and an optional call, so this node owns no
+  manifest path; already-reviewed paths may move only toward pass, and
+  unreviewed paths stay reserved for their owning batches. This is a
+  preexisting generic optional-call correction, not an eval source
+  evaluation admission or an exclusion."
+dependencies:
+  - eval-intrinsic-value
+  - proper-tail-calls
+landed: false
+status: blocked

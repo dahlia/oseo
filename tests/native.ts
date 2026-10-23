@@ -66,6 +66,10 @@ import * as agentFixtures from "./native/fixtures/atomics-and-shared-memory.ts";
 import { crossRealmFixtures } from "./native/fixtures/cross-realm.ts";
 import { weakCollectionFixtures } from "./native/fixtures/weak-collections.ts";
 import {
+  withGetBindingValueExpected,
+  withGetBindingValueSource,
+} from "./native/fixtures/with-get-binding-value.ts";
+import {
   withKeyedBindingTargetOrderExpected,
   withKeyedBindingTargetOrderSource,
 } from "./native/fixtures/with-keyed-binding-target-order.ts";
@@ -431,27 +435,64 @@ for (const dynamicSource of [
     name: "dynamic-source-async-generator-function-construct.ts",
     source: "new (Object.getPrototypeOf(async function* () {}).constructor)();",
   },
+  // A bare `eval` read is the global %eval% value, so every call that
+  // ADR 0016 leaves to run time meets its String boundary: an indirect
+  // call, an optional call, a call through a parameter, and a call whose
+  // `with` object misses and falls back to the global property.
+  {
+    diagnostic: "eval",
+    name: "dynamic-source-eval-indirect.ts",
+    source: '(0, eval)("1");',
+  },
+  {
+    diagnostic: "eval",
+    name: "dynamic-source-eval-optional.ts",
+    source: 'eval?.("1");',
+  },
+  {
+    diagnostic: "eval",
+    name: "dynamic-source-eval-parameter.ts",
+    source: 'function run(evaluate) { return evaluate("1"); } run(eval);',
+  },
+  {
+    diagnostic: "eval",
+    name: "dynamic-source-eval-with-fallback.ts",
+    source: 'with ({}) { eval("1"); }',
+  },
+  // A hashbang in the String reaches the same run-time boundary, since
+  // only the later parse that ADR 0016 excludes would read it.
+  {
+    bothPolicies: true,
+    diagnostic: "eval",
+    name: "dynamic-source-eval-indirect-hashbang.ts",
+    source: "(0, eval)('#!\\n');",
+  },
 ]) {
-  const rejected = await runNativeCli(
-    {
-      args: [dynamicSource.name],
-      source: dynamicSource.source,
-      sourceId: dynamicSource.name,
-      version: "0.1.0",
-    },
-    host,
-  );
-  assert.equal(rejected.exitStatus, 1);
-  assert.equal(rejected.stdout, "");
-  assert.match(
-    rejected.stderr,
-    new RegExp(
-      `^${dynamicSource.name.replace(".", "\\.")}:1:\\d+: ` +
-        `error\\[OSEO1001\\]: ${dynamicSource.diagnostic} compiles ` +
-        "source text at run time, which is outside the admitted profile\\.",
-      "u",
-    ),
-  );
+  const policies = dynamicSource.bothPolicies
+    ? ([[], ["--no-specialization"]] as const)
+    : ([[]] as const);
+  for (const specializationArgs of policies) {
+    const rejected = await runNativeCli(
+      {
+        args: [...specializationArgs, dynamicSource.name],
+        source: dynamicSource.source,
+        sourceId: dynamicSource.name,
+        version: "0.1.0",
+      },
+      host,
+    );
+    assert.equal(rejected.exitStatus, 1);
+    assert.equal(rejected.stdout, "");
+    assert.match(
+      rejected.stderr,
+      new RegExp(
+        `^${dynamicSource.name.replace(".", "\\.")}:1:\\d+: ` +
+          `error\\[OSEO1001\\]: ${dynamicSource.diagnostic} compiles ` +
+          "source text at run time, which is outside the admitted profile\\.",
+        "u",
+      ),
+    );
+  }
 }
 
 for (const shadowedRegExpPlaceholder of [
@@ -929,6 +970,56 @@ for (const specialization of ["disabled", "enabled"] as const) {
   }
 }
 
+/*
+ * GetBindingValue repeats HasProperty on the Object Environment Record
+ * HasBinding selected, so an identifier read, `typeof`, or call whose
+ * binding disappears in between reads `undefined` or throws in strict
+ * code. V8 and JSC both skip that test, differently, so this native-only
+ * observation compares the compiled program with the ECMA-262 2025 text.
+ * Both policies force collection at every safepoint.
+ */
+for (const specialization of ["disabled", "enabled"] as const) {
+  const compiled = compileSource(
+    defaultComponents.frontend,
+    {
+      source: withGetBindingValueSource,
+      sourceId: "with-get-binding-value.ts",
+    },
+    { observeSpecialization: true, specialization },
+  );
+  assert.deepEqual(compiled.diagnostics, []);
+  assert(compiled.mir != null, "with GetBindingValue MIR");
+  process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+  try {
+    await withNativeFixture(
+      {
+        backend: cBackend,
+        host,
+        input: compiled.mir,
+        keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+        operation: "execute",
+        runtime: cRuntimeProvider,
+        target: nativeTarget,
+        toolchain: nativeToolchain,
+      },
+      (native) => {
+        assertMatchingObservations([
+          { exitStatus: 0, stderr: "", stdout: withGetBindingValueExpected },
+          native,
+        ]);
+        assert(native.counters != null, "with GetBindingValue counters");
+        assert.ok(native.counters.collections > 0);
+        if (specialization === "disabled") {
+          assert.equal(native.counters.guardHits, 0);
+          assert.equal(native.counters.guardMisses, 0);
+        }
+      },
+    );
+  } finally {
+    delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+  }
+}
+
 const selectedFixtures = selectTestShard(fixtures, nativeArguments.shard);
 for (const fixture of selectedFixtures) {
   if (fixture.name === "iterator-next-callability") {
@@ -1049,6 +1140,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "object-own-keys" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "eval-intrinsic-value" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "set-intrinsic" ||
     fixture.name === "set-composition-methods" ||
@@ -1191,6 +1283,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-own-keys-virtual-assignment" ||
     fixture.name === "object-own-keys-virtual-read-only" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "eval-intrinsic-value" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "with-strict-heritage-write" ||
     fixture.name === "object-prototype" ||
@@ -1288,6 +1381,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-descriptor-queries" ||
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
+    fixture.name === "eval-intrinsic-value" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "symbols" ||
     fixture.name === "symbol-intrinsic" ||
@@ -1459,6 +1553,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "object-descriptor-queries" ||
             fixture.name === "object-integrity-levels" ||
             fixture.name === "global-object-record" ||
+            fixture.name === "eval-intrinsic-value" ||
             fixture.name === "globalthis-binding" ||
             fixture.name === "with-strict-heritage-write" ||
             fixture.name === "object-prototype" ||

@@ -99,7 +99,9 @@ export const nativeShardCosts = {
     "tests/property/m5-generator.property.test.ts": 444,
     "tests/property/m5-generic-string-coercion.property.test.ts": 282,
     "tests/property/m5-global-numeric-functions.property.test.ts": 667,
-    "tests/property/m5-global-object-record.property.test.ts": 343,
+    // Local Linux extended case sum: 812.733362007 s, rounded up.
+    // October 23, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-global-object-record.property.test.ts": 813,
     "tests/property/m5-globalthis-binding.property.test.ts": 2647,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 590,
     "tests/property/m5-harness-promise-helper.property.test.ts": 578,
@@ -244,7 +246,9 @@ export const nativeShardCosts = {
     "tests/property/m5-generator.property.test.ts": 232,
     "tests/property/m5-generic-string-coercion.property.test.ts": 246,
     "tests/property/m5-global-numeric-functions.property.test.ts": 313,
-    "tests/property/m5-global-object-record.property.test.ts": 210,
+    // Historical-ratio model: ceil(813 * 210/343); not a macOS
+    // observation. Refresh from CI.
+    "tests/property/m5-global-object-record.property.test.ts": 498,
     "tests/property/m5-globalthis-binding.property.test.ts": 855,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 479,
     "tests/property/m5-harness-promise-helper.property.test.ts": 548,

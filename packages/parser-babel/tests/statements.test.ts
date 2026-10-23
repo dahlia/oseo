@@ -869,20 +869,210 @@ test("resolves every non-typeof unresolved reference by lookup", () => {
     printMir(write.mir),
     /binary in %\d+, %\d+[^]*constant 1[^]*branch && [^]*binary in /u,
   );
-  // A standard global the profile has not admitted as a value is never
-  // unresolvable in a conforming realm, so it stays rejected.
-  for (const source of ["console.log(eval);", "eval = 1;"]) {
+  // An admitted standard global is never unresolvable in a conforming
+  // realm, so a read or write reaches the global object's property like
+  // any other global-object name rather than an unknown binding.
+  const admitted = String.raw`\("Float16Array" in ${object}\)`;
+  for (const [source, form] of [
+    [
+      "console.log(Float16Array);",
+      String.raw`${admitted} \? \(${admitted} \? ` +
+        String.raw`get ${object}\["Float16Array"\] : undefined\) : ` +
+        String.raw`%b\d+\(\*missing intrinsic:Float16Array\*\)`,
+    ],
+    ["Float16Array = 1;", String.raw`set ${object}\["Float16Array"\] = 1`],
+  ] as const) {
     const result = compileSource(babelFrontend, {
       source,
-      sourceId: "unadmitted-standard-read.ts",
+      sourceId: "admitted-standard-read.ts",
     });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(
-      result.diagnostics[0]?.message ?? "",
-      /Unknown binding 'eval'/u,
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+    assert.ok(result.mir != null, source);
+    assert.match(printHir(result.hir), new RegExp(form, "u"), source);
+  }
+});
+
+test("reads and writes the eval global property as a value", () => {
+  // %eval% is the global object's own property in every realm, so a bare
+  // `eval` that no declaration or `with` object supplies is an ordinary
+  // global-object reference, exactly like `parseInt`.
+  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  const exists = String.raw`\("eval" in ${object}\)`;
+  const lookup = new RegExp(
+    String.raw`${exists} \? \(${exists} \? ` +
+      String.raw`get ${object}\["eval"\] : ` +
+      String.raw`undefined\) : %b\d+\(\*missing intrinsic:eval\*\)`,
+    "u",
+  );
+  for (const source of [
+    "console.log(eval);",
+    "console.log(eval === globalThis.eval, eval.length);",
+    "[1].forEach(function () {}, eval);",
+    "new Proxy(eval, {});",
+    "console.log(eval?.(1));",
+    "console.log((0, eval)(1));",
+    "try { new eval(); } catch (error) { console.log(error.name); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "eval-value-read.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+    assert.match(printHir(result.hir), lookup, source);
+  }
+  const typeofResult = compileSource(babelFrontend, {
+    source: "console.log(typeof eval);",
+    sourceId: "eval-typeof.ts",
+  });
+  assert.deepEqual(typeofResult.diagnostics, []);
+  assert.ok(typeofResult.hir != null);
+  assert.match(
+    printHir(typeofResult.hir),
+    new RegExp(`typeof ${typeofGlobalRead("eval")}`, "u"),
+  );
+  const write = compileSource(babelFrontend, {
+    source: "eval = 1;",
+    sourceId: "eval-write.ts",
+  });
+  assert.deepEqual(write.diagnostics, []);
+  assert.ok(write.hir != null);
+  assert.match(
+    printHir(write.hir),
+    new RegExp(`set ${object}\\["eval"\\] = 1`, "u"),
+  );
+  const deleted = compileSource(babelFrontend, {
+    source: "console.log(delete eval);",
+    sourceId: "eval-delete.ts",
+  });
+  assert.deepEqual(deleted.diagnostics, []);
+  assert.ok(deleted.hir != null);
+  assert.match(
+    printHir(deleted.hir),
+    /delete %b\d+\(\*intrinsic global object\*\)\["eval"\]/u,
+  );
+});
+
+test("keeps the ADR 0016 rejection of an unshadowed eval call", () => {
+  // The call position is a direct eval whenever the value is %eval%, so
+  // only the global object's property can be it, and ADR 0016 keeps that
+  // call outside the profile with the diagnostic it always had.
+  for (const source of [
+    'eval("1");',
+    "eval(1);",
+    "(eval)(1);",
+    "eval(...[1]);",
+    "eval(`x`);",
+    "eval(`x${1}`, 2);",
+    "function f() { return eval(1); }",
+    "eval = 1; eval(1);",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "eval-call.ts",
+    });
+    assert.equal(result.mir, undefined, source);
+    assert.deepEqual(
+      result.diagnostics.map((diagnostic) => [
+        diagnostic.code,
+        diagnostic.message,
+        diagnostic.byteRange,
+      ]),
+      [["OSEO1001", "Unknown binding 'eval'.", { end: 0, start: 0 }]],
       source,
     );
   }
+  // A declared or `with` binding may hold any value, so its call is an
+  // ordinary call, and a String argument meets %eval%'s run-time boundary.
+  for (const source of [
+    "function f(eval) { return eval(1); }",
+    "var eval; eval(1);",
+    "function eval(value) { return value; } eval(1);",
+    "with ({}) { eval(1); }",
+    'with ({ eval() { return 1; } }) { eval("1"); }',
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "eval-shadowed-call.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+  }
+});
+
+test("calls the global eval property as an ordinary template tag", () => {
+  // A tagged template is an ordinary call that passes a template object,
+  // never a direct eval, and %eval% returns that non-String unchanged.
+  const object = String.raw`%b\d+\(\*intrinsic global object\*\)`;
+  const exists = String.raw`\("eval" in ${object}\)`;
+  const lookup =
+    String.raw`${exists} \? \(${exists} \? ` +
+    String.raw`get ${object}\["eval"\] : ` +
+    String.raw`undefined\) : %b\d+\(\*missing intrinsic:eval\*\)`;
+  for (const [source, template] of [
+    ["console.log((eval`x`)[0]);", String.raw`\(template \["x"\]`],
+    ["console.log(((eval)`x`)[0]);", String.raw`\(template \["x"\]`],
+    [
+      "console.log(eval`a${1}b`.raw.join());",
+      String.raw`\(template \["a", "b"\] raw \["a", "b"\], 1\)`,
+    ],
+    [
+      "function f() { return eval`y`; } console.log(f()[0]);",
+      String.raw`\(template \["y"\]`,
+    ],
+    [
+      "eval = 1; try { eval`x`; } catch (error) { console.log(error.name); }",
+      String.raw`\(template \["x"\]`,
+    ],
+  ] as const) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "eval-tagged.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.hir != null, source);
+    assert.ok(result.mir != null, source);
+    assert.match(
+      printHir(result.hir),
+      new RegExp(String.raw`call \(${lookup}\)${template}`, "u"),
+      source,
+    );
+  }
+  // A declared or `with` binding stays an ordinary tag as before.
+  for (const source of [
+    "function f(eval) { return eval`x`; }",
+    "{ let eval = String.raw; console.log(eval`x`); }",
+    "with ({}) { console.log(eval`x`[0]); }",
+    "with ({ eval: String.raw }) { console.log(eval`x`); }",
+  ]) {
+    const result = compileSource(babelFrontend, {
+      source,
+      sourceId: "eval-shadowed-tagged.ts",
+    });
+    assert.deepEqual(result.diagnostics, [], source);
+    assert.ok(result.mir != null, source);
+  }
+});
+
+test("reads the global eval property through a with fallback", () => {
+  // An object environment that lacks `eval` falls back to the global
+  // object's property, never to an uninitialized hidden binding.
+  const result = compileSource(babelFrontend, {
+    source:
+      "var outer = 1;\n" +
+      "function testcase() {\n" +
+      "  var o = { outer: 2 };\n" +
+      "  with (o) { return eval(outer) === 2 && typeof eval; }\n" +
+      "}\n" +
+      "console.log(testcase());",
+    sourceId: "eval-with-fallback.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.hir != null);
+  const hir = printHir(result.hir);
+  assert.match(hir, /get %b\d+\(\*intrinsic global object\*\)\["eval"\]/u);
+  assert.doesNotMatch(hir, /with fallback:eval/u);
 });
 
 test("rejects typeof of an unshadowed runtime intrinsic name", () => {
@@ -911,25 +1101,32 @@ test("reads typeof of materialized intrinsics through properties", () => {
   }
 });
 
-test("rejects typeof of an unimplemented standard global name", () => {
-  // ECMA-262 clause 19 requires every conforming realm to bind this
-  // name, so an absent property's "undefined" answer would misreport it;
-  // it stays a source-located rejection until the profile admits it as a
-  // value, inside and outside `with` alike.
-  for (const source of [
-    "console.log(typeof eval);",
-    "with ({}) { console.log(typeof eval); }",
-  ]) {
-    const result = compileSource(babelFrontend, {
-      source,
-      sourceId: "typeof-standard-global.ts",
-    });
-    assert.equal(result.diagnostics[0]?.code, "OSEO1001", source);
-    assert.match(
-      result.diagnostics[0]?.message ?? "",
-      /typeof standard global binding '\w+' is outside/u,
-      source,
-    );
+test("reads typeof of eval and Float16Array through global properties", () => {
+  // ECMA-262 clause 19 requires every conforming realm to bind both
+  // names. The profile admits each as a value, so `typeof` reads the
+  // global object's property, inside and outside `with` alike, instead
+  // of rejecting the reference or answering "undefined" unconditionally.
+  for (const name of ["eval", "Float16Array"]) {
+    for (const [source, operand] of [
+      [`console.log(typeof ${name});`, typeofGlobalRead(name)],
+      [
+        `with ({}) { console.log(typeof ${name}); }`,
+        String.raw`with\[%b\d+\] ${name} fallback ${typeofGlobalRead(name)}`,
+      ],
+    ] as const) {
+      const result = compileSource(babelFrontend, {
+        source,
+        sourceId: "typeof-standard-global.ts",
+      });
+      assert.deepEqual(result.diagnostics, [], source);
+      assert.ok(result.hir != null, source);
+      assert.ok(result.mir != null, source);
+      assert.match(
+        printHir(result.hir),
+        new RegExp(`typeof ${operand}`, "u"),
+        source,
+      );
+    }
   }
 });
 
@@ -1535,6 +1732,111 @@ with (environment) {
         const missing = /read \*missing intrinsic:x\*/u;
         if (strict) assert.match(mir, missing, body);
         else assert.doesNotMatch(mir, missing, body);
+      }
+    }
+  }
+});
+
+test("tests a selected with binding again before its read", () => {
+  // GetBindingValue repeats HasProperty on the object HasBinding selected,
+  // so a binding gone in between reads undefined, or the strict missing
+  // cell's ReferenceError, while a call keeps that object as `this`.
+  const forms = { call: "x()", typeof: "typeof x", value: "x" };
+  for (const [form, use] of Object.entries(forms)) {
+    for (const strict of [false, true]) {
+      const source =
+        "function g(o, x) {\n" +
+        "  with (o) {\n" +
+        "    return (function () {\n" +
+        (strict ? '      "use strict";\n' : "") +
+        `      return ${use};\n` +
+        "    })();\n" +
+        "  }\n" +
+        "}\n" +
+        "g({ x: 1 }, 0);\n";
+      for (const specialization of ["disabled", "enabled"] as const) {
+        const mode = strict ? "strict" : "sloppy";
+        const label = `${form} ${mode} ${specialization}`;
+        const result = compileSource(
+          babelFrontend,
+          { source, sourceId: "with-get-binding-value.js" },
+          { specialization },
+        );
+        assert.deepEqual(result.diagnostics, [], label);
+        assert.ok(result.mir != null, label);
+        const inner = result.mir.functions.find((item) =>
+          item.blocks.some((block) =>
+            block.operations.some(
+              (operation) =>
+                operation.kind === "read" &&
+                operation.detail === "<with object>",
+            ),
+          ),
+        );
+        assert.ok(inner != null, label);
+        const blocks = new Map(inner.blocks.map((block) => [block.id, block]));
+        const operations = inner.blocks.flatMap((block) => block.operations);
+        assert.ok(
+          !operations.some((operation) => operation.kind.startsWith("guard-")),
+          `${label}: no guard on the with read`,
+        );
+        const withObjects = new Set(
+          operations
+            .filter(
+              (operation) =>
+                operation.kind === "read" &&
+                operation.detail === "<with object>",
+            )
+            .map((operation) => operation.id),
+        );
+        const tests = operations.filter(
+          (operation) =>
+            operation.kind === "binary" && operation.operator === "in",
+        );
+        assert.equal(tests.length, 2, `${label}: HasBinding, GetBindingValue`);
+        const [hasBinding, getBindingValue] = tests;
+        assert.ok(withObjects.has(hasBinding!.arguments[1] ?? -1), label);
+        const selected = getBindingValue!.arguments[1]!;
+        assert.ok(!withObjects.has(selected), `${label}: selected object`);
+        const branch = inner.blocks.find(
+          (block) =>
+            block.terminator.kind === "branch" &&
+            block.terminator.test === getBindingValue!.id,
+        )?.terminator;
+        assert.ok(branch?.kind === "branch", label);
+        const present = blocks.get(branch.whenTrue)!.operations;
+        assert.ok(
+          present.some(
+            (operation) =>
+              operation.kind === "property-get" &&
+              operation.arguments[0] === selected,
+          ),
+          `${label}: Get only after the second test`,
+        );
+        const missing = blocks
+          .get(branch.whenFalse)!
+          .operations.some(
+            (operation) =>
+              operation.kind === "read" &&
+              operation.detail === "*missing intrinsic:x*",
+          );
+        assert.equal(missing, strict, `${label}: strict missing binding`);
+        if (form !== "call") continue;
+        const call = operations.find((operation) => operation.kind === "call");
+        const receiver = call?.arguments[1];
+        const join = inner.blocks.find((block) =>
+          block.parameters?.includes(receiver ?? -1),
+        );
+        assert.ok(join != null, `${label}: call receiver join`);
+        assert.ok(
+          inner.blocks.some(
+            (block) =>
+              block.terminator.kind === "jump" &&
+              block.terminator.target === join.id &&
+              block.terminator.values?.[1] === selected,
+          ),
+          `${label}: the selected object stays the receiver`,
+        );
       }
     }
   }

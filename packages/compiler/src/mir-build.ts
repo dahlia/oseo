@@ -1301,6 +1301,13 @@ function lowerWithReference(
   };
 }
 
+/**
+ * GetValue of an identifier read through active `with` environments. A
+ * selected object performs GetBindingValue's own HasProperty before the
+ * Get, so a binding gone since HasBinding reads `undefined` or throws in
+ * strict code. A call keeps the selected object as its receiver either
+ * way, since WithBaseObject does not depend on the property.
+ */
 function lowerWithRead(
   reference: HirWithReference,
   builder: MirBuilder,
@@ -1322,9 +1329,10 @@ function lowerWithRead(
     whenTrue: propertyBlock.id,
   };
   builder.current = propertyBlock;
-  const propertyValue = lowerPropertyRead(
+  const propertyValue = lowerGlobalBindingValue(
     selected.object,
     selected.key,
+    reference.globalReference,
     reference.range,
     builder,
   );

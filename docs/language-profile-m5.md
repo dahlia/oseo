@@ -697,7 +697,12 @@ current evidence assessment. Those live only in the indexed records above.
     regular expressions; the group holds twenty-one passes since M5a Unit
     8.5l promoted its `for-in` iteration-statement case and the M5b
     `string-intrinsic` node promoted its `String` one. Optional calls through
-    `super` properties are admitted by M5a Unit 8.2 as recorded below. The
+    `super` properties are admitted by M5a Unit 8.2 as recorded below. An
+    optional call whose callee is an identifier resolved through a `with`
+    object environment does not yet pass the selected object as `this`; that
+    known defect is recorded under identifier reads through `with` below and
+    is owned by M5c node `with-optional-call-receiver`, which blocks the M5
+    exit. The
     remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
     not materialized yet.
@@ -1520,7 +1525,9 @@ current evidence assessment. Those live only in the indexed records above.
     reference before an assignment evaluates its right operand. Nested
     declarative scopes stop an outer object environment from bypassing a
     nearer lexical binding. Reads, writes, method receivers, closures, nested
-    `with` statements, and abrupt exits preserve that resolution order. Strict
+    `with` statements, and abrupt exits preserve that resolution order. A
+    read, `typeof`, or call through a selected object tests that object again
+    before `Get` (see *Identifier reads through with environments*). Strict
     source keeps the required parse-time rejection. Fixed native evidence also
     covers one-time object evaluation, fallback reads and writes, captured
     object environments, nested environments, abrupt completion, and a
@@ -3709,6 +3716,36 @@ with no semantic, harness, or infrastructure failures. The follow-up runtime
 ABI moves to `oseo-runtime-m5-59` without exposing the global object or
 changing the graph's orchestration state. Compatibility classifications and
 counts do not move.
+
+M5c node `eval-intrinsic-value` adds `eval` to the property-owned names. A
+bare `eval` that no declaration or `with` object supplies reads, writes,
+deletes, and applies `typeof` to the global object's `eval` property, which
+the realm installs with %eval% (ADR 0027). An object environment that lacks
+`eval` falls back to that property rather than to an uninitialized hidden
+binding. Declarations, parameters, and `with` objects named `eval` shadow it
+as ordinary bindings. ADR 0016 still excludes the unshadowed call position,
+`eval(...)`, which ECMA-262 treats as a direct eval whenever the value is
+%eval%. The resolver rejects that call before evaluating any argument and
+keeps its original `Unknown binding 'eval'.` diagnostic text and range,
+because the exclusion audit binds each accepted direct-eval observation to
+that text. Every other call of the value, such as `(0, eval)(...)`,
+`eval?.(...)`, a call through a parameter, a call whose `with` object
+misses, or a tagged template such as ``eval`x` ``, is an ordinary call. Its
+String argument meets %eval%‘s run-time `OSEO1001` boundary, and any other
+argument is returned unchanged. No source is evaluated.
+
+The fixed `eval-intrinsic-value` native fixture and the generated domain at
+property seed `0x60003d01` cover descriptor identity, `length`, `name`,
+prototype absence, nonconstructibility directly and through a Proxy, the
+value as an Array callback receiver and Promise context, non-String indirect
+and `with`-fallback calls, tagged template calls that return the template
+object, sloppy writes, deletion and recreation, strict reads after deletion,
+shadowing, both specialization policies, forced collection, and a cached
+global-object shape read that misses after the property is recreated and
+reaches the compiled generic read. Native-only checks pin the run-time
+boundary of indirect, optional, parameter, and `with`-fallback String calls.
+The reviewed test262 observation of the node's owned paths is pending the
+complete manifest update.
 
 ### Object.defineProperties descriptor collection
 
@@ -8295,10 +8332,10 @@ non-enumerable, configurable `eval` property with `length` 1 and `name`
 without parsing, and reports `OSEO1001` “eval compiles source text at run time,
 which is outside the admitted profile.” for a String, the boundary of
 [ADR 0016](./adr/0016-dynamic-source-boundary.md); it never evaluates source.
-The compiler still rejects the bare `eval` identifier, which the
-`eval-intrinsic-value` node owns. `%Function%`'s [[Call]] and [[Construct]]
-report the same boundary as `OSEO1001`, as the generator and async function
-constructors do.
+The `eval-intrinsic-value` node later admits the bare `eval` identifier as
+a value, while the unshadowed call position stays the ADR 0016 rejection.
+`%Function%`'s [[Call]] and [[Construct]] report the same boundary as
+`OSEO1001`, as the generator and async function constructors do.
 
 Six fixed native differential fixtures run through Node.js and Deno, whose
 reference `$262.createRealm` creates a `node:vm` context, and through both
@@ -8492,9 +8529,11 @@ complete. The remaining gaps retain their existing owners.
     admitted standard globals as replaceable properties of the same object,
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
     other unresolved global reference through it at run time. Three
-    boundaries remain. First, a reference to `eval`, the one clause 19
-    standard global name this profile has not admitted as an identifier
-    reference, stays a source-located rejection. Every realm's global
+    boundaries remain. First, M5c node `eval-intrinsic-value` admits a bare
+    `eval` identifier read as the global object's `eval` property, but an
+    unshadowed `eval(...)` call stays the source-located ADR 0016
+    rejection, and any other call that passes a String to `%eval%` reaches
+    its run-time `OSEO1001` boundary. Every realm's global
     object holds the `%eval%` value of
     [ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md), so a Script
     top-level `var eval` keeps it. M5c node `typed-array-feature-admission`
@@ -9017,6 +9056,93 @@ canonical admission.
 
 [keyed binding case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/destructuring/binding/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
 [assignment-pattern twin]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/expressions/assignment/destructuring/keyed-destructuring-property-reference-target-evaluation-order-with-bindings.js
+
+
+Identifier reads through with environments
+------------------------------------------
+
+M5c node `eval-intrinsic-value` makes an identifier read through a selected
+Object Environment Record perform ECMA-262 2025 GetBindingValue (9.1.1.2.6).
+HasBinding selects the nearest object whose `HasProperty` succeeds and whose
+`Symbol.unscopables` does not block the name. GetValue then calls
+GetBindingValue, which tests `HasProperty` on that object again before `Get`.
+A binding gone in between, for example deleted by a `Symbol.unscopables`
+getter or denied by a Proxy `has` trap, reads `undefined` in non-strict code
+and throws `ReferenceError` in strict code. The reference is strict when the
+code containing it is strict, so a strict function nested in a sloppy `with`
+body throws. The rule covers a value read; `typeof`, which special-cases
+only an unresolvable reference before GetValue, so a reference resolved to a
+selected object still performs GetBindingValue and propagates its strict
+`ReferenceError`; and a call callee, whose strict `ReferenceError` precedes
+argument evaluation. An ordinary call expression keeps the selected object
+as `this` whether or not the property survived. An abrupt
+second `has` propagates before any `Get`. An all-miss chain is unchanged, and
+compound, logical, and update reads already performed the second test.
+
+HIR records the read's strictness on the `with-get` reference, and MIR reuses
+the global Environment Record's GetBindingValue lowering on the selected
+object. The added `in` is a safepoint; the selected object, key, value, and
+receiver stay rooted across it.
+
+The reference hosts diverge from this algorithm. Node.js 24.21.0 (V8
+13.6.233.17) and Deno 2.9.7 (V8 15.0.245.2) skip the second `HasProperty` and
+return what `Get` yields. Node.js fails the pinned [identifier trace] and
+[call trace] cases and the [strict deletion case]. This evidence therefore
+uses no Node.js or Deno differential for the selected path. The fixed
+observation in *tests/native.ts* compiles the program in
+*tests/native/fixtures/with-get-binding-value.ts* under both specialization
+policies with collection forced at every safepoint, and requires a positive
+collection count and the exact ECMA-262 output. With specialization disabled
+it also requires zero guard hits and misses. Its 27 rows cover, in sloppy and
+strict code:
+
+ -  a binding deleted by a `Symbol.unscopables` getter, behind a global or a
+    lexical fallback, and present and inherited bindings;
+ -  `typeof` of a deleted binding and of an all-miss name;
+ -  a call after deletion with its argument trace, and a present call's
+    `this`;
+ -  the Proxy trace that the pinned test262 cases assert, a Proxy whose
+    second `has` answers `false` or throws, and a Proxy miss followed by the
+    next object.
+
+The existing *m5-global-object-record.property.test.ts* family adds slot
+`0x60003d02` with 12 ordinary cases and a 180-second interrupt limit. It
+generates one to four value, `typeof`, and call references, sloppy or in a
+nested strict function, behind a lexical or unresolvable outer binding,
+through one to three plain or Proxy objects with scripted `has` answers and
+six `Symbol.unscopables` forms. Native output under both specialization
+policies, with forced collection and a positive collection count, must equal
+an independent symbolic model of HasBinding, GetBindingValue, GetValue,
+`typeof`, and EvaluateCall; no reference host runs. With specialization
+disabled the domain also requires zero guard hits and misses. Slots
+`0x60003d00` and `0x60003d01` and their Node.js and Deno comparisons are
+unchanged. Parser and MIR structural tests check, under both policies, that a
+value read, `typeof`, and a callee test the selected object again before its
+`Get`, that only strict code reaches the missing binding's `ReferenceError`,
+that a call's receiver is the selected object, and that the path has no
+guard.
+
+The repair adds no specialized path or guard and no runtime, ABI, or heap
+change. It admits no test262 path: the four pinned GetBindingValue cases
+under *test/language/statements/with/* remain unreviewed with
+`observation-batch-28`.
+
+This correction does not cover optional calls. An optional call such as
+`with (o) { f?.() }` lowers its identifier callee as a value and passes
+`undefined` instead of the selected object as `this`. Native runs on
+`13ab5051` observed `false` for a strict `this === o` check under both
+specialization policies, where ECMA-262 and the ordinary call give `true`.
+That commit precedes this correction, which was not executed for that
+program; static analysis shows the correction leaves the optional-chain
+lowering unchanged. This is a known remaining defect, not an exclusion. Active
+remediation node `with-optional-call-receiver` owns it, and `m5-exit-audit`
+depends on that node. The
+[*with-optional-call-receiver.md*](./m5c-graph/with-optional-call-receiver.md)
+record holds the evidence and the repair contract.
+
+[identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
+[call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js
+[strict deletion case]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-mutable-binding-binding-deleted-in-get-unscopables-strict-mode.js
 
 
 Parenthesized assignment targets
