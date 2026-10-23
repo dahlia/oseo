@@ -741,51 +741,6 @@ matching-host CI case sum when available. This is one local Linux case sum,
 not final native CI, a whole-suite result, or a full UPDATE. No case budget,
 seed, deadline, or shard total changes.
 
-The `proper-tail-calls` property family adds a native property file with
-three generated domains: bounded tail chains, calls outside tail position,
-and live arguments, closures, and errors across tail chains.
-
-A local Linux x86-64 whole-file extended run on 2026-10-23 UTC, from
-03:14:33 to 03:43:22, at clean source
-`87aeb56b7cbd9ad84caeb464b75ed4727aba4bca` (tree
-`ef0cba416b1bc64ec2d03cabb7354a896a9a530b`) naturally exited zero with
-all three registrations passing and none skipped, cancelled, or failed.
-Their printed leaf durations were 155,378.61886, 104,271.39819, and
-1,465,810.607444 milliseconds. Their sum is 1,725,460.624494
-milliseconds, so the Linux weight is 1,726 seconds after rounding up.
-That sum excludes build and plugin timing. It is a derived case sum, not
-processor time or file wall time; the separate process wall time was
-1,729 seconds, and the property runner's own duration was
-1,725.969713619 seconds.
-
-The command was `mise run test:property:extended:native:shard --shard 1/1`
-with this exact property file. The task supplied `OSEO_PROPERTY_RUN_SCALE=10`,
-`OSEO_PROPERTY_SEED=1592590339`, and `OSEO_PROPERTY_SIZE=large`, with one
-file worker. Because `propertyParameters` lets `OSEO_PROPERTY_SEED` replace
-each suite's own seed, all three registrations executed with seed
-1592590339; the family constants `0x60008900` to `0x60008902` stayed
-unchanged in the file but were not the execution seeds of this run. The
-ordinary budgets of 8, 8, and 6 cases ran as 80, 80, and 60 at scale 10.
-Each registration's 180,000-millisecond limit constant stayed unchanged;
-the effective interrupt limit was 1,800,000 milliseconds per registration,
-with no time scale. Size limits were unchanged. The capacity profile was
-`generous` (`desktop-idle`), with no CPU quota and a 104G memory cap. Clean
-HEAD, tree, and property SHA-256 matched before and after execution. The
-property digest was:
-`2f39f24230aab3221368184230d2b49b397db8d7408690536e7fcd7482bbbb09`.
-
-Raw result, stdout, stderr and exact timing tokens remain under:
-*/data/m5c-tco-computed-focused-prepare-20261023/*.
-
-macOS remains unmeasured. Its scheduling weight of 286 seconds is the
-unknown-file default: the upper median of the macOS table before this entry
-was added. It is neither a measured host ratio nor a claimed conservative
-bound. Adding both entries leaves each host's unknown-file median unchanged.
-Replace the macOS default with an actual matching-host CI case sum when
-available. This is one local Linux case sum, not final native CI, a
-whole-suite result, or a full UPDATE. No case budget, seed, deadline, or
-shard total changes.
-
 The `computed-member-reference-key-order` node adds slot `0x60000c03`, four
 fixed native registrations, one native-only diagnostic registration, and one
 model-only registration to
@@ -904,3 +859,23 @@ under */data/m5c-four-source-property-fix-20261023/*. These focused timings
 do not change the historical whole-file weights or any case budget.
 
 [36358067906]: https://github.com/dahlia/oseo/actions/runs/36358067906
+
+### Primitive wrapper objects planning weights
+
+The new *tests/property/m5-primitive-wrapper-objects.property.test.ts*
+reserves 900 seconds on each host. Both entries are conservative planning
+estimates, not measured extended durations or upper bounds. The two local
+Linux ordinary registrations took 18,252.721235 and 23,255.609218 ms on
+2026-10-23, summing to 41,508.330453 ms. This is a complete ordinary file
+observation with 12 cases in each of two domains; it is neither an extended
+run nor comparable candidate CI evidence. The focused process also ran four
+fixed registrations and took 49.812 seconds overall.
+
+A linear ten-times projection of those case durations is about 416 seconds.
+The 900-second reservation leaves planning margin for the unmeasured larger
+run, cold artifacts, host variation, and the unmeasured macOS host. It uses
+no claimed macOS speed ratio. Replace both estimates with complete matching
+host extended CI case sums when available. Raw commands, stdout, stderr, and
+timing metadata are under
+*/data/m5c-primitive-wrapper-objects-20261023/focused-ordinary.*.
+No existing case budget, seed, deadline, or shard total changes.

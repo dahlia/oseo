@@ -235,12 +235,31 @@ prototype values and delegates object and null values to the existing
 `oseo_object_set_prototype` authority.
 
 The `m5-38` ABI adds `oseo_this_value`, `oseo_global_object_create`, and
-`oseo_global_binding_set`. `oseo_this_value` returns a non-nullish receiver
-unchanged and otherwise resolves the realm's global this value, which it
+`oseo_global_binding_set`. `oseo_this_value` resolves a nullish receiver
+to the realm's global this value, which it
 creates on first use as an ordinary extensible object with a null
 `[[Prototype]]`. The context permanently roots that one object, so Script
 top-level `this` and every non-strict nullish receiver observe one identity
 across collection.
+
+The M5c `primitive-wrapper-objects` unit completes the non-nullish branch
+with `ToObject`. Objects retain their identity; Boolean, Number, String,
+Symbol, and BigInt primitives produce fresh branded wrappers over the
+callee realm's intrinsic prototypes. The C backend binds and roots this
+receiver once at a non-strict function's entry, before parameter effects or
+suspension-frame creation. Repeated `this` reads and lexical arrows retain
+that identity, and the suspension record traces it across resumes. Strict
+functions receive their original values. Existing wrapper layouts, tracing,
+constructor behavior, and branded prototype methods remain authoritative;
+this unit adds no runtime entry point or heap field.
+
+`Array.from` keeps the original receiver for its `GetMethod` iterator
+lookup, then materializes one `ToObject` result for the array-like branch's
+length and indexed reads. `Object.prototype.toString` likewise reads
+`Symbol.toStringTag` from its `ToObject` result. Ordinary primitive property
+References and `Object.prototype.toLocaleString`'s `Invoke` keep their
+primitive receivers. This admission does not complete primitive inherited
+`[[Set]]`, which has its own M5c node.
 
 `oseo_global_object_create` performs GlobalDeclarationInstantiation's binding
 creation for one Script. Each named entry becomes a writable, enumerable,
@@ -1132,21 +1151,6 @@ build compiled ahead of time borrows that static program when the new
 flags agree on `i`, `m`, `s`, `u`, and `v`; every other copy still parses
 its source dynamically. No entry point, public layout, heap kind,
 intrinsic slot, or built-in code ID is added.
-
-The `m5-136` ABI records proper tail calls. `OSEO_STATUS_TAIL_CALL` reports
-that a PrepareForTailCall site recorded the call it owes in the context.
-`oseo_tail_call` and `oseo_tail_call_derived` throw for a value that is not
-callable, as an ordinary call does, and otherwise record the callee, receiver,
-copied arguments, running realm, and, for a derived class constructor, its
-`this` binding cell. `oseo_call_function` and `oseo_call_complete` perform
-recorded calls in a loop, one rooted step at a time, so a chain of tail calls
-holds one step's native stack, call depth, frame budget, and roots.
-`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`
-record their final call, as their PrepareForTailCall steps require, and the
-[[Call]] of a bound function or a Proxy forwards the same way because it
-creates no execution context. A non-tail call through a bound function or
-Proxy therefore no longer adds a call-depth level for that wrapper.
-[[Construct]] is unchanged. The context gains one private record pointer.
 
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named

@@ -441,13 +441,13 @@ static OseoResult function_prototype_call(
     const OseoValue *forwarded = forwarded_count == 0u
         ? NULL
         : arguments + 1u;
-    /* Function.prototype.call step 2 performs PrepareForTailCall. */
-    return oseo_internal_tail_call(
+    return oseo_call_function(
         context,
         target,
         receiver,
         forwarded_count,
-        forwarded
+        forwarded,
+        oseo_undefined()
     );
 }
 
@@ -465,10 +465,15 @@ static OseoResult function_prototype_apply(
     OseoValue source = argument_count < 2u
         ? oseo_undefined()
         : arguments[1];
-    /* Both Function.prototype.apply branches perform PrepareForTailCall
-     * once the argument list is complete. */
     if (is_nullish(source)) {
-        return oseo_internal_tail_call(context, target, receiver, 0u, NULL);
+        return oseo_call_function(
+            context,
+            target,
+            receiver,
+            0u,
+            NULL,
+            oseo_undefined()
+        );
     }
     OseoValue slots[4] = {
         target,
@@ -494,12 +499,13 @@ static OseoResult function_prototype_apply(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_tail_call(
+        result = oseo_call_function(
             context,
             slots[0],
             slots[1],
             forwarded_count,
-            forwarded
+            forwarded,
+            oseo_undefined()
         );
     }
     oseo_roots_pop(context, &frame);
@@ -2782,26 +2788,15 @@ static OseoResult call_bound_function(
             &combined_values
         );
     }
-    bool constructing = tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED;
-    if (result.status == OSEO_STATUS_NORMAL && !constructing) {
-        /* A bound function's [[Call]] creates no execution context and
-         * returns the target's result unchanged, so it forwards through
-         * the trampoline instead of nesting one more native call. */
-        result = oseo_internal_tail_call(
-            context,
-            frame.slots[3],
-            frame.slots[4],
-            combined_count,
-            combined_values
-        );
-    } else if (result.status == OSEO_STATUS_NORMAL) {
+    if (result.status == OSEO_STATUS_NORMAL) {
+        bool constructing = tag_of(frame.slots[2]) != OSEO_TAG_UNDEFINED;
         OseoValue forwarded_target = frame.slots[2] == frame.slots[0]
             ? frame.slots[3]
             : frame.slots[2];
         result = oseo_call_function(
             context,
             frame.slots[3],
-            frame.slots[1],
+            constructing ? frame.slots[1] : frame.slots[4],
             combined_count,
             combined_values,
             forwarded_target
@@ -2915,13 +2910,7 @@ static OseoResult call_in_running_realm(
     return result;
 }
 
-/*
- * One [[Call]] or [[Construct]] step. Its result may carry
- * OSEO_STATUS_TAIL_CALL when the callee, or a bound function, Proxy, or
- * built-in forwarding on its behalf, ended in a tail call; only the
- * trampoline below and its public wrappers see that status.
- */
-static OseoResult call_once(
+OseoResult oseo_call_function(
     OseoContext *context,
     OseoValue callee,
     OseoValue receiver,
@@ -2970,364 +2959,4 @@ static OseoResult call_once(
     );
     oseo_internal_realm_leave(context, &scope);
     return result;
-}
-
-static OseoTailCall *tail_call_record(OseoContext *context) {
-    if (context->tail_call == NULL) {
-        OseoTailCall *record = malloc(sizeof(OseoTailCall));
-        if (record == NULL) return NULL;
-        record->callee = oseo_undefined();
-        record->receiver = oseo_undefined();
-        record->realm_record = oseo_undefined();
-        record->this_cell = oseo_undefined();
-        record->arguments = NULL;
-        record->argument_count = 0u;
-        record->argument_capacity = 0u;
-        record->host = 0u;
-        record->pending = false;
-        record->derived = false;
-        context->tail_call = record;
-    }
-    return context->tail_call;
-}
-
-/*
- * Stores one owed call. Nothing runs between a recording site and the
- * trampoline that takes the record, so a record that is already pending
- * is an internal invariant failure rather than a call to overwrite. A
- * buffer that must grow is replaced, never reallocated in place: the new
- * buffer is filled from `arguments` before the old one is freed, so an
- * argument pointer into the old buffer stays valid for the copy.
- */
-static OseoResult record_tail_call(
-    OseoContext *context,
-    unsigned host,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments,
-    bool derived,
-    OseoValue this_cell
-) {
-    OseoTailCall *record = tail_call_record(context);
-    if (record == NULL) {
-        return failure(
-            context,
-            "OSEO2001",
-            "Tail call record allocation failed."
-        );
-    }
-    if (record->pending) {
-        return failure(
-            context,
-            "OSEO2001",
-            "A tail call is already pending."
-        );
-    }
-    if (argument_count > record->argument_capacity) {
-        if (argument_count > SIZE_MAX / sizeof(OseoValue)) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Tail call argument list is too large."
-            );
-        }
-        OseoValue *grown = malloc(argument_count * sizeof(OseoValue));
-        if (grown == NULL) {
-            return failure(
-                context,
-                "OSEO2001",
-                "Tail call argument allocation failed."
-            );
-        }
-        memcpy(grown, arguments, argument_count * sizeof(OseoValue));
-        free(record->arguments);
-        record->arguments = grown;
-        record->argument_capacity = argument_count;
-    } else if (argument_count > 0u) {
-        memmove(
-            record->arguments,
-            arguments,
-            argument_count * sizeof(OseoValue)
-        );
-    }
-    record->host = host;
-    record->callee = callee;
-    record->receiver = receiver;
-    record->realm_record = context->realm_record;
-    record->this_cell = this_cell;
-    record->argument_count = argument_count;
-    record->derived = derived;
-    record->pending = true;
-    return (OseoResult){OSEO_STATUS_TAIL_CALL, oseo_undefined()};
-}
-
-static void clear_tail_call(OseoTailCall *record) {
-    record->host = 0u;
-    record->callee = oseo_undefined();
-    record->receiver = oseo_undefined();
-    record->realm_record = oseo_undefined();
-    record->this_cell = oseo_undefined();
-    record->argument_count = 0u;
-    record->pending = false;
-    record->derived = false;
-}
-
-OseoResult oseo_internal_tail_call(
-    OseoContext *context,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments
-) {
-    return record_tail_call(
-        context,
-        0u,
-        callee,
-        receiver,
-        argument_count,
-        arguments,
-        false,
-        oseo_undefined()
-    );
-}
-
-void oseo_internal_tail_call_release(OseoContext *context) {
-    OseoTailCall *record = context->tail_call;
-    if (record == NULL) return;
-    free(record->arguments);
-    free(record);
-    context->tail_call = NULL;
-}
-
-OseoResult oseo_tail_call(
-    OseoContext *context,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments
-) {
-    /* EvaluateCall steps 3 and 4 throw before PrepareForTailCall, so the
-     * ordinary call path raises that TypeError in the calling frame. */
-    if (!is_callable(callee)) {
-        return oseo_call_function(
-            context,
-            callee,
-            receiver,
-            argument_count,
-            arguments,
-            oseo_undefined()
-        );
-    }
-    return record_tail_call(
-        context,
-        0u,
-        callee,
-        receiver,
-        argument_count,
-        arguments,
-        false,
-        oseo_undefined()
-    );
-}
-
-OseoResult oseo_tail_host_call(
-    OseoContext *context,
-    OseoTailHost host,
-    size_t argument_count,
-    const OseoValue *arguments
-) {
-    return record_tail_call(
-        context,
-        (unsigned)host,
-        oseo_undefined(),
-        oseo_undefined(),
-        argument_count,
-        arguments,
-        false,
-        oseo_undefined()
-    );
-}
-
-OseoResult oseo_tail_host_call_derived(
-    OseoContext *context,
-    OseoTailHost host,
-    size_t argument_count,
-    const OseoValue *arguments,
-    OseoValue this_cell
-) {
-    return record_tail_call(
-        context,
-        (unsigned)host,
-        oseo_undefined(),
-        oseo_undefined(),
-        argument_count,
-        arguments,
-        true,
-        this_cell
-    );
-}
-
-/* One trampoline step's call: a host intrinsic or [[Call]]. */
-static OseoResult tail_call_step(
-    OseoContext *context,
-    unsigned host,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments
-) {
-    if (host == (unsigned)OSEO_TAIL_HOST_CONSOLE_LOG) {
-        return oseo_console_log(context, argument_count, arguments);
-    }
-    if (host == (unsigned)OSEO_TAIL_HOST_SET_TIMEOUT) {
-        return oseo_set_timeout(context, argument_count, arguments);
-    }
-    if (host != 0u) {
-        return failure(context, "OSEO2001", "Tail call host is invalid.");
-    }
-    return call_once(
-        context,
-        callee,
-        receiver,
-        argument_count,
-        arguments,
-        oseo_undefined()
-    );
-}
-
-OseoResult oseo_tail_call_derived(
-    OseoContext *context,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments,
-    OseoValue this_cell
-) {
-    if (!is_callable(callee)) {
-        return oseo_call_function(
-            context,
-            callee,
-            receiver,
-            argument_count,
-            arguments,
-            oseo_undefined()
-        );
-    }
-    return record_tail_call(
-        context,
-        0u,
-        callee,
-        receiver,
-        argument_count,
-        arguments,
-        true,
-        this_cell
-    );
-}
-
-/*
- * Performs pending tail calls until one completes without owing another.
- * Each step moves the record into a root frame of its own before the
- * call runs, so a nested call or trampoline inside the callee finds the
- * record free, and the step's frame, realm scope, call depth, and frame
- * budget are all released before the next step begins: a chain of any
- * length holds one step's resources. Only the first step can come from a
- * derived class constructor, since every later step is a [[Call]], which
- * never evaluates a class constructor body; its `this` cell and realm stay
- * rooted here until the chain's final value passes the constructor's
- * result rules.
- */
-static OseoResult run_tail_calls(OseoContext *context) {
-    OseoTailCall *record = context->tail_call;
-    OseoValue continuation[2] = {oseo_undefined(), oseo_undefined()};
-    OseoRootFrame continuation_frame = {NULL, continuation, 2u};
-    oseo_roots_push(context, &continuation_frame);
-    bool derived = record->derived;
-    if (derived) {
-        continuation[0] = record->this_cell;
-        continuation[1] = record->realm_record;
-    }
-    OseoResult result;
-    for (;;) {
-        OseoRootFrame frame = {NULL, NULL, 0u};
-        size_t argument_count = record->argument_count;
-        result = oseo_roots_allocate(context, &frame, argument_count + 3u);
-        if (result.status != OSEO_STATUS_NORMAL) {
-            clear_tail_call(record);
-            break;
-        }
-        unsigned host = record->host;
-        frame.slots[0] = record->callee;
-        frame.slots[1] = record->receiver;
-        frame.slots[2] = record->realm_record;
-        if (argument_count > 0u) {
-            memcpy(
-                frame.slots + 3u,
-                record->arguments,
-                argument_count * sizeof(OseoValue)
-            );
-        }
-        clear_tail_call(record);
-        OseoRealmScope scope;
-        oseo_internal_realm_enter(context, &scope, frame.slots[2]);
-        result = tail_call_step(
-            context,
-            host,
-            frame.slots[0],
-            frame.slots[1],
-            argument_count,
-            frame.slots + 3u
-        );
-        oseo_internal_realm_leave(context, &scope);
-        oseo_roots_release(context, &frame);
-        if (result.status != OSEO_STATUS_TAIL_CALL) break;
-        if (record->derived) {
-            clear_tail_call(record);
-            result = failure(
-                context,
-                "OSEO2001",
-                "A derived constructor tail call followed a [[Call]]."
-            );
-            break;
-        }
-    }
-    if (derived && result.status == OSEO_STATUS_NORMAL) {
-        OseoRealmScope scope;
-        oseo_internal_realm_enter(context, &scope, continuation[1]);
-        result = oseo_derived_constructor_result(
-            context,
-            result.value,
-            continuation[0]
-        );
-        oseo_internal_realm_leave(context, &scope);
-    }
-    oseo_roots_pop(context, &continuation_frame);
-    return result;
-}
-
-OseoResult oseo_call_complete(OseoContext *context, OseoResult result) {
-    if (result.status != OSEO_STATUS_TAIL_CALL) return result;
-    return run_tail_calls(context);
-}
-
-OseoResult oseo_call_function(
-    OseoContext *context,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments,
-    OseoValue new_target
-) {
-    return oseo_call_complete(
-        context,
-        call_once(
-            context,
-            callee,
-            receiver,
-            argument_count,
-            arguments,
-            new_target
-        )
-    );
 }

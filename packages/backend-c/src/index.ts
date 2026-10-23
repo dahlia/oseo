@@ -1505,9 +1505,7 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   state.usesAbrupt = true;
   const argumentsValue = emitArguments(state, callArguments);
-  if (operation.tail === true) {
-    emitTailCall(state, operation, argumentsValue);
-  } else if (target.kind === "console-log") {
+  if (target.kind === "console-log") {
     line(
       state,
       renderC(
@@ -1713,88 +1711,9 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     );
     line(state, renderC(emittedC.common.indentedCloseBlock));
     line(state, renderC(emittedC.call.oseoCallLeaveContextStatement));
-    // A direct call bypasses `oseo_call_function`, so it completes any
-    // tail call chain the callee's body ended in here.
-    line(state, renderC(emittedC.call.callCompleteStatement));
     line(state, renderC(emittedC.common.closeBlock));
   }
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
-}
-
-/**
- * Emits a call MIR marks as being in tail position. The runtime records
- * it and returns OSEO_STATUS_TAIL_CALL, so the following status check
- * leaves through the body's ordinary abrupt exit, which releases the
- * frame's roots and returns that result to the trampoline. A tail call
- * never has a handler in its own body, so that exit is the body's
- * return. A derived class constructor passes its `this` binding cell
- * along for the result rules the frame can no longer apply.
- */
-function emitTailCall(
-  state: EmitState,
-  operation: MirOperation,
-  argumentsValue: { readonly count: number | string; readonly name: string },
-): void {
-  const target = operation.target;
-  const thisBindingId = operation.tailThisBindingId;
-  if (thisBindingId != null) {
-    line(
-      state,
-      renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
-        renderC(
-          emittedC.common.rootsUStatement,
-          state.environmentSlot,
-          thisBindingId,
-        ),
-    );
-    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
-  }
-  const derived = thisBindingId != null;
-  if (target?.kind === "dynamic") {
-    const callee = operationArgument(operation, 0);
-    const receiver = operationArgument(operation, 1);
-    const prefix = derived
-      ? emittedC.call.tailCallDerivedPrefix
-      : emittedC.call.tailCallPrefix;
-    line(
-      state,
-      renderC(prefix, callee) +
-        renderC(
-          emittedC.common.twoRootsWithComma,
-          receiver,
-          argumentsValue.count,
-        ) +
-        (derived
-          ? renderC(emittedC.common.valueWithComma, argumentsValue.name) +
-            renderC(emittedC.derivedReturn.resultValueStatement)
-          : renderC(emittedC.common.callSuffix, argumentsValue.name)),
-    );
-    return;
-  }
-  let host: string;
-  if (target?.kind === "console-log") {
-    host = renderC(emittedC.call.tailHostConsoleLog);
-  } else if (
-    target?.kind === "timer-intrinsic" &&
-    target.method === "setTimeout"
-  ) {
-    host = renderC(emittedC.call.tailHostSetTimeout);
-  } else {
-    throw new Error(
-      `MIR tail call %${operation.id} has a target with no tail call ABI.`,
-    );
-  }
-  const prefix = derived
-    ? emittedC.call.tailHostCallDerivedPrefix
-    : emittedC.call.tailHostCallPrefix;
-  line(
-    state,
-    renderC(prefix, host, argumentsValue.count) +
-      (derived
-        ? renderC(emittedC.common.valueWithComma, argumentsValue.name) +
-          renderC(emittedC.derivedReturn.resultValueStatement)
-        : renderC(emittedC.common.callSuffix, argumentsValue.name)),
-  );
 }
 
 function emitObjectOperation(state: EmitState, operation: MirOperation): void {
@@ -3644,8 +3563,16 @@ function rootCount(functionValue: MirFunction): number {
     32,
   );
   return (
-    baseRootCount + maximumArgumentCount(blocks) + completionSlotCount(blocks)
+    baseRootCount +
+    maximumArgumentCount(blocks) +
+    completionSlotCount(blocks) +
+    (needsThisBinding(functionValue) && !functionValue.generator ? 1 : 0)
   );
+}
+
+/** Script this is separate; lexical receivers arrive captured by [[Call]]. */
+function needsThisBinding(functionValue: MirFunction): boolean {
+  return functionValue.id >= 0 && functionValue.strict !== true;
 }
 
 /**
@@ -3673,23 +3600,6 @@ function scriptFrameCost(functionValue: MirFunction): number {
   return rootCount(compact) + 2 * bindingAccesses;
 }
 
-/**
- * Blocks of `functionValue` that C control can enter from `start`,
- * without crossing `excluded`.
- *
- * A completion target is entered only through a `resume-completion`
- * terminator, whose switch names every block emitted for the same body.
- * Targets are therefore deferred until such a terminator is reachable;
- * targets found before or after it join the fixed point together. When
- * every `finally` in the body leaves abruptly, no dispatch exists, and
- * emitting the targets would leave labels that no `goto` names.
- *
- * Block 0 as a target is the sentinel that a `return`, `throw`, or normal
- * completion without a jump destination saves (`enterFinalizer`); the
- * dispatch switch never names it. It is not deferred, so a generator body
- * that starts after the call-time parameter prologue does not take in the
- * prologue's entry block.
- */
 function reachableBlocksFrom(
   functionValue: MirFunction,
   start: number,
@@ -3700,13 +3610,7 @@ function reachableBlocksFrom(
   );
   const pending = [start];
   const reachable = new Set<number>();
-  const completionTargets: number[] = [];
-  let resumesCompletion = false;
-  while (
-    pending.length > 0 ||
-    (resumesCompletion && completionTargets.length > 0)
-  ) {
-    if (pending.length === 0) pending.push(...completionTargets.splice(0));
+  while (pending.length > 0) {
     const id = pending.pop();
     if (id == null || reachable.has(id) || excluded.has(id)) continue;
     const block = blocks.get(id);
@@ -3728,8 +3632,11 @@ function reachableBlocksFrom(
       }
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
-    } else if (block.terminator.kind === "resume-completion") {
-      resumesCompletion = true;
+    } else if (
+      block.terminator.kind === "resume-completion" &&
+      (block.terminator.outerAbrupt != null ||
+        block.terminator.outerFinalizer != null)
+    ) {
       if (block.terminator.outerAbrupt != null) {
         pending.push(block.terminator.outerAbrupt.blockId);
       }
@@ -3741,11 +3648,8 @@ function reachableBlocksFrom(
       if (operation.abruptTarget != null) {
         pending.push(operation.abruptTarget.blockId);
       }
-      if (
-        operation.completionTarget != null &&
-        operation.completionTarget.blockId !== 0
-      ) {
-        completionTargets.push(operation.completionTarget.blockId);
+      if (operation.completionTarget != null) {
+        pending.push(operation.completionTarget.blockId);
       }
     }
   }
@@ -4488,6 +4392,21 @@ function emitFunction(
     lines: [],
   };
   state.usesAbrupt = fragmentUnit == null || functionValue.id >= 0;
+  if (needsThisBinding(functionValue)) {
+    // OrdinaryCallBindThis precedes parameter evaluation. Keep its one
+    // result rooted even when no MIR this read is live. An arrow receives
+    // its already-bound lexical receiver, which ToObject preserves.
+    // The initial generator frame has one slot; generator_create transfers
+    // this value into the traced suspension record before that slot changes.
+    location(state, functionValue.range);
+    line(state, "result = oseo_this_value(context, receiver);");
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+    line(
+      state,
+      `roots[${generator ? 0 : functionRootCount - 1}] = result.value;`,
+    );
+    line(state, "receiver = result.value;");
+  }
   if (generator) {
     line(
       state,

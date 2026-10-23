@@ -1005,19 +1005,12 @@ results:
     dependencies:
       - dynamic-source
       - expression-operators
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
     observation:
-      detail: 'test/language/expressions/optional-chaining/eval-optional-call.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/optional-chaining/eval-optional-call.js:107:10:
-        error[OSEO1001]: eval compiles source text at run time, which is
-        outside the admitted profile.\n"'
+      detail: "test/language/expressions/optional-chaining/eval-optional-call\
+        .js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/optional-chaining/eval-optio\
+        nal-call.js:107:10: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

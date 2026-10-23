@@ -123,21 +123,6 @@ results, reviewed exclusion-audit rows, and ledger owner
 batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
 remain mixed coverage debt.
 
-M5c node `proper-tail-calls` admits `tail-call-optimization`. Every call
-that ECMA-262 15.10 places in tail position of a strict ordinary, arrow,
-method, accessor, or class constructor body discards its frame before the
-call. The same holds for the PrepareForTailCall steps of
-`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`, and
-for bound function and Proxy [[Call]] forwarding. A chain of such calls holds
-constant native stack, call depth, and roots, and its errors keep the realm
-of the call that raised them. Derived constructors apply their result rules
-to the chain's value. Calls outside tail position, non-strict code, and
-generator and async bodies keep their frames and the 256-call limit. The
-indexed proper tail call family records generated positions, forms,
-exclusions, and liveness (seeds `0x60008900` through `0x60008902`), fixed
-100,000-step chains, differential fixtures under forced collection, and the
-runtime trampoline fixture. The runtime ABI is `oseo-runtime-m5-136`.
-
 M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
 list. The tag was the only unmet prerequisite of the four reviewed
 `super-*.js` parse negatives under *test/language/global-code/*. Each places a
@@ -234,8 +219,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,311 reviewed cases: 24,267 passes, 2,581
-expected negatives, and 1,463 unsupported profile features. It records no
+The current manifest contains 28,311 reviewed cases: 24,234 passes, 2,581
+expected negatives, and 1,496 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3768,15 +3753,15 @@ shadowing, both specialization policies, forced collection, and a cached
 global-object shape read that misses after the property is recreated and
 reaches the compiled generic read. Native-only checks pin the run-time
 boundary of indirect, optional, parameter, and `with`-fallback String calls.
-The complete reviewed update on
-`edccfd292b245c80c3503a93bf1a268fc99506c7` observes 26 passes among the
-node's original 33 paths. The seven indirect-eval private-class cases now
-reach the first String call's existing `OSEO1001` source-compilation
-boundary before their private-name and brand assertions. Their source-bound
-`fixture-construction` assessments assign them to
-`dynamic-source-coverage-remediation`, with
-`normativeDependency: not-demonstrated`; the private identity and access
-subjects remain inside the claim, and no whole-path exclusion is added.
+The complete update on historical four-source composition
+`edccfd292b245c80c3503a93bf1a268fc99506c7` observed 26 passes among the
+node's original 33 paths and seven indirect-eval private-class cases at the
+source-compilation boundary. Those observations and their reassessments
+belong to that composition. This preparation restores successful Main's
+manifest and all original owners; all 33 paths remain unsupported under
+`eval-intrinsic-value` until a new complete update observes this source.
+The private-name and brand subjects remain inside the claim, and no
+whole-path exclusion is added.
 
 ### Object.defineProperties descriptor collection
 
@@ -9265,3 +9250,58 @@ their subset rows were retained. The only new observation is a pass for
 *test/language/expressions/assignment/fn-name-lhs-cover.js*.
 This is preparation evidence; landing and the whole ordinary and extended
 gates remain pending.
+
+
+Primitive wrapper call bindings
+-------------------------------
+
+M5c node `primitive-wrapper-objects` admits the missing non-strict call
+boundary for all five wrapper kinds. Boolean, Number, String, Symbol, and
+BigInt use their existing internal-slot representation and branded methods.
+A generated entry binds and roots one receiver before parameters run;
+nullish arguments select the callee realm's global this value, objects keep
+their identity, and primitives get fresh wrappers over that realm's intrinsic
+prototypes. Strict functions keep primitive receivers. Repeated reads,
+lexical arrows, defaults, call forwarding, and suspension retain the bound
+object, while separate calls produce separate boxes.
+
+`Array.from` performs its iterator lookup with the original primitive and
+uses one `ToObject` result for its non-iterable branch's length and indexed
+reads. `Object.prototype.toString` likewise passes its `ToObject` result to
+an inherited `@@toStringTag` getter. Node.js 24.21.0 and Deno 2.9.7 expose
+the primitive there; the fixed and generated suites retain a labeled V8 model
+beside the ECMA-262 2025 expectation. Ordinary property References and
+`Object.prototype.toLocaleString`'s `Invoke` keep primitive receivers.
+Primitive inherited `[[Set]]` remains separately owned remediation.
+
+*tests/primitive-wrapper-objects.test.ts* covers brands, fresh identity,
+String properties, strict and non-strict calls, invalid receivers, nullish
+and object controls, abrupt calls, default order, lexical captures, and
+synchronous and asynchronous suspension, and callee-realm selection through
+foreign helpers. A public-runtime C fixture sweeps warmed boxing allocation
+failures for all five kinds, checks root balance and retry, and forces
+collection. Its structural check places the
+rooted receiver before environment and suspension initialization. Two
+structured property domains at seeds `0x60008a00` and `0x60008a01` preserve
+all five primitive kinds during shrinking. Each has 12 ordinary cases and
+compares an independent model with Node.js, Deno, and both specialization
+policies, with forced collection and positive collection and generic
+fallback counters. A String wrapper deliberately falsifies a numeric hint;
+a shape mutation exercises the property cache miss.
+
+The TCO-dependent strict tail-forwarding registration and its actual tail
+MIR and C assertions remain preserved at `22a70dd9`, pending independent
+TCO remediation. This composition retains the earlier fixed strict calls,
+bound and Proxy forwarding, defaults, captures, and five-kind assertions;
+it claims no tail-forwarding execution evidence.
+
+The focused standards registration uses the exact 40-path fixture selector
+and checks every requested strictness and specialization variant. It writes
+no reviewed expectation or result. The canonical manifest still records
+these paths as unsupported at the old `primitive-wrapper` boundary until a
+later authorized complete UPDATE supplies fresh observations. This source
+preparation adds the 148th indexed family after composition without TCO;
+full and extended candidate CI,
+outer review, and landing remain pending. Zig's address and undefined flags
+alone establish no ASan activity; the exact candidate's host C sanitizer
+lanes must supply that evidence.

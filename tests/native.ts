@@ -52,7 +52,6 @@ import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import * as mapFixtures from "./native/fixtures/map-intrinsic.ts";
 import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
-import { properTailCallFixtures } from "./native/fixtures/proper-tail-calls.ts";
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
@@ -206,7 +205,6 @@ Object.defineProperty(globalThis, "console", {
 
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
-  ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   ...globalThisFixture.globalThisBindingFixtures,
   ...objectFixtures,
@@ -1242,17 +1240,6 @@ for (const fixture of selectedFixtures) {
     }
   }
 
-  if (fixture.name === "proper-tail-calls") {
-    // Both policies lower the same tail calls; no specialized path
-    // replaces the generic tail call ABI.
-    for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
-      assert.match(text, /= call tail dynamic function value/u);
-      assert.match(text, /= call tail this=%b\d+ dynamic function value/u);
-      assert.match(text, /= call tail console_log/u);
-      assert.match(text, /= call tail setTimeout/u);
-    }
-  }
-
   if (fixture.name === "script-this-hints") {
     assert.match(printMir(enabledMir), /guard-smi/u);
     assert.doesNotMatch(printMir(disabledMir), /guard-smi/u);
@@ -1454,7 +1441,6 @@ for (const fixture of selectedFixtures) {
     fixture.name === "json-stringify" ||
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals" ||
-    fixture.name === "proper-tail-calls" ||
     fixture.name.startsWith("cross-realm-")
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
@@ -1477,15 +1463,31 @@ for (const fixture of selectedFixtures) {
           toolchain: nativeToolchain,
         },
         (native) => {
-          assertMatchingObservations([nodeReference, denoReference, native]);
+          if (fixture.name === "object-constructor") {
+            // ECMA-262 2025 toString steps 3 and 15 Get from ToObject.
+            // Keep V8's measured primitive receiver as a reference control.
+            const v8Line = "primitive tag receiver [object Boolean] boolean";
+            assert.equal(
+              nodeReference.stdout.split("\n").filter((line) => line === v8Line)
+                .length,
+              1,
+            );
+            assertMatchingObservations([
+              {
+                ...nodeReference,
+                stdout: nodeReference.stdout.replace(
+                  `${v8Line}\n`,
+                  "primitive tag receiver [object Boolean] object\n",
+                ),
+              },
+              native,
+            ]);
+          } else {
+            assertMatchingObservations([nodeReference, denoReference, native]);
+          }
           assert(native.counters != null, `${fixture.name}: counters`);
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
-          if (
-            fixture.name === "iterator-next-callability" ||
-            fixture.name === "proper-tail-calls"
-          ) {
-            // Forced collection runs while tail call records and the
-            // trampoline's steps hold the only references to arguments.
+          if (fixture.name === "iterator-next-callability") {
             assert.ok(native.counters.collections > 0);
           }
           if (mode === "disabled") {

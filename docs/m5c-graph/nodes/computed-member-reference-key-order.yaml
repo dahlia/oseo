@@ -43,5 +43,5 @@ delivers: 'Repairs the generic computed member Reference as one semantic unit,
   Add no exclusion and remove or retag no path.'
 dependencies:
   - compound-member-assignment-key-order
-landed: true
+landed: false
 status: ready

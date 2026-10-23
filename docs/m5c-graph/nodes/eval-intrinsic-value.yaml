@@ -24,15 +24,14 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   it on a class source string. Before admission the identifier read was
   rejected as an unknown binding before that call or any private name
   or brand assertion ran. Their private name and brand subjects stay
-  inside the claim; the current combined update reaches the explicit
-  source-compilation boundary and retains remediation for those subjects.
+  inside the claim; a new complete update must reassess their boundary.
   The eval cases observe
   length, name, prototype absence, and nonconstructibility without source
   evaluation. The Proxy case
   wraps eval and calls the proxy with no arguments, so it evaluates no source
-  and observes callable/nonconstructible target behavior. The actual
-  combined update on edccfd292b245c80c3503a93bf1a268fc99506c7 observes
-  that path as a pass under both specialization policies and strictnesses.
+  and observes callable/nonconstructible target behavior. The historical
+  four-source update on edccfd292b245c80c3503a93bf1a268fc99506c7
+  observed that path as a pass; it is not an observation of this source.
   Cross-realm-host installs the eval value and global descriptor in every
   realm. This node resolves the compiler's handling of the bare eval identifier
   read as a value, admitting those reads or obtaining an accepted record that
@@ -50,15 +49,13 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   direct and indirect global-env-rec-with.js paths remain unreviewed under
   observation-batch-06, and this node adds no observation for them. This
   repairs identifier lookup without admitting direct eval source evaluation.
-  The complete update on edccfd292b245c80c3503a93bf1a268fc99506c7
-  observes 26 passes among the original 33 paths. Its seven indirect-eval
-  class cases stop at the first aliased eval String call with the
-  profile-syntax OSEO1001 boundary, before any private name or brand
-  assertion. Their source-bound fixture-construction assessments keep
-  those subjects inside the claim and assign exactly those seven paths to
-  dynamic-source-coverage-remediation; no whole-path exclusion is added.
-  The original 33-path selection is therefore 26 passes and seven
-  unsupported paths in the current manifest, not 33 eval binding failures.
+  The historical four-source update on
+  edccfd292b245c80c3503a93bf1a268fc99506c7 observed 26 passes among
+  the original 33 paths and seven private-class cases at the existing
+  source-compilation boundary. This preparation restores successful Main's
+  canonical observations and owners. All 33 paths remain unsupported under
+  eval-intrinsic-value pending a new complete update and reassessment; the
+  seven paths have no current ownership transfer or new exclusion.
   The node also repairs every identifier read through a selected with
   Object Environment Record, for any name, not only eval. A value read, a
   typeof operand, and a call callee perform GetBindingValue (ECMA-262 2025
@@ -85,5 +82,5 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
 dependencies:
   - cross-realm-host
   - unsupported-ownership-audit
-landed: true
+landed: false
 status: ready

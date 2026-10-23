@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 26848
-openPaths: 14243
+closedPaths: 26815
+openPaths: 14276
 states:
   expected-negative: 2581
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 24267
+  pass: 24234
   semantic-failure: 0
   unreviewed: 12780
-  unsupported-profile-feature: 1463
+  unsupported-profile-feature: 1496
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -126,15 +126,25 @@ owners:
       obtained statically are asserted constructible before their
       trailing zero-argument construction reports the ADR 0016 run-time
       rejection, so their IsConstructor subject stays inside the claim
-      pending replacement evidence or a maintainer accounting decision.
-      The complete update on edccfd292b245c80c3503a93bf1a268fc99506c7
-      adds seven indirect-eval class private-name and brand subjects
-      formerly owned by eval-intrinsic-value. Their identifier reads
-      succeed, but the first String call reaches the existing eval
-      OSEO1001 boundary before the class assertions. Source-bound
-      fixture-construction assessments keep their private identity and
-      access subjects in claim, with no whole-path exclusion."
-    paths: 265
+      pending replacement evidence or a maintainer accounting decision."
+    paths: 258
+  node:eval-intrinsic-value:
+    note: "Unknown binding 'eval' in 25 paths that read eval as a value
+      without evaluating source; ADR 0016 excludes eval in call position
+      rather than the binding. The Proxy target case calls its proxy
+      with no arguments and observes callable/nonconstructible behavior.
+      Observation-batch-04 adds 8 intrinsic cases for length, name,
+      prototype absence, and nonconstructibility. Observation-batch-09
+      adds simple-basic-identifierreference-eval.js: assigning to the
+      global eval identifier is rejected as an unknown binding without
+      source evaluation. Observation-batch-11 adds seven class
+      multiple-evaluation tests that pass the bare eval identifier as an
+      argument to a helper that calls it on a class source string. The
+      identifier read is rejected as an unknown binding before that call
+      or any private name or brand assertion runs. Their private name
+      and brand subjects stay inside the claim; a later observation that
+      reaches the source-compilation rejection must reassess them."
+    paths: 33
   node:iterator-helpers:
     note: Only unsupported frontmatter feature is iterator-helpers (392), or
       iterator-helpers once cross-realm was admitted, in
@@ -266,6 +276,13 @@ owners:
       2e3d973f observed 4 RAB harness cases reaching the same
       primitive-wrapper boundary; they remain active coverage debt.
     paths: 40
+  node:proper-tail-calls:
+    note: Gated by tail-call-optimization; no accepted record excludes
+      proper tail calls; 2 paths.
+    paths: 2
+  node:regexp-pattern-extensions:
+    note: Runtime capability regexp-pattern-extension; 5 paths.
+    paths: 5
   node:regexp-property-escape-harness:
     note: "harness-definition: the reviewed regExpUtils.js omits buildString
       (453) and testPropertyEscapes (441 of them)."
@@ -295,7 +312,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 26848
+    paths: 26815
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -730,7 +747,7 @@ paths:
   test/built-ins/Array/prototype/every/15.4.4.16-5-4.js: [pass, observation]
   test/built-ins/Array/prototype/every/15.4.4.16-5-5.js: [pass, observation]
   test/built-ins/Array/prototype/every/15.4.4.16-5-6.js: [pass, observation]
-  test/built-ins/Array/prototype/every/15.4.4.16-5-7.js: [pass, observation]
+  test/built-ins/Array/prototype/every/15.4.4.16-5-7.js: [unsupported-profile-feature, node:eval-intrinsic-value, [functions, object-properties]]
   test/built-ins/Array/prototype/every/15.4.4.16-5-9.js: [pass, observation]
   test/built-ins/Array/prototype/every/15.4.4.16-7-1.js: [pass, observation]
   test/built-ins/Array/prototype/every/15.4.4.16-7-2.js: [pass, observation]
@@ -977,7 +994,7 @@ paths:
   test/built-ins/Array/prototype/filter/15.4.4.20-5-4.js: [pass, observation]
   test/built-ins/Array/prototype/filter/15.4.4.20-5-5.js: [pass, observation]
   test/built-ins/Array/prototype/filter/15.4.4.20-5-6.js: [pass, observation]
-  test/built-ins/Array/prototype/filter/15.4.4.20-5-7.js: [pass, observation]
+  test/built-ins/Array/prototype/filter/15.4.4.20-5-7.js: [unsupported-profile-feature, node:eval-intrinsic-value, [functions, object-properties]]
   test/built-ins/Array/prototype/filter/15.4.4.20-5-9.js: [pass, observation]
   test/built-ins/Array/prototype/filter/15.4.4.20-6-1.js: [pass, observation]
   test/built-ins/Array/prototype/filter/15.4.4.20-6-2.js: [pass, observation]
@@ -1349,7 +1366,7 @@ paths:
   test/built-ins/Array/prototype/forEach/15.4.4.18-5-4.js: [pass, observation]
   test/built-ins/Array/prototype/forEach/15.4.4.18-5-5.js: [pass, observation]
   test/built-ins/Array/prototype/forEach/15.4.4.18-5-6.js: [pass, observation]
-  test/built-ins/Array/prototype/forEach/15.4.4.18-5-7.js: [pass, observation]
+  test/built-ins/Array/prototype/forEach/15.4.4.18-5-7.js: [unsupported-profile-feature, node:eval-intrinsic-value, [functions, object-properties]]
   test/built-ins/Array/prototype/forEach/15.4.4.18-5-9.js: [pass, observation]
   test/built-ins/Array/prototype/forEach/15.4.4.18-7-1.js: [pass, observation]
   test/built-ins/Array/prototype/forEach/15.4.4.18-7-2.js: [pass, observation]
@@ -1744,7 +1761,7 @@ paths:
   test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-5.js: [pass, observation]
   test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-6.js: [pass, observation]
   test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-7.js: [pass, observation]
-  test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-8.js: [pass, observation]
+  test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-8.js: [unsupported-profile-feature, node:eval-intrinsic-value, [functions, object-properties]]
   test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-2-9.js: [pass, observation]
   test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-1.js: [pass, observation]
   test/built-ins/Array/prototype/lastIndexOf/15.4.4.15-3-10.js: [pass, observation]
@@ -2006,7 +2023,7 @@ paths:
   test/built-ins/Array/prototype/map/15.4.4.19-5-4.js: [pass, observation]
   test/built-ins/Array/prototype/map/15.4.4.19-5-5.js: [pass, observation]
   test/built-ins/Array/prototype/map/15.4.4.19-5-6.js: [pass, observation]
-  test/built-ins/Array/prototype/map/15.4.4.19-5-7.js: [pass, observation]
+  test/built-ins/Array/prototype/map/15.4.4.19-5-7.js: [unsupported-profile-feature, node:eval-intrinsic-value, [functions, object-properties]]
   test/built-ins/Array/prototype/map/15.4.4.19-5-9.js: [pass, observation]
   test/built-ins/Array/prototype/map/15.4.4.19-6-1.js: [pass, observation]
   test/built-ins/Array/prototype/map/15.4.4.19-6-2.js: [pass, observation]
@@ -2902,7 +2919,7 @@ paths:
   test/built-ins/Array/prototype/some/15.4.4.17-5-4.js: [pass, observation]
   test/built-ins/Array/prototype/some/15.4.4.17-5-5.js: [pass, observation]
   test/built-ins/Array/prototype/some/15.4.4.17-5-6.js: [pass, observation]
-  test/built-ins/Array/prototype/some/15.4.4.17-5-7.js: [pass, observation]
+  test/built-ins/Array/prototype/some/15.4.4.17-5-7.js: [unsupported-profile-feature, node:eval-intrinsic-value, [functions, object-properties]]
   test/built-ins/Array/prototype/some/15.4.4.17-5-9.js: [pass, observation]
   test/built-ins/Array/prototype/some/15.4.4.17-7-1.js: [pass, observation]
   test/built-ins/Array/prototype/some/15.4.4.17-7-2.js: [pass, observation]
@@ -10838,7 +10855,7 @@ paths:
   test/built-ins/Promise/all/capability-resolve-throws-reject.js: [pass, observation]
   test/built-ins/Promise/all/ctx-ctor-throws.js: [pass, observation]
   test/built-ins/Promise/all/ctx-ctor.js: [pass, observation]
-  test/built-ins/Promise/all/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/all/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/all/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/all/does-not-invoke-array-setters.js: [pass, observation]
   test/built-ins/Promise/all/invoke-resolve-error-close.js: [unsupported-profile-feature, node:unhandled-rejection-observation, [promise-settlement]]
@@ -10920,7 +10937,7 @@ paths:
   test/built-ins/Promise/allSettled/capability-resolve-throws-reject.js: [pass, observation]
   test/built-ins/Promise/allSettled/ctx-ctor-throws.js: [pass, observation]
   test/built-ins/Promise/allSettled/ctx-ctor.js: [pass, observation]
-  test/built-ins/Promise/allSettled/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/allSettled/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/allSettled/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/allSettled/does-not-invoke-array-setters.js: [pass, observation]
   test/built-ins/Promise/allSettled/invoke-resolve-error-close.js: [unreviewed, node:observation-batch-01]
@@ -11024,7 +11041,7 @@ paths:
   test/built-ins/Promise/any/capability-resolve-throws-reject.js: [pass, observation]
   test/built-ins/Promise/any/ctx-ctor-throws.js: [pass, observation]
   test/built-ins/Promise/any/ctx-ctor.js: [unreviewed, node:observation-batch-01]
-  test/built-ins/Promise/any/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/any/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/any/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/any/invoke-resolve-error-close.js: [pass, observation]
   test/built-ins/Promise/any/invoke-resolve-error-reject.js: [pass, observation]
@@ -11278,7 +11295,7 @@ paths:
   test/built-ins/Promise/race/capability-executor-not-callable.js: [pass, observation]
   test/built-ins/Promise/race/ctx-ctor-throws.js: [pass, observation]
   test/built-ins/Promise/race/ctx-ctor.js: [pass, observation]
-  test/built-ins/Promise/race/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/race/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/race/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/race/invoke-resolve-error-close.js: [unsupported-profile-feature, node:unhandled-rejection-observation, [promise-settlement]]
   test/built-ins/Promise/race/invoke-resolve-error-reject.js: [pass, observation]
@@ -11374,7 +11391,7 @@ paths:
   test/built-ins/Promise/reject/capability-invocation.js: [pass, observation]
   test/built-ins/Promise/reject/ctx-ctor-throws.js: [pass, observation]
   test/built-ins/Promise/reject/ctx-ctor.js: [unsupported-profile-feature, node:unhandled-rejection-observation, [promise-settlement]]
-  test/built-ins/Promise/reject/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/reject/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/reject/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/reject/length.js: [pass, observation]
   test/built-ins/Promise/reject/name.js: [pass, observation]
@@ -11416,7 +11433,7 @@ paths:
   test/built-ins/Promise/resolve/context-non-object-with-promise.js: [pass, observation]
   test/built-ins/Promise/resolve/ctx-ctor-throws.js: [pass, observation]
   test/built-ins/Promise/resolve/ctx-ctor.js: [pass, observation]
-  test/built-ins/Promise/resolve/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/resolve/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/resolve/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/resolve/length.js: [pass, observation]
   test/built-ins/Promise/resolve/name.js: [pass, observation]
@@ -11432,7 +11449,7 @@ paths:
   test/built-ins/Promise/try/args.js: [pass, observation]
   test/built-ins/Promise/try/ctx-ctor-throws.js: [pass, observation]
   test/built-ins/Promise/try/ctx-ctor.js: [pass, observation]
-  test/built-ins/Promise/try/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/try/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/try/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/try/length.js: [pass, observation]
   test/built-ins/Promise/try/name.js: [pass, observation]
@@ -11443,7 +11460,7 @@ paths:
   test/built-ins/Promise/try/throws.js: [pass, observation]
   test/built-ins/Promise/undefined-newtarget.js: [pass, observation]
   test/built-ins/Promise/withResolvers/ctx-ctor.js: [pass, observation]
-  test/built-ins/Promise/withResolvers/ctx-non-ctor.js: [pass, observation]
+  test/built-ins/Promise/withResolvers/ctx-non-ctor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [promise-settlement]]
   test/built-ins/Promise/withResolvers/ctx-non-object.js: [pass, observation]
   test/built-ins/Promise/withResolvers/promise.js: [pass, observation]
   test/built-ins/Promise/withResolvers/resolvers.js: [pass, observation]
@@ -11499,7 +11516,7 @@ paths:
   test/built-ins/Proxy/create-handler-not-object-throw-string.js: [pass, observation]
   test/built-ins/Proxy/create-handler-not-object-throw-symbol.js: [pass, observation]
   test/built-ins/Proxy/create-handler-not-object-throw-undefined.js: [pass, observation]
-  test/built-ins/Proxy/create-target-is-not-a-constructor.js: [pass, observation]
+  test/built-ins/Proxy/create-target-is-not-a-constructor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [dynamic-source, functions, object-properties, proxy-exotic-object, reflect-namespace]]
   test/built-ins/Proxy/create-target-is-not-callable.js: [pass, observation]
   test/built-ins/Proxy/create-target-is-revoked-function-proxy.js: [pass, observation]
   test/built-ins/Proxy/create-target-is-revoked-proxy.js: [pass, observation]
@@ -12415,9 +12432,9 @@ paths:
   test/built-ins/RegExp/named-groups/groups-properties.js: [pass, observation]
   test/built-ins/RegExp/named-groups/lookbehind.js: [pass, observation]
   test/built-ins/RegExp/named-groups/non-unicode-match.js: [pass, observation]
-  test/built-ins/RegExp/named-groups/non-unicode-property-names-invalid.js: [pass, observation]
+  test/built-ins/RegExp/named-groups/non-unicode-property-names-invalid.js: [unsupported-profile-feature, node:regexp-pattern-extensions, [regular-expressions]]
   test/built-ins/RegExp/named-groups/non-unicode-property-names-valid.js: [pass, observation]
-  test/built-ins/RegExp/named-groups/non-unicode-property-names.js: [pass, observation]
+  test/built-ins/RegExp/named-groups/non-unicode-property-names.js: [unsupported-profile-feature, node:regexp-pattern-extensions, [regular-expressions]]
   test/built-ins/RegExp/named-groups/non-unicode-references.js: [pass, observation]
   test/built-ins/RegExp/named-groups/string-replace-escaped.js: [pass, observation]
   test/built-ins/RegExp/named-groups/string-replace-get.js: [pass, observation]
@@ -12427,9 +12444,9 @@ paths:
   test/built-ins/RegExp/named-groups/string-replace-unclosed.js: [pass, observation]
   test/built-ins/RegExp/named-groups/string-replace-undefined.js: [pass, observation]
   test/built-ins/RegExp/named-groups/unicode-match.js: [pass, observation]
-  test/built-ins/RegExp/named-groups/unicode-property-names-invalid.js: [pass, observation]
+  test/built-ins/RegExp/named-groups/unicode-property-names-invalid.js: [unsupported-profile-feature, node:regexp-pattern-extensions, [regular-expressions]]
   test/built-ins/RegExp/named-groups/unicode-property-names-valid.js: [pass, observation]
-  test/built-ins/RegExp/named-groups/unicode-property-names.js: [pass, observation]
+  test/built-ins/RegExp/named-groups/unicode-property-names.js: [unsupported-profile-feature, node:regexp-pattern-extensions, [regular-expressions]]
   test/built-ins/RegExp/named-groups/unicode-references.js: [pass, observation]
   test/built-ins/RegExp/nullable-quantifier.js: [pass, observation]
   test/built-ins/RegExp/prop-desc.js: [pass, observation]
@@ -14763,7 +14780,7 @@ paths:
   test/built-ins/String/prototype/matchAll/regexp-prototype-has-no-matchAll.js: [pass, observation]
   test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-invocation.js: [pass, observation]
   test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-throws.js: [pass, observation]
-  test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js: [pass, observation]
+  test/built-ins/String/prototype/matchAll/regexp-prototype-matchAll-v-u-flag.js: [unsupported-profile-feature, node:regexp-pattern-extensions, [functions, iterator-protocol, object-properties, symbols]]
   test/built-ins/String/prototype/matchAll/this-val-non-obj-coercible.js: [pass, observation]
   test/built-ins/String/prototype/matchAll/toString-this-val.js: [pass, observation]
   test/built-ins/String/prototype/normalize/form-is-not-valid-throws.js: [pass, observation]
@@ -18204,14 +18221,14 @@ paths:
   test/built-ins/encodeURIComponent/name.js: [pass, observation]
   test/built-ins/encodeURIComponent/not-a-constructor.js: [pass, observation]
   test/built-ins/encodeURIComponent/prop-desc.js: [pass, observation]
-  test/built-ins/eval/length-enumerable.js: [pass, observation]
-  test/built-ins/eval/length-non-configurable.js: [pass, observation]
-  test/built-ins/eval/length-non-writable.js: [pass, observation]
-  test/built-ins/eval/length-value.js: [pass, observation]
-  test/built-ins/eval/name.js: [pass, observation]
-  test/built-ins/eval/no-construct.js: [pass, observation]
-  test/built-ins/eval/no-proto.js: [pass, observation]
-  test/built-ins/eval/not-a-constructor.js: [pass, observation]
+  test/built-ins/eval/length-enumerable.js: [unsupported-profile-feature, node:eval-intrinsic-value, [abrupt-completion, dynamic-source, functions, object-properties, property-enumeration, var-bindings]]
+  test/built-ins/eval/length-non-configurable.js: [unsupported-profile-feature, node:eval-intrinsic-value, [abrupt-completion, dynamic-source, functions, object-properties]]
+  test/built-ins/eval/length-non-writable.js: [unsupported-profile-feature, node:eval-intrinsic-value, [abrupt-completion, dynamic-source, functions, object-properties, var-bindings]]
+  test/built-ins/eval/length-value.js: [unsupported-profile-feature, node:eval-intrinsic-value, [abrupt-completion, dynamic-source, functions]]
+  test/built-ins/eval/name.js: [unsupported-profile-feature, node:eval-intrinsic-value, [dynamic-source, functions, object-properties]]
+  test/built-ins/eval/no-construct.js: [unsupported-profile-feature, node:eval-intrinsic-value, [abrupt-completion, dynamic-source, functions]]
+  test/built-ins/eval/no-proto.js: [unsupported-profile-feature, node:eval-intrinsic-value, [abrupt-completion, dynamic-source, functions]]
+  test/built-ins/eval/not-a-constructor.js: [unsupported-profile-feature, node:eval-intrinsic-value, [abrupt-completion, dynamic-source, functions, reflect-namespace]]
   test/built-ins/eval/private-identifiers-not-empty.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, dynamic-source, functions, lexical-bindings]]
   test/built-ins/eval/prop-desc.js: [pass, observation]
   test/built-ins/global/10.2.1.1.3-4-16-s.js: [pass, observation]
@@ -18219,11 +18236,11 @@ paths:
   test/built-ins/global/10.2.1.1.3-4-22.js: [pass, observation]
   test/built-ins/global/10.2.1.1.3-4-27.js: [pass, observation]
   test/built-ins/global/S10.2.3_A1.1_T1.js: [pass, observation]
-  test/built-ins/global/S10.2.3_A1.1_T2.js: [pass, observation]
+  test/built-ins/global/S10.2.3_A1.1_T2.js: [unsupported-profile-feature, node:eval-intrinsic-value, [dynamic-source, object-properties]]
   test/built-ins/global/S10.2.3_A1.1_T3.js: [pass, observation]
   test/built-ins/global/S10.2.3_A1.1_T4.js: [pass, observation]
   test/built-ins/global/S10.2.3_A1.2_T1.js: [pass, observation]
-  test/built-ins/global/S10.2.3_A1.2_T2.js: [pass, observation]
+  test/built-ins/global/S10.2.3_A1.2_T2.js: [unsupported-profile-feature, node:eval-intrinsic-value, [dynamic-source, functions, object-properties]]
   test/built-ins/global/S10.2.3_A1.2_T3.js: [pass, observation]
   test/built-ins/global/S10.2.3_A1.2_T4.js: [pass, observation]
   test/built-ins/global/S10.2.3_A1.3_T1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, object-properties]]
@@ -20673,7 +20690,7 @@ paths:
   test/language/expressions/assignmenttargettype/parenthesized-yieldexpression-1.js: [expected-negative, observation]
   test/language/expressions/assignmenttargettype/simple-basic-identifierreference-arguments.js: [pass, observation]
   test/language/expressions/assignmenttargettype/simple-basic-identifierreference-await.js: [pass, observation]
-  test/language/expressions/assignmenttargettype/simple-basic-identifierreference-eval.js: [pass, observation]
+  test/language/expressions/assignmenttargettype/simple-basic-identifierreference-eval.js: [unsupported-profile-feature, node:eval-intrinsic-value, [dynamic-source, expression-operators]]
   test/language/expressions/assignmenttargettype/simple-basic-identifierreference-yield.js: [pass, observation]
   test/language/expressions/assignmenttargettype/simple-complex-callexpression-expression.js: [pass, observation]
   test/language/expressions/assignmenttargettype/simple-complex-callexpression.identifiername.js: [pass, observation]
@@ -25628,41 +25645,41 @@ paths:
   test/language/expressions/class/params-dflt-meth-static-args-unmapped.js: [pass, observation]
   test/language/expressions/class/params-dflt-meth-static-ref-arguments.js: [pass, observation]
   test/language/expressions/class/poisoned-underscore-proto.js: [unreviewed, node:observation-batch-32]
-  test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:eval-intrinsic-value, [classes, dynamic-source]]
   test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-factory.js: [pass, observation]
   test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-function-ctor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-realm-function-ctor.js: [unreviewed, node:observation-batch-29]
   test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-realm.js: [unreviewed, node:observation-batch-29]
-  test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:eval-intrinsic-value, [classes, dynamic-source]]
   test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-factory.js: [pass, observation]
   test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-function-ctor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-realm-function-ctor.js: [unreviewed, node:observation-batch-29]
   test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-realm.js: [unreviewed, node:observation-batch-29]
-  test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:eval-intrinsic-value, [classes, dynamic-source]]
   test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-factory.js: [pass, observation]
   test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-function-ctor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-realm-function-ctor.js: [unreviewed, node:observation-batch-29]
   test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-realm.js: [unreviewed, node:observation-batch-29]
   test/language/expressions/class/private-static-field-multiple-evaluations-of-class-direct-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
-  test/language/expressions/class/private-static-field-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/private-static-field-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:eval-intrinsic-value, [classes, dynamic-source]]
   test/language/expressions/class/private-static-field-multiple-evaluations-of-class-factory.js: [pass, observation]
   test/language/expressions/class/private-static-field-multiple-evaluations-of-class-function-ctor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-static-field-multiple-evaluations-of-class-realm.js: [unreviewed, node:observation-batch-29]
   test/language/expressions/class/private-static-getter-multiple-evaluations-of-class-direct-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
-  test/language/expressions/class/private-static-getter-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/private-static-getter-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:eval-intrinsic-value, [classes, dynamic-source]]
   test/language/expressions/class/private-static-getter-multiple-evaluations-of-class-factory.js: [pass, observation]
   test/language/expressions/class/private-static-getter-multiple-evaluations-of-class-function-ctor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-static-getter-multiple-evaluations-of-class-realm.js: [unreviewed, node:observation-batch-29]
   test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-direct-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
-  test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:eval-intrinsic-value, [classes, dynamic-source]]
   test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-factory.js: [pass, observation]
   test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-function-ctor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-realm.js: [unreviewed, node:observation-batch-29]
   test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-direct-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
-  test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-eval-indirect.js: [unsupported-profile-feature, node:eval-intrinsic-value, [classes, dynamic-source]]
   test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-factory.js: [pass, observation]
   test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-function-ctor.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
   test/language/expressions/class/private-static-setter-multiple-evaluations-of-class-realm.js: [unreviewed, node:observation-batch-29]
@@ -29900,8 +29917,8 @@ paths:
   test/language/expressions/tagged-template/invalid-escape-sequences.js: [pass, observation]
   test/language/expressions/tagged-template/member-expression-argument-list-evaluation.js: [pass, observation]
   test/language/expressions/tagged-template/member-expression-context.js: [pass, observation]
-  test/language/expressions/tagged-template/tco-call.js: [pass, observation]
-  test/language/expressions/tagged-template/tco-member.js: [pass, observation]
+  test/language/expressions/tagged-template/tco-call.js: [unsupported-profile-feature, node:proper-tail-calls, [expression-operators]]
+  test/language/expressions/tagged-template/tco-member.js: [unsupported-profile-feature, node:proper-tail-calls, [expression-operators]]
   test/language/expressions/tagged-template/template-object-frozen-non-strict.js: [pass, observation]
   test/language/expressions/tagged-template/template-object-frozen-strict.js: [pass, observation]
   test/language/expressions/tagged-template/template-object-template-map.js: [unreviewed, node:observation-batch-16]

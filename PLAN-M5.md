@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-28,311 reviewed cases: 24,267 passes, 2,581 expected negatives, and 1,463
+28,311 reviewed cases: 24,234 passes, 2,581 expected negatives, and 1,496
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -8779,3 +8779,63 @@ Node.js 24.21.0 and Deno 2.9.7 and the expected MIR structure.
 The global object record family keeps its identity and gains the eval scope
 and the structural parser test. ADR 0016 and ADR 0019 are unchanged, and no
 exclusion is added.
+
+
+Primitive wrapper call bindings and ToObject receivers
+------------------------------------------------------
+
+M5c node `primitive-wrapper-objects` completes non-strict call binding for
+Boolean, Number, String, Symbol, and BigInt primitives. Existing constructors,
+internal-slot brands, prototype methods, String own properties, and collector
+tracing already represent all five wrappers. The missing boundary rejected a
+primitive in `oseo_this_value`. It now uses the shared `ToObject` operation.
+The C backend binds and roots its result once before parameter evaluation and
+before creating a suspension record. Repeated `this` expressions, lexical
+arrows, defaults, bound calls, proxy forwarding, and suspended functions keep
+one identity within an invocation; distinct calls produce distinct boxes.
+Strict callees preserve the original receiver. The running realm is already
+the callee realm, so conversion does not read a mutable global constructor.
+No new runtime entry point, internal slot, or ABI layout is needed.
+
+`Array.from` keeps `GetMethod(items, @@iterator)` on the original receiver.
+Only its non-iterable branch converts to one object before reading `length`
+and indices. `Object.prototype.toString` reads `@@toStringTag` from its
+`ToObject` result as ECMA-262 2025 20.1.3.6 steps 3 and 15 require. Node.js
+24.21.0 and Deno 2.9.7 instead pass the primitive to a strict tag getter.
+Fixed and generated tests record that V8 behavior in a separate reference
+model; native expectations follow the normative object receiver. Ordinary
+primitive property References and `Object.prototype.toLocaleString`'s
+`Invoke` keep their primitive receivers. Primitive inherited `[[Set]]` stays
+with its separate remediation node.
+
+The fixed suite covers all five brands, fresh and retained identities,
+nullish and object controls, invalid branded receivers, String descriptors,
+abrupt completion, parameter order, arrows, synchronous and asynchronous
+suspension, callee-realm selection through foreign helpers, and the two
+ToObject consumers. A public-runtime C fixture sweeps every allocation
+attempt in warmed per-kind boxing, checks balanced roots after each failure,
+forces collection, and retries the same context. Structured properties at seeds
+`0x60008a00` and `0x60008a01` each retain all five kinds while shrinking,
+with 12 ordinary cases and a 240-second interrupt limit per domain. They
+compare independent models with both reference hosts and both native
+specialization policies. Native properties force collection, keep live
+wrappers across allocations, and require positive collection, guard-hit,
+guard-miss, and generic-addition counters. The false numeric hint receives
+a String wrapper; a shape mutation also exercises the generic fallback.
+The distinct seed block `0x60008a00` stays unchanged. The later
+TCO-dependent strict tail-forwarding registration is retained only in the
+original `22a70dd9` source, pending independent TCO remediation. Its tail
+MIR and trampoline assertions cannot run in this preparation. All earlier
+wrapper assertions and generated budgets remain intact.
+
+The exact focused selector contains 40 pinned upstream paths, including the
+four resizable-buffer locale cases added after the historical 36-path audit.
+The focused runner executes every requested strictness and specialization
+variant without writing the canonical manifest. The complete UPDATE,
+affected review, and exact candidate CI remain pending. Root authorized
+composition with Eval, RegExp, and computed Reference after removing TCO.
+Canonical observations are restored from successful Main `52a868c9`:
+28,311 reviewed paths, 24,234 passes, 2,581 expected negatives,
+1,496 unsupported results, and no failure classifications, against 41,091
+included paths at revision `f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
+These source-preparation results neither land the node nor promote a row.

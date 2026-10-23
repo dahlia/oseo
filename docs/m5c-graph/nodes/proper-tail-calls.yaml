@@ -7,5 +7,5 @@ delivers: "Owns the 2 reviewed tagged-template tco-*.js paths gated by
   an accepted record that authorizes and bounds the exclusion."
 dependencies:
   - unsupported-ownership-audit
-landed: true
+landed: false
 status: ready

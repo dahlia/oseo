@@ -302,7 +302,9 @@ console.log("global restore", Object === originalObject);
 `;
 }
 
-function expected(testCase: ObjectConstructorCase): string {
+// ECMA-262 2025 toString steps 3 and 15 use the ToObject result. V8's
+// strict tag getter instead receives the Boolean primitive.
+function expected(testCase: ObjectConstructorCase, v8 = false): string {
   const selected = testCase.alternatePrototype ? "alternate" : "base";
   return [
     "identity true true true true",
@@ -313,7 +315,7 @@ function expected(testCase: ObjectConstructorCase): string {
     "string method metadata indexOf 1",
     `string tag wrapper [object ${testCase.text[0]}] ` +
       `${testCase.text.length}`,
-    "primitive tag receiver [object Boolean] boolean",
+    `primitive tag receiver [object Boolean] ${v8 ? "boolean" : "object"}`,
     `primitive locale ${testCase.text} true true`,
     "same value true false true true true false",
     `prototype true true ${selected} ${testCase.integer}`,
@@ -393,7 +395,7 @@ test(
           stdout: expected(testCase),
         };
         assertMatchingObservations([
-          expectedObservation,
+          { ...expectedObservation, stdout: expected(testCase, true) },
           ...(await references(source)),
         ]);
         for (const specialization of ["disabled", "enabled"] as const) {

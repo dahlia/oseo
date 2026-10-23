@@ -424,20 +424,23 @@ constructors, rest parameters, and eventual host calls. Only the generic ABI is
 stable across independently compiled units. Specialized entries are private to
 the linked program and may change between builds.
 
+A non-strict function binds its receiver once before parameter evaluation.
+Nullish values select the callee realm's global this value; other primitives
+produce fresh Boolean, Number, String, Symbol, or BigInt wrappers through
+`ToObject`. The generated entry roots that value for the call, and a
+suspension record retains it across resumes. Lexical arrows capture the
+bound receiver, while strict functions preserve the original value. This
+binding is separate from a primitive property Reference: its original
+primitive still reaches an inherited getter, even when lookup uses a box.
+An algorithm that actually performs `ToObject`, such as `Array.from`'s
+array-like branch, instead uses that one object's identity for its reads.
+
 Exceptions, `return`, `break`, and `continue` are represented explicitly before
 backend lowering. A generic call returns a two-word `OseoResult` containing an
 `OseoStatus` and an `OseoValue`. Normal and thrown values use the same value
 field. `return`, `break`, and `continue` are resolved within a compiled
 function; only thrown completion crosses an ordinary call boundary. Private
 helpers that are proven not to throw may return a value directly.
-
-A proper tail call (ECMA-262 15.10) is the one other completion a generated
-body returns: `OSEO_STATUS_TAIL_CALL` reports that the body recorded the call
-it owes in the context and released its frame. Only `oseo_call_function`, the
-single generic call entry, and `oseo_call_complete` for a direct call ever
-receive it, and both perform recorded calls in a loop before returning. The
-compiler marks a tail call only where IsInTailPosition holds, so no recorded
-call can skip work its caller still owed.
 
 Cleanup regions record the destination block and cleanup depth for every
 control transfer. A `finally` clause runs only when the transfer leaves its

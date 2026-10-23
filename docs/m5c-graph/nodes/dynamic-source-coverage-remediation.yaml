@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 265 reviewed unsupported paths assigned to
+delivers: "Resolves the 258 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure ledger.
   Select exactly those owners and their exclusion-audit path assessments:
   the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
@@ -58,16 +58,6 @@ delivers: "Resolves the 265 reviewed unsupported paths assigned to
   their trailing zero-argument construction reports the ADR 0016
   run-time rejection, so their IsConstructor subject stays inside the
   claim.
-  The complete update on edccfd292b245c80c3503a93bf1a268fc99506c7
-  adds seven indirect-eval class tests formerly owned by
-  eval-intrinsic-value. Like the 14 direct-eval or Function analogs,
-  they evaluate class source strings to compare private names, brands,
-  and cross-instance or cross-class access. Their identifier reads now
-  succeed, but their first String call reaches the existing OSEO1001
-  eval boundary before those assertions. The source-bound
-  fixture-construction assessments retain these private-class subjects
-  under remediation, with normativeDependency not-demonstrated and no
-  whole-path exclusion.
   Obtain the maintainer accounting decision in
   PLAN-M5C.md, then review equivalent ahead-of-time observation or replacement
   evidence per original path; preserve all paths and assertions, never emulate

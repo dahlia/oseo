@@ -1009,19 +1009,13 @@ results:
     dependencies:
       - classes
       - dynamic-source
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
     observation:
-      detail: 'test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-eval-indirect.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/private-setter-brand-check-multiple-evaluations-of-class-eval-indirect.js:109:15:
-        error[OSEO1001]: eval compiles source text at run time, which is
-        outside the admitted profile.\n"'
+      detail: "test/language/expressions/class/private-setter-brand-check-mul\
+        tiple-evaluations-of-class-eval-indirect.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/private-setter-brand-c\
+        heck-multiple-evaluations-of-class-eval-indirect.js:112:36:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -3757,11 +3757,6 @@ function lowerOptionalChain(
       kind: "call",
       range: link.range,
       target: { kind: "dynamic" },
-      ...tailCallProperties(
-        index === expression.links.length - 1 &&
-          builder.pendingTailCalls.has(expression),
-        builder,
-      ),
     });
     appendMirMetadata(
       builder,
@@ -5410,7 +5405,6 @@ function lowerExpression(
     kind: "call",
     range: expression.range,
     target: callTarget,
-    ...tailCallProperties(builder.pendingTailCalls.has(expression), builder),
   });
   appendMirMetadata(
     builder,
@@ -5420,67 +5414,6 @@ function lowerExpression(
     expression.range,
   );
   return recordRoot(builder, id, expression.range);
-}
-
-/**
- * The `tail` marking of one `call`, and the derived constructor `this`
- * binding it carries when the running body is such a constructor.
- */
-function tailCallProperties(
-  tail: boolean,
-  builder: MirBuilder,
-): Pick<MirOperation, "tail" | "tailThisBindingId"> {
-  if (!tail) return {};
-  return {
-    tail: true,
-    ...includePropertiesWhen(() => {
-      if (builder.derivedThisBindingId == null) return undefined;
-      return {
-        tailThisBindingId: builder.derivedThisBindingId,
-      };
-    }),
-  };
-}
-
-/**
- * Collects the calls HasCallInTailPosition (ECMA-262 15.10.2) finds in a
- * returned expression: the expression itself when it is a call, both
- * arms of a conditional, the right operand of `&&`, `||`, and `??`, the
- * last element of a comma expression, and an optional chain whose last
- * link is a call. HIR keeps no parentheses, and a tagged template is
- * already a call. A `super()` call and a call that lowering does not
- * route through the generic or host call ABI never qualify.
- */
-function collectTailCalls(
-  expression: HirExpression,
-  calls: Set<HirExpression>,
-): void {
-  if (expression.kind === "call") {
-    const target = expression.target;
-    if (
-      target.kind === "dynamic" ||
-      target.kind === "method" ||
-      target.kind === "private-method" ||
-      target.kind === "console-log" ||
-      (target.kind === "timer-intrinsic" && target.method === "setTimeout")
-    ) {
-      calls.add(expression);
-    }
-  } else if (expression.kind === "conditional") {
-    collectTailCalls(expression.consequent, calls);
-    collectTailCalls(expression.alternate, calls);
-  } else if (expression.kind === "logical") {
-    collectTailCalls(expression.right, calls);
-  } else if (expression.kind === "sequence") {
-    const last = expression.expressions.at(-1);
-    if (last != null) collectTailCalls(last, calls);
-  } else if (
-    expression.kind === "optional-chain" &&
-    expression.delete !== true &&
-    expression.links.at(-1)?.kind === "call"
-  ) {
-    calls.add(expression);
-  }
 }
 
 /**
@@ -7201,22 +7134,6 @@ function lowerStatements(
       recordRoot(builder, id, statement.range);
     } else if (statement.kind === "expression") {
       lowerExpression(statement.expression, builder);
-    } else if (
-      statement.kind === "return" &&
-      statement.expression != null &&
-      builder.tailCalls &&
-      builder.finalizers.length === 0 &&
-      builder.abruptTargets.length === 0
-    ) {
-      // With no enclosing `finally`, catch handler, or iterator close in
-      // this body, the ReturnStatement is in tail position by the
-      // statement rules of HasCallInTailPosition: only a try Block, a
-      // Catch with a Finally, and a for-of body push those targets.
-      collectTailCalls(statement.expression, builder.pendingTailCalls);
-      const value = lowerExpression(statement.expression, builder);
-      builder.pendingTailCalls.clear();
-      builder.current.terminator = { kind: "return", value };
-      return true;
     } else if (statement.kind === "return") {
       const returned =
         statement.expression == null
@@ -7739,9 +7656,6 @@ function routeDerivedReturns(
   for (const block of blocks) {
     const terminator = block.terminator;
     if (terminator?.kind !== "return") continue;
-    // The trampoline applies these rules to a tail call's eventual
-    // value through the `this` binding the call carries.
-    if (tailCallReturned(block) != null) continue;
     const id = builder.nextValue;
     builder.nextValue += 1;
     block.operations.push({
@@ -7753,117 +7667,6 @@ function routeDerivedReturns(
       range,
     });
     block.terminator = { kind: "return", value: id };
-  }
-}
-
-/** Metadata that may separate a tail call from the `return` of its value. */
-function tailMetadata(operation: MirOperation): boolean {
-  return operation.kind === "check-status" || operation.kind === "root-store";
-}
-
-/**
- * The tail call whose value the block's `return` returns, when only
- * metadata follows that call in the block.
- */
-function tailCallReturned(block: MutableMirBlock): MirOperation | undefined {
-  const terminator = block.terminator;
-  if (terminator?.kind !== "return") return undefined;
-  for (let index = block.operations.length - 1; index >= 0; index -= 1) {
-    const operation = block.operations[index]!;
-    if (operation.kind === "call" && operation.tail === true) {
-      return operation.id === terminator.value ? operation : undefined;
-    }
-    if (!tailMetadata(operation)) return undefined;
-  }
-  return undefined;
-}
-
-/**
- * Replaces the jump that carries a tail call's value through the join
- * blocks of `?:`, `&&`, `||`, `??`, and `?.` with a direct `return` of
- * that value. A join block forwards when its only parameter is its
- * value, it holds only `join` and root metadata, and it returns that
- * parameter or forwards it again. The skipped joins compute nothing, so
- * returning early is the same completion; a join left without a
- * predecessor is unreachable and never emitted.
- */
-function returnTailCallsDirectly(blocks: readonly MutableMirBlock[]): void {
-  const byId = new Map(blocks.map((block) => [block.id, block]));
-  const returnsParameter = (start: number): boolean => {
-    const seen = new Set<number>();
-    let current = byId.get(start);
-    while (current != null && !seen.has(current.id)) {
-      seen.add(current.id);
-      const parameter = current.parameters?.[0];
-      if (current.parameters?.length !== 1 || parameter == null) return false;
-      if (
-        current.operations.some(
-          (operation) =>
-            operation.kind !== "join" && operation.kind !== "root-store",
-        )
-      ) {
-        return false;
-      }
-      const terminator = current.terminator;
-      if (terminator?.kind === "return") return terminator.value === parameter;
-      if (
-        terminator?.kind !== "jump" ||
-        terminator.values?.length !== 1 ||
-        terminator.values[0] !== parameter
-      ) {
-        return false;
-      }
-      current = byId.get(terminator.target);
-    }
-    return false;
-  };
-  for (const block of blocks) {
-    const terminator = block.terminator;
-    if (terminator?.kind !== "jump" || terminator.values?.length !== 1) {
-      continue;
-    }
-    const value = terminator.values[0];
-    let call: MirOperation | undefined;
-    for (let index = block.operations.length - 1; index >= 0; index -= 1) {
-      const operation = block.operations[index]!;
-      if (operation.kind === "call" && operation.tail === true) {
-        if (operation.id === value) call = operation;
-        break;
-      }
-      if (!tailMetadata(operation)) break;
-    }
-    if (call == null || !returnsParameter(terminator.target)) continue;
-    block.terminator = { kind: "return", value: call.id };
-  }
-}
-
-/**
- * Rejects a tail call that lowering left anywhere but directly before
- * the `return` of its own value, or on a target the backend cannot
- * leave the frame for. A frame discarded before such a call would lose
- * work the call's caller still owed.
- */
-function validateTailCalls(blocks: readonly MutableMirBlock[]): void {
-  for (const block of blocks) {
-    const returned = tailCallReturned(block);
-    for (const operation of block.operations) {
-      if (operation.kind !== "call" || operation.tail !== true) continue;
-      const target = operation.target?.kind;
-      if (
-        operation !== returned ||
-        (target !== "dynamic" &&
-          target !== "console-log" &&
-          !(
-            operation.target?.kind === "timer-intrinsic" &&
-            operation.target.method === "setTimeout"
-          ))
-      ) {
-        throw new Error(
-          `MIR tail call %${operation.id} does not return its value ` +
-            `directly from bb${block.id}.`,
-        );
-      }
-    }
   }
 }
 
@@ -7887,7 +7690,6 @@ function buildMirFunction(
   argumentsBindingId?: number,
   generatorCallStatementCount = 0,
   argumentsMapped = false,
-  tailCalls = false,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -7913,16 +7715,8 @@ function buildMirFunction(
     initializesInstanceElements,
     nextValue: 0,
     pendingLabels: [],
-    pendingTailCalls: new Set<HirExpression>(),
     specialization,
     strictCode: strict,
-    tailCalls,
-    ...includePropertiesWhen(() => {
-      if (derivedThisBindingId == null) return undefined;
-      return {
-        derivedThisBindingId,
-      };
-    }),
   };
   // A base constructor initializes its class's fields before its body
   // runs, which is where [[Construct]] performs InitializeInstanceElements
@@ -7957,11 +7751,9 @@ function buildMirFunction(
     const value = lowerSyntheticUndefined(range, builder);
     builder.current.terminator = { kind: "return", value };
   }
-  returnTailCallsDirectly(builder.blocks);
   if (derivedThisBindingId != null) {
     routeDerivedReturns(builder.blocks, derivedThisBindingId, builder, range);
   }
-  validateTailCalls(builder.blocks);
   const mirParameters: readonly MirParameter[] = parameters.map(
     (parameter) => ({
       bindingId: parameter.bindingId,
@@ -8122,7 +7914,6 @@ export function buildMir(
         functionValue.argumentsBindingId,
         functionValue.generatorCallStatementCount,
         functionValue.argumentsMapped === true,
-        functionValue.tailCalls === true,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

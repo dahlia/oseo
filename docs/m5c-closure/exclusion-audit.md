@@ -132,22 +132,7 @@ identity assertions execute. The
 remediation; Git history keeps that assessment. The reservation never widened
 the original 178-path `dynamic-source-coverage-remediation` cohort. Observation
 batches 11, 12, 13, and 05 later added 19, 23, 30, and 5 paths to that owner,
-followed by three intrinsic-constructor IsConstructor subjects from the
-well-known-intrinsics harness and seven indirect-eval private-class subjects
-from the complete update on `edccfd292b245c80c3503a93bf1a268fc99506c7`.
-The current contract is 265 paths. The seven class cases previously belonged
-to `eval-intrinsic-value`: their bare identifier reads now succeed, and the
-first String call reaches the existing eval source-compilation boundary
-before private-name, brand, or cross-instance assertions run. Their
-`fixture-construction` assessments retain remediation with
-`normativeDependency: not-demonstrated`, like the 14 direct-eval or Function
-analogs. This adds no whole-path exclusion.
-
-The same update changes the normalized observations of 42 existing
-`eval-semantics` rows from the missing-binding rejection to the explicit
-String-compilation rejection. Their pinned source digests, normative
-subjects, assessments, owners, and ADR 0016 authorization are unchanged;
-only the observation digests are refreshed after source assessment.
+whose current contract is 255 paths.
 
 The maintainer accounting decision of 2026-10-22 accounts for the 64 paths
 under ADR 0016 instead. Their ledger owner is

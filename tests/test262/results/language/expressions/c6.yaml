@@ -585,19 +585,13 @@ results:
     dependencies:
       - classes
       - dynamic-source
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
     observation:
-      detail: 'test/language/expressions/class/elements/derived-cls-indirect-eval-err-contains-supercall.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/elements/derived-cls-indirect-eval-err-contains-supercall.js:104:7:
-        error[OSEO1001]: eval compiles source text at run time, which is
-        outside the admitted profile.\n"'
+      detail: "test/language/expressions/class/elements/derived-cls-indirect-\
+        eval-err-contains-supercall.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/expressions/class/elements/derived-cls-i\
+        ndirect-eval-err-contains-supercall.js:104:11: error[OSEO1001]:
+        Unknown binding 'eval'.\\n\""
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -778,19 +772,13 @@ results:
     dependencies:
       - classes
       - dynamic-source
-    execution:
-      harnessIncludes:
-        - base.js
-      target: linux-x86_64-gnu
-      variants:
-        - specialization: disabled
-          strictness: non-strict
     observation:
-      detail: 'test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-eval-indirect.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/language/expressions/class/private-static-method-brand-check-multiple-evaluations-of-class-eval-indirect.js:112:10:
-        error[OSEO1001]: eval compiles source text at run time, which is
-        outside the admitted profile.\n"'
+      detail: "test/language/expressions/class/private-static-method-brand-ch\
+        eck-multiple-evaluations-of-class-eval-indirect.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/class/private-static-method-\
+        brand-check-multiple-evaluations-of-class-eval-indirect.js:115:\
+        20: error[OSEO1001]: Unknown binding 'eval'.\\n\""
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
