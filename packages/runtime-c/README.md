@@ -1120,6 +1120,19 @@ numeric keys, and the object-literal prototype setter keep their behavior,
 and a primitive base keeps its existing early return. No entry point, public
 layout, heap kind, intrinsic slot, or built-in code ID is added.
 
+The `m5-135` ABI admits Unicode group names in dynamically constructed
+patterns. *runtime\_unicode\_tables.h* gains the pinned `ID_Start` and
+`ID_Continue` inversion lists, which *runtime\_string.c* exposes as two
+internal predicates. The validator and the dynamic program builder share
+one RegExpIdentifierName decoder, so escaped and written spellings name the
+same group in duplicate checks, named references, and `groups` keys, and a
+name outside those properties is a `SyntaxError` rather than the profile
+boundary. Constructing a RegExp from a branded RegExp whose program the
+build compiled ahead of time borrows that static program when the new
+flags agree on `i`, `m`, `s`, `u`, and `v`; every other copy still parses
+its source dynamically. No entry point, public layout, heap kind,
+intrinsic slot, or built-in code ID is added.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

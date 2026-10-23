@@ -5743,6 +5743,32 @@ property domain emits lone atoms rather than operations, and
 `\p{gc=Ll}` and binary spellings that must keep cancelling and the negation
 that must keep complementing over the folded code points.
 
+M5c node `regexp-pattern-extensions` closes the two runtime gaps the M5b node
+left behind its located boundary. A dynamically constructed pattern now
+decodes RegExpIdentifierName exactly as the compiler parser does: a `\u`
+escape always uses the unicode form, so `\u{...}` and an escaped surrogate
+pair are admitted without `u`, and a written surrogate pair joins in either
+mode while a lone surrogate never names an identifier character. The C runtime
+links the pinned Unicode 17.0 `ID_Start` and `ID_Continue` tables to classify
+the result, with the `$`, `_`, ZWNJ, and ZWJ allowances the grammar adds.
+Duplicate detection, named references, and the `groups` and `indices.groups`
+keys all compare the decoded name, so `(?<\u03C0>a)` and `(?<π>a)` declare the
+same group, and any other name is the edition's `SyntaxError` rather than the
+profile boundary.
+
+`RegExp(pattern, flags)` with a branded pattern parses its
+[[OriginalSource]] again, and that parse depends only on the text and the
+`i`, `m`, `s`, `u`, and `v` flags. When the pattern's program was compiled
+ahead of time and the new flags agree on those five, the copy borrows that
+immutable program rather than handing the literal's text to the dynamic
+compiler. Species construction in `@@matchAll` and `@@split` takes exactly
+this path, so `"𠮷a".matchAll(/\p{Script=Han}/gu)` executes the literal's
+artifact. Each copy keeps its own identity, flags string, and `lastIndex`.
+A copy with different parse flags, a copy of a dynamically compiled
+pattern, and a non-branded `IsRegExp` pattern still parse dynamically, and
+dynamic Unicode properties, class sets, unlinked case folding, and a
+non-ASCII identity escape without `u` keep their located boundary.
+
 
 Promise settled combinators
 ---------------------------

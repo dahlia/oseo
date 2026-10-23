@@ -357,16 +357,18 @@ for (const deferredRegExp of [
     source: 'new RegExp("[\\\\q{ab}]", "v");',
   },
   {
-    name: "deferred-regexp-escaped-group-name.ts",
-    source: 'new RegExp("(?<\\\\u0041>a)");',
+    name: "deferred-regexp-copy-ignore-case.ts",
+    source: 'new RegExp(/\\p{L}/u, "iu");',
   },
   {
-    name: "deferred-regexp-escaped-group-forward-reference.ts",
-    source: 'new RegExp("\\\\k<A>(?<\\\\u0041>x)");',
+    name: "deferred-regexp-copy-unicode-sets.ts",
+    source: 'new RegExp(/\\p{L}/u, "v");',
   },
   {
-    name: "deferred-regexp-unicode-group-name.ts",
-    source: 'new RegExp("\\\\k<é>(?<é>a)");',
+    name: "deferred-regexp-copy-unbranded.ts",
+    source:
+      "new RegExp({ [Symbol.match]: true, source: /\\p{L}/u.source, " +
+      'flags: "u" });',
   },
   {
     name: "deferred-regexp-nonascii-identity.ts",

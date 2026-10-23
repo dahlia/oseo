@@ -4258,6 +4258,24 @@ OseoRegExpProgram *oseo_internal_regexp_program_build(
 );
 void oseo_internal_regexp_program_release(OseoRegExpProgram *program);
 /*
+ * Decode one RegExpIdentifierName starting at `start`, just after the
+ * `<` of a group specifier or a named reference, and apply its early
+ * errors. On success `*end` is the index of the closing `>` and
+ * `*unit_count`, when not NULL, is the decoded name's length in UTF-16
+ * code units. `units`, when not NULL, receives the decoded name; it never
+ * needs more units than the name's source text spans.
+ */
+bool oseo_internal_regexp_group_name(
+    const OseoString *source,
+    size_t start,
+    size_t *end,
+    uint16_t *units,
+    size_t *unit_count
+);
+/* The pinned Unicode `ID_Start` and `ID_Continue` properties. */
+bool oseo_internal_unicode_id_start(uint32_t code_point);
+bool oseo_internal_unicode_id_continue(uint32_t code_point);
+/*
  * Search for the first match at or after `start_index`, writing the
  * half-open capture spans into `captures`, which holds
  * `2 * (capture_count + 1)` entries and uses -1 for a capture that did

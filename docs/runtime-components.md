@@ -170,8 +170,10 @@ Ownership follows the plan's target layout:
     and flag validation, immutable matcher artifact, `Symbol.species`,
     built-in execution and its match result object, `exec`, `test`,
     `toString`, the `source` and `flags` accessors, the eight individual
-    flag accessors, and the ahead-of-time literal entry point with the
-    realm-local artifact cache its descriptors key;
+    flag accessors, the ahead-of-time literal entry point with the
+    realm-local artifact cache its descriptors key, and the program reuse
+    that lets a copy of a branded RegExp borrow its ahead-of-time program
+    when the parse flags agree;
  -  *runtime\_regexp\_matcher.c*: the generic matcher, meaning the
     pattern compiler that lowers one validated pattern into an owned
     instruction program over a register file and the executor that runs
@@ -179,8 +181,8 @@ Ownership follows the plan's target layout:
     the runtime's choice order, capture visibility, assertion and
     lookaround behavior, backreference resolution, quantifier priority,
     empty-progress failure, UTF-16 and code-point traversal, ignore-case
-    closure, and the reviewed instruction, register, step, backtrack, and
-    trail boundaries;
+    closure, the RegExpIdentifierName decoder the validator shares, and the
+    reviewed instruction, register, step, backtrack, and trail boundaries;
  -  *runtime\_regexp\_symbol.c*: the five `RegExp.prototype`
     well-known symbol methods of 22.2.6 and the `RegExp.escape` static of
     22.2.5, meaning their receiver requirement, their `flags`,
@@ -335,6 +337,12 @@ step does not call `next`. No entry point, public layout, heap kind, code
 ID, or package version is added. Direct asynchronous iterator acquisition
 retains its existing separate validation; Async-from-Sync acquisition shares
 the repaired synchronous helper.
+
+The `m5-135` runtime identity links the pinned `ID_Start` and `ID_Continue`
+tables, which *runtime\_string.c* exposes to the RegExp components, so a
+dynamically constructed pattern decides its group names as a literal does.
+No entry point, public layout, heap kind, intrinsic slot, or code ID is
+added.
 
 Array literal spread also shares iterator get and next, then calls the
 `oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations

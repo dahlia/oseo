@@ -515,6 +515,23 @@ static bool unicode_case_ignorable(uint32_t code_point) {
     );
 }
 
+bool oseo_internal_unicode_id_start(uint32_t code_point) {
+    return unicode_set_has(
+        oseo_unicode_id_start,
+        sizeof(oseo_unicode_id_start) / sizeof(oseo_unicode_id_start[0]),
+        code_point
+    );
+}
+
+bool oseo_internal_unicode_id_continue(uint32_t code_point) {
+    return unicode_set_has(
+        oseo_unicode_id_continue,
+        sizeof(oseo_unicode_id_continue) /
+            sizeof(oseo_unicode_id_continue[0]),
+        code_point
+    );
+}
+
 static bool unicode_final_sigma(
     const OseoCodePointBuilder *subject,
     size_t index

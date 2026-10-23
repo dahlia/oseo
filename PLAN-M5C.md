@@ -1153,3 +1153,32 @@ not touch the Float16Array source. A reference run under Node.js and Deno
 on hosts that define Float16Array is evidence that the copy is equivalent
 to upstream, not an Oseo observation. The classifications come only from
 that complete update.
+
+
+Dynamic RegExp pattern extensions
+---------------------------------
+
+The `regexp-pattern-extensions` node owns the five reviewed paths whose
+observation names the `regexp-pattern-extension` capability. None of them is
+a lexer, literal, flag, or harness gap: each stops at the runtime C
+validator, reached through RegExp construction at run time. Four are the
+*test/built-ins/RegExp/named-groups/* `*-property-names*.js` cases. Their
+literals already compile ahead of time, but `RegExp("(?<\\u0041>.)")`,
+`RegExp("(?<a\u{104A4}>.)", "u")`, and `new RegExp("(?<🦊>fox)")` need an
+escaped name decoded and a non-ASCII name classified, which the runtime
+refused for lack of identifier data. The fifth,
+*regexp-prototype-matchAll-v-u-flag.js* under
+*test/built-ins/String/prototype/matchAll/*, reaches `@@matchAll` species
+construction, which handed the literal `/\p{Script=Han}/gu` back to the
+dynamic compiler that deliberately has no property tables.
+
+The node links the pinned `ID_Start` and `ID_Continue` tables into the
+runtime and shares one RegExpIdentifierName decoder between the validator and
+the dynamic program builder, and it lets a copy of a branded RegExp borrow an
+ahead-of-time program when the parse flags agree. The profile record in
+[*docs/language-profile-m5.md*](./docs/language-profile-m5.md) states both
+contracts. Runtime ABI `m5-135` records them. Dynamic Unicode properties,
+class sets, unlinked case folding, and the non-ASCII identity escape without
+`u` keep their located boundary, so the capability stays in the runner's
+vocabulary. No exclusion is proposed, and no dynamic source text is admitted
+beyond the pattern grammar RegExp construction already compiled.

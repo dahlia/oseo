@@ -26,6 +26,11 @@
  * estimate using each file's 298/694 and 544/936 host ratios in the source
  * run. See U6 provenance.
  *
+ * RegExp pattern extensions now include a native generated domain.
+ * Its Linux entry uses a local extended three-registration case sum
+ * at `ef014905`. macOS uses the Linux number only as an unmeasured
+ * scheduling placeholder, not a measured host ratio. See U6 provenance.
+ *
  * Computed-member-reference-key-order adds a Reference-order domain and
  * fixed cases to the compound-assignment file. Its Linux entry uses a local
  * extended whole-file case sum of seventeen registrations; macOS remains
@@ -147,7 +152,7 @@ export const nativeShardCosts = {
     "tests/property/m5-regexp-intrinsic.property.test.ts": 223,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 438,
     "tests/property/m5-regexp-matcher.property.test.ts": 8,
-    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 1,
+    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 44,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,
     "tests/property/m5-regexp-prototype-and-exec.property.test.ts": 409,
     "tests/property/m5-regexp-symbol-methods.property.test.ts": 977,
@@ -294,7 +299,7 @@ export const nativeShardCosts = {
     "tests/property/m5-regexp-intrinsic.property.test.ts": 185,
     "tests/property/m5-regexp-literal-aot.property.test.ts": 353,
     "tests/property/m5-regexp-matcher.property.test.ts": 4,
-    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 1,
+    "tests/property/m5-regexp-pattern-extensions.property.test.ts": 44,
     "tests/property/m5-regexp-pattern.property.test.ts": 2,
     "tests/property/m5-regexp-prototype-and-exec.property.test.ts": 429,
     "tests/property/m5-regexp-symbol-methods.property.test.ts": 481,

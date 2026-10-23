@@ -708,6 +708,39 @@ sums and unmeasured macOS models, not native CI, a whole-suite result, or a
 full test262 UPDATE. This update changes no case budgets, seeds, deadlines,
 or shard totals.
 
+The `regexp-pattern-extensions` property family now includes a native
+generated dynamic group-name domain alongside its compiler model and pinned
+identifier-table registrations.
+
+A local Linux x86-64 whole-file extended run at clean composed source
+`ef014905727a1a83e82677967cfa906fd2c09710` (tree
+`cbf8c75cbdd325c7dea3aa231648d34a723765ac`) naturally exited zero with all
+three registrations passing and none skipped, cancelled, or failed. Their
+exact printed leaf durations are 72.050594 milliseconds for generated
+pattern extensions, 1.14754 milliseconds for the group-name table, and
+43021.130237 milliseconds for generated dynamic group names. They sum to
+43094.328371000 milliseconds (43.094328371 seconds), giving a Linux weight
+of 44 seconds after rounding up. That sum excludes build and plugin timing.
+The Node test process reported 43310.739077 milliseconds; the mise task
+finished in 44.63 seconds.
+
+The run kept task scale 10, seed 1592590339, size `large`, one file worker,
+and all existing budgets and interrupt limits. The branch was clean before
+and after execution, and the property SHA-256 was:
+`4ce4961db79a3d984d6da63cfb377831b370558e67244ee0986a41a46a190f8d`.
+
+Raw result, stdout, stderr and exact timing tokens remain under:
+*/data/m5c-regexp-computed-focused-prepare-20261023/logs/property-extended.log*.
+
+macOS remains unmeasured. Its scheduling weight is the same 44 seconds as
+Linux, solely as a Linux-based placeholder. The previous 1/1 entries
+described the old compile-free-only file and provide no native host
+calibration. This 1:1 choice is neither a measured host ratio nor a claimed
+conservative upper bound. Replace the macOS placeholder with an actual
+matching-host CI case sum when available. This is one local Linux case sum,
+not final native CI, a whole-suite result, or a full UPDATE. No case budget,
+seed, deadline, or shard total changes.
+
 The `computed-member-reference-key-order` node adds slot `0x60000c03`, four
 fixed native registrations, one native-only diagnostic registration, and one
 model-only registration to

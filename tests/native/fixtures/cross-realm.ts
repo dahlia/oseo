@@ -265,6 +265,20 @@ console.log(
   Object.getPrototypeOf(Array.from(nested)) === Array.prototype,
   Object.getPrototypeOf(other.Array.from.call(Array, [1])) === Array.prototype,
 );
+const letters = /\\p{L}+/u;
+const foreign = new other.RegExp(letters, "gu");
+console.log(
+  "regexp copy",
+  Object.getPrototypeOf(foreign) === other.RegExp.prototype,
+  foreign.source === letters.source,
+  foreign.flags,
+  foreign.exec("1éa2")[0],
+  foreign.lastIndex,
+  Array.from(
+    other.RegExp.prototype[Symbol.matchAll].call(/\\p{Lu}/gu, "aBcD"),
+    (match) => match.index,
+  ).join(","),
+);
 `,
   },
   {
