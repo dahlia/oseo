@@ -13,7 +13,7 @@ a sloppy `with` body can return `f?.()`. HasCallInTailPosition (ECMA-262
 2025 15.10.2) puts an optional chain whose last link is a call in tail
 position, and that node lowers such a call through its tail call
 trampoline. The repaired receiver must therefore reach a call whose
-execution contract that node defines, and that node is unlanded.
+execution contract that node defines.
 
 
 Defect

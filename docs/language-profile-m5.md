@@ -234,8 +234,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 28,311 reviewed cases: 24,231 passes, 2,581
-expected negatives, and 1,499 unsupported profile features. It records no
+The current manifest contains 28,311 reviewed cases: 24,267 passes, 2,581
+expected negatives, and 1,463 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 
@@ -3749,11 +3749,14 @@ that 13.3.6.1 never routes to PerformEval. A call written `eval(...)` inside
 a `with` body is a direct eval under 13.3.6.1 whenever the value is %eval%,
 whether the `with` object supplies the name or the lookup falls back to the
 global property, because its Reference Record has an Environment Record
-base either way; only a `with` object that supplies a different function
-makes it an ordinary call of that function. Oseo performs no direct eval.
-It dispatches such a call through the generic call path, so its String
-argument meets %eval%‘s run-time `OSEO1001` boundary, and any other
-argument is returned unchanged. No source is evaluated.
+base either way. A different callable makes it an ordinary call of that
+callable, whether supplied by the `with` object, the global fallback, or
+an enclosing binding. Oseo performs no direct eval. It dispatches the
+resolved callable through the generic call path. A nonintrinsic replacement
+is invoked ordinarily with its own behavior and may itself invoke %eval%.
+If execution reaches %eval%, its String argument meets its run-time
+`OSEO1001` boundary and its non-String argument is returned unchanged.
+The intrinsic evaluates no source.
 
 The fixed `eval-intrinsic-value` native fixture and the generated domain at
 property seed `0x60003d01` cover descriptor identity, `length`, `name`,
@@ -8722,9 +8725,10 @@ complete. The remaining gaps retain their existing owners.
     string, record, and lookup failure of the pinned upstream text and
     obtains each value from a statically compiled function that returns
     the same source expression, ignoring an abrupt completion as upstream
-    does. Its one respelling is `%eval%`, because the profile rejects a
-    bare `eval` identifier read. Upstream's bare `eval` resolves in the
-    global environment; when no global lexical `eval` exists, that is the
+    does. Its one respelling, `%eval%`, is retained from before
+    `eval-intrinsic-value` admitted bare `eval` identifier reads.
+    Upstream's bare `eval` resolves in the global environment; when no
+    global lexical `eval` exists, that is the
     global object record, so the lookup performs its HasProperty and Get
     on the Script's top-level `this`, which is the global object in either
     strictness and does not depend on the `globalThis` binding. An absent
@@ -8735,8 +8739,8 @@ complete. The remaining gaps retain their existing owners.
     an identifier read can observe, and a Module's undefined top-level
     `this` would leave `%eval%` undefined. No consumer of the include at
     the pinned upstream revision is either, which a source test checks
-    against every pinned consumer; reading the identifier itself belongs to
-    M5c node `eval-intrinsic-value`. A case that then calls or constructs one
+    against every pinned consumer. M5c node `eval-intrinsic-value` now admits
+    reading the identifier itself. A case that then calls or constructs one
     of the source-compiling constructors the include returns still reaches the
     ADR 0016 boundary at that call. The reviewed *asyncHelpers.js* probes
     `$DONE` with `typeof` rather than through

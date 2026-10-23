@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-28,311 reviewed cases: 24,231 passes, 2,581 expected negatives, and 1,499
+28,311 reviewed cases: 24,267 passes, 2,581 expected negatives, and 1,463
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -8698,14 +8698,17 @@ is %eval%, including the fallback in
 *test/language/eval-code/direct/global-env-rec-with.js*.
 Node.js 24.21.0 and Deno 2.9.7 confirm that both the with-owned and the
 fallback form read the caller's local scope while `(0, eval)`, `eval?.()`,
-and a parameter call read the global one. Only a `with` object that
-supplies a different function makes the call an ordinary call of that
-function. Oseo performs no direct eval. The resolver cannot decide the
-call statically, so it dispatches it through the generic call path, where
-a String argument reaches %eval%‘s run-time `OSEO1001` boundary and any
-other argument is returned unchanged, as PerformEval (19.2.1.1, step 2)
-does before parsing in the direct and the indirect case alike. This
-dispatch is an implementation path, not a classification of the call as
+and a parameter call read the global one. A different callable makes the
+call an ordinary call of that callable, whether supplied by the `with`
+object, the global fallback, or an enclosing binding. Oseo performs no
+direct eval. The resolver cannot decide the callable's identity statically,
+so it dispatches the resolved callable through the generic call path.
+A nonintrinsic replacement is invoked ordinarily with its own behavior
+and may itself invoke %eval%. If execution reaches %eval%, its String
+argument reaches its run-time `OSEO1001` boundary and its non-String argument
+is returned unchanged, as PerformEval (19.2.1.1, step 2) does before parsing
+in the direct and the indirect case alike. The intrinsic evaluates no source.
+This dispatch is an implementation path, not a classification of the call as
 indirect; the admitted observations and their owners do not change.
 
 A tagged template whose tag is the unshadowed `eval`, such as ``eval`x` ``
