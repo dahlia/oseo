@@ -1153,3 +1153,39 @@ not touch the Float16Array source. A reference run under Node.js and Deno
 on hosts that define Float16Array is evidence that the copy is equivalent
 to upstream, not an Oseo observation. The classifications come only from
 that complete update.
+
+
+RegExp utility harness source preparation
+-----------------------------------------
+
+The `regexp-property-escape-harness` source change adds `buildString`,
+`testPropertyEscapes`, and its `printCodePoint` diagnostic helper to the
+reviewed *regExpUtils.js*. Their operations match the pinned upstream
+helpers: lone code points precede inclusive ranges in supplied order, range
+conversion flushes at 10,000 code points, and the property helper first tests
+the aggregate string before testing each iterated symbol on a miss. It keeps
+assertion failures, diagnostic formatting, abrupt completion, and the supplied
+RegExp object's mutations, including `lastIndex`. Existing helpers and upstream
+subject source and assertions remain unchanged.
+
+The checked-in closure ledger still assigns 453 unsupported paths to this
+node: 441 generated property-escape paths omit both helpers, and 12
+CharacterClassEscapes paths omit `buildString`. Adding their definitions
+removes that harness prerequisite when the runner next observes them; it does
+not establish their new classifications. Canonical subset, results, ownership,
+and graph changes await observation and review.
+
+The pinned generated property sources declare Unicode 17.0.0. The pure
+*tests/test262-regexp-utils.test.ts* suite reads their literal numeric data
+without executing or replacing their assertions and compares all 441 positive
+sets and every supplied complement with the existing `@oseo/unicode` tables.
+Those tables retain the input digests, license, and offline regeneration
+contract in *packages/unicode/data/manifest.yaml* and
+[*packages/unicode/README.md*](./packages/unicode/README.md). No Unicode pin,
+data, dependency, or table change is needed. The pure suite also compares
+normalized helper syntax and observable calls, errors, descriptors, chunk
+boundaries, and UTF-16 results against the original helpers under Node.js and
+Deno. *tests/test262-regexp-utils-native.test.ts* retains bounded original
+subjects and explicit failing-assertion controls under both specialization
+policies. These focused checks do not substitute for the later full reviewed
+corpus observation or exact-candidate CI gates.
