@@ -746,8 +746,9 @@ authorized adding the ready `primitive-wrapper-objects` source as the fourth
 unit. Its 40 paths retain Main's unsupported observations and owners. The
 TCO-specific strict tail-forwarding registration stays only in the original
 Wrapper source; every earlier wrapper assertion and property budget remains.
-The source nodes remain unlanded; the optional-call receiver and primitive
-inherited-Set contracts stay on the exit path with their unmet prerequisites.
+At that source preparation, all four source nodes remained unlanded. The
+optional-call receiver and primitive inherited-Set contracts stay on the exit
+path with their unmet prerequisites.
 
 The complete update on clean source `6e54c5d5` finished naturally with exit 0.
 It observed all 28,311 reviewed paths: 24,305 passes, 2,581 expected negatives,
@@ -758,10 +759,18 @@ reach the existing run-time Eval source-compilation boundary: 42 retain their
 bounded ADR 0016 ownership with refreshed observation digests, and seven
 private-class subjects move to `dynamic-source-coverage-remediation` under
 the existing fixture-construction assessment. That owner now has 265 paths;
-those private name and brand subjects remain inside the claim. No exclusion,
-reviewed path, feature, inventory entry, or node landing is added. The graph
-keeps all 44 landed nodes and the source preparation's statuses.
+those private name and brand subjects remain inside the claim. That update
+added no exclusion, reviewed path, feature, inventory entry, or node landing;
+it retained the source preparation's graph state with 44 landed nodes.
 Post-observation review and exact candidate CI remain pending.
+
+This publication candidate prospectively marks `eval-intrinsic-value`,
+`regexp-pattern-extensions`, `computed-member-reference-key-order`, and
+`primitive-wrapper-objects` landed, bringing its graph to 48 landed nodes.
+Successful Main `52a868c9` still has 44 landed nodes. The four candidate
+transitions take effect only after exact candidate CI succeeds, an equal-tree
+merge, and successful main CI for that exact merge commit, as the Gates
+section below requires.
 
 
 Gates

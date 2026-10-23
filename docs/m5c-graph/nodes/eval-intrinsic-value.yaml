@@ -59,7 +59,10 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
   dynamic-source-coverage-remediation under the existing fixture-construction
   assessment: their private name and brand subjects stay inside the claim,
   pending replacement evidence or a maintainer accounting decision. No
-  exclusion is added, and this node remains unlanded.
+  exclusion is added. This publication candidate prospectively marks this
+  node landed; its transition takes effect only after exact candidate CI
+  succeeds, an equal-tree merge, and successful main CI for that exact merge
+  commit, as PLAN-M5C.md requires.
   The node also repairs every identifier read through a selected with
   Object Environment Record, for any name, not only eval. A value read, a
   typeof operand, and a call callee perform GetBindingValue (ECMA-262 2025
