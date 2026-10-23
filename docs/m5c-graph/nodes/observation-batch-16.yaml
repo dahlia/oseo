@@ -10,4 +10,4 @@ dependencies:
   - computed-member-reference-key-order
   - observation-batch-plan
 landed: false
-status: blocked
+status: ready

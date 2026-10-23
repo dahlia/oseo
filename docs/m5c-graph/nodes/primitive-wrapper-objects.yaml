@@ -6,5 +6,5 @@ delivers: "Admits Boolean, Number, String, Symbol, and BigInt wrapper objects
   40 reviewed paths with that unsupported capability are observed."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

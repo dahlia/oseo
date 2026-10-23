@@ -86,5 +86,5 @@ delivers: "Originally owned 33 reviewed unsupported paths rejected with
 dependencies:
   - cross-realm-host
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
