@@ -552,3 +552,7 @@ families:
     owner: tests/property/m5-primitive-wrapper-objects.property.test.ts
     start: 0x60008a00
     end: 0x60008aff
+  - family: m5-script-module-declarations
+    owner: tests/property/m5-script-module-declarations.property.test.ts
+    start: 0x60008b00
+    end: 0x60008bff

@@ -227,6 +227,10 @@ export function moduleProgram(
       continue;
     }
     if (item.type === "ExportAllDeclaration") {
+      if (item.exportKind === "type") {
+        unsupported(context, item, "Type-only exports are outside M4.");
+        break;
+      }
       const specifier = attributedSpecifier(context, item);
       if (specifier == null) break;
       const exported = node(item.exported);

@@ -24,7 +24,10 @@ delivers: "Repairs the Script frontend's static import and export declaration
   fresh manifest evidence and derived ledger through the normal gates.
   The source-bound failed leading observation is preserved externally in
   /data/m5c-b17-wrapper-leading-20261023 and Root independently reproduced
-  both OSEO1001 diagnostics through the public frontend on Main52a868c9."
+  both OSEO1001 diagnostics through the public frontend on Main52a868c9.
+  Source preparation and its pure grammar evidence are documented in
+  docs/m5c-graph/script-module-declaration-early-error.md; full UPDATE,
+  independent review, and exact-candidate CI remain separate gates."
 dependencies:
   - module-export-forms
 landed: false
