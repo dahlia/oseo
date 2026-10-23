@@ -1240,17 +1240,17 @@ units) on accepted Source4 R, f2c306680af07fea8011e6737d5b21100d9654d0. The
 actual scoped UPDATE read clean B15 input `ca53384a` and left its tree
 unchanged; that commit is both the original input U and result R. This
 preparation replays only its B15 delta onto the corrected Source4 documentation
-at `e6994838`, which changes no observation input. Fresh execution records 661
-passes, 151 expected negatives, and 24 unsupported profile features. The subset
-retains R's pinned revision and supported features; all prior 28,311 records
-remain unchanged. The manifest totals are 29,147 reviewed paths: 24,966 passes,
-2,732 expected negatives, and 1,449 unsupported profile features, with 11,944
-inventory paths still unreviewed. The 146 supported features are unchanged.
-These preparation counts do not replace the successful Main baseline or land
-any node. The corrected classes dependencies and two async-only
-iterator-protocol removals come from the preserved B15 admission metadata at
-`29d5f8fd`. Its old failed-source observations are historical and were not
-reused.
+at `e6994838`, which changes no observation input. That historical execution
+recorded 661 passes, 151 expected negatives, and 24 unsupported profile
+features. The subset retains R's pinned revision and supported features; all
+prior 28,311 records remain unchanged. The manifest totals are 29,147 reviewed
+paths: 24,966 passes, 2,732 expected negatives, and 1,449 unsupported profile
+features, with 11,944 inventory paths still unreviewed. The 146 supported
+features are unchanged. These preparation counts do not replace the successful
+Main baseline or land any node. The corrected classes dependencies and two
+async-only iterator-protocol removals come from the preserved B15 admission
+metadata at `29d5f8fd`. Its old failed-source observations are historical and
+were not reused.
 
 The unsupported rows retain source-bound assessments: 16 eval-semantic subjects
 retain the existing bounded ADR 0016 approval and resume conditions, while eight
@@ -1269,3 +1269,68 @@ emission. The contract and focused regression evidence are recorded in
 [*PLAN-M5.md*](./PLAN-M5.md#generator-continuation-stack-accounting).
 Source preparation does not mark the node landed, admit test262 paths, or
 replace source reviews, the full UPDATE, and exact-candidate CI gates.
+
+
+RegExp utility harness source preparation
+-----------------------------------------
+
+The `regexp-property-escape-harness` source change adds `buildString`,
+`testPropertyEscapes`, and its `printCodePoint` diagnostic helper to the
+reviewed *regExpUtils.js*. Their operations match the pinned upstream
+helpers: lone code points precede inclusive ranges in supplied order, range
+conversion flushes at 10,000 code points, and the property helper first tests
+the aggregate string before testing each iterated symbol on a miss. It keeps
+assertion failures, diagnostic formatting, abrupt completion, and the supplied
+RegExp object's mutations, including `lastIndex`. Existing helpers and upstream
+subject source and assertions remain unchanged.
+
+The checked-in closure ledger still assigns 453 unsupported paths to this
+node: 441 generated property-escape paths omit both helpers, and 12
+CharacterClassEscapes paths omit `buildString`. Adding their definitions
+removes that harness prerequisite when the runner next observes them; it does
+not establish their new classifications. Canonical subset, results, ownership,
+and graph changes await observation and review.
+
+The pinned generated property sources declare Unicode 17.0.0. The pure
+*tests/test262-regexp-utils.test.ts* suite reads their literal numeric data
+without executing or replacing their assertions and compares all 441 positive
+sets and every supplied complement with the existing `@oseo/unicode` tables.
+Those tables retain the input digests, license, and offline regeneration
+contract in *packages/unicode/data/manifest.yaml* and
+[*packages/unicode/README.md*](./packages/unicode/README.md). No Unicode pin,
+data, dependency, or table change is needed. The pure suite also compares
+normalized helper syntax and observable calls, errors, descriptors, chunk
+boundaries, and UTF-16 results against the original helpers under Node.js and
+Deno. *tests/test262-regexp-utils-native.test.ts* retains bounded original
+subjects and explicit failing-assertion controls under both specialization
+policies. These focused checks do not substitute for the later full reviewed
+corpus observation or exact-candidate CI gates.
+
+
+Conditional next-U preparation on Source4 C
+-------------------------------------------
+
+The next preparation starts from exact Source4 candidate
+`8387dc9a4d00fa38ce19225c20b4eb5788815429`, tree
+`2281f0c3979e2d40aed08659ed8b576d8520aa28`. It first adopts the exact
+B15 delta from `0381835e`, then composes the accepted Script declaration
+source at `a0cebe45`, continuation stack source at `04d7d7d4`, and RegExp
+utility harness at `98c42049`. Their original commits and observation refs
+remain preserved. The Script registration already belongs to C; its Source4
+ancestors are not replayed.
+
+The 29,147 reviewed records, including B15's 836 records and 24 bounded
+assessments, retain the historical B15 observation input and result
+`ca53384ab035661df8fa8e611c9f1959da682caf`. These are adopted records for
+preparation accounting, not fresh observations of the changed implementation.
+All 28,311 C records and 24,305 C passes remain intact. The three source
+changes require a new full UPDATE before publication; this preparation runs
+only local CHECK and short pure focused tests.
+
+Successful Main `52a868c9` still has 44 effective landed nodes. C's 48-node
+prospective landing state is retained without changing any node's status or
+landed flag. The four units prepared here remain unlanded. C's exact-candidate
+CI, equal-tree Main merge and successful Main CI, later reparenting and D3
+reassessment, affected-scope reviews, fresh observations, and publication
+remain coordinator-owned steps. No runtime ABI, budget, helper chunk size,
+assertion, upstream data, shard total, or additional admission changes.

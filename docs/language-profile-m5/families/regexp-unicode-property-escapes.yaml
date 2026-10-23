@@ -27,11 +27,13 @@ scope:
     nodes land. Generated property evidence uses the host engine except for
     the retained empty `Hrkt` Script value, whose independent oracle is its
     absence from the pinned Script and Script_Extensions assignments."
-  - "All 625 reviewed paths under the CharacterClassEscapes and
-    property-escapes inventory roots are classified. The 142 parse-negative
-    paths are expected negatives. The remaining 483 paths retain explicit
-    RegExp intrinsic, execution, `v`-class-set, or related later-node
-    boundaries."
+  - "The initial M5b checkpoint classified all 625 reviewed paths under
+    the CharacterClassEscapes and property-escapes inventory roots: 142
+    expected parse negatives and 483 explicit prerequisites. Current
+    classifications remain in the reviewed manifest. M5c source preparation
+    adds the pinned buildString and testPropertyEscapes harness operations;
+    the existing 453 harness-definition unsupported records await fresh
+    canonical observation. This source change admits no semantic family."
 owners:
   - PLAN-M5.md
   - PLAN-REGEXP.md
@@ -44,6 +46,8 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/test262-regexp-utils.test.ts
+      - tests/test262-regexp-utils-native.test.ts
       - packages/cli/tests/index.test.ts
       - packages/parser-babel/tests/regexp-literal.test.ts
       - packages/unicode/tests/tables.test.ts
@@ -79,6 +83,7 @@ evidence:
   structural:
     status: covered
     references:
+      - tests/test262-regexp-utils.test.ts
       - packages/cli/src/index.ts
       - packages/compiler/src/regexp-matcher.ts
       - packages/parser-babel/src/regexp-literal.ts
