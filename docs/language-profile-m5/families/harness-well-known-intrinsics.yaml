@@ -1,0 +1,90 @@
+version: 1
+id: harness-well-known-intrinsics
+title: "wellKnownIntrinsicObjects.js harness include"
+scope:
+  - "The reviewed WellKnownIntrinsicObjects table, with every upstream name
+    and source string in upstream order and one value per record obtained
+    by a statically compiled lookup of that source expression instead of
+    the Function constructor, which ADR 0016 keeps outside the profile."
+  - "The reviewed getWellKnownIntrinsicObject helper, which returns a
+    recorded value, reports an intrinsic the realm does not provide, and
+    rejects an unknown name with the upstream failure text."
+  - "The one respelled source: because the profile rejects a bare eval
+    identifier read, %eval% performs the global object record's
+    HasProperty and Get on the Script's top-level this, which is what
+    upstream's bare eval resolves to when the Script declares no global
+    lexical eval, independent of the globalThis binding. An absent property
+    yields undefined, as upstream's discarded ReferenceError does, without
+    calling the replaceable ReferenceError global."
+  - "The bounded divergence: a non-strict Script's top-level let or const
+    named eval, which only an identifier read observes, and a Module, whose
+    top-level this is undefined. No consumer of the include at the pinned
+    upstream revision is either, and a source test checks every one."
+owners:
+  - PLAN-M5C.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/test262-well-known-intrinsics.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/test262-well-known-intrinsics.test.ts
+  forced-collection:
+    status: omitted
+    reason: "The include allocates only its record table, ordinary
+      closures, and the values its upstream source expressions produce. It
+      adds no object kind, root, or collector path of its own; each value's
+      collector behavior belongs to the family that owns that intrinsic."
+    replacements:
+      - tests/test262/harness/wellKnownIntrinsicObjects.js
+      - tests/test262/results.yaml
+  generated:
+    status: omitted
+    reason: "The input is the fixed upstream table at the pinned revision.
+      No generated domain adds an independent model: the source test
+      compares every record with the upstream copy and checks every lookup
+      expression against its source string."
+    replacements:
+      - tests/test262-well-known-intrinsics.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The include adds no hint, guard, or specialized operation of
+      its own. The reviewed runner first executes a case that loads it in
+      its first admitted strictness mode with specialization disabled.
+      Only when that variant does not decide the result does the runner
+      execute every admitted strictness mode under both specialization
+      policies, so a passing case has run all of them. A case whose first
+      variant decides an unsupported or failing result records only that
+      variant, and its result is no evidence about the enabled policy."
+    replacements:
+      - tools/test262.ts
+      - tests/test262/results.yaml
+  specialization:
+    status: omitted
+    reason: "The include adds no specialization surface of its own. The
+      reviewed runner compares the enabled and disabled policies of a case
+      that loads it only when the case's first variant, specialization
+      disabled in its first admitted strictness mode, does not decide the
+      result. It then executes every admitted variant and rejects any
+      difference, so a passing case matched under both policies. A case
+      that stops at its first variant records only that variant, and its
+      result proves no comparison with an enabled-policy execution."
+    replacements:
+      - tools/test262.ts
+      - tests/test262/results.yaml
+  standards:
+    status: covered
+    references:
+      - tests/test262/harness/wellKnownIntrinsicObjects.js
+      - tests/test262/subset.yaml
+      - tests/test262/results.yaml
+  structural:
+    status: omitted
+    reason: "The include is ordinary JavaScript assembled ahead of each
+      reviewed test body and adds no IR construct, generated-C contract,
+      realm intrinsic, runtime helper, or ABI surface of its own."
+    replacements:
+      - tools/test262.ts
+      - tests/test262/harness/wellKnownIntrinsicObjects.js

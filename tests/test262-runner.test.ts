@@ -1946,32 +1946,6 @@ test("admitted super tag exposes the global-code parse negatives", async () => {
   );
 });
 
-test("classifies reviewed missing includes as unsupported", async () => {
-  await Promise.all(
-    ["wellKnownIntrinsicObjects.js"].map(async (include) => {
-      const source = `/*---
-includes: [${include}]
----*/
-`;
-      const parsed = parseTest262Case(source, "test/harness-gap.js", revision);
-      const result = await executeTest262Case(
-        source,
-        parsed,
-        new Set(),
-        harnesses,
-        {
-          async execute() {
-            return assert.fail("unsupported harness case must not execute");
-          },
-        },
-        ["functions"],
-      );
-      assert.equal(result.classification, "unsupported-profile-feature");
-      assert.equal(result.observation.unsupportedCapability, "harness-include");
-    }),
-  );
-});
-
 type ComparedValue = number | readonly number[];
 
 /** Run a harness, then a probe Script in the same realm, as a test body. */

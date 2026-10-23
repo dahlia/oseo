@@ -1042,10 +1042,14 @@ original harness admission changed no runtime, compiler, or feature list;
 the node's later `__proto__` write guard is described in the incidental
 Annex B prototype write dependency section.
 
-The unavailable-include list still contains *wellKnownIntrinsicObjects.js*.
-Its six reviewed paths keep main's `harness-include` observations and owners.
-This node admits only *resizableArrayBufferUtils.js*. An unknown include that
-the reviewed harness does not implement still fails as a harness defect.
+With `well-known-intrinsics-harness`, which registers
+*wellKnownIntrinsicObjects.js*, the runner's list of unavailable harness
+includes becomes empty. The runner therefore no longer has that list or the
+branch that classified a case naming a listed include as unsupported with the
+`harness-include` capability. A case that names an include the reviewed
+harness does not implement still fails as a harness defect. The six WKI
+records retain their inherited `harness-include` observations and owners
+until the complete update observes the combined source.
 
 The earlier combined update recorded in `615d9d3b` observed 163 passes in
 this node's 168-path cohort. Five remained unsupported with their actual
