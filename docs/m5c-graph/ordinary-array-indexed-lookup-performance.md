@@ -314,11 +314,74 @@ blocks, every oracle, assertion, seed, twelve cases, specialization policy,
 forced-collection check and deadline remain unchanged. Pure reference and
 C emission checks do not establish native semantics or a deadline benefit.
 
-This source phase runs no native compiler, linker or executable. Root must
-authorize that work separately after the shared UPDATE drains.
-Focused native validation and matching-host timing remain pending. A later
-actual full UPDATE must observe this backend composition from its own clean
-U and retain its distinct R; the running shared-U99 UPDATE cannot supply
-those observations. Root owns review retention, final candidate/Main CI,
-publication and any separate CI-capacity decision. No graph landing status
-or test262 classification changes in this source correction.
+The fixed correction is `f26a74bf60d6d85df9e467f7a8d90154bc006ec0`, tree
+`abc68d461aac7b15d1881018918c45e855cc5d06`. The source-only phase executed no
+native code. The separately authorized focused Linux phase below observed
+that exact source; earlier U99 and runtime measurements remain bound to
+their original commits.
+
+
+Focused Linux completion-storage evidence
+-----------------------------------------
+
+Four original entry points passed once in order on Linux x86\_64 with Node
+v24.21.0, Deno 2.9.7 references where owned by the entry point, and Zig
+0.16.0. This is Node-host native execution, not a separate Deno-host native
+lane. The explicit target was `linux-x86_64-gnu`; retained compiler commands
+include address/undefined sanitizer flags. No independent sanitizer
+readiness probe ran, so flags alone do not prove instrumentation activity.
+
+| Original command                                                   | Raw registrations/passes/failures | Runner wall seconds | Raw stdout                                                                                               |
+| ------------------------------------------------------------------ | --------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------- |
+| `node --test tests/property/m5-array-constructor.property.test.ts` | 1/1/0                             | 51.196210359        | [Array](/data/m5c-completion-storage-native-20261025/task_cc1f1ec8b2fb/01-array.stdout)                  |
+| `node --test tests/runtime-generator-dispatch-stack.test.ts`       | 7/7/0                             | 47.700369348        | [Dispatch](/data/m5c-completion-storage-native-20261025/task_cc1f1ec8b2fb/02-generator-stack.stdout)     |
+| `node --test tests/tco-generator-interop.test.ts`                  | 1/1/0                             | 13.929496694        | [Interop](/data/m5c-completion-storage-native-20261025/task_cc1f1ec8b2fb/03-tco-interop.stdout)          |
+| `node --test tests/proper-tail-calls.test.ts`                      | 9/9/0                             | 9.360440990         | [Tail calls](/data/m5c-completion-storage-native-20261025/task_cc1f1ec8b2fb/04-proper-tail-calls.stdout) |
+
+All 18 registrations passed. The four commands exited zero with empty
+stderr and no failed, cancelled or skipped tests. Each used fresh capacity,
+choom 1000, one mise job and the existing nonblocking heavy runner. Exact
+source/tree, tracked modes and clean status were verified; all 34 stashes
+were preserved. Every runner and owned scope drained naturally before the
+next command, with the last drain verified at 2026-10-24T21:29:51.169719Z.
+The
+[native packet](/data/m5c-completion-storage-native-20261025/task_cc1f1ec8b2fb/REPORT.md)
+retains original stdout/stderr, command receipts, process/scope identities,
+source bindings and a recursive SHA256 inventory.
+
+The Array property keeps both complete transition blocks, all oracles and
+assertions, twelve cases, seed 1610628864, both policies, forced GC,
+positive collection/guard-miss assertions and its 180,000 ms deadline.
+The existing safety suites passed their suspension/throw/return, iterator
+and finally cleanup, realm/derived-constructor and TCO resource assertions.
+Dispatch guards still reject with the exact `OSEO2001` frame diagnostic;
+interop also asserts zero active-frame charge, call depth and root chain at
+teardown. The non-tail tests retain their modeled resource rejections.
+Source loops imply 59 native subject/policy variants, including 17 expected
+rejections; these are not 59 raw registrations or printed numeric counters.
+
+Successful numeric GC/guard/frame values are not printed. Successful C,
+MIR and binaries are not archived by these normal test entry points.
+Fourteen expected-rejection directories remain as actual error evidence:
+twelve dispatch variants and two interop guards, including original C,
+binaries and native observations. Their expected exit-one diagnostics do
+not mean the test commands failed.
+
+The corrected Array property duration was 50.920130469 seconds; the
+separate original U99
+[baseline](/data/m5c-array-native-baseline-20261025/task_595ce367bff5/REPORT.md)
+was 36.480273056 seconds, with runner wall 36.736795027 seconds. Both retain
+the same complete property contract. The baseline used
+*/data/zig-cache/m5c-source4-no-tco-update*, while the correction used
+*/data/zig-cache/m5c-primitive-wrapper-objects*. Neither was flushed or warmed
+for measurement, and cache equivalence, causality and variance are
+unestablished. There is no observed Linux speedup, macOS benefit or deadline
+repair. The historical helper benchmarks above do not supply that proof.
+
+A new full UPDATE must observe this backend composition from its own clean
+U and retain its distinct R; historical U99 observations cannot supply
+those results. Full ordinary/extended, sanitizer and cross-host gates,
+exact candidate/Main CI and the Mac deadline question remain pending.
+Root owns review retention, integration, publication and any separate
+CI-capacity decision. No graph landing status or test262 classification
+changes in this correction or its focused evidence.

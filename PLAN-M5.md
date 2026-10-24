@@ -8890,9 +8890,25 @@ script binding-access charge. Dispatch, direct-call, continuation and
 fragment enter/leave pairs, callable multipliers and rejection guards keep
 those values even when physical allocations shrink. The runtime ABI,
 ceiling, collector policy and TCO trampoline protocol do not change.
-This is source preparation: focused native correctness, actual full
-manifest regeneration, impact review and exact candidate/Main CI remain
-required, and no native cost or deadline improvement is established.
+Focused Linux validation of fixed source
+`f26a74bf60d6d85df9e467f7a8d90154bc006ec0` passed the unchanged Array property,
+generator dispatch accounting, TCO/generator interop and proper-tail-call
+entry points: 18 raw registrations, all passed, without skips or cancelled
+tests. Existing assertions retain forced collection, enabled guard misses,
+completion value identity, cleanup and teardown balance, and original
+logical resource rejection outcomes. These Node-host native runs retain
+Node/Deno references where owned by each entry point; they are not separate
+Deno-host native evidence. The
+[Array node](./docs/m5c-graph/ordinary-array-indexed-lookup-performance.md#focused-linux-completion-storage-evidence)
+binds exact commands, source, raw packets and retained rejection artifacts.
+
+The corrected full Array property took 50.920130469 seconds versus the
+separate U99 baseline's 36.480273056 seconds. Assigned cache paths differ;
+cache equivalence, causality and variance are unestablished. There is no
+observed Linux speedup, macOS benefit or deadline repair. Actual new full
+manifest regeneration, impact review, full ordinary/extended, sanitizer and
+cross-host gates, and exact candidate/Main CI remain required. Earlier U99
+observations remain historical evidence for that implementation.
 
 
 Primitive receiver inherited Set source preparation
