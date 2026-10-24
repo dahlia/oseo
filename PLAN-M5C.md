@@ -1656,9 +1656,14 @@ Bounded Array/TCO interaction examples
 --------------------------------------
 
 Two additional fixed examples extend the existing continuation/TCO
-registrations. One resumes a generator, coerces a dense Array's shorter
-length through a reentrant tail helper, and forwards the remaining values
-through apply before clearing the source Array and tail-draining. The
+registrations. One resumes a generator and coerces a dense Array's shorter
+length through a primitive Number assignment. Its strict inherited setter
+clears the source payload and returns a tail call into an ordinary helper.
+Each helper hop allocates and truncates a dense Array; its base restores
+the live payload and returns a distinct sentinel. The assignment must
+still return its original RHS and the setter must keep its primitive
+receiver. Apply then forwards the remaining values before clearing the
+source Array and tail-draining. The
 other captures apply-list length before an own getter truncates it, then
 reads inherited indices with receiver checks and reentry. A separate
 throwing getter in that example prevents the target and later getter from

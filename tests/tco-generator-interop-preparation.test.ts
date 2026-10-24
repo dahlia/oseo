@@ -110,6 +110,31 @@ for (const fixture of fixtures) {
       const mir = compileInterop(fixture, policy);
       const emitted = cBackend.emit(mir);
       const instrumented = balancedInteropBackend.emit(mir);
+      if (fixture.name === "dense-array-apply-and-truncation") {
+        const setter = mir.functions.find(
+          (fn) => fn.name === "primitiveTailSetter",
+        );
+        assert.ok(setter?.strict === true);
+        assert.equal(
+          setter.blocks
+            .flatMap((block) => block.operations)
+            .filter(
+              (operation) =>
+                operation.kind === "call" && operation.tail === true,
+            ).length,
+          1,
+          "the inherited setter must return an ordinary helper tail call",
+        );
+        const start = emitted.source.indexOf(
+          `static OseoResult oseo_function_${setter.id}(\n`,
+        );
+        assert.ok(start >= 0);
+        const body = emitted.source.slice(
+          start,
+          emitted.source.indexOf("\n}\n", start),
+        );
+        assert.match(body, /oseo_tail_call\(/u);
+      }
       assert.match(
         emitted.source,
         /OSEO_TAIL_HOST_CLEAR_TIMEOUT/u,
