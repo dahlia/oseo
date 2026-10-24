@@ -932,6 +932,119 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/object/11.1.5_7-3-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/expressions/object/11.1.5_7-3-1.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/object/11.1.5_7-3-1.js:90:3:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - async-iteration
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/object/dstr/async-gen-meth-ary-ptrn-elem-obj-id.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - async-iteration
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - object-literals
+      - object-properties
+      - promise-settlement
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Symbol.iterator
+        - generators
+        - destructuring-binding
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/object/dstr/gen-meth-ary-init-iter-get-err.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - destructuring-bindings
+      - expression-operators
+      - functions
+      - generators
+      - iterator-protocol
+      - object-literals
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - destructuring-binding
         - default-parameters
@@ -947,6 +1060,60 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
+      - object-literals
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/object/identifier-shorthand-private-invalid-strict-mode.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - object-literals
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/expressions/object/prop-dup-get-get.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
       - object-literals
     execution:
       harnessIncludes:

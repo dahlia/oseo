@@ -94,7 +94,7 @@ Exceptions to the current table
 -------------------------------
 
 The current weight-source runs above observed two families before later
-changes grew them. Only these four entries override that upstream table;
+changes grew them. The exceptions described below override that upstream table;
 all other refreshed weights, including compound assignment at 1,838 Linux
 and 1,242 macOS seconds, remain intact. None of the four changes file
 inventory, seeds, case budgets, sizes, shard totals or interrupt limits.
@@ -879,3 +879,101 @@ host extended CI case sums when available. Raw commands, stdout, stderr, and
 timing metadata are under
 */data/m5c-primitive-wrapper-objects-20261023/focused-ordinary.*.
 No existing case budget, seed, deadline, or shard total changes.
+
+### Script and Module declaration grammar
+
+*tests/property/m5-script-module-declarations.property.test.ts* checks pure
+parser/compiler behavior across package boundaries. It stays in
+*tests/property/*, whose complete glob the native extended task collects.
+Its two registrations therefore need scheduling weights even though they
+build and execute no Oseo native artifact.
+
+On October 24, 2026 KST, a local Linux observation ran from clean source
+`a94d779fdb6f16bc729f21de6dc35f7688749c50`, tree
+`c1f4847e81eb959aa9215e120e00e066b6fd84d1`. It started at
+`2026-10-23T17:29:14.125586Z` and ended at
+`2026-10-23T17:29:55.242893Z`, with exit zero and both registrations passing:
+
+ -  `generated ModuleItems are admitted only by the Module goal`:
+    21,356.579799 milliseconds; and
+ -  `generated nested declarations precede unsupported conversion`:
+    19,153.894982 milliseconds.
+
+The sum is 40,510.474781 milliseconds. Rounding its seconds up gives the
+provisional Linux weight of 41. The TAP runner duration, 40,785.25627
+milliseconds, and the process wall, 40.985180203 seconds, are separate
+observations and are not the weight. This is one local single-file extended
+observation, not CI, an upper bound, or evidence of run-to-run variation.
+
+~~~~ sh
+$(oseo-capacity --prefix) env MISE_JOBS=1 MISE_TASK_JOBS=1 \
+  mise run --skip-deps test:property:extended:native:shard \
+  --test-reporter=tap \
+  tests/property/m5-script-module-declarations.property.test.ts
+~~~~
+
+The task supplied the exact CI extended parameters:
+`OSEO_PROPERTY_RUN_SCALE=10`, `OSEO_PROPERTY_SIZE=large`, and
+`OSEO_PROPERTY_SEED=1592590339`. Both domains retained 64 ordinary cases,
+giving 640 extended cases each and the existing scaled 300,000-millisecond
+interrupt limit per domain. No replay path, case shard, or time scale was
+set. There was one selected file and no file-shard flag; `--skip-deps`
+omitted the package build because these properties import source directly.
+The Node.js host was the pinned `v24.21.0` on `dorikom`, Linux x86\_64,
+with an AMD Ryzen 7 7700X and 16 logical CPUs. The fresh capacity prefix
+selected `generous`, no CPU quota, and `MemoryMax=104G`. The source tree
+stayed clean throughout the measurement.
+
+macOS is unmeasured. At measurement source `a94d779f` and pre-composition
+base `8387dc9a`, each host's table held 135 entries. Sorting numerically and
+selecting zero-based index `floor(135/2) = 67` gave unknown-file upper
+medians of 401 Linux/286 macOS seconds. Adding only Script's explicit
+41/286 entries gives 136 entries and index `floor(136/2) = 68`, with the
+same upper medians. The macOS placeholder therefore kept this file's
+assigned cost and the unknown-file fallback at 286 in that historical
+Script-only calculation.
+
+The integrated table at `6cbc6c9f` includes the continuation-dispatch
+planning estimates below. Its 136 entries select index 68 at 406
+Linux/296 macOS seconds. The increases to three existing generator/async
+weights raise those unknown-file fallbacks; inserting the old median
+alone does not. Script's explicit entries still assign it 41 Linux/286
+macOS seconds, independently of the combined table's upper medians.
+The macOS value remains a provisional unmeasured scheduling placeholder,
+with no measured host ratio or bound. Refresh both host entries from
+future exact-candidate extended CI case logs.
+
+Raw TAP, stderr, timestamps, commands, runtime/machine metadata, source
+hashes, the aggregate calculation, and the fallback calculation are retained
+under */data/m5c-script-shard-cost-20261024/* as *measurement.stdout*,
+*measurement.stderr*, *measurement.json*, *measurement-task.json*,
+*before.json*, *aggregate.json*, and *base-fallback.json*. This cost update
+changes no source, generated domain, seed, budget, deadline, shard total,
+partition rule, or canonical test262 record.
+
+
+Continuation dispatch nesting
+-----------------------------
+
+The `generator-dispatch-stack-charge` source preparation extends the existing
+synchronous generator, ordinary async-await, and asynchronous generator domains
+with zero through three nested dispatch wrappers. All previous semantic choices,
+seeds, case budgets, size modes, and interrupt limits remain present. No
+property file or seed family is added. The wrappers add compilation and
+dispatch work; their relative cost has not yet been measured in an extended CI
+run.
+
+The provisional scheduling weights are twice each file's source-run weight:
+
+| File                                  | Linux source | Linux provisional | macOS source | macOS provisional |
+| ------------------------------------- | -----------: | ----------------: | -----------: | ----------------: |
+| *m5-generator.property.test.ts*       |          444 |               888 |          232 |               464 |
+| *m5-async-await.property.test.ts*     |          321 |               642 |          157 |               314 |
+| *m5-async-generator.property.test.ts* |          226 |               452 |          190 |               380 |
+
+These are unmeasured planning estimates in seconds, not CI observations, local
+extended measurements, or conservative bounds. Replace them with each host's
+summed registration durations from the exact candidate's full extended CI run.
+Focused local ordinary results remain in
+*/data/m5c-generator-dispatch-stack-charge-20261024/* and do not stand in for
+those measurements. No shard total, input file, seed, or case budget changes.

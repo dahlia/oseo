@@ -3,6 +3,7 @@ id: async-functions
 title: "Asynchronous functions"
 scope:
   - "Async functions and arrows with traced suspension frames."
+  - "Active continuation dispatch owns the callable native-frame charge."
 owners:
   - PLAN-M5.md
 evidence:
@@ -13,10 +14,12 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/native/fixtures/async.ts
   forced-collection:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/property/m5-async-await.property.test.ts
   generated:
     status: covered
@@ -29,6 +32,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/runtime-generator-dispatch-stack.test.ts
       - tests/native.ts
       - tests/native/fixtures/async.ts
   standards:
@@ -39,4 +43,6 @@ evidence:
   structural:
     status: covered
     references:
+      - packages/backend-c/tests/index.test.ts
+      - packages/backend-c/tests/fragments.test.ts
       - packages/parser-babel/tests/async.test.ts
