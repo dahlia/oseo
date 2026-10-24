@@ -24,11 +24,13 @@ evidence:
       - tests/proper-tail-calls.test.ts
       - tests/runtime-tail-calls.test.ts
       - tests/fixtures/runtime-tail-calls.c
+      - tests/tco-generator-interop.test.ts
   forced-collection:
     status: covered
     references:
       - tests/property/m5-proper-tail-calls.property.test.ts
       - tests/fixtures/runtime-tail-calls.c
+      - tests/tco-generator-interop.test.ts
   generated:
     status: covered
     references:
@@ -45,6 +47,7 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/proper-tail-calls.ts
+      - tests/tco-generator-interop.test.ts
   standards:
     status: covered
     references:
@@ -58,3 +61,4 @@ evidence:
       - tests/proper-tail-calls-emission.test.ts
       - tests/proper-tail-call-resources.test.ts
       - tests/completion-target-labels.test.ts
+      - tests/tco-generator-interop-preparation.test.ts

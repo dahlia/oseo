@@ -1482,11 +1482,70 @@ remains `86c845d0`, with actual result `8ee78291`; these are not new TCO
 observations. The two reviewed TCO paths retain their unsupported records.
 
 The preserved TCO completion-target reachability feeds the continuation
-logical frame charge. The three interaction files remain unreviewed source;
-pure Node/Deno references, MIR/C emission, and resource models establish no
-native guard, collector, balance, sanitizer, or performance success.
-All native commands remain deferred. Root owns affected D1.9 reviews,
-actual green-Main alignment under D10, D3, a later full UPDATE, exact
-candidate ordinary/extended gates, and publication. TCO stays unlanded.
-At dispatch, effective Main remains last successful `de491133`; C3 and its
-matching Main CI are not declared successful by this preparation.
+logical frame charge. At this source-preparation stage, the pure Node/Deno
+references, MIR/C emission, and resource models supplied no native guard,
+collector, balance, sanitizer, or performance success. At its dispatch,
+effective Main was last successful `de491133`, and matching C3/Main CI
+remained pending. The subsequent Linux focus below adds bounded execution
+evidence without changing that source or its inherited observations.
+
+
+Focused Linux TCO/continuation evidence
+---------------------------------------
+
+The focused run used source
+`baf6f7d7ed8273e37b6c6e7b2b3229dface46ad2`, tree
+`82b8766edbc1629b81f8154b3b5c6e35308537d7`, without source changes.
+*tests/tco-generator-interop.test.ts* ran its complete registration under
+Node/createNodeHost and Deno/createDenoHost, each with Zig and host-cc on
+Linux AMD64. All four registrations passed both specialization policies
+and all three selected fixed cases with forced safepoint collection.
+The six-command focus also completed its normal bootstrap build and the
+fresh host-cc ASan/UBSan self-probe, which passed all seven tests using
+Clang 22.1.8. Zig sanitizer flags alone establish no sanitizer activity.
+
+The unchanged registrations cover 24 case/policy/bootstrap/lane
+combinations. Sixteen successful combinations passed exact independent
+stdout, empty stderr, exit 0, positive allocation/collection assertions,
+and the backend's main-context frame/call/root balance assertions.
+The fixed source retains its 13 Boolean checks and event trace for resumed
+generator/async/async-generator bodies calling strict ordinary helpers,
+including direct, bound, Proxy, apply, and clearTimeout forwarding. Realm,
+closure, Symbol, default-parameter, finally/abrupt, undefined-result, and
+extra-argument behavior retain their independent expectations.
+
+Successful per-case raw output, numerical counters, and binaries were not
+retained by the registration. Its complete test success proves the
+original assertions; it is not a collection of 24 saved raw observations
+or proof of every foreign-context or collector invariant. The earlier
+Node/Deno reference observations remain pure evidence, not native passes.
+
+Eight raw guard results are retained. Each exits 1, prints `before` followed
+by LF, and reports exactly the owned `OSEO2001` active-frame-budget
+diagnostic. No signal, compiler failure, or sanitizer error counts as that
+guard. Their actual aggregate C, compilation units, and staged headers
+match the prepared per-policy inputs. Logical charge remains 2,192,
+compact heap slots 826, MIR roots 2,177, and the frame ceiling 65,536.
+Zig selects depth 29/cost 2,192; host-cc multiplier 8/base 32 selects depth
+3/cost 17,312. Script charge is 47 disabled/52 enabled. The original tests
+check the actual wide MIR's resource model; no expectation was normalized.
+These resource-limit checks add no optimization guard or specialized path.
+
+The source-bound command results, exact guard observations, input hashes,
+and limitations are retained in
+*/data/m5c-tco-c3-native-focus-20261024/REPORT.md*. All six commands exited
+naturally 0 with full descendant drains and zero recorded OOM events.
+This focus establishes no timing, speedup, or full-suite performance claim.
+Existing source, collector, and historical performance evidence stays
+bound to its original source and qualifications.
+
+The two composed backend interfaces and three interaction files still
+require affected independent review. Unchanged `8490591d`/`e75995e8`
+review scopes retain their original source provenance; this focus extends
+none of those review claims. Thirteen unselected records in the original
+18-command plan remain deferred, including the older complete ordinary/
+extended focus and all macOS focus. Full ordinary, extended, native,
+standards, cross-target, and exact-candidate CI requirements remain.
+Root owns the affected reviews, actual successful-Main alignment under
+D10, exact U/R D3, a later full UPDATE, and publication. The inherited
+standards records and admissions remain unchanged, and TCO stays unlanded.
