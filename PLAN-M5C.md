@@ -729,7 +729,7 @@ Source preparation after the four-source candidate
 --------------------------------------------------
 
 The four-source candidate at `cbe81ee1` did not complete its gates. Root's
-D6 decision removes the proper-tail-call implementation from the next source
+D6 decision removed the proper-tail-call implementation from the Source4
 preparation while retaining that candidate and its original source and
 observation refs. The Linux extended-property liveness failure and ordinary
 native fixture timeout remain unresolved; neither a semantic counterexample
@@ -744,8 +744,8 @@ results. These are Main observations, not observations of the new source.
 All original owners remain, and a new full UPDATE is required. Root later
 authorized adding the ready `primitive-wrapper-objects` source as the fourth
 unit. Its 40 paths retain Main's unsupported observations and owners. The
-TCO-specific strict tail-forwarding registration stays only in the original
-Wrapper source; every earlier wrapper assertion and property budget remains.
+TCO-specific strict tail-forwarding registration was retained in the original
+Wrapper source; every earlier wrapper assertion and property budget remained.
 At that source preparation, all four source nodes remained unlanded. The
 optional-call receiver and primitive inherited-Set contracts stay on the exit
 path with their unmet prerequisites.
@@ -764,13 +764,25 @@ added no exclusion, reviewed path, feature, inventory entry, or node landing;
 it retained the source preparation's graph state with 44 landed nodes.
 Post-observation review and exact candidate CI remain pending.
 
-This publication candidate prospectively marks `eval-intrinsic-value`,
+The Source4 publication candidate prospectively marked `eval-intrinsic-value`,
 `regexp-pattern-extensions`, `computed-member-reference-key-order`, and
 `primitive-wrapper-objects` landed, bringing its graph to 48 landed nodes.
-Successful Main `52a868c9` still has 44 landed nodes. The four candidate
-transitions take effect only after exact candidate CI succeeds, an equal-tree
-merge, and successful main CI for that exact merge commit, as the Gates
-section below requires.
+Its prior successful Main `52a868c9` had 44 landed nodes. The four candidate
+transitions required exact candidate CI, an equal-tree merge, and successful
+main CI for that exact merge commit, as the Gates section below requires.
+
+The subsequent proper-tail-call source preparation starts at Source4
+`6e54c5d5` and restores the complete TCO semantic unit, its completion-target
+label repair, and that exact Wrapper registration. It also retains the
+owner-local weak collector phase fix and ABI `m5-137`. This is preparation
+of the existing node's source delta, not a five-node publication unit or an
+UPDATE input. The reviewed delta was reanchored on successful Main
+`de491133`, preserving its 48 landed nodes and complete observations, subset,
+closure records, and graph state. Root must assess affected review scopes
+before native validation, D3, a fresh full UPDATE, and exact-candidate CI.
+This preparation supplies no new execution or CI claim. Proper tail calls
+remain unlanded; the optional-call receiver and primitive inherited-Set
+contracts stay on the exit path with their unmet prerequisites.
 
 
 Gates
@@ -1362,3 +1374,119 @@ workflows succeed; this record does not claim those CI results in advance.
 The property harness stays unlanded and subject to the user's Array
 performance publication prerequisite. This candidate adds no Array source,
 node, or exclusion and changes no test budgets, seeds, or shard totals.
+
+
+Proper tail calls
+-----------------
+
+The `proper-tail-calls` node implements ECMA-262 15.10 rather than seeking an
+exclusion; no accepted record excludes it. A call is a tail call exactly when
+IsInTailPosition holds. Its body must be strict source code of an ordinary,
+arrow, method, accessor, or class constructor function. Generator and async
+bodies, class field initializers, static blocks, parameter defaults, and Script
+or Module code have none. Within a body, a `return` qualifies only outside every
+try Block, every Catch with a Finally, and every for-of body, which are the
+statement contexts HasCallInTailPosition excludes. The expression rules then
+select the returned call itself, both conditional arms, the right operand of
+`&&`, `||`, and `??`, the last comma operand, an optional chain ending in a
+call, and tagged templates of either form.
+
+A tail call records its callee, receiver, copied arguments, and running realm
+in the context and leaves its frame through the body's ordinary exit with
+`OSEO_STATUS_TAIL_CALL`. `oseo_call_function` performs recorded calls one rooted
+step at a time, so a chain of any length holds one step's native stack, call
+depth, frame budget, and roots. `Function.prototype.call`,
+`Function.prototype.apply`, and `Reflect.apply` record their final call as
+their PrepareForTailCall steps require. Bound function and Proxy [[Call]]
+forward the same way because neither creates an execution context. A derived
+constructor's tail call carries its `this` binding cell, so the constructor
+result rules apply to the chain's final value. `console.log`, `setTimeout`,
+and `clearTimeout` also run as recorded host steps in tail position. All
+arguments, including unused extras and spread iteration, evaluate before
+recording and releasing the frame. `clearTimeout` keeps its existing
+numeric-handle-only behavior and undefined result; no user conversion runs.
+PrepareForTailCall requires releasing transient resources before the target
+even when the target runs no user code or allocation.
+
+A call outside tail position keeps nesting its frame and the 256-call limit.
+A chain of wide frames can exhaust the active native frame budget first,
+which the host C compiler lane reaches sooner because it charges each slot
+past the 32-slot base eight times. Because forwarding no longer nests, a
+non-tail call through a bound function or Proxy now uses one call level fewer
+for that wrapper. A strict chain of tail calls with no base case now runs until
+it is stopped instead of reporting `OSEO2001`, as the specification requires.
+Runtime ABI `m5-136` reserved this contract; the composed source uses
+`m5-137` for the additional owner-local collector counts.
+
+The source implements proper tail calls and restores the reviewed
+*tests/test262/harness/tcoHelper.js* that keeps `$MAX_ITERATIONS` at
+100,000. It owns the two reviewed tagged-template paths
+*test/language/expressions/tagged-template/tco-call.js* and *tco-member.js*;
+both retain Source4's unsupported observations. Feature admission and
+classification changes require Root's later full UPDATE; the reviewed
+`supportedFeatures` list stays unchanged in this source preparation.
+The fixed inventory tags 35 paths with the feature, all applicable and none a
+negative test. The other 33 remain unreviewed and keep their
+`observation-batch-32` reservation, whose planning basis is unchanged.
+Evidence lives in *tests/property/m5-proper-tail-calls.property.test.ts*
+(seeds `0x60008900` through `0x60008902`), *tests/proper-tail-calls.test.ts*,
+*tests/native/fixtures/proper-tail-calls.ts*,
+*tests/runtime-tail-calls.test.ts*, and the structural tests the family record
+indexes. The native non-tail tests and the non-tail property draws predict
+which resource guard a chain reaches, if any, with
+*tests/proper-tail-call-resources.ts*. It replays the chain's calls against
+the runtime's frame contract, the toolchain's `-D` overrides, and the slot
+counts the backend declares in the emitted dispatcher, so it checks the
+runtime's accounting rather than the compiler's slot allocation. A draw
+predicted to exhaust the budget must stop with exactly that guard's
+diagnostic; every other draw keeps the exact semantic comparison, and both
+references always match the semantic model.
+
+The non-tail property's catch-finally context exposed a C backend defect that
+predates this node: it reproduces at the parent commit and in non-strict code
+with no tail call. A completion target is entered only through a
+`resume-completion` switch, which names every block emitted for its body, but
+reachability followed completion targets unconditionally. A body whose every
+`finally` leaves abruptly, such as one whose catch always returns or one that a
+`break` or `continue` crosses before returning, therefore emitted a label with
+no `goto`, and both toolchains' `-Werror` rejected the program. Reachability now
+defers completion targets until a `resume-completion` terminator is reachable in
+the same body, including generator entry and body partitions. The target block 0
+that a `return`, `throw`, or normal completion saves is a sentinel that no
+dispatch names, so reachability never defers it: a generator, async, or async
+generator body that starts after a non-simple parameter prologue does not emit
+that prologue's blocks again. Blocks it drops had no incoming jump; a function
+whose only dispatch lay in such dead code also loses that code, which can lower
+its declared frame slots. *tests/completion-target-labels.test.ts* checks the
+emitted labels and the dispatch it keeps, and the *proper-tail-calls* native
+fixture and *tests/proper-tail-calls.test.ts* run the affected shapes.
+
+
+TCO source preparation on reduced C3
+------------------------------------
+
+This private preparation replays only the authored TCO delta from
+`3bc6ab35..16ab7119` and the three fixed interaction files from
+`16ab7119..305a4bf3` onto fixed reduced candidate `ccde36cd`, tree
+`3cc56f471883a7398f0c77bc6278ac53578f7f4a`. Matching Main `44c46bfc`
+has the same tree. The original source commits, authors, branches, reports,
+and review qualifications remain preserved; this replay does not extend
+old reviews to the composed backend interfaces or new interaction tests.
+
+C3 already supplies B15, Script declaration errors, and continuation stack
+charging. No expanded RegExp property helper is imported. Its helper,
+license, tests, family contract, graph, and accounting stay exactly C3.
+All C3 canonical partitions, subset, index, parity, ledger, owners, source
+identities, and classifications remain unchanged. Their observation input
+remains `86c845d0`, with actual result `8ee78291`; these are not new TCO
+observations. The two reviewed TCO paths retain their unsupported records.
+
+The preserved TCO completion-target reachability feeds the continuation
+logical frame charge. The three interaction files remain unreviewed source;
+pure Node/Deno references, MIR/C emission, and resource models establish no
+native guard, collector, balance, sanitizer, or performance success.
+All native commands remain deferred. Root owns affected D1.9 reviews,
+actual green-Main alignment under D10, D3, a later full UPDATE, exact
+candidate ordinary/extended gates, and publication. TCO stays unlanded.
+At dispatch, effective Main remains last successful `de491133`; C3 and its
+matching Main CI are not declared successful by this preparation.

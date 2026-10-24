@@ -1796,3 +1796,185 @@ test("unenterable generator and async continuations are guarded", () => {
     );
   }
 });
+
+test("leaves a tail call through the frame's abrupt exit", () => {
+  const range = {
+    end: { column: 1, line: 1 },
+    sourceId: "tail-call.ts",
+    start: { column: 1, line: 1 },
+  };
+  const constant = (id: number) =>
+    ({
+      arguments: [],
+      constant: { kind: "undefined" },
+      detail: "undefined",
+      id,
+      kind: "constant",
+      range,
+    }) as const;
+  const tailFunction = {
+    blocks: [
+      {
+        id: 0,
+        operations: [
+          constant(0),
+          constant(1),
+          constant(2),
+          {
+            arguments: [0, 1, 2],
+            detail: "dynamic function value",
+            id: 3,
+            kind: "call",
+            range,
+            tail: true,
+            target: { kind: "dynamic" },
+          },
+          {
+            arguments: [3],
+            detail: "normal -> continue, abrupt -> return",
+            id: 4,
+            kind: "check-status",
+            range,
+          },
+        ],
+        terminator: { kind: "return", value: 3 },
+      },
+    ],
+    functionLength: 0,
+    id: 0,
+    kind: "mir-function",
+    localBindingIds: [],
+    name: "tail",
+    parameterCount: 0,
+    parameters: [],
+    range,
+    rootSlotCount: 5,
+  } as const;
+  const program: MirProgram = {
+    functions: [tailFunction],
+    globalBindings: [],
+    globalObjectBindings: [],
+    kind: "mir-program",
+    observeSpecialization: false,
+    script: {
+      blocks: [
+        {
+          id: 0,
+          operations: [
+            {
+              arguments: [],
+              detail: "call tail",
+              id: 0,
+              kind: "call",
+              range,
+              target: { functionId: 0, kind: "function" },
+            },
+          ],
+          terminator: { kind: "return", value: 0 },
+        },
+      ],
+      functionLength: 0,
+      id: -1,
+      kind: "mir-function",
+      localBindingIds: [],
+      name: "<script>",
+      parameterCount: 0,
+      parameters: [],
+      range,
+      rootSlotCount: 1,
+    },
+    sourceId: "tail-call.ts",
+    specialization: "disabled",
+  };
+  const emitted = cBackend.emit(program).source;
+  // The recorded call returns OSEO_STATUS_TAIL_CALL, which the status
+  // check sends to the exit that releases the roots and returns it.
+  assert.ok(
+    emitted.includes(
+      "result = oseo_tail_call(context, roots[0], roots[1], 1u, &roots[",
+    ),
+  );
+  assert.match(
+    emitted,
+    new RegExp(
+      [
+        String.raw`\]\);`,
+        String.raw`roots\[3\] = result\.value;`,
+        String.raw`if \(result\.status != OSEO_STATUS_NORMAL\) goto abrupt;`,
+      ].join(String.raw`\n\s*`),
+      "u",
+    ),
+  );
+  assert.doesNotMatch(emitted, /oseo_call_function\(context, roots\[0\]/u);
+  // The direct call bypasses oseo_call_function, so it completes the
+  // chain the callee's tail call left pending.
+  assert.match(
+    emitted,
+    /oseo_call_leave\(context\);\n\s*result = oseo_call_complete\(/u,
+  );
+  assert.match(
+    cBackend.emit({
+      ...program,
+      functions: [
+        {
+          ...tailFunction,
+          blocks: [
+            {
+              ...tailFunction.blocks[0],
+              operations: [
+                ...tailFunction.blocks[0].operations.slice(0, 3),
+                {
+                  arguments: [0, 1, 2],
+                  detail: "clearTimeout",
+                  id: 3,
+                  kind: "call",
+                  range,
+                  tail: true,
+                  target: {
+                    kind: "timer-intrinsic",
+                    method: "clearTimeout",
+                  },
+                },
+                ...tailFunction.blocks[0].operations.slice(4),
+              ],
+            },
+          ],
+        },
+      ],
+    }).source,
+    /oseo_tail_host_call\(context, OSEO_TAIL_HOST_CLEAR_TIMEOUT, 3u, /u,
+  );
+  assert.throws(
+    () =>
+      cBackend.emit({
+        ...program,
+        functions: [
+          {
+            ...tailFunction,
+            blocks: [
+              {
+                ...tailFunction.blocks[0],
+                operations: [
+                  ...tailFunction.blocks[0].operations.slice(0, 3),
+                  {
+                    arguments: [0, 1, 2],
+                    detail: "Promise.resolve",
+                    id: 3,
+                    kind: "call",
+                    range,
+                    tail: true,
+                    target: {
+                      kind: "promise-intrinsic",
+                      method: "resolve",
+                    },
+                  },
+                  ...tailFunction.blocks[0].operations.slice(4),
+                ],
+              },
+            ],
+          },
+        ],
+      }),
+    /MIR tail call %3 has a target with no tail call ABI\./u,
+  );
+});
