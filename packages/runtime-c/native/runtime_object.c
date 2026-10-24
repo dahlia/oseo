@@ -37,6 +37,18 @@ size_t oseo_internal_own_property_index(
     const OseoOrdinaryObject *object,
     OseoValue key
 ) {
+    /* Dense arrays commonly store index i in property slot i. Check the
+     * current key before using that slot: holes, deletion, named keys,
+     * and out-of-order insertion can all break the correspondence.
+     * No slot or pointer survives this call, and no safepoint occurs. */
+    uint32_t array_index;
+    if (object->header.kind == OSEO_HEAP_ARRAY &&
+        oseo_internal_array_index(key, &array_index) &&
+        array_index < object->property_count &&
+        oseo_internal_property_key_equal(
+            object->properties[array_index].key, key)) {
+        return array_index;
+    }
     for (size_t index = 0u; index < object->property_count; index += 1u) {
         if (oseo_internal_property_key_equal(
             object->properties[index].key, key)) {
