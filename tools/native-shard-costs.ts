@@ -77,7 +77,7 @@ export const nativeShardCosts = {
     "tests/property/m5-arguments-object.property.test.ts": 647,
     "tests/property/m5-array-binding.property.test.ts": 171,
     "tests/property/m5-array-buffer.property.test.ts": 551,
-    "tests/property/m5-array-constructor.property.test.ts": 674,
+    "tests/property/m5-array-constructor.property.test.ts": 1119,
     "tests/property/m5-array-prototype-change-by-copy.property.test.ts": 355,
     // Local Linux extended case sum: 332.426991265 s, rounded up.
     // October 22, 2026; not CI or file wall time. See U6 provenance.
@@ -231,7 +231,7 @@ export const nativeShardCosts = {
     "tests/property/m5-arguments-object.property.test.ts": 436,
     "tests/property/m5-array-binding.property.test.ts": 108,
     "tests/property/m5-array-buffer.property.test.ts": 400,
-    "tests/property/m5-array-constructor.property.test.ts": 543,
+    "tests/property/m5-array-constructor.property.test.ts": 638,
     "tests/property/m5-array-prototype-change-by-copy.property.test.ts": 265,
     // Provisional estimate: ceil(333 * 339/326) from this file's host
     // ratio in run 39070198868; not a macOS observation. Refresh from CI.
