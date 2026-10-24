@@ -10,7 +10,9 @@ scope:
     inherited receivers, mutation, ordering, and generic fallback. Array
     length reduction validates dense configurable data elements before
     tail deletion; unusual layouts keep descending generic deletion.
-    Native validation of this expanded M5c source remains pending."
+    Focused expanded-source correctness and private-composition cost
+    evidence, with source identities and limitations, are recorded in
+    docs/m5c-graph/ordinary-array-indexed-lookup-performance.md."
 owners:
   - PLAN-M5.md
 evidence:

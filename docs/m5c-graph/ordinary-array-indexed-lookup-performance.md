@@ -41,10 +41,10 @@ Fresh final observations, D1 impact reviews, local CHECK, and exact candidate
 CI remain required before publication under the current M5c procedure.
 
 
-Source preparation
-------------------
+Lookup-only source and historical evidence
+------------------------------------------
 
-The candidate lookup checks only arrays branded `OSEO_HEAP_ARRAY`. For a
+The earlier lookup-only source checks arrays branded `OSEO_HEAP_ARRAY`. For a
 canonical array index `i`, it checks whether property slot `i` exists and
 currently holds the requested key. Only that match returns early. Every
 miss retains the complete ordinary property scan, including a numeric key
@@ -73,10 +73,12 @@ The property's arbitrary, seed, case budget, and timeout stay unchanged;
 its numeric payloads vary while every transition remains during shrinking.
 Both native policies and forced collection remain in that existing lane.
 
-The accepted native and measured lookup-only evidence is pinned to that
-earlier source and its private benchmark composition. It does not validate
-the following expanded runtime or its compiler/backend reanchor. The node
-stays ready and unlanded.
+The accepted lookup-only native evidence is pinned to source
+`a541b567b79f76bb6ccac076caef39c12164971a`; its benchmark composition is
+`74ba6573473635178c775b6087c3d5210db8909c`. Those results are historical,
+not complete proof of the expanded runtime or its compiler/backend reanchor.
+The focused expanded-source evidence below is separate. The node stays
+ready and unlanded.
 
 
 Insertion and length reduction source
@@ -122,7 +124,156 @@ The existing Array constructor arbitrary, domain identity, shrinking, seed
 Every transition remains present while its existing numeric payloads shrink.
 The historical file weight has not measured these added transitions.
 
-Pure Node/Deno reference and compiler checks validate the new test source
-only. Native execution, host ASan/UBSan/LSan, cross-linking, the same-helper
-benchmark, observations, reviews and exact candidate CI remain pending for
-the expanded source. No old result is relabeled as new validation.
+Pure Node/Deno reference and compiler checks validate the test source and
+lowering without invoking a C toolchain. The following focused executions
+validate the expanded runtime on their exact sources; they do not replace
+the later observation, review and candidate-CI requirements.
+
+
+Expanded fixed-source correctness
+---------------------------------
+
+Primary source `c2b039c573ef3f265b6af52bb7b27179c4d518f0`, tree
+`38557606a2651cb8f8c5c346d5727257eb4d18de`, is the expanded implementation.
+Its parent `9fde8122b929f2e95ebfd8111ec47e9a0e7c29c7` normally merges the
+lookup source with fixed C3 `ccde36cd1e57d22f44d61fd919ca6ee5fe2ed04d`.
+C3 changes the Script parser and generator stack-charge backend, so the
+earlier a541 native proof was not treated as complete reanchor validation.
+
+The accepted focused run retains thirty native observations: these five
+fixtures under both specialization policies in each of three lanes:
+
+ -  `array-indexed-lookup-transitions`;
+ -  `array-insertion-truncation-transitions`;
+ -  `array-constructor`;
+ -  `array-prototype-mutation`; and
+ -  `object-define-property`.
+
+The lanes use actual NodeHost, actual DenoHost, and NodeHost with the real
+Clang 22.1.8 host-compiler sanitizer toolchain. All ten fixture/policy pairs
+agree across the lanes on complete expected/reference stdout, native exit
+zero, empty stderr and counters. Forced safepoint collection yields positive
+allocations and collections throughout. Existing applicable guard-miss,
+disabled-policy, fallback and MIR assertions remain; these counters do not
+measure hits in the new C runtime branches. Fixture flags and independent
+Node/Deno references remain part of the retained driver evidence.
+
+Six complete property executions, ordinary Zig and host-compiler sanitizer
+for each family below, retain their arbitraries, size, shrinking/replay,
+both policies, forced collection and original assertions:
+
+| Family                   | Cases per lane | Seed       | Ordinary limit ms | Linux sanitizer limit ms |
+| ------------------------ | -------------- | ---------- | ----------------- | ------------------------ |
+| Array constructor        | 12             | 0x60003f00 | 180000            | 540000                   |
+| Array prototype mutation | 12             | 0x60005c00 | 240000            | 720000                   |
+| Object DefineOwnProperty | 12             | 0x60003700 | 180000            | 540000                   |
+
+The existing Linux sanitizer task multiplies only the deadline by three,
+not cases or size. Seven actual host-compiler readiness tests recognize
+ASan heap-buffer-overflow and UBSan signed-overflow diagnostics in runtime
+and generated code and check compiler selection. They include no intentional
+LSan leak-readiness probe. The fixed and property runs retain default Linux
+leak detection without suppression or `detect_leaks` overrides; their lack
+of sanitizer diagnostics is bounded execution evidence, not a no-leaks proof.
+
+The sanitizer controls introduce no external ptrace/strace process. One
+hostCCdefine snapshot nevertheless records native PID 2732565 traced by its
+same-name child 2732568. The literal
+`all_observed_untraced_oom1000` predicate remains false. Root's version-matched
+LLVM 22.1.8 assessment finds the pair consistent with LSan's internal
+stop-the-world clone tracer; the snapshot does not establish exact helper
+identity. Root accepted functional and enforcement proof with that explicit
+qualification. No rerun, suppression or normalization was used, and no
+universal TracerPid-zero claim is made. The earlier a541 external-ptrace/LSan
+fatal attempt remains failed.
+
+Both insertion/truncation policies also compile and link to explicit
+`linux-aarch64-musl`, retaining ELF64 little-endian machine 183 artifacts.
+These two cross-links execute no ARM program and supply no macOS evidence.
+All twelve focused commands exited zero and drained naturally with the
+actual 104G/no-CPU-quota scopes, OOM adjustment 1000 and zero OOM events.
+
+Complete sources, driver inputs, C/MIR, requests, outputs, counter rows,
+sanitizer diagnostics, resource records and the retained tracer predicate
+are in `/data/m5c-array-expanded-native-validation-20261024/REPORT.md` and
+its raw run directories. `ROOT-TRACER-ASSESSMENT.md` and
+`root-final-acceptance.json` there record the qualification and acceptance.
+Normal successful property/probe cleanup remains unchanged; retained fixed
+artifacts do not imply every successful property binary was kept.
+
+
+Same-original-helper measurements
+---------------------------------
+
+The private expanded diagnostic composition is
+`91cc81574ef87fb2124cb745003835071ca3be87`, tree
+`9b4a5236882395d20687e2d4fba10102703e1787`, sole parent lookup-only
+`74ba6573473635178c775b6087c3d5210db8909c`. Its only delta from that parent
+is the two actual c2 runtime files, +40/-6. Packages, tools and selected
+build/dependency configuration match primary c2. The original full helper,
+10,000-element chunk, registration, upstream data, assertions and ordinary
+GC policy stay equal to the prior measured composition. This private source
+is not the Array publication candidate or a RegExp helper admission.
+
+Matched retained baselines are original
+`3bc6ab35a6f8eb24ffdad36bd8d428e6bde568d8`, tree
+`4b3aea2a6171bd4c5417c738a188b753d6533934`, and lookup-only 74ba, tree
+`4bc3fa8fc57ba8a0792df113a56bba0112012f5d`. Complete packages/tools and
+selected input equality between measured 74ba and reanchor 9fde justify
+that specific baseline reuse. No BEFORE, warmup or repeat was rerun.
+
+Every source/subject observation runs all four original strict/sloppy and
+enabled/disabled variants, classification pass, actual execution, exit zero
+and empty native stdout/stderr. Exact name filters select one original
+subject; filtered registrations are not unsupported-host skips.
+
+| Subject      | Original native union s | Lookup-only native union s | Expanded native union s | Incremental ratio | Overall ratio |
+| ------------ | ----------------------- | -------------------------- | ----------------------- | ----------------- | ------------- |
+| ASCII        | 224.009661              | 157.380816                 | 5.775870                | 27.247985x        | 38.783710x    |
+| Surrogate    | 225.839902              | 158.263050                 | 6.585524                | 24.031960x        | 34.293383x    |
+| Word control | 0.016141                | 0.016654                   | 0.014355                | 1.160126x         | 1.124433x     |
+
+These are single Linux observations using ordinary Zig process-only
+strace. Native interval union has the same exec-to-exit definition across
+sources; concurrent interval sums are occupancy, not wall or CPU time.
+Command clock boundaries differ: the new inner clock excludes scope
+launch/drain, unlike the old outer wrapper. Compilation, normal cache
+history, the time gap and tracing also affect command comparisons.
+The millisecond word-control difference establishes no reliable change.
+Historical ASCII 235.573s is a separate run, not a denominator above.
+No variance, whole-corpus/CI/Mac speedup or deadline guarantee is established.
+
+The complete old and new measurements, original variant diagnostics,
+source hashes, compiler/link/native intervals and limits are retained in
+`/data/m5c-array-lookup-benchmark-20261024/REPORT.md` and
+`/data/m5c-array-expanded-benchmark-20261024/REPORT.md`. The latter's
+`comparison.json`, `measurements.json` and `root-final-acceptance.json`
+retain unrounded results and Root acceptance. Zig benchmark execution does
+not replace the separate primary host-ASan/UBSan/LSan evidence.
+
+
+Evidence validity and remaining gates
+-------------------------------------
+
+Documentation-only successors may retain this focused evidence only while
+packages, tools, compiler/runtime interfaces, tests and input bodies remain
+exact c2; the benchmark retains its intentionally different full helper.
+Runtime, generator or interface fixes require an explicit impact assessment
+and Root-routed revalidation. Existing native-shard weights are historical
+CI-derived sums, not fresh measurements of the expanded transitions. The
+local constructor property time is not a controlled CI weight ratio.
+
+Array adds no fresh test262 observations. The fixed C3 input contains
+29,147 reviewed paths, including all 836 B15 records and 28,311 prior
+records; this node does not alter their partitions, classifications, ledger,
+approvals or owners. C3's inherited prospective graph marks are conditional
+on exact candidate and Main CI success. At Root's 2026-10-24T12:01:13Z
+handoff, Main `44c46bfc` was still in CI and the last confirmed green Main
+had 48 landed nodes. Later Main CI results are separate Root evidence;
+unrelated moving refs do not invalidate this fixed snapshot.
+
+Array stays ready, unlanded and a terminal-audit prerequisite. Publication
+requires completed internal and outer reviews, a fresh full UPDATE and exact
+candidate/Main CI. These focused reports do not mark the node complete or
+authorize publication. Review records belong in their actual ledgers and
+reports, without treating one clean stage as gate completion.
