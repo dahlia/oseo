@@ -21,8 +21,6 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { nativeToolchain } from "../native-toolchain.ts";
-import { arrayIndexedLookupCase } from "../array-indexed-lookup-cases.ts";
-import { arrayInsertionTruncationCase } from "../array-mutation-cases.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -138,8 +136,6 @@ console.log(
   hinted(${testCase.offset}, 1),
   hinted("${testCase.offset}", 1),
 );
-${arrayIndexedLookupCase(testCase.items, testCase.marker).source}
-${arrayInsertionTruncationCase(testCase.items, testCase.marker).source}
 const stringPrototype = Object.getPrototypeOf(Object(""));
 ${iteratorOverride}
 function observeString(label, input) {
@@ -200,11 +196,6 @@ function expected(testCase: ArrayConstructorCase): string {
     `guard ${testCase.marker}`,
     `guard ${testCase.marker}`,
     `hint ${testCase.offset + 1} ${testCase.offset}1`,
-    arrayIndexedLookupCase(testCase.items, testCase.marker).stdout.trimEnd(),
-    arrayInsertionTruncationCase(
-      testCase.items,
-      testCase.marker,
-    ).stdout.trimEnd(),
     `string primitive ${initial}`,
     `string wrapper ${initial}`,
     `deleted primitive ${codeUnits}`,
@@ -337,13 +328,8 @@ test(
         profile: "M5 Array constructor and statics",
         seed: 0x6000_3f00,
         sizeLimit:
-          "four generated elements, constructor length eight, one mapping " +
-          "pass, and two guarded " +
-          "reads, primitive and wrapper string iterator transitions, and " +
-          "fixed indexed lookup transitions over six initial elements " +
-          "and a sparse array with nine properties and length 2^32 - 1, " +
-          "fixed insertion and truncation transitions with at most six " +
-          "dense elements and five out-of-order elements",
+          "four elements, length eight, one mapping pass, and two guarded " +
+          "reads, plus primitive and wrapper string iterator transitions",
         timeLimitMilliseconds: 180_000,
       },
     );

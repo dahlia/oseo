@@ -67,7 +67,6 @@ dependencies:
   - observation-batch-30
   - observation-batch-31
   - observation-batch-32
-  - ordinary-array-indexed-lookup-performance
   - parenthesized-assignment-function-name
   - primitive-receiver-inherited-set
   - primitive-wrapper-objects

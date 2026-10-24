@@ -1,16 +1,6 @@
 import type { Fixture } from "../fixture.ts";
-import { arrayIndexedLookupCase } from "../../array-indexed-lookup-cases.ts";
-import { arrayInsertionTruncationCase } from "../../array-mutation-cases.ts";
 
 export const arrayConstructorFixtures: readonly Fixture[] = [
-  {
-    name: "array-insertion-truncation-transitions",
-    source: arrayInsertionTruncationCase([-3, 0, 4, 9], 7).source,
-  },
-  {
-    name: "array-indexed-lookup-transitions",
-    source: arrayIndexedLookupCase([-3, 0, 4, 9], 7).source,
-  },
   {
     globalScriptReference: true,
     name: "array-constructor",

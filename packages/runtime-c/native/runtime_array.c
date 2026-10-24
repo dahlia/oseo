@@ -410,33 +410,6 @@ OseoResult oseo_internal_to_array_length(
     return normal(oseo_number(converted));
 }
 
-/*
- * Validate the whole current vector before changing it. For a dense run
- * of configurable data elements, descending index deletion is exactly
- * tail removal, with no repeated search or shift. Any unusual key,
- * descriptor, or slot order keeps the generic descending search below.
- * Neither validation nor removal allocates or invokes user code.
- */
-static bool truncate_dense_elements(
-    OseoOrdinaryObject *array,
-    uint32_t requested
-) {
-    if (array->header.kind != OSEO_HEAP_ARRAY ||
-        array->property_count > array->array_length) return false;
-    for (size_t slot = 0u; slot < array->property_count; slot += 1u) {
-        const OseoProperty *property = &array->properties[slot];
-        uint32_t index;
-        if (property->attributes.accessor ||
-            !property->attributes.configurable ||
-            !oseo_internal_array_index(property->key, &index) ||
-            index != slot) return false;
-    }
-    while (array->property_count > requested) {
-        (void)oseo_internal_remove_property(array, array->property_count - 1u);
-    }
-    return true;
-}
-
 OseoResult oseo_internal_set_array_length(
     OseoContext *context,
     OseoOrdinaryObject *array,
@@ -475,8 +448,7 @@ OseoResult oseo_internal_set_array_length(
         }
         return normal(value);
     }
-    if (requested < array->array_length &&
-        !truncate_dense_elements(array, requested)) {
+    if (requested < array->array_length) {
         bool removed = false;
         while (true) {
             size_t selected = SIZE_MAX;
