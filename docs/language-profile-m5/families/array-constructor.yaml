@@ -6,10 +6,11 @@ scope:
     prototype identity, and Symbol.species accessor."
   - "Array.from, Array.of, and Array.isArray, including generic constructor
     fallback and iterator-close behavior."
-  - "Ordinary array indexed lookup retains descriptors, holes, inherited
-    receivers, mutation, ordering, and generic fallback when checking a
-    current property slot before the ordinary scan. Native validation of
-    this M5c performance candidate remains pending."
+  - "Ordinary array indexed lookup and insertion retain descriptors, holes,
+    inherited receivers, mutation, ordering, and generic fallback. Array
+    length reduction validates dense configurable data elements before
+    tail deletion; unusual layouts keep descending generic deletion.
+    Native validation of this expanded M5c source remains pending."
 owners:
   - PLAN-M5.md
 evidence:
@@ -57,3 +58,4 @@ evidence:
       - packages/runtime-c/tests/intrinsic-graph.test.ts
       - packages/runtime-c/native/runtime_array.c
       - tests/array-indexed-lookup-source.test.ts
+      - tests/array-insertion-truncation-source.test.ts

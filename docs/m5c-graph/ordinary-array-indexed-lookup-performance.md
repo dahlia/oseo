@@ -10,8 +10,11 @@ It owns no new test262 path and admits no language surface or exclusion.
 The initial diagnostic found 18 of 24 sampled stacks in apply argument-list
 construction, five in indexed assignment, and one in length truncation.
 Those samples identify candidate paths; they are not exact CPU percentages.
-Array-length truncation is a separate observed cost, not an automatic reason
-to widen this node beyond indexed own-property lookup.
+Lookup-only measurement on the unchanged original helper subsequently left
+ASCII and Surrogate native interval unions near 158 seconds, about 1.42
+times faster. The user's 2026-10-24 decision authorizes this node's bounded
+expansion to insertion and length truncation. That focused measurement does
+not establish whole-corpus deadline margin.
 
 Preserve data and accessor descriptors, numeric and nonnumeric property
 ordering, holes, inherited properties, unusual array states, Proxy behavior,
@@ -56,7 +59,8 @@ their existing callers. No runtime layout, public API, or ABI changes.
 
 For dense arrays populated in ascending index order, a successful indexed
 lookup examines one candidate key instead of scanning preceding properties.
-Absent-key insertions still scan, and truncation retains its existing cost.
+In that initial source, absent-key insertions still scan, and truncation
+retains its existing cost.
 The worst-case fallback remains linear. Runtime costs, including overhead
 on fallback cases, require later measurement with fixed sources.
 
@@ -69,7 +73,56 @@ The property's arbitrary, seed, case budget, and timeout stay unchanged;
 its numeric payloads vary while every transition remains during shrinking.
 Both native policies and forced collection remain in that existing lane.
 
-Pure reference and compiler checks validate the test source only. Native
-semantics, sanitizer coverage, target parity, speedup, complete original
-harness execution, full observations, and model reviews remain unverified
-in this source phase. The node stays ready and unlanded.
+The accepted native and measured lookup-only evidence is pinned to that
+earlier source and its private benchmark composition. It does not validate
+the following expanded runtime or its compiler/backend reanchor. The node
+stays ready and unlanded.
+
+
+Insertion and length reduction source
+-------------------------------------
+
+An Array's own canonical indices are strictly below its current length.
+The ordinary lookup helper therefore reports no own property for an index
+at or beyond that length, without scanning the vector. This applies to
+append and out-of-length insertion even after named properties or holes.
+It establishes absence only on that Array: Set still walks prototypes and
+honors setters and inherited read-only data, while definition keeps every
+extensibility, descriptor, and writable-length check. A below-length slot
+miss, noncanonical string, symbol, or non-Array keeps the existing scan.
+Preallocated holes below length are not an optimized insertion case.
+
+Length reduction first performs the existing conversions and writable
+checks. A new guard then validates the complete current property vector:
+every slot i must hold canonical key i and a configurable data descriptor.
+Only that whole-vector match removes the affected tail in descending order.
+No repeated search or shift is needed, so validation and removal are linear
+in stored elements rather than quadratic. A dense prefix with trailing
+holes is valid; holes or reordering within the stored prefix, named/symbol
+keys, accessors, or non-configurable elements retain the unchanged generic
+descending selection and deletion, including partial failure and rollback.
+Common length, dictionary, and shape updates remain shared with that path.
+
+Neither guard allocates or calls user code, and neither retains a slot or
+pointer across allocation or a safepoint. The property vector remains the
+only descriptor storage; there is no layout, public API, ABI, cache, or
+collector-policy change. The collector traces only the live property count,
+as after an ordinary removal. Truncation does not invoke getters, setters,
+or finalization during the validated removal loop.
+
+The fixed insertion/truncation transition fixture and its pure reference
+and lowering checks cover dense append, partial/zero reduction, reuse with
+heap values, trailing holes, definition, preallocated holes, deletion and
+reinsertion, named and symbol keys before indices, accessors, inherited
+setters and data, dense and out-of-order non-configurable barriers, strict
+failure, failed definition making length read-only, non-extensibility,
+length conversions and abrupt completion, SameValue and Proxy writes.
+The existing Array constructor arbitrary, domain identity, shrinking, seed
+0x60003f00, twelve cases, both policies and 180000 ms limit remain fixed.
+Every transition remains present while its existing numeric payloads shrink.
+The historical file weight has not measured these added transitions.
+
+Pure Node/Deno reference and compiler checks validate the new test source
+only. Native execution, host ASan/UBSan/LSan, cross-linking, the same-helper
+benchmark, observations, reviews and exact candidate CI remain pending for
+the expanded source. No old result is relabeled as new validation.

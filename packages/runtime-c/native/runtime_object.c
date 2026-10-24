@@ -43,11 +43,17 @@ size_t oseo_internal_own_property_index(
      * No slot or pointer survives this call, and no safepoint occurs. */
     uint32_t array_index;
     if (object->header.kind == OSEO_HEAP_ARRAY &&
-        oseo_internal_array_index(key, &array_index) &&
-        array_index < object->property_count &&
-        oseo_internal_property_key_equal(
-            object->properties[array_index].key, key)) {
-        return array_index;
+        oseo_internal_array_index(key, &array_index)) {
+        /* Array exotic definitions keep every own index below length.
+         * An extension therefore has no own descriptor, even when named
+         * properties, holes, or out-of-order indices occupy the vector.
+         * Callers still check prototypes and all definition restrictions. */
+        if (array_index >= object->array_length) return SIZE_MAX;
+        if (array_index < object->property_count &&
+            oseo_internal_property_key_equal(
+                object->properties[array_index].key, key)) {
+            return array_index;
+        }
     }
     for (size_t index = 0u; index < object->property_count; index += 1u) {
         if (oseo_internal_property_key_equal(
