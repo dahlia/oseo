@@ -3454,6 +3454,17 @@ have saved 0.81 minutes once and nothing otherwise.
 *docs/evidence/u46/README.md* records the measurements and what they do not
 address.
 
+On 2026-10-24, the Linux sanitizer property shard count increased from
+two to three. Main run 40090884630 canceled shard `2/2` at the 45-minute
+limit after 149 passing tests. Comparable long-running tests took a median
+1.70 times as long on that runner as on the same-tree candidate's runner,
+where the shard finished in about 27 minutes. The full suite had taken
+24.80 to 48.30 minutes across fifteen runs. All three indices use the same
+property file glob, preserving the complete file set, and the `native`
+aggregate now requires the sanitizer property matrix. The timeout stays at
+45 minutes; seeds, case counts, budgets, time scale, concurrency, and each
+shard's instrumentation preflight stay unchanged.
+
 ### Making the readiness probe the first stage (U47)
 
 `macOS self-hosted availability` runs for about twenty seconds and holds
