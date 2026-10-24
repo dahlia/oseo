@@ -31,6 +31,8 @@ import {
   primitiveComputedSetterExpected,
   primitiveSetControlsSource,
   primitiveSetControlsExpected,
+  primitiveSetArraySource,
+  primitiveSetArrayExpected,
 } from "../native/fixtures/primitive-receiver-inherited-set.ts";
 
 const { assertAsyncProperty } = await import(
@@ -145,6 +147,7 @@ test(
       [primitiveSetterSource, primitiveSetterExpected],
       [primitiveComputedSetterSource, primitiveComputedSetterExpected],
       [primitiveSetControlsSource, primitiveSetControlsExpected],
+      [primitiveSetArraySource, primitiveSetArrayExpected],
     ] as const)
       await observe(source, expected);
     for (const value of primitiveSetBoundaries()) {

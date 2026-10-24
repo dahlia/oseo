@@ -25,6 +25,8 @@ import {
   primitiveComputedSetterExpected,
   primitiveSetControlsSource,
   primitiveSetControlsExpected,
+  primitiveSetArraySource,
+  primitiveSetArrayExpected,
 } from "./native/fixtures/primitive-receiver-inherited-set.ts";
 
 const host = createNodeHost();
@@ -108,6 +110,7 @@ test("primitive setter regressions agree with references", async () => {
     [primitiveSetterSource, primitiveSetterExpected],
     [primitiveComputedSetterSource, primitiveComputedSetterExpected],
     [primitiveSetControlsSource, primitiveSetControlsExpected],
+    [primitiveSetArraySource, primitiveSetArrayExpected],
   ] as const)
     await references(source, expected);
 });
@@ -117,6 +120,7 @@ test("primitive Set sources lower to generic stores", () => {
     primitiveSetterSource,
     primitiveComputedSetterSource,
     primitiveSetControlsSource,
+    primitiveSetArraySource,
     ...matrix().map(primitiveSetProgram),
     ...primitiveSetBoundaries().map(primitiveSetProgram),
   ];
