@@ -99,6 +99,25 @@ all other refreshed weights, including compound assignment at 1,838 Linux
 and 1,242 macOS seconds, remain intact. None of the four changes file
 inventory, seeds, case budgets, sizes, shard totals or interrupt limits.
 
+### Array construction historical CI weights
+
+The Array constructor property file uses CI run [40114537406] at Array C3
+source `5107403544cb71626e20292bfb3d642745fa3f59`. Its one registration,
+“generated Array construction and statics match the M5 property model”,
+records 1,118,572.790749 milliseconds in Linux job `120933071940` and
+637,818.339708 milliseconds in macOS job `120933072478`. Dividing by 1,000
+and rounding up gives the 1,119-second Linux and 638-second macOS weights.
+Raw job logs remain in */data/m5c-array-ci-cost-refresh-20261025/*.
+
+These are historical measured extended case durations, not isolated local
+or job wall times. They precede completion storage source `f26a74bf` and
+the new TCO composition, so they supply scheduling weights without a
+current-source performance or deadline guarantee. Matching candidate CI
+must measure the current composition; all other weights and shard rules
+remain unchanged.
+
+[40114537406]: https://github.com/dahlia/oseo/actions/runs/40114537406
+
 ### Destructuring assignment
 
 The iterator-next-callability extension grows the existing destructuring
@@ -1073,6 +1092,11 @@ Primitive receiver Set source preparation
 The new *m5-primitive-receiver-inherited-set.property.test.ts* family has a
 900-second planning weight on each host. Both values are unmeasured
 estimates; this source phase runs no native property, fixture, or toolchain.
-The existing host counts, shard totals, case budgets, seeds, and deadlines
-stay unchanged. Later native runs must retain exact source and target
-identities and case durations before replacing these estimates.
+The current TCO and Set composition has 138 entries per host. At reduced
+source `74a73385`, zero-based index `floor(138/2) = 69` selects upper-median
+fallbacks of 409 Linux/296 macOS seconds. These are derived scheduling
+values, not new measurements; the Array CI weight refresh does not change
+them. The historical 137-entry composition above retains its original
+inputs and 406/296 fallbacks. Shard totals, case budgets, seeds, and
+deadlines stay unchanged. Later native runs must retain exact source and
+target identities and case durations before replacing these estimates.

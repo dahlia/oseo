@@ -60,8 +60,9 @@
  * Script and Module declaration grammar is pure JavaScript but participates
  * in the native extended file glob. Its Linux weight is a local extended
  * two-registration case sum; its unmeasured macOS placeholder retains the
- * historical 286-second assigned cost. The combined continuation-dispatch
- * estimates raise unknown-file upper medians to 406 Linux/296 macOS seconds.
+ * historical 286-second assigned cost. The combined table at `6cbc6c9f`
+ * had upper medians of 406 Linux/296 macOS seconds. The current 138-entry
+ * host tables use 409/296 after TCO and primitive receiver Set composition.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
  *
  * Primitive receiver inherited Set reserves 900 seconds per host as an
@@ -77,7 +78,7 @@ export const nativeShardCosts = {
     "tests/property/m5-arguments-object.property.test.ts": 647,
     "tests/property/m5-array-binding.property.test.ts": 171,
     "tests/property/m5-array-buffer.property.test.ts": 551,
-    "tests/property/m5-array-constructor.property.test.ts": 674,
+    "tests/property/m5-array-constructor.property.test.ts": 1119,
     "tests/property/m5-array-prototype-change-by-copy.property.test.ts": 355,
     // Local Linux extended case sum: 332.426991265 s, rounded up.
     // October 22, 2026; not CI or file wall time. See U6 provenance.
@@ -231,7 +232,7 @@ export const nativeShardCosts = {
     "tests/property/m5-arguments-object.property.test.ts": 436,
     "tests/property/m5-array-binding.property.test.ts": 108,
     "tests/property/m5-array-buffer.property.test.ts": 400,
-    "tests/property/m5-array-constructor.property.test.ts": 543,
+    "tests/property/m5-array-constructor.property.test.ts": 638,
     "tests/property/m5-array-prototype-change-by-copy.property.test.ts": 265,
     // Provisional estimate: ceil(333 * 339/326) from this file's host
     // ratio in run 39070198868; not a macOS observation. Refresh from CI.
