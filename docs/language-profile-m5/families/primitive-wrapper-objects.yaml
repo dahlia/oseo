@@ -24,6 +24,17 @@ scope:
     exposed-stderr, positive-GC and foreign allocation/root/realm/retry
     assertions passed; raw successful-case outputs/counter values were not
     retained. PLAN-M5C.md records the exact scope and artifact provenance."
+  - "The additional Set Array-ancestry fixed subject has focused Linux
+    AMD64 evidence on combined source c4bcb412: all twelve Set registrations
+    across Node.js/Deno and ordinary/host-cc passed, with the normal seven
+    sanitizer self tests. Original assertions prove stdout, exposed stderr,
+    collection and allocation/root/realm/retry behavior; successful raw
+    counter values remain absent. The loops derive 344 JS subject/policy
+    invocations plus four C registrations, separately from passing test
+    counts. The shared focus used nine actual commands across two lock
+    admissions after a preserved first-checkpoint supervisor failure.
+    Historical 43b84b70 evidence retains its own inputs and cardinality.
+    PLAN-M5C.md records provenance and the remaining integration gates."
   - "Earlier wrapper references remain wrapper evidence. Standards and
     guard-fallback assessments here retain that wrapper scope; no inherited
     Set test262 observation or new guard is claimed. The generic Set store
