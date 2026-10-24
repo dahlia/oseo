@@ -49,6 +49,10 @@ evidence:
       - tests/native/fixtures/proper-tail-calls.ts
       - tests/tco-generator-interop.test.ts
   standards:
+    # These records cover reviewed classifications, not native passes: both
+    # owned tagged-template bodies were feature-gated and not executed.
+    # Admission preparation leaves those historical observations unchanged;
+    # focused native execution and the new full UPDATE remain pending.
     status: covered
     references:
       - tests/test262/subset.yaml
@@ -62,3 +66,4 @@ evidence:
       - tests/proper-tail-call-resources.test.ts
       - tests/completion-target-labels.test.ts
       - tests/tco-generator-interop-preparation.test.ts
+      - tests/tco-feature-admission-preparation.test.ts
