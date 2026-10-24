@@ -14,8 +14,23 @@ scope:
   - "Node.js and Deno expose primitive receivers to strict toStringTag
     getters in Object.prototype.toString. The tests retain a labeled V8
     model separately from ECMA-262 2025 steps 3 and 15."
-  - "Ordinary primitive inherited Set has its own remediation node and
-    is not completed by this admission."
+  - "Primitive inherited Set uses a rooted full wrapper for lookup and
+    retains the original Receiver through inherited descriptors and Proxy
+    dispatch, including String own restrictions and strict/sloppy refusal.
+    Its separate remediation node remains ready and unlanded."
+  - "The Set-specific references below have focused Linux AMD64 evidence
+    on source 43b84b70: complete Node.js and Deno ordinary/host-cc property
+    files and a fresh normal sanitizer self-probe passed. Original stdout,
+    exposed-stderr, positive-GC and foreign allocation/root/realm/retry
+    assertions passed; raw successful-case outputs/counter values were not
+    retained. PLAN-M5C.md records the exact scope and artifact provenance."
+  - "Earlier wrapper references remain wrapper evidence. Standards and
+    guard-fallback assessments here retain that wrapper scope; no inherited
+    Set test262 observation or new guard is claimed. The generic Set store
+    adds no guard, retaining the compound-assignment record's omission and
+    named replacement evidence. Matching macOS/cross-target, full ordinary,
+    extended and standards gates, full UPDATE, independent reviews and exact
+    candidate/Main CI remain required for the Set node."
 owners:
   - PLAN-M5.md
 evidence:
@@ -24,21 +39,29 @@ evidence:
     references:
       - tests/primitive-wrapper-objects.test.ts
       - tests/property/m5-primitive-wrapper-objects.property.test.ts
+      - tests/primitive-receiver-inherited-set.test.ts
+      - tests/property/m5-primitive-receiver-inherited-set.property.test.ts
   fixed:
     status: covered
     references:
       - tests/primitive-wrapper-objects.test.ts
       - tests/fixtures/primitive-wrapper-objects/allocation.c
+      - tests/native/fixtures/primitive-receiver-inherited-set.ts
+      - tests/property/m5-primitive-receiver-inherited-set.property.test.ts
+      - tests/fixtures/primitive-receiver-inherited-set/allocation.c
   forced-collection:
     status: covered
     references:
       - tests/primitive-wrapper-objects.test.ts
       - tests/fixtures/primitive-wrapper-objects/allocation.c
       - tests/property/m5-primitive-wrapper-objects.property.test.ts
+      - tests/property/m5-primitive-receiver-inherited-set.property.test.ts
+      - tests/fixtures/primitive-receiver-inherited-set/allocation.c
   generated:
     status: covered
     references:
       - tests/property/m5-primitive-wrapper-objects.property.test.ts
+      - tests/property/m5-primitive-receiver-inherited-set.property.test.ts
   guard-fallback:
     status: covered
     references:
@@ -48,6 +71,7 @@ evidence:
     references:
       - tests/primitive-wrapper-objects.test.ts
       - tests/property/m5-primitive-wrapper-objects.property.test.ts
+      - tests/property/m5-primitive-receiver-inherited-set.property.test.ts
   standards:
     status: covered
     references:
@@ -57,3 +81,4 @@ evidence:
     status: covered
     references:
       - tests/primitive-wrapper-objects.test.ts
+      - tests/primitive-receiver-inherited-set.test.ts

@@ -560,3 +560,7 @@ families:
     owner: tests/property/m5-script-module-declarations.property.test.ts
     start: 0x60008b00
     end: 0x60008bff
+  - family: m5-primitive-receiver-inherited-set
+    owner: tests/property/m5-primitive-receiver-inherited-set.property.test.ts
+    start: 0x60008c00
+    end: 0x60008cff

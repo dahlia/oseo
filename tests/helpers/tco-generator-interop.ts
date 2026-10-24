@@ -78,6 +78,93 @@ async function main() {
 main().catch(error => { throw error; });
 `;
 
+const denseApplySource = `"use strict";
+const events = [], key = Symbol("payload");
+const values = [2, { value: 17 }, { value: -1 }, { value: -2 }];
+values[1][key] = 23;
+function reenter(n, value) {
+  if (n > 0) return reenter(n - 1, value);
+  events.push("reenter:" + value.value + ":" + value[key]);
+  return value;
+}
+function drain(n, value) {
+  if (n > 0) return drain(n - 1, value);
+  events.push("leaf:" + value.value + ":" + value[key]);
+  return clearTimeout(undefined, events.push("host"));
+}
+function accept(n, value) {
+  events.push("accept"); values.length = 0;
+  return drain(n, value);
+}
+function invoke() { return accept.apply(null, values); }
+function* resumed() {
+  yield values[1];
+  values.length = { valueOf() {
+    events.push("coerce"); reenter(2, values[1]); return 2;
+  } };
+  events.push("trim:" + values.length + ":" + (2 in values));
+  return invoke();
+}
+const it = resumed(); it.next();
+const end = it.next();
+console.log(events.join("|"));
+console.log(end.done, end.value === undefined, values.length);
+`;
+
+const mutatingApplySource = `"use strict";
+const events = [], values = [2, { value: 17 }, { value: -1 }, 0];
+delete values[3];
+const prototype = Object.create(Array.prototype);
+function reenter(n, value) {
+  if (n > 0) return reenter(n - 1, value);
+  events.push("reenter:" + value.value); return value;
+}
+Object.defineProperty(values, "0", { configurable: true, get() {
+  events.push("get0"); reenter(2, values[1]); values.length = 2;
+  events.push("shrink:" + values.length); return 2;
+} });
+Object.defineProperty(prototype, "2", { get() {
+  events.push("proto2:" + (this === values));
+  reenter(1, values[1]); return { value: 29 };
+} });
+Object.defineProperty(prototype, "3", { get() {
+  events.push("proto3:" + (this === values)); return { value: 31 };
+} });
+Object.setPrototypeOf(values, prototype);
+function drain(n, a, b, c) {
+  if (n > 0) return drain(n - 1, a, b, c);
+  events.push("leaf:" + a.value + ":" + b.value + ":" + c.value);
+  return clearTimeout(undefined, events.push("host"));
+}
+function accept(n, a, b, c) {
+  events.push("argc:" + arguments.length); values.length = 0;
+  return drain(n, a, b, c);
+}
+function invoke() { return Reflect.apply(accept, null, values); }
+function* resumed() { yield 0; return invoke(); }
+const it = resumed(); it.next(); it.next();
+const failure = { value: 43 }, bad = [2, { value: 41 }, 0];
+const badPrototype = Object.create(Array.prototype);
+Object.defineProperty(bad, "0", { configurable: true, get() {
+  events.push("bad0"); bad.length = 1; return 2;
+} });
+Object.defineProperty(badPrototype, "1", { get() {
+  events.push("bad1"); reenter(1, failure); throw failure;
+} });
+Object.defineProperty(badPrototype, "2", { get() {
+  events.push("unreachable"); return 0;
+} });
+Object.setPrototypeOf(bad, badPrototype);
+function never() { events.push("unexpected"); }
+function abrupt() { return never.apply(null, bad); }
+try { abrupt(); } catch (error) {
+  events.push("caught:" + (error === failure));
+}
+reenter(1, failure);
+console.log(events.join("|"));
+console.log(values.length, bad.length);
+`;
+
 /** Each resumed frame stays active while its ordinary helper tail-drains. */
 function wideSource(depth: number): string {
   const bindings = Array.from(
@@ -119,6 +206,24 @@ export const interopCases: readonly InteropCase[] = [
     name: "wide-continuation-control",
     source: wideSource(0),
     stdout: "before\nafter 255\n",
+    guard: false,
+  },
+  {
+    name: "dense-array-apply-and-truncation",
+    source: denseApplySource,
+    stdout:
+      "coerce|reenter:17:23|coerce|reenter:17:23|trim:2:false|" +
+      "accept|leaf:17:23|host\n" +
+      "true true 0\n",
+    guard: false,
+  },
+  {
+    name: "mutating-array-apply-and-abrupt-getter",
+    source: mutatingApplySource,
+    stdout:
+      "get0|reenter:17|shrink:2|proto2:true|reenter:17|proto3:true|" +
+      "argc:4|leaf:17:29:31|host|bad0|bad1|reenter:43|caught:true|" +
+      "reenter:43\n0 1\n",
     guard: false,
   },
 ];

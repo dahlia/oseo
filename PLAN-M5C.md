@@ -1587,3 +1587,96 @@ old green Main `44c46bfc`, used as both U and R for D3. This source step
 preserves all admissions and classifications and performs no UPDATE.
 Final successful-Main alignment, final-candidate CHECK, and CI remain
 Root's later work.
+
+
+Primitive receiver inherited Set source and focused evidence
+------------------------------------------------------------
+
+The `primitive-receiver-inherited-set` source was prepared on Main
+`de491133` and reanchored on successful Main `44c46bfc` as clean source
+`43b84b70d20621d6003a5c142a124a10f458518d`, tree
+`4ca2385217440e9ccac028c6c6244142886c36ea`. The runtime, tests, structured
+oracle and allocation fixture from that source remain the actual native
+inputs. The source-phase descriptions in *PLAN-M5.md* and the normative
+profile record preparation; the focused observations below followed it.
+
+On Linux AMD64, five focused commands completed once with natural exit 0:
+the complete primitive Set property file under Node.js and Deno with the
+selected ordinary toolchain, the normal host C sanitizer self-probe, then
+the complete property file under each bootstrap with host C ASan/UBSan.
+All three registrations in each property command passed, as did all seven
+self tests: twelve property registrations and seven self registrations.
+The self-probe verified address and undefined-behavior detection in runtime
+and generated code. Host C used Clang 22.1.8. Every command and its natural
+descendant drain completed; the supervisor released its exclusive lock at
+`2026-10-24T14:34:39.770840Z`. No command was retried or source fixed.
+
+Each property command retained twelve generated cases at native seed
+`0x60008c00`, three fixed sources, all 27 guaranteed boundaries and both
+specialization policies with collection forced at every safepoint. Passing
+original assertions establish expected stdout, empty exposed stderr and
+positive collection counters. The C registration passed its unchanged
+foreign-setter, 128-allocation-attempt bound, root/realm restoration and
+successful retry assertions. The pure historical sixteen-sample seed
+`0x60008b00`, every landed seed, domain, oracle, shrinking/replay control,
+case budget and 240-second ordinary deadline remain unchanged. Host C used
+only the normal time scale of three; no extended case scale was applied.
+
+The 336 JavaScript subject/policy combinations and four C registrations
+are source-derived cardinalities. They are not 336 retained raw native
+observations. Successful per-case stdout, counter values, generated C/MIR
+and binaries were not retained after normal fixture cleanup. No numeric
+allocation-attempt or foreign-context transition counts are claimed. The
+testkit processed private counter stderr normally before the exposed-stderr
+assertions. Prepared pure C/MIR lacked native observation instrumentation,
+so it does not establish byte identity with successful native C.
+
+Full command/test logs, source identities, scope/resource/drain records and
+the artifact hash inventory are retained in
+*/data/m5c-primitive-set-native-focus-20261024/*; its *REPORT.md* records the
+assertion-based limits. The existing primitive-wrapper family record names
+Set-specific fixed, differential, generated, collection, specialization and
+structural evidence separately from the earlier wrapper tests. Wrapper
+standards and guard evidence do not become inherited-Set standards or guard
+observations; the generic Set store adds no guard, and the existing named
+compound-assignment replacement evidence remains applicable.
+
+This focused Linux evidence does not replace matching macOS execution,
+AArch64 Linux compile-link/inspection, whole ordinary/extended/standards
+gates, other required focused regressions, independent reviews, the complete
+reviewed UPDATE or exact candidate/Main CI. The 900-second extended weights
+remain unmeasured planning estimates, not CI costs measured by this focus.
+The node remains `landed: false`, `status: ready`. No graph, ledger, manifest,
+observation ownership, classification, exclusion or admission changes here.
+Batches 28/29 keep first admission, and included ordinary accessor-setter
+coverage stays unknown. Root owns all remaining gates and publication.
+
+
+Bounded Array/TCO interaction examples
+--------------------------------------
+
+Two additional fixed examples extend the existing continuation/TCO
+registrations. One resumes a generator, coerces a dense Array's shorter
+length through a reentrant tail helper, and forwards the remaining values
+through apply before clearing the source Array and tail-draining. The
+other captures apply-list length before an own getter truncates it, then
+reads inherited indices with receiver checks and reentry. A separate
+throwing getter in that example prevents the target and later getter from
+running. Fresh getter-created objects travel through the copied tail
+arguments after the source is cleared.
+
+Their literal event and value oracles follow source semantics. The
+original two examples, 13 Boolean checks, frame guard, property generators,
+seeds, budgets, shrinking, and weights remain unchanged. These additions
+supply reference and emission preparation; combined native execution and
+its factual evidence review remain pending. The earlier 24-combination
+Linux proof remains bound to `baf6f7d7` and covers none of these new cases.
+
+This private combined preparation also merges reviewed PrimitiveSet source
+`41c59036`, preserving its primitive receiver lookup, setter callback and
+assignment-result contract. Set calls its inherited setter through the
+ordinary call entry, which drains recorded tail calls before returning to
+the rooted assignment frame. The Array/TCO examples above and existing
+Set Array regressions share this source snapshot. All earlier native
+observations keep their original inputs; a shared bounded native focus
+and subsequent factual reviews remain pending Root's authorization.

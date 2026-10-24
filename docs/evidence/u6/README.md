@@ -1065,3 +1065,14 @@ current-source cost or liveness pass. The generator/async planning values
 retain their measured-versus-estimated qualifications. Complete matching-host
 exact-candidate CI measurements remain necessary before replacing them.
 No shard rule, seed, case budget, deadline, or replay setting changes.
+
+
+Primitive receiver Set source preparation
+-----------------------------------------
+
+The new *m5-primitive-receiver-inherited-set.property.test.ts* family has a
+900-second planning weight on each host. Both values are unmeasured
+estimates; this source phase runs no native property, fixture, or toolchain.
+The existing host counts, shard totals, case budgets, seeds, and deadlines
+stay unchanged. Later native runs must retain exact source and target
+identities and case durations before replacing these estimates.
