@@ -231,10 +231,13 @@ jobs:
           if-no-files-found: warn
 
   test_sanitizer_property:
-    name: host C sanitizers (Linux, property, ${{ matrix.shard }}/2)
+    name: host C sanitizers (Linux, property, ${{ matrix.shard }}/3)
     runs-on: ubuntu-latest
     # The full suite took 24.80 to 48.30 minutes across fifteen runs.
-    # Two shards leave slow-runner and cold-cache margin within 45 minutes.
+    # Main run 40090884630 (2026-10-24) canceled shard 2/2 at the
+    # 45-minute limit after 149 passing tests. Its runner was about 1.70x
+    # slower than the same-tree candidate, where the shard took about
+    # 27 minutes. Three shards add margin for that runner variation.
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -242,6 +245,7 @@ jobs:
         include:
           - shard: 1
           - shard: 2
+          - shard: 3
     steps:
       - uses: actions/checkout@v7
         with:
@@ -256,12 +260,12 @@ jobs:
       - run: mise run test:sanitizer:self
       - run: >-
           mise run test:sanitizer:property:shard
-          --test-shard=${{ matrix.shard }}/2
+          --test-shard=${{ matrix.shard }}/3
           tests/property/*.property.test.ts
       - if: failure() || cancelled()
         uses: actions/upload-artifact@v7
         with:
-          name: host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-2
+          name: host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-3
           path: /tmp/oseo-native-*
           if-no-files-found: warn
 
@@ -679,6 +683,7 @@ jobs:
     if: ${{ always() }}
     needs:
       - test_native
+      - test_sanitizer_property
       - test_native_support
       - test_property_case
       - test_reflect_case

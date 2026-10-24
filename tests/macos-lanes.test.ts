@@ -289,8 +289,8 @@ test("every check name and concurrency policy is preserved", () => {
         (_, index) => `native support (linux-x86_64-gnu, ${index + 1}/7)`,
       ),
       ...Array.from(
-        { length: 2 },
-        (_, index) => `host C sanitizers (Linux, property, ${index + 1}/2)`,
+        { length: 3 },
+        (_, index) => `host C sanitizers (Linux, property, ${index + 1}/3)`,
       ),
       // The Reflect namespace property file now runs in dedicated
       // case-shard jobs on both native hosts, outside the file shards;
@@ -303,7 +303,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 76);
+  assert.equal(names(after).length, 77);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -470,12 +470,16 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
   assert.equal(native.name, "host C sanitizers (Linux, ${{ matrix.shard }}/3)");
   assert.equal(
     property.name,
-    "host C sanitizers (Linux, property, ${{ matrix.shard }}/2)",
+    "host C sanitizers (Linux, property, ${{ matrix.shard }}/3)",
   );
   assert.equal(native["timeout-minutes"], 45);
   assert.equal(property["timeout-minutes"], 45);
   assert.deepEqual(entries(native), [{ shard: 1 }, { shard: 2 }, { shard: 3 }]);
-  assert.deepEqual(entries(property), [{ shard: 1 }, { shard: 2 }]);
+  assert.deepEqual(entries(property), [
+    { shard: 1 },
+    { shard: 2 },
+    { shard: 3 },
+  ]);
   assert.deepEqual(
     native.steps.filter((step) => step.run).map((step) => step.run),
     [
@@ -496,7 +500,7 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
     [
       "mise run test:sanitizer:self",
       "mise run test:sanitizer:property:shard " +
-        "--test-shard=${{ matrix.shard }}/2 " +
+        "--test-shard=${{ matrix.shard }}/3 " +
         "tests/property/*.property.test.ts",
     ],
   );
@@ -530,7 +534,7 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
     ...nativeUpload,
     with: {
       ...parsedMapping(nativeUpload.with, "Native sanitizer artifact"),
-      name: "host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-2",
+      name: "host-cc-sanitizer-property-failures-${{ matrix.shard }}-of-3",
     },
   });
 });
@@ -553,7 +557,8 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     throw new Error("Aggregate requires an explicit dependency list");
   }
   assert.deepEqual(needs.toSorted(), expected);
-  assert.equal(expected.length, 38);
+  assert.ok(needs.includes("test_sanitizer_property"));
+  assert.equal(expected.length, 39);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -599,7 +604,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 39);
+  assert.equal(needs.length, 40);
 });
 
 test("committed workflow matches generator output exactly", () => {
