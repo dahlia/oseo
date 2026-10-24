@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 148
+M5a is complete. The normative family records described below inventory 149
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -122,6 +122,34 @@ results, reviewed exclusion-audit rows, and ledger owner
 `node:class-private-accessor-lookup-coverage-remediation` arrive with that
 batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
 remain mixed coverage debt.
+
+M5c node `proper-tail-calls` implements the tail-call source contract;
+`tail-call-optimization` remains unadmitted in the reviewed subset pending
+Root's later full UPDATE. Its two reviewed tagged-template paths retain
+Source4's unsupported observations. Every call
+that ECMA-262 15.10 places in tail position of a strict ordinary, arrow,
+method, accessor, or class constructor body discards its frame before the
+call. The same holds for the PrepareForTailCall steps of
+`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`, and
+for bound function and Proxy [[Call]] forwarding. A chain of such calls holds
+constant native stack, call depth, and roots, and its errors keep the realm
+of the call that raised them. Derived constructors apply their result rules
+to the chain's value. Direct `console.log`, `setTimeout`, and `clearTimeout`
+calls use recorded host steps in tail position. Their arguments finish
+before frame release; `clearTimeout` still ignores non-number handles and
+extra values and returns undefined. Calls outside tail position, non-strict
+code, and generator and async bodies keep their frames and the 256-call limit.
+The indexed proper tail call family records generated positions, forms,
+exclusions, and liveness (seeds `0x60008900` through `0x60008902`), fixed
+100,000-step chains, differential fixtures under forced collection, and the
+runtime trampoline fixture. The composed runtime ABI is `oseo-runtime-m5-137`:
+`m5-136` introduced the tail-call contract, and `m5-137` adds owner-local
+published weak-record counts. Only empty owner-local weak clearing,
+finalization scheduling, and registry compaction may be skipped. Ephemeron
+fixed-point tracing remains unconditional for foreign-heap activation; root
+tracing, sweep, and forced safepoints retain their existing behavior. Full
+current-source fixture, liveness, extended, UPDATE, and CI evidence remains
+pending.
 
 M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
 list. The tag was the only unmet prerequisite of the four reviewed
@@ -9301,11 +9329,11 @@ policies, with forced collection and positive collection and generic
 fallback counters. A String wrapper deliberately falsifies a numeric hint;
 a shape mutation exercises the property cache miss.
 
-The TCO-dependent strict tail-forwarding registration and its actual tail
-MIR and C assertions remain preserved at `22a70dd9`, pending independent
-TCO remediation. This composition retains the earlier fixed strict calls,
-bound and Proxy forwarding, defaults, captures, and five-kind assertions;
-it claims no tail-forwarding execution evidence.
+The TCO source preparation restores the exact strict tail-forwarding
+registration from `22a70dd9`, including its actual tail MIR and C assertions.
+It retains every earlier fixed strict call, bound and Proxy forwarding,
+default, capture, and five-kind assertion. Native tail-forwarding execution
+remains pending on the composed source.
 
 The focused standards registration uses the exact 40-path fixture selector
 and checks every requested strictness and specialization variant. It writes
@@ -9313,9 +9341,11 @@ no reviewed expectation or result. Clean source preparation retained Main's
 40 unsupported observations at the old `primitive-wrapper` boundary. The
 fresh complete UPDATE on clean source `6e54c5d5` observed all 40 selector
 paths as passes and promoted them in the canonical manifest recorded in
-`f2c30668`. This composition without TCO adds the 148th indexed family;
-full and extended candidate CI, affected post-observation review, and
-landing remain pending. Zig's address and undefined flags
+`f2c30668`. That composition without TCO added the 148th indexed family.
+This preparation retains Wrapper's indexed family alongside the restored
+TCO family, bringing the source inventory to 149 records. Full and extended
+candidate CI, affected review, and TCO landing remain pending. Zig's address
+and undefined flags
 alone establish no ASan activity; the exact candidate's host C sanitizer
 lanes must supply that evidence.
 

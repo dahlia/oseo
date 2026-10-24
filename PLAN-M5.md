@@ -27,7 +27,7 @@ tests and 18,093 built-in tests are inside the 16th edition, while 6,290
 proposal, post-edition, or Annex B paths are outside it. The compact inventory
 remains separate from the result manifest.
 
-M5a and M5b are complete. The 148 indexed records in the normative
+M5a and M5b are complete. The 149 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
@@ -8822,11 +8822,12 @@ specialization policies. Native properties force collection, keep live
 wrappers across allocations, and require positive collection, guard-hit,
 guard-miss, and generic-addition counters. The false numeric hint receives
 a String wrapper; a shape mutation also exercises the generic fallback.
-The distinct seed block `0x60008a00` stays unchanged. The later
-TCO-dependent strict tail-forwarding registration is retained only in the
-original `22a70dd9` source, pending independent TCO remediation. Its tail
-MIR and trampoline assertions cannot run in this preparation. All earlier
-wrapper assertions and generated budgets remain intact.
+The distinct seed block `0x60008a00` stays unchanged. TCO source preparation
+restores exactly the strict tail-forwarding registration added at `22a70dd9`.
+It asserts actual tail MIR and trampoline emission before comparing all five
+brands through ordinary, bound, and Proxy callees with defaults and captures.
+Its native execution remains pending. All earlier wrapper assertions and
+generated budgets remain intact; TCO retains its separate `0x60008900` block.
 
 The exact focused selector contains 40 pinned upstream paths, including the
 four resizable-buffer locale cases added after the historical 36-path audit.
@@ -8834,7 +8835,9 @@ The focused runner executes every requested strictness and specialization
 variant without writing the canonical manifest. The complete UPDATE on clean
 source `6e54c5d5` observed all 40 paths as passes. Post-observation review and
 exact candidate CI remain pending. Root authorized
-composition with Eval, RegExp, and computed Reference after removing TCO.
+composition with Eval, RegExp, and computed Reference after removing TCO,
+then a separate TCO source delta against that Source4 base. This source
+preparation is not a five-node publication unit or an UPDATE input.
 Clean source preparation restored successful Main `52a868c9` observations:
 28,311 reviewed paths, 24,234 passes, 2,581 expected negatives, and 1,496
 unsupported results, against 41,091 included paths at revision

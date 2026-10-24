@@ -210,6 +210,10 @@ const wellKnownIntrinsicObjectsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/wellKnownIntrinsicObjects.js",
 );
+const tcoHelperHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/tcoHelper.js",
+);
 
 const canonicalTarget = canonicalTest262Target;
 const runnerHost = createNodeHost();
@@ -1894,6 +1898,7 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
         "resizableArrayBufferUtils.js",
         await readFile(resizableArrayBufferUtilsHarnessPath, "utf8"),
       ],
+      ["tcoHelper.js", await readFile(tcoHelperHarnessPath, "utf8")],
       ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
       ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
       [

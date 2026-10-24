@@ -977,3 +977,91 @@ summed registration durations from the exact candidate's full extended CI run.
 Focused local ordinary results remain in
 */data/m5c-generator-dispatch-stack-charge-20261024/* and do not stand in for
 those measurements. No shard total, input file, seed, or case budget changes.
+
+### Proper tail call historical planning weights
+
+The entries 1,726 Linux and 286 macOS seconds restore only the TCO
+scheduling inputs preserved at `4a9e29ec`, after Source4 withdrew the
+implementation. The complete measurement below describes old source
+`87aeb56b`, not the current source with the owner-local collector counts,
+Wrapper composition, and clearTimeout tail steps. Both current entries
+are unmeasured planning values; neither is a current pass, a current
+complete timing, a performance bound, or a CI deadline claim.
+
+The `proper-tail-calls` property family adds a native property file with
+three generated domains: bounded tail chains, calls outside tail position,
+and live arguments, closures, and errors across tail chains.
+
+A local Linux x86-64 whole-file extended run on 2026-10-23 UTC, from
+03:14:33 to 03:43:22, at clean source
+`87aeb56b7cbd9ad84caeb464b75ed4727aba4bca` (tree
+`ef0cba416b1bc64ec2d03cabb7354a896a9a530b`) naturally exited zero with
+all three registrations passing and none skipped, cancelled, or failed.
+Their printed leaf durations were 155,378.61886, 104,271.39819, and
+1,465,810.607444 milliseconds. Their sum is 1,725,460.624494
+milliseconds, so the Linux weight is 1,726 seconds after rounding up.
+That sum excludes build and plugin timing. It is a derived case sum, not
+processor time or file wall time; the separate process wall time was
+1,729 seconds, and the property runner's own duration was
+1,725.969713619 seconds.
+
+The command was `mise run test:property:extended:native:shard --shard 1/1`
+with this exact property file. The task supplied `OSEO_PROPERTY_RUN_SCALE=10`,
+`OSEO_PROPERTY_SEED=1592590339`, and `OSEO_PROPERTY_SIZE=large`, with one
+file worker. Because `propertyParameters` lets `OSEO_PROPERTY_SEED` replace
+each suite's own seed, all three registrations executed with seed
+1592590339; the family constants `0x60008900` to `0x60008902` stayed
+unchanged in the file but were not the execution seeds of this run. The
+ordinary budgets of 8, 8, and 6 cases ran as 80, 80, and 60 at scale 10.
+Each registration's 180,000-millisecond limit constant stayed unchanged;
+the effective interrupt limit was 1,800,000 milliseconds per registration,
+with no time scale. Size limits were unchanged. The capacity profile was
+`generous` (`desktop-idle`), with no CPU quota and a 104G memory cap. Clean
+HEAD, tree, and property SHA-256 matched before and after execution. The
+property digest was:
+`2f39f24230aab3221368184230d2b49b397db8d7408690536e7fcd7482bbbb09`.
+
+Raw result, stdout, stderr and exact timing tokens remain under:
+*/data/m5c-tco-computed-focused-prepare-20261023/*.
+
+macOS remains unmeasured. Its scheduling weight of 286 seconds is the
+unknown-file default: the upper median of the macOS table before this entry
+was added. It is neither a measured host ratio nor a claimed conservative
+bound. Both host tables grow from 135 entries at Source4 `6e54c5d5` to
+136 at `f9251d59`. The wrapper selects the upper median for an even-sized
+table: Linux's unknown-file fallback rises from 401 to 405 seconds, while
+its statistical median becomes 403 seconds. The macOS fallback remains
+286 seconds. These are derived scheduling effects of the restored entries,
+not new host measurements.
+Replace the macOS default with an actual matching-host CI case sum when
+available. This is one local Linux case sum, not final native CI, a
+whole-suite result, or a full UPDATE. No case budget, seed, deadline, or
+shard total changes.
+
+Old CI run 39960353885 later interrupted Linux extended liveness after
+23 of 60 cases at 1,800,088 milliseconds, with seed 1592590339 and size
+`large`. The subsequent collector repair's 290-second sample did not
+complete the fixture or that liveness domain. Neither supplies a complete
+current-source cost or proves the old CI timeouts fixed. The historical
+complete Linux sum and the historical macOS fallback remain explicit
+planning inputs until complete matching-host current-source extended CI
+case sums replace them. All other table values, partition rules, Wrapper
+estimates, shard totals, case budgets, seeds, and deadlines are unchanged.
+
+### Future source composition of scheduling inputs
+
+The private future TCO preparation composes predecessor source `3bc6ab35`
+with TCO preparation `e75995e8`. The merged host tables each have 137
+entries. Applying the repository's numeric sort and zero-based
+`floor(length / 2)` rule selects index 68, giving unknown-file upper-median
+fallbacks of 406 Linux and 296 macOS seconds. These are derived scheduling
+values for this source composition, not new measurements. The historical
+Script-only and TCO-only calculations above retain their original inputs.
+
+TCO's explicit 1,726 Linux/286 macOS entries, Script's 41/286 entries, and
+the continuation-dispatch estimates remain unchanged. The historical TCO
+Linux measurement and unmeasured macOS placeholder do not establish a
+current-source cost or liveness pass. The generator/async planning values
+retain their measured-versus-estimated qualifications. Complete matching-host
+exact-candidate CI measurements remain necessary before replacing them.
+No shard rule, seed, case budget, deadline, or replay setting changes.

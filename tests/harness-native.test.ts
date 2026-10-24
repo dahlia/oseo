@@ -122,8 +122,11 @@ throw new Error("body error");`,
       { name: "harness-error-location", source: `assert.sameValue(1, 2);` },
       {
         name: "recursion-limit",
+        // The addition runs after the call returns, so the call is not in
+        // tail position even under the strict prefix and keeps the
+        // ordinary call-depth limit.
         source: `
-function recurse() { return recurse(); }
+function recurse() { return 1 + recurse(); }
 try { recurse(); } catch (error) { console.log(error.name); }`,
       },
     ],

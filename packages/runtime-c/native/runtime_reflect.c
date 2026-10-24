@@ -125,14 +125,14 @@ static OseoResult reflect_apply(
             &forwarded
         );
     }
+    /* Reflect.apply step 3 performs PrepareForTailCall. */
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_call_function(
+        result = oseo_internal_tail_call(
             context,
             slots[0],
             slots[1],
             forwarded_count,
-            forwarded,
-            oseo_undefined()
+            forwarded
         );
     }
     oseo_roots_pop(context, &frame);
