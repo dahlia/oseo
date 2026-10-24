@@ -60,8 +60,9 @@
  * Script and Module declaration grammar is pure JavaScript but participates
  * in the native extended file glob. Its Linux weight is a local extended
  * two-registration case sum; its unmeasured macOS placeholder retains the
- * historical 286-second assigned cost. The combined continuation-dispatch
- * estimates raise unknown-file upper medians to 406 Linux/296 macOS seconds.
+ * historical 286-second assigned cost. The combined table at `6cbc6c9f`
+ * had upper medians of 406 Linux/296 macOS seconds. The current 138-entry
+ * host tables use 409/296 after TCO and primitive receiver Set composition.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
  *
  * Primitive receiver inherited Set reserves 900 seconds per host as an
