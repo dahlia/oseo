@@ -6706,6 +6706,322 @@ paths:
       "instanceof follows a reassigned F.prototype (Object.prototype) for an
       ordinary object"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5-0-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "21472383c977b0b0e08b54ae93e40a33ccd0d1603e1e29224dce7dc3c05f\
+      63f9"
+    observationDigest: "5664c7d427a0ea3223f361cd71c60d4fd4719c0c21d0f4569be6c4a\
+      02e01d895"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject:
+      "A get and set accessor pair defined in an object literal reads and writes
+      through its functions; eval only compiles the object literal under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5-0-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dbefefaba8f76434a3be758beceb94c9fafe015357ad13774613c8fdbe26\
+      6950"
+    observationDigest: "f9daed31da99e6a75d687048fc4a9ffdb8c963ea823785571e82cfa\
+      5ffa39937"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject:
+      "Several get and set accessor pairs defined in one object literal each
+      read and write through their own functions; eval only compiles the object
+      literal under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5_4-4-a-3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "40a7a9c700ba15282ffeb80fb7f55059ff6736dbe7ee2d176f7941b70162\
+      4c48"
+    observationDigest: "5cc8d9c51dbfc32e1fe5c8deb711d73502348f0ab6f75ef4842a857\
+      93ca2c580"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject:
+      "A duplicate data property name in an object literal is allowed and the
+      property gets the last defined value; eval only compiles the object
+      literal under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5_4-4-b-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b392af2b7ac9dba06f81bcaecec9d2f8cfa669d8baae4fdef0096a6b7152\
+      83c0"
+    observationDigest: "1a30c7fd2696daefd384e3ddfdaaf5ae49fb3ef8fcd3f79a59e27b1\
+      7fc1d599e"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject: "A data property definition followed by a same-named get accessor
+      definition is not a SyntaxError; eval only compiles the object literal
+      under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5_6-3-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "710e66c7f40fe2c4ee79e8858c2c9464d5eb63f0ffa11bc17822b1d63464\
+      e023"
+    observationDigest: "46be3f49655489697332185794674efd4d6d207a1ac07041fbacb0e\
+      020f602f5"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject:
+      "The property descriptor that a get accessor definition creates; eval only
+      compiles the object literal under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5_6-3-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "45b74653d3bf09ca67f44e99cebafe4b303df34045e52e64c4c8bbd9e5a8\
+      6beb"
+    observationDigest: "5143edf84960235b3d941e4a2829290bd0b8128486cdb1c78ab1411\
+      0fbc7c7c0"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject:
+      "A get accessor definition creates no set function; eval only compiles the
+      object literal under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5_7-3-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "40a063df57564531b9c5f617f4b0707d9b6e3d31eaa1e579465a007070ce\
+      0bd4"
+    observationDigest: "4997f2242164c9b6977be7fded768f8e39f0c47f1a8e719cdc522c2\
+      3838b8d91"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject:
+      "The property descriptor that a set accessor definition creates; eval only
+      compiles the object literal under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/11.1.5_7-3-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "aa05f2203cfba1575003cd7f0e5f09682c74ac60bedb87ba18a0fa645f9b\
+      b26b"
+    observationDigest: "f614c3022fa8850f93b63ed0573f4ec53edebc059de1c7f4274b849\
+      51a0a121f"
+    missingDynamicTag: false
+    section: "sec-object-initializer"
+    subject:
+      "A set accessor definition creates no get function; eval only compiles the
+      object literal under test"
+    assessment: "fixture-construction"
+  - path: "test/language/expressions/object/method-definition/async-gen-meth-ev\
+      al-var-scope-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "ae8f25df640d708a758f654d4bba543245a8a8c7829a5704bd2d28371a66\
+      ec99"
+    observationDigest: "5a5382bad29d011b04ddaaffb828d25e2eadb42c9f04b6fe0192e6a\
+      946bbbdf8"
+    missingDynamicTag: false
+    section: "sec-asyncgenerator-definitions-propertydefinitionevaluation"
+    subject:
+      "Sloppy direct eval in a parameter initializer of an async generator
+      method introduces a var that conflicts with a parameter"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/method-definition/async-meth-eval-v\
+      ar-scope-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5e85152fabc147ddd965ccd267cb4e7e8c142e78205cefa1918d9114ec3a\
+      62c5"
+    observationDigest: "3bd8172110a400210a9779f1dcd9fb855ed1a811a22f076f2b81a69\
+      7ad36ad23"
+    missingDynamicTag: false
+    section: "sec-async-function-definitions"
+    subject: "Sloppy direct eval in a parameter initializer of an async method
+      introduces a var that conflicts with a parameter"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/method-definition/gen-meth-eval-var\
+      -scope-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "fd7493592238c30ff4ae6a84740d92d2b38f9ff8f5c3392e76756a88b058\
+      0810"
+    observationDigest: "5fc0088d8c262b8d973c0ba52a4772dcbbdb7e2393851591db6f36d\
+      240a1b6a9"
+    missingDynamicTag: false
+    section: "sec-generator-function-definitions-runtime-semantics-propertydefi\
+      nitionevaluation"
+    subject:
+      "Sloppy direct eval in a parameter initializer of a generator method
+      introduces a var that conflicts with a parameter"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/method-definition/meth-eval-var-sco\
+      pe-syntax-err.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "8d046a9be38d444405bcfb4daee7eb7d39eabab3b275a991c16646b2a46e\
+      dd6a"
+    observationDigest: "00c5fe3d249ae789bf906a9d1ae5542c908f757a2e68782ba789129\
+      1433ae521"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-definemethod"
+    subject:
+      "Sloppy direct eval in a parameter initializer of a method introduces a
+      var that conflicts with a parameter"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-gen-meth-body-lex-distinct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a592ee44f7be62e167ff8a5a49ed613c699c094b48d58516da53bc9eb9b5\
+      8e5b"
+    observationDigest: "06e0b90c22e5130514c397c49d18b1f487819d2d0b8721abed9e6ef\
+      e675f5e34"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Direct eval var declarations in a sloppy generator method body go to a
+      variable environment distinct from the body lexical environment"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-gen-meth-param-elem-var-close\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2fa36410e06b927e53df4a818abc16c1a22447c627548c14e678a5193c14\
+      eaa6"
+    observationDigest: "43d461f35dccb609cc939d00c841cdda729904833fe1087d10172af\
+      657ffc3c6"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator method
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-gen-meth-param-elem-var-open.\
+      js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a0364f515060589835fd453e43280077e2a5d9c61036b3407a84cf3fefd6\
+      c4b3"
+    observationDigest: "0a49b7ed1991e0119c0905b4635370f8356a719b7a9a1b79f6339a8\
+      068e1f0ae"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator method
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-gen-meth-param-rest-elem-var-\
+      close.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "93c17d46faa00ecaf6f04811129913f993209e7e4ae220207ac187d109d1\
+      15a0"
+    observationDigest: "2ee81c235aeac09246e4c55c0590c67d01c58e99208facc4b03396a\
+      f62d8aa30"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator method
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-gen-meth-param-rest-elem-var-\
+      open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6f10540a3a75a316729fe65e2f396f032d96aacbe71a8841a161b27b2299\
+      08f0"
+    observationDigest: "053190c1d65ddfd117a048d41b5c0ac7d12f280ed24d1ae0399a1bd\
+      e4c39c081"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Variable environments created by sloppy direct eval in generator method
+      parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-getter-body-lex-distinc.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "32a88944eb3aa67ca16d04334f31e502216e78ca21aa088a533684b80965\
+      4e43"
+    observationDigest: "9c614e003b98dffcc34f027aebabf86dc2eddcf4ef30b10fca6ec90\
+      f0f318f7f"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Direct eval var declarations in a sloppy getter body go to a variable
+      environment distinct from the body lexical environment"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-meth-body-lex-distinct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "74243100c824fdf152a12af7cf33565714de788e8fd390460993be1c007f\
+      58d6"
+    observationDigest: "3bfebee34ec71fcd3169f4857d13c0834cce2f7779b5798f49185bb\
+      43b8c671e"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Direct eval var declarations in a sloppy method body go to a variable
+      environment distinct from the body lexical environment"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-meth-param-elem-var-close.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "359d605b360b2c70f800abed1d76df084798930096493faf64bf5383a07c\
+      22b2"
+    observationDigest: "b9fdb01fa4c03962870b30bd1e12a5e942e561442710b21dfa82f6b\
+      46527884b"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Var environments from sloppy direct eval in method parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-meth-param-elem-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e0367b8e8d88fb9a200afbc2af0194ad9a656da946a6d05ed1b084b6e30e\
+      492d"
+    observationDigest: "5c50920ebafe056da70c18614862fcbf6316d58af6c95ce41903d03\
+      3985cf242"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Var environments from sloppy direct eval in method parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-meth-param-rest-elem-var-clos\
+      e.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0c1c9f35c1996f58af69f8e4ea587c210f7df6686dd4a12acb0cadd28488\
+      f167"
+    observationDigest: "e46e2e0de04490d07347472b236fb2324ab613c20832e98bd312d17\
+      902d97f20"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Var environments from sloppy direct eval in method parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-meth-param-rest-elem-var-open\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0fc352e5f3674c6e8add9928590777f3b62a4ea2e2270a254a73d6dad64e\
+      5e87"
+    observationDigest: "c4cbc26d0bcdad2ef39c655229939cbe05e059546882136d4ecf4aa\
+      105afe296"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject: "Var environments from sloppy direct eval in method parameters"
+    assessment: "eval-semantics"
+  - path: "test/language/expressions/object/scope-setter-body-lex-distinc.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c0dc810e76d99db1229ba9e580c8dcba121a3f3907a3800933d887689850\
+      8331"
+    observationDigest: "999a01d9719ac5ac96f2d9d4a21f95f67c8be70c861679c16afa887\
+      b734b3938"
+    missingDynamicTag: false
+    section: "sec-functiondeclarationinstantiation"
+    subject:
+      "Direct eval var declarations in a sloppy setter body go to a variable
+      environment distinct from the body lexical environment"
+    assessment: "eval-semantics"
   - path: test/language/expressions/optional-chaining/eval-optional-call.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject

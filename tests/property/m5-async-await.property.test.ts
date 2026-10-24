@@ -35,6 +35,8 @@ type AwaitPosition =
   | "nested";
 
 interface AwaitCase {
+  /** Zero preserves the original driver; other values wrap its dispatch. */
+  readonly dispatchDepth: number;
   readonly falseHint: boolean;
   readonly form: "arrow" | "function";
   readonly left: number;
@@ -58,6 +60,7 @@ const nativeTarget = targetForExecutionHost(
 );
 const large = propertySize() === "large";
 const awaitCaseArbitrary = fc.record({
+  dispatchDepth: fc.integer({ min: 0, max: 3 }),
   falseHint: fc.boolean(),
   form: fc.constantFrom("arrow" as const, "function" as const),
   left: fc.integer({ max: 20, min: -20 }),
@@ -222,7 +225,15 @@ function printSource(testCase: AwaitCase): string {
     '    console.log("finally after");',
     "  }",
     close,
-    "run().then(function (value) {",
+    "async function nested(depth) {",
+    "  if (depth > 0) return nested(depth - 1);",
+    "  return run();",
+    "}",
+    `${
+      testCase.dispatchDepth === 0
+        ? "run()"
+        : `nested(${testCase.dispatchDepth - 1})`
+    }.then(function (value) {`,
     '  console.log("result", value);',
     "});",
     "",

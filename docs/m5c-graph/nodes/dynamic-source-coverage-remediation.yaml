@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 265 reviewed unsupported paths assigned to
+delivers: "Resolves the 273 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure ledger.
   Select exactly those owners and their exclusion-audit path assessments:
   the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
@@ -69,6 +69,11 @@ delivers: "Resolves the 265 reviewed unsupported paths assigned to
   existing fixture-construction assessment, not a whole-path exclusion.
   The dynamic-source dependency tag grants no exclusion, and ADR 0016's
   boundary and reopening triggers remain unchanged.
+  Batch 15 adds eight object-literal fixture subjects: 11.1.5-0-1.js,
+  11.1.5-0-2.js, 11.1.5_4-4-a-3.js, 11.1.5_4-4-b-1.js,
+  11.1.5_6-3-1.js, 11.1.5_6-3-2.js, 11.1.5_7-3-1.js, and
+  11.1.5_7-3-2.js under test/language/expressions/object/. Their getter,
+  setter, descriptor, and duplicate-property subjects remain in-claim.
   Their eval or source constructor rejection is authorized, but non-source
   subject coverage remains unresolved.
   The 3 paths from well-known-intrinsics-harness assert AsyncFunction,

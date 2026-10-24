@@ -13,6 +13,7 @@ import {
 import { program } from "./convert.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
 import { convertModule } from "./modules.ts";
+import { scriptModuleDeclarations } from "./script-goal.ts";
 
 /** Configuration supplied by a composition root to both Babel frontends. */
 export type BabelFrontendOptions = ConvertOptions;
@@ -27,6 +28,8 @@ export function createBabelFrontend(
       try {
         const file = node(
           parseBabel(input.source, {
+            // Preserve TS-only profile boundaries; the Script grammar is
+            // checked on the parsed declarations before conversion below.
             allowImportExportEverywhere: true,
             attachComment: true,
             createParenthesizedExpressions: true,
@@ -46,6 +49,16 @@ export function createBabelFrontend(
           return {
             diagnostics: parserErrors.map((error) =>
               diagnosticAt(input, locations, errorOffset(error)),
+            ),
+            parsed: false,
+            sourceId: input.sourceId,
+          };
+        }
+        const moduleDeclarations = scriptModuleDeclarations(file);
+        if (moduleDeclarations.length > 0) {
+          return {
+            diagnostics: moduleDeclarations.map((declaration) =>
+              diagnosticAt(input, locations, declaration.start ?? 0),
             ),
             parsed: false,
             sourceId: input.sourceId,

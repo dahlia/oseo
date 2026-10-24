@@ -10,5 +10,5 @@ delivers: "emitGeneratorDispatcher calls resumed generator and async bodies
   including host-cc sanitizers, without lowering any budget."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
