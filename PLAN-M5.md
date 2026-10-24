@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-28,311 reviewed cases: 24,305 passes, 2,581 expected negatives, and 1,425
+29,147 reviewed cases: 24,966 passes, 2,732 expected negatives, and 1,449
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -8841,3 +8841,31 @@ unsupported results, against 41,091 included paths at revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2`. The later complete update observed
 24,305 passes, 2,581 expected negatives, and 1,425 unsupported results with no
 failure classifications. These observations do not land the node.
+
+
+Generator continuation stack accounting
+---------------------------------------
+
+M5c node `generator-dispatch-stack-charge` applies the existing callable
+native-frame charge to every continuation dispatch, including ordinary async
+functions, async generators, and the fragment resume entry points. A body
+must enter the aggregate budget before running. Every successful entry leaves
+its charge after the body returns a normal, throw, or suspended completion.
+A rejected entry runs no body and leaves the caller's charge unchanged.
+Suspended heap roots remain in the existing traced frame; neither its layout
+nor the runtime ABI changes. The 65,536-unit ceiling and the host C sanitizer
+multiplier remain unchanged.
+
+*tests/runtime-generator-dispatch-stack.test.ts* exercises 1,000-binding
+recursive bodies at initial and resumed dispatch under both specialization
+policies. They must report the owned `OSEO2001` native-frame diagnostic. Its
+instrumented backend also checks that the aggregate charge is zero before
+native context teardown on normal and failing runs. Repeated yield, throw,
+return, and await operations preserve cross-realm object identity with
+collection at every safepoint. The existing synchronous generator, async-await,
+and async-generator properties add bounded nested dispatch while retaining
+their original choices, shrinking, seeds, case budgets, and interrupt limits.
+
+This is source preparation. Model reviews, full manifest regeneration, and the
+ordinary and extended gates of the exact publication candidate remain required
+before landing. No reviewed test262 path or classification changes here.

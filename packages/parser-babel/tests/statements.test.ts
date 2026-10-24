@@ -1515,7 +1515,6 @@ test("converts with statements to owned syntax", () => {
 
 const unsupportedForms = [
   ["property", "console.error(1);"],
-  ["module", 'import "fixture";'],
   ["optional parameter", "function value(input?: number) {}"],
   [
     "TypeScript this parameter",
@@ -1541,6 +1540,15 @@ for (const [name, source] of unsupportedForms) {
     assert.equal(result.diagnostics[0]?.code, "OSEO1001");
   });
 }
+
+test("rejects a static import as a Script grammar error", () => {
+  const result = compileSource(babelFrontend, {
+    source: 'import "fixture";',
+    sourceId: "module.ts",
+  });
+  assert.equal(result.diagnostics[0]?.code, "OSEO0001");
+  assert.equal(result.mir, undefined);
+});
 
 test("rejects constructor type arguments instead of erasing them", () => {
   const result = compileSource(babelFrontend, {

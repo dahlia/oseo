@@ -56,6 +56,8 @@ interface Step {
 }
 
 interface GeneratorCase {
+  /** Zero preserves the original driver; other values wrap its dispatch. */
+  readonly dispatchDepth: number;
   /** Values delivered by every resumption after the first `next()`. */
   readonly sends: readonly number[];
   readonly steps: readonly Step[];
@@ -93,6 +95,7 @@ const stepArbitrary: fc.Arbitrary<Step> = fc.record({
 });
 
 const caseArbitrary: fc.Arbitrary<GeneratorCase> = fc.record({
+  dispatchDepth: fc.integer({ min: 0, max: 3 }),
   sends: fc.array(fc.integer({ max: 9, min: -9 }), {
     maxLength: 3,
     minLength: 1,
@@ -239,7 +242,15 @@ ${testCase.steps.map(printStep).join("\n")}
 }
 console.log("meta", typeof generated, generated.length, generated.name);
 const sends = [${sendList}];
-const iterator = generated(0);
+function* nested(depth) {
+  if (depth > 0) return yield* nested(depth - 1);
+  return yield* generated(0);
+}
+const iterator = ${
+    testCase.dispatchDepth === 0
+      ? "generated(0)"
+      : `nested(${testCase.dispatchDepth - 1})`
+  };
 console.log("lazy", entered);
 let index = 0;
 let consumed = 0;
@@ -323,6 +334,7 @@ async function references(source: string): Promise<
 test("generator model orders every suspension in source order", () => {
   assert.equal(
     expected({
+      dispatchDepth: 0,
       sends: [2],
       steps: [
         { flag: true, inner: 0, kind: "plain", outer: 0, value: 1 },
@@ -346,6 +358,7 @@ test("generator model orders every suspension in source order", () => {
 
 test("generator model closes a body that stops before its last step", () => {
   const testCase: GeneratorCase = {
+    dispatchDepth: 0,
     sends: [2],
     steps: [
       { flag: true, inner: 0, kind: "plain", outer: 0, value: 1 },
@@ -375,6 +388,7 @@ test("generator model closes a body that stops before its last step", () => {
 
 test("generator model folds a delegated result into the body total", () => {
   const testCase: GeneratorCase = {
+    dispatchDepth: 0,
     sends: [5],
     steps: [
       { flag: true, inner: 0, kind: "delegated", outer: 2, value: 3 },
@@ -401,6 +415,7 @@ test("generator model folds a delegated result into the body total", () => {
 
 test("generator model expands loop and nested suspensions", () => {
   const testCase: GeneratorCase = {
+    dispatchDepth: 0,
     sends: [3, 4],
     steps: [
       { flag: true, inner: 0, kind: "loop", outer: 2, value: 0 },

@@ -1230,3 +1230,91 @@ class sets, unlinked case folding, and the non-ASCII identity escape without
 `u` keep their located boundary, so the capability stays in the runner's
 vocabulary. No exclusion is proposed, and no dynamic source text is admitted
 beyond the pattern grammar RegExp construction already compiled.
+
+
+Observation batch 15 current-source preparation
+-----------------------------------------------
+
+The historical scoped UPDATE observed the 836 reserved paths (456 review
+units) from clean B15 input U,
+`ca53384ab035661df8fa8e611c9f1959da682caf`, with accepted Source4 R,
+`f2c306680af07fea8011e6737d5b21100d9654d0`, as its explicit baseline. It
+left U's tree unchanged, so the original B15 result R is also `ca53384a`.
+That execution recorded 661 passes, 151 expected negatives, and 24 unsupported
+profile features. The B15-only delta was later replayed as `0381835e` onto
+the corrected Source4 documentation at `e6994838`; that replay made no new
+observations.
+
+The reduced source preparation below retains those B15 records on green
+Main `de491133`, whose tree equals Source4 candidate `8387dc9a`. All prior
+28,311 records remain unchanged. The combined manifest totals are 29,147
+reviewed paths: 24,966 passes, 2,732 expected negatives, and 1,449 unsupported
+profile features, with 11,944
+inventory paths still unreviewed. The subset retains the original B15 U/R's
+pinned revision and 146 supported features. These totals are historical
+preparation accounting, not fresh observations of the combined source. They
+do not replace the successful Main baseline or land any node. The corrected
+classes dependencies and two async-only iterator-protocol removals come from
+the preserved B15 admission metadata at `29d5f8fd`. Its old failed-source
+observations are historical and were not reused.
+
+The unsupported rows retain source-bound assessments: 16 eval-semantic subjects
+retain the existing bounded ADR 0016 approval and resume conditions, while eight
+object-literal fixture subjects remain in-claim under dynamic source coverage
+remediation. Tags do not authorize exclusions. B15 remains ready and unlanded;
+Root review retention, exact candidate CI, and Main reparenting with D3
+reassessment remain publication prerequisites.
+
+
+Generator continuation stack source preparation
+-----------------------------------------------
+
+The existing `generator-dispatch-stack-charge` node charges resumed bodies
+through the callable native-frame model in both standalone and fragment
+emission. The contract and focused regression evidence are recorded in
+[*PLAN-M5.md*](./PLAN-M5.md#generator-continuation-stack-accounting).
+Source preparation does not mark the node landed, admit test262 paths, or
+replace source reviews, the full UPDATE, and exact-candidate CI gates.
+
+
+Reduced three-unit source preparation on green Main
+---------------------------------------------------
+
+The user-approved reduced preparation starts from successful Main
+`de491133b74b2f6893399cb32b7e05e21f6667c1`, tree
+`2281f0c3979e2d40aed08659ed8b576d8520aa28`. It retains observation-batch-15,
+script-module-declaration-early-error, and generator-dispatch-stack-charge
+from preserved reviewed source `eb045685` and equal-tree preparation
+`3bc6ab35`. The accepted B15 input is `0381835e`, Script is `a0cebe45`, and
+Generator is `04d7d7d4`. Their original commits, authors, review history, and
+observation refs remain preserved. The reviewed fragment baseline corrections
+at `d4467a6e` and later B15 and Script provenance corrections remain intact.
+The split itself has no new model review or review-retention verdict.
+
+The excluded `regexp-property-escape-harness` unit at `98c42049` contributes
+no helper, license, test, or family-evidence addition to this tree. Its 453
+existing Main paths remain reviewed unsupported under their original owner;
+none is removed from the subset, inventory, manifest, or closure ledger.
+The node remains ready and unlanded. The user requires Array performance to
+land before a later candidate containing that property harness is pushed.
+This source-only preparation introduces no Array node or graph dependency.
+
+Of the 29,147 adopted reviewed records, B15's 836 records and 24 bounded
+assessments retain the historical B15 observation input and result
+`ca53384ab035661df8fa8e611c9f1959da682caf`. The other 28,311 records come
+from Main: 24,305 passes, 2,581 expected negatives, and 1,425 unsupported
+profile features, all unchanged. These are historical preparation counts,
+not fresh observations of this implementation. The original full UPDATE on
+`57a2b491bd5619455363c7facfc7bfef98896520` was allowed to finish naturally
+in its separate worktree. Actual R adoption remains pending and R is never
+identified with U here. Root must decide reduced-candidate observation reuse
+or a new full UPDATE from real U/R and the clean candidate under D3 after that
+exit. No UPDATE or D3 verdict is produced by this source preparation.
+
+Main's effective 48 landed flags remain unchanged. All three selected nodes
+remain unlanded, as does the deferred property harness. Local CHECK and pure
+Script, Generator, and MIR/C structural tests establish source preparation
+only. Root owns D1.9 affected-scope reviews, actual observation adoption,
+D3, final candidate gates, CI, Main publication, and later graph sequencing.
+No runtime ABI, property budget, seed, deadline, shard total, toolchain pin,
+accepted exclusion, or additional admission changes in this split.

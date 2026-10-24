@@ -4545,23 +4545,36 @@ function prototype(functionValue: MirFunction): string {
     : entry;
 }
 
+/** Charge active continuation bodies, independently of their heap roots. */
+function generatorDispatchCases(
+  functions: readonly MirFunction[],
+  functionFrameCosts: ReadonlyMap<number, number>,
+): string {
+  return functions
+    .filter((fn) => fn.generator === true)
+    .map((fn) => {
+      const count = functionFrameCosts.get(fn.id);
+      if (count == null) {
+        throw new Error(`MIR function '${fn.name}' has no root frame layout.`);
+      }
+      return renderC(
+        emittedC.generatorDispatcher.caseClause,
+        fn.id,
+        count,
+        generatorBodyName(fn),
+        count,
+      );
+    })
+    .join(renderC(emittedC.common.newline));
+}
+
 /** Route a resumed generator to the body code its function identity owns. */
 function emitGeneratorDispatcher(
   functions: readonly MirFunction[],
+  functionFrameCosts: ReadonlyMap<number, number>,
 ): string | undefined {
-  const generators = functions.filter(
-    (functionValue) => functionValue.generator === true,
-  );
-  if (generators.length === 0) return undefined;
-  const cases = generators
-    .map((functionValue) =>
-      renderC(
-        emittedC.generatorDispatcher.caseClause,
-        functionValue.id,
-        generatorBodyName(functionValue),
-      ),
-    )
-    .join(renderC(emittedC.common.newline));
+  const cases = generatorDispatchCases(functions, functionFrameCosts);
+  if (cases === "") return undefined;
   return renderC(emittedC.generatorDispatcher.source, cases);
 }
 
@@ -4753,7 +4766,10 @@ export const cBackend: NativeBackend = {
     );
     const dispatcher =
       units == null ? dispatcherSource : bodyUnit(dispatcherSource, 0);
-    const generatorDispatcher = emitGeneratorDispatcher(declaredFunctions);
+    const generatorDispatcher = emitGeneratorDispatcher(
+      declaredFunctions,
+      functionFrameCosts,
+    );
     const functionReferences = declaredFunctions
       .map((functionValue) =>
         renderC(emittedC.program.voidOseoFunctionStatement, functionValue.id),
@@ -4958,16 +4974,7 @@ OseoResult oseo_${unit}_${name}(OseoContext *context,
       ),
     )
     .join("\n");
-  const generatorCases = functions
-    .filter((fn) => fn.generator === true)
-    .map((fn) =>
-      renderC(
-        emittedC.generatorDispatcher.caseClause,
-        fn.id,
-        generatorBodyName(fn),
-      ),
-    )
-    .join("\n");
+  const generatorCases = generatorDispatchCases(functions, counts);
   return (
     fragmentIncludes +
     `
@@ -4988,7 +4995,8 @@ ${cases}
 }
 OseoResult oseo_${unit}_resume(size_t code_id,
     OseoContext *context, OseoValue generator) {
-    (void)generator;
+    OseoResult result;
+    (void)result; (void)generator;
     switch (code_id) {
 ${generatorCases}
     default: return oseo_unknown_function(context, code_id);
