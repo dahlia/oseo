@@ -90,4 +90,5 @@ dependencies:
   - with-optional-call-receiver
   - with-strict-assignment-fallback
 landed: false
-status: blocked
+status: parked
+reason: "Waiting for proper-tail-calls review authorization."

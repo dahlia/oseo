@@ -33,4 +33,5 @@ dependencies:
   - typed-array-feature-admission
   - well-known-intrinsics-harness
 landed: false
-status: blocked
+status: parked
+reason: "Waiting for proper-tail-calls review authorization."
