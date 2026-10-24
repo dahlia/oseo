@@ -147,8 +147,10 @@ mise run test:sanitizer:property:shard \
   --test-shard=1/12 tests/property/*.property.test.ts
 ~~~~
 
-The full property task and the Linux CI lane remain unsharded. The shard task
-uses ordinary seeds, sizes, and case counts, not the extended property budget.
+The full property task remains unsharded. The Linux CI lane runs all three
+shards with `--test-shard=N/3` over _tests/property/\*.property.test.ts_,
+and the `native` aggregate requires the whole matrix. The shard task uses
+ordinary seeds, sizes, and case counts, not the extended property budget.
 
 The archive reuse key includes the exact resolved compiler path, full version
 output, archiver path, compile flags, target, runtime contents, and captured
@@ -372,11 +374,13 @@ Both jobs upload _oseo-native-\*_ failure directories from `runner.temp` on
 failure or cancellation, using distinct artifact names and the Linux lane's
 warning when no files are found. Step-level `TMPDIR` makes the test output and
 upload paths agree. The macOS suites are separate jobs, so one failed suite
-does not cancel the other. The Linux sanitizer job has no aggregate `needs`
-wiring; the macOS jobs likewise report independent checks. The `native`
-aggregate continues to cover the ordinary native, native-support, and test262
-shards. At configuration time, GitHub reported no main-branch protection or
-applicable rules; no server-side required-check settings were changed.
+does not cancel the other. At configuration time, the Linux sanitizer job
+had no aggregate `needs` wiring. The macOS jobs still report independent
+checks. The `native` aggregate now also requires all three Linux sanitizer
+property shards alongside the ordinary native, native-support, and test262
+shards. At configuration time, GitHub reported
+no main-branch protection or applicable rules; no server-side required-check
+settings were changed.
 
 Branch run `36598029271` at `d0a39f79` completed both macOS sanitizer jobs
 successfully. The native job passed the ASan/UBSan self-check, runtime, and
