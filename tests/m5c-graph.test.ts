@@ -382,7 +382,7 @@ test("the checked-in M5c work graph is valid", () => {
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 52);
-  assert.equal(summary.parked, 0);
+  assert.equal(summary.parked, 4);
 });
 
 interface NodeContract extends PublicationNode {
@@ -582,9 +582,14 @@ test("the with optional-call receiver defect stays on the exit path", () => {
     remediation.dependencies,
     prerequisites.map((node) => node.id),
   );
+  const unparkedStatus = prerequisites.every((node) => node.landed)
+    ? "ready"
+    : "blocked";
   assert.equal(
     remediation.status,
-    prerequisites.every((node) => node.landed) ? "ready" : "blocked",
+    prerequisites.some((node) => node.status === "parked")
+      ? "parked"
+      : unparkedStatus,
   );
   assert.match(remediation.delivers, /strict tail-position optional calls/u);
   assert.match(
