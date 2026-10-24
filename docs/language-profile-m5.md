@@ -123,10 +123,10 @@ results, reviewed exclusion-audit rows, and ledger owner
 batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
 remain mixed coverage debt.
 
-M5c node `proper-tail-calls` implements the tail-call source contract;
-`tail-call-optimization` remains unadmitted in the reviewed subset pending
-Root's later full UPDATE. Its two reviewed tagged-template paths retain
-Source4's unsupported observations. Every call
+M5c node `proper-tail-calls` implements the tail-call source contract.
+The reviewed subset admits `tail-call-optimization`. Its two reviewed
+tagged-template paths retain Source4's unsupported observations pending a
+new full UPDATE; admission alone does not establish a pass. Every call
 that ECMA-262 15.10 places in tail position of a strict ordinary, arrow,
 method, accessor, or class constructor body discards its frame before the
 call. The same holds for the PrepareForTailCall steps of

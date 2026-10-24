@@ -1422,12 +1422,32 @@ The source implements proper tail calls and restores the reviewed
 *tests/test262/harness/tcoHelper.js* that keeps `$MAX_ITERATIONS` at
 100,000. It owns the two reviewed tagged-template paths
 *test/language/expressions/tagged-template/tco-call.js* and *tco-member.js*;
-both retain Source4's unsupported observations. Feature admission and
-classification changes require Root's later full UPDATE; the reviewed
-`supportedFeatures` list stays unchanged in this source preparation.
-The fixed inventory tags 35 paths with the feature, all applicable and none a
-negative test. The other 33 remain unreviewed and keep their
-`observation-batch-32` reservation, whose planning basis is unchanged.
+both retain Source4's historical unsupported observations, which did not
+execute their feature-gated bodies. The admission preparation adds only
+`tail-call-optimization` to `supportedFeatures`, from 146 to 147 features,
+without changing any of the 29,147 reviewed rows or their expectations.
+Admission permits an execution attempt; it does not establish a pass.
+
+*tests/test262-tail-call-optimization.test.ts* prepares focused execution of
+both unmodified pinned subjects through the existing test262 runner,
+fragment executor and selected native toolchain. Each original strict-only
+body runs under both specialization policies with the faithful 100,000-depth
+helper. The regression requires actual execution, pass classification and
+the original empty stdout/stderr, with no shortened recursion or substitute
+oracle. The pinned Node.js and Deno reference engines do not provide proper
+tail calls; their stack overflow is not a native success oracle.
+*tests/tco-feature-admission-preparation.test.ts* checks source identity,
+helper fidelity and MIR/C emission only, not native execution or results.
+
+The focused Node and Deno native entry points await Root's separate Native
+GO. A new full UPDATE on the actual admitted-feature source must observe
+both owned paths; only actual improvements accepted by `--accept-promotions`
+may change their expected classifications. The earlier 146-feature input
+at source `f26a74bf60d6d85df9e467f7a8d90154bc006ec0` cannot certify this
+147-feature input. The fixed inventory tags 35 paths with
+the feature, all applicable and none a negative test. The other 33 remain
+unreviewed and keep their `observation-batch-32` reservation, whose planning
+basis is unchanged. No path, owner, exclusion or landing status changes.
 Evidence lives in *tests/property/m5-proper-tail-calls.property.test.ts*
 (seeds `0x60008900` through `0x60008902`), *tests/proper-tail-calls.test.ts*,
 *tests/native/fixtures/proper-tail-calls.ts*,
