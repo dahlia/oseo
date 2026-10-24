@@ -315,13 +315,34 @@ OseoResult oseo_object_set(
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (!is_object(object_value)) {
-        if (is_nullish(object_value) || strict) {
+        if (is_nullish(object_value)) {
             return type_error(
                 context,
                 "Cannot set properties of a nullish or primitive value."
             );
         }
-        return normal(value);
+        /* PutValue uses ToObject only for lookup. Keep GetThisValue's
+         * primitive receiver, including across Proxy dispatch and a
+         * setter's call into its own realm. Full String wrappers retain
+         * the non-writable own index and length descriptors. */
+        OseoValue slots[4] = {object_value, key, value, oseo_undefined()};
+        OseoRootFrame frame = {NULL, slots, 4u};
+        oseo_roots_push(context, &frame);
+        OseoResult result = oseo_internal_to_object(context, slots[0]);
+        slots[3] = result.value;
+        const char *refusal = NULL;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_set_with_receiver(
+                context, slots[3], slots[1], slots[2], slots[0], &refusal
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = strict && refusal != NULL
+                ? type_error(context, refusal)
+                : normal(slots[2]);
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
     }
     if (is_proxy(object_value)) {
         const char *refusal = NULL;

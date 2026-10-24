@@ -57,6 +57,10 @@
  * historical 286-second assigned cost. The combined continuation-dispatch
  * estimates raise unknown-file upper medians to 406 Linux/296 macOS seconds.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
+ *
+ * Primitive receiver inherited Set reserves 900 seconds per host as an
+ * unmeasured extended planning estimate. No native run has measured it;
+ * source preparation permits only pure tests. See U6 provenance.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -163,7 +167,8 @@ export const nativeShardCosts = {
     "tests/property/m5-pattern-await.property.test.ts": 596,
     "tests/property/m5-promise-combine.property.test.ts": 1433,
     "tests/property/m5-promise-intrinsic.property.test.ts": 944,
-    // Unmeasured extended estimate; see U6 provenance.
+    // Unmeasured extended estimates; see U6 provenance.
+    "tests/property/m5-primitive-receiver-inherited-set.property.test.ts": 900,
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 1559,
     // Retained; case-sharded out of the file shards.
@@ -315,7 +320,8 @@ export const nativeShardCosts = {
     "tests/property/m5-pattern-await.property.test.ts": 341,
     "tests/property/m5-promise-combine.property.test.ts": 631,
     "tests/property/m5-promise-intrinsic.property.test.ts": 669,
-    // Unmeasured extended estimate; see U6 provenance.
+    // Unmeasured extended estimates; see U6 provenance.
+    "tests/property/m5-primitive-receiver-inherited-set.property.test.ts": 900,
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 441,
     // Retained; case-sharded out of the file shards.

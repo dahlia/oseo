@@ -977,3 +977,14 @@ summed registration durations from the exact candidate's full extended CI run.
 Focused local ordinary results remain in
 */data/m5c-generator-dispatch-stack-charge-20261024/* and do not stand in for
 those measurements. No shard total, input file, seed, or case budget changes.
+
+
+Primitive receiver Set source preparation
+-----------------------------------------
+
+The new *m5-primitive-receiver-inherited-set.property.test.ts* family has a
+900-second planning weight on each host. Both values are unmeasured
+estimates; this source phase runs no native property, fixture, or toolchain.
+The existing host counts, shard totals, case budgets, seeds, and deadlines
+stay unchanged. Later native runs must retain exact source and target
+identities and case durations before replacing these estimates.
