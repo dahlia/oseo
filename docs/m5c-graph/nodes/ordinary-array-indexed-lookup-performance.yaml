@@ -1,0 +1,18 @@
+version: 1
+id: ordinary-array-indexed-lookup-performance
+title: Reduce ordinary array indexed property costs
+delivers: "Investigates and reduces the repeated linear indexed own-property
+  lookup, insertion, and length-truncation costs observed while the original
+  RegExp buildString helper fills, reads, and clears ordinary arrays.
+  Preserve descriptors, property ordering,
+  holes, prototypes, mutation invalidation, GC safety, and generic fallback
+  behavior. Keep the original helper, chunk size, source data, assertions,
+  and every existing case budget unchanged; demonstrate correctness and
+  measured before/after costs without claiming an unmeasured corpus speedup.
+  The bounded contract is
+  docs/m5c-graph/ordinary-array-indexed-lookup-performance.md.
+  This performance node admits no new language surface or exclusion."
+dependencies:
+  - unsupported-ownership-audit
+landed: true
+status: ready
