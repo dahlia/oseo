@@ -30,5 +30,5 @@ delivers: "Repairs the Script frontend's static import and export declaration
   independent review, and exact-candidate CI remain separate gates."
 dependencies:
   - module-export-forms
-landed: false
+landed: true
 status: ready

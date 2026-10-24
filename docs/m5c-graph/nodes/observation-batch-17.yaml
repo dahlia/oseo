@@ -10,4 +10,4 @@ dependencies:
   - observation-batch-plan
   - script-module-declaration-early-error
 landed: false
-status: blocked
+status: ready
