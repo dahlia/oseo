@@ -34,5 +34,4 @@ dependencies:
   - eval-intrinsic-value
   - proper-tail-calls
 landed: false
-status: parked
-reason: "Waiting for proper-tail-calls review authorization."
+status: blocked

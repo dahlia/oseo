@@ -20,9 +20,9 @@ baseline:
   unsupportedProfileFeatures: 1449
 summary:
   nodes: 89
-  ready: 85
-  blocked: 0
-  parked: 4
+  ready: 86
+  blocked: 3
+  parked: 0
   landed: 52
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml

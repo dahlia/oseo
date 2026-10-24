@@ -8,5 +8,4 @@ delivers: "Owns the 2 reviewed tagged-template tco-*.js paths gated by
 dependencies:
   - unsupported-ownership-audit
 landed: false
-status: parked
-reason: "Waiting for proper-tail-calls review authorization."
+status: ready
