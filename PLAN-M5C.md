@@ -1673,8 +1673,8 @@ arguments after the source is cleared.
 Their literal event and value oracles follow source semantics. The
 original two examples, 13 Boolean checks, frame guard, property generators,
 seeds, budgets, shrinking, and weights remain unchanged. These additions
-supply reference and emission preparation; combined native execution and
-its factual evidence review remain pending. The earlier 24-combination
+supplied reference and emission preparation before the shared native focus
+recorded below. The earlier 24-combination
 Linux proof remains bound to `baf6f7d7` and covers none of these new cases.
 
 This private combined preparation also merges reviewed PrimitiveSet source
@@ -1683,5 +1683,62 @@ assignment-result contract. Set calls its inherited setter through the
 ordinary call entry, which drains recorded tail calls before returning to
 the rooted assignment frame. The Array/TCO examples above and existing
 Set Array regressions share this source snapshot. All earlier native
-observations keep their original inputs; a shared bounded native focus
-and subsequent factual reviews remain pending Root's authorization.
+observations keep their original inputs. The following record adds only
+the subsequently authorized shared focus on this combined source.
+
+
+Shared Linux Array/Set/TCO evidence
+-----------------------------------
+
+The shared focus executed fixed source
+`c4bcb412b9c2f3e8884dd079e5e806a2d4826c46`, tree
+`cf49eb612cdb3778f7a1e91483a1a4c82def970e`. All package, runtime, test,
+seed, and budget inputs remain exactly that source. The four complete
+TCO registrations passed under Node/createNodeHost and Deno/createDenoHost,
+each with Zig and host-cc on Linux AMD64. Both specialization policies
+and forced safepoint collection ran unchanged. Their loops account for
+40 case/policy/host/lane combinations: 32 fixed successes and eight
+expected frame-budget refusals. This is source-derived cardinality,
+separate from the four actual passing test registrations.
+
+The successes retain exact independent stdout, empty exposed stderr,
+exit 0, positive allocation/collection assertions, and the backend's
+main-context frame/call/root balance assertions. The original 13 Boolean
+checks and both new Array examples ran, including strict primitive setter
+tail-return reentry, original assignment RHS, captured apply-list length,
+dense truncation, inherited reads after generic truncation, getter reentry,
+abrupt completion, and copied object/Symbol values after source clearing.
+Successful per-case output, numerical counters, C/MIR, and binaries were
+removed by normal cleanup. These are assertion-based successes; no raw
+values or successful native C/MIR equality are reconstructed.
+
+Eight naturally retained guard records each exit 1, print `before` plus
+LF, and report the exact owned `OSEO2001` frame-budget diagnostic. Their
+aggregate C matches the prepared instrumented per-policy guard C; staged
+headers match this source. Compilation units, native ELF files, and the
+three referenced runtime archives are separately retained and hashed.
+No actual guard MIR was retained. The logical charge 2,192, compact heap
+826, MIR roots 2,177, frame ceiling 65,536, Zig depth 29, host-cc depth 3,
+and script charges 47/52 remain unchanged.
+
+The shared nine-command focus passed 23 registrations, including the
+normal seven-test Clang 22.1.8 ASan/UBSan self-probe. It skipped only its
+proven-current build dependency. Zig flags establish no sanitizer activity;
+LSan internal ptrace sampling establishes no intentional leak proof.
+The first command passed and drained before supervisor stdin EOF caused
+the original batch to fail with status 1. A separately authorized
+continuation ran the remaining eight commands without repeating the first.
+Exactly nine commands ran across two lock admissions; the final descendant
+drain was `2026-10-24T18:50:04.199386Z` and release was
+`2026-10-24T18:50:04.476201Z`. Root accepted the complete execution packet.
+
+Raw commands, source/build/resource bindings, failed original controller,
+continuation, and limitations are in
+[the shared execution packet](/data/m5c-primitive-set-array-interop-20261024/shared-focus/NATIVE-EVIDENCE.md).
+The additional guard inventory and comparisons are in
+*/data/m5c-tco-shared-native-evidence-20261024/NATIVE-FACTS.md*. The older
+`baf6f7d7` proof keeps its original source. This bounded Linux focus
+establishes no universal foreign-context/collector invariant, performance
+result, macOS execution, cross-link, full gate, UPDATE, candidate/Main CI,
+landing, or publication. Factual evidence review and Root's overall review
+decision remain separate requirements.
