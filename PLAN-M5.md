@@ -8874,6 +8874,27 @@ ordinary and extended gates of the exact publication candidate remain required
 before landing. No reviewed test262 path or classification changes here.
 
 
+Physical completion storage and logical charges
+-----------------------------------------------
+
+The Array performance source correction separates physical completion
+storage from the existing logical native-frame model. Each emitted
+function or fragment phase maps its distinct completion storage identities
+to dense metadata and saved-value root slots. Generator entry and resumed
+bodies retain one shared layout across suspension. Logical control targets,
+cleanup depths and error provenance remain unchanged; every saved heap
+value stays traced for its original lifetime, without slot reuse.
+
+The backend retains its original logical completion/root counts and
+script binding-access charge. Dispatch, direct-call, continuation and
+fragment enter/leave pairs, callable multipliers and rejection guards keep
+those values even when physical allocations shrink. The runtime ABI,
+ceiling, collector policy and TCO trampoline protocol do not change.
+This is source preparation: focused native correctness, actual full
+manifest regeneration, impact review and exact candidate/Main CI remain
+required, and no native cost or deadline improvement is established.
+
+
 Primitive receiver inherited Set source preparation
 ---------------------------------------------------
 

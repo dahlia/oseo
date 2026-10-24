@@ -277,3 +277,48 @@ requires completed internal and outer reviews, a fresh full UPDATE and exact
 candidate/Main CI. These focused reports do not mark the node complete or
 authorize publication. Review records belong in their actual ledgers and
 reports, without treating one clean stage as gate completion.
+
+
+Physical completion storage correction
+--------------------------------------
+
+Two Main attempts on the exact candidate tree interrupted the unchanged
+Array constructor property at its 180,000 ms limit after ten tests. The
+candidate completed that property in 150,259 ms. Those observations prove
+neither a semantic counterexample nor a runner flake. The full generated
+program retains both fixed Array transition sequences in every case; its
+larger C/MIR and repeated native builds are cost inputs, not a measured
+explanation of the interrupted interval.
+
+The source correction starts from shared composition
+`99e0c9cd426573a60c7da98a2290a9c5d5f1a830`. It assigns sorted, distinct
+physical slots to the completion identities actually used by each emitted
+function or fragment phase. Generator entry and resumed bodies share one
+layout, as do outlined helpers. Metadata and saved-value roots use the same
+mapping. Logical jump destinations, cleanup depth, error provenance and
+resume points do not change. Identity zero remains a real storage slot for
+a directly resumed throw; a saved control target zero remains a sentinel.
+There is no lifetime-based reuse or change to public MIR or runtime ABI.
+
+Physical root allocations, generator storage counts and the appended
+non-strict receiver root use the compact layout. Existing logical
+`completionSlotCount`, `rootCount`, `functionFrameCosts`, callable macros,
+`scriptFrameCost`, guards and enter/leave ordering keep their prior values.
+Reducing storage does not lower the logical native-frame charge. Saved
+completion values remain traced for the same frame or suspension lifetime.
+
+Source tests cover sparse identities, missing slots, implicit copies,
+fragment isolation, nested abrupt/finally/iterator paths and generator
+return/throw/await transitions. The original property, both transition
+blocks, every oracle, assertion, seed, twelve cases, specialization policy,
+forced-collection check and deadline remain unchanged. Pure reference and
+C emission checks do not establish native semantics or a deadline benefit.
+
+This source phase runs no native compiler, linker or executable. Root must
+authorize that work separately after the shared UPDATE drains.
+Focused native validation and matching-host timing remain pending. A later
+actual full UPDATE must observe this backend composition from its own clean
+U and retain its distinct R; the running shared-U99 UPDATE cannot supply
+those observations. Root owns review retention, final candidate/Main CI,
+publication and any separate CI-capacity decision. No graph landing status
+or test262 classification changes in this source correction.
