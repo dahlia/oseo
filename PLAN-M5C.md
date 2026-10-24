@@ -1596,9 +1596,10 @@ The `primitive-receiver-inherited-set` source was prepared on Main
 `de491133` and reanchored on successful Main `44c46bfc` as clean source
 `43b84b70d20621d6003a5c142a124a10f458518d`, tree
 `4ca2385217440e9ccac028c6c6244142886c36ea`. The runtime, tests, structured
-oracle and allocation fixture from that source remain the actual native
-inputs. The source-phase descriptions in *PLAN-M5.md* and the normative
-profile record preparation; the focused observations below followed it.
+oracle and allocation fixture at that source were the historical native
+inputs below. The source-phase descriptions in *PLAN-M5.md* and the
+normative profile record preparation; the focused observations below
+followed it.
 
 On Linux AMD64, five focused commands completed once with natural exit 0:
 the complete primitive Set property file under Node.js and Deno with the
@@ -1652,6 +1653,61 @@ Batches 28/29 keep first admission, and included ordinary accessor-setter
 coverage stays unknown. Root owns all remaining gates and publication.
 
 
+Primitive Set through Array ancestors on combined source
+--------------------------------------------------------
+
+The existing Set fixed registration now includes one independently expected
+Array-ancestry source. It covers all five primitives, caller and setter
+strictness, setter receivers and heap RHS identity; dense indexed hits,
+reordered/named/symbol fallback, holes and refusal descriptors; inherited
+setters after own absence beyond length; Proxy-to-Array forwarding, abrupt
+completion and invariants; String own index/length precedence; primitive
+refusal before Array length mutation; and setter-side truncation plus throw.
+Actual Node.js and Deno verified its hand-written trace. The original three
+fixed sources, generated domain, boundaries, seeds and budgets remain.
+
+On Linux AMD64, the combined source
+`c4bcb412b9c2f3e8884dd079e5e806a2d4826c46`, tree
+`cf49eb612cdb3778f7a1e91483a1a4c82def970e`, passed the complete Set property
+file under Node.js and Deno with ordinary and host C toolchains. All twelve
+Set registrations passed, including the unchanged allocation fixture. The
+fresh normal sanitizer self-probe executed all seven tests with Clang
+22.1.8. Four complete TCO file commands also passed their registrations on
+this same source; their separate factual evidence update belongs to the
+TCO worker. The shared focus therefore has nine actual commands and 23
+passing registrations, with no skipped test or retried native command.
+
+The first supervisor stopped on stdin EOF at its first checkpoint after one
+successful command and natural drain. That batch remains failed. Root
+approved a real-TTY continuation for only the remaining eight commands,
+retaining the actual first result. The focus used two nonblocking lock
+admissions, not one continuous lock. Both releases followed natural whole
+scope drains; the final release was `2026-10-24T18:50:04.476201Z`. Source,
+protected refs and all 34 stashes stayed unchanged. Sampled OOM events were
+zero. Each command used its fresh resource prefix and assigned cache.
+
+The current Set loops derive 344 JavaScript subject/policy invocations:
+twelve generated draws, four fixed sources and 27 boundaries, both policies,
+under four host/toolchain combinations. Four C registrations are separate.
+These are source-derived counts, not retained per-case native observations.
+Original assertions establish expected stdout, empty exposed native stderr,
+positive collection counters and the unchanged allocation/root/realm/retry
+assertions. Numeric native counter values and successful C/MIR/binaries remain
+absent after cleanup.
+The prepared pure C/MIR is separate from native instrumentation. Historical
+`43b84b70` evidence above remains its original 336 combinations and nineteen
+registrations. No new standards observation or compatibility promotion is
+claimed by this focused execution.
+
+The execution report, exact commands, raw logs, source/resource/drain records
+and SHA inventory are in
+*/data/m5c-primitive-set-array-interop-20261024/shared-focus/*, including
+*NATIVE-EVIDENCE.md*. Matching macOS execution, cross-target inspection,
+whole ordinary/extended/standards gates, full reviewed UPDATE, affected
+reviews and exact candidate/Main CI remain separate requirements. This is
+source preparation; no node becomes effectively landed here.
+
+
 Bounded Array/TCO interaction examples
 --------------------------------------
 
@@ -1673,9 +1729,10 @@ arguments after the source is cleared.
 Their literal event and value oracles follow source semantics. The
 original two examples, 13 Boolean checks, frame guard, property generators,
 seeds, budgets, shrinking, and weights remain unchanged. These additions
-supply reference and emission preparation; combined native execution and
-its factual evidence review remain pending. The earlier 24-combination
-Linux proof remains bound to `baf6f7d7` and covers none of these new cases.
+supplied reference and emission preparation at `c4bcb412`, before the shared
+focus above. Their separate TCO factual evidence update and review remain
+with the TCO worker and Root. The earlier 24-combination Linux proof remains
+bound to `baf6f7d7` and covers none of these new cases.
 
 This private combined preparation also merges reviewed PrimitiveSet source
 `41c59036`, preserving its primitive receiver lookup, setter callback and
@@ -1683,5 +1740,6 @@ assignment-result contract. Set calls its inherited setter through the
 ordinary call entry, which drains recorded tail calls before returning to
 the rooted assignment frame. The Array/TCO examples above and existing
 Set Array regressions share this source snapshot. All earlier native
-observations keep their original inputs; a shared bounded native focus
-and subsequent factual reviews remain pending Root's authorization.
+observations keep their original inputs. This paragraph records C4
+preparation before the shared focus above; the separate TCO factual evidence
+followup remains with its worker and Root.
