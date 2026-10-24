@@ -225,6 +225,10 @@ for (let kind = 0; kind < primitives.length; kind++) {
           }
           assign(descriptor, owner, "3");
           trace.push(descriptor + "-length:" + owner.length);
+          const own = Object.getOwnPropertyDescriptor(owner, "3");
+          trace.push(descriptor + "-kept:" + (descriptor === "missing"
+            ? own === undefined : descriptor === "getter"
+              ? own.set === undefined : own.value === 11));
         }
         assign("own-zero", accessor([0], "0"), "0");
         const lengthOwner = [0, 1, 2, 3];
@@ -303,12 +307,16 @@ export const primitiveSetArrayExpected: string =
             "throw:reason",
             `writable:${refused}`,
             "writable-length:4",
+            "writable-kept:true",
             `readonly:${refused}`,
             "readonly-length:4",
+            "readonly-kept:true",
             `getter:${refused}`,
             "getter-length:4",
+            "getter-kept:true",
             `missing:${refused}`,
             "missing-length:4",
+            "missing-kept:true",
             ...(kind === "string"
               ? [`own-zero:${refused}`]
               : [`own-zero:${binding}`, "own-zero:normal"]),
