@@ -49,14 +49,15 @@ evidence:
       - tests/native/fixtures/proper-tail-calls.ts
       - tests/tco-generator-interop.test.ts
   standards:
-    # These records cover reviewed classifications, not native passes: both
-    # owned tagged-template bodies were feature-gated and not executed.
-    # Admission preparation leaves those historical observations unchanged;
-    # focused native execution and the new full UPDATE remain pending.
-    status: covered
-    references:
-      - tests/test262/subset.yaml
-      - tests/test262/results.yaml
+    status: omitted
+    reason: "The two owned pinned tagged-template paths retain historical
+      feature-gated unsupported records without execution. Admission only
+      prepares their observation; focused native validation and a new full
+      UPDATE remain pending. Existing native and property regressions cover
+      the implemented tail-call contract, not passes of these subjects."
+    replacements:
+      - tests/proper-tail-calls.test.ts
+      - tests/property/m5-proper-tail-calls.property.test.ts
   structural:
     status: covered
     references:

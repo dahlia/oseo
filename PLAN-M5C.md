@@ -1442,8 +1442,9 @@ helper fidelity and MIR/C emission only, not native execution or results.
 The focused Node and Deno native entry points await Root's separate Native
 GO. A new full UPDATE on the actual admitted-feature source must observe
 both owned paths; only actual improvements accepted by `--accept-promotions`
-may change their expected classifications. The 146-feature f26 UPDATE does
-not certify this 147-feature input. The fixed inventory tags 35 paths with
+may change their expected classifications. The earlier 146-feature input
+at source `f26a74bf60d6d85df9e467f7a8d90154bc006ec0` cannot certify this
+147-feature input. The fixed inventory tags 35 paths with
 the feature, all applicable and none a negative test. The other 33 remain
 unreviewed and keep their `observation-batch-32` reservation, whose planning
 basis is unchanged. No path, owner, exclusion or landing status changes.
