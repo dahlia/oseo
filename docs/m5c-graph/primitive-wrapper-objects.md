@@ -41,9 +41,13 @@ ordinary primitive inherited setters, descriptor precedence, Proxy Set
 dispatch, and strict/sloppy write failure. This node does not claim that
 contract or transfer either of its reserved Proxy paths. Root authorized
 composition with Eval, RegExp, and computed Reference after removing the
-TCO implementation. Canonical observations and owners come from successful
-Main `52a868c9`; this preparation neither reuses the four-source candidate's
-observations nor claims successful Main gates for the new source.
+TCO implementation. Main `52a868c9` was the historical pre-UPDATE baseline
+for that preparation. The current no-TCO Array/F3 source inherits canonical
+observations and owners from successful Main
+`f100ab8edf91c981888311a31251b874801c374e`; those observations do not describe
+the changed implementation. A new clean full UPDATE and its distinct result
+record remain required for this source. This preparation claims no successful
+candidate or Main gates for the new source.
 
 
 Evidence and preparation boundary
