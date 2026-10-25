@@ -1393,3 +1393,39 @@ remain byte-identical. The source graph adds only F3 as ready/unlanded:
 and test expectations stay Root-owned. Array, Set, RegExp and TCO source
 and admission are not restored. No native, model or Full run is claimed;
 exact-source validation, D3, affected review and publication remain pending.
+
+
+Observation batch 16 source-bound preparation
+---------------------------------------------
+
+This branch prepares 467 original rows from the accepted leading
+observation on Source4 R db4104, with 407 passes, 41 expected
+negatives and 19 unsupported results. No fresh execution or publication is
+claimed. The original path/variant/source identities, active mixed-core
+owners and bounded existing-record assessments are documented in
+[the batch preparation](./docs/m5c-graph/observation-batch-16.md).
+Independent review, Root integration/D3 and required later observation
+remain pending; B18 and its failed partial evidence are untouched.
+
+
+Observation batch 17 source-bound preparation
+---------------------------------------------
+
+This branch prepares 287 original rows from the accepted leading
+observation on Source4 R db4104, with 229 passes, 29 expected
+negatives and 29 unsupported results. No fresh execution or publication is
+claimed. The original path/variant/source identities, active mixed-core
+owners and bounded existing-record assessments are documented in
+[the batch preparation](./docs/m5c-graph/observation-batch-17.md).
+Independent review, Root integration/D3 and required later observation
+remain pending; B18 and its failed partial evidence are untouched.
+
+
+Main-only reanchor preparation
+------------------------------
+
+This preparation is anchored to successful Main 128d63fc. Product code and
+node flags remain Main-only. These records retain the original leading
+observation on R db4104, whose run failed later in B18; the 754 originals
+have not been freshly observed on Main. Root owns actual U/R, D3, required
+scoped observation, affected reviews, final judgment and publication.

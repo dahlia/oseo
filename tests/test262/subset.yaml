@@ -125353,12 +125353,187 @@ tests:
   - path: test/language/expressions/optional-chaining/update-expression-prefix.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/11.3.2-2-3-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A2.1_T2.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A2.2_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A3_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A3_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A3_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A3_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A3_T5.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A4_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A4_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A4_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A4_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A4_T5.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A5_T1.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A5_T2.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A5_T3.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A6_T1.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A6_T2.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/S11.3.2_A6_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/arguments-nostrict.js
   - path: test/language/expressions/postfix-decrement/arguments.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/postfix-decrement/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/eval-nostrict.js
+  - dependencies: [expression-operators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/eval.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/line-terminator-carriage-return.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/line-terminator-line-feed.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/line-terminator-line-separator.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/line-terminator-paragraph-separator.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/operator-x-postfix-decrement-calls-putvalue-lhs-newvalue--1.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/operator-x-postfix-decrement-calls-putvalue-lhs-newvalue-.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-decrement/target-cover-id.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/target-cover-newtarget.js
+  - dependencies: [expression-operators, functions, generators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/target-cover-yieldexpr.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-decrement/target-newtarget.js
   - path: test/language/expressions/postfix-decrement/this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -125368,12 +125543,187 @@ tests:
   - path: test/language/expressions/postfix-increment/11.3.1-2-1gs.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions]
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/11.3.1-2-3.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A2.1_T2.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A2.2_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A3_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A3_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A3_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A3_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A3_T5.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A4_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A4_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A4_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A4_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A4_T5.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A5_T1.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A5_T2.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A5_T3.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A6_T1.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A6_T2.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/S11.3.1_A6_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/arguments-nostrict.js
   - path: test/language/expressions/postfix-increment/arguments.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/postfix-increment/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/eval-nostrict.js
+  - dependencies: [expression-operators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/eval.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/line-terminator-carriage-return.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/line-terminator-line-feed.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/line-terminator-line-separator.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/line-terminator-paragraph-separator.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/operator-x-postfix-increment-calls-putvalue-lhs-newvalue--1.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/operator-x-postfix-increment-calls-putvalue-lhs-newvalue-.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/postfix-increment/target-cover-id.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/target-cover-newtarget.js
+  - dependencies: [expression-operators, functions, generators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/target-cover-yieldexpr.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/postfix-increment/target-newtarget.js
   - path: test/language/expressions/postfix-increment/this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
@@ -125383,30 +125733,574 @@ tests:
   - path: test/language/expressions/prefix-decrement/11.4.5-2-2gs.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions]
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/11.4.5-2-3-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A2.1_T2.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A2.2_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A3_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A3_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A3_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A3_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A3_T5.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A4_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A4_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A4_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A4_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A4_T5.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A5_T1.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A5_T2.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A5_T3.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A6_T1.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A6_T2.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/S11.4.5_A6_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/arguments-nostrict.js
   - path: test/language/expressions/prefix-decrement/arguments.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/prefix-decrement/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/eval-nostrict.js
+  - dependencies: [expression-operators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-decrement/eval.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/operator-prefix-decrement-x-calls-putvalue-lhs-newvalue--1.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/operator-prefix-decrement-x-calls-putvalue-lhs-newvalue-.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-decrement/target-cover-id.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-decrement/target-cover-newtarget.js
+  - dependencies: [expression-operators, functions, generators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-decrement/target-cover-yieldexpr.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-decrement/target-newtarget.js
   - path: test/language/expressions/prefix-decrement/this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/prefix-decrement/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/11.4.4-2-3-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A2.1_T2.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A2.2_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A3_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A3_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A3_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A3_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A3_T5.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A4_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A4_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A4_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A4_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A4_T5.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A5_T1.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A5_T2.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A5_T3.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A6_T1.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A6_T2.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/S11.4.4_A6_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/arguments-nostrict.js
   - path: test/language/expressions/prefix-increment/arguments.js
     expectedClassification: expected-negative
     dependencies: [expression-operators, functions, object-properties]
   - path: test/language/expressions/prefix-increment/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators, var-bindings]
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/eval-nostrict.js
+  - dependencies: [expression-operators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-increment/eval.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/operator-prefix-increment-x-calls-putvalue-lhs-newvalue--1.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/operator-prefix-increment-x-calls-putvalue-lhs-newvalue-.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/prefix-increment/target-cover-id.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-increment/target-cover-newtarget.js
+  - dependencies: [expression-operators, functions, generators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-increment/target-cover-yieldexpr.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: expected-negative
+    path: test/language/expressions/prefix-increment/target-newtarget.js
   - path: test/language/expressions/prefix-increment/this.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
   - path: test/language/expressions/prefix-increment/whitespace.js
     expectedClassification: pass
     dependencies: [expression-operators, var-bindings]
+  - dependencies:
+      [
+        dynamic-source,
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+      ]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/property-accessors/S11.2.1_A1.1.js
+  - dependencies:
+      [
+        dynamic-source,
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+      ]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/property-accessors/S11.2.1_A1.2.js
+  - dependencies:
+      [control-flow, error-intrinsics, expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A2.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A3_T1.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A3_T2.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A3_T3.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A3_T4.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A3_T5.js
+  - dependencies: [date, expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T1.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T2.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T3.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T4.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T5.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T6.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T7.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T8.js
+  - dependencies: [date, expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S11.2.1_A4_T9.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S8.12.3_A1.js
+  - dependencies:
+      [expression-operators, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S8.12.3_A2.js
+  - dependencies:
+      [expression-operators, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/property-accessors/S8.12.3_A3.js
+  - dependencies: [lexical-grammar, object-properties]
+    expectedClassification: expected-negative
+    path: test/language/expressions/property-accessors/non-identifier-name.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/relational/S9.1_A1_T4.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/right-shift/S11.7.2_A1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.1_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.1_T3.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.2_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.3_T1.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.4_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.4_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.4_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A2.4_T4.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T1.1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T1.2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T1.3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T1.4.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T1.5.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.4.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.5.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.6.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.7.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.8.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A3_T2.9.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A4_T1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A4_T2.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A4_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A4_T4.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A5.1_T1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/S11.7.2_A5.2_T1.js
+  - dependencies:
+      [bigint-primitive, error-intrinsics, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/bigint-and-number.js
   - path: test/language/expressions/right-shift/bigint-errors.js
     expectedClassification: pass
     dependencies:
@@ -125417,6 +126311,17 @@ tests:
         object-properties,
         symbols,
       ]
+  - dependencies:
+      [
+        bigint-primitive,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/bigint-non-primitive.js
   - path: test/language/expressions/right-shift/bigint-toprimitive.js
     expectedClassification: pass
     dependencies:
@@ -125427,9 +126332,108 @@ tests:
         object-properties,
         symbols,
       ]
+  - dependencies:
+      [
+        bigint-primitive,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/bigint-wrapped-values.js
   - path: test/language/expressions/right-shift/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/right-shift/order-of-evaluation.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A2.1_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A2.1_T3.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A2.4_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A2.4_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A2.4_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A2.4_T4.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A3.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A4.1_T1.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A4.1_T2.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A4.2.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A4.3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A5.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A6.1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A6.2.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A7.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A8_T1.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A8_T2.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A8_T3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A8_T4.js
+  - dependencies: [abrupt-completion, control-flow, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/S11.9.5_A8_T5.js
   - path: test/language/expressions/strict-does-not-equals/bigint-and-bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
@@ -125449,9 +126453,90 @@ tests:
   - path: test/language/expressions/strict-does-not-equals/bigint-and-number.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - dependencies:
+      [bigint-primitive, expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-does-not-equals/bigint-and-object.js
   - path: test/language/expressions/strict-does-not-equals/bigint-and-string.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/strict-equals/S11.9.4_A1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A2.1_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A2.1_T3.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A2.4_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A2.4_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A2.4_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A2.4_T4.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A3.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A4.1_T1.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A4.1_T2.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A4.2.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A4.3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A5.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/strict-equals/S11.9.4_A6.1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A6.2.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A7.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A8_T1.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A8_T2.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A8_T3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A8_T4.js
+  - dependencies: [abrupt-completion, control-flow, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/S11.9.4_A8_T5.js
   - path: test/language/expressions/strict-equals/bigint-and-bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
@@ -125471,9 +126556,138 @@ tests:
   - path: test/language/expressions/strict-equals/bigint-and-number.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - dependencies:
+      [bigint-primitive, expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/strict-equals/bigint-and-object.js
   - path: test/language/expressions/strict-equals/bigint-and-string.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/subtraction/S11.6.2_A1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.1_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.1_T3.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.2_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.3_T1.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.4_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.4_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.4_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A2.4_T4.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T1.1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T1.2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T1.3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T1.4.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T1.5.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.4.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.5.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.6.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.7.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.8.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A3_T2.9.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T1.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T2.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T3.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T4.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T5.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T6.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T7.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/S11.6.2_A4_T8.js
+  - dependencies:
+      [bigint-primitive, error-intrinsics, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/bigint-and-number.js
   - path: test/language/expressions/subtraction/bigint-arithmetic.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
@@ -125497,6 +126711,39 @@ tests:
         object-properties,
         symbols,
       ]
+  - dependencies:
+      [
+        bigint-primitive,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/bigint-wrapped-values.js
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/subtraction/order-of-evaluation.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        control-flow,
+        functions,
+        lexical-bindings,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-arg-evaluation-err.js
   - path: test/language/expressions/super/call-bind-this-value-twice.js
     expectedClassification: pass
     dependencies: [classes]
@@ -125506,9 +126753,24 @@ tests:
   - path: test/language/expressions/super/call-construct-error.js
     expectedClassification: pass
     dependencies: [classes]
+  - dependencies:
+      [
+        classes,
+        functions,
+        lexical-bindings,
+        object-properties,
+        reflect-namespace,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-construct-invocation.js
   - path: test/language/expressions/super/call-expr-value.js
     expectedClassification: pass
     dependencies: [classes]
+  - dependencies:
+      [classes, functions, lexical-bindings, object-literals, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-poisoned-underscore-proto.js
   - path: test/language/expressions/super/call-proto-not-ctor.js
     expectedClassification: pass
     dependencies: [classes]
@@ -125530,6 +126792,30 @@ tests:
   - path: test/language/expressions/super/call-spread-err-mult-err-itr-value.js
     expectedClassification: pass
     dependencies: [classes, iterator-protocol]
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-err-mult-err-obj-unresolvable.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-err-mult-err-unresolvable.js
   - path: test/language/expressions/super/call-spread-err-sngl-err-expr-throws.js
     expectedClassification: pass
     dependencies: [classes, iterator-protocol]
@@ -125548,6 +126834,81 @@ tests:
   - path: test/language/expressions/super/call-spread-err-sngl-err-itr-value.js
     expectedClassification: pass
     dependencies: [classes, iterator-protocol]
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-err-sngl-err-obj-unresolvable.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        error-intrinsics,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-err-sngl-err-unresolvable.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-mult-empty.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-mult-expr.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-mult-iter.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-mult-literal.js
   - path: test/language/expressions/super/call-spread-mult-obj-ident.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
@@ -125563,6 +126924,20 @@ tests:
   - path: test/language/expressions/super/call-spread-obj-getter-init.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-obj-manipulate-outter-obj-in-getter.js
   - path: test/language/expressions/super/call-spread-obj-mult-spread-getter.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
@@ -125578,9 +126953,116 @@ tests:
   - path: test/language/expressions/super/call-spread-obj-overrides-prev-properties.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-obj-skip-non-enumerable.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-obj-spread-order.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-obj-symbol-property.js
   - path: test/language/expressions/super/call-spread-obj-undefined.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-own-keys,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-obj-with-overrides.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-sngl-empty.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-sngl-expr.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        expression-operators,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-sngl-iter.js
+  - dependencies:
+      [
+        abrupt-completion,
+        classes,
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/super/call-spread-sngl-literal.js
   - path: test/language/expressions/super/call-spread-sngl-obj-ident.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
@@ -125713,6 +127195,9 @@ tests:
   - path: test/language/expressions/super/prop-poisoned-underscore-proto.js
     expectedClassification: pass
     dependencies: [classes, object-literals]
+  - dependencies: [classes, functions, lexical-bindings, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/super/super-reference-resolution.js
   - path: test/language/expressions/tagged-template/cache-different-functions-same-site.js
     expectedClassification: pass
     dependencies: [expression-operators]
@@ -125746,6 +127231,16 @@ tests:
   - path: test/language/expressions/tagged-template/cache-realm.js
     expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-properties,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/tagged-template/cache-same-site-top-level.js
   - path: test/language/expressions/tagged-template/cache-same-site.js
     expectedClassification: pass
     dependencies: [expression-operators]
@@ -125785,33 +127280,417 @@ tests:
   - path: test/language/expressions/tagged-template/template-object-frozen-strict.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/tagged-template/template-object-template-map.js
   - path: test/language/expressions/tagged-template/template-object.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/evaluation-order.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-hexidecimal-character-escape-sequence-truncated-1.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-hexidecimal-character-escape-sequence-truncated-2.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-hexidecimal-character-escape-sequence-truncated-3.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence-8.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence-9.js
   - path: test/language/expressions/template-literal/invalid-legacy-octal-escape-sequence.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-1.js
   - path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-2.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-3.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-4.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-5.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-6.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-7.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/invalid-unicode-escape-sequence-8.js
+  - dependencies: [abrupt-completion, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-abrupt.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-function.js
+  - dependencies:
+      [expression-operators, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-member-expr.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-method.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-obj.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-primitive.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-template.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/literal-expr-tostr-error.js
+  - dependencies: [abrupt-completion, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-abrupt.js
+  - dependencies: [abrupt-completion, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-function.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-member-expr.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-method.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-obj.js
+  - dependencies: [abrupt-completion, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-primitive.js
+  - dependencies: [abrupt-completion, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-template.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-many-expr-tostr-error.js
+  - dependencies: [abrupt-completion, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-abrupt.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-function.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-member-expr.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-method.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-obj.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-primitive.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-template.js
+  - dependencies:
+      [
+        abrupt-completion,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/middle-list-one-expr-tostr-error.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/template-literal/mongolian-vowel-separator-eval.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/mongolian-vowel-separator.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/no-sub.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-character-escape-sequence.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-hex-escape-sequence.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-line-continuation.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-line-terminator-sequence.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-no-substitution.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-null-character-escape-sequence.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-template-character.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-template-characters.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-template-head.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-template-middle.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-template-tail.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-utf16-escape-sequence.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/template-literal/tv-zwnbsp.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/unicode-escape-nls-err.js
+  - dependencies: [expression-operators, lexical-grammar]
+    expectedClassification: expected-negative
+    path: test/language/expressions/template-literal/unicode-escape-no-hex-err.js
   - path: test/language/expressions/this/11.1.1-1.js
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/this/S11.1.1_A1.js
     expectedClassification: expected-negative
     dependencies: [expression-operators]
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/this/S11.1.1_A3.1.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, object-properties]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/this/S11.1.1_A3.2.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/this/S11.1.1_A4.1.js
+  - dependencies:
+      [
+        dynamic-source,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/this/S11.1.1_A4.2.js
+  - dependencies: [bigint-primitive, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/bigint.js
   - path: test/language/expressions/typeof/boolean.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - dependencies:
+      [
+        date,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        regular-expressions,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/built-in-exotic-objects-no-call.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/built-in-functions.js
+  - dependencies: [expression-operators, reflect-namespace]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/built-in-ordinary-objects-no-call.js
+  - dependencies:
+      [error-intrinsics, expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/get-value-ref-err.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/get-value.js
+  - dependencies:
+      [
+        date,
+        dynamic-source,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        regular-expressions,
+      ]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/typeof/native-call.js
   - path: test/language/expressions/typeof/null.js
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/typeof/number.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        lexical-bindings,
+        object-literals,
+        object-properties,
+        proxy-exotic-object,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/proxy.js
   - path: test/language/expressions/typeof/string.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - dependencies: [expression-operators, functions, symbols]
+    expectedClassification: pass
+    path: test/language/expressions/typeof/symbol.js
   - path: test/language/expressions/typeof/syntax.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, expression-operators]
@@ -125821,12 +127700,289 @@ tests:
   - path: test/language/expressions/typeof/unresolvable-reference.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/11.4.7-4-1.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/unary-minus/S11.4.7_A1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A2.1_T2.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A2.2_T1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A3_T1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A3_T2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A3_T3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A3_T4.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A3_T5.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A4.1.js
+  - dependencies: [expression-operators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/S11.4.7_A4.2.js
+  - dependencies:
+      [
+        bigint-primitive,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unary-minus/bigint-non-primitive.js
   - path: test/language/expressions/unary-minus/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, expression-operators]
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/11.4.6-2-1.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/unary-plus/S11.4.6_A1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A2.1_T2.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A2.2_T1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A3_T1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A3_T2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A3_T3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A3_T4.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S11.4.6_A3_T5.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/unary-plus/S9.3_A1_T2.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S9.3_A2_T2.js
+  - dependencies: [expression-operators, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S9.3_A3_T2.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S9.3_A4.1_T2.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S9.3_A4.2_T2.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unary-plus/S9.3_A5_T2.js
   - path: test/language/expressions/unary-plus/bigint-throws.js
     expectedClassification: pass
     dependencies: [bigint-primitive, error-intrinsics, expression-operators]
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.1_T1.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.1_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.1_T3.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.2_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.3_T1.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.4_T1.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.4_T2.js
+  - dependencies: [control-flow, error-intrinsics, expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.4_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A2.4_T4.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T1.1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T1.2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T1.3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T1.4.js
+  - dependencies: [expression-operators, functions, object-literals]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T1.5.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.3.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.4.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.5.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.6.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.7.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.8.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A3_T2.9.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A4_T1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A4_T2.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A4_T3.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A4_T4.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A5.1_T1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S11.7.3_A5.2_T1.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A2.1.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A2.2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A3.1_T1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A3.1_T2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A3.1_T3.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A3.1_T4.js
+  - dependencies: [expression-operators]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/S9.6_A3.2_T1.js
+  - dependencies:
+      [bigint-primitive, error-intrinsics, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/bigint-and-number.js
   - path: test/language/expressions/unsigned-right-shift/bigint-errors.js
     expectedClassification: pass
     dependencies:
@@ -125837,6 +127993,18 @@ tests:
         object-properties,
         symbols,
       ]
+  - dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/bigint-non-primitive.js
   - path: test/language/expressions/unsigned-right-shift/bigint-toprimitive.js
     expectedClassification: pass
     dependencies:
@@ -125847,15 +128015,208 @@ tests:
         object-properties,
         symbols,
       ]
+  - dependencies:
+      [
+        bigint-primitive,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        symbols,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/bigint-wrapped-values.js
   - path: test/language/expressions/unsigned-right-shift/bigint.js
     expectedClassification: pass
     dependencies: [bigint-primitive, error-intrinsics, expression-operators]
+  - dependencies:
+      [
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-literals,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/unsigned-right-shift/order-of-evaluation.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, lexical-grammar]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/expressions/void/S11.4.2_A1.js
   - path: test/language/expressions/void/S11.4.2_A2_T1.js
     expectedClassification: pass
     dependencies: [expression-operators]
+  - dependencies: [error-intrinsics, expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/expressions/void/S11.4.2_A2_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/void/S11.4.2_A4_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/void/S11.4.2_A4_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/void/S11.4.2_A4_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/void/S11.4.2_A4_T4.js
+  - dependencies:
+      [expression-operators, functions, object-literals, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/void/S11.4.2_A4_T5.js
+  - dependencies: [expression-operators, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/void/S11.4.2_A4_T6.js
   - path: test/language/expressions/yield/arguments-object-attributes.js
     expectedClassification: pass
     dependencies: [functions, generators, object-properties]
+  - dependencies: [functions, generators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/captured-free-vars.js
+  - dependencies: [functions, generators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/formal-parameters-after-reassignment-non-strict.js
+  - dependencies: [functions, generators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/formal-parameters-after-reassignment-strict.js
+  - dependencies: [functions, generators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/formal-parameters.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        generators,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/from-catch.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        functions,
+        generators,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/from-try.js
+  - dependencies:
+      [
+        control-flow,
+        functions,
+        generators,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/from-with.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        generators,
+        object-literals,
+      ]
+    expectedClassification: expected-negative
+    path: test/language/expressions/yield/in-iteration-stmt.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        generators,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/in-rltn-expr.js
+  - dependencies: [expression-operators, functions, generators]
+    expectedClassification: expected-negative
+    path: test/language/expressions/yield/invalid-left-hand-side.js
+  - dependencies:
+      [functions, generators, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/iter-value-specified.js
+  - dependencies: [functions, generators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/iter-value-unspecified.js
+  - dependencies:
+      [
+        functions,
+        generators,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/rhs-iter.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        generators,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/rhs-omitted.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        generators,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/rhs-primitive.js
+  - dependencies:
+      [
+        functions,
+        generators,
+        object-literals,
+        object-properties,
+        regular-expressions,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/rhs-regexp.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        generators,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/rhs-template-middle.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        generators,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/rhs-unresolvable.js
+  - dependencies: [functions, generators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/rhs-yield.js
   - path: test/language/expressions/yield/star-array.js
     expectedClassification: pass
     dependencies: [generators, iterator-protocol]
@@ -125931,12 +128292,1262 @@ tests:
   - path: test/language/expressions/yield/star-rhs-iter-rtrn-rtrn-invoke.js
     expectedClassification: pass
     dependencies: [generators, iterator-protocol]
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-res-done-err.js
+  - dependencies:
+      [
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-res-done-no-value.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-res-value-err.js
+  - dependencies:
+      [
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-res-value-final.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-thrw-call-err.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-thrw-call-non-obj.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-thrw-get-err.js
+  - dependencies:
+      [
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-thrw-invoke.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-violation-no-rtrn.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-violation-rtrn-call-err.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-violation-rtrn-call-non-obj.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-violation-rtrn-get-err.js
+  - dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-rhs-iter-thrw-violation-rtrn-invoke.js
   - path: test/language/expressions/yield/star-rhs-unresolvable.js
     expectedClassification: pass
     dependencies: [generators, iterator-protocol]
+  - dependencies:
+      [
+        functions,
+        generators,
+        iterator-protocol,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-string.js
+  - dependencies:
+      [
+        error-intrinsics,
+        functions,
+        generators,
+        iterator-protocol,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/star-throw-is-null.js
+  - dependencies: [functions, generators, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/expressions/yield/then-return.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        generators,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/expressions/yield/within-for.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-1-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-10-s.js
+  - dependencies: [functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-100-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-100gs.js
+  - dependencies: [functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-101-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-101gs.js
+  - dependencies: [functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-102-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-102gs.js
+  - dependencies:
+      [expression-operators, functions, object-literals, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-103.js
+  - dependencies:
+      [expression-operators, functions, object-literals, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-104.js
+  - dependencies:
+      [expression-operators, functions, object-literals, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-105.js
+  - dependencies:
+      [expression-operators, functions, object-literals, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-106.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-10gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-11-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-11gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-12-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-12gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-13-s.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-13gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-14-s.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-14gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-15-s.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-15gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-16-s.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-16gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-17-s.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-17gs.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-18gs.js
+  - dependencies: [dynamic-source, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-19-s.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-19gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-2-s.js
+  - dependencies: [dynamic-source, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-20-s.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-20gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-21-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-21gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-22-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-22gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-23-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-23gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-24-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-24gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-25-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-25gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-26-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-26gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-27-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-27gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-28-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-28gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-29-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-29gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-3-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-30-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-30gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-31-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-31gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-32-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-32gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-33-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-33gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-34-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-34gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-35-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-35gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-36-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-36gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-37-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-37gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-38-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-38gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-39-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-39gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-4-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-40-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-40gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-41-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-41gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-42-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-42gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-43-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-43gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-44-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-44gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-45-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-45gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-46-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-46gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-47-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-47gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-48-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-48gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-49-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-49gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-5-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-50-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-50gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-51-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-51gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-52-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-52gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-53-s.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-53gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-54-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-54gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-55-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-55gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-56-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-56gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-57-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-57gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-58-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-58gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-59-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-59gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-60-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-60gs.js
+  - dependencies: [functions, object-literals, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-61-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-61gs.js
+  - dependencies: [functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-62-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-62gs.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-63-s.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-63gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, object-properties]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-64-s.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-64gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, object-properties]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-65-s.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-65gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-66-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-66gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-67-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-67gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-68-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-68gs.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-69-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-69gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-7-s.js
+  - dependencies: [functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-70-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-70gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-71-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-71gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-72-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-72gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-73-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-73gs.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-74-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-74gs.js
+  - dependencies: [functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-75-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-75gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-76-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-76gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-77-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-77gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-78-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-78gs.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-79-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-79gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-7gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-8-s.js
+  - dependencies: [functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-80-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-80gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-81-s.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-81gs.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-82-s.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-82gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, object-properties]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-83-s.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-83gs.js
+  - dependencies:
+      [dynamic-source, expression-operators, functions, object-properties]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-84-s.js
+  - dependencies: [dynamic-source, expression-operators, functions]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/10.4.3-1-84gs.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-85-s.js
+  - dependencies: [expression-operators, functions, object-properties]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-85gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-86-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-86gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-87-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-87gs.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-88-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-88gs.js
+  - dependencies: [functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-89-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-89gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-8gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-9-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-90-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-90gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-91-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-91gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-92-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-92gs.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-93-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-93gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-94-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-94gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-95-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-95gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-96-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-96gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-97-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-97gs.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-98-s.js
+  - dependencies:
+      [
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-98gs.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-99-s.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-99gs.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/10.4.3-1-9gs.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/S10.1.6_A1_T1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A1.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A2.js
+  - dependencies: [expression-operators, functions]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A3.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A4_T1.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A4_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A5.1_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A5.1_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.2.1_A5.2_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.4.3_A1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.4A1.1_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/function-code/S10.4_A1.1_T1.js
   - path: test/language/function-code/block-decl-onlystrict.js
     expectedClassification: pass
     dependencies: [error-intrinsics, functions, lexical-bindings]
+  - dependencies:
+      [
+        destructuring-bindings,
+        dynamic-source,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/eval-param-env-with-computed-key.js
+  - dependencies:
+      [
+        default-parameters,
+        destructuring-bindings,
+        dynamic-source,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: unsupported-profile-feature
+    path: test/language/function-code/eval-param-env-with-prop-initializer.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/switch-case-decl-onlystrict.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/function-code/switch-dflt-decl-onlystrict.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/_implements.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/abstract.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/boolean.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/byte.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/char.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/class.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/const.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/debugger.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/double.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/enum.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/export.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/extends.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/final.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/float.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/goto.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/implement.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/implements-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/implements-strict.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/implements-titlecase.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/implements-uppercase.js
+  - dependencies: [lexical-bindings, lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/implements.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/implements0.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/implementss.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/import.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/int.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/interface-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/interface-strict.js
+  - dependencies: [lexical-bindings, lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/interface.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/let-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/let-strict.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/long.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/native.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/package-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/package-strict.js
+  - dependencies: [lexical-bindings, lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/package.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/private-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/private-strict.js
+  - dependencies: [lexical-bindings, lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/private.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/protected-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/protected-strict.js
+  - dependencies: [lexical-bindings, lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/protected.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/public-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/public-strict.js
+  - dependencies: [lexical-bindings, lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/public.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/short.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/static-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/static-strict.js
+  - dependencies: [lexical-bindings, lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/static.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/super.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/synchronized.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/throws.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/transient.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: pass
+    path: test/language/future-reserved-words/volatile.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/yield-strict-escaped.js
+  - dependencies: [lexical-grammar, var-bindings]
+    expectedClassification: expected-negative
+    path: test/language/future-reserved-words/yield-strict.js
   - path: test/language/global-code/S10.1.7_A1_T1.js
     expectedClassification: pass
     dependencies: [expression-operators]
@@ -125955,6 +129566,10 @@ tests:
   - path: test/language/global-code/decl-func.js
     expectedClassification: pass
     dependencies: [functions, object-properties]
+  - dependencies:
+      [expression-operators, functions, lexical-bindings, object-properties]
+    expectedClassification: pass
+    path: test/language/global-code/decl-lex-configurable-global.js
   - path: test/language/global-code/decl-lex-deletion.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
@@ -125967,6 +129582,12 @@ tests:
   - path: test/language/global-code/decl-var.js
     expectedClassification: pass
     dependencies: [object-properties, var-bindings]
+  - dependencies: [module-linking]
+    expectedClassification: expected-negative
+    path: test/language/global-code/export.js
+  - dependencies: [module-linking]
+    expectedClassification: expected-negative
+    path: test/language/global-code/import.js
   - path: test/language/global-code/invalid-private-names-call-expression-bad-reference.js
     expectedClassification: expected-negative
     dependencies: [classes]
@@ -126054,9 +129675,99 @@ tests:
   - path: test/language/global-code/yield-strict.js
     expectedClassification: expected-negative
     dependencies: [generators]
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T1.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T2.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T3.js
+  - dependencies: [expression-operators, functions, var-bindings]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T4.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T5.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T6.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T7.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T8.js
+  - dependencies:
+      [
+        control-flow,
+        expression-operators,
+        functions,
+        object-literals,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S10.2.2_A1_T9.js
+  - dependencies:
+      [expression-operators, functions, object-properties, var-bindings]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S11.1.2_A1_T1.js
+  - dependencies:
+      [
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/S11.1.2_A1_T2.js
+  - dependencies:
+      [abrupt-completion, error-intrinsics, functions, object-properties]
+    expectedClassification: expected-negative
+    path: test/language/identifier-resolution/assign-to-global-undefined.js
   - path: test/language/identifier-resolution/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
+  - dependencies:
+      [functions, object-literals, object-properties, symbols, var-bindings]
+    expectedClassification: pass
+    path: test/language/identifier-resolution/unscopables.js
   - path: test/language/identifiers/val-this.js
     expectedClassification: expected-negative
     dependencies: [var-bindings]

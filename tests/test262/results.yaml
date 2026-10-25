@@ -17859,8 +17859,569 @@ partitions:
     key: ff
     path: results/language/expressions/ff.yaml
   - group: language/function-code
+    key: "00"
+    path: results/language/function-code/00.yaml
+  - group: language/function-code
+    key: "01"
+    path: results/language/function-code/01.yaml
+  - group: language/function-code
+    key: "04"
+    path: results/language/function-code/04.yaml
+  - group: language/function-code
+    key: "05"
+    path: results/language/function-code/05.yaml
+  - group: language/function-code
+    key: "06"
+    path: results/language/function-code/06.yaml
+  - group: language/function-code
+    key: "07"
+    path: results/language/function-code/07.yaml
+  - group: language/function-code
+    key: "09"
+    path: results/language/function-code/09.yaml
+  - group: language/function-code
+    key: 0a
+    path: results/language/function-code/0a.yaml
+  - group: language/function-code
+    key: 0c
+    path: results/language/function-code/0c.yaml
+  - group: language/function-code
+    key: 0d
+    path: results/language/function-code/0d.yaml
+  - group: language/function-code
+    key: 0e
+    path: results/language/function-code/0e.yaml
+  - group: language/function-code
+    key: "14"
+    path: results/language/function-code/14.yaml
+  - group: language/function-code
+    key: "15"
+    path: results/language/function-code/15.yaml
+  - group: language/function-code
+    key: "16"
+    path: results/language/function-code/16.yaml
+  - group: language/function-code
+    key: "17"
+    path: results/language/function-code/17.yaml
+  - group: language/function-code
+    key: "18"
+    path: results/language/function-code/18.yaml
+  - group: language/function-code
+    key: 1b
+    path: results/language/function-code/1b.yaml
+  - group: language/function-code
+    key: 1d
+    path: results/language/function-code/1d.yaml
+  - group: language/function-code
+    key: 1e
+    path: results/language/function-code/1e.yaml
+  - group: language/function-code
+    key: 1f
+    path: results/language/function-code/1f.yaml
+  - group: language/function-code
+    key: "20"
+    path: results/language/function-code/20.yaml
+  - group: language/function-code
+    key: "21"
+    path: results/language/function-code/21.yaml
+  - group: language/function-code
+    key: "22"
+    path: results/language/function-code/22.yaml
+  - group: language/function-code
+    key: "24"
+    path: results/language/function-code/24.yaml
+  - group: language/function-code
+    key: "25"
+    path: results/language/function-code/25.yaml
+  - group: language/function-code
+    key: "26"
+    path: results/language/function-code/26.yaml
+  - group: language/function-code
+    key: "29"
+    path: results/language/function-code/29.yaml
+  - group: language/function-code
+    key: 2a
+    path: results/language/function-code/2a.yaml
+  - group: language/function-code
+    key: 2f
+    path: results/language/function-code/2f.yaml
+  - group: language/function-code
+    key: "30"
+    path: results/language/function-code/30.yaml
+  - group: language/function-code
+    key: "32"
+    path: results/language/function-code/32.yaml
+  - group: language/function-code
+    key: "33"
+    path: results/language/function-code/33.yaml
+  - group: language/function-code
+    key: "34"
+    path: results/language/function-code/34.yaml
+  - group: language/function-code
+    key: "35"
+    path: results/language/function-code/35.yaml
+  - group: language/function-code
+    key: "37"
+    path: results/language/function-code/37.yaml
+  - group: language/function-code
+    key: "38"
+    path: results/language/function-code/38.yaml
+  - group: language/function-code
+    key: 3c
+    path: results/language/function-code/3c.yaml
+  - group: language/function-code
+    key: "41"
+    path: results/language/function-code/41.yaml
+  - group: language/function-code
+    key: "42"
+    path: results/language/function-code/42.yaml
+  - group: language/function-code
+    key: "43"
+    path: results/language/function-code/43.yaml
+  - group: language/function-code
+    key: "44"
+    path: results/language/function-code/44.yaml
+  - group: language/function-code
+    key: "45"
+    path: results/language/function-code/45.yaml
+  - group: language/function-code
+    key: "46"
+    path: results/language/function-code/46.yaml
+  - group: language/function-code
+    key: "47"
+    path: results/language/function-code/47.yaml
+  - group: language/function-code
+    key: "48"
+    path: results/language/function-code/48.yaml
+  - group: language/function-code
+    key: "49"
+    path: results/language/function-code/49.yaml
+  - group: language/function-code
+    key: 4a
+    path: results/language/function-code/4a.yaml
+  - group: language/function-code
+    key: 4d
+    path: results/language/function-code/4d.yaml
+  - group: language/function-code
+    key: "50"
+    path: results/language/function-code/50.yaml
+  - group: language/function-code
+    key: "52"
+    path: results/language/function-code/52.yaml
+  - group: language/function-code
+    key: "54"
+    path: results/language/function-code/54.yaml
+  - group: language/function-code
+    key: "58"
+    path: results/language/function-code/58.yaml
+  - group: language/function-code
+    key: 5a
+    path: results/language/function-code/5a.yaml
+  - group: language/function-code
+    key: 5d
+    path: results/language/function-code/5d.yaml
+  - group: language/function-code
+    key: "63"
+    path: results/language/function-code/63.yaml
+  - group: language/function-code
+    key: "65"
+    path: results/language/function-code/65.yaml
+  - group: language/function-code
+    key: "67"
+    path: results/language/function-code/67.yaml
+  - group: language/function-code
+    key: "68"
+    path: results/language/function-code/68.yaml
+  - group: language/function-code
+    key: "69"
+    path: results/language/function-code/69.yaml
+  - group: language/function-code
+    key: 6a
+    path: results/language/function-code/6a.yaml
+  - group: language/function-code
+    key: 6b
+    path: results/language/function-code/6b.yaml
+  - group: language/function-code
+    key: 6c
+    path: results/language/function-code/6c.yaml
+  - group: language/function-code
+    key: 6d
+    path: results/language/function-code/6d.yaml
+  - group: language/function-code
+    key: 6f
+    path: results/language/function-code/6f.yaml
+  - group: language/function-code
+    key: "71"
+    path: results/language/function-code/71.yaml
+  - group: language/function-code
+    key: "72"
+    path: results/language/function-code/72.yaml
+  - group: language/function-code
+    key: "73"
+    path: results/language/function-code/73.yaml
+  - group: language/function-code
+    key: "74"
+    path: results/language/function-code/74.yaml
+  - group: language/function-code
+    key: "76"
+    path: results/language/function-code/76.yaml
+  - group: language/function-code
+    key: "77"
+    path: results/language/function-code/77.yaml
+  - group: language/function-code
+    key: "79"
+    path: results/language/function-code/79.yaml
+  - group: language/function-code
+    key: 7a
+    path: results/language/function-code/7a.yaml
+  - group: language/function-code
+    key: 7b
+    path: results/language/function-code/7b.yaml
+  - group: language/function-code
+    key: 7e
+    path: results/language/function-code/7e.yaml
+  - group: language/function-code
+    key: 7f
+    path: results/language/function-code/7f.yaml
+  - group: language/function-code
+    key: "80"
+    path: results/language/function-code/80.yaml
+  - group: language/function-code
+    key: "81"
+    path: results/language/function-code/81.yaml
+  - group: language/function-code
+    key: "82"
+    path: results/language/function-code/82.yaml
+  - group: language/function-code
+    key: "84"
+    path: results/language/function-code/84.yaml
+  - group: language/function-code
+    key: "86"
+    path: results/language/function-code/86.yaml
+  - group: language/function-code
+    key: 8c
+    path: results/language/function-code/8c.yaml
+  - group: language/function-code
+    key: 8e
+    path: results/language/function-code/8e.yaml
+  - group: language/function-code
+    key: "92"
+    path: results/language/function-code/92.yaml
+  - group: language/function-code
+    key: "94"
+    path: results/language/function-code/94.yaml
+  - group: language/function-code
+    key: "96"
+    path: results/language/function-code/96.yaml
+  - group: language/function-code
+    key: "97"
+    path: results/language/function-code/97.yaml
+  - group: language/function-code
+    key: 9a
+    path: results/language/function-code/9a.yaml
+  - group: language/function-code
+    key: 9b
+    path: results/language/function-code/9b.yaml
+  - group: language/function-code
+    key: 9c
+    path: results/language/function-code/9c.yaml
+  - group: language/function-code
+    key: 9d
+    path: results/language/function-code/9d.yaml
+  - group: language/function-code
+    key: 9f
+    path: results/language/function-code/9f.yaml
+  - group: language/function-code
+    key: a1
+    path: results/language/function-code/a1.yaml
+  - group: language/function-code
+    key: a6
+    path: results/language/function-code/a6.yaml
+  - group: language/function-code
+    key: a9
+    path: results/language/function-code/a9.yaml
+  - group: language/function-code
+    key: ab
+    path: results/language/function-code/ab.yaml
+  - group: language/function-code
+    key: ae
+    path: results/language/function-code/ae.yaml
+  - group: language/function-code
+    key: b0
+    path: results/language/function-code/b0.yaml
+  - group: language/function-code
+    key: b2
+    path: results/language/function-code/b2.yaml
+  - group: language/function-code
+    key: b4
+    path: results/language/function-code/b4.yaml
+  - group: language/function-code
+    key: b5
+    path: results/language/function-code/b5.yaml
+  - group: language/function-code
+    key: b6
+    path: results/language/function-code/b6.yaml
+  - group: language/function-code
+    key: b9
+    path: results/language/function-code/b9.yaml
+  - group: language/function-code
+    key: ba
+    path: results/language/function-code/ba.yaml
+  - group: language/function-code
+    key: bb
+    path: results/language/function-code/bb.yaml
+  - group: language/function-code
+    key: bd
+    path: results/language/function-code/bd.yaml
+  - group: language/function-code
+    key: be
+    path: results/language/function-code/be.yaml
+  - group: language/function-code
+    key: bf
+    path: results/language/function-code/bf.yaml
+  - group: language/function-code
+    key: c0
+    path: results/language/function-code/c0.yaml
+  - group: language/function-code
+    key: c1
+    path: results/language/function-code/c1.yaml
+  - group: language/function-code
+    key: c2
+    path: results/language/function-code/c2.yaml
+  - group: language/function-code
+    key: c3
+    path: results/language/function-code/c3.yaml
+  - group: language/function-code
+    key: c4
+    path: results/language/function-code/c4.yaml
+  - group: language/function-code
+    key: c5
+    path: results/language/function-code/c5.yaml
+  - group: language/function-code
+    key: c6
+    path: results/language/function-code/c6.yaml
+  - group: language/function-code
+    key: c7
+    path: results/language/function-code/c7.yaml
+  - group: language/function-code
+    key: c8
+    path: results/language/function-code/c8.yaml
+  - group: language/function-code
+    key: c9
+    path: results/language/function-code/c9.yaml
+  - group: language/function-code
+    key: ce
+    path: results/language/function-code/ce.yaml
+  - group: language/function-code
+    key: d0
+    path: results/language/function-code/d0.yaml
+  - group: language/function-code
+    key: d2
+    path: results/language/function-code/d2.yaml
+  - group: language/function-code
+    key: d4
+    path: results/language/function-code/d4.yaml
+  - group: language/function-code
+    key: d5
+    path: results/language/function-code/d5.yaml
+  - group: language/function-code
+    key: d7
+    path: results/language/function-code/d7.yaml
+  - group: language/function-code
+    key: d8
+    path: results/language/function-code/d8.yaml
+  - group: language/function-code
+    key: d9
+    path: results/language/function-code/d9.yaml
+  - group: language/function-code
+    key: da
+    path: results/language/function-code/da.yaml
+  - group: language/function-code
+    key: db
+    path: results/language/function-code/db.yaml
+  - group: language/function-code
+    key: dc
+    path: results/language/function-code/dc.yaml
+  - group: language/function-code
+    key: dd
+    path: results/language/function-code/dd.yaml
+  - group: language/function-code
+    key: e0
+    path: results/language/function-code/e0.yaml
+  - group: language/function-code
+    key: e2
+    path: results/language/function-code/e2.yaml
+  - group: language/function-code
+    key: e3
+    path: results/language/function-code/e3.yaml
+  - group: language/function-code
+    key: ea
+    path: results/language/function-code/ea.yaml
+  - group: language/function-code
+    key: eb
+    path: results/language/function-code/eb.yaml
+  - group: language/function-code
+    key: ee
+    path: results/language/function-code/ee.yaml
+  - group: language/function-code
+    key: ef
+    path: results/language/function-code/ef.yaml
+  - group: language/function-code
     key: f0
     path: results/language/function-code/f0.yaml
+  - group: language/function-code
+    key: f3
+    path: results/language/function-code/f3.yaml
+  - group: language/function-code
+    key: f4
+    path: results/language/function-code/f4.yaml
+  - group: language/function-code
+    key: f5
+    path: results/language/function-code/f5.yaml
+  - group: language/function-code
+    key: fa
+    path: results/language/function-code/fa.yaml
+  - group: language/function-code
+    key: fe
+    path: results/language/function-code/fe.yaml
+  - group: language/function-code
+    key: ff
+    path: results/language/function-code/ff.yaml
+  - group: language/future-reserved-words
+    key: "03"
+    path: results/language/future-reserved-words/03.yaml
+  - group: language/future-reserved-words
+    key: 0a
+    path: results/language/future-reserved-words/0a.yaml
+  - group: language/future-reserved-words
+    key: "14"
+    path: results/language/future-reserved-words/14.yaml
+  - group: language/future-reserved-words
+    key: 1c
+    path: results/language/future-reserved-words/1c.yaml
+  - group: language/future-reserved-words
+    key: 1d
+    path: results/language/future-reserved-words/1d.yaml
+  - group: language/future-reserved-words
+    key: 2b
+    path: results/language/future-reserved-words/2b.yaml
+  - group: language/future-reserved-words
+    key: 2d
+    path: results/language/future-reserved-words/2d.yaml
+  - group: language/future-reserved-words
+    key: 2e
+    path: results/language/future-reserved-words/2e.yaml
+  - group: language/future-reserved-words
+    key: "31"
+    path: results/language/future-reserved-words/31.yaml
+  - group: language/future-reserved-words
+    key: 3c
+    path: results/language/future-reserved-words/3c.yaml
+  - group: language/future-reserved-words
+    key: 3f
+    path: results/language/future-reserved-words/3f.yaml
+  - group: language/future-reserved-words
+    key: "40"
+    path: results/language/future-reserved-words/40.yaml
+  - group: language/future-reserved-words
+    key: "45"
+    path: results/language/future-reserved-words/45.yaml
+  - group: language/future-reserved-words
+    key: "47"
+    path: results/language/future-reserved-words/47.yaml
+  - group: language/future-reserved-words
+    key: 4a
+    path: results/language/future-reserved-words/4a.yaml
+  - group: language/future-reserved-words
+    key: 4b
+    path: results/language/future-reserved-words/4b.yaml
+  - group: language/future-reserved-words
+    key: "52"
+    path: results/language/future-reserved-words/52.yaml
+  - group: language/future-reserved-words
+    key: "53"
+    path: results/language/future-reserved-words/53.yaml
+  - group: language/future-reserved-words
+    key: 5b
+    path: results/language/future-reserved-words/5b.yaml
+  - group: language/future-reserved-words
+    key: 5c
+    path: results/language/future-reserved-words/5c.yaml
+  - group: language/future-reserved-words
+    key: 5d
+    path: results/language/future-reserved-words/5d.yaml
+  - group: language/future-reserved-words
+    key: "64"
+    path: results/language/future-reserved-words/64.yaml
+  - group: language/future-reserved-words
+    key: "69"
+    path: results/language/future-reserved-words/69.yaml
+  - group: language/future-reserved-words
+    key: 6a
+    path: results/language/future-reserved-words/6a.yaml
+  - group: language/future-reserved-words
+    key: 6b
+    path: results/language/future-reserved-words/6b.yaml
+  - group: language/future-reserved-words
+    key: "79"
+    path: results/language/future-reserved-words/79.yaml
+  - group: language/future-reserved-words
+    key: 7d
+    path: results/language/future-reserved-words/7d.yaml
+  - group: language/future-reserved-words
+    key: "85"
+    path: results/language/future-reserved-words/85.yaml
+  - group: language/future-reserved-words
+    key: "86"
+    path: results/language/future-reserved-words/86.yaml
+  - group: language/future-reserved-words
+    key: "88"
+    path: results/language/future-reserved-words/88.yaml
+  - group: language/future-reserved-words
+    key: 8d
+    path: results/language/future-reserved-words/8d.yaml
+  - group: language/future-reserved-words
+    key: 8f
+    path: results/language/future-reserved-words/8f.yaml
+  - group: language/future-reserved-words
+    key: "90"
+    path: results/language/future-reserved-words/90.yaml
+  - group: language/future-reserved-words
+    key: "92"
+    path: results/language/future-reserved-words/92.yaml
+  - group: language/future-reserved-words
+    key: a0
+    path: results/language/future-reserved-words/a0.yaml
+  - group: language/future-reserved-words
+    key: a8
+    path: results/language/future-reserved-words/a8.yaml
+  - group: language/future-reserved-words
+    key: b0
+    path: results/language/future-reserved-words/b0.yaml
+  - group: language/future-reserved-words
+    key: b5
+    path: results/language/future-reserved-words/b5.yaml
+  - group: language/future-reserved-words
+    key: bd
+    path: results/language/future-reserved-words/bd.yaml
+  - group: language/future-reserved-words
+    key: da
+    path: results/language/future-reserved-words/da.yaml
+  - group: language/future-reserved-words
+    key: dd
+    path: results/language/future-reserved-words/dd.yaml
+  - group: language/future-reserved-words
+    key: e1
+    path: results/language/future-reserved-words/e1.yaml
+  - group: language/future-reserved-words
+    key: e3
+    path: results/language/future-reserved-words/e3.yaml
+  - group: language/future-reserved-words
+    key: ea
+    path: results/language/future-reserved-words/ea.yaml
+  - group: language/future-reserved-words
+    key: fb
+    path: results/language/future-reserved-words/fb.yaml
   - group: language/global-code
     key: "08"
     path: results/language/global-code/08.yaml
@@ -17885,6 +18446,12 @@ partitions:
   - group: language/global-code
     key: 4f
     path: results/language/global-code/4f.yaml
+  - group: language/global-code
+    key: "50"
+    path: results/language/global-code/50.yaml
+  - group: language/global-code
+    key: "52"
+    path: results/language/global-code/52.yaml
   - group: language/global-code
     key: "62"
     path: results/language/global-code/62.yaml
@@ -17940,6 +18507,9 @@ partitions:
     key: b8
     path: results/language/global-code/b8.yaml
   - group: language/global-code
+    key: c0
+    path: results/language/global-code/c0.yaml
+  - group: language/global-code
     key: c2
     path: results/language/global-code/c2.yaml
   - group: language/global-code
@@ -17970,8 +18540,47 @@ partitions:
     key: f1
     path: results/language/global-code/f1.yaml
   - group: language/identifier-resolution
+    key: "06"
+    path: results/language/identifier-resolution/06.yaml
+  - group: language/identifier-resolution
+    key: 2b
+    path: results/language/identifier-resolution/2b.yaml
+  - group: language/identifier-resolution
+    key: "33"
+    path: results/language/identifier-resolution/33.yaml
+  - group: language/identifier-resolution
+    key: "35"
+    path: results/language/identifier-resolution/35.yaml
+  - group: language/identifier-resolution
     key: "39"
     path: results/language/identifier-resolution/39.yaml
+  - group: language/identifier-resolution
+    key: 4d
+    path: results/language/identifier-resolution/4d.yaml
+  - group: language/identifier-resolution
+    key: "53"
+    path: results/language/identifier-resolution/53.yaml
+  - group: language/identifier-resolution
+    key: 5a
+    path: results/language/identifier-resolution/5a.yaml
+  - group: language/identifier-resolution
+    key: "80"
+    path: results/language/identifier-resolution/80.yaml
+  - group: language/identifier-resolution
+    key: "83"
+    path: results/language/identifier-resolution/83.yaml
+  - group: language/identifier-resolution
+    key: 8a
+    path: results/language/identifier-resolution/8a.yaml
+  - group: language/identifier-resolution
+    key: "92"
+    path: results/language/identifier-resolution/92.yaml
+  - group: language/identifier-resolution
+    key: 9a
+    path: results/language/identifier-resolution/9a.yaml
+  - group: language/identifier-resolution
+    key: a1
+    path: results/language/identifier-resolution/a1.yaml
   - group: language/identifiers
     key: "76"
     path: results/language/identifiers/76.yaml
@@ -19453,18 +20062,18 @@ partitions:
     path: results/language/statements/ff.yaml
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 summary:
-  expectedNegatives: 2732
+  expectedNegatives: 2802
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 24966
+  passes: 25602
   semanticFailures: 0
-  unsupportedProfileFeatures: 1449
+  unsupportedProfileFeatures: 1497
   dependencies:
     - dependency: abrupt-completion
-      expectedNegatives: 6
+      expectedNegatives: 7
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1563
+      passes: 1626
       semanticFailures: 0
       unsupportedProfileFeatures: 53
     - dependency: array-buffer
@@ -19506,21 +20115,21 @@ summary:
       expectedNegatives: 39
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 453
+      passes: 465
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: classes
       expectedNegatives: 966
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4040
+      passes: 4061
       semanticFailures: 0
       unsupportedProfileFeatures: 114
     - dependency: control-flow
-      expectedNegatives: 275
+      expectedNegatives: 276
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1327
+      passes: 1412
       semanticFailures: 0
       unsupportedProfileFeatures: 60
     - dependency: data-view
@@ -19534,63 +20143,63 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 583
+      passes: 586
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 4
     - dependency: default-parameters
       expectedNegatives: 171
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 1553
       semanticFailures: 0
-      unsupportedProfileFeatures: 25
+      unsupportedProfileFeatures: 26
     - dependency: destructuring-bindings
       expectedNegatives: 462
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 4165
       semanticFailures: 0
-      unsupportedProfileFeatures: 11
+      unsupportedProfileFeatures: 13
     - dependency: dynamic-source
       expectedNegatives: 3
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 18
       semanticFailures: 0
-      unsupportedProfileFeatures: 399
+      unsupportedProfileFeatures: 447
     - dependency: error-intrinsics
-      expectedNegatives: 5
+      expectedNegatives: 6
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1170
+      passes: 1245
       semanticFailures: 0
-      unsupportedProfileFeatures: 49
+      unsupportedProfileFeatures: 50
     - dependency: expression-operators
-      expectedNegatives: 417
+      expectedNegatives: 457
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4122
+      passes: 4669
       semanticFailures: 0
-      unsupportedProfileFeatures: 104
+      unsupportedProfileFeatures: 148
     - dependency: functions
-      expectedNegatives: 725
+      expectedNegatives: 740
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9439
+      passes: 9938
       semanticFailures: 0
-      unsupportedProfileFeatures: 718
+      unsupportedProfileFeatures: 766
     - dependency: generators
-      expectedNegatives: 259
+      expectedNegatives: 265
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1929
+      passes: 1963
       semanticFailures: 0
       unsupportedProfileFeatures: 30
     - dependency: iterator-protocol
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3336
+      passes: 3361
       semanticFailures: 0
       unsupportedProfileFeatures: 405
     - dependency: json-parse
@@ -19611,44 +20220,44 @@ summary:
       expectedNegatives: 243
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 822
+      passes: 855
       semanticFailures: 0
       unsupportedProfileFeatures: 27
     - dependency: lexical-grammar
-      expectedNegatives: 46
+      expectedNegatives: 95
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 90
+      passes: 129
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 14
     - dependency: module-linking
-      expectedNegatives: 196
+      expectedNegatives: 198
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 66
       semanticFailures: 0
       unsupportedProfileFeatures: 65
     - dependency: object-literals
-      expectedNegatives: 168
+      expectedNegatives: 169
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2565
+      passes: 2727
       semanticFailures: 0
-      unsupportedProfileFeatures: 30
+      unsupportedProfileFeatures: 32
     - dependency: object-own-keys
       expectedNegatives: 6
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 364
+      passes: 369
       semanticFailures: 0
       unsupportedProfileFeatures: 2
     - dependency: object-properties
-      expectedNegatives: 579
+      expectedNegatives: 581
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 15391
+      passes: 15665
       semanticFailures: 0
-      unsupportedProfileFeatures: 127
+      unsupportedProfileFeatures: 137
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -19667,23 +20276,23 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 303
+      passes: 304
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - dependency: reflect-namespace
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 317
+      passes: 319
       semanticFailures: 0
       unsupportedProfileFeatures: 4
     - dependency: regular-expressions
       expectedNegatives: 2
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 515
+      passes: 517
       semanticFailures: 0
-      unsupportedProfileFeatures: 2
+      unsupportedProfileFeatures: 3
     - dependency: rest-parameters
       expectedNegatives: 55
       harnessFailures: 0
@@ -19709,7 +20318,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1992
+      passes: 2023
       semanticFailures: 0
       unsupportedProfileFeatures: 34
     - dependency: top-level-await
@@ -19769,12 +20378,12 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1
     - dependency: var-bindings
-      expectedNegatives: 138
+      expectedNegatives: 164
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4418
+      passes: 4777
       semanticFailures: 0
-      unsupportedProfileFeatures: 100
+      unsupportedProfileFeatures: 120
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
@@ -20239,31 +20848,38 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 3
     - group: language/expressions
-      expectedNegatives: 1504
+      expectedNegatives: 1545
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6977
+      passes: 7384
       semanticFailures: 0
-      unsupportedProfileFeatures: 312
+      unsupportedProfileFeatures: 331
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1
+      passes: 188
+      semanticFailures: 0
+      unsupportedProfileFeatures: 29
+    - group: language/future-reserved-words
+      expectedNegatives: 26
+      harnessFailures: 0
+      infrastructureFailures: 0
+      passes: 29
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/global-code
-      expectedNegatives: 13
+      expectedNegatives: 15
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 13
+      passes: 14
       semanticFailures: 0
       unsupportedProfileFeatures: 13
     - group: language/identifier-resolution
-      expectedNegatives: 1
+      expectedNegatives: 2
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 0
+      passes: 12
       semanticFailures: 0
       unsupportedProfileFeatures: 0
     - group: language/identifiers

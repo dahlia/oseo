@@ -2,10 +2,13 @@ version: 1
 id: observation-batch-16
 title: Observe language/expressions/postfix- and 15 more
 delivers: "Observes the 467 unreviewed paths that
-  docs/m5c-closure/observation-batches.yaml selects for observation-batch-16
-  (469 review units): admits them to the reviewed subset with dependency tags,
-  regenerates the manifest and the ledger, and assigns every unsupported
-  result an owner."
+  docs/m5c-closure/observation-batches.yaml selects for
+  observation-batch-16 (469 review units): admits them to the reviewed
+  subset with dependency tags, regenerates the manifest and the ledger,
+  and assigns every unsupported result an owner. The source-bound
+  admission preparation and remaining review/integration gates are
+  recorded in docs/m5c-graph/observation-batch-16.md; all originals
+  enter together and no B18 path is admitted."
 dependencies:
   - computed-member-reference-key-order
   - observation-batch-plan

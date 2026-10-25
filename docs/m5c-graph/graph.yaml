@@ -1,23 +1,24 @@
 version: 1
 checkpoint: M5c
-usage: "Take a node whose status is ready and whose landed field is false.
-  The measured tail is already partitioned into bounded observation batches
-  and remediation owners. The remediation-work-graph audit records exact
-  coverage and missing collisions in docs/m5c-graph/remediation-audit.md.
-  Add genuinely new work only from observations and put every new terminal
-  prerequisite on the m5-exit-audit path. Update baseline whenever the
-  checked-in reviewed manifest changes; check:m5c-graph rejects stale counts."
+usage: "Take a node whose status is ready and whose landed field is
+  false. The measured tail is already partitioned into bounded
+  observation batches and remediation owners. The remediation-work-graph
+  audit records exact coverage and missing collisions in
+  docs/m5c-graph/remediation-audit.md. Add genuinely new work only from
+  observations and put every new terminal prerequisite on the
+  m5-exit-audit path. Update baseline whenever the checked-in reviewed
+  manifest changes; check:m5c-graph rejects stale counts."
 baseline:
-  expectedNegatives: 2732
+  expectedNegatives: 2802
   harnessFailures: 0
   infrastructureFailures: 0
   inventoryPaths: 41091
-  passes: 24966
-  reviewedPaths: 29147
+  passes: 25602
+  reviewedPaths: 29901
   semanticFailures: 0
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-  unreviewedPaths: 11944
-  unsupportedProfileFeatures: 1449
+  unreviewedPaths: 11190
+  unsupportedProfileFeatures: 1497
 summary:
   nodes: 89
   ready: 86
@@ -30,58 +31,64 @@ serializationPoints:
       graph changes one at a time."
   - path: docs/m5c-closure/ledger.yaml
     note: "The closure ledger will assign one state and one owner to every
-      applicable inventory path. Ownership audits and batch planning may both
-      need to extend it."
+      applicable inventory path. Ownership audits and batch planning may
+      both need to extend it."
   - path: docs/m5c-closure/exclusion-audit.yaml
     note: "Boundary assessments bind accepted records, upstream sources, and
-      normalized rejection observations. A changed diagnostic or source needs
-      a reviewed assessment update alongside its manifest and ledger owners."
+      normalized rejection observations. A changed diagnostic or source
+      needs a reviewed assessment update alongside its manifest and
+      ledger owners."
   - path: tests/test262/subset.yaml
     note: "Every newly reviewed path enters the reviewed subset before its
       observation can appear in the result manifest."
   - path: tests/test262/results.yaml
-    note: "The manifest index and partitions are regenerated as one canonical
-      observation set, so two lanes never regenerate them concurrently."
+    note: "The manifest index and partitions are regenerated as one
+      canonical observation set, so two lanes never regenerate them
+      concurrently."
   - path: docs/language-profile-m5.md
     note: "Semantic remediation updates the normative profile and its family
       evidence records in the same change."
   - path: docs/m5c-closure/observation-batches.yaml
-    note: "Batch landings refresh fixed selectors and measured counts; serialize
-      the derived update with ledger and manifest publication."
+    note: "Batch landings refresh fixed selectors and measured counts;
+      serialize the derived update with ledger and manifest
+      publication."
   - path: tests/test262/target-parity.yaml
     note: "Every manifest update publishes its index, partitions, and parity
-      digest together; never merge a digest from another observation set."
+      digest together; never merge a digest from another observation
+      set."
 collisions:
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - dynamic-source-coverage-remediation
       - typed-array-proto-coverage-remediation
     note: "Mixed-coverage accounting updates independent assessments in the
-      exclusion audit; serialize these edits. The TypedArray owner follows
-      its classification prerequisite, which stays outside this group."
+      exclusion audit; serialize these edits. The TypedArray owner
+      follows its classification prerequisite, which stays outside this
+      group."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - authorized-exclusion-audit
       - cross-realm-host
       - runtime-dynamic-source-classification
     note: "The initial audit, realm-owned eval, and runtime rejection
-      classification may revise independent boundary assessments; serialize
-      their audit edits."
+      classification may revise independent boundary assessments;
+      serialize their audit edits."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - annexb-proto-dependency-classification
       - cross-realm-host
       - dynamic-source-coverage-remediation
       - runtime-dynamic-source-classification
-    note: "Realm-owned eval, dynamic source accounting, and runtime rejection
-      classification may revise reviewed boundary assessments; serialize their
-      audit edits."
+    note: "Realm-owned eval, dynamic source accounting, and runtime
+      rejection classification may revise reviewed boundary assessments;
+      serialize their audit edits."
   - path: docs/m5c-closure/ledger.yaml
     nodes:
       - observation-batch-plan
       - unsupported-ownership-audit
     note: "These ownership nodes classify paths after the ledger lands. Run
-      their analysis concurrently if useful, but serialize their ledger edits."
+      their analysis concurrently if useful, but serialize their ledger
+      edits."
   - path: docs/m5c-closure/ledger.yaml
     nodes:
       - authorized-exclusion-audit
@@ -93,8 +100,8 @@ collisions:
       - dynamic-source-coverage-remediation
       - observation-batch-plan
       - regexp-split-coverage-remediation
-    note: "Coverage remediation and batch planning have independent path sets;
-      serialize their ledger edits."
+    note: "Coverage remediation and batch planning have independent path
+      sets; serialize their ledger edits."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-proto-dependency-classification
@@ -136,8 +143,8 @@ collisions:
     note: "Each remediation node from unsupported-ownership-audit and each
       prerequisite node from observation-batch-plan admits behavior or
       harness capabilities, regenerates the reviewed manifest, and moves
-      its paths in the closure ledger, so their landings serialize at the
-      manifest and ledger."
+      its paths in the closure ledger, so their landings serialize at
+      the manifest and ledger."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-proto-dependency-classification
@@ -177,10 +184,11 @@ collisions:
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
       - with-strict-assignment-fallback
-    note: "Bare eval identifier observation follows cross-realm-host and shares
-      manifest writes with the other independent remediation nodes. Separate
-      collision groups retain those conflicts without treating ordered realm
-      installation and identifier observation as concurrent work."
+    note: "Bare eval identifier observation follows cross-realm-host and
+      shares manifest writes with the other independent remediation
+      nodes. Separate collision groups retain those conflicts without
+      treating ordered realm installation and identifier observation as
+      concurrent work."
   - path: tests/test262/results.yaml
     nodes:
       - array-sort-stability
@@ -219,10 +227,10 @@ collisions:
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
       - with-strict-assignment-fallback
-    note: TypedArray mixed Annex B coverage follows classification and shares
-      manifest writes with these independent remediation nodes. Keep its own
-      prerequisite outside this group and preserve existing ordering between
-      realm installation and identifier observation.
+    note: TypedArray mixed Annex B coverage follows classification and
+      shares manifest writes with these independent remediation nodes.
+      Keep its own prerequisite outside this group and preserve existing
+      ordering between realm installation and identifier observation.
   - path: tests/test262/results.yaml
     nodes:
       - array-sort-stability
@@ -262,10 +270,10 @@ collisions:
       - unhandled-rejection-observation
       - well-known-intrinsics-harness
       - with-strict-assignment-fallback
-    note: TypedArray mixed Annex B coverage follows classification and shares
-      manifest writes with these independent remediation nodes. Keep its own
-      prerequisite outside this group and preserve existing ordering between
-      realm installation and identifier observation.
+    note: TypedArray mixed Annex B coverage follows classification and
+      shares manifest writes with these independent remediation nodes.
+      Keep its own prerequisite outside this group and preserve existing
+      ordering between realm installation and identifier observation.
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-01
@@ -300,9 +308,10 @@ collisions:
       - observation-batch-31
       - observation-batch-32
     note: "Every observation batch adds its paths to the reviewed subset,
-      updates the manifest index and its partitions and the ledger, and runs
-      the complete test:test262 gate, so batch landings serialize with each
-      other and with the prerequisite nodes they do not depend on."
+      updates the manifest index and its partitions and the ledger, and
+      runs the complete test:test262 gate, so batch landings serialize
+      with each other and with the prerequisite nodes they do not depend
+      on."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-01
@@ -335,9 +344,10 @@ collisions:
       - observation-batch-31
       - observation-batch-32
     note: "Every observation batch adds its paths to the reviewed subset,
-      updates the manifest index and its partitions and the ledger, and runs
-      the complete test:test262 gate, so batch landings serialize with each
-      other and with the prerequisite nodes they do not depend on."
+      updates the manifest index and its partitions and the ledger, and
+      runs the complete test:test262 gate, so batch landings serialize
+      with each other and with the prerequisite nodes they do not depend
+      on."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-proto-dependency-classification
@@ -369,9 +379,10 @@ collisions:
       - observation-batch-32
       - typed-array-construction-order
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-proto-dependency-classification
@@ -401,9 +412,10 @@ collisions:
       - observation-batch-32
       - typed-array-construction-order
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - array-tolocalestring-arguments
@@ -434,9 +446,10 @@ collisions:
       - observation-batch-31
       - observation-batch-32
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - array-tolocalestring-arguments
@@ -465,9 +478,10 @@ collisions:
       - observation-batch-31
       - observation-batch-32
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - destructuring-binding-target-order
@@ -496,9 +510,10 @@ collisions:
       - observation-batch-31
       - observation-batch-32
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-source-coverage-remediation
@@ -542,9 +557,10 @@ collisions:
       - typed-array-proto-coverage-remediation
       - unhandled-rejection-observation
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-source-coverage-remediation
@@ -586,9 +602,10 @@ collisions:
       - typed-array-proto-coverage-remediation
       - unhandled-rejection-observation
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - eval-intrinsic-value
@@ -619,9 +636,10 @@ collisions:
       - observation-batch-31
       - observation-batch-32
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - eval-intrinsic-value
@@ -650,9 +668,10 @@ collisions:
       - observation-batch-31
       - observation-batch-32
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - fn-global-object-harness
@@ -693,9 +712,10 @@ collisions:
       - typed-array-feature-admission
       - well-known-intrinsics-harness
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - fn-global-object-harness
@@ -734,9 +754,10 @@ collisions:
       - typed-array-feature-admission
       - well-known-intrinsics-harness
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes
@@ -766,9 +787,10 @@ collisions:
       - observation-batch-29
       - observation-batch-30
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes
@@ -796,9 +818,10 @@ collisions:
       - observation-batch-29
       - observation-batch-30
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - iterator-next-callability
@@ -830,9 +853,10 @@ collisions:
       - parenthesized-assignment-function-name
       - with-strict-assignment-fallback
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - iterator-next-callability
@@ -863,9 +887,10 @@ collisions:
       - parenthesized-assignment-function-name
       - with-strict-assignment-fallback
     note: "Independent observation and remediation lanes publish the same
-      manifest index, partitions, parity digest, subset, ledger, and batch
-      counts. Serialize their publication; ordered prerequisites are omitted
-      from each group because dependencies already serialize them."
+      manifest index, partitions, parity digest, subset, ledger, and
+      batch counts. Serialize their publication; ordered prerequisites
+      are omitted from each group because dependencies already serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - iterator-next-callability
@@ -897,7 +922,8 @@ collisions:
       - observation-batch-32
       - parenthesized-assignment-function-name
     note: "Batch 12 retains publication collisions with independent lanes;
-      its two semantic prerequisites are already ordered by dependencies."
+      its two semantic prerequisites are already ordered by
+      dependencies."
   - path: tests/test262/results.yaml
     nodes:
       - iterator-next-callability
@@ -928,7 +954,8 @@ collisions:
       - observation-batch-32
       - parenthesized-assignment-function-name
     note: "Batch 12 retains publication collisions with independent lanes;
-      its two semantic prerequisites are already ordered by dependencies."
+      its two semantic prerequisites are already ordered by
+      dependencies."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - annexb-proto-dependency-classification
@@ -936,9 +963,9 @@ collisions:
       - dynamic-source-retagging
       - eval-intrinsic-value
     note: "Retagging refreshes debt flags while coverage and identifier
-      remediation can add or revise path assessments. Serialize these edits
-      with the independent Annex B owner; keep its ordered prerequisite in
-      a separate group."
+      remediation can add or revise path assessments. Serialize these
+      edits with the independent Annex B owner; keep its ordered
+      prerequisite in a separate group."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - dynamic-source-coverage-remediation
@@ -946,9 +973,9 @@ collisions:
       - eval-intrinsic-value
       - typed-array-proto-coverage-remediation
     note: "Retagging refreshes debt flags while coverage and identifier
-      remediation can add or revise path assessments. Serialize these edits
-      with the independent Annex B owner; keep its ordered prerequisite in
-      a separate group."
+      remediation can add or revise path assessments. Serialize these
+      edits with the independent Annex B owner; keep its ordered
+      prerequisite in a separate group."
   - path: tests/test262/results.yaml
     nodes:
       - class-private-accessor-lookup-coverage-remediation
@@ -993,7 +1020,8 @@ collisions:
       - unhandled-rejection-observation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - class-private-accessor-lookup-coverage-remediation
@@ -1036,7 +1064,8 @@ collisions:
       - unhandled-rejection-observation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - class-duplicate-constructor-early-error
@@ -1080,7 +1109,8 @@ collisions:
       - unhandled-rejection-observation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - class-duplicate-constructor-early-error
@@ -1122,7 +1152,8 @@ collisions:
       - unhandled-rejection-observation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-legacy-lookup-dependency-classification
@@ -1166,7 +1197,8 @@ collisions:
       - unhandled-rejection-observation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-legacy-lookup-dependency-classification
@@ -1208,7 +1240,8 @@ collisions:
       - unhandled-rejection-observation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - array-tolocalestring-arguments
@@ -1247,7 +1280,8 @@ collisions:
       - with-strict-assignment-fallback
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - array-tolocalestring-arguments
@@ -1286,7 +1320,8 @@ collisions:
       - with-strict-assignment-fallback
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-legacy-lookup-dependency-classification
@@ -1325,21 +1360,24 @@ collisions:
       - with-strict-assignment-fallback
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - annexb-legacy-lookup-dependency-classification
       - class-duplicate-constructor-early-error
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - class-duplicate-constructor-early-error
       - class-private-accessor-lookup-coverage-remediation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - annexb-legacy-lookup-dependency-classification
@@ -1349,7 +1387,8 @@ collisions:
       - typed-array-proto-coverage-remediation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - class-private-accessor-lookup-coverage-remediation
@@ -1359,421 +1398,422 @@ collisions:
       - typed-array-proto-coverage-remediation
     note: "The bounded batch11 prerequisite and these independent lanes
       share canonical publication inputs; serialize their edits. Ordered
-      prerequisites are excluded because their dependencies serialize them."
+      prerequisites are excluded because their dependencies serialize
+      them."
   - path: tests/test262/results.yaml
     nodes:
       - array-tolocalestring-arguments
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - destructuring-binding-target-order
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-source-coverage-remediation
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-source-retagging
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - eval-intrinsic-value
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - fn-global-object-harness
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - frontmatter-feature-tags
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - function-caller-restrictions
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - generator-dispatch-stack-charge
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - hashbang-comments
       - import-attributes-dynamic-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - import-meta
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - iterator-helpers
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - iterator-next-callability
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - minor-feature-tag-admission
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - module-export-forms
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - module-top-level-await-patterns
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - non-blocking-agent
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-01
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-03
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-05
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-06
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-08
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-11
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-12
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-13
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-14
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-15
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-16
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-17
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-18
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-19
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-20
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-21
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-22
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-23
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-24
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-25
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-26
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-27
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-28
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-29
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-30
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-31
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - observation-batch-32
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - parenthesized-assignment-function-name
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - primitive-wrapper-objects
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - promise-feature-admission
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - proper-tail-calls
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - regexp-pattern-extensions
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - regexp-property-escape-harness
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - regexp-split-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - resizable-array-buffer-harness
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - test262-host-script-bindings
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - typed-array-construction-order
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - typed-array-feature-admission
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - typed-array-proto-coverage-remediation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - unhandled-rejection-observation
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
       - well-known-intrinsics-harness
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: tests/test262/results.yaml
     nodes:
       - compound-member-assignment-key-order
       - import-attributes-dynamic-coverage-remediation
       - with-strict-assignment-fallback
-    note:
-      The bounded dynamic attribute owner and this independent publisher both
-      refresh canonical observations; serialize manifest publication.
+    note: The bounded dynamic attribute owner and this independent publisher
+      both refresh canonical observations; serialize manifest
+      publication.
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - dynamic-source-coverage-remediation
@@ -1788,44 +1828,44 @@ collisions:
     nodes:
       - annexb-legacy-lookup-dependency-classification
       - import-attributes-dynamic-coverage-remediation
-    note: "The bounded dynamic attribute owner and this independent
-      batch11 prerequisite share canonical evidence publication inputs;
+    note: "The bounded dynamic attribute owner and this independent batch11
+      prerequisite share canonical evidence publication inputs;
       serialize their edits without widening either owner."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - annexb-legacy-lookup-dependency-classification
       - import-attributes-dynamic-coverage-remediation
-    note: "The bounded dynamic attribute owner and this independent
-      batch11 prerequisite share canonical evidence publication inputs;
+    note: "The bounded dynamic attribute owner and this independent batch11
+      prerequisite share canonical evidence publication inputs;
       serialize their edits without widening either owner."
   - path: tests/test262/results.yaml
     nodes:
       - class-duplicate-constructor-early-error
       - import-attributes-dynamic-coverage-remediation
-    note: "The bounded dynamic attribute owner and this independent
-      batch11 prerequisite share canonical evidence publication inputs;
+    note: "The bounded dynamic attribute owner and this independent batch11
+      prerequisite share canonical evidence publication inputs;
       serialize their edits without widening either owner."
   - path: tests/test262/results.yaml
     nodes:
       - class-private-accessor-lookup-coverage-remediation
       - import-attributes-dynamic-coverage-remediation
-    note: "The bounded dynamic attribute owner and this independent
-      batch11 prerequisite share canonical evidence publication inputs;
+    note: "The bounded dynamic attribute owner and this independent batch11
+      prerequisite share canonical evidence publication inputs;
       serialize their edits without widening either owner."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - class-private-accessor-lookup-coverage-remediation
       - import-attributes-dynamic-coverage-remediation
-    note: "The bounded dynamic attribute owner and this independent
-      batch11 prerequisite share canonical evidence publication inputs;
+    note: "The bounded dynamic attribute owner and this independent batch11
+      prerequisite share canonical evidence publication inputs;
       serialize their edits without widening either owner."
   - path: tests/test262/results.yaml
     nodes:
       - compound-member-assignment-key-order
       - import-attributes-dynamic-coverage-remediation
     note: "The bounded compound member ordering repair and the dynamic
-      attribute owner both publish canonical observations; serialize their
-      manifest regeneration."
+      attribute owner both publish canonical observations; serialize
+      their manifest regeneration."
   - path: tests/test262/results.yaml
     nodes:
       - array-tolocalestring-arguments
@@ -2970,20 +3010,20 @@ collisions:
     nodes:
       - dynamic-source-coverage-remediation
       - primitive-receiver-inherited-set
-    note: "Independent semantic remediation publishes shared graph, owner
-      or profile data; serialize final publication under D2."
+    note: "Independent semantic remediation publishes shared graph, owner or
+      profile data; serialize final publication under D2."
   - path: docs/m5c-closure/ledger.yaml
     nodes:
       - dynamic-source-coverage-remediation
       - primitive-receiver-inherited-set
-    note: "Independent semantic remediation publishes shared graph, owner
-      or profile data; serialize final publication under D2."
+    note: "Independent semantic remediation publishes shared graph, owner or
+      profile data; serialize final publication under D2."
   - path: docs/language-profile-m5.md
     nodes:
       - dynamic-source-coverage-remediation
       - primitive-receiver-inherited-set
-    note: "Independent semantic remediation publishes shared graph, owner
-      or profile data; serialize final publication under D2."
+    note: "Independent semantic remediation publishes shared graph, owner or
+      profile data; serialize final publication under D2."
   - path: tests/test262/results.yaml
     nodes:
       - eval-intrinsic-value
@@ -3006,248 +3046,248 @@ collisions:
     nodes:
       - class-private-accessor-lookup-coverage-remediation
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - computed-member-reference-key-order
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-source-coverage-remediation
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-source-retagging
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - eval-intrinsic-value
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - generator-dispatch-stack-charge
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - iterator-helpers
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - module-top-level-await-patterns
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - non-blocking-agent
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-01
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-03
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-06
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-08
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-14
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-15
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-16
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-18
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-19
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-20
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-21
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-22
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-23
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-24
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-25
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-26
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-27
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-28
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-29
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-30
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-31
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - observation-batch-32
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - primitive-receiver-inherited-set
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - primitive-wrapper-objects
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - proper-tail-calls
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - regexp-pattern-extensions
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - regexp-property-escape-harness
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - regexp-split-coverage-remediation
       - script-module-declaration-early-error
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - script-module-declaration-early-error
       - test262-host-script-bindings
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - script-module-declaration-early-error
       - typed-array-proto-coverage-remediation
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - script-module-declaration-early-error
       - unhandled-rejection-observation
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - script-module-declaration-early-error
       - with-optional-call-receiver
-    note: "Script-goal repair shares canonical observation partitions
-      with this independent publisher; serialize their publication."
+    note: "Script-goal repair shares canonical observation partitions with
+      this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - class-private-accessor-lookup-coverage-remediation
