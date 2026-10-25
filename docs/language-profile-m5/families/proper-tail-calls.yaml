@@ -49,15 +49,12 @@ evidence:
       - tests/native/fixtures/proper-tail-calls.ts
       - tests/tco-generator-interop.test.ts
   standards:
-    status: omitted
-    reason: "The two owned pinned tagged-template paths retain historical
-      feature-gated unsupported records without execution. Admission only
-      prepares their observation; focused native validation and a new full
-      UPDATE remain pending. Existing native and property regressions cover
-      the implemented tail-call contract, not passes of these subjects."
-    replacements:
-      - tests/proper-tail-calls.test.ts
-      - tests/property/m5-proper-tail-calls.property.test.ts
+    status: covered
+    references:
+      - tests/test262/subset.yaml
+      - tests/test262/results/language/expressions/03.yaml
+      - tests/test262/results/language/expressions/b7.yaml
+      - tests/test262-tail-call-optimization.test.ts
   structural:
     status: covered
     references:

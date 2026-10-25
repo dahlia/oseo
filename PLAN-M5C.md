@@ -1422,13 +1422,15 @@ The source implements proper tail calls and restores the reviewed
 *tests/test262/harness/tcoHelper.js* that keeps `$MAX_ITERATIONS` at
 100,000. It owns the two reviewed tagged-template paths
 *test/language/expressions/tagged-template/tco-call.js* and *tco-member.js*;
-both retain Source4's historical unsupported observations, which did not
-execute their feature-gated bodies. The admission preparation adds only
+their historical unsupported observations did not execute the feature-gated
+bodies. The admission preparation added only
 `tail-call-optimization` to `supportedFeatures`, from 146 to 147 features,
-without changing any of the 29,147 reviewed rows or their expectations.
-Admission permits an execution attempt; it does not establish a pass.
+without changing any of the 29,147 reviewed rows or their expectations at
+that step. The fresh full observation below passes both original subjects;
+only those two expectations subsequently promote to pass. Admission alone
+does not establish a pass.
 
-*tests/test262-tail-call-optimization.test.ts* prepares focused execution of
+*tests/test262-tail-call-optimization.test.ts* executes
 both unmodified pinned subjects through the existing test262 runner,
 fragment executor and selected native toolchain. Each original strict-only
 body runs under both specialization policies with the faithful 100,000-depth
@@ -1439,15 +1441,33 @@ tail calls; their stack overflow is not a native success oracle.
 *tests/tco-feature-admission-preparation.test.ts* checks source identity,
 helper fidelity and MIR/C emission only, not native execution or results.
 
-The focused Node and Deno native entry points await Root's separate Native
-GO. A new full UPDATE on the actual admitted-feature source must observe
-both owned paths; only actual improvements accepted by `--accept-promotions`
-may change their expected classifications. The earlier 146-feature input
-at source `f26a74bf60d6d85df9e467f7a8d90154bc006ec0` cannot certify this
-147-feature input. The fixed inventory tags 35 paths with
-the feature, all applicable and none a negative test. The other 33 remain
-unreviewed and keep their `observation-batch-32` reservation, whose planning
-basis is unchanged. No path, owner, exclusion or landing status changes.
+The author-focused commands ran once each on clean source
+`957a0df1da17f0da0c1493c0b2e55cb18696074d`, tree
+`59de411157e0d6454254507c56a9fdd50acbd587`. Node passed two registrations
+from 2026-10-24T23:16:26.954034Z to 23:16:30.556053Z, wall
+3.601928535 seconds. Deno passed two from 23:16:47.189973Z to
+23:16:53.367672Z, wall 6.177587355 seconds. The final natural drain was
+23:16:58.303872Z. These four printed registrations imply eight
+subject/policy executions through the unchanged assertions. Each asserts
+actual execution, pass classification, strict/disabled and strict/enabled
+variants, matching harness identities, exit zero and empty native output.
+Deno's host stderr retains its Check line. The separate reviewer Node
+probe at `8249ebeb` is not author execution.
+
+Both original full bodies and the 100,000-depth helper remain unchanged.
+The original IIFE result is unused; no assertion was added to strengthen
+that oracle, and the existing richer semantic/property/resource evidence
+remains necessary. Normal cleanup removed successful native C/MIR and
+binaries; no numeric GC/frame counters are retained. This Zig focus adds no
+independent sanitizer-readiness proof. The complete receipts and limitations
+are in
+*/data/m5c-tco-feature-admission-native-20261025/task\_0f1c1b7a95b7/*.
+
+The fixed inventory tags 35 paths with the feature, all applicable and none
+a negative test. The other 33 remain unreviewed and keep their
+`observation-batch-32` reservation, whose planning
+basis is unchanged. The full observation changes no inventory membership,
+exclusion or landing status.
 Evidence lives in *tests/property/m5-proper-tail-calls.property.test.ts*
 (seeds `0x60008900` through `0x60008902`), *tests/proper-tail-calls.test.ts*,
 *tests/native/fixtures/proper-tail-calls.ts*,
@@ -1570,9 +1590,10 @@ unselected records in the original
 18-command plan remain deferred, including the older complete ordinary/
 extended focus and all macOS focus. Full ordinary, extended, native,
 standards, cross-target, and exact-candidate CI requirements remain.
-Root owns the affected reviews, actual successful-Main alignment under
-D10, exact U/R D3, a later full UPDATE, and publication. The inherited
-standards records and admissions remain unchanged, and TCO stays unlanded.
+At that stage, Root owned the affected reviews, successful-Main alignment,
+exact U/R D3, a later full UPDATE, and publication. The inherited standards
+records and admissions were unchanged. The later admitted-feature full
+observation is recorded below; TCO remains unlanded.
 
 
 TCO source preparation on the Array C3 candidate
@@ -1602,11 +1623,12 @@ safepoint inside their fast paths. These static boundaries do not extend
 native evidence from `baf6f7d7` to this Array runtime. Root owns D1.9 review
 retention and any affected review or bounded native follow-up.
 
-A later full UPDATE is required for the TCO runtime inputs relative to
-old green Main `44c46bfc`, used as both U and R for D3. This source step
-preserves all admissions and classifications and performs no UPDATE.
-Final successful-Main alignment, final-candidate CHECK, and CI remain
-Root's later work.
+At this source step, a later full UPDATE was required for the TCO runtime
+inputs relative to old green Main `44c46bfc`, used as both U and R for D3.
+This source step preserved all admissions and classifications and performed
+no UPDATE.
+The later observation below does not replace final-candidate CHECK or exact
+candidate/Main CI.
 
 
 Primitive receiver inherited Set source and focused evidence
@@ -1818,3 +1840,64 @@ establishes no universal foreign-context/collector invariant, performance
 result, macOS execution, cross-link, full gate, UPDATE, candidate/Main CI,
 landing, or publication. Factual evidence review and Root's overall review
 decision remain separate requirements.
+
+
+Reduced admitted-feature full observation
+-----------------------------------------
+
+The complete `mise run test262:update -- --accept-promotions` read clean U
+`222880e5ded95756de4047cf4c51edbfefd1a957`, tree
+`f459795d50ee515bd80b303fbddd2fb9692febcf`. It started at
+2026-10-24T23:23:37.967273Z and finished naturally with exit zero at
+2026-10-25T00:35:13.126452Z. Controller wall time was 4295.159093990 seconds;
+the repository runner separately reported 4287326.34ms, pool eight and
+zero retries. The natural runner/PID/scope drain was verified at
+00:35:31.131637Z, with no signal. Root labeled this D10.1 leading execution:
+the new admission/native/observation outer permission was still pending.
+
+Actual result R is `494247c5f5e6c25b2e2bedd76cbba17c8bd85018`, tree
+`b74a259f6d8e01c835a184489b3286250508728c`, whose sole parent is U.
+Its complete 29,147-path manifest records 24,968 passes, 2,732 expected
+negatives and 1,447 unsupported results, with zero semantic, harness or
+infrastructure failures. Exactly the two owned original tagged-template
+records promote from unsupported to pass. Both retain their pinned source,
+case metadata and `expression-operators` dependency, and record
+*base.js*/*tcoHelper.js*, `linux-x86_64-gnu`, and both strict specialization
+variants. The canonical ledger now gives both passes the observation owner.
+
+Every other observation remains unchanged against U and fixed successful
+Main `f100ab8e`, including all 24,966 prior passes. B15's 836 source/record
+identities and 24 assessments remain exact. All 453 RegExp rows and owners
+remain Main's; none of the historical RegExp-inclusive 146-feature
+`f26a74bf`/`4e56e104` result's 450 promotions is adopted here. The other
+41,089 ledger rows and all 33 unreviewed TCO reservations remain unchanged.
+The batch updater changes only nine derived estimate fields and preserves
+the original selectors and basis. The inventory stays at 41,091 paths.
+
+The accepted report, actual two records, canonical 6,484-partition audit,
+command/drain receipts and failed first result hook are retained under
+*/data/m5c-array-set-tco-full-update-20261025/task\_1d39a9cf333f/*.
+The first hook rejected a stale derived batch plan and created no commit.
+Root authorized its canonical refresh, followed by the successful normal
+result hook. Neither failure nor accounting repair changes an observation.
+No successful C/MIR, binaries or numeric collector values are reconstructed.
+This Node-host Linux FULL supplies neither a Deno-host full execution nor
+independent sanitizer readiness, performance or macOS deadline evidence.
+
+The author-native input `957a0df1` and U have identical package, tool,
+configuration, harness and test inputs. Root integrated R with the reviewed
+two-file scheduler-cost delta at `4c9a1d58`, tree
+`f881d28e514c0e63b2273eb2f5325b36821e1100`; its eight result-data
+blobs/modes equal R. The cost tools therefore differ from U, although the
+semantic inputs do not. Root's actual D3 on U/R/`4c9a1d58`, with Main base
+`f100ab8e`, returned neutral. That decision covers this integration, not an
+unexamined later candidate; Root retains the final D3 judgment.
+
+Effective successful Main `f100ab8e` still has 88 nodes and 51 landed nodes.
+The private preparation's 89 nodes and 52 prospective landed flags are not
+effective Main. TCO remains unlanded. The original-subject focus and FULL
+do not complete the separate Wrapper strict registration, liveness,
+ordinary/extended, macOS, cross-target, sanitizer or exact candidate/Main
+requirements. Meaningful post-observation review and the requested outer
+permission remain separate from the preserved source review gates. Root
+owns final accounting, candidate/Main acceptance, landing and publication.
