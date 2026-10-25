@@ -89,5 +89,6 @@ dependencies:
   - well-known-intrinsics-harness
   - with-optional-call-receiver
   - with-strict-assignment-fallback
+  - yield-star-throw-callability
 landed: false
 status: blocked

@@ -19,8 +19,8 @@ baseline:
   unreviewedPaths: 11944
   unsupportedProfileFeatures: 1447
 summary:
-  nodes: 89
-  ready: 86
+  nodes: 90
+  ready: 87
   blocked: 3
   parked: 0
   landed: 52
