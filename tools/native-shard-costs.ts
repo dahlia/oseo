@@ -61,13 +61,9 @@
  * in the native extended file glob. Its Linux weight is a local extended
  * two-registration case sum; its unmeasured macOS placeholder retains the
  * historical 286-second assigned cost. The combined table at `6cbc6c9f`
- * had upper medians of 406 Linux/296 macOS seconds. The current 138-entry
- * host tables use 409/296 after TCO and primitive receiver Set composition.
+ * had upper medians of 406 Linux/296 macOS seconds. The reduced 137-entry
+ * Array/TCO host tables use the same 406/296 upper-median fallbacks.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
- *
- * Primitive receiver inherited Set reserves 900 seconds per host as an
- * unmeasured extended planning estimate. No native run has measured it;
- * source preparation permits only pure tests. See U6 provenance.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -175,7 +171,6 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-combine.property.test.ts": 1433,
     "tests/property/m5-promise-intrinsic.property.test.ts": 944,
     // Unmeasured extended estimates; see U6 provenance.
-    "tests/property/m5-primitive-receiver-inherited-set.property.test.ts": 900,
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
     "tests/property/m5-proper-tail-calls.property.test.ts": 1726,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 1559,
@@ -329,7 +324,6 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-combine.property.test.ts": 631,
     "tests/property/m5-promise-intrinsic.property.test.ts": 669,
     // Unmeasured extended estimates; see U6 provenance.
-    "tests/property/m5-primitive-receiver-inherited-set.property.test.ts": 900,
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
     "tests/property/m5-proper-tail-calls.property.test.ts": 286,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 441,

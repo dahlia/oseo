@@ -8915,63 +8915,21 @@ and cross-host gates, and exact candidate/Main CI remain required. Earlier
 U99 and f26 observations retain their historical source bindings.
 
 
-Primitive receiver inherited Set source preparation
----------------------------------------------------
+Reduced Array and TCO publication source
+----------------------------------------
 
-M5c node `primitive-receiver-inherited-set` prepares the bounded PutValue
-repair originally prepared on Main `de491133` and reanchored on successful
-Main `44c46bfc`. `oseo_object_set` now constructs a
-full intrinsic wrapper for lookup and passes the original primitive as
-Receiver to the existing receiver-carrying Set walk. This preserves String
-own index and length restrictions, inherited accessor and Proxy dispatch,
-data-write refusal, setter abrupt completion, and caller strictness only
-when Set reports false. A stack root frame keeps the original base, key,
-value, and wrapper live until a refusal has become a language error.
-Ordinary call entry still owns strict primitive this and sloppy boxing in
-the callee realm. No compiler guard, Reference lowering, runtime ABI, or
-object-receiver Set path changes.
+The D6.5 preparation after failed C2 `ceca0314` defers primitive receiver
+inherited Set. Its only production reversal restores Main `f100ab8e`'s
+primitive store branch; all other Array/TCO package blobs and modes stay
+exact C2. The shared dense apply example and preparation assertions return
+to their independent pre-setter versions, preserving all four Array/TCO
+cases. Historical `c4bcb412` native evidence includes the later setter
+variant and retains that source binding. It is not current-source execution.
+The separate strict primitive-wrapper tail-forwarding test is unchanged.
 
-The minimized ordinary fixtures retain the strict Number counterexample
-and the computed Reference regression from the original intake. A separate
-structured domain reserves seed block `0x60008c00` through `0x60008cff`,
-using slot zero for 12 ordinary cases and a 240-second interrupt limit.
-Each case retains all five primitive kinds, object and nullish controls,
-two writes, independent caller/setter strictness, string/symbol/index/length
-keys, descriptor or Proxy outcomes, and up to two extra prototype levels.
-Its model computes expected traces without executing the rendered source.
-Record shrinking retains those invariants and the normal seed/path replay.
-Existing domains and their budgets remain unchanged.
-
-The unpublished native default moved from `0x60008b00` to `0x60008c00`
-on reanchor because Main already assigns the former block to Script/Module
-declarations. No native observations used the original default. The arbitrary,
-shrinking, replay controls, case budget, and deadline are unchanged. The pure
-suite retains its separate `0x60008b00` seed and all sixteen sample records
-for historical comparison. No landed seed or ratchet override changes.
-
-The native registration selects the bootstrap host's public Node.js or Deno
-adapter and names both reference engines explicitly under either bootstrap.
-This is host composition source; static checking does not prove native Deno
-execution. The isolated Script source and expected output are unchanged.
-
-The pure suite compares its matrix with Node.js and Deno and checks MIR/C
-emission under both specialization policies. Twenty-seven fixed native
-subjects guarantee strictness, descriptor/Proxy, key, and String boundaries
-independently of generated draws. Fixed native and property
-registrations are source only at this phase; their forced-collection
-assertions require positive counters when Root later executes them. A C
-fixture constructs foreign ordinary setters without dynamic source and
-sweeps warmed allocation failures with root/realm restoration and retry.
-It follows the generated call-entry contract checked by the pure structural
-test. No native execution, positive GC activity, sanitizer result, Test262
-observation, or performance result is established here.
-
-The generic-only store adds no guard. The compound-assignment record's
-existing guard-fallback omission and named replacement evidence remain.
-The wrapper admission retains its forty-path scope; batches 28/29 retain
-first admission of their primitive PutValue/Proxy paths. Exact included
-ordinary accessor-setter coverage remains unknown. The original edcc and
-560162 observations remain historical raw counterexamples. Full reviewed
-manifest regeneration, derived publication data, native and sanitizer
-validation, independent reviews, and exact candidate/main CI remain Root's
-later gates. The node stays ready and unlanded.
+The removed unpublished Set property leaves 137 scheduling entries per host
+and derived 406/296 upper-median fallbacks, with Array's 1,119/638 weights
+unchanged. No matching-host measurement is added. Generated observations,
+admissions, reservations and graph flags remain exact inherited C2 until
+Root's actual D3, regeneration and final candidate mechanics. Source
+preparation and normal CHECK do not establish native validation or landing.

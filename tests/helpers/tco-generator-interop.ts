@@ -83,20 +83,10 @@ const events = [], key = Symbol("payload");
 const values = [2, { value: 17 }, { value: -1 }, { value: -2 }];
 values[1][key] = 23;
 function reenter(n, value) {
-  if (n > 0) {
-    const held = [value, { value: n }, 0]; held.length = 1;
-    return reenter(n - 1, held[0]);
-  }
-  values[1] = value;
+  if (n > 0) return reenter(n - 1, value);
   events.push("reenter:" + value.value + ":" + value[key]);
-  return 91;
+  return value;
 }
-Object.defineProperty(Number.prototype, "tailPayload", {
-  configurable: true, set: function primitiveTailSetter(value) {
-    events.push("setter:" + (this === 7)); values[1] = undefined;
-    return reenter(2, value);
-  },
-});
 function drain(n, value) {
   if (n > 0) return drain(n - 1, value);
   events.push("leaf:" + value.value + ":" + value[key]);
@@ -110,9 +100,7 @@ function invoke() { return accept.apply(null, values); }
 function* resumed() {
   yield values[1];
   values.length = { valueOf() {
-    events.push("coerce");
-    const assigned = ((7).tailPayload = values[1]);
-    events.push("rhs:" + (assigned === values[1])); return 2;
+    events.push("coerce"); reenter(2, values[1]); return 2;
   } };
   events.push("trim:" + values.length + ":" + (2 in values));
   return invoke();
@@ -121,7 +109,6 @@ const it = resumed(); it.next();
 const end = it.next();
 console.log(events.join("|"));
 console.log(end.done, end.value === undefined, values.length);
-delete Number.prototype.tailPayload;
 `;
 
 const mutatingApplySource = `"use strict";
@@ -225,8 +212,7 @@ export const interopCases: readonly InteropCase[] = [
     name: "dense-array-apply-and-truncation",
     source: denseApplySource,
     stdout:
-      "coerce|setter:true|reenter:17:23|rhs:true|" +
-      "coerce|setter:true|reenter:17:23|rhs:true|trim:2:false|" +
+      "coerce|reenter:17:23|coerce|reenter:17:23|trim:2:false|" +
       "accept|leaf:17:23|host\n" +
       "true true 0\n",
     guard: false,

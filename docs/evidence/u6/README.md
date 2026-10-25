@@ -1086,17 +1086,18 @@ exact-candidate CI measurements remain necessary before replacing them.
 No shard rule, seed, case budget, deadline, or replay setting changes.
 
 
-Primitive receiver Set source preparation
------------------------------------------
+Reduced Array and TCO source composition
+----------------------------------------
 
-The new *m5-primitive-receiver-inherited-set.property.test.ts* family has a
-900-second planning weight on each host. Both values are unmeasured
-estimates; this source phase runs no native property, fixture, or toolchain.
-The current TCO and Set composition has 138 entries per host. At reduced
-source `74a73385`, zero-based index `floor(138/2) = 69` selects upper-median
-fallbacks of 409 Linux/296 macOS seconds. These are derived scheduling
-values, not new measurements; the Array CI weight refresh does not change
-them. The historical 137-entry composition above retains its original
-inputs and 406/296 fallbacks. Shard totals, case budgets, seeds, and
-deadlines stay unchanged. Later native runs must retain exact source and
-target identities and case durations before replacing these estimates.
+The reduced preparation removes the unpublished primitive receiver Set
+property and its two 900-second planning entries. The unchanged repository
+cost API now reads 137 entries per host. Its zero-based
+`floor(137 / 2) = 68` upper-median fallback is 406 Linux/296 macOS seconds.
+These are derived composition values, not matching-host measurements.
+
+Array's existing 1,119 Linux/638 macOS entries, TCO's 1,726/286 entries,
+Script's 41/286 entries and every other weight remain unchanged. Historical
+measurements and unmeasured placeholders retain their original source and
+host bounds. The reduced source adds no performance or deadline result.
+Shard totals, algorithms, case budgets, seeds, deadlines and replay controls
+stay unchanged; Root owns the later exact-source gates and publication.

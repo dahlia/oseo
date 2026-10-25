@@ -1631,158 +1631,34 @@ The later observation below does not replace final-candidate CHECK or exact
 candidate/Main CI.
 
 
-Primitive receiver inherited Set source and focused evidence
-------------------------------------------------------------
-
-The `primitive-receiver-inherited-set` source was prepared on Main
-`de491133` and reanchored on successful Main `44c46bfc` as clean source
-`43b84b70d20621d6003a5c142a124a10f458518d`, tree
-`4ca2385217440e9ccac028c6c6244142886c36ea`. The runtime, tests, structured
-oracle and allocation fixture at that source were the historical native
-inputs below. The source-phase descriptions in *PLAN-M5.md* and the
-normative profile record preparation; the focused observations below
-followed it.
-
-On Linux AMD64, five focused commands completed once with natural exit 0:
-the complete primitive Set property file under Node.js and Deno with the
-selected ordinary toolchain, the normal host C sanitizer self-probe, then
-the complete property file under each bootstrap with host C ASan/UBSan.
-All three registrations in each property command passed, as did all seven
-self tests: twelve property registrations and seven self registrations.
-The self-probe verified address and undefined-behavior detection in runtime
-and generated code. Host C used Clang 22.1.8. Every command and its natural
-descendant drain completed; the supervisor released its exclusive lock at
-`2026-10-24T14:34:39.770840Z`. No command was retried or source fixed.
-
-Each property command retained twelve generated cases at native seed
-`0x60008c00`, three fixed sources, all 27 guaranteed boundaries and both
-specialization policies with collection forced at every safepoint. Passing
-original assertions establish expected stdout, empty exposed stderr and
-positive collection counters. The C registration passed its unchanged
-foreign-setter, 128-allocation-attempt bound, root/realm restoration and
-successful retry assertions. The pure historical sixteen-sample seed
-`0x60008b00`, every landed seed, domain, oracle, shrinking/replay control,
-case budget and 240-second ordinary deadline remain unchanged. Host C used
-only the normal time scale of three; no extended case scale was applied.
-
-The 336 JavaScript subject/policy combinations and four C registrations
-are source-derived cardinalities. They are not 336 retained raw native
-observations. Successful per-case stdout, counter values, generated C/MIR
-and binaries were not retained after normal fixture cleanup. No numeric
-allocation-attempt or foreign-context transition counts are claimed. The
-testkit processed private counter stderr normally before the exposed-stderr
-assertions. Prepared pure C/MIR lacked native observation instrumentation,
-so it does not establish byte identity with successful native C.
-
-Full command/test logs, source identities, scope/resource/drain records and
-the artifact hash inventory are retained in
-*/data/m5c-primitive-set-native-focus-20261024/*; its *REPORT.md* records the
-assertion-based limits. The existing primitive-wrapper family record names
-Set-specific fixed, differential, generated, collection, specialization and
-structural evidence separately from the earlier wrapper tests. Wrapper
-standards and guard evidence do not become inherited-Set standards or guard
-observations; the generic Set store adds no guard, and the existing named
-compound-assignment replacement evidence remains applicable.
-
-This focused Linux evidence does not replace matching macOS execution,
-AArch64 Linux compile-link/inspection, whole ordinary/extended/standards
-gates, other required focused regressions, independent reviews, the complete
-reviewed UPDATE or exact candidate/Main CI. The 900-second extended weights
-remain unmeasured planning estimates, not CI costs measured by this focus.
-The node remains `landed: false`, `status: ready`. No graph, ledger, manifest,
-observation ownership, classification, exclusion or admission changes here.
-Batches 28/29 keep first admission, and included ordinary accessor-setter
-coverage stays unknown. Root owns all remaining gates and publication.
-
-
-Primitive Set through Array ancestors on combined source
---------------------------------------------------------
-
-The existing Set fixed registration now includes one independently expected
-Array-ancestry source. It covers all five primitives, caller and setter
-strictness, setter receivers and heap RHS identity; dense indexed hits,
-reordered/named/symbol fallback, holes and refusal descriptors; inherited
-setters after own absence beyond length; Proxy-to-Array forwarding, abrupt
-completion and invariants; String own index/length precedence; primitive
-refusal before Array length mutation; and setter-side truncation plus throw.
-Actual Node.js and Deno verified its hand-written trace. The original three
-fixed sources, generated domain, boundaries, seeds and budgets remain.
-
-On Linux AMD64, the combined source
-`c4bcb412b9c2f3e8884dd079e5e806a2d4826c46`, tree
-`cf49eb612cdb3778f7a1e91483a1a4c82def970e`, passed the complete Set property
-file under Node.js and Deno with ordinary and host C toolchains. All twelve
-Set registrations passed, including the unchanged allocation fixture. The
-fresh normal sanitizer self-probe executed all seven tests with Clang
-22.1.8. Four complete TCO file commands also passed their registrations on
-this same source; their separate factual evidence update belongs to the
-TCO worker. The shared focus therefore has nine actual commands and 23
-passing registrations, with no skipped test or retried native command.
-
-The first supervisor stopped on stdin EOF at its first checkpoint after one
-successful command and natural drain. That batch remains failed. Root
-approved a real-TTY continuation for only the remaining eight commands,
-retaining the actual first result. The focus used two nonblocking lock
-admissions, not one continuous lock. Both releases followed natural whole
-scope drains; the final release was `2026-10-24T18:50:04.476201Z`. Source,
-protected refs and all 34 stashes stayed unchanged. Sampled OOM events were
-zero. Each command used its fresh resource prefix and assigned cache.
-
-The current Set loops derive 344 JavaScript subject/policy invocations:
-twelve generated draws, four fixed sources and 27 boundaries, both policies,
-under four host/toolchain combinations. Four C registrations are separate.
-These are source-derived counts, not retained per-case native observations.
-Original assertions establish expected stdout, empty exposed native stderr,
-positive collection counters and the unchanged allocation/root/realm/retry
-assertions. Numeric native counter values and successful C/MIR/binaries remain
-absent after cleanup.
-The prepared pure C/MIR is separate from native instrumentation. Historical
-`43b84b70` evidence above remains its original 336 combinations and nineteen
-registrations. No new standards observation or compatibility promotion is
-claimed by this focused execution.
-
-The execution report, exact commands, raw logs, source/resource/drain records
-and SHA inventory are in
-*/data/m5c-primitive-set-array-interop-20261024/shared-focus/*, including
-*NATIVE-EVIDENCE.md*. Matching macOS execution, cross-target inspection,
-whole ordinary/extended/standards gates, full reviewed UPDATE, affected
-reviews and exact candidate/Main CI remain separate requirements. This is
-source preparation; no node becomes effectively landed here.
-
-
 Bounded Array/TCO interaction examples
 --------------------------------------
 
 Two additional fixed examples extend the existing continuation/TCO
-registrations. One resumes a generator and coerces a dense Array's shorter
-length through a primitive Number assignment. Its strict inherited setter
-clears the source payload and returns a tail call into an ordinary helper.
-Each helper hop allocates and truncates a dense Array; its base restores
-the live payload and returns a distinct sentinel. The assignment must
-still return its original RHS and the setter must keep its primitive
-receiver. Apply then forwards the remaining values before clearing the
-source Array and tail-draining. The
-other captures apply-list length before an own getter truncates it, then
-reads inherited indices with receiver checks and reentry. A separate
-throwing getter in that example prevents the target and later getter from
-running. Fresh getter-created objects travel through the copied tail
-arguments after the source is cleared.
+registrations. The reduced source restores the dense apply example and
+its preparation assertions to the exact parent of `c4bcb412`. A resumed
+generator coerces a dense Array's shorter length and reenters an ordinary
+tail helper during conversion. Apply then forwards the remaining values
+before clearing the source Array and tail-draining. The other example
+captures apply-list length before an own getter truncates it, then reads
+inherited indices with receiver checks and reentry. A separate throwing
+getter prevents the target and later getter from running. Fresh
+getter-created objects travel through copied tail arguments after the
+source is cleared.
 
-Their literal event and value oracles follow source semantics. The
-original two examples, 13 Boolean checks, frame guard, property generators,
-seeds, budgets, shrinking, and weights remain unchanged. These additions
-supplied reference and emission preparation before the shared native focus
-recorded below. The earlier 24-combination
-Linux proof remains bound to `baf6f7d7` and covers none of these new cases.
+Their original literal event and value oracles remain unchanged from that
+parent. All four independent cases remain, including the original two
+examples, 13 Boolean checks and the frame guard; property generators,
+seeds, budgets, shrinking and weights are unchanged. Only the later
+`c4bcb412` primitive inherited-setter variant and its dedicated MIR
+assertion are removed with the deferred Set implementation. The strict
+primitive wrapper tail-forwarding test remains exactly C2.
 
-This private combined preparation also merges reviewed PrimitiveSet source
-`41c59036`, preserving its primitive receiver lookup, setter callback and
-assignment-result contract. Set calls its inherited setter through the
-ordinary call entry, which drains recorded tail calls before returning to
-the rooted assignment frame. The Array/TCO examples above and existing
-Set Array regressions share this source snapshot. All earlier native
-observations keep their original inputs. The following record adds only
-the subsequently authorized shared focus on this combined source.
+The earlier 24-combination Linux proof remains bound to `baf6f7d7`.
+The shared native focus below instead used `c4bcb412`, including its
+primitive setter extension. Its original source, assertions and raw
+receipts stay historical; they are not relabeled as native execution of
+this reduced source. Root owns the affected review and later gates.
 
 
 Shared Linux Array/Set/TCO evidence
@@ -1790,8 +1666,8 @@ Shared Linux Array/Set/TCO evidence
 
 The shared focus executed fixed source
 `c4bcb412b9c2f3e8884dd079e5e806a2d4826c46`, tree
-`cf49eb612cdb3778f7a1e91483a1a4c82def970e`. All package, runtime, test,
-seed, and budget inputs remain exactly that source. The four complete
+`cf49eb612cdb3778f7a1e91483a1a4c82def970e`. Its package, runtime, test,
+seed and budget inputs belong to that historical snapshot. The four complete
 TCO registrations passed under Node/createNodeHost and Deno/createDenoHost,
 each with Zig and host-cc on Linux AMD64. Both specialization policies
 and forced safepoint collection ran unchanged. Their loops account for
@@ -1901,3 +1777,34 @@ ordinary/extended, macOS, cross-target, sanitizer or exact candidate/Main
 requirements. Meaningful post-observation review and the requested outer
 permission remain separate from the preserved source review gates. Root
 owns final accounting, candidate/Main acceptance, landing and publication.
+
+
+Reduced Array and TCO preparation after C2
+------------------------------------------
+
+D6.5 drops the responsible primitive receiver inherited Set implementation
+from failed candidate `ceca031432d771203a9cc3ec5454ec81bc9da8cc`, tree
+`adb4700e08b8a008d075d6a1c267054d49bfe9b7`. Only its primitive
+`oseo_object_set` branch returns to successful Main `f100ab8e`; the entire
+file has no other Main-to-C2 delta. Every other package blob and mode,
+including Array's physical completion storage, logical resource model,
+collector and TCO protocol, stays C2. Set's own new fixtures, property,
+seed, planning weight and added evidence claims leave this preparation.
+The shared dense apply case keeps its independent pre-setter form above.
+
+Generated test262 records, all 29,147 reviewed paths, 147 features, the two
+original TCO pass records and all 33 unreviewed reservations remain exact
+C2. The inherited P24,968/EN2,732/UN1,447 data is not a fresh observation of
+this changed runtime. No RegExp helper restoration or yield-star runtime
+is included. The original RegExp U/R and all historical evidence remain
+preserved separately. Root must run actual D3 and any required complete
+UPDATE before adopting observations for a later candidate.
+
+Removing the deferred Set property gives 137 scheduling entries per host;
+the unchanged upper-median rule yields 406 Linux/296 macOS seconds. Array
+keeps its 1,119/638 entries and every other weight remains unchanged. These
+composition values supply no new host measurement, performance or deadline
+result. The inherited C2 graph flags are prospective preparation state;
+effective successful Main remains `f100ab8e` with 51 landed of 88 nodes.
+Root owns the final graph correction, affected review, candidate/Main gates
+and publication. This source preparation establishes no new native pass.

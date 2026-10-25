@@ -9390,31 +9390,3 @@ The regression suite selects the integration toolchain, including host C
 ASan/UBSan. macOS execution and the full ordinary and extended gates remain
 exact-candidate CI obligations; this source change records no new test262
 observations.
-
-
-Primitive receiver inherited Set preparation
---------------------------------------------
-
-The `primitive-receiver-inherited-set` source prepares wrapper lookup with
-the original primitive Receiver, following ECMA-262 2025 PutValue,
-OrdinarySetWithOwnDescriptor, and OrdinaryCallBindThis. String own
-restrictions precede inherited descriptors; inherited callable setters and
-Proxy Set dispatch keep the primitive; data writes may still fail. Caller
-strictness affects a false Set result independently of setter strictness.
-The existing ordinary call boundary boxes sloppy this in the callee realm.
-
-*tests/primitive-receiver-inherited-set.test.ts* supplies pure reference and
-structural checks. The independent structured model and the source for
-later native evidence are in
-*tests/helpers/primitive-receiver-set.ts*,
-*tests/property/m5-primitive-receiver-inherited-set.property.test.ts*, and
-*tests/fixtures/primitive-receiver-inherited-set/allocation.c*.
-Native seed `0x60008c00` has 12 ordinary cases and a 240-second deadline; each
-case retains all primitive kinds and two writes while shrinking. The separate
-pure sixteen-sample seed remains `0x60008b00`; the unpublished native default
-moved to avoid Main's Script/Module seed block. Forced
-collection and allocation-failure assertions are pending native execution.
-This preparation changes no covered evidence assessment, compatibility
-observation, reviewed selector, or exclusion. The wrapper family's earlier
-coverage does not establish this Set repair. See *PLAN-M5.md* for the
-implementation contract and Root-owned validation and publication gates.
