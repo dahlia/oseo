@@ -977,3 +977,20 @@ summed registration durations from the exact candidate's full extended CI run.
 Focused local ordinary results remain in
 */data/m5c-generator-dispatch-stack-charge-20261024/* and do not stand in for
 those measurements. No shard total, input file, seed, or case budget changes.
+
+
+F3-only generator-throw cost composition
+----------------------------------------
+
+The Main `f100ab8e` generator-throw weights, 47 Linux and 43 macOS seconds,
+describe the old one-domain workload. F3 adds a second 15-case domain and
+retires only those samples. Its original `df282b3f` 137-entry composition
+had 409/296 upper medians; that is historical source-bound metadata.
+
+This Main-based F3-only table has 135 entries per host. The unchanged upper
+median rule derives 406 Linux/296 macOS seconds as unmeasured scheduling
+estimates, not host costs, bounds or new native measurements. Main's Array
+674/543 and every other retained entry remain unchanged. The failed Array
+candidate's 1119/638 costs are not F3 measurements and are not copied.
+Matching-host extended case sums and exact candidate gates remain required.
+No width, shard total, seed, case budget, timeout or scheduling rule changes.

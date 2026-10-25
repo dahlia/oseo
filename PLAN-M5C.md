@@ -1362,3 +1362,34 @@ workflows succeed; this record does not claim those CI results in advance.
 The property harness stays unlanded and subject to the user's Array
 performance publication prerequisite. This candidate adds no Array source,
 node, or exclusion and changes no test budgets, seeds, or shard totals.
+
+
+F3-only source preparation after the Array candidate failure
+------------------------------------------------------------
+
+D6.5 removes the failed Array node from the next publication source. This
+preparation starts at successful Main `f100ab8e` and restores only existing
+node `yield-star-throw-callability`: GetMethod of a noncallable delegate
+throw raises TypeError without reading return. Nullish/absent closing,
+callable dispatch, abrupt getters, result validation, roots and teardown
+retain their original contracts. The independent backend helper asserts
+public context balance and imports no Array completion layout or TCO code.
+
+The minimized regression and 88 boundary cases retain independent Node/Deno
+references, both native policies, forced collection, positive allocation and
+collection counters, and public context balance checks. The added delegated
+throw property uses the same checks with seed `0x60001b01`. The original
+throw-resumption domain uses default compiler options and the C backend,
+comparing native stdout with a constructed expected string. It retains seed
+`0x60001b00`; both domains retain 15 cases, 180-second deadlines and replay.
+All fourteen pinned B16 subjects remain whole and unadmitted. Their loop
+requires pass and four variants per subject through its original runner and
+collector settings. Their earlier diagnostic passes are distinct from the
+minimized counterexample and establish no new row.
+
+Main's inventory, subset, results, parity, ledger, owners and exclusions
+remain byte-identical. The source graph adds only F3 as ready/unlanded:
+89 nodes, 86 ready, three blocked and 51 landed. Final landed transitions
+and test expectations stay Root-owned. Array, Set, RegExp and TCO source
+and admission are not restored. No native, model or Full run is claimed;
+exact-source validation, D3, affected review and publication remain pending.

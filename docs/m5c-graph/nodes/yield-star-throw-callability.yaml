@@ -1,0 +1,28 @@
+version: 1
+id: yield-star-throw-callability
+title: Propagate noncallable yield-star throw methods
+delivers: Repair synchronous yield-star delegation when GetMethod on the
+  iterator throw property encounters a noncallable value. Preserve the
+  original TypeError without reading or calling return. Retain separate
+  absent or null throw-method iterator closing, callable throw dispatch,
+  abrupt getter propagation, result validation, rooting and exactly-once
+  frame teardown. Preserve the independently observed noncallable-throw
+  counterexample as an ordinary regression under both specialization
+  policies, with Node and Deno reference agreement and observable cleanup
+  ordering. Cover coupled nullish, callable, getter-abrupt and close paths,
+  forced collection and applicable semantic evidence in PLAN-M5. Retain
+  all fourteen original B16 yield-star subjects and their full assertions;
+  all fourteen passed in the bounded diagnostic, which separately exposed
+  the counterexample. Do not invent a failing test262 path or change its
+  classification, reservation or owner from that diagnostic. Extend the
+  applicable property domain with stable replay and independent oracles;
+  preserve existing seeds, case budgets, timeouts and semantic boundaries.
+  Update normative evidence and plans with actual results, obtain affected
+  independent reviews, and regenerate the full reviewed manifest when D3
+  requires it. No exclusion, retagging, path deletion or ownership transfer
+  is authorized. Native observations and candidate evidence remain distinct
+  from exact-SHA successful Main landing.
+dependencies:
+  - iterator-next-callability
+landed: true
+status: ready

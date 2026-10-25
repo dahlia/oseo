@@ -8869,3 +8869,91 @@ their original choices, shrinking, seeds, case budgets, and interrupt limits.
 This is source preparation. Model reviews, full manifest regeneration, and the
 ordinary and extended gates of the exact publication candidate remain required
 before landing. No reviewed test262 path or classification changes here.
+
+
+Synchronous yield-star throw callability correction
+---------------------------------------------------
+
+M5c node `yield-star-throw-callability` separates GetMethod failure from
+missing-method cleanup. A synchronous delegate whose `throw` property is
+noncallable must raise `TypeError` immediately. It must not read or call
+`return`. An absent, undefined, or null `throw` still follows the separate
+IteratorClose path before the protocol-violation `TypeError`. Callable throw
+methods, abrupt getters, result validation, roots and frame teardown retain
+their existing interfaces. No runtime ABI or logical resource policy changes.
+
+The minimized ordinary regression is preserved byte-for-byte in
+*tests/native/fixtures/yield-star-noncallable-throw.js.txt*. It distinguishes
+normal, throwing-getter and primitive-result return methods using the error
+name and cleanup-log length. Its independent oracle is `TypeError` with zero
+cleanup in all three modes. The `.txt` suffix keeps the original source bytes
+outside source formatting; the native test reads and compiles those bytes.
+
+*tests/helpers/yield-star-throw.ts* models 11 throw-method/result classes and
+eight return/close classes independently of execution. Fixed examples retain
+all 88 combinations, receiver/arity, original abrupt-value identity, finally
+ordering, result field access and completion. The existing generator-throw
+property uses default compiler options and the C backend, comparing native
+stdout with a constructed expected string. It keeps its original domain,
+seed `0x60001b00`, 15 cases and 180,000-millisecond limit. The added delegated
+throw domain uses unused slot `0x60001b01`, 15 structured cases and the same
+limit, shrinking protocol classes and bounded integer payloads without
+filtering. That added domain compares the model with Node, Deno and both
+native policies, with forced collection, positive allocation and collection
+counters, and public context balance assertions.
+
+*tests/yield-star-throw-model.test.ts* checks the fixed oracle, exact minimized
+source hash and public MIR/C delegation boundary without native execution.
+*tests/yield-star-throw-callability.test.ts* contains the native regression,
+88-boundary packet and the 14 complete original pinned B16 subjects. The
+subjects' earlier passes are distinct from the separately failing minimized
+repro; this correction changes no reviewed row, reservation or classification.
+
+On the original author source, four authorized Linux AMD64 commands passed
+once each: Node and
+Deno on the complete focused fixture file (three registrations each), then
+Node and Deno on the complete property file (two registrations each). The
+minimized regression and 88-boundary programs checked both policies with
+forced collection, positive allocation/collection and zero active native-frame
+slots, call depth and roots at teardown. Numeric counter values were not
+retained by those assertion-based tests. The original 14-subject loop requires
+pass and four variants per subject through its original runner and collector
+settings; it does not add 14 framework registrations or admit reserved rows.
+
+The source snapshot and complete raw commands are in the durable author packet
+*/data/m5c-yield-star-throw-callability-20261025/task\_09a9fcb547c7/*.
+The whole-file walls were 14.321340655/12.712538977 seconds for Node/Deno fixed
+checks and 22.894722875/25.854402194 seconds for Node/Deno properties. Those
+focused Linux timings do not establish an extended or other-host cost.
+The old generator-throw weights, 47 Linux and 43 macOS seconds, describe
+the earlier one-domain workload and are retired from the active tables.
+In original F3 source `df282b3f`, the unchanged unknown-file fallback
+supplied 409 Linux/296 macOS seconds in its 137-entry composition. These
+historical composition values are unmeasured scheduling estimates, not
+measured host times or conservative bounds. Actual matching-host
+extended CI case sums must replace them; U6 retains the source provenance.
+No other table value, scheduling rule, shard, case budget or timeout changes.
+
+The synchronous-generator family's generic-runtime guard-fallback omission
+and named replacements remain; this node adds no specialization guard.
+Mac-native/sanitizer, ordinary/extended candidate gates, affected review and
+D3 full regeneration remain required beyond this focused preparation.
+
+
+F3-only preparation after the Array candidate failure
+-----------------------------------------------------
+
+This D6.5 source preparation starts at successful Main `f100ab8e` and
+restores only the F3 runtime correction and its fixed/generated evidence.
+The exact teardown backend extracted at `432ab4b3` has no Array layout
+or TCO dependency: it wraps the existing backend and checks public context
+roots, call depth and active-frame slots before context destruction.
+All original F3 programs, oracles, assertions and fourteen pinned subjects
+remain. Other package blobs, Main observations and owners stay unchanged.
+
+The Array candidate's required extended property hit its deadline after
+97 cases; its source and gates are not inherited here. Earlier F3 author
+native results above keep their original source identity. This composition
+claims no new native, model, Full or candidate/Main result. Affected review,
+source-bound native validation, actual D3 and any required observations
+remain Root-owned. F3 stays ready and unlanded.
