@@ -1092,7 +1092,7 @@ Primitive receiver Set source preparation
 The new *m5-primitive-receiver-inherited-set.property.test.ts* family has a
 900-second planning weight on each host. Both values are unmeasured
 estimates; this source phase runs no native property, fixture, or toolchain.
-The current TCO and Set composition has 138 entries per host. At reduced
+The historical TCO and Set composition had 138 entries per host. At reduced
 source `74a73385`, zero-based index `floor(138/2) = 69` selects upper-median
 fallbacks of 409 Linux/296 macOS seconds. These are derived scheduling
 values, not new measurements; the Array CI weight refresh does not change
@@ -1100,3 +1100,35 @@ them. The historical 137-entry composition above retains its original
 inputs and 406/296 fallbacks. Shard totals, case budgets, seeds, and
 deadlines stay unchanged. Later native runs must retain exact source and
 target identities and case durations before replacing these estimates.
+
+
+Yield-star throw workload sample retirement
+-------------------------------------------
+
+The `yield-star-throw-callability` correction adds a second domain to
+*tests/property/m5-generator-throw.property.test.ts*. Its original domain
+retains seed `0x60001b00`, 15 cases and a 180,000-millisecond interrupt
+limit. The new domain uses `0x60001b01`, 15 cases and the same limit.
+Both domains remain in the complete ordinary and extended file inputs.
+
+The old 47-second Linux and 43-second macOS entries came from CI run
+39070198868 at `c78d9df1`, before this new domain. They remain historical
+source-bound samples, not current workload measurements. The active tables
+retire only these two entries. Each now contains 137 entries; zero-based
+`floor(137/2) = 68` selects the unchanged upper medians of 409 Linux and
+296 macOS seconds. The existing unknown-file fallback applies to this file.
+Those values are unmeasured scheduling estimates for the changed workload,
+not measured host times or conservative bounds. No scheduling algorithm,
+shard total, remaining table value, case, seed or deadline changes.
+
+The authorized focused author runs used the changed runtime and complete
+two-domain file on Linux AMD64. Node's old and new domain durations were
+1.675962742 and 20.964122 seconds; the command wall was 22.894722875 seconds.
+Deno reported rounded domain durations of 1 and 21 seconds and a command
+wall of 25.854402194 seconds. These ordinary runs establish no extended
+case sum, macOS cost or variance estimate. Their exact source and complete
+raw execution are retained under
+*/data/m5c-yield-star-throw-callability-20261025/task\_09a9fcb547c7/*.
+The runtime and native test blobs remain unchanged by this retirement.
+Replace the fallback with actual matching-host extended case sums from the
+future exact-candidate CI and retain that source/run provenance here.

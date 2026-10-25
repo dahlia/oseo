@@ -9025,9 +9025,14 @@ The source snapshot and complete raw commands are in the durable author packet
 */data/m5c-yield-star-throw-callability-20261025/task\_09a9fcb547c7/*.
 The whole-file walls were 14.321340655/12.712538977 seconds for Node/Deno fixed
 checks and 22.894722875/25.854402194 seconds for Node/Deno properties. Those
-focused Linux timings do not set CI weights or establish other-host cost.
-The existing historical shard weights need a later matching extended-lane
-measurement before any refresh; no shard, case budget or timeout changes.
+focused Linux timings do not establish an extended or other-host cost.
+The old generator-throw weights, 47 Linux and 43 macOS seconds, describe
+the earlier one-domain workload and are retired from the active tables.
+The unchanged unknown-file fallback supplies 409 Linux/296 macOS seconds
+in this 137-entry composition. These are unmeasured scheduling estimates,
+not measured host times or conservative bounds. Actual matching-host
+extended CI case sums must replace them; U6 retains the source provenance.
+No other table value, scheduling rule, shard, case budget or timeout changes.
 
 The synchronous-generator family's generic-runtime guard-fallback omission
 and named replacements remain; this node adds no specialization guard.

@@ -61,9 +61,15 @@
  * in the native extended file glob. Its Linux weight is a local extended
  * two-registration case sum; its unmeasured macOS placeholder retains the
  * historical 286-second assigned cost. The combined table at `6cbc6c9f`
- * had upper medians of 406 Linux/296 macOS seconds. The current 138-entry
- * host tables use 409/296 after TCO and primitive receiver Set composition.
+ * had upper medians of 406 Linux/296 macOS seconds. The current 137-entry
+ * host tables use 409/296 after retiring generator-throw's stale sample.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
+ *
+ * Yield-star throw callability adds a second generator-throw domain.
+ * Its old 47/43 samples no longer describe the workload and are retired.
+ * This file uses the unchanged unknown-file fallback, 409/296 in this
+ * composition, as an unmeasured scheduling estimate, not a host time or
+ * conservative bound. Replace it with matching-host extended CI sums.
  *
  * Primitive receiver inherited Set reserves 900 seconds per host as an
  * unmeasured extended planning estimate. No native run has measured it;
@@ -128,7 +134,6 @@ export const nativeShardCosts = {
     "tests/property/m5-function-prototype.property.test.ts": 417,
     "tests/property/m5-generator-methods.property.test.ts": 51,
     "tests/property/m5-generator-parameter.property.test.ts": 168,
-    "tests/property/m5-generator-throw.property.test.ts": 47,
     "tests/property/m5-generator.property.test.ts": 888,
     "tests/property/m5-generic-string-coercion.property.test.ts": 282,
     "tests/property/m5-global-numeric-functions.property.test.ts": 667,
@@ -282,7 +287,6 @@ export const nativeShardCosts = {
     "tests/property/m5-function-prototype.property.test.ts": 183,
     "tests/property/m5-generator-methods.property.test.ts": 64,
     "tests/property/m5-generator-parameter.property.test.ts": 138,
-    "tests/property/m5-generator-throw.property.test.ts": 43,
     "tests/property/m5-generator.property.test.ts": 464,
     "tests/property/m5-generic-string-coercion.property.test.ts": 246,
     "tests/property/m5-global-numeric-functions.property.test.ts": 313,
