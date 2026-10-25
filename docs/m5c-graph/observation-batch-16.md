@@ -257,8 +257,34 @@ Missing core contracts and replacement obligations
 Main-only reanchor preparation
 ------------------------------
 
-This preparation is anchored to successful Main 128d63fc. Product code and
-node flags remain Main-only. These records retain the original leading
-observation on R db4104, whose run failed later in B18; the 754 originals
-have not been freshly observed on Main. Root owns actual U/R, D3, required
-scoped observation, affected reviews, final judgment and publication.
+The earlier source-bound preparation and leading-run descriptions are
+historical evidence on R db4104; that original run failed later in B18.
+All original sources, negative phases, assertions and B18 reservations
+remain unchanged, with304 active remediation owners and17 existing ADR0016
+assessment bindings. They grant no new exclusion or publication approval.
+
+The subsequent Main-only execution used actual clean U
+`44d2c4f03d65f8742c043532a9bef909c852cce1`, tree
+`b83c495e945e76a508b76aef63e1e8859caeef8d`, with product code exact successful
+Main128d63. Its single stock scoped command was:
+
+~~~~ sh
+mise run test262:update:changed -- \
+    --baseline 128d63fcec3a625eca799f5bd9df8b9267b8c6b2
+~~~~
+
+It naturally completed0 on2026-10-25: all754 originals freshly observed,
+636passes,70expected negatives and48unsupported, pool8/retries0. The actual
+manifest update wrote0 partitions with6688 unchanged index/partition files;
+all29147 old Main records and all754 prepared values/tags remain exact.
+No expected value, owner, source or failure was normalized. Two naturally
+empty owned drains were15.106281s apart; source/dist/tool bindings held.
+
+[Actual command output, argv, bindings and owned drains](/data/m5c-b16-b17-main-scoped-observation-20261025/task_3335cb68b22b/ctx_fb50e986ca95/)
+are the fresh execution evidence. This observation-provenance commit records
+the genuine zero record delta after that actual U; it does not relabel the
+older R as a new U/R. The original leading packet and B18's semantic failure
+plus264 unreached paths remain preserved separately. All336 B18 paths remain
+unreviewed. Root owns actual D3, affected internal/ outer review judgment,
+final owners/exclusions, candidate gates and publication; no node is marked
+landed or final gate claimed here.
