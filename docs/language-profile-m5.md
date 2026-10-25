@@ -9365,12 +9365,15 @@ The exact minimized counterexample is retained in
 modeled 88-boundary programs in *tests/yield-star-throw-callability.test.ts*
 and *tests/helpers/yield-star-throw.ts* distinguish those branches. The
 existing *tests/property/m5-generator-throw.property.test.ts* retains its
-original domain and adds seeded structured delegation cases with an independent
-oracle, Node/Deno references, both policies, forced collection and public
-context balance checks. On the original author source, the Linux AMD64
+original throw-resumption domain with default compiler options, the C backend
+and a constructed expected stdout string. Its added structured delegation
+domain has an independent oracle, Node/Deno references, both native policies,
+forced collection, positive allocation and collection counters, and public
+context balance checks. The minimized regression and 88-boundary packet use
+those same checks. Both property domains retain their original seeds, 15 cases,
+180-second limits and replay. On the original author source, the Linux AMD64
 Node/Deno fixed and property entry points passed once each, ten registrations
-total. Positive collection
-and allocation were asserted; numeric counter values were not retained.
+total. Numeric counter values were not retained by the assertion-based tests.
 Matching Mac/sanitizer, full gates and new manifest observations remain
 pending.
 

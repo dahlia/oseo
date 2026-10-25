@@ -8893,11 +8893,14 @@ outside source formatting; the native test reads and compiles those bytes.
 eight return/close classes independently of execution. Fixed examples retain
 all 88 combinations, receiver/arity, original abrupt-value identity, finally
 ordering, result field access and completion. The existing generator-throw
-property keeps its original domain, seed `0x60001b00`, 15 cases and
-180,000-millisecond limit. A second domain uses unused slot `0x60001b01`,
-15 structured cases and the same limit, shrinking protocol classes and bounded
-integer payloads without filtering. It compares the model with Node, Deno and
-both native policies, with forced collection and existing balance assertions.
+property uses default compiler options and the C backend, comparing native
+stdout with a constructed expected string. It keeps its original domain,
+seed `0x60001b00`, 15 cases and 180,000-millisecond limit. The added delegated
+throw domain uses unused slot `0x60001b01`, 15 structured cases and the same
+limit, shrinking protocol classes and bounded integer payloads without
+filtering. That added domain compares the model with Node, Deno and both
+native policies, with forced collection, positive allocation and collection
+counters, and public context balance assertions.
 
 *tests/yield-star-throw-model.test.ts* checks the fixed oracle, exact minimized
 source hash and public MIR/C delegation boundary without native execution.
@@ -8910,11 +8913,12 @@ On the original author source, four authorized Linux AMD64 commands passed
 once each: Node and
 Deno on the complete focused fixture file (three registrations each), then
 Node and Deno on the complete property file (two registrations each). The
-fixed programs checked both policies, positive allocation/collection and zero
-active native-frame slots, call depth and roots at teardown. Numeric counter
-values were not retained by those assertion-based tests. The original
-14-subject loop requires pass and four variants per subject; it does not add
-14 framework registrations or admit their reserved rows.
+minimized regression and 88-boundary programs checked both policies with
+forced collection, positive allocation/collection and zero active native-frame
+slots, call depth and roots at teardown. Numeric counter values were not
+retained by those assertion-based tests. The original 14-subject loop requires
+pass and four variants per subject through its original runner and collector
+settings; it does not add 14 framework registrations or admit reserved rows.
 
 The source snapshot and complete raw commands are in the durable author packet
 */data/m5c-yield-star-throw-callability-20261025/task\_09a9fcb547c7/*.

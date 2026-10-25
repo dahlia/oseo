@@ -1375,11 +1375,17 @@ callable dispatch, abrupt getters, result validation, roots and teardown
 retain their original contracts. The independent backend helper asserts
 public context balance and imports no Array completion layout or TCO code.
 
-The unchanged original regression, 88 boundary cases and two generator-throw
-property domains retain both policies, forced collection, independent
-Node/Deno oracles, seeds, cases, deadlines and replay. All fourteen pinned
-B16 subjects remain whole and unadmitted. Their earlier diagnostic passes
-are distinct from the minimized counterexample and establish no new row.
+The minimized regression and 88 boundary cases retain independent Node/Deno
+references, both native policies, forced collection, positive allocation and
+collection counters, and public context balance checks. The added delegated
+throw property uses the same checks with seed `0x60001b01`. The original
+throw-resumption domain uses default compiler options and the C backend,
+comparing native stdout with a constructed expected string. It retains seed
+`0x60001b00`; both domains retain 15 cases, 180-second deadlines and replay.
+All fourteen pinned B16 subjects remain whole and unadmitted. Their loop
+requires pass and four variants per subject through its original runner and
+collector settings. Their earlier diagnostic passes are distinct from the
+minimized counterexample and establish no new row.
 
 Main's inventory, subset, results, parity, ledger, owners and exclusions
 remain byte-identical. The source graph adds only F3 as ready/unlanded:
