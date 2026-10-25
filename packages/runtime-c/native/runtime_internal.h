@@ -2825,45 +2825,6 @@ void oseo_internal_realm_enter(
 void oseo_internal_realm_leave(OseoContext *context, OseoRealmScope *scope);
 
 /*
- * The one call a PrepareForTailCall site owes after it discarded its own
- * frame (ECMA-262 15.10.3). `realm_record` is the running realm at that
- * site, which stays the realm of any error the call itself raises before
- * a callee switches to its own. A nonzero `host` names the OseoTailHost
- * intrinsic to run instead of calling `callee`. `this_cell` is the `this`
- * binding of a derived class constructor when `derived` is set.
- * `arguments` is a private buffer whose capacity only grows; only its
- * first `argument_count` entries are live, and only while `pending`.
- */
-typedef struct {
-    OseoValue callee;
-    OseoValue receiver;
-    OseoValue realm_record;
-    OseoValue this_cell;
-    OseoValue *arguments;
-    size_t argument_count;
-    size_t argument_capacity;
-    unsigned host;
-    bool pending;
-    bool derived;
-} OseoTailCall;
-
-/*
- * Records a call that a runtime PrepareForTailCall site owes once it has
- * checked that `callee` is callable, and returns OSEO_STATUS_TAIL_CALL.
- * `arguments` may point anywhere, including into memory the caller
- * releases right after this returns. Defined in runtime_function.c.
- */
-OseoResult oseo_internal_tail_call(
-    OseoContext *context,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments
-);
-/* Frees the context's tail call record during context destruction. */
-void oseo_internal_tail_call_release(OseoContext *context);
-
-/*
  * Prepares one realm's state and releases the caches it owns. Realm
  * initialization takes the next process-wide realm ordinal, which seeds
  * the realm's Math.random. Defined in runtime_core.c.

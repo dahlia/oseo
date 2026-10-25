@@ -36,11 +36,11 @@
  * at `ef014905`. macOS uses the Linux number only as an unmeasured
  * scheduling placeholder, not a measured host ratio. See U6 provenance.
  *
- * Proper tail calls retain historical planning weights: Linux 1726 from
+ * Deferred proper tail calls had historical planning weights: Linux 1726 from
  * the complete local extended run at `87aeb56b`, macOS 286 from the then
  * unknown-file fallback. The changed source is unmeasured; the old Linux
  * CI liveness timeout and partial GC sample prove no current full cost.
- * See U6 provenance and replace both with complete matching-host CI sums.
+ * Both entries are retired with the deferred source; see U6 provenance.
  *
  * Computed-member-reference-key-order adds a Reference-order domain and
  * fixed cases to the compound-assignment file. Its Linux entry uses a local
@@ -63,7 +63,7 @@
  * historical 286-second assigned cost. The combined table at `6cbc6c9f`
  * had upper medians of 406 Linux/296 macOS seconds. Reduced source
  * `cdcb3416` had 137 entries and the same 406/296 fallbacks. The current
- * combined tables have 136 entries and derived fallbacks of 409/296.
+ * Array/F3 tables have 135 entries and derived fallbacks of 406/296.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
  *
  * Yield-star throw callability adds a second generator-throw domain.
@@ -178,7 +178,6 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-intrinsic.property.test.ts": 944,
     // Unmeasured extended estimates; see U6 provenance.
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
-    "tests/property/m5-proper-tail-calls.property.test.ts": 1726,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 1559,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2299,
@@ -330,7 +329,6 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-intrinsic.property.test.ts": 669,
     // Unmeasured extended estimates; see U6 provenance.
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
-    "tests/property/m5-proper-tail-calls.property.test.ts": 286,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 441,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2283,

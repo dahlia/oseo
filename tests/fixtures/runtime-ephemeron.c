@@ -20,127 +20,6 @@ static void assert_cleared_target(OseoValue reference) {
     assert(oseo_internal_weak_reference_target(reference) == oseo_undefined());
 }
 
-/* Count actual owned objects independently of reachability and queues. */
-static void assert_heap_counts(const OseoContext *context) {
-    size_t tables = 0u;
-    size_t references = 0u;
-    size_t registries = 0u;
-    size_t cells = 0u;
-    for (const OseoHeapObject *object = context->objects;
-         object != NULL;
-         object = object->next) {
-        tables += object->kind == OSEO_HEAP_EPHEMERON_TABLE;
-        references += object->kind == OSEO_HEAP_WEAK_REFERENCE;
-        registries += object->kind == OSEO_HEAP_FINALIZATION_REGISTRY;
-        cells += object->kind == OSEO_HEAP_FINALIZATION_CELL;
-    }
-    assert(context->ephemeron_table_count == tables);
-    assert(context->weak_reference_count == references);
-    assert(context->finalization_registry_count == registries);
-    assert(context->finalization_cell_count == cells);
-}
-
-/* Reuse the same heap after every weak record has been swept. */
-static void test_empty_phase_transitions(void) {
-    OseoContext context;
-    OseoRootFrame frame = {NULL, NULL, 0u};
-    oseo_context_init(&context, "empty-phases", 12u);
-    require_normal(oseo_roots_allocate(&context, &frame, 4u));
-    for (size_t round = 0u; round < 2u; round += 1u) {
-        assert(context.objects == NULL);
-        assert_heap_counts(&context);
-        oseo_collect(&context);
-        frame.slots[0] = require_normal(
-            oseo_internal_ephemeron_table_create(&context)
-        );
-        frame.slots[1] = node(&context);
-        frame.slots[2] = require_normal(oseo_internal_weak_reference_create(
-            &context, frame.slots[1]
-        ));
-        frame.slots[3] = require_normal(
-            oseo_internal_finalization_registry_create(
-                &context, oseo_undefined()
-            )
-        );
-        require_normal(oseo_internal_ephemeron_set(
-            &context, frame.slots[0], frame.slots[1], oseo_number(7.0)
-        ));
-        require_normal(oseo_internal_finalization_register(
-            &context, frame.slots[3], frame.slots[1], oseo_number(9.0)
-        ));
-        assert_heap_counts(&context);
-        oseo_collect(&context);
-        assert_live_target(frame.slots[2]);
-        assert(context.finalization_pending_count == 0u);
-
-        frame.slots[1] = oseo_undefined();
-        oseo_collect(&context);
-        assert_heap_counts(&context);
-        assert_cleared_target(frame.slots[2]);
-        assert(oseo_internal_ephemeron_live_count(frame.slots[0]) == 0u);
-        assert(context.finalization_pending_count == 1u);
-        OseoValue registry = oseo_undefined();
-        OseoValue holdings = oseo_undefined();
-        assert(oseo_internal_finalization_take_cleanup(
-            &context, &registry, &holdings
-        ));
-        assert(registry == frame.slots[3]);
-        assert(holdings == oseo_number(9.0));
-        /* Consuming the job leaves its cell published until compaction. */
-        assert(context.finalization_cell_count == 1u);
-        assert_heap_counts(&context);
-        for (size_t index = 0u; index < 4u; index += 1u) {
-            frame.slots[index] = oseo_undefined();
-        }
-        oseo_collect(&context);
-    }
-    assert(context.objects == NULL);
-    assert_heap_counts(&context);
-    oseo_roots_release(&context, &frame);
-    oseo_context_destroy(&context);
-    assert_heap_counts(&context);
-}
-
-/*
- * A context with no local weak records still has to compute a foreign
- * table's ephemeron fixed point. Owner-local phase guards cannot guard
- * the tracing worklist or count objects merely because it visits them.
- */
-static void test_foreign_ephemeron_with_empty_local_heap(void) {
-    OseoContext owner;
-    OseoContext observer;
-    OseoRootFrame owned = {NULL, NULL, 0u};
-    OseoRootFrame observed = {NULL, NULL, 0u};
-    oseo_context_init(&owner, "weak-owner", 10u);
-    oseo_context_init(&observer, "weak-observer", 13u);
-    require_normal(oseo_roots_allocate(&owner, &owned, 3u));
-    require_normal(oseo_roots_allocate(&observer, &observed, 2u));
-    owned.slots[0] = require_normal(
-        oseo_internal_ephemeron_table_create(&owner)
-    );
-    owned.slots[1] = node(&owner);
-    owned.slots[2] = node(&owner);
-    require_normal(oseo_internal_ephemeron_set(
-        &owner, owned.slots[0], owned.slots[1], owned.slots[2]
-    ));
-    OseoHeapObject *value = heap_object(owned.slots[2]);
-    observed.slots[0] = owned.slots[0];
-    observed.slots[1] = owned.slots[1];
-    oseo_internal_clear_heap_marks(&owner);
-    oseo_collect(&observer);
-    assert(value->marked);
-    assert(observer.objects == NULL);
-    assert_heap_counts(&observer);
-    assert_heap_counts(&owner);
-
-    oseo_roots_release(&observer, &observed);
-    oseo_context_destroy(&observer);
-    oseo_roots_release(&owner, &owned);
-    oseo_context_destroy(&owner);
-    assert_heap_counts(&owner);
-    assert(owner.objects == NULL);
-}
-
 static void test_queued_registries_stay_live(void) {
     OseoContext context;
     OseoRootFrame frame = {NULL, NULL, 0u};
@@ -340,9 +219,7 @@ static void assert_failed_allocation(
     assert(result.value == oseo_undefined());
     assert(context->allocation_attempts == 1u);
     assert(context->roots == frame);
-    assert_heap_counts(context);
     oseo_collect(context);
-    assert_heap_counts(context);
     oseo_context_fail_allocation_at(context, 0u);
     oseo_context_clear_language_error(context);
 }
@@ -453,8 +330,6 @@ static void test_allocation_failures(void) {
 
     oseo_roots_pop(&context, &frame);
     oseo_context_destroy(&context);
-    assert_heap_counts(&context);
-    assert(context.objects == NULL);
 }
 
 static void test_destroy_nonempty_queue(void) {
@@ -485,8 +360,6 @@ static void test_destroy_nonempty_queue(void) {
 
     oseo_roots_release(&context, &frame);
     oseo_context_destroy(&context);
-    assert_heap_counts(&context);
-    assert(context.objects == NULL);
 }
 
 int main(void) {
@@ -801,7 +674,5 @@ int main(void) {
     test_nested_table_discovery();
     test_allocation_failures();
     test_destroy_nonempty_queue();
-    test_empty_phase_transitions();
-    test_foreign_ephemeron_with_empty_local_heap();
     return 0;
 }

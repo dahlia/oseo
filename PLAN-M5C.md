@@ -1848,6 +1848,9 @@ implementation and cannot certify this runtime correction.
 Three-node Array, TCO and yield-star source assembly
 ----------------------------------------------------
 
+This section records historical source `cda5d73c`; the later D6.5 reduction
+below supersedes its current-source claims.
+
 This assembly composes reduced Array/TCO source `cdcb3416` with original
 reviewed F3 tip `df282b3f`. The seven nonshared F3 runtime, test and family
 blobs retain their original modes and bytes. Its only production delta is
@@ -1873,3 +1876,49 @@ These are unmeasured scheduling estimates, not measured workload times,
 conservative bounds, speedups or deadline evidence. Every remaining weight
 is exact `cdcb3416`, including Array 1,119/638 and TCO 1,726/286. Matching-host
 extended CI case sums and exact candidate/Main gates remain required.
+
+
+Array and F3 preparation after failed TCO extended CI
+-----------------------------------------------------
+
+Required job `121086124368` in candidate run `40165660431` failed on exact
+`1fd374f64e7c436f51069983cc55526c61031bf7`, tree
+`1f25c77bc993996c1d1c088e8e7ab74e1185c896`. The Linux TCO liveness domain
+interrupted after 39 of 60 cases at 1,800,004.285095 milliseconds, with
+seed 1592590339, depth 1,200 and 12 extra arguments. The selected target
+reported address/undefined sanitizers and four file workers. Its other
+two native domains passed, which does not complete liveness. Historical
+1,726/286 scheduling values establish no current-source pass or bound.
+
+D6.5 removes TCO source, admission and dependent evidence from the next
+preparation. It also removes the complete `795d3c82` weak-record counter
+repair, pending tail roots and the unpublished `m5-136`/`m5-137` interfaces.
+The runtime and collector return to Main `f100ab8e`'s `m5-135` contract.
+The original Array optimizations and `f26a74bf` physical completion
+compaction remain. Their logical resource charges and guards do not change.
+The independent completion dispatch/sentinel fixes from `7d8445b1` and
+`90693863` keep their complete structural regressions and extracted native
+witnesses. *PLAN-M5.md* identifies the new entry points and exact origins.
+
+F3's runtime branch, fourteen pinned subjects, fixed/model observations and
+two property domains remain. Its shared balanced backend is extracted
+unchanged; neither root/frame checks nor forced collection is weakened.
+TCO-specific deep/forwarding/generated programs, the `0x60008900` family,
+the strict Wrapper tail registration and the local tcoHelper admission
+leave this preparation with their production implementation. Every original
+source, author, seed assignment and raw failure remains preserved in history.
+No reviewed path is deleted, and no budget, timeout, policy or shard changes.
+
+The reduced scheduling catalogue has 135 entries per host, with derived
+upper-median fallbacks 406 Linux/296 macOS seconds. These remain unmeasured
+estimates, not deadline repair. Array's 1,119/638 values and F3's retirement
+of the old 47/43 samples remain; all other values and partition rules stay.
+
+Source preparation establishes no new native or model-review result.
+Main remains the successful `f100ab8e` with 51 landed nodes. Root restores
+canonical Main-derived observations, owners, batch accounting and effective
+graph states before the source commit; those inherited observations do not
+describe this changed implementation. Actual D3, required full regeneration,
+affected reviews and exact candidate/Main gates remain separate. The running
+RegExp FULL at immutable `229ab56e` is not interrupted or changed, and its
+results require an actual later D3 decision before reuse on another source.

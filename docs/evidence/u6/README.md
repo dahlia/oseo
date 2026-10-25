@@ -1140,6 +1140,9 @@ future exact-candidate CI and retain that source/run provenance here.
 Combined Array, TCO and yield-star composition
 ----------------------------------------------
 
+This section records historical source `cda5d73c`; the reduced Array/F3
+catalogue below supersedes its current-composition values.
+
 After the prior Set sample removal at `cdcb3416` and the F3 generator-throw
 sample retirement, the existing repository cost API reads 136 entries per
 host. Its unchanged `floor(136 / 2) = 68` rule gives upper-median fallbacks
@@ -1154,3 +1157,24 @@ shard totals, seeds, cases, replay and deadlines are unchanged. The original
 generator-throw domain and reviewed new seed `0x60001b01` remain in the whole
 property file. Future matching-host extended CI case sums must replace the
 fallback; this source assembly supplies no native execution or Mac margin.
+
+
+Reduced Array and F3 catalogue
+------------------------------
+
+After candidate `1fd374f6` failed required Linux TCO liveness at 39 of 60
+cases, D6.5 removes that implementation and its property file. Its active
+1,726 Linux/286 macOS scheduling entries are therefore retired. Their
+historical source, complete local single-worker sample, old CI interruption
+and explicit measurement limits above remain unchanged. Neither they nor
+the failed candidate's successful jobs certify a reduced source.
+
+The existing `nativeShardModel` API now supplies 135 entries per host.
+The unchanged sorted upper-median rule selects index 67, giving 406 Linux
+and 296 macOS seconds. These are unmeasured scheduling estimates for this
+catalogue, not host times, conservative bounds or deadline improvements.
+Array retains 1,119/638, and F3's obsolete 47/43 samples remain retired.
+Every other table value, host width, shard total, partition rule, source
+domain, case budget, seed and interrupt limit stays unchanged. Actual
+matching-host extended CI observations remain necessary before replacing
+the estimates. This source assembly runs no native workload or model review.

@@ -20,7 +20,7 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { nativeToolchain } from "../native-toolchain.ts";
-import { balancedInteropBackend } from "../helpers/tco-generator-interop.ts";
+import { balancedInteropBackend } from "../helpers/balanced-backend.ts";
 import {
   closeKinds,
   delegatedThrowExpected,

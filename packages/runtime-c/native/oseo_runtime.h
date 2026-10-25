@@ -30,15 +30,6 @@ typedef uint64_t OseoValue;
 typedef enum {
     OSEO_STATUS_NORMAL = 0,
     OSEO_STATUS_THROW = 1,
-    /*
-     * A PrepareForTailCall site recorded the call it owes in the context
-     * and discarded its own frame. Only a generated function body that
-     * returns `oseo_tail_call`'s result, and the runtime's own
-     * PrepareForTailCall sites, produce it. `oseo_call_function` and
-     * `oseo_call_complete` perform every recorded call before they
-     * return, so no other consumer ever observes this status.
-     */
-    OSEO_STATUS_TAIL_CALL = 2,
 } OseoStatus;
 
 typedef enum {
@@ -636,16 +627,6 @@ struct OseoContext {
     uint64_t next_finalization_order;
     size_t finalization_pending_count;
     /*
-     * Exact counts of published records on this context's object list,
-     * including unreachable and consumed records until its sweep removes
-     * them. Only empty owner-local weak/finalization scans may use these;
-     * strong and ephemeron tracing can also visit another context's heap.
-     */
-    size_t ephemeron_table_count;
-    size_t weak_reference_count;
-    size_t finalization_registry_count;
-    size_t finalization_cell_count;
-    /*
      * The current job's KeptAlive set. The private open-addressed layout
      * stays behind this public generated-code boundary; every occupied
      * slot is a strong root until the event loop clears it.
@@ -653,14 +634,6 @@ struct OseoContext {
     void *kept_objects;
     size_t kept_object_count;
     size_t kept_object_capacity;
-    /*
-     * The pending tail call between the PrepareForTailCall site that
-     * recorded it and the trampoline that performs it, NULL until the
-     * first one. The private record layout stays behind this public
-     * generated-code boundary; the collector traces it while a call is
-     * pending.
-     */
-    void *tail_call;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;
@@ -1126,75 +1099,6 @@ OseoResult oseo_call_function(
     const OseoValue *arguments,
     OseoValue new_target
 );
-/*
- * EvaluateCall for a call in tail position, after its arguments are
- * evaluated. A value that is not callable throws here, in the calling
- * frame, exactly as `oseo_call_function` would. Otherwise the call is
- * recorded with the running realm and OSEO_STATUS_TAIL_CALL is returned;
- * the generated body releases its roots and returns that result, and the
- * enclosing `oseo_call_function` or `oseo_call_complete` performs the
- * call. The arguments are copied, so they may live in the caller's
- * frame.
- */
-OseoResult oseo_tail_call(
-    OseoContext *context,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments
-);
-/*
- * `oseo_tail_call` from a derived class constructor body. The `this`
- * binding cell travels with the call, and once the chain completes
- * normally the trampoline applies the derived constructor result rules
- * to its value in the realm that made the call.
- */
-OseoResult oseo_tail_call_derived(
-    OseoContext *context,
-    OseoValue callee,
-    OseoValue receiver,
-    size_t argument_count,
-    const OseoValue *arguments,
-    OseoValue this_cell
-);
-/*
- * The host intrinsics a generated body may call in tail position without
- * a callable value of their own. The calling frame is discarded before
- * each intrinsic, including `clearTimeout`, as PrepareForTailCall
- * requires even when the target runs no user code or allocation.
- */
-typedef enum {
-    OSEO_TAIL_HOST_CONSOLE_LOG = 1,
-    OSEO_TAIL_HOST_SET_TIMEOUT = 2,
-    OSEO_TAIL_HOST_CLEAR_TIMEOUT = 3,
-} OseoTailHost;
-/*
- * `oseo_tail_call` for one host intrinsic: the arguments are copied and
- * the intrinsic runs as the next trampoline step, in the realm that made
- * the call. `clearTimeout` uses its first argument or undefined when
- * absent, ignores extra arguments after their evaluation, and preserves
- * the direct intrinsic's numeric-handle-only contract and undefined result.
- */
-OseoResult oseo_tail_host_call(
-    OseoContext *context,
-    OseoTailHost host,
-    size_t argument_count,
-    const OseoValue *arguments
-);
-/* `oseo_tail_host_call` from a derived class constructor body. */
-OseoResult oseo_tail_host_call_derived(
-    OseoContext *context,
-    OseoTailHost host,
-    size_t argument_count,
-    const OseoValue *arguments,
-    OseoValue this_cell
-);
-/*
- * Completes a direct call of a generated function body: a result with
- * OSEO_STATUS_TAIL_CALL performs the recorded calls, and any other result
- * is returned unchanged.
- */
-OseoResult oseo_call_complete(OseoContext *context, OseoResult result);
 /*
  * Creates one suspended generator for a call to `callee`. The record
  * owns `slot_count` collector-traced root slots and `completion_count`

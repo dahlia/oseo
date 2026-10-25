@@ -14,5 +14,5 @@ delivers: "Investigates and reduces the repeated linear indexed own-property
   This performance node admits no new language surface or exclusion."
 dependencies:
   - unsupported-ownership-audit
-landed: true
+landed: false
 status: ready

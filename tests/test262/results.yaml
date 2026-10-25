@@ -19456,9 +19456,9 @@ summary:
   expectedNegatives: 2732
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 24968
+  passes: 24966
   semanticFailures: 0
-  unsupportedProfileFeatures: 1447
+  unsupportedProfileFeatures: 1449
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 6
@@ -19569,9 +19569,9 @@ summary:
       expectedNegatives: 417
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4124
+      passes: 4122
       semanticFailures: 0
-      unsupportedProfileFeatures: 102
+      unsupportedProfileFeatures: 104
     - dependency: functions
       expectedNegatives: 725
       harnessFailures: 0
@@ -20242,9 +20242,9 @@ summary:
       expectedNegatives: 1504
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6979
+      passes: 6977
       semanticFailures: 0
-      unsupportedProfileFeatures: 310
+      unsupportedProfileFeatures: 312
     - group: language/function-code
       expectedNegatives: 0
       harnessFailures: 0

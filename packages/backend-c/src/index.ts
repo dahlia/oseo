@@ -1512,9 +1512,7 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   state.usesAbrupt = true;
   const argumentsValue = emitArguments(state, callArguments);
-  if (operation.tail === true) {
-    emitTailCall(state, operation, argumentsValue);
-  } else if (target.kind === "console-log") {
+  if (target.kind === "console-log") {
     line(
       state,
       renderC(
@@ -1720,89 +1718,9 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     );
     line(state, renderC(emittedC.common.indentedCloseBlock));
     line(state, renderC(emittedC.call.oseoCallLeaveContextStatement));
-    // A direct call bypasses `oseo_call_function`, so it completes any
-    // tail call chain the callee's body ended in here.
-    line(state, renderC(emittedC.call.callCompleteStatement));
     line(state, renderC(emittedC.common.closeBlock));
   }
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
-}
-
-/**
- * Emits a call MIR marks as being in tail position. The runtime records
- * it and returns OSEO_STATUS_TAIL_CALL, so the following status check
- * leaves through the body's ordinary abrupt exit, which releases the
- * frame's roots and returns that result to the trampoline. A tail call
- * never has a handler in its own body, so that exit is the body's
- * return. A derived class constructor passes its `this` binding cell
- * along for the result rules the frame can no longer apply.
- */
-function emitTailCall(
-  state: EmitState,
-  operation: MirOperation,
-  argumentsValue: { readonly count: number | string; readonly name: string },
-): void {
-  const target = operation.target;
-  const thisBindingId = operation.tailThisBindingId;
-  if (thisBindingId != null) {
-    line(
-      state,
-      renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
-        renderC(
-          emittedC.common.rootsUStatement,
-          state.environmentSlot,
-          thisBindingId,
-        ),
-    );
-    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
-  }
-  const derived = thisBindingId != null;
-  if (target?.kind === "dynamic") {
-    const callee = operationArgument(operation, 0);
-    const receiver = operationArgument(operation, 1);
-    const prefix = derived
-      ? emittedC.call.tailCallDerivedPrefix
-      : emittedC.call.tailCallPrefix;
-    line(
-      state,
-      renderC(prefix, callee) +
-        renderC(
-          emittedC.common.twoRootsWithComma,
-          receiver,
-          argumentsValue.count,
-        ) +
-        (derived
-          ? renderC(emittedC.common.valueWithComma, argumentsValue.name) +
-            renderC(emittedC.derivedReturn.resultValueStatement)
-          : renderC(emittedC.common.callSuffix, argumentsValue.name)),
-    );
-    return;
-  }
-  let host: string;
-  if (target?.kind === "console-log") {
-    host = renderC(emittedC.call.tailHostConsoleLog);
-  } else if (target?.kind === "timer-intrinsic") {
-    host = renderC(
-      target.method === "setTimeout"
-        ? emittedC.call.tailHostSetTimeout
-        : emittedC.call.tailHostClearTimeout,
-    );
-  } else {
-    throw new Error(
-      `MIR tail call %${operation.id} has a target with no tail call ABI.`,
-    );
-  }
-  const prefix = derived
-    ? emittedC.call.tailHostCallDerivedPrefix
-    : emittedC.call.tailHostCallPrefix;
-  line(
-    state,
-    renderC(prefix, host, argumentsValue.count) +
-      (derived
-        ? renderC(emittedC.common.valueWithComma, argumentsValue.name) +
-          renderC(emittedC.derivedReturn.resultValueStatement)
-        : renderC(emittedC.common.callSuffix, argumentsValue.name)),
-  );
 }
 
 function emitObjectOperation(state: EmitState, operation: MirOperation): void {

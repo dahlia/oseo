@@ -41,12 +41,9 @@ ordinary primitive inherited setters, descriptor precedence, Proxy Set
 dispatch, and strict/sloppy write failure. This node does not claim that
 contract or transfer either of its reserved Proxy paths. Root authorized
 composition with Eval, RegExp, and computed Reference after removing the
-TCO implementation. The subsequent TCO source preparation restores only
-that node's delta on Source4, including the exact Wrapper tail registration;
-it is not a five-node publication unit or an UPDATE input. Canonical
-observations and owners remain those of successful Main `de491133`, including
-the later Source4 UPDATE described below. This preparation claims no
-successful Main gates for the new TCO source.
+TCO implementation. Canonical observations and owners come from successful
+Main `52a868c9`; this preparation neither reuses the four-source candidate's
+observations nor claims successful Main gates for the new source.
 
 
 Evidence and preparation boundary
@@ -62,15 +59,15 @@ pinned revision remains `f2d1435644797268dca1f7988cad5a4e89ccd8d2`.
 structural, and focused standards evidence. Its public-runtime C fixture
 sweeps every allocation attempt of warmed per-kind boxing, forces collection,
 checks balanced roots after each failure, and retries the same context.
-TCO source preparation restores the exact strict tail-forwarding
-registration from `22a70dd9`. It checks actual tail MIR and trampoline C
-before observing all five brands through ordinary, bound, and Proxy calls,
-parameter defaults, and lexical captures. Every earlier fixed assertion
-remains unchanged. Native execution on the composed source remains pending.
+The later strict tail-forwarding registration is retained at the original
+`22a70dd9` source pending independent TCO remediation. Its actual tail MIR
+and C assertions require the removed TCO implementation and are absent
+here; none of the earlier wrapper assertions is changed. No tail execution
+claim follows from this composition.
 The two independently modeled domains in
 *tests/property/m5-primitive-wrapper-objects.property.test.ts* reserve
 `0x60008a00` and `0x60008a01`. Their aligned seed block remains unchanged;
-TCO separately retains its restored `0x60008900` block. Budgets are 12
+the removed TCO block is retained in its original refs. Budgets are 12
 ordinary cases and 240-second interrupt limits per domain, with both native
 policies, forced collection, and positive guard and generic fallback counters.
 

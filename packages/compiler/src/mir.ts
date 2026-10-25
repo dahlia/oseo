@@ -1,4 +1,4 @@
-import type { ErrorIntrinsicName, HirExpression } from "./hir.ts";
+import type { ErrorIntrinsicName } from "./hir.ts";
 import type { RegExpMatcherProgram } from "./regexp-matcher.ts";
 import type { SourceRange } from "./source.ts";
 import type {
@@ -238,21 +238,6 @@ export interface MirOperation {
   readonly mutable?: boolean;
   readonly namespaceBindingIds?: readonly number[];
   readonly namespaceNames?: readonly string[];
-  /**
-   * Marks a `call` in tail position (ECMA-262 15.10). Its block returns
-   * its value directly, with only `check-status` and `root-store`
-   * metadata between, so the backend may discard the frame before the
-   * call runs. Dynamic, console, and timer targets carry it; host targets
-   * use the host tail-call ABI without a first-class callable value.
-   */
-  readonly tail?: true;
-  /**
-   * The `this` binding of the derived class constructor a tail `call`
-   * leaves. The constructor's result rules then apply to the value the
-   * whole tail call chain returns, in place of the `derived-return` the
-   * frame can no longer run.
-   */
-  readonly tailThisBindingId?: number;
   /** Cooked strings for one cached tagged-template object. */
   readonly templateCooked?: readonly (string | undefined)[];
   /** Raw strings paired with `templateCooked`. */
@@ -597,17 +582,4 @@ export interface MirBuilder {
    * their failures instead of ignoring them.
    */
   strictCode: boolean;
-  /** True while lowering a body whose HIR function admits tail calls. */
-  readonly tailCalls: boolean;
-  /**
-   * The derived class constructor `this` binding a tail call carries,
-   * set only while lowering such a constructor.
-   */
-  readonly derivedThisBindingId?: number;
-  /**
-   * The HIR call and optional-chain expressions the current `return`
-   * lowers in tail position. Lowering one of those exact nodes marks its
-   * `call` as `tail`.
-   */
-  readonly pendingTailCalls: Set<HirExpression>;
 }

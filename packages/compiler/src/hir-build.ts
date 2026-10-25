@@ -2333,7 +2333,6 @@ function resolveFunction(
   id: number,
   selfBinding?: Binding,
   derivedThisBinding?: HirClassThisBinding,
-  sourceBody = true,
 ): HirFunction {
   const outerThisBinding = state.thisBinding;
   if (derivedThisBinding != null) {
@@ -2410,16 +2409,6 @@ function resolveFunction(
     argumentsBinding != null &&
     functionValue.strict !== true &&
     functionValue.simpleParameterList === true;
-  const functionKind = functionValue.functionKind ?? "ordinary";
-  // IsInTailPosition (15.10.1) admits only strict code, and never the
-  // body of a generator, an async function, or an async arrow.
-  const tailCalls =
-    sourceBody &&
-    functionValue.strict === true &&
-    (functionKind === "ordinary" ||
-      functionKind === "arrow" ||
-      functionKind === "method" ||
-      functionKind === "class");
   const resolved: HirFunction = {
     ...functionValue,
     ...includePropertiesWhen(() => {
@@ -2442,7 +2431,7 @@ function resolveFunction(
       };
     }),
     functionLength: functionValue.functionLength ?? parameters.length,
-    functionKind,
+    functionKind: functionValue.functionKind ?? "ordinary",
     id,
     kind: "hir-function",
     localBindingIds: [
@@ -2459,12 +2448,6 @@ function resolveFunction(
       if (selfBinding == null) return undefined;
       return {
         selfBindingId: selfBinding.id,
-      };
-    }),
-    ...includePropertiesWhen(() => {
-      if (!tailCalls) return undefined;
-      return {
-        tailCalls: true as const,
       };
     }),
   };
@@ -3070,16 +3053,11 @@ function resolveClassExpression(
       const blockId = state.nextFunctionId;
       state.nextFunctionId += 1;
       state.functionInfo.set(element.body, { id: blockId });
-      // A ClassStaticBlockBody is not a FunctionBody, so no call in it
-      // is in tail position.
       const resolvedBlock = resolveFunction(
         element.body,
         classScopes,
         state,
         blockId,
-        undefined,
-        undefined,
-        false,
       );
       elements.push({
         ...element,

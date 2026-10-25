@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 149
+M5a is complete. The normative family records described below inventory 148
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -122,47 +122,6 @@ results, reviewed exclusion-audit rows, and ledger owner
 `node:class-private-accessor-lookup-coverage-remediation` arrive with that
 batch; ADR 0013 accepts no new exclusion, and the private accessor subjects
 remain mixed coverage debt.
-
-M5c node `proper-tail-calls` implements the tail-call source contract.
-The reviewed subset admits `tail-call-optimization`. Its two reviewed
-tagged-template paths now pass the fresh complete observation on U
-`222880e5`, recorded in R `494247c5`. Their unchanged strict-only bodies
-use the faithful 100,000-depth helper under both specialization policies;
-admission alone did not establish these passes. The other 33 feature-tagged
-paths remain unreviewed under observation-batch-32. Every call
-that ECMA-262 15.10 places in tail position of a strict ordinary, arrow,
-method, accessor, or class constructor body discards its frame before the
-call. The same holds for the PrepareForTailCall steps of
-`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`, and
-for bound function and Proxy [[Call]] forwarding. A chain of such calls holds
-constant native stack, call depth, and roots, and its errors keep the realm
-of the call that raised them. Derived constructors apply their result rules
-to the chain's value. Direct `console.log`, `setTimeout`, and `clearTimeout`
-calls use recorded host steps in tail position. Their arguments finish
-before frame release; `clearTimeout` still ignores non-number handles and
-extra values and returns undefined. Calls outside tail position, non-strict
-code, and generator and async bodies keep their frames and the 256-call limit.
-The indexed proper tail call family records generated positions, forms,
-exclusions, and liveness (seeds `0x60008900` through `0x60008902`), fixed
-100,000-step chains, differential fixtures under forced collection, and the
-runtime trampoline fixture. The composed runtime ABI is `oseo-runtime-m5-137`:
-`m5-136` introduced the tail-call contract, and `m5-137` adds owner-local
-published weak-record counts. Only empty owner-local weak clearing,
-finalization scheduling, and registry compaction may be skipped. Ephemeron
-fixed-point tracing remains unconditional for foreign-heap activation; root
-tracing, sweep, and forced safepoints retain their existing behavior.
-Author-native checks on `957a0df1` passed two original-subject registrations
-on Node and two on Deno, separately from the earlier reviewer Node probe.
-Their eight assertion-derived subject/policy executions retain empty native
-output, actual execution and the original unused IIFE result. No stronger
-oracle, saved successful C/MIR or numeric GC counters are claimed.
-The full 29,147-path result records 24,968 passes, 2,732 expected negatives
-and 1,447 unsupported results with no failure classification; only those
-two original records change. The source-bound receipts and U/R timing are
-recorded in *PLAN-M5C.md*. Full current-source fixture, liveness,
-ordinary/extended, cross-host, sanitizer and exact candidate/Main
-requirements remain separate; neither this FULL nor the focused original
-subjects complete them or land TCO.
 
 M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
 list. The tag was the only unmet prerequisite of the four reviewed
@@ -9342,11 +9301,11 @@ policies, with forced collection and positive collection and generic
 fallback counters. A String wrapper deliberately falsifies a numeric hint;
 a shape mutation exercises the property cache miss.
 
-The TCO source preparation restores the exact strict tail-forwarding
-registration from `22a70dd9`, including its actual tail MIR and C assertions.
-It retains every earlier fixed strict call, bound and Proxy forwarding,
-default, capture, and five-kind assertion. Native tail-forwarding execution
-remains pending on the composed source.
+The TCO-dependent strict tail-forwarding registration and its actual tail
+MIR and C assertions remain preserved at `22a70dd9`, pending independent
+TCO remediation. This composition retains the earlier fixed strict calls,
+bound and Proxy forwarding, defaults, captures, and five-kind assertions;
+it claims no tail-forwarding execution evidence.
 
 The focused standards registration uses the exact 40-path fixture selector
 and checks every requested strictness and specialization variant. It writes
@@ -9354,11 +9313,9 @@ no reviewed expectation or result. Clean source preparation retained Main's
 40 unsupported observations at the old `primitive-wrapper` boundary. The
 fresh complete UPDATE on clean source `6e54c5d5` observed all 40 selector
 paths as passes and promoted them in the canonical manifest recorded in
-`f2c30668`. That composition without TCO added the 148th indexed family.
-This preparation retains Wrapper's indexed family alongside the restored
-TCO family, bringing the source inventory to 149 records. Full and extended
-candidate CI, affected review, and TCO landing remain pending. Zig's address
-and undefined flags
+`f2c30668`. This composition without TCO adds the 148th indexed family;
+full and extended candidate CI, affected post-observation review, and
+landing remain pending. Zig's address and undefined flags
 alone establish no ASan activity; the exact candidate's host C sanitizer
 lanes must supply that evidence.
 
@@ -9424,10 +9381,21 @@ this generic runtime correction introduces no specialized path. Required
 full/cross-host/sanitizer gates, D3 regeneration, review and landing remain
 separate from the source change and pure model checks.
 
-This three-node assembly adds those exact original F3 runtime and test
-blobs to the reduced Array/TCO source `cdcb3416`. Set remains deferred and
+The historical three-node assembly added those exact original F3 runtime and
+test blobs to the reduced Array/TCO source `cdcb3416`. Set remains deferred and
 no RegExp restoration is included. All other packages, headers and GC/call
 interfaces retain their reduced-source identities. The earlier F3 author
-execution record stays bound to its original inputs; this assembly runs
-no new native program. Generated observations and all 14 B16 reservations
-remain unchanged pending actual D3 and any required complete regeneration.
+execution record stays bound to its original inputs; this assembly runs no new
+native program. Generated observations and all 14 B16 reservations remain
+unchanged pending actual D3 and any required complete regeneration.
+
+The later D6.5 Array/F3 preparation removes failed TCO source and admission,
+including its weak-record counter repair, and retains the original `m5-135`
+runtime interface. Array physical completion compaction and the independent
+general completion dispatch/sentinel corrections remain. The full structural
+and extracted native cleanup witnesses retain their original source and
+assertion contracts; the new composition has no native validation yet.
+F3's exact generic teardown backend moves to an independent helper without
+weakening its public frame/root checks. All original domains, seeds, cases,
+fourteen pinned subjects and reservations remain. Fresh observations,
+affected review and exact candidate/Main gates remain required.

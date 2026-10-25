@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-29,147 reviewed cases: 24,968 passes, 2,732 expected negatives, and 1,447
+29,147 reviewed cases: 24,966 passes, 2,732 expected negatives, and 1,449
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -27,7 +27,7 @@ tests and 18,093 built-in tests are inside the 16th edition, while 6,290
 proposal, post-edition, or Annex B paths are outside it. The compact inventory
 remains separate from the result manifest.
 
-M5a and M5b are complete. The 149 indexed records in the normative
+M5a and M5b are complete. The 148 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
@@ -9003,6 +9003,9 @@ D3 full regeneration remain required beyond this focused preparation.
 Three-node source composition
 -----------------------------
 
+This section records historical source `cda5d73c`, not the current
+Array/F3 preparation described below.
+
 The Array/TCO/F3 assembly keeps the reduced `cdcb3416` source and its
 Set-free qualifications, adding the seven original `df282b3f` F3 runtime,
 test and family blobs. Only *runtime\_iterator.c* changes among packages;
@@ -9017,3 +9020,50 @@ original F3 `df282b3f` 137-entry/409/296 values remain historical source-bound
 compositions. All remaining weights, including Array 1,119/638 and TCO
 1,726/286, are unchanged. No new matching-host measurement or performance
 bound follows; extended CI and final exact-source gates remain required.
+
+
+Reduced Array and F3 source after the TCO failure
+-------------------------------------------------
+
+Candidate `1fd374f6` failed required Linux extended TCO liveness after
+39 of 60 cases at 1,800,004.285095 milliseconds, with seed 1592590339,
+depth 1,200 and 12 extra arguments. D6.5 removes the complete unlanded
+TCO implementation and its owner-local weak-record counter repair from
+this preparation. The runtime returns to Main `f100ab8e`'s `m5-135`
+interface and collector phases. No case budget, seed, size, deadline,
+shard width or assertion changes. The failure is not a semantic
+counterexample, a current pass or established runner variance.
+
+Array keeps its original indexed lookup, append and dense truncation
+optimizations from `a541b567` and `c2b039c5`, plus the physical completion
+mapping authored in `f26a74bf` and replayed in `5f27bb4a`. Logical frame
+charges and guards stay unchanged. The general completion-target dispatch
+and zero-sentinel corrections from `7d8445b1` and `90693863` also remain:
+they protect ordinary finally cleanup and suspended default-parameter
+bodies independently of the removed tail-call protocol.
+
+The exact structural completion regressions remain. The original
+`finallyChain` source, oracle, `finally-chain.js` identity, references and
+both-policy native registration move to
+*tests/completion-target-native.test.ts*. That entry point also runs the
+complete general finally/generator fixture suffix from the old TCO fixture,
+with its own strict prefix, both references and policies, positive forced
+collection, disabled guard-counter checks and explicit native/cross targets.
+The source statements retain their original authored bytes; extraction
+changes the surrounding program and requires fresh validation.
+
+F3 retains the noncallable delegated-throw TypeError without return access,
+all fourteen original pinned subjects, its original fixed/model programs
+and both property domains. Its exact generic teardown backend moves to
+*tests/helpers/balanced-backend.ts*, and only its two imports change.
+The active-frame, call-depth and root checks remain intact. No Set or RegExp
+restoration, new admission or exclusion is included. Original TCO and Set
+sources, authors and source-bound evidence remain in protected history.
+
+Removing the deferred TCO file's two scheduling entries leaves 135 entries
+per host. The unchanged upper-median rule gives 406 Linux/296 macOS seconds.
+These are unmeasured composition estimates. Array keeps 1,119/638 and F3's
+old 47/43 samples stay retired; every other value and scheduling rule stays
+unchanged. No focused native, full observation or model review is run by
+this source assembly. Root owns data/graph reconstruction, affected review,
+actual D3, required full observations and exact candidate/Main gates.

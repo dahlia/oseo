@@ -24,7 +24,7 @@ import {
   parseTest262Case,
 } from "../tools/test262-source.ts";
 import { executeTest262Case } from "../tools/test262.ts";
-import { balancedInteropBackend } from "./helpers/tco-generator-interop.ts";
+import { balancedInteropBackend } from "./helpers/balanced-backend.ts";
 import {
   delegatedThrowBoundaries,
   delegatedThrowExpected,

@@ -1294,15 +1294,6 @@ export interface HirFunction extends LocatedSyntax {
   readonly sourceText?: string;
   readonly selfBindingId?: number;
   readonly strict?: boolean;
-  /**
-   * True when the body is an ECMA-262 FunctionBody or ConciseBody whose
-   * tail position calls are proper tail calls (15.10.1): strict source
-   * code of an ordinary, arrow, method, accessor, or class constructor
-   * function. Generator and async bodies never set it, and neither does
-   * any function the compiler synthesizes, such as a class field
-   * initializer, whose `return` stands for no source ReturnStatement.
-   */
-  readonly tailCalls?: true;
 }
 
 /** One script environment cell required outside the script statement list. */

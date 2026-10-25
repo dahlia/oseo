@@ -135,7 +135,6 @@ supportedFeatures:
   - Symbol.toStringTag
   - Symbol.unscopables
   - symbols-as-weakmap-keys
-  - tail-call-optimization
   - template
   - top-level-await
   - TypedArray
@@ -125775,10 +125774,10 @@ tests:
     expectedClassification: pass
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/tco-call.js
-    expectedClassification: pass
+    expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/tco-member.js
-    expectedClassification: pass
+    expectedClassification: unsupported-profile-feature
     dependencies: [expression-operators]
   - path: test/language/expressions/tagged-template/template-object-frozen-non-strict.js
     expectedClassification: pass
