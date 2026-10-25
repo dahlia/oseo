@@ -44,10 +44,12 @@ export const primitiveComputedSetterExpected: string =
 
 export const primitiveReceiverSetFixtures: readonly Fixture[] = [
   {
+    globalScriptReference: true,
     name: "primitive-receiver-inherited-set",
     source: primitiveSetterSource,
   },
   {
+    globalScriptReference: true,
     name: "primitive-receiver-computed-set",
     source: primitiveComputedSetterSource,
   },

@@ -19,6 +19,7 @@ import type {
   SetDescriptor,
 } from "./helpers/primitive-receiver-set.ts";
 import {
+  primitiveReceiverSetFixtures,
   primitiveSetterSource,
   primitiveSetterExpected,
   primitiveComputedSetterSource,
@@ -113,6 +114,22 @@ test("primitive setter regressions agree with references", async () => {
     [primitiveSetArraySource, primitiveSetArrayExpected],
   ] as const)
     await references(source, expected);
+});
+
+test("strict Set fixture references survive a prefix statement", async () => {
+  const expected = new Map([
+    ["primitive-receiver-inherited-set", primitiveSetterExpected],
+    ["primitive-receiver-computed-set", primitiveComputedSetterExpected],
+  ]);
+  for (const fixture of primitiveReceiverSetFixtures) {
+    const output = expected.get(fixture.name);
+    assert.ok(output != null, fixture.name);
+    const source = fixture.globalScriptReference
+      ? `(0, eval)(${JSON.stringify(fixture.source)});\n`
+      : fixture.source;
+    // A preceding statement ends the outer Script's directive prologue.
+    await references(`void 0;\n${source}`, output);
+  }
 });
 
 test("primitive Set sources lower to generic stores", () => {
