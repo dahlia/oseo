@@ -9046,16 +9046,53 @@ Array emission baseline on current Main
 The complete original 44 family/name/specialization tuples were collected
 through compileSource, printHir, printMir and cBackend.emit on the new source.
 Fixture bytes, source IDs, policies, printed HIR and MIR remain exact the
-original source-qualified five-input audit. Every complete emitted object
-matches Array646 and the corrected `01f57d58` composition. Relative to the
-inherited Array646 baseline, 30 records stay exact and 14 hashes change only
-because physical compilation-unit source materializes the existing selection;
-aggregate C and all other object fields stay exact its d210 predecessor.
-Main-to-Array's earlier 34 compaction changes remain distinct from those 14.
+original
+[five-input audit](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission-tuple-proof.json)
+identified below. Every complete emitted object matches Array646 and the
+corrected `01f57d58` composition. Relative to the inherited Array646 baseline,
+30 records stay exact and 14 hashes change only because physical
+compilation-unit source materializes the existing selection; aggregate C and
+all other object fields stay exact its d210 predecessor. Main-to-Array's
+earlier 34 compaction changes remain distinct from those 14.
+
+The audit's
+[snapshot identities](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/snapshot-identities.json)
+and
+[collector](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-emission.mjs)
+identify five 44-row captures, 220 complete tuples in total. Each raw index
+names its original fixture, HIR, MIR, aggregate C, full emitted-C object and
+tuple files; each capture record retains the actual command.
+
+| Capture label | Source commit                              | Raw index and capture record                                                                                                                                                                                         |
+| ------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| main          | `f100ab8edf91c981888311a31251b874801c374e` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/main/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-main/record.json)         |
+| d210          | `d2100e07df8fd3c3afa572d43dac114ca16e8b74` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/d210/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-d210/record.json)         |
+| array646      | `646fadd58e4f545669f4c944d309ea0de3a415ad` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/array646/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-array646/record.json) |
+| f3e234        | `e2345fbe33d8a0e591f1bed1fea166e3ba852ee2` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/f3e234/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-f3e234/record.json)     |
+| combined      | `01f57d58cb9d5843ece58b9df4fa13979973c9f6` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/combined/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-combined/record.json) |
+
+The combined capture used a working snapshot before the baseline repair;
+its collector-loaded source files match those in the later `01f57d58`
+commit.
+It is not a capture of that commit's repaired baseline. The
+[physical-unit token proof](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/physical-unit-token-proof.json)
+retains the independent comparison of the selected C units. The current
+`6fd3c49d80b1acd7228e86422b1be9ef7c648340` source's
+[44-row raw index](/data/m5c-array-only-current-main-preparation-20261025/task_61d947a3473d/emission/current/records.json)
+and
+[tuple comparison](/data/m5c-array-only-current-main-preparation-20261025/task_61d947a3473d/tuple-proof.json)
+bind its equality to those original captures. The fourteen C-only digest rows
+represent seven fixture identities under two policies; they are separate from
+the fourteen original B16 Test262 subjects.
 
 The baseline is generated from these complete repository-API tuples using
 its unchanged full-object formula, with all 44 keys, order and policies
 preserved. No fixture, HIR, MIR, assertion or emitted C is normalized or
-truncated. Original failed audit evidence remains at its original path;
-this source preparation does not relabel those historical failures. Pure
-baseline equality supplies no native semantics or performance observation.
+truncated. The original pre-repair whole-Script baseline check's
+[exit-1 record](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/harness-emission-node/record.json)
+and
+[preserved failure stdout](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/harness-emission-node/FAILED-stdout-preserved)
+retain the function-prototype/enabled baseline mismatch. That failure precedes
+the `01f57d58` baseline repair and is not a failure of its repaired baseline or
+a CI result. Pure baseline equality supplies no native semantics or performance
+observation.
