@@ -24,5 +24,5 @@ delivers: Repair synchronous yield-star delegation when GetMethod on the
   from exact-SHA successful Main landing.
 dependencies:
   - iterator-next-callability
-landed: false
+landed: true
 status: ready
