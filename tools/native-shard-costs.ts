@@ -57,6 +57,11 @@
  * historical 286-second assigned cost. The combined continuation-dispatch
  * estimates raise unknown-file upper medians to 406 Linux/296 macOS seconds.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
+ *
+ * F3 adds a second generator-throw domain. Retire its old 47/43 samples.
+ * The 135-entry Main/F3 tables derive 406 Linux/296 macOS fallback weights.
+ * These are unmeasured scheduling estimates, not matching-host costs.
+ * All other Main entries and partition rules remain unchanged. See U6.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -117,7 +122,6 @@ export const nativeShardCosts = {
     "tests/property/m5-function-prototype.property.test.ts": 417,
     "tests/property/m5-generator-methods.property.test.ts": 51,
     "tests/property/m5-generator-parameter.property.test.ts": 168,
-    "tests/property/m5-generator-throw.property.test.ts": 47,
     "tests/property/m5-generator.property.test.ts": 888,
     "tests/property/m5-generic-string-coercion.property.test.ts": 282,
     "tests/property/m5-global-numeric-functions.property.test.ts": 667,
@@ -269,7 +273,6 @@ export const nativeShardCosts = {
     "tests/property/m5-function-prototype.property.test.ts": 183,
     "tests/property/m5-generator-methods.property.test.ts": 64,
     "tests/property/m5-generator-parameter.property.test.ts": 138,
-    "tests/property/m5-generator-throw.property.test.ts": 43,
     "tests/property/m5-generator.property.test.ts": 464,
     "tests/property/m5-generic-string-coercion.property.test.ts": 246,
     "tests/property/m5-global-numeric-functions.property.test.ts": 313,

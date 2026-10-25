@@ -19,8 +19,8 @@ baseline:
   unreviewedPaths: 11944
   unsupportedProfileFeatures: 1449
 summary:
-  nodes: 88
-  ready: 85
+  nodes: 89
+  ready: 86
   blocked: 3
   parked: 0
   landed: 51
@@ -3248,3 +3248,54 @@ collisions:
       - with-optional-call-receiver
     note: "Script-goal repair shares canonical observation partitions
       with this independent publisher; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-coverage-remediation
+      - dynamic-source-retagging
+      - iterator-helpers
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-14
+      - observation-batch-16
+      - observation-batch-17
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - regexp-property-escape-harness
+      - regexp-split-coverage-remediation
+      - test262-host-script-bindings
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+      - with-optional-call-receiver
+      - yield-star-throw-callability
+    note: "The yield-star repair shares canonical observations with these
+      independent publishers; serialize final publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - yield-star-throw-callability
+    note: "The yield-star repair shares canonical observations with this
+      independent publisher; serialize final publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - proper-tail-calls
+      - yield-star-throw-callability
+    note: "The yield-star repair shares canonical observations with this
+      independent publisher; serialize final publication."

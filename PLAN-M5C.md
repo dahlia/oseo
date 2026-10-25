@@ -1362,3 +1362,28 @@ workflows succeed; this record does not claim those CI results in advance.
 The property harness stays unlanded and subject to the user's Array
 performance publication prerequisite. This candidate adds no Array source,
 node, or exclusion and changes no test budgets, seeds, or shard totals.
+
+
+F3-only source preparation after the Array candidate failure
+------------------------------------------------------------
+
+D6.5 removes the failed Array node from the next publication source. This
+preparation starts at successful Main `f100ab8e` and restores only existing
+node `yield-star-throw-callability`: GetMethod of a noncallable delegate
+throw raises TypeError without reading return. Nullish/absent closing,
+callable dispatch, abrupt getters, result validation, roots and teardown
+retain their original contracts. The independent backend helper asserts
+public context balance and imports no Array completion layout or TCO code.
+
+The unchanged original regression, 88 boundary cases and two generator-throw
+property domains retain both policies, forced collection, independent
+Node/Deno oracles, seeds, cases, deadlines and replay. All fourteen pinned
+B16 subjects remain whole and unadmitted. Their earlier diagnostic passes
+are distinct from the minimized counterexample and establish no new row.
+
+Main's inventory, subset, results, parity, ledger, owners and exclusions
+remain byte-identical. The source graph adds only F3 as ready/unlanded:
+89 nodes, 86 ready, three blocked and 51 landed. Final landed transitions
+and test expectations stay Root-owned. Array, Set, RegExp and TCO source
+and admission are not restored. No native, model or Full run is claimed;
+exact-source validation, D3, affected review and publication remain pending.
