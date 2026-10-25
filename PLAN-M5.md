@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-29,147 reviewed cases: 24,966 passes, 2,732 expected negatives, and 1,449
+29,147 reviewed cases: 24,968 passes, 2,732 expected negatives, and 1,447
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -8905,10 +8905,14 @@ binds exact commands, source, raw packets and retained rejection artifacts.
 The corrected full Array property took 50.920130469 seconds versus the
 separate U99 baseline's 36.480273056 seconds. Assigned cache paths differ;
 cache equivalence, causality and variance are unestablished. There is no
-observed Linux speedup, macOS benefit or deadline repair. Actual new full
-manifest regeneration, impact review, full ordinary/extended, sanitizer and
-cross-host gates, and exact candidate/Main CI remain required. Earlier U99
-observations remain historical evidence for that implementation.
+observed Linux speedup, macOS benefit or deadline repair. The reduced
+147-feature full observation on U `222880e5`, recorded in R `494247c5`,
+completed with only the two original TCO promotions and no failure
+classification; *PLAN-M5C.md* binds the exact source, timing and audit.
+That full observation does not rerun these four focused commands or prove
+a performance improvement. Impact review, full ordinary/extended, sanitizer
+and cross-host gates, and exact candidate/Main CI remain required. Earlier
+U99 and f26 observations retain their historical source bindings.
 
 
 Primitive receiver inherited Set source preparation

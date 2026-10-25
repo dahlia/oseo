@@ -125,8 +125,11 @@ remain mixed coverage debt.
 
 M5c node `proper-tail-calls` implements the tail-call source contract.
 The reviewed subset admits `tail-call-optimization`. Its two reviewed
-tagged-template paths retain Source4's unsupported observations pending a
-new full UPDATE; admission alone does not establish a pass. Every call
+tagged-template paths now pass the fresh complete observation on U
+`222880e5`, recorded in R `494247c5`. Their unchanged strict-only bodies
+use the faithful 100,000-depth helper under both specialization policies;
+admission alone did not establish these passes. The other 33 feature-tagged
+paths remain unreviewed under observation-batch-32. Every call
 that ECMA-262 15.10 places in tail position of a strict ordinary, arrow,
 method, accessor, or class constructor body discards its frame before the
 call. The same holds for the PrepareForTailCall steps of
@@ -147,9 +150,19 @@ runtime trampoline fixture. The composed runtime ABI is `oseo-runtime-m5-137`:
 published weak-record counts. Only empty owner-local weak clearing,
 finalization scheduling, and registry compaction may be skipped. Ephemeron
 fixed-point tracing remains unconditional for foreign-heap activation; root
-tracing, sweep, and forced safepoints retain their existing behavior. Full
-current-source fixture, liveness, extended, UPDATE, and CI evidence remains
-pending.
+tracing, sweep, and forced safepoints retain their existing behavior.
+Author-native checks on `957a0df1` passed two original-subject registrations
+on Node and two on Deno, separately from the earlier reviewer Node probe.
+Their eight assertion-derived subject/policy executions retain empty native
+output, actual execution and the original unused IIFE result. No stronger
+oracle, saved successful C/MIR or numeric GC counters are claimed.
+The full 29,147-path result records 24,968 passes, 2,732 expected negatives
+and 1,447 unsupported results with no failure classification; only those
+two original records change. The source-bound receipts and U/R timing are
+recorded in *PLAN-M5C.md*. Full current-source fixture, liveness,
+ordinary/extended, cross-host, sanitizer and exact candidate/Main
+requirements remain separate; neither this FULL nor the focused original
+subjects complete them or land TCO.
 
 M5c node `frontmatter-feature-tags` adds `super` to the reviewed feature
 list. The tag was the only unmet prerequisite of the four reviewed
