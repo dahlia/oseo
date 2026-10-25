@@ -2691,14 +2691,13 @@ OseoResult oseo_iterator_delegate_throw(
         return result;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_callable(slots[1])) {
-        result = oseo_iterator_close(context, slots[0], 0u);
-        if (result.status == OSEO_STATUS_NORMAL) {
-            result = oseo_internal_throw_error(
-                context,
-                OSEO_ERROR_TYPE,
-                "The iterator throw method is not callable."
-            );
-        }
+        /* GetMethod fails before the absent-method IteratorClose branch.
+         * Reading return here would replace that failure or add effects. */
+        result = oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "The iterator throw method is not callable."
+        );
         oseo_roots_pop(context, &frame);
         return result;
     }

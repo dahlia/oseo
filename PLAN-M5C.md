@@ -1800,11 +1800,76 @@ is included. The original RegExp U/R and all historical evidence remain
 preserved separately. Root must run actual D3 and any required complete
 UPDATE before adopting observations for a later candidate.
 
-Removing the deferred Set property gives 137 scheduling entries per host;
-the unchanged upper-median rule yields 406 Linux/296 macOS seconds. Array
+At reduced source `cdcb3416`, removing the deferred Set property gave
+137 scheduling entries per host; the unchanged upper-median rule yielded
+406 Linux/296 macOS seconds. Array
 keeps its 1,119/638 entries and every other weight remains unchanged. These
 composition values supply no new host measurement, performance or deadline
 result. The inherited C2 graph flags are prospective preparation state;
 effective successful Main remains `f100ab8e` with 51 landed of 88 nodes.
 Root owns the final graph correction, affected review, candidate/Main gates
 and publication. This source preparation establishes no new native pass.
+
+The following F3 preparation record retains its original author-source and
+execution-receipt scope. Its phase notes are historical; this assembly
+adds no native execution or review claim.
+
+
+Yield-star throw callability correction preparation
+---------------------------------------------------
+
+The bounded B16 diagnostic at exact result `494247c5` observed all 14 original
+yield-star throw subjects passing in 56 native variants. Separately, its
+unchanged noncallable-throw repro observed unwanted return getter/call effects
+under both Oseo policies. A throwing return getter replaced the required
+`TypeError` with `RangeError`; Node and Deno observed `TypeError` with no
+cleanup. Passing original subjects do not cover this additional counterexample.
+
+The ready `yield-star-throw-callability` node repairs only the synchronous
+runtime's noncallable GetMethod branch. The original repro remains an ordinary
+regression and the existing generator-throw property gains a distinct modeled
+domain while preserving its old seed, cases, replay and limit. Coupled nullish,
+callable, accessor-abrupt, result-validation, finally and root/frame paths stay
+in fixed and generated coverage. The authorized Node/Deno fixed and property
+files passed all ten registrations on Linux AMD64, once each, with both
+policies, forced-collection and balanced root/frame assertions on the new
+programs. The exact original 14-subject loop retains pass/four-variant
+assertions. This focused evidence neither admits those paths nor supplies
+full-corpus observations. Independent review remains pending.
+
+No B16 admission, dependency tag, expected classification, ownership, exclusion
+or graph status is changed by the worker. All 14 paths retain their current
+reservations. Root owns the runtime change's D3 full regeneration, actual new
+observations/accounting, affected integration review, exact-candidate gates,
+Main and landing. Historical full-UPDATE results describe their actual older
+implementation and cannot certify this runtime correction.
+
+
+Three-node Array, TCO and yield-star source assembly
+----------------------------------------------------
+
+This assembly composes reduced Array/TCO source `cdcb3416` with original
+reviewed F3 tip `df282b3f`. The seven nonshared F3 runtime, test and family
+blobs retain their original modes and bytes. Its only production delta is
+noncallable synchronous delegate `throw`; every other package blob and
+mode stays `cdcb3416`, including the Main `f100ab8e` primitive store and
+all Array physical storage, TCO, GC, frame and public/private interfaces.
+Property reads, calls, roots and iterator-close code remain unchanged by
+the primitive-store restoration. The F3 inputs require no inherited
+primitive Set feature. Set and RegExp restorations remain outside this
+assembly.
+
+All generated test262, subset, parity, closure, observation-batch, graph,
+node and test-expectation bytes remain exact `cdcb3416`. The 14 original
+B16 subjects are still reserved and unreviewed. No admission, owner,
+classification, exclusion, feature, seed registry or graph flag changes.
+The inherited observations do not certify the changed runtime; actual D3
+and any required new complete UPDATE remain separate steps.
+
+Retiring generator-throw's old 47/43 samples after the prior Set removal
+leaves 136 scheduling entries per host. The unchanged upper-median rule
+selects index 68 and derived fallbacks of 409 Linux/296 macOS seconds.
+These are unmeasured scheduling estimates, not measured workload times,
+conservative bounds, speedups or deadline evidence. Every remaining weight
+is exact `cdcb3416`, including Array 1,119/638 and TCO 1,726/286. Matching-host
+extended CI case sums and exact candidate/Main gates remain required.

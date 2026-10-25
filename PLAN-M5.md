@@ -8927,9 +8927,93 @@ cases. Historical `c4bcb412` native evidence includes the later setter
 variant and retains that source binding. It is not current-source execution.
 The separate strict primitive-wrapper tail-forwarding test is unchanged.
 
-The removed unpublished Set property leaves 137 scheduling entries per host
-and derived 406/296 upper-median fallbacks, with Array's 1,119/638 weights
-unchanged. No matching-host measurement is added. Generated observations,
-admissions, reservations and graph flags remain exact inherited C2 until
-Root's actual D3, regeneration and final candidate mechanics. Source
-preparation and normal CHECK do not establish native validation or landing.
+At reduced source `cdcb3416`, removing the unpublished Set property left
+137 scheduling entries per host and derived 406/296 upper-median fallbacks,
+with Array's 1,119/638 weights unchanged. No matching-host measurement is
+added. Generated observations, admissions, reservations and graph flags remain
+exact inherited C2 until Root's actual D3, regeneration and final candidate
+mechanics. Source preparation and normal CHECK do not establish native
+validation or landing.
+
+
+Synchronous yield-star throw callability correction
+---------------------------------------------------
+
+M5c node `yield-star-throw-callability` separates GetMethod failure from
+missing-method cleanup. A synchronous delegate whose `throw` property is
+noncallable must raise `TypeError` immediately. It must not read or call
+`return`. An absent, undefined, or null `throw` still follows the separate
+IteratorClose path before the protocol-violation `TypeError`. Callable throw
+methods, abrupt getters, result validation, roots and frame teardown retain
+their existing interfaces. No runtime ABI or logical resource policy changes.
+
+The minimized ordinary regression is preserved byte-for-byte in
+*tests/native/fixtures/yield-star-noncallable-throw.js.txt*. It distinguishes
+normal, throwing-getter and primitive-result return methods using the error
+name and cleanup-log length. Its independent oracle is `TypeError` with zero
+cleanup in all three modes. The `.txt` suffix keeps the original source bytes
+outside source formatting; the native test reads and compiles those bytes.
+
+*tests/helpers/yield-star-throw.ts* models 11 throw-method/result classes and
+eight return/close classes independently of execution. Fixed examples retain
+all 88 combinations, receiver/arity, original abrupt-value identity, finally
+ordering, result field access and completion. The existing generator-throw
+property keeps its original domain, seed `0x60001b00`, 15 cases and
+180,000-millisecond limit. A second domain uses unused slot `0x60001b01`,
+15 structured cases and the same limit, shrinking protocol classes and bounded
+integer payloads without filtering. It compares the model with Node, Deno and
+both native policies, with forced collection and existing balance assertions.
+
+*tests/yield-star-throw-model.test.ts* checks the fixed oracle, exact minimized
+source hash and public MIR/C delegation boundary without native execution.
+*tests/yield-star-throw-callability.test.ts* contains the native regression,
+88-boundary packet and the 14 complete original pinned B16 subjects. The
+subjects' earlier passes are distinct from the separately failing minimized
+repro; this correction changes no reviewed row, reservation or classification.
+
+The four authorized Linux AMD64 author commands passed once each: Node and
+Deno on the complete focused fixture file (three registrations each), then
+Node and Deno on the complete property file (two registrations each). The
+fixed programs checked both policies, positive allocation/collection and zero
+active native-frame slots, call depth and roots at teardown. Numeric counter
+values were not retained by those assertion-based tests. The original
+14-subject loop requires pass and four variants per subject; it does not add
+14 framework registrations or admit their reserved rows.
+
+The source snapshot and complete raw commands are in the durable author packet
+*/data/m5c-yield-star-throw-callability-20261025/task\_09a9fcb547c7/*.
+The whole-file walls were 14.321340655/12.712538977 seconds for Node/Deno fixed
+checks and 22.894722875/25.854402194 seconds for Node/Deno properties. Those
+focused Linux timings do not establish an extended or other-host cost.
+The old generator-throw weights, 47 Linux and 43 macOS seconds, describe
+the earlier one-domain workload and are retired from the active tables.
+In original F3 source `df282b3f`, the unchanged unknown-file fallback
+supplied 409 Linux/296 macOS seconds in its 137-entry composition. These
+historical composition values are unmeasured scheduling estimates, not
+measured host times or conservative bounds. Actual matching-host
+extended CI case sums must replace them; U6 retains the source provenance.
+No other table value, scheduling rule, shard, case budget or timeout changes.
+
+The synchronous-generator family's generic-runtime guard-fallback omission
+and named replacements remain; this node adds no specialization guard.
+Mac-native/sanitizer, ordinary/extended candidate gates, affected review and
+D3 full regeneration remain required beyond this focused preparation.
+
+
+Three-node source composition
+-----------------------------
+
+The Array/TCO/F3 assembly keeps the reduced `cdcb3416` source and its
+Set-free qualifications, adding the seven original `df282b3f` F3 runtime,
+test and family blobs. Only *runtime\_iterator.c* changes among packages;
+the primitive store remains exact Main, with Array/TCO code, headers,
+collector/frame contracts and call/GetMethod interfaces unchanged. No RegExp
+helper restoration, reviewed-data change or B16 admission is included.
+
+The current tables contain 136 entries per host after both sample removals.
+The existing index-68 upper median gives 409 Linux/296 macOS seconds as
+unmeasured scheduling estimates. Prior `cdcb3416` 137-entry/406/296 and
+original F3 `df282b3f` 137-entry/409/296 values remain historical source-bound
+compositions. All remaining weights, including Array 1,119/638 and TCO
+1,726/286, are unchanged. No new matching-host measurement or performance
+bound follows; extended CI and final exact-source gates remain required.

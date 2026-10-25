@@ -1089,11 +1089,12 @@ No shard rule, seed, case budget, deadline, or replay setting changes.
 Reduced Array and TCO source composition
 ----------------------------------------
 
-The reduced preparation removes the unpublished primitive receiver Set
-property and its two 900-second planning entries. The unchanged repository
-cost API now reads 137 entries per host. Its zero-based
-`floor(137 / 2) = 68` upper-median fallback is 406 Linux/296 macOS seconds.
-These are derived composition values, not matching-host measurements.
+The prior reduced source `cdcb3416` removed the unpublished primitive
+receiver Set property and its two 900-second planning entries. The unchanged
+repository cost API then read 137 entries per host. Its zero-based
+`floor(137 / 2) = 68` upper-median fallback was 406 Linux/296 macOS seconds.
+These are historical source-bound composition values, not matching-host
+measurements.
 
 Array's existing 1,119 Linux/638 macOS entries, TCO's 1,726/286 entries,
 Script's 41/286 entries and every other weight remain unchanged. Historical
@@ -1101,3 +1102,55 @@ measurements and unmeasured placeholders retain their original source and
 host bounds. The reduced source adds no performance or deadline result.
 Shard totals, algorithms, case budgets, seeds, deadlines and replay controls
 stay unchanged; Root owns the later exact-source gates and publication.
+
+
+Yield-star throw workload sample retirement
+-------------------------------------------
+
+The `yield-star-throw-callability` correction adds a second domain to
+*tests/property/m5-generator-throw.property.test.ts*. Its original domain
+retains seed `0x60001b00`, 15 cases and a 180,000-millisecond interrupt
+limit. The new domain uses `0x60001b01`, 15 cases and the same limit.
+Both domains remain in the complete ordinary and extended file inputs.
+
+The old 47-second Linux and 43-second macOS entries came from CI run
+39070198868 at `c78d9df1`, before this new domain. They remain historical
+source-bound samples, not current workload measurements. Original F3
+source `df282b3f` retired only these two entries. Each table then contained
+137 entries; zero-based `floor(137/2) = 68` selected upper medians of
+409 Linux/296 macOS seconds. These values describe that historical source
+composition. The existing unknown-file fallback applies to this file.
+Those values are unmeasured scheduling estimates for the changed workload,
+not measured host times or conservative bounds. No scheduling algorithm,
+shard total, remaining table value, case, seed or deadline changes.
+
+The authorized focused author runs used the changed runtime and complete
+two-domain file on Linux AMD64. Node's old and new domain durations were
+1.675962742 and 20.964122 seconds; the command wall was 22.894722875 seconds.
+Deno reported rounded domain durations of 1 and 21 seconds and a command
+wall of 25.854402194 seconds. These ordinary runs establish no extended
+case sum, macOS cost or variance estimate. Their exact source and complete
+raw execution are retained under
+*/data/m5c-yield-star-throw-callability-20261025/task\_09a9fcb547c7/*.
+The runtime and native test blobs remain unchanged by this retirement.
+Replace the fallback with actual matching-host extended case sums from the
+future exact-candidate CI and retain that source/run provenance here.
+
+
+Combined Array, TCO and yield-star composition
+----------------------------------------------
+
+After the prior Set sample removal at `cdcb3416` and the F3 generator-throw
+sample retirement, the existing repository cost API reads 136 entries per
+host. Its unchanged `floor(136 / 2) = 68` rule gives upper-median fallbacks
+of 409 Linux/296 macOS seconds. These are unmeasured scheduling estimates
+for the composed catalogue, not matching-host measurements, conservative
+bounds or speedups. The historical 137-entry values above keep their exact
+source identities.
+
+Every remaining host-table value is exact `cdcb3416`, including Array's
+1,119/638, TCO's 1,726/286 and Script's 41/286 entries. Host widths, algorithm,
+shard totals, seeds, cases, replay and deadlines are unchanged. The original
+generator-throw domain and reviewed new seed `0x60001b01` remain in the whole
+property file. Future matching-host extended CI case sums must replace the
+fallback; this source assembly supplies no native execution or Mac margin.

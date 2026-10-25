@@ -61,9 +61,16 @@
  * in the native extended file glob. Its Linux weight is a local extended
  * two-registration case sum; its unmeasured macOS placeholder retains the
  * historical 286-second assigned cost. The combined table at `6cbc6c9f`
- * had upper medians of 406 Linux/296 macOS seconds. The reduced 137-entry
- * Array/TCO host tables use the same 406/296 upper-median fallbacks.
+ * had upper medians of 406 Linux/296 macOS seconds. Reduced source
+ * `cdcb3416` had 137 entries and the same 406/296 fallbacks. The current
+ * combined tables have 136 entries and derived fallbacks of 409/296.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
+ *
+ * Yield-star throw callability adds a second generator-throw domain.
+ * Its old 47/43 samples no longer describe the workload and are retired.
+ * The unchanged unknown-file fallback is an unmeasured scheduling estimate,
+ * not a host time or conservative bound. Replace it with matching-host
+ * extended CI case sums. See U6 for source-bound table compositions.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -124,7 +131,6 @@ export const nativeShardCosts = {
     "tests/property/m5-function-prototype.property.test.ts": 417,
     "tests/property/m5-generator-methods.property.test.ts": 51,
     "tests/property/m5-generator-parameter.property.test.ts": 168,
-    "tests/property/m5-generator-throw.property.test.ts": 47,
     "tests/property/m5-generator.property.test.ts": 888,
     "tests/property/m5-generic-string-coercion.property.test.ts": 282,
     "tests/property/m5-global-numeric-functions.property.test.ts": 667,
@@ -277,7 +283,6 @@ export const nativeShardCosts = {
     "tests/property/m5-function-prototype.property.test.ts": 183,
     "tests/property/m5-generator-methods.property.test.ts": 64,
     "tests/property/m5-generator-parameter.property.test.ts": 138,
-    "tests/property/m5-generator-throw.property.test.ts": 43,
     "tests/property/m5-generator.property.test.ts": 464,
     "tests/property/m5-generic-string-coercion.property.test.ts": 246,
     "tests/property/m5-global-numeric-functions.property.test.ts": 313,

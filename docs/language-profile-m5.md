@@ -9390,3 +9390,44 @@ The regression suite selects the integration toolchain, including host C
 ASan/UBSan. macOS execution and the full ordinary and extended gates remain
 exact-candidate CI obligations; this source change records no new test262
 observations.
+
+
+Synchronous yield-star throw callability correction
+---------------------------------------------------
+
+M5c node `yield-star-throw-callability` corrects the synchronous GetMethod
+boundary for a noncallable delegate `throw`. That failure raises `TypeError`
+without reading or calling `return`; the separate absent/nullish-method branch
+still performs IteratorClose with its observable getters, calls and result
+validation. Callable dispatch and abrupt getters retain their original values,
+roots, completion and finally ordering. No asynchronous-generator or ABI change
+is included.
+
+The exact minimized counterexample is retained in
+*tests/native/fixtures/yield-star-noncallable-throw.js.txt*. The fixed and
+modeled 88-boundary programs in *tests/yield-star-throw-callability.test.ts*
+and *tests/helpers/yield-star-throw.ts* distinguish those branches. The
+existing *tests/property/m5-generator-throw.property.test.ts* retains its
+original domain and adds seeded structured delegation cases with an independent
+oracle, Node/Deno references, both policies, forced collection and public
+context balance checks. The authorized Linux AMD64 Node/Deno fixed and property
+entry points passed once each, ten registrations total. Positive collection
+and allocation were asserted; numeric counter values were not retained.
+Matching Mac/sanitizer, full gates and new manifest observations remain
+pending.
+
+The original 14 pinned B16 subjects retain their complete source and assertions
+in the focused regression entry point. Their prior diagnostic passes do not
+admit those reserved rows or repair the distinct noncallable-method repro.
+The synchronous-generator family keeps its guard-fallback omission because
+this generic runtime correction introduces no specialized path. Required
+full/cross-host/sanitizer gates, D3 regeneration, review and landing remain
+separate from the source change and pure model checks.
+
+This three-node assembly adds those exact original F3 runtime and test
+blobs to the reduced Array/TCO source `cdcb3416`. Set remains deferred and
+no RegExp restoration is included. All other packages, headers and GC/call
+interfaces retain their reduced-source identities. The earlier F3 author
+execution record stays bound to its original inputs; this assembly runs
+no new native program. Generated observations and all 14 B16 reservations
+remain unchanged pending actual D3 and any required complete regeneration.
