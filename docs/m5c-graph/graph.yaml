@@ -3521,3 +3521,21 @@ collisions:
       - yield-star-throw-callability
     note: "The yield-star repair shares canonical observations with these
       independent publishers; serialize final publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - yield-star-throw-callability
+    note: "The yield-star repair shares canonical observations with this
+      independent publisher; serialize final publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - primitive-receiver-inherited-set
+      - yield-star-throw-callability
+    note: "The yield-star repair shares canonical observations with this
+      independent publisher; serialize final publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - proper-tail-calls
+      - yield-star-throw-callability
+    note: "The yield-star repair shares canonical observations with this
+      independent publisher; serialize final publication."
