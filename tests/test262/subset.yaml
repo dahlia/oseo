@@ -126860,7 +126860,6 @@ tests:
     path: test/language/expressions/super/call-spread-err-sngl-err-unresolvable.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         iterator-protocol,
@@ -126872,7 +126871,6 @@ tests:
     path: test/language/expressions/super/call-spread-mult-empty.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         iterator-protocol,
@@ -126899,7 +126897,6 @@ tests:
     path: test/language/expressions/super/call-spread-mult-iter.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         iterator-protocol,
@@ -126926,7 +126923,6 @@ tests:
     dependencies: [classes, object-literals]
   - dependencies:
       [
-        abrupt-completion,
         classes,
         expression-operators,
         functions,
@@ -126955,7 +126951,6 @@ tests:
     dependencies: [classes, object-literals]
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         lexical-bindings,
@@ -126968,7 +126963,6 @@ tests:
     path: test/language/expressions/super/call-spread-obj-skip-non-enumerable.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         lexical-bindings,
@@ -126982,7 +126976,6 @@ tests:
     path: test/language/expressions/super/call-spread-obj-spread-order.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         lexical-bindings,
@@ -126999,7 +126992,6 @@ tests:
     dependencies: [classes, object-literals]
   - dependencies:
       [
-        abrupt-completion,
         classes,
         expression-operators,
         functions,
@@ -127014,7 +127006,6 @@ tests:
     path: test/language/expressions/super/call-spread-obj-with-overrides.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         iterator-protocol,
@@ -127026,7 +127017,6 @@ tests:
     path: test/language/expressions/super/call-spread-sngl-empty.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         iterator-protocol,
@@ -127053,7 +127043,6 @@ tests:
     path: test/language/expressions/super/call-spread-sngl-iter.js
   - dependencies:
       [
-        abrupt-completion,
         classes,
         functions,
         iterator-protocol,
@@ -127379,13 +127368,7 @@ tests:
     expectedClassification: pass
     path: test/language/expressions/template-literal/middle-list-many-expr-function.js
   - dependencies:
-      [
-        abrupt-completion,
-        expression-operators,
-        object-literals,
-        object-properties,
-        var-bindings,
-      ]
+      [expression-operators, object-literals, object-properties, var-bindings]
     expectedClassification: pass
     path: test/language/expressions/template-literal/middle-list-many-expr-member-expr.js
   - dependencies:
@@ -127409,10 +127392,10 @@ tests:
       ]
     expectedClassification: pass
     path: test/language/expressions/template-literal/middle-list-many-expr-obj.js
-  - dependencies: [abrupt-completion, expression-operators]
+  - dependencies: [expression-operators]
     expectedClassification: pass
     path: test/language/expressions/template-literal/middle-list-many-expr-primitive.js
-  - dependencies: [abrupt-completion, expression-operators]
+  - dependencies: [expression-operators]
     expectedClassification: pass
     path: test/language/expressions/template-literal/middle-list-many-expr-template.js
   - dependencies:
@@ -127432,13 +127415,7 @@ tests:
     expectedClassification: pass
     path: test/language/expressions/template-literal/middle-list-one-expr-function.js
   - dependencies:
-      [
-        abrupt-completion,
-        expression-operators,
-        object-literals,
-        object-properties,
-        var-bindings,
-      ]
+      [expression-operators, object-literals, object-properties, var-bindings]
     expectedClassification: pass
     path: test/language/expressions/template-literal/middle-list-one-expr-member-expr.js
   - dependencies:
@@ -128098,14 +128075,7 @@ tests:
     expectedClassification: pass
     path: test/language/expressions/yield/from-catch.js
   - dependencies:
-      [
-        abrupt-completion,
-        control-flow,
-        functions,
-        generators,
-        object-properties,
-        var-bindings,
-      ]
+      [control-flow, functions, generators, object-properties, var-bindings]
     expectedClassification: pass
     path: test/language/expressions/yield/from-try.js
   - dependencies:
@@ -128134,7 +128104,6 @@ tests:
         expression-operators,
         functions,
         generators,
-        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -129747,25 +129716,16 @@ tests:
     expectedClassification: pass
     path: test/language/identifier-resolution/S11.1.2_A1_T1.js
   - dependencies:
-      [
-        control-flow,
-        error-intrinsics,
-        expression-operators,
-        functions,
-        object-properties,
-        var-bindings,
-      ]
+      [control-flow, error-intrinsics, expression-operators, object-properties]
     expectedClassification: pass
     path: test/language/identifier-resolution/S11.1.2_A1_T2.js
-  - dependencies:
-      [abrupt-completion, error-intrinsics, functions, object-properties]
+  - dependencies: [abrupt-completion, error-intrinsics, object-properties]
     expectedClassification: expected-negative
     path: test/language/identifier-resolution/assign-to-global-undefined.js
   - path: test/language/identifier-resolution/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
-  - dependencies:
-      [functions, object-literals, object-properties, symbols, var-bindings]
+  - dependencies: [object-literals, object-properties, symbols, var-bindings]
     expectedClassification: pass
     path: test/language/identifier-resolution/unscopables.js
   - path: test/language/identifiers/val-this.js

@@ -20073,7 +20073,7 @@ summary:
       expectedNegatives: 7
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1626
+      passes: 1610
       semanticFailures: 0
       unsupportedProfileFeatures: 53
     - dependency: array-buffer
@@ -20182,10 +20182,10 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 148
     - dependency: functions
-      expectedNegatives: 740
+      expectedNegatives: 739
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9938
+      passes: 9936
       semanticFailures: 0
       unsupportedProfileFeatures: 766
     - dependency: generators
@@ -20227,7 +20227,7 @@ summary:
       expectedNegatives: 95
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 129
+      passes: 128
       semanticFailures: 0
       unsupportedProfileFeatures: 14
     - dependency: module-linking
@@ -20381,7 +20381,7 @@ summary:
       expectedNegatives: 164
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4777
+      passes: 4776
       semanticFailures: 0
       unsupportedProfileFeatures: 120
     - dependency: weak-collections

@@ -303,3 +303,32 @@ plus264 unreached paths remain preserved separately. All336 B18 paths remain
 unreviewed. Root owns actual D3, affected internal/ outer review judgment,
 final owners/exclusions, candidate gates and publication; no node is marked
 landed or final gate claimed here.
+
+
+Dependency-tag metadata repair
+------------------------------
+
+The joint audit for B16-B17-DEPENDENCY-COVERAGE-001 also inspects all 287
+original batch 17 bodies and frontmatter. Three paths lose four incidental
+tag claims, with their original observations and negative phases intact:
+
+| Original path                                       | Removed tags            | Body evidence                                                                                                          |
+| --------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| identifier-resolution/S11.1.2\_A1\_T2.js            | functions, var-bindings | Lines 11-19 read this.z and unresolved z, then check ReferenceError; no var declaration or subject call occurs.        |
+| identifier-resolution/assign-to-global-undefined.js | functions               | Line 20 is a strict unresolvable assignment with a runtime ReferenceError negative; no function is called.             |
+| identifier-resolution/unscopables.js                | functions               | Lines 18-22 install the var/global symbol property and check binding resolution; only the harness assertion is called. |
+
+The batch now has 227 functions and 197 var-bindings tags. Its one
+abrupt-completion tag remains on the runtime-negative assignment. Strict
+switch function declarations retain lexical-bindings, and intrinsic
+Function/prototype reads remain function subjects. The earlier two
+lexical-bindings corrections stay preserved.
+
+[The complete 754-path audit](/data/m5c-b16-b17-dependency-tag-repair-20261025/task_6fb3f44dbafb/ctx_869904f6cbc9/AUDIT.tsv)
+and its JSON companion include unchanged paths and body-line evidence for every
+retained tag. The batch 16 repair section records the shared method and
+original U/R provenance. T changes dependency metadata only; the actual 229
+passes, 29 expected negatives and 29 unsupported results remain exact. All 31
+mixed-core remediation and 17 bounded existing ADR bindings across both batches
+remain exact. No new exclusion or landing is recorded. Affected independent
+review and Root's D3 decision remain pending.

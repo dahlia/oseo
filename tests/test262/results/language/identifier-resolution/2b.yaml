@@ -18,7 +18,6 @@ results:
     dependencies:
       - abrupt-completion
       - error-intrinsics
-      - functions
       - object-properties
     execution:
       harnessIncludes:

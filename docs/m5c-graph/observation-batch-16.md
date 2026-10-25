@@ -288,3 +288,51 @@ plus264 unreached paths remain preserved separately. All336 B18 paths remain
 unreviewed. Root owns actual D3, affected internal/ outer review judgment,
 final owners/exclusions, candidate gates and publication; no node is marked
 landed or final gate claimed here.
+
+
+Dependency-tag metadata repair
+------------------------------
+
+The audit for outer finding B16-B17-DEPENDENCY-COVERAGE-001 inspects all
+467 original batch bodies and frontmatter with the public metadata parser
+and an independent AST walk. It removes 16 abrupt-completion claims and
+one lexical-grammar claim across 17 paths. The corrected records retain
+47 abrupt-completion and 43 lexical-grammar tags in this batch.
+
+| Subject family                               | Changed paths |   Removed tag claims |
+| -------------------------------------------- | ------------: | -------------------: |
+| Normal super spread/construction             |            11 | 11 abrupt-completion |
+| Normal template substitutions/property reads |             4 |  4 abrupt-completion |
+| Yield in an unexceptional try body           |             1 |  1 abrupt-completion |
+| Yield/relational-expression precedence       |             1 |    1 lexical-grammar |
+
+The two custom-iterator spread tests retain their exercised return
+completions. Template functions, methods and coercion hooks that return
+values also retain abrupt-completion. Deliberate throws, assert.throws
+callbacks, generator throw/close paths and negative contracts remain.
+In from-try.js, the two next calls never enter the rethrowing catch.
+In in-rltn-expr.js, the no-LineTerminator restriction appears only in the
+frontmatter grammar excerpt; the body tests expression precedence.
+
+The original three reported examples now omit abrupt-completion:
+call-spread-mult-empty.js and the template-literal cases
+middle-list-many-expr-primitive.js and middle-list-one-expr-member-expr.js.
+Their full bodies exercise successful construction, substitution and
+property reads. ReturnIfAbrupt prose supplies no additional coverage.
+
+[The per-path audit table](/data/m5c-b16-b17-dependency-tag-repair-20261025/task_6fb3f44dbafb/ctx_869904f6cbc9/AUDIT.tsv)
+records old/new tags, exact body-line evidence, negative phases and every
+change for all 754 new paths across both batches. The JSON companion records a
+witness for each retained tag. The audit compares complete pinned bodies with
+the preserved source captures; it does not use comment keywords or failing
+assertion messages as semantic evidence.
+
+This repair is T, metadata derived from actual U44d2c4f and R2609fcd5.
+It creates no new native-observation R. Every classification, variant,
+sourceHash, diagnostic and output remains exact, as do the old 29,147
+records, all 48 new unsupported owners and existing ADR assessments.
+Ledger state and prerequisites are regenerated from the records; their
+bytes and the unreviewed batch counts remain unchanged. Supported features,
+source products, graph state and B18 reservations remain fixed.
+Root must judge D3 and authorize affected internal/outer review and any
+later observation. The outer finding remains pending that review.

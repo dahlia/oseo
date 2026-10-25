@@ -1272,7 +1272,6 @@ results:
       - expression-operators
       - functions
       - generators
-      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
