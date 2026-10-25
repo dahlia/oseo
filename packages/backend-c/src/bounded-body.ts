@@ -31,6 +31,93 @@ export function bodyUnit(source: string, unit: number): string {
   );
 }
 
+/** An opaque C condition keeps both branches; a unit condition selects one. */
+interface UnitConditional {
+  readonly alternateSeen: boolean;
+  readonly parentIncluded: boolean;
+  readonly selected: boolean | undefined;
+}
+
+/**
+ * Resolve only the unit selectors this emitter owns, leaving C resource
+ * guards and all common text intact. Blank excluded lines preserve logical
+ * line numbers when the caller maps the unit back to its aggregate source.
+ * This is not a general C preprocessor; unexpected unit conditions fail.
+ */
+export function selectBodyUnit(source: string, unit: number): string {
+  if (!Number.isSafeInteger(unit) || unit < 0) {
+    throw new Error(`Invalid native body unit ${unit}.`);
+  }
+  const literalsAndComments = new RegExp(
+    [
+      String.raw`/\*[\s\S]*?\*/`,
+      String.raw`//(?:\\\r?\n|[^\n])*`,
+      String.raw`"(?:\\[\s\S]|[^"\\])*"`,
+      String.raw`'(?:\\[\s\S]|[^'\\])*'`,
+    ].join("|"),
+    "gu",
+  );
+  const masked = source
+    .replace(literalsAndComments, (text) => text.replace(/[^\n]/gu, " "))
+    .split("\n");
+  const conditionals: UnitConditional[] = [];
+  let included = true;
+  const selected = source.split("\n").map((line, index) => {
+    const directive = masked[index]!.match(
+      /^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b(.*)$/u,
+    );
+    if (directive == null) return included ? line : "";
+    const kind = directive[1];
+    const condition = directive[2]!.trim();
+    if (kind === "elif" && condition.includes("OSEO_C_BODY_UNIT")) {
+      throw new Error("Native unit selectors do not admit elif.");
+    }
+    if (kind === "if" || kind === "ifdef" || kind === "ifndef") {
+      const selector = condition.match(
+        /^!defined\(OSEO_C_BODY_UNIT\) \|\| OSEO_C_BODY_UNIT == (\d+)$/u,
+      );
+      if (condition.includes("OSEO_C_BODY_UNIT") && selector == null) {
+        throw new Error(`Unexpected native unit condition: ${condition}.`);
+      }
+      const matches =
+        selector == null ? undefined : Number(selector[1]) === unit;
+      conditionals.push({
+        alternateSeen: false,
+        parentIncluded: included,
+        selected: matches,
+      });
+      if (matches == null) return included ? line : "";
+      included = included && matches;
+      return "";
+    }
+    const current = conditionals.at(-1);
+    if (current == null) {
+      throw new Error(`Unmatched native unit directive: ${kind}.`);
+    }
+    if (kind === "endif") {
+      conditionals.pop();
+      included = current.parentIncluded;
+    } else if (current.selected != null) {
+      if (kind === "elif") {
+        throw new Error("Native unit selectors do not admit elif.");
+      }
+      if (current.alternateSeen) {
+        throw new Error("Native unit selectors admit only one else.");
+      }
+      conditionals[conditionals.length - 1] = {
+        ...current,
+        alternateSeen: true,
+      };
+      included = current.parentIncluded && !current.selected;
+    }
+    return current.selected == null && included ? line : "";
+  });
+  if (conditionals.length !== 0) {
+    throw new Error("Unclosed native unit conditional.");
+  }
+  return selected.join("\n");
+}
+
 /** The owner retains roots and completion storage across outlined calls. */
 export interface BoundedBody {
   readonly declarations: string;

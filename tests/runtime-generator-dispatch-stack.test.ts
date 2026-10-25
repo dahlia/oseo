@@ -14,6 +14,7 @@ import { babelFrontend } from "../packages/parser-babel/src/index.ts";
 import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
 import { withNativeFixture } from "../packages/testkit/src/index.ts";
 import { nativeToolchain } from "./native-toolchain.ts";
+import { mapNativeSources } from "./helpers/balanced-backend.ts";
 
 const host = createNodeHost();
 const nativeTarget = targetForExecutionHost(
@@ -28,14 +29,13 @@ const accountingBackend: typeof cBackend = {
   ...cBackend,
   emit(input) {
     const emitted = cBackend.emit(input);
-    return {
-      ...emitted,
-      source: emitted.source.replaceAll(
+    return mapNativeSources(emitted, (source) =>
+      source.replaceAll(
         "oseo_context_destroy(&context);",
         "if (context.active_frame_slots != 0u) abort();\n" +
           "        oseo_context_destroy(&context);",
       ),
-    };
+    );
   },
 };
 

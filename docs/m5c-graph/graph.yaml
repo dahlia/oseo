@@ -19,8 +19,8 @@ baseline:
   unreviewedPaths: 11944
   unsupportedProfileFeatures: 1449
 summary:
-  nodes: 89
-  ready: 86
+  nodes: 90
+  ready: 87
   blocked: 3
   parked: 0
   landed: 52
@@ -3296,6 +3296,246 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - proper-tail-calls
+      - yield-star-throw-callability
+    note: "The yield-star repair shares canonical observations with this
+      independent publisher; serialize final publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - generator-dispatch-stack-charge
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-15
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-16
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-17
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - ordinary-array-indexed-lookup-performance
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - primitive-receiver-inherited-set
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - proper-tail-calls
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - regexp-property-escape-harness
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - regexp-split-coverage-remediation
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - script-module-declaration-early-error
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - test262-host-script-bindings
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - typed-array-proto-coverage-remediation
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - unhandled-rejection-observation
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
+      - with-optional-call-receiver
+    note: "Array lookup performance observations share the canonical
+      manifest; serialize publication with this independent node."
+  - path: tests/test262/results.yaml
+    nodes:
+      - ordinary-array-indexed-lookup-performance
       - yield-star-throw-callability
     note: "The yield-star repair shares canonical observations with this
       independent publisher; serialize final publication."

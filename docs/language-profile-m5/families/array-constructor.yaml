@@ -6,6 +6,13 @@ scope:
     prototype identity, and Symbol.species accessor."
   - "Array.from, Array.of, and Array.isArray, including generic constructor
     fallback and iterator-close behavior."
+  - "Ordinary array indexed lookup and insertion retain descriptors, holes,
+    inherited receivers, mutation, ordering, and generic fallback. Array
+    length reduction validates dense configurable data elements before
+    tail deletion; unusual layouts keep descending generic deletion.
+    Focused expanded-source correctness and private-composition cost
+    evidence, with source identities and limitations, are recorded in
+    docs/m5c-graph/ordinary-array-indexed-lookup-performance.md."
 owners:
   - PLAN-M5.md
 evidence:
@@ -52,3 +59,5 @@ evidence:
       - packages/parser-babel/tests/basics.test.ts
       - packages/runtime-c/tests/intrinsic-graph.test.ts
       - packages/runtime-c/native/runtime_array.c
+      - tests/array-indexed-lookup-source.test.ts
+      - tests/array-insertion-truncation-source.test.ts

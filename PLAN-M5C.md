@@ -1393,3 +1393,40 @@ remain byte-identical. The source graph adds only F3 as ready/unlanded:
 and test expectations stay Root-owned. Array, Set, RegExp and TCO source
 and admission are not restored. No native, model or Full run is claimed;
 exact-source validation, D3, affected review and publication remain pending.
+
+
+Array-only source preparation on successful F3 Main
+---------------------------------------------------
+
+Successful Main `128d63fc`, tree
+`6753319f91a7e4805e63becb5e5f4db39586a767`, is the baseline for this
+preparation. Run `40205743337` completed all 78 jobs and its workflow
+successfully. Its F3 landing is retained: 52 of 89 nodes are landed before
+the existing `ordinary-array-indexed-lookup-performance` source is composed.
+The earlier F3-only preparation section records historical state, not a
+reversal of that landing.
+
+Only the existing Array node from source `646fadd5` is added to this Main's
+graph as ready and unlanded, with its terminal-audit dependency and canonical
+publisher collisions. Main's existing nodes, dependencies, landed flags,
+observations, owners and exclusions remain. Source-only graph counts are
+recomputed from the resulting records. Root owns final publication state.
+
+The Array runtime delta is limited to ordinary own-index lookup and dense
+length truncation. Current Main's iterator/F3 implementation, corrected
+contracts, two property domains and original fourteen B16 subjects remain.
+The backend retains physical completion storage and selected C units, with
+the original Array teardown-assertion propagation. Necessary shared
+interfaces and contracts are a D1.9 impact scope, not a new review-clean
+claim. No Set, RegExp or TCO implementation or admission is composed.
+
+The reviewed 29,147 paths, 24,966 passes, 2,732 expected negatives, 1,449
+unsupported records, 6,484 canonical partitions, fixed 41,091 inventory,
+146 features and all fourteen original B16 reservations stay exact Main.
+This preparation makes no fresh corpus observation or performance claim.
+The independent Array-only source differs from the live joint Array/Set/F3
+`808391c8` Full input. That run continues naturally; neither its observations
+nor any historical Full result is declared reusable here. Actual U/R/input
+comparison under D3 and any required complete regeneration remain Root-owned.
+Native, full ordinary/extended, sanitizer, cross-host and exact candidate/Main
+gates remain separate obligations before Array publication.

@@ -21,8 +21,13 @@ import { lowerFragmentPhases, scriptFragmentAbi } from "@oseo/compiler";
 import { emittedC as emittedCSource, type CFragment } from "./emitted-c.ts";
 import { encodeRegExpProgram } from "./regexp-program.ts";
 import {
+  createCompletionLayout,
+  type CompletionLayout,
+} from "./completion-layout.ts";
+import {
   boundBody,
   BodyUnits,
+  selectBodyUnit,
   bodyUnit,
   replaceSyntax,
 } from "./bounded-body.ts";
@@ -104,6 +109,7 @@ interface EmitState {
   readonly fragmentUnit?: "harness" | "case";
   readonly argumentSlotStart: number;
   readonly completionSlotStart: number;
+  readonly completionLayout: CompletionLayout;
   readonly derivedThisBindingId?: number;
   readonly functionId: number;
   readonly functionFrameCosts: ReadonlyMap<number, number>;
@@ -1092,17 +1098,18 @@ function emitIteratorOperation(
     const promise = operation.iteratorValueResult;
     const ignoreResult = operation.iteratorValueOnlyResult;
     const skipValidation = operation.iteratorCloseResultMode;
-    const slot = operation.completionSlot;
+    const logicalSlot = operation.completionSlot;
     if (
       promise == null ||
       ignoreResult == null ||
       skipValidation == null ||
-      slot == null
+      logicalSlot == null
     ) {
       throw new Error(
         `MIR iterator close start %${operation.id} is incomplete.`,
       );
     }
+    const slot = state.completionLayout.slot(logicalSlot);
     state.usesCompletion = true;
     state.scalarKinds.set(operation.id, "boolean");
     line(
@@ -1450,10 +1457,11 @@ function emitIteratorOperation(
     return;
   }
   const iterator = operationArgument(operation, 0);
-  const slot = operation.completionSlot;
-  if (slot == null) {
+  const logicalSlot = operation.completionSlot;
+  if (logicalSlot == null) {
     throw new Error(`MIR iterator close %${operation.id} has no completion.`);
   }
+  const slot = state.completionLayout.slot(logicalSlot);
   state.usesCompletion = true;
   if (operation.iteratorDoneState == null) {
     line(
@@ -2910,10 +2918,11 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     );
   } else if (operation.kind === "caught") {
     state.usesCompletion = true;
-    const slot = operation.completionSlot;
-    if (slot == null) {
+    const logicalSlot = operation.completionSlot;
+    if (logicalSlot == null) {
       throw new Error(`MIR caught %${operation.id} has no completion slot.`);
     }
+    const slot = state.completionLayout.slot(logicalSlot);
     line(state, renderC(emittedC.common.oseoContextClearLanguageErrorContext));
     line(
       state,
@@ -2938,12 +2947,13 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
     if (kind == null) {
       throw new Error(`MIR completion-set %${operation.id} has no kind.`);
     }
-    const slot = operation.completionSlot;
-    if (slot == null) {
+    const logicalSlot = operation.completionSlot;
+    if (logicalSlot == null) {
       throw new Error(
         `MIR completion-set %${operation.id} has no completion slot.`,
       );
     }
+    const slot = state.completionLayout.slot(logicalSlot);
     line(
       state,
       renderC(
@@ -3123,6 +3133,7 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     } else {
       const target = operation.abruptTarget.blockId;
+      const slot = state.completionLayout.slot(target);
       state.usesCompletion = true;
       line(
         state,
@@ -3132,26 +3143,26 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
         state,
         renderC(emittedC.operation.ifContextMemberHasDiagnosticGotoAbrupt),
       );
-      line(state, renderC(emittedC.operation.setThrowKind, target));
+      line(state, renderC(emittedC.operation.setThrowKind, slot));
       line(
         state,
         renderC(
           emittedC.common.rootsUAssign,
-          state.completionSlotStart + target,
+          state.completionSlotStart + slot,
         ) + renderC(emittedC.operation.resultValueStatement),
       );
-      line(state, renderC(emittedC.operation.setThrowLine, target));
-      line(state, renderC(emittedC.operation.setThrowColumn, target));
-      line(state, renderC(emittedC.operation.setThrowSourceId, target));
+      line(state, renderC(emittedC.operation.setThrowLine, slot));
+      line(state, renderC(emittedC.operation.setThrowColumn, slot));
+      line(state, renderC(emittedC.operation.setThrowSourceId, slot));
       line(
         state,
-        renderC(emittedC.operation.setThrowSourceIdLength, target) +
+        renderC(emittedC.operation.setThrowSourceIdLength, slot) +
           renderC(emittedC.common.contextMemberSourceIdLengthStatement),
       );
-      line(state, renderC(emittedC.operation.setThrowErrorCode, target));
+      line(state, renderC(emittedC.operation.setThrowErrorCode, slot));
       line(
         state,
-        renderC(emittedC.operation.completionUErrorMessageAssign, target) +
+        renderC(emittedC.operation.completionUErrorMessageAssign, slot) +
           renderC(emittedC.operation.contextMemberErrorMessageStatement),
       );
       line(state, renderC(emittedC.common.gotoBbStatement, target));
@@ -3165,20 +3176,25 @@ function emitCompletionCopy(
   source: number,
   target: number,
 ): void {
+  const sourceSlot = state.completionLayout.slot(source);
+  const targetSlot = state.completionLayout.slot(target);
   line(
     state,
     renderC(
       emittedC.completionCopy.completionUAssignCompletionUStatement,
-      target,
-      source,
+      targetSlot,
+      sourceSlot,
     ),
   );
   line(
     state,
-    renderC(emittedC.common.rootsUAssign, state.completionSlotStart + target) +
+    renderC(
+      emittedC.common.rootsUAssign,
+      state.completionSlotStart + targetSlot,
+    ) +
       renderC(
         emittedC.completionCopy.rootsUStatement,
-        state.completionSlotStart + source,
+        state.completionSlotStart + sourceSlot,
       ),
   );
 }
@@ -3251,11 +3267,11 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     // The saved-throw branch below always emits `goto abrupt`, so the label
     // must exist even when no other operation in the body can be abrupt.
     state.usesAbrupt = true;
-    const slot = terminator.completionSlot;
+    const slot = state.completionLayout.slot(terminator.completionSlot);
     if (terminator.outerAbrupt != null) {
       const target = terminator.outerAbrupt.blockId;
       line(state, renderC(emittedC.common.ifCompletionKindThrowOpen, slot));
-      emitCompletionCopy(state, slot, target);
+      emitCompletionCopy(state, terminator.completionSlot, target);
       line(state, renderC(emittedC.common.gotoBbStatement, target));
       line(state, renderC(emittedC.common.closeBlock));
     }
@@ -3273,7 +3289,7 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
             target.cleanupDepth,
           ),
       );
-      emitCompletionCopy(state, slot, target.blockId);
+      emitCompletionCopy(state, terminator.completionSlot, target.blockId);
       line(state, renderC(emittedC.common.gotoBbStatement, target.blockId));
       line(state, renderC(emittedC.common.closeBlock));
     }
@@ -3600,6 +3616,23 @@ function scriptFrameCost(functionValue: MirFunction): number {
   return rootCount(compact) + 2 * bindingAccesses;
 }
 
+/**
+ * Blocks of `functionValue` that C control can enter from `start`,
+ * without crossing `excluded`.
+ *
+ * A completion target is entered only through a `resume-completion`
+ * terminator, whose switch names every block emitted for the same body.
+ * Targets are therefore deferred until such a terminator is reachable;
+ * targets found before or after it join the fixed point together. When
+ * every `finally` in the body leaves abruptly, no dispatch exists, and
+ * emitting the targets would leave labels that no `goto` names.
+ *
+ * Block 0 as a target is the sentinel that a `return`, `throw`, or normal
+ * completion without a jump destination saves (`enterFinalizer`); the
+ * dispatch switch never names it. It is not deferred, so a generator body
+ * that starts after the call-time parameter prologue does not take in the
+ * prologue's entry block.
+ */
 function reachableBlocksFrom(
   functionValue: MirFunction,
   start: number,
@@ -3610,7 +3643,13 @@ function reachableBlocksFrom(
   );
   const pending = [start];
   const reachable = new Set<number>();
-  while (pending.length > 0) {
+  const completionTargets: number[] = [];
+  let resumesCompletion = false;
+  while (
+    pending.length > 0 ||
+    (resumesCompletion && completionTargets.length > 0)
+  ) {
+    if (pending.length === 0) pending.push(...completionTargets.splice(0));
     const id = pending.pop();
     if (id == null || reachable.has(id) || excluded.has(id)) continue;
     const block = blocks.get(id);
@@ -3632,11 +3671,8 @@ function reachableBlocksFrom(
       }
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
-    } else if (
-      block.terminator.kind === "resume-completion" &&
-      (block.terminator.outerAbrupt != null ||
-        block.terminator.outerFinalizer != null)
-    ) {
+    } else if (block.terminator.kind === "resume-completion") {
+      resumesCompletion = true;
       if (block.terminator.outerAbrupt != null) {
         pending.push(block.terminator.outerAbrupt.blockId);
       }
@@ -3648,8 +3684,11 @@ function reachableBlocksFrom(
       if (operation.abruptTarget != null) {
         pending.push(operation.abruptTarget.blockId);
       }
-      if (operation.completionTarget != null) {
-        pending.push(operation.completionTarget.blockId);
+      if (
+        operation.completionTarget != null &&
+        operation.completionTarget.blockId !== 0
+      ) {
+        completionTargets.push(operation.completionTarget.blockId);
       }
     }
   }
@@ -4314,7 +4353,8 @@ function emitFunction(
     throw new Error(`MIR function '${functionValue.name}' has no blocks.`);
   }
   const blocks = reachableBlocks(functionValue);
-  const completionSlots = completionSlotCount(blocks);
+  const completionLayout = createCompletionLayout(blocks);
+  const completionSlots = completionLayout.count;
   const valueSlotCount = maximumValueId(blocks) + 1;
   const bindingIdValues =
     functionValue.localBindingIds ??
@@ -4328,6 +4368,10 @@ function emitFunction(
   );
   const argumentSlots = maximumArgumentCount(blocks);
   const functionRootCount = rootCount(functionValue);
+  // Only physical storage shrinks. Charge maps and guards retain the old
+  // logical count, including its sparse completion reservation.
+  const physicalRootCount =
+    functionRootCount - completionSlotCount(blocks) + completionSlots;
   if (!functionFrameCosts.has(functionValue.id)) {
     throw new Error(
       `MIR function '${functionValue.name}' has no root frame layout.`,
@@ -4352,6 +4396,7 @@ function emitFunction(
       blocks.map((block) => [block.id, block.parameters ?? []]),
     ),
     completionSlotStart: baseRootCount + argumentSlots,
+    completionLayout,
     ...includePropertiesWhen(() => {
       if (functionValue.derivedThisBindingId == null) return undefined;
       return { derivedThisBindingId: functionValue.derivedThisBindingId };
@@ -4403,7 +4448,7 @@ function emitFunction(
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
     line(
       state,
-      `roots[${generator ? 0 : functionRootCount - 1}] = result.value;`,
+      `roots[${generator ? 0 : physicalRootCount - 1}] = result.value;`,
     );
     line(state, "receiver = result.value;");
   }
@@ -4413,7 +4458,7 @@ function emitFunction(
       renderC(emittedC.function.resultAssignOseoGeneratorCreateContext) +
         renderC(
           emittedC.common.sourcePositionSuffix,
-          functionRootCount,
+          physicalRootCount,
           completionSlots,
         ),
     );
@@ -4499,7 +4544,7 @@ function emitFunction(
     renderC(emittedC.function.resultAssignOseoRootsAllocate) +
     renderC(
       emittedC.function.contextAddressFrameULine,
-      generator ? 1 : functionRootCount,
+      generator ? 1 : physicalRootCount,
     ) +
     renderC(emittedC.function.ifResultStatusNotEqualOseoStatusNormal) +
     renderC(emittedC.function.rootsAssignFrameSlotsLine) +
@@ -4687,7 +4732,9 @@ function nativeSource(
   const compilationUnits = Array.from(
     { length: units.count + 1 },
     (_, unit) => ({
-      source: `#define OSEO_C_BODY_UNIT ${unit}\n#include "${sourceName}"\n`,
+      source:
+        `#define OSEO_C_BODY_UNIT ${unit}\n#line 1 "${sourceName}"\n` +
+        selectBodyUnit(source, unit),
       sourceName: `${sourceName.slice(0, -2)}-unit-${unit}.c`,
     }),
   );
