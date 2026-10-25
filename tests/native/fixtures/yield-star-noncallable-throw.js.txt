@@ -1,0 +1,24 @@
+for (const mode of ["normal", "getter-throw", "primitive"]) {
+  let log = "";
+  const inner = {
+    [Symbol.iterator]() { return this; },
+    next() { return { done: false, value: 1 }; },
+    throw: 1,
+    get return() {
+      log += "rg;";
+      if (mode === "getter-throw") throw new RangeError("return getter");
+      return function () {
+        log += "rc;";
+        return mode === "primitive" ? 0 : {};
+      };
+    },
+  };
+  function* outer() { yield* inner; }
+  const g = outer();
+  g.next();
+  try {
+    g.throw(new Error("sent"));
+  } catch (error) {
+    console.log(mode, error.name, log.length);
+  }
+}

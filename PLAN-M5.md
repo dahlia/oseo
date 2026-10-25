@@ -8975,3 +8975,61 @@ ordinary accessor-setter coverage remains unknown. The original edcc and
 manifest regeneration, derived publication data, native and sanitizer
 validation, independent reviews, and exact candidate/main CI remain Root's
 later gates. The node stays ready and unlanded.
+
+
+Synchronous yield-star throw callability correction
+---------------------------------------------------
+
+M5c node `yield-star-throw-callability` separates GetMethod failure from
+missing-method cleanup. A synchronous delegate whose `throw` property is
+noncallable must raise `TypeError` immediately. It must not read or call
+`return`. An absent, undefined, or null `throw` still follows the separate
+IteratorClose path before the protocol-violation `TypeError`. Callable throw
+methods, abrupt getters, result validation, roots and frame teardown retain
+their existing interfaces. No runtime ABI or logical resource policy changes.
+
+The minimized ordinary regression is preserved byte-for-byte in
+*tests/native/fixtures/yield-star-noncallable-throw.js.txt*. It distinguishes
+normal, throwing-getter and primitive-result return methods using the error
+name and cleanup-log length. Its independent oracle is `TypeError` with zero
+cleanup in all three modes. The `.txt` suffix keeps the original source bytes
+outside source formatting; the native test reads and compiles those bytes.
+
+*tests/helpers/yield-star-throw.ts* models 11 throw-method/result classes and
+eight return/close classes independently of execution. Fixed examples retain
+all 88 combinations, receiver/arity, original abrupt-value identity, finally
+ordering, result field access and completion. The existing generator-throw
+property keeps its original domain, seed `0x60001b00`, 15 cases and
+180,000-millisecond limit. A second domain uses unused slot `0x60001b01`,
+15 structured cases and the same limit, shrinking protocol classes and bounded
+integer payloads without filtering. It compares the model with Node, Deno and
+both native policies, with forced collection and existing balance assertions.
+
+*tests/yield-star-throw-model.test.ts* checks the fixed oracle, exact minimized
+source hash and public MIR/C delegation boundary without native execution.
+*tests/yield-star-throw-callability.test.ts* contains the native regression,
+88-boundary packet and the 14 complete original pinned B16 subjects. The
+subjects' earlier passes are distinct from the separately failing minimized
+repro; this correction changes no reviewed row, reservation or classification.
+
+The four authorized Linux AMD64 author commands passed once each: Node and
+Deno on the complete focused fixture file (three registrations each), then
+Node and Deno on the complete property file (two registrations each). The
+fixed programs checked both policies, positive allocation/collection and zero
+active native-frame slots, call depth and roots at teardown. Numeric counter
+values were not retained by those assertion-based tests. The original
+14-subject loop requires pass and four variants per subject; it does not add
+14 framework registrations or admit their reserved rows.
+
+The source snapshot and complete raw commands are in the durable author packet
+*/data/m5c-yield-star-throw-callability-20261025/task\_09a9fcb547c7/*.
+The whole-file walls were 14.321340655/12.712538977 seconds for Node/Deno fixed
+checks and 22.894722875/25.854402194 seconds for Node/Deno properties. Those
+focused Linux timings do not set CI weights or establish other-host cost.
+The existing historical shard weights need a later matching extended-lane
+measurement before any refresh; no shard, case budget or timeout changes.
+
+The synchronous-generator family's generic-runtime guard-fallback omission
+and named replacements remain; this node adds no specialization guard.
+Mac-native/sanitizer, ordinary/extended candidate gates, affected review and
+D3 full regeneration remain required beyond this focused preparation.

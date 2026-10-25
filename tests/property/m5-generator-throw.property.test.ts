@@ -20,6 +20,14 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { nativeToolchain } from "../native-toolchain.ts";
+import { balancedInteropBackend } from "../helpers/tco-generator-interop.ts";
+import {
+  closeKinds,
+  delegatedThrowExpected,
+  delegatedThrowSource,
+  throwKinds,
+} from "../helpers/yield-star-throw.ts";
+import type { DelegatedThrowCase } from "../helpers/yield-star-throw.ts";
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -129,6 +137,92 @@ test(
         profile: "M5 generator throw resumptions",
         seed: 0x6000_1b00,
         sizeLimit: "single yield with catching or uncaught throw",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+test(
+  "delegated throw GetMethod and close ordering match the model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    const generator = fc.record({
+      close: fc.constantFrom(...closeKinds),
+      method: fc.constantFrom(...throwKinds),
+      value: fc.integer({ min: -20, max: 20 }),
+    });
+    await assertAsyncProperty(
+      "delegated throw GetMethod and close ordering match the model",
+      fc.asyncProperty(generator, async (sample: DelegatedThrowCase) => {
+        const source = delegatedThrowSource([sample]);
+        const expected = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: delegatedThrowExpected([sample]),
+        };
+        for (const [command, args] of [
+          ["node", ["--eval", source]],
+          ["deno", ["eval", source]],
+        ] as const) {
+          assertMatchingObservations([
+            expected,
+            await host.run({ command, args, cwd: process.cwd() }),
+          ]);
+        }
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "delegated-throw.property.js" },
+            { specialization, observeSpecialization: true },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          const previous = process.env.OSEO_GC_EVERY_SAFEPOINT;
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: balancedInteropBackend,
+                host,
+                input: compiled.mir,
+                keepArtifacts: process.env.OSEO_KEEP_ARTIFACTS === "1",
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: nativeToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expected, native]);
+                assert.ok(native.counters != null);
+                assert.ok(native.counters.allocations > 0);
+                assert.ok(native.counters.collections > 0);
+              },
+            );
+          } finally {
+            if (previous == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            else process.env.OSEO_GC_EVERY_SAFEPOINT = previous;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "synchronous yield-star throw GetMethod with callable, nullish, " +
+          "noncallable and abrupt accessors, iterator close and finally order",
+        numRuns: 15,
+        profile: "M5 synchronous delegated throw protocol",
+        seed: 0x6000_1b01,
+        sizeLimit:
+          "one delegation, four allocation steps, one throw resumption",
         timeLimitMilliseconds: 180_000,
       },
     );

@@ -1901,3 +1901,33 @@ ordinary/extended, macOS, cross-target, sanitizer or exact candidate/Main
 requirements. Meaningful post-observation review and the requested outer
 permission remain separate from the preserved source review gates. Root
 owns final accounting, candidate/Main acceptance, landing and publication.
+
+
+Yield-star throw callability correction preparation
+---------------------------------------------------
+
+The bounded B16 diagnostic at exact result `494247c5` observed all 14 original
+yield-star throw subjects passing in 56 native variants. Separately, its
+unchanged noncallable-throw repro observed unwanted return getter/call effects
+under both Oseo policies. A throwing return getter replaced the required
+`TypeError` with `RangeError`; Node and Deno observed `TypeError` with no
+cleanup. Passing original subjects do not cover this additional counterexample.
+
+The ready `yield-star-throw-callability` node repairs only the synchronous
+runtime's noncallable GetMethod branch. The original repro remains an ordinary
+regression and the existing generator-throw property gains a distinct modeled
+domain while preserving its old seed, cases, replay and limit. Coupled nullish,
+callable, accessor-abrupt, result-validation, finally and root/frame paths stay
+in fixed and generated coverage. The authorized Node/Deno fixed and property
+files passed all ten registrations on Linux AMD64, once each, with both
+policies, forced-collection and balanced root/frame assertions on the new
+programs. The exact original 14-subject loop retains pass/four-variant
+assertions. This focused evidence neither admits those paths nor supplies
+full-corpus observations. Independent review remains pending.
+
+No B16 admission, dependency tag, expected classification, ownership, exclusion
+or graph status is changed by the worker. All 14 paths retain their current
+reservations. Root owns the runtime change's D3 full regeneration, actual new
+observations/accounting, affected integration review, exact-candidate gates,
+Main and landing. Historical full-UPDATE results describe their actual older
+implementation and cannot certify this runtime correction.

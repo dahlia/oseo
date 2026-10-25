@@ -12,12 +12,15 @@ evidence:
     references:
       - tests/native/fixtures/generators.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/yield-star-throw-callability.test.ts
+      - tests/property/m5-generator-throw.property.test.ts
   fixed:
     status: covered
     references:
       - tests/runtime-generator-dispatch-stack.test.ts
       - tests/native/fixtures/generators.ts
       - tests/native.ts
+      - tests/yield-star-throw-callability.test.ts
   forced-collection:
     status: covered
     references:
@@ -25,11 +28,14 @@ evidence:
       - tests/property/m5-generator.property.test.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
       - tests/native.ts
+      - tests/yield-star-throw-callability.test.ts
+      - tests/property/m5-generator-throw.property.test.ts
   generated:
     status: covered
     references:
       - tests/property/m5-generator.property.test.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/property/m5-generator-throw.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family owns no specialized path or family-specific guard."
@@ -37,6 +43,8 @@ evidence:
       - tests/property/m5-generator.property.test.ts
       - tests/native/fixtures/generators.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/yield-star-throw-callability.test.ts
+      - tests/property/m5-generator-throw.property.test.ts
   specialization:
     status: covered
     references:
@@ -44,14 +52,18 @@ evidence:
       - tests/native.ts
       - tests/native/fixtures/generators.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
+      - tests/yield-star-throw-callability.test.ts
+      - tests/property/m5-generator-throw.property.test.ts
   standards:
     status: covered
     references:
       - tests/test262/subset.yaml
       - tests/test262/results.yaml
+      - tests/yield-star-throw-callability.test.ts
   structural:
     status: covered
     references:
       - packages/backend-c/tests/index.test.ts
       - packages/backend-c/tests/fragments.test.ts
       - packages/parser-babel/tests/generators.test.ts
+      - tests/yield-star-throw-model.test.ts
