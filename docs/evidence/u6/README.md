@@ -1,6 +1,15 @@
 U6 shard assignment evidence
 ============================
 
+The current seven Linux file shards exclude both `caseShardedNativeFiles`
+and `dedicatedLinuxNativeFiles` before cost partitioning. The latter contains
+only *tests/property/m5-array-constructor.property.test.ts*, which runs all
+120 extended cases in a required dedicated Linux job with its unchanged
+1,800-second property limit. macOS file shards keep that file. The historical
+measurements below retain their original input sets; they do not measure the
+dedicated job.
+
+
 Current weight source
 ---------------------
 

@@ -571,10 +571,15 @@ set.
 CI now passes `--exclude-case-sharded` to those file shards and runs each
 file in `caseShardedNativeFiles` in three separate case-shard jobs on each
 native host, six jobs per file. Every one is required by the `native`
-aggregate. With that exclusion, all seven Linux file shards carry remaining
-files. The local unsharded extended task still runs both files once with
-all cases. The Linux singleton rule still applies to other wrapper
-invocations that include *m5-object-own-keys.property.test.ts* without the
+aggregate. Linux file shards also pass `--exclude-dedicated-linux`, which
+removes `dedicatedLinuxNativeFiles` before partitioning. That list contains
+*tests/property/m5-array-constructor.property.test.ts*, run in one required
+Linux job with all 120 extended cases and its unchanged 1,800-second limit.
+The seven Linux file shards partition the remaining files. macOS file shards
+omit that flag and still run the Array file once. The local unsharded extended
+task still runs every file with all cases. The Linux singleton rule still
+applies to wrapper invocations that include
+*m5-object-own-keys.property.test.ts* without the
 exclusion flag; it covers that file alone, because its deadline margin,
 not its weight, is what the singleton protects.
 Unknown files use the measured table's upper median weight. Empty shards execute
