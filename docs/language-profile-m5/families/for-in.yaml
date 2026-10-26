@@ -23,18 +23,30 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
+      - tests/annexb-for-in-preparation.test.ts
+      - tests/annexb-for-in.test.ts
+      - tests/helpers/annexb-for-in.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
+      - tests/annexb-for-in.test.ts
+      - tests/fixtures/annexb-for-in/allocation.c
+      - tests/helpers/annexb-for-in.ts
   forced-collection:
     status: covered
     references:
       - tests/property/m5-for-in.property.test.ts
+      - tests/annexb-for-in.test.ts
+      - tests/fixtures/annexb-for-in/allocation.c
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   generated:
     status: covered
     references:
       - tests/property/m5-for-in.property.test.ts
+      - tests/helpers/annexb-for-in.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family owns no specialized path or family-specific guard."
@@ -45,6 +57,8 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/objects.ts
+      - tests/annexb-for-in.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   standards:
     status: covered
     references:
@@ -54,3 +68,4 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/for-in.test.ts
+      - tests/annexb-for-in-preparation.test.ts

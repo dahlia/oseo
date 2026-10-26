@@ -9,6 +9,37 @@ static OseoValue require_normal(OseoResult result) {
     return result.value;
 }
 
+/* Configure the stored bootstrap accessor before the acquisition-only sweep.
+ * Keep both reflected identities rooted and preserve them when changing only
+ * enumerability; the retired virtual metadata is not the own descriptor. */
+static void prepare_enumerable_proto(OseoContext *context, OseoValue *roots) {
+    roots[2] = require_normal(oseo_internal_ascii_string(context, "__proto__"));
+    OseoValue value = oseo_undefined();
+    OseoPropertyAttributes attributes = {false, false, false, false};
+    uint8_t omitted = 0u;
+    bool found = oseo_internal_own_descriptor(
+        roots[0], roots[2], &value, &attributes, &roots[3], &roots[4], &omitted
+    );
+    assert(found);
+    assert(attributes.accessor && attributes.configurable && omitted == 0u);
+    assert(is_callable(roots[3]) && is_callable(roots[4]));
+    attributes.enumerable = true;
+    (void)require_normal(oseo_object_define_accessor(
+        context, roots[0], roots[2], roots[3], roots[4], true, true, attributes
+    ));
+    OseoValue getter = oseo_undefined();
+    OseoValue setter = oseo_undefined();
+    found = oseo_internal_own_descriptor(
+        roots[0], roots[2], &value, &attributes, &getter, &setter, &omitted
+    );
+    assert(found);
+    assert(attributes.enumerable && omitted == 0u);
+    assert(getter == roots[3] && setter == roots[4]);
+    roots[2] = oseo_undefined();
+    roots[3] = oseo_undefined();
+    roots[4] = oseo_undefined();
+}
+
 static void prepare_value(OseoContext *context, OseoValue *roots, size_t kind) {
     static const uint16_t units[] = {'a', 'b'};
     roots[1] = kind == 0u ? oseo_boolean(false) : oseo_number(-0.0);
@@ -41,7 +72,7 @@ static size_t exercise(size_t kind, size_t fail_at) {
     oseo_roots_push(&context, &frame);
     roots[0] = require_normal(oseo_internal_intrinsic(
         &context, OSEO_INTRINSIC_OBJECT_PROTOTYPE));
-    ordinary_object(roots[0])->annexb_proto_enumerable = true;
+    prepare_enumerable_proto(&context, roots);
     prepare_value(&context, roots, kind);
     context.observe_specialization = true;
     context.collect_every_safepoint = true;
