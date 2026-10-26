@@ -9034,10 +9034,12 @@ existing guard-fallback omission and named replacement evidence remain.
 The wrapper admission retains its forty-path scope; batches 28/29 retain
 first admission of their primitive PutValue/Proxy paths. Exact included
 ordinary accessor-setter coverage remains unknown. The original edcc and
-560162 observations remain historical raw counterexamples. Full reviewed
-manifest regeneration, derived publication data, native and sanitizer
-validation, independent reviews, and exact candidate/main CI remain Root's
-later gates. The node stays ready and unlanded.
+560162 observations remain historical raw counterexamples. At that initial
+preparation stage, full reviewed manifest regeneration, derived publication
+data, native and sanitizer validation, independent reviews, and exact
+candidate/main CI were still pending; the node was ready and unlanded.
+A publication candidate marks it landed prospectively. That state becomes
+effective only after successful equal-tree Main CI.
 
 
 Primitive Set and omitted accessor metadata

@@ -1650,6 +1650,8 @@ normal CHECK/hooks. These do not execute the runtime, validate native
 layout/allocation/realm/GC assertions, or create observation evidence.
 Historical results above retain their exact inputs. Fresh source review,
 whole reference/native/sanitizer scopes, actual D3 and full UPDATE, and exact
-candidate/Main CI remain Root-owned later stages. All inventory paths,
-reviewed observations, classifications, owners, exclusions, pins, budgets
-and graph state remain exact Main; Set stays ready and unlanded.
+candidate/Main CI were Root-owned later stages at that initial preparation
+step. All inventory paths, reviewed observations, classifications, owners,
+exclusions, pins, budgets and graph state then remained exact Main; Set was
+ready and unlanded. Publication candidates mark landed prospectively; only
+successful equal-tree Main CI makes that state effective.
