@@ -12,5 +12,5 @@ delivers: "Observes the 287 unreviewed paths that
 dependencies:
   - observation-batch-plan
   - script-module-declaration-early-error
-landed: false
+landed: true
 status: ready
