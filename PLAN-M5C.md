@@ -1703,14 +1703,13 @@ The source implements proper tail calls and restores the reviewed
 *tests/test262/harness/tcoHelper.js* that keeps `$MAX_ITERATIONS` at
 100,000. It owns the two reviewed tagged-template paths
 *test/language/expressions/tagged-template/tco-call.js* and *tco-member.js*;
-their checked-in unsupported records and expectations describe the prior
-146-feature source. This preparation admits `tail-call-optimization` as the
-147th feature, so those records are stale for the staged implementation.
-The current `test:test262` gate would reject the classification mismatch;
-source preparation supplies no candidate gate pass. Focused author execution
-on `353a9f17` is recorded below. A full
-`mise run test262:update -- --accept-promotions` remains required. Only passes
-actually observed by that UPDATE may be promoted.
+the full UPDATE on U`68e298a9` observed both as pass with the original
+100,000-depth helper and both specialization policies. The accepted
+`--accept-promotions` output changes exactly their two expectations and
+records. The single `tail-call-optimization` admission remains the 147th
+feature. The current-source evidence and its limits are recorded below;
+source admission alone supplies no candidate/Main gate pass. Earlier
+focused execution on `353a9f17` remains historical.
 The fixed inventory tags 35 paths with the feature, all applicable and none a
 negative test. The other 33 remain unreviewed and keep their
 `observation-batch-32` reservation, whose planning basis is unchanged.
@@ -1766,11 +1765,12 @@ Root state-paragraph corrections remain. TCO `1a305507`/incomplete32 and
 `b1eaeff0`/normal33 keep their original targets and outcomes; neither is
 new-source execution or a complete admission gate.
 
-At this preparation, successful effective Main is `cf0902db` with 54 landed
-nodes. The base has prospective Set55; Array and TCO remain unlanded.
-Root's single Array Full is running on immutable `cccb7195`, which excludes
-TCO and has 146 features. No Full result, Native pass or adoption is claimed
-for this composition. All fifteen TCO production postimages stay exact
+At initial preparation, successful effective Main was `cf0902db` with 54
+landed nodes. The base has prospective Set55; Array and TCO remain unlanded.
+Root's then-running standalone Array Full used immutable `cccb7195`,
+which excluded TCO and had 146 features. It is distinct from the later
+combined-source U`68e298a9` Full recorded below. All fifteen TCO production
+postimages stay exact
 `b1eaeff0`; thirteen product postimages
 remain exact `145819bd`/`baf6f7d7`. The header and Proxy merge only the TCO
 record declarations and two Call forwarding changes over Set's omitted
@@ -1790,8 +1790,9 @@ source is imported. The guarded Array lookup/insertion/truncation paths
 are preserved, including all generic fallbacks, coercion and rollback.
 
 Their interactions with apply argument-list roots, primitive Receiver/RHS,
-pending tail arguments, reentry and collector ownership require bounded
-D1.9 review. The Array worknote's compiler, Native and performance statements
+pending tail arguments, reentry and collector ownership received bounded
+D1.9 interaction review and the U`68e298a9` focused execution below. The Array
+worknote's compiler, Native and performance statements
 speak to its named standalone sources, including `cccb7195` before this TCO
 overlay. They are not new combined-source claims. Set U`071e447d`/R`868da1d6`,
 TCO `145819bd` checks, `b1eaeff0` reviews and frozen older Array proofs keep
@@ -1800,15 +1801,15 @@ outer review and exact candidate/Main gates remain separate Root phases.
 
 The faithful helper keeps MAX\_ITERATIONS 100,000 with its original license.
 Only its runner entry and the one source feature admission return. The two
-reviewed subjects keep the historical 146-feature unsupported expectations
-and TCO remediation owners. All 29,901 stored observations and their parity,
-ledger, inventory, policy and ADRs remain unchanged. They do not describe the
-staged 147-feature implementation: the standards gate would reject the
-classification mismatch until fresh full observations and accepted actual
-promotions bring expectations and records into agreement. The historical
-Array-bound author runs below do not validate this composition; source
-preparation is no candidate gate pass. The other 33 TCO paths remain unreviewed
-under batch32. The accepted B32 source packet still covers 199 unreviewed
+reviewed subjects now have actual U`68e298a9` pass observations, with
+exactly their two expected classifications promoted by the original Full.
+The other 29,899 stored records remain byte-identical. The derived ledger
+moves these two paths to observation ownership; inventory, policy, ADRs
+and all other ownership assignments remain unchanged. The historical
+Array-bound author runs below do not validate this composition; the current
+U`68e298a9` evidence is separate and supplies no candidate/Main gate pass.
+The other 33 TCO paths remain unreviewed under batch32. The accepted B32
+source packet still covers 199 unreviewed
 paths/191 units; it grants no execution, admission or observation authority
 here.
 
@@ -1827,8 +1828,8 @@ adoption. The focused results below belong only to their fixed source; they
 are separate from restoration and this Main-specific composition.
 
 
-Focused TCO author execution on the Array source
-------------------------------------------------
+Historical focused TCO execution on Array 353a9f17
+--------------------------------------------------
 
 Six serial command vectors completed naturally with exit zero on
 `353a9f17631b808a5131f49fcff0b16396aa72f4`, tree
@@ -1905,11 +1906,46 @@ under both frameworks. These ordinary runs do not complete the historical
 failed extended 39/60 run, establish new scheduling weights or prove deadline
 margin. The frame ceiling, call limit and host-cc charge remain unchanged.
 
-Focused execution includes the two original pinned TCO subjects without
-changing their unsupported expectations or stored records. All 29,901 rows,
-parity, owners, the 147-feature source list and all seeds/budgets remain
-unchanged. `TCO-ADMIT-GATE` remains open: fresh Full observations, normal
-accepted promotions/R, affected review and exact candidate/Main gates are
-still required. Full UPDATE on this old Array-bound source has not run.
+At that historical checkpoint, focused execution included the two original
+pinned TCO subjects without changing their unsupported expectations or
+stored records. All 29,901 rows, parity, owners, the 147-feature source list
+and seeds/budgets remained unchanged. `TCO-ADMIT-GATE` remained open pending
+fresh Full observations, actual promotions/R and affected review.
+Full UPDATE on that old Array-bound source did not run.
 Native935 remains evidence on `05c1f074`; these results cannot be relabeled
 as evidence on a later Array source or a completed internal review gate.
+
+
+Current U68 TCO observations on the Array source
+------------------------------------------------
+
+The current execution source is
+`68e298a9a96a6d22dc2e33b9e70b7c6a86720e41`, tree
+`dcca1b0bf57b63d0446fab54c676f42a2ca19739`, directly on Array U`cccb7195`.
+Six focused whole-command vectors completed naturally on that fixed source:
+runtime C 3 registrations; Node integration 27; Deno integration 27;
+sanitizer self 7 followed by host-cc integration 28; ordinary Node
+properties 5; ordinary Deno properties 5. These overlapping framework counts
+include the whole Array property where named; they are not unique programs.
+All original TCO and Array domains, cases, seeds, budgets, policies, source
+oracles and shrinking/replay controls remained unchanged.
+
+The original whole Full UPDATE then ran as Root's explicit D10.1 leading
+execution, while the admission data finding awaited actual observations.
+It completed naturally on Linux AMD64 with exit zero, pool eight and zero
+retries. It observed all 29,901 reviewed paths: 25,604 pass, 2,802 expected
+negatives, 1,495 unsupported, and zero semantic, harness or infrastructure
+failures. Only the two owned strict tagged-template subjects changed from
+unsupported to pass. Their recorded execution retains the original helper,
+both specialization policies and the pinned source revision. No reviewed
+path was removed; all other 29,899 result records are byte-identical.
+The five generated output changes are preserved as actual Full output,
+without regeneration or normalization by hand.
+
+[*Current U68 evidence*](docs/evidence/proper-tail-calls-u68-20261027.md)
+records the commands, source, raw locations, timing and limits. Actual Full
+observations resolve the prior stale-data condition; the admission data
+gate closes only after its result commit and required affected reviews.
+Candidate/Main gates and adoption remain separate Root work. No old Native
+proof, mixed Reg/TCO promotion, unreviewed batch32 subject, macOS execution
+or failed extended interruption is relabeled as current-source evidence.

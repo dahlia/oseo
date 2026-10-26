@@ -9270,10 +9270,11 @@ source-qualified worknote. Set's corrected locator and historical versus
 prospective state paragraphs remain. TCO `b1eaeff0` and its internal33
 assessment stay bound to that Set-based source, not this composition.
 
-At preparation, effective Main remains `cf0902db` with 54 landed nodes;
-the base's Set55 mark is prospective and Array remains unlanded. Root's
-Array Full is running on immutable `cccb7195`, without this TCO delta;
-no result or pass is claimed here. Thirteen production preimages
+At initial preparation, effective Main was `cf0902db` with 54 landed nodes;
+the base's Set55 mark was prospective and Array remained unlanded. Root's
+then-running standalone Array Full used `cccb7195`, without this TCO delta.
+The later combined-source U`68e298a9` evidence is distinct. Thirteen
+production preimages
 retain their original `ccde36cd`/Main identity and exact `baf6f7d7` TCO
 postimages. The internal header and Proxy Call merge only TCO declarations
 and forwarding hunks over Set's current descriptor signatures/metadata,
@@ -9294,8 +9295,8 @@ validate this combined source. Array's unchanged-compiler descriptions
 refer to its standalone U before the TCO overlay. Frozen branches and
 packets remain. No rejected Array packing, completion-layout or RegExp
 implementation is imported. Array's guard preservation is not a current
-TCO performance or Native claim; changed apply/Set/GC interfaces need
-bounded review and current-source execution under later Root authority.
+TCO performance claim. The changed apply/Set/GC interfaces received bounded
+interaction review and current-source execution under Root authority.
 
 The original property block `0x60008900` through `0x600089ff` returns with
 8, 8 and 6 ordinary draws, each with a 180-second limit, stable slots,
@@ -9307,16 +9308,23 @@ remain scheduling inputs without a new-source cost or deadline claim.
 
 The single `tail-call-optimization` source-admission entry restores the
 faithful original 100,000-depth helper and two pinned tagged-template
-subjects in the staged 147-feature implementation. Both unsupported
-expectations and all 29,901 stored records still describe the historical
-146-feature source; their owners and the 41,091-path inventory stay unchanged.
-Those records are stale for this implementation, so the current standards
-gate would reject the classification mismatch. Source preparation supplies
-no candidate gate pass. Historical focused author Native execution on Array
-`353a9f17` is recorded in *PLAN-M5C.md*. A full UPDATE with
-`--accept-promotions` remains pending; only its actual observed passes may
-change expectations and results. The other 33 TCO paths retain their unreviewed
-batch32 reservations. Historical Native935 remains bound to `05c1f074`, not
+subjects in the 147-feature implementation. Source U
+`68e298a9a96a6d22dc2e33b9e70b7c6a86720e41`, tree
+`dcca1b0bf57b63d0446fab54c676f42a2ca19739`, then completed six focused
+whole-command vectors and the original full UPDATE. Its 29,901 observations
+are 25,604 pass, 2,802 expected negatives and 1,495 unsupported, without
+semantic, harness or infrastructure failures. Only the two owned TCO
+subjects were promoted; all other 29,899 result records are byte-identical.
+The derived ledger gives the two actual passes observation ownership;
+all other assignments and the 41,091-path inventory stay unchanged.
+
+[*Current U68 evidence*](docs/evidence/proper-tail-calls-u68-20261027.md)
+records actual command/source/target limits. The admission data gate still
+requires its actual result commit and affected reviews; no candidate/Main
+pass follows from source preparation or focused Native. Historical author
+execution on Array `353a9f17` remains separately qualified in *PLAN-M5C.md*.
+The other 33 TCO paths retain their unreviewed batch32 reservations.
+Historical Native935 remains bound to `05c1f074`, not
 this composition. The old `1fd374f6` extended interruption at 39 of 60 liveness
 draws stays failed and incomplete. Source-qualified reviews, execution, actual
 D3/U/R and exact candidate/Main gates remain separate Root-owned work.

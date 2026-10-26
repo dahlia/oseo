@@ -13,12 +13,12 @@ baseline:
   harnessFailures: 0
   infrastructureFailures: 0
   inventoryPaths: 41091
-  passes: 25602
+  passes: 25604
   reviewedPaths: 29901
   semanticFailures: 0
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
   unreviewedPaths: 11190
-  unsupportedProfileFeatures: 1497
+  unsupportedProfileFeatures: 1495
 summary:
   nodes: 90
   ready: 87

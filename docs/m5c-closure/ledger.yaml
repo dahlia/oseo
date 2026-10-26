@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 28404
-openPaths: 12687
+closedPaths: 28406
+openPaths: 12685
 states:
   expected-negative: 2802
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 25602
+  pass: 25604
   semantic-failure: 0
   unreviewed: 11190
-  unsupported-profile-feature: 1497
+  unsupported-profile-feature: 1495
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -254,10 +254,6 @@ owners:
       selects for observation-batch-32. The batch observes them; no
       classification is assumed before it does.
     paths: 199
-  node:proper-tail-calls:
-    note: Gated by tail-call-optimization; no accepted record excludes
-      proper tail calls; 2 paths.
-    paths: 2
   node:regexp-property-escape-harness:
     note: "harness-definition: the reviewed regExpUtils.js omits buildString
       (453) and testPropertyEscapes (441 of them)."
@@ -287,7 +283,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 28404
+    paths: 28406
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -29892,8 +29888,8 @@ paths:
   test/language/expressions/tagged-template/invalid-escape-sequences.js: [pass, observation]
   test/language/expressions/tagged-template/member-expression-argument-list-evaluation.js: [pass, observation]
   test/language/expressions/tagged-template/member-expression-context.js: [pass, observation]
-  test/language/expressions/tagged-template/tco-call.js: [unsupported-profile-feature, node:proper-tail-calls, [expression-operators]]
-  test/language/expressions/tagged-template/tco-member.js: [unsupported-profile-feature, node:proper-tail-calls, [expression-operators]]
+  test/language/expressions/tagged-template/tco-call.js: [pass, observation]
+  test/language/expressions/tagged-template/tco-member.js: [pass, observation]
   test/language/expressions/tagged-template/template-object-frozen-non-strict.js: [pass, observation]
   test/language/expressions/tagged-template/template-object-frozen-strict.js: [pass, observation]
   test/language/expressions/tagged-template/template-object-template-map.js: [pass, observation]

@@ -9561,9 +9561,10 @@ TCO delta onto Array U`cccb7195`, tree
 three runtime guard hunks, six coverage files and new worknote stay exact.
 Set's locator, state prose, Receiver/descriptor/identity/invariant rules
 remain inherited. All fifteen TCO product postimages stay exact `b1eaeff0`.
-At preparation, Main is still `cf0902db`/54; Set55 is prospective and Array
-is unlanded. Root's running Array Full excludes TCO; this source claims no
-Full result, Native pass or adoption. Prior TCO sources and reviews remain
+At initial preparation, Main was `cf0902db`/54; Set55 was prospective and
+Array was unlanded. Root's then-running standalone Array Full excluded TCO.
+The later combined-source U`68e298a9` evidence is distinct. Prior TCO sources
+and reviews remain
 preserved, including the incomplete32 and known-Gate-only33 outcomes.
 Generic/host-tail, bound/Proxy Call forwarding, pending roots, derived/realm
 rules and four owner-local counters keep the full `m5-137` unit. The two
@@ -9575,22 +9576,28 @@ Old Set Full, TCO checks/reviews and Array proofs keep their own sources.
 Array's worknote describes its standalone source before this TCO overlay;
 its measurements and unchanged-compiler statements do not validate the
 combined implementation. Changed lookup/Set/coercion/truncation/pending-GC
-interfaces need bounded review and current-source execution. No rejected
+interfaces received bounded interaction review and current-source execution.
+No rejected
 Array packing, completion-layout, B8 or RegExp implementation is imported.
 
 The new family indexes retained fixed, generated, structural and native
 contracts. Historical Array-bound author execution on `353a9f17` is recorded in
 *PLAN-M5C.md*, with its framework, host, target and policy limits. It does not
 validate this current Array/TCO composition.
-The single source-admission entry for `tail-call-optimization` stages the
-147-feature implementation. The two stored unsupported records and their
-expectations describe the historical 146-feature source. Those records are
-stale for this implementation; the current standards gate would reject the
-classification mismatch. All stored observations, owners and accepted
-exclusions stay unchanged. Full UPDATE evidence remains pending, with
-`--accept-promotions` accepting only actual observed passes. Source preparation
-supplies no candidate gate pass. The standards assessment stays omitted until
-fresh full observations and the required review.
+The single source-admission entry for `tail-call-optimization` remains
+in the 147-feature implementation. The six focused vectors and original
+full UPDATE ran on source `68e298a9a96a6d22dc2e33b9e70b7c6a86720e41`, tree
+`dcca1b0bf57b63d0446fab54c676f42a2ca19739`. The Full observed 29,901 paths:
+25,604 pass, 2,802 expected negatives and 1,495 unsupported, with no semantic,
+harness or infrastructure failures. Its only promotions are the two owned
+strict tagged-template TCO subjects, using the unchanged 100,000-depth helper
+and both specialization policies. All other 29,899 result records stay
+byte-identical. Derived observation ownership replaces remediation only for
+those two passes; other owners, inventory, policy and exclusions stay exact.
+The standards assessment cites these actual observations. Admission data
+review, candidate/Main gates and adoption remain separate requirements;
+source admission alone supplies no candidate gate pass.
+See [*current U68 evidence*](evidence/proper-tail-calls-u68-20261027.md).
 Native935 remains historical `05c1f074` evidence; the old 39/60 interruption
 is failed incomplete evidence. All 33 other pinned TCO paths remain
 unreviewed under batch32, whose accepted source plan remains separate.

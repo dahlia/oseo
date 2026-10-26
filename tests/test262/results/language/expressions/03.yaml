@@ -946,14 +946,22 @@ results:
       strictness:
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - expression-operators
+    execution:
+      harnessIncludes:
+        - base.js
+        - tcoHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: "Not executed: the frontmatter needs an unsupported feature."
-      passed: false
-    unsupportedFeatures:
-      - tail-call-optimization
+      passed: true
+    unsupportedFeatures: []
   - case:
       async: false
       features: []
