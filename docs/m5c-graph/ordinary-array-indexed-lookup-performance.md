@@ -24,8 +24,12 @@ Both specialization policies and forced collection remain part of evidence.
 
 Keep the original helper, its 10,000-element chunk size, upstream source and
 Unicode data, assertions, case counts, seeds, and time limits unchanged.
-Do not change CI shard totals or settings. New generated domains reserve
-stable seed slots and retain deliberate fallback and invalidation cases.
+The runtime change keeps CI shard totals and settings unchanged. The
+companion B scheduling change, authorized by the user and reviewed
+separately, gives the unchanged Linux Array property a dedicated job.
+It preserves all shard totals, cases, seeds, policies and deadlines.
+New generated domains reserve stable seed slots and retain deliberate
+fallback and invalidation cases.
 
 Measure the same fixed sources and conditions before and after the change.
 Separate compilation from native execution, retain raw timing and failures,

@@ -381,7 +381,7 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 55);
+  assert.ok(summary.landed >= 56);
   assert.equal(summary.parked, 0);
   assert.equal(summary.nodes, 90);
   assert.equal(summary.ready, 87);
@@ -389,7 +389,7 @@ test("the checked-in M5c work graph is valid", () => {
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
-  assert.equal(array.landed, false);
+  assert.equal(array.landed, true);
   assert.equal(array.status, "ready");
   assert.deepEqual(array.dependencies, ["unsupported-ownership-audit"]);
   assert.ok(
