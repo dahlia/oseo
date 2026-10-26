@@ -48,6 +48,11 @@ size_t oseo_internal_own_property_index(
 
 bool oseo_internal_remove_property(OseoOrdinaryObject *object, size_t index) {
     if (!object->properties[index].attributes.configurable) return false;
+    if (object->immutable_prototype && !object->module_namespace &&
+        !object->annexb_proto_deleted &&
+        index < object->annexb_proto_position) {
+        object->annexb_proto_position -= 1u;
+    }
     for (size_t next = index + 1u; next < object->property_count; next += 1u) {
         object->properties[next - 1u] = object->properties[next];
     }
@@ -85,6 +90,10 @@ static OseoResult object_create(
     object->extensible = true;
     object->module_namespace = false;
     object->immutable_prototype = false;
+    object->annexb_proto_deleted = false;
+    object->annexb_proto_configurable = true;
+    object->annexb_proto_enumerable = false;
+    object->annexb_proto_position = 0u;
     object->global_object = false;
     object->error_data = false;
     object->number_data = false;

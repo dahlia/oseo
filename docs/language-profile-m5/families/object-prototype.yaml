@@ -6,15 +6,17 @@ scope:
     prototype."
   - "hasOwnProperty, isPrototypeOf, propertyIsEnumerable, toString,
     toLocaleString, valueOf, and constructor."
-  - "A missing __proto__ read reaching an intrinsic Object.prototype
-    reports OSEO1001 for the excluded Annex B accessor; ordinary properties
-    with that name, null prototypes, and proxy traps retain core behavior."
-  - "A __proto__ [[Set]] whose ordinary or receiver walk reaches an
-    intrinsic Object.prototype without an own or inherited user property
-    reports the same OSEO1001 for the omitted setter; user properties,
-    proxy set traps, null prototypes, typed-array numeric keys, the
-    object-literal prototype setter, and primitive bases retain their
-    behavior."
+  - "Core reflection exposes stable, distinct realm-owned native identities
+    for the excluded __proto__ getter and setter. Describing, comparing,
+    copying or redefining them does not invoke their bodies; invocation of
+    an excluded half reports source-located OSEO1001. Partial replacement,
+    explicit undefined halves, deletion/recreation, integrity operations
+    and Proxy invariants retain ordinary descriptor behavior."
+  - "Primitive [[Set]] uses full wrapper lookup with the original primitive
+    Receiver, including inherited setter and Proxy dispatch, String own
+    restrictions and strict/sloppy refusal. User accessor halves, ordinary
+    properties, null prototypes, proxy traps, typed-array numeric keys and
+    the object-literal prototype setter retain their core behavior."
   - "A missing __lookupGetter__ or __lookupSetter__ read reaching an
     intrinsic Object.prototype reports OSEO1001 for the omitted normative
     optional legacy method (16th edition 20.1.3.9, mapped onto the ADR 0013

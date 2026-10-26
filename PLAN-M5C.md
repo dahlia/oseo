@@ -1455,3 +1455,201 @@ plus264 unreached paths remain preserved separately. All336 B18 paths remain
 unreviewed. Root owns actual D3, affected internal/ outer review judgment,
 final owners/exclusions, candidate gates and publication; no node is marked
 landed or final gate claimed here.
+
+The following Set contracts are restored for the standalone source
+preparation on Main `cf0902db`. Every historical execution result remains
+bound to its named source; none validates this new composition. Fresh
+in-memory structural checks and CHECK/hooks are recorded in the source
+preparation report. Runtime, reference and native execution, affected review,
+fresh full observations and exact candidate/Main gates remain pending.
+
+Earlier Set focus remains source-bound: `43b84b70` supplied the initial
+Linux ordinary/host-cc and sanitizer evidence. Source `c4bcb412`, recorded
+by `f5eff4b9`, later passed nine whole Linux commands with 23 total
+registrations, including twelve Set registrations and seven sanitizer
+self tests. Its Set loops derive 344 JavaScript subject/policy invocations
+plus four C registrations, which are not framework test counts. The first
+supervisor failure and two lock admissions remain historical facts. Neither
+source validates the subsequent integrity, identity or Main composition.
+
+
+Primitive Set C2 Annex boundary repair
+--------------------------------------
+
+Exact C2 ceca0314 failed one Mac Node registration with OSEO1001 at line
+130 of the unchanged preservedWrites Script, after successful deletion of a
+user-defined Object.prototype.__proto__ setter. The complete source matches
+independent Node and Deno Script references. This is a semantic candidate
+failure, not a deadline or runner-variation diagnosis.
+
+The first repair passed six complete Node/Deno focused commands on Linux
+AMD64, with 20 actual test registrations and natural drain. The original
+Script, deletion/realm controls and Set resource assertions remain intact.
+Those observations bind to 1c96126b. A later independent native review probe
+found an additional freeze/seal metadata defect, so the initial passes do
+not establish a clean or complete integrity correction.
+
+The current source correction represents private accessor metadata and
+unavailable getter/setter halves explicitly. Ordinary and Proxy own-key,
+descriptor and integrity paths share presence, attributes and creation order;
+core reflection exposes stable native identities while invocation of an
+excluded getter/setter body keeps the Annex dependency diagnostic.
+Real descriptors, failed deletion, user function identity, trap/abrupt order,
+realm isolation, primitive Receiver identity and strict/sloppy Set behavior
+retain their core contracts. *PLAN-M5.md* records the bounded representation,
+unchanged static layouts and logical policy functions, dynamic snapshot
+root counts and exact pending validation limits.
+
+The original arbitrary, seeds, cases, limits and assertions remain; the
+existing property adds a fresh bounded integrity subject without replacing
+its old program. No classification, exclusion, admission, owner, graph flag
+or result changes. Source-only reference checks do not replace focused
+native, affected review, fresh full observations or exact candidate/Main
+requirements. Root separately owns D6 composition and any later integration
+of this repair; Core Ucda contained none of this source.
+
+
+Set integrity native8 on the fixed no-TCO source
+------------------------------------------------
+
+After separate execution authorization, exact clean
+`eab6f36600fa8863d17a84533711392e07d9955f`, tree
+`2b70928606de831887956979f09e03d179da6db7`, ran these whole commands
+once, sequentially, on Linux AMD64. All naturally exited zero: 28 actual
+passing registrations, 14 per bootstrap host, with no skipped registrations.
+
+| Whole command                                                                      | Passed | Wall seconds |
+| ---------------------------------------------------------------------------------- | -----: | -----------: |
+| `node --test tests/annexb-proto-boundary.test.ts`                                  |      9 |    92.387790 |
+| `deno test -A tests/annexb-proto-boundary.test.ts`                                 |      9 |    67.327571 |
+| `node --test tests/property/m5-annexb-proto-boundary.property.test.ts`             |      1 |    35.376709 |
+| `deno test -A tests/property/m5-annexb-proto-boundary.property.test.ts`            |      1 |    37.520988 |
+| `node --test tests/property/m5-primitive-receiver-inherited-set.property.test.ts`  |      3 |   111.521138 |
+| `deno test -A tests/property/m5-primitive-receiver-inherited-set.property.test.ts` |      3 |   131.585252 |
+| `node --test tests/primitive-set-array-interop.test.ts`                            |      1 |     1.903703 |
+| `deno test -A tests/primitive-set-array-interop.test.ts`                           |      1 |     4.741917 |
+
+All 8,043 tracked hashes/modes and exact clean HEAD/tree were verified after
+each command, followed by natural owned PID/starttick and scope drain with
+two observations 15 seconds apart, without signals. Each installed heavy
+gate used a fresh capacity prefix with gates=1, choom1000, jobs1, the assigned
+Wrapper Zig cache and an external task TMPDIR. Full argv, raw outputs,
+framework counts, walls, source inventories and process/scope observations
+are sealed under
+*/data/m5c-set-integrity-native8-20261025/task\_af9240358454/*.
+
+Original domains, seeds, 12-case budgets, 180/240-second limits, both policies,
+forced collection, guard misses/fallbacks, diagnostic oracles and root/realm
+retry checks remain. The allocation registrations actually compiled the
+old-prefix and full old-property layout assertions on this Linux ABI. The
+generic driver passed its seven callback assertions and balanced teardown.
+Numeric successful-case counters/sizes and temporary C/MIR/binaries were not
+retained as output. Dynamic snapshot key/root counts and costs can differ.
+
+These are ordinary focused command walls, not extended case sums, macOS
+measurements, sanitizer proof or cost bounds. The 134-entry 409/296 fallbacks
+remain unmeasured estimates; no 900 entry or budget change follows. The
+native input remains eab6 even when later evidence documentation has a new
+commit identity. Affected review, fresh D3/full observations, outer/owner
+checks and exact candidate/Main gates remain pending under Root ownership.
+
+
+For-in virtual-key consumer correction
+--------------------------------------
+
+The later for-in correction preserves the source-bound eab6 native8 facts
+above while preparing a changed implementation. Ordinary enumeration must
+include enumerable omitted metadata in creation order and retain hidden own
+metadata for shadowing; inherited primitive enumeration uses rooted ToObject.
+The new fixed programs, independent reference/emission test, allocation-failure
+fixture and third fresh Annex property subject are named in *PLAN-M5.md*.
+All old programs/oracles, arbitrary inputs, seeds, cases and hard limits stay.
+
+The required focused validation now has 40 actual passing registrations
+across two explicitly bound inputs. Whole commands 1-8 passed 28 on clean
+`46933fd3ec1a16362350ccc32b5dec27a2d1c496`, tree
+`5e37a71dee909cf911e50580f30ff09e81e28f98`. Command 9 then naturally
+failed its C fixture's positive collection assertion: the counter required
+observation to be enabled. That phase remains 29 passes/one failure;
+commands 10-14 never started there. Its raw output, failed C/binary and
+natural drain are retained unchanged.
+
+The fixture-only correction on clean
+`97f06518d12f5fb9c8af8b8037299c6197b55845`, tree
+`8f98244f38d468c0ea058c10ae9ed2c89144e24f`, adds only
+`context.observe_specialization = true;`. Every assertion, five-kind sweep,
+retry, realm/root check, teardown and default limit remains. All other
+8,046 tracked files/modes are exact, including runtime, test programs,
+oracles, generators and flags. Under the explicit unchanged-input evidence
+rule, commands 1-8 retain their 46933 binding; they were not rerun on 97.
+After separate execution GO, the six whole commands 9-14 passed 12 actual
+registrations on 97. No all-fourteen-on-97 result is claimed.
+
+| Ordinal | Whole command                                                                      | Source | Passed | Wall seconds |
+| ------- | ---------------------------------------------------------------------------------- | ------ | -----: | -----------: |
+| 1       | `node --test tests/annexb-proto-boundary.test.ts`                                  | 46933  |      9 |    99.520975 |
+| 2       | `deno test -A tests/annexb-proto-boundary.test.ts`                                 | 46933  |      9 |    87.007306 |
+| 3       | `node --test tests/property/m5-annexb-proto-boundary.property.test.ts`             | 46933  |      1 |    64.951403 |
+| 4       | `deno test -A tests/property/m5-annexb-proto-boundary.property.test.ts`            | 46933  |      1 |    62.961854 |
+| 5       | `node --test tests/property/m5-primitive-receiver-inherited-set.property.test.ts`  | 46933  |      3 |   153.286201 |
+| 6       | `deno test -A tests/property/m5-primitive-receiver-inherited-set.property.test.ts` | 46933  |      3 |   150.355762 |
+| 7       | `node --test tests/primitive-set-array-interop.test.ts`                            | 46933  |      1 |     2.106310 |
+| 8       | `deno test -A tests/primitive-set-array-interop.test.ts`                           | 46933  |      1 |     3.455743 |
+| 9       | `node --test tests/annexb-for-in.test.ts`                                          | 97f065 |      2 |    14.573503 |
+| 10      | `deno test -A tests/annexb-for-in.test.ts`                                         | 97f065 |      2 |    18.845015 |
+| 11      | `node --test tests/property/m5-for-in.property.test.ts`                            | 97f065 |      2 |    30.717361 |
+| 12      | `deno test -A tests/property/m5-for-in.property.test.ts`                           | 97f065 |      2 |    33.836163 |
+| 13      | `node --test tests/property/m5-for-in-object-pattern.property.test.ts`             | 97f065 |      2 |    36.476596 |
+| 14      | `deno test -A tests/property/m5-for-in-object-pattern.property.test.ts`            | 97f065 |      2 |    39.730977 |
+
+Each admitted command ran whole once with default limits, original seeds,
+cases, policies, forced-GC/assertion/oracle behavior and no filters, scaling
+or retry. Every source freeze covered 8,047 hashes/modes and exact clean
+HEAD/tree. Natural owned PID/starttick and scope drain passed after each
+return, with two observations 15 seconds apart and no signals. Every
+installed HEAVY gate used fresh local capacity/gates1, choom1000, jobs1,
+the Wrapper cache and an external task TMPDIR; no compiler probe or warmup.
+The positive collection assertion passed after the observation correction;
+no numeric successful-case counters or sizeof values were printed.
+
+The immutable source-bound packets are
+*/data/m5c-set-forin-native14-20261025/task\_af9240358454/* for the original
+28 passes and real command 9 failure,
+*/data/m5c-set-forin-observation-fix-20261025/task\_af9240358454/* for the
+one-line correction and normal hook, and
+*/data/m5c-set-forin-followup6-20261025/task\_af9240358454/* for the six
+follow-up passes. Their recursive SHA lists contain 133, 170 and 92 entries.
+The earlier eab6 packet remains historical evidence on its own input.
+
+These ordinary Linux walls are not extended case sums, macOS measurements,
+sanitizer proof, CI gates or scheduling bounds. Dynamic candidate/root
+allocations may differ despite unchanged static layouts. The 134-entry
+409/296 fallbacks remain unmeasured estimates; no weights, shards, budgets,
+Array/F3 contracts, owners or classification data change. Affected review,
+fresh observations and exact candidate/Main gates remain pending. The
+required Array CI failure blocked that historical bundle, not standalone
+Set preparation. Old PASS samples cannot establish a current deadline bound.
+
+
+Standalone Set source preparation on successful Main
+----------------------------------------------------
+
+This private source candidate starts from exact successful Main
+`cf0902db05ee8a51a2801f5d70372bfc5ca37b48`. It retains only the complete
+Set Receiver, descriptor/integrity, reflected-identity and for-in consumer
+unit from fixed source `2992ee7ca78516449e4f569a7f494ebbb6a1743d`.
+The two generic interop preparation/helper files use exact `b45d28ea`
+versions, preserving the original fifth Script/oracle without TCO assertions.
+Main's linear own-index lookup, array truncation, call/GC/realm and backend
+source, and public `m5-135` ABI remain. Both actual graph dependencies,
+computed-member-reference-key-order and primitive-wrapper-objects, are
+already landed; no unlanded Array or TCO prerequisite is introduced.
+
+Source preparation permits only focused pure structural/unit checks and
+normal CHECK/hooks. These do not execute the runtime, validate native
+layout/allocation/realm/GC assertions, or create observation evidence.
+Historical results above retain their exact inputs. Fresh source review,
+whole reference/native/sanitizer scopes, actual D3 and full UPDATE, and exact
+candidate/Main CI remain Root-owned later stages. All inventory paths,
+reviewed observations, classifications, owners, exclusions, pins, budgets
+and graph state remain exact Main; Set stays ready and unlanded.

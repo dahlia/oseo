@@ -136,7 +136,8 @@ static bool object_environment_has_property(
             &value,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         )) {
             return true;
         }
@@ -613,7 +614,8 @@ OseoResult oseo_global_object_create(
             &value,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         );
         if (exists && !attributes.configurable) {
             result = oseo_internal_throw_error(
@@ -650,7 +652,8 @@ OseoResult oseo_global_object_create(
             &value,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         );
         bool allowed = exists
             ? !function_declarations[index] || attributes.configurable ||
@@ -700,7 +703,8 @@ OseoResult oseo_global_object_create(
             &current,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         );
         if (!exists) {
             result = oseo_object_define(
@@ -743,6 +747,7 @@ OseoResult oseo_global_object_create(
             !cell_object(cell)->object_environment) {
             property->attributes =
                 (OseoPropertyAttributes){false, true, true, false};
+            property->omitted_accessors = 0u;
             object->dictionary = true;
             object->shape_id = context->next_shape_id;
             context->next_shape_id += 1u;

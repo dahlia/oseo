@@ -52,6 +52,8 @@ import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import * as mapFixtures from "./native/fixtures/map-intrinsic.ts";
 import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
+const { primitiveReceiverSetFixtures } =
+  await import("./native/fixtures/primitive-receiver-inherited-set.ts");
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
 import { receiverFixtures } from "./native/fixtures/receivers.ts";
 import { regexpIntrinsicFixtures } from "./native/fixtures/regexp-intrinsic.ts";
@@ -242,6 +244,7 @@ const fixtures: readonly Fixture[] = [
   ...expressionFixtures,
   ...genericStringCoercionFixtures,
   ...receiverFixtures,
+  ...primitiveReceiverSetFixtures,
   ...regexpIntrinsicFixtures,
   ...regexpLiteralAotFixtures,
   ...regexpPatternExtensionFixtures,

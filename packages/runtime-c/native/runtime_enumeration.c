@@ -150,8 +150,28 @@ static OseoResult enumeration_keys(OseoContext *context, OseoValue level) {
                 );
             }
         }
+        OseoOrdinaryObject *initial = ordinary_object(frame.slots[0]);
+        bool pending_annexb = initial->immutable_prototype &&
+            !initial->module_namespace && !initial->annexb_proto_deleted;
+        size_t annexb_position = pending_annexb
+            ? initial->annexb_proto_position : 0u;
         for (size_t index = 0u; result.status == OSEO_STATUS_NORMAL; ) {
             OseoOrdinaryObject *object = ordinary_object(frame.slots[0]);
+            /* Include non-enumerable metadata too: it must shadow an
+             * inherited key just like a stored own descriptor. Allocation
+             * may collect, so keep the synthesized key in the root frame
+             * and reacquire the object before reading its property vector. */
+            if (pending_annexb && (index >= annexb_position ||
+                    index >= object->property_count)) {
+                result = oseo_internal_ascii_string(context, "__proto__");
+                frame.slots[2] = result.value;
+                if (result.status == OSEO_STATUS_NORMAL) {
+                    result = oseo_argument_list_append(
+                        context, frame.slots[1], frame.slots[2]);
+                }
+                pending_annexb = false;
+                continue;
+            }
             if (index >= object->property_count) break;
             OseoValue key = object->properties[index].key;
             index += 1u;
@@ -277,7 +297,8 @@ static OseoResult enumeration_own_key(
     }
     if (is_proxy(level)) {
         OseoResult result = oseo_internal_proxy_get_own_property(
-            context, level, key, found, &value, &attributes, &getter, &setter);
+            context, level, key, found, &value, &attributes,
+            &getter, &setter, NULL);
         if (result.status != OSEO_STATUS_NORMAL || !*found) return result;
     } else if (!oseo_internal_own_descriptor(
             level,
@@ -285,7 +306,8 @@ static OseoResult enumeration_own_key(
             &value,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         )) return normal(oseo_undefined());
     else *found = true;
     *enumerable = attributes.enumerable;
@@ -336,8 +358,8 @@ static OseoResult enumeration_parent(
     OseoContext *context,
     OseoValue level
 ) {
-    /* A string level stands for a String exotic object whose
-     * %String.prototype% this realm never creates. */
+    /* Acquisition materializes primitives before this outward walk, so
+     * ordinary inputs reach their actual intrinsic prototype chains. */
     return is_object(level)
         ? oseo_internal_get_prototype(context, level)
         : normal(oseo_null());
@@ -448,26 +470,15 @@ OseoResult oseo_enumerate_get(
     OseoRootFrame frame = {NULL, NULL, 0u};
     OseoResult result = oseo_roots_allocate(context, &frame, 3u);
     if (result.status != OSEO_STATUS_NORMAL) return result;
-    /*
-     * ToObject, modeled rather than materialized while primitive wrapper
-     * objects stay outside the profile. A String exotic object's own
-     * index properties are enumerable and are described by the string
-     * itself, and %String.prototype% is not an object this realm
-     * creates. Every other primitive wrapper owns no property at all, so
-     * enumerating one is enumerating its prototype: only `Symbol` has a
-     * reachable prototype here, and a symbol value can exist only after
-     * the intrinsic that owns it was created, so an absent constructor
-     * means no symbol and no chain to walk.
-     */
-    OseoValue symbol_prototype = oseo_undefined();
-    if (is_symbol(subject)) {
-        symbol_prototype =
-            context->realm->intrinsics[OSEO_INTRINSIC_SYMBOL_PROTOTYPE];
+    /* Root the original primitive while ToObject materializes its full
+     * wrapper and prototype chain. String indices remain own keys, and
+     * every primitive kind can inherit enumerable metadata or user keys. */
+    frame.slots[0] = subject;
+    result = oseo_internal_to_object(context, frame.slots[0]);
+    frame.slots[0] = result.value;
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = enumeration_collect(context, frame.slots[0]);
     }
-    frame.slots[0] = is_object(subject) || is_string(subject)
-        ? subject
-        : symbol_prototype;
-    result = enumeration_collect(context, frame.slots[0]);
     frame.slots[1] = result.value;
     if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_argument_list_create(context);

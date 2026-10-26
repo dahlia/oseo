@@ -483,7 +483,8 @@ static OseoResult json_own_enumerable(
             &ignored,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         )
         : normal(oseo_boolean(
             (found = oseo_internal_own_property_descriptor(
@@ -493,7 +494,8 @@ static OseoResult json_own_enumerable(
                 &ignored,
                 &attributes,
                 &getter,
-                &setter
+                &setter,
+                NULL
             ))
         ));
     *enumerable = result.status == OSEO_STATUS_NORMAL &&

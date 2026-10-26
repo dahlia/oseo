@@ -981,7 +981,8 @@ static OseoResult iterator_setter(
             &ignored,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         );
         result = own
             ? oseo_object_set(context, slots[0], slots[2], slots[1], true)

@@ -3,6 +3,19 @@ id: for-in
 title: "For-in statements"
 scope:
   - "For-in enumeration with simple declaration and assignment heads."
+  - "A later consumer correction prepares ordinary omitted-key metadata
+    in creation order, non-enumerable shadowing and rooted ToObject
+    reachability for all primitive kinds. New reference/fixed controls and
+    allocation-failure retry checks passed both hosts on 97f06518: six whole
+    commands, 12 actual registrations, both policies, forced GC, all five
+    primitive failure sweeps and balanced realm/root checks. The first eight
+    required commands retain 28 passes on 46933fd3; only the C fixture
+    observation flag changed, with all other 8,046 files/modes exact. The
+    original counter assertion failure remains recorded. Numeric GC counts
+    were not printed. Affected review and broader exact-source gates remain
+    pending. The required Array CI failure blocked that historical bundle,
+    not standalone Set preparation on Main cf0902db.
+    Existing domains, seeds, budgets and assessments remain unchanged."
 owners:
   - PLAN-M5.md
 evidence:
