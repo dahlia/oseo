@@ -31,18 +31,112 @@ export function bodyUnit(source: string, unit: number): string {
   );
 }
 
+/** An opaque C condition keeps both branches; a unit condition selects one. */
+interface UnitConditional {
+  readonly alternateSeen: boolean;
+  readonly parentIncluded: boolean;
+  readonly selected: boolean | undefined;
+}
+
+/**
+ * Resolve only the unit selectors this emitter owns, leaving C resource
+ * guards and all common text intact. Blank excluded lines preserve logical
+ * line numbers when the caller maps the unit back to its aggregate source.
+ * This is not a general C preprocessor; unexpected unit conditions fail.
+ */
+export function selectBodyUnit(source: string, unit: number): string {
+  if (!Number.isSafeInteger(unit) || unit < 0) {
+    throw new Error(`Invalid native body unit ${unit}.`);
+  }
+  const literalsAndComments = new RegExp(
+    [
+      String.raw`/\*[\s\S]*?\*/`,
+      String.raw`//(?:\\\r?\n|[^\n])*`,
+      String.raw`"(?:\\[\s\S]|[^"\\])*"`,
+      String.raw`'(?:\\[\s\S]|[^'\\])*'`,
+    ].join("|"),
+    "gu",
+  );
+  const masked = source
+    .replace(literalsAndComments, (text) => text.replace(/[^\n]/gu, " "))
+    .split("\n");
+  const conditionals: UnitConditional[] = [];
+  let included = true;
+  const selected = source.split("\n").map((line, index) => {
+    const directive = masked[index]!.match(
+      /^\s*#\s*(if|ifdef|ifndef|elif|else|endif)\b(.*)$/u,
+    );
+    if (directive == null) return included ? line : "";
+    const kind = directive[1];
+    const condition = directive[2]!.trim();
+    if (kind === "elif" && condition.includes("OSEO_C_BODY_UNIT")) {
+      throw new Error("Native unit selectors do not admit elif.");
+    }
+    if (kind === "if" || kind === "ifdef" || kind === "ifndef") {
+      const selector = condition.match(
+        /^!defined\(OSEO_C_BODY_UNIT\) \|\| OSEO_C_BODY_UNIT == (\d+)$/u,
+      );
+      if (condition.includes("OSEO_C_BODY_UNIT") && selector == null) {
+        throw new Error(`Unexpected native unit condition: ${condition}.`);
+      }
+      const matches =
+        selector == null ? undefined : Number(selector[1]) === unit;
+      conditionals.push({
+        alternateSeen: false,
+        parentIncluded: included,
+        selected: matches,
+      });
+      if (matches == null) return included ? line : "";
+      included = included && matches;
+      return "";
+    }
+    const current = conditionals.at(-1);
+    if (current == null) {
+      throw new Error(`Unmatched native unit directive: ${kind}.`);
+    }
+    if (kind === "endif") {
+      conditionals.pop();
+      included = current.parentIncluded;
+    } else if (current.selected != null) {
+      if (kind === "elif") {
+        throw new Error("Native unit selectors do not admit elif.");
+      }
+      if (current.alternateSeen) {
+        throw new Error("Native unit selectors admit only one else.");
+      }
+      conditionals[conditionals.length - 1] = {
+        ...current,
+        alternateSeen: true,
+      };
+      included = current.parentIncluded && !current.selected;
+    }
+    return current.selected == null && included ? line : "";
+  });
+  if (conditionals.length !== 0) {
+    throw new Error("Unclosed native unit conditional.");
+  }
+  return selected.join("\n");
+}
+
 /** The owner retains roots and completion storage across outlined calls. */
 export interface BoundedBody {
   readonly declarations: string;
   readonly execution: string;
 }
 
-/** Mask literals before inspecting the backend's own generated C syntax. */
+const opaqueSyntax = new RegExp(
+  [
+    String.raw`/\*[\s\S]*?\*/`,
+    String.raw`//(?:\\\r?\n|[^\n])*`,
+    String.raw`"(?:\\[\s\S]|[^"\\])*"`,
+    String.raw`'(?:\\[\s\S]|[^'\\])*'`,
+  ].join("|"),
+  "gu",
+);
+
+/** Mask opaque tokens before inspecting the backend's own C syntax. */
 function syntax(source: string): string {
-  return source.replace(
-    /"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'/gu,
-    (literal) => " ".repeat(literal.length),
-  );
+  return source.replace(opaqueSyntax, (literal) => " ".repeat(literal.length));
 }
 
 /** Apply replacements only to syntax, preserving bytes inside C literals. */
@@ -60,6 +154,135 @@ export function replaceSyntax(
     start = match.index + match[0].length;
   }
   return result + source.slice(start);
+}
+
+/** A logical entry stays stable even when its code shares a C function. */
+interface BodyEntry {
+  readonly id: number;
+  readonly statements: readonly string[];
+  readonly next: number | undefined;
+}
+
+/** Materialized functions and the logical-entry table that calls them. */
+interface GroupedBody {
+  readonly helpers: readonly string[];
+  readonly entries: readonly number[];
+}
+
+/** Pack atomic statements while charging every new entry and branch. */
+function groupBody(
+  chunks: readonly (readonly string[])[],
+  labels: ReadonlyMap<string, number>,
+  name: string,
+  typeName: string,
+  entryField: string,
+  units: BodyUnits,
+): GroupedBody {
+  const target = (label: string): number => {
+    const value = labels.get(label);
+    if (value == null) throw new Error(`Missing C label ${label}.`);
+    return value;
+  };
+  const rewrite = (source: string, edge: (id: number) => string): string =>
+    replaceSyntax(
+      replaceSyntax(source, /\bgoto\s+(bb\d+|abrupt);/gu, (label) =>
+        edge(target(label!)),
+      ),
+      /\breturn result;/gu,
+      () => "return SIZE_MAX;",
+    );
+  const dispatch = (entries: readonly BodyEntry[]): string =>
+    `    (void)context;
+    (void)body;
+    switch (body->${entryField}) {
+${entries.map(({ id }) => `    case ${id}u: goto entry_${id};`).join("\n")}
+    default: return SIZE_MAX;
+    }
+`;
+  // At most one additional entry per atomic statement can be needed.
+  // Use its width for all edges, so cross-group returns can only shrink.
+  const maximumId =
+    chunks.length + chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const edgeBound = Math.max(
+    `goto entry_${maximumId};`.length,
+    "return SIZE_MAX;".length,
+  );
+  const statementSizes = new Map<string, number>();
+  const statementSize = (statement: string): number => {
+    let size = statementSizes.get(statement);
+    if (size == null) {
+      size = rewrite(statement, () => " ".repeat(edgeBound)).length + 1;
+      statementSizes.set(statement, size);
+    }
+    return size;
+  };
+  const entrySize = ({ id, statements }: BodyEntry): number =>
+    `    entry_${id}:;\n`.length +
+    statements.reduce((sum, statement) => sum + statementSize(statement), 0) +
+    edgeBound +
+    (statements.length === 0 ? 6 : 5);
+  const bodySize = (entries: readonly BodyEntry[]): number =>
+    dispatch(entries).length +
+    entries.reduce((sum, entry) => sum + entrySize(entry), 0);
+
+  let nextId = chunks.length;
+  const pieces: BodyEntry[] = [];
+  for (const [id, chunk] of chunks.entries()) {
+    let pieceId = id;
+    let statements: string[] = [];
+    for (const statement of chunk) {
+      const candidate = { id: pieceId, statements: [...statements, statement] };
+      if (
+        statements.length > 0 &&
+        bodySize([{ ...candidate, next: undefined }]) > chunkBytes
+      ) {
+        pieces.push({ id: pieceId, statements, next: nextId });
+        pieceId = nextId++;
+        statements = [];
+      }
+      statements.push(statement);
+    }
+    pieces.push({
+      id: pieceId,
+      statements,
+      next: id + 1 < chunks.length ? id + 1 : undefined,
+    });
+  }
+  const groups: BodyEntry[][] = [];
+  for (const piece of pieces) {
+    const current = groups.at(-1);
+    if (current == null || bodySize([...current, piece]) > chunkBytes) {
+      groups.push([piece]);
+    } else {
+      current.push(piece);
+    }
+  }
+  const entries: number[] = [];
+  for (const [group, members] of groups.entries()) {
+    for (const piece of members) entries[piece.id] = group;
+  }
+  const helpers = groups.map((members, group) => {
+    const edge = (id: number): string =>
+      entries[id] === group ? `goto entry_${id};` : `return ${id}u;`;
+    const executable =
+      dispatch(members) +
+      members
+        .map(
+          ({ id, statements, next }) =>
+            `    entry_${id}:;\n` +
+            rewrite(statements.join("\n"), edge) +
+            `\n    ${next == null ? "return SIZE_MAX;" : edge(next)}\n`,
+        )
+        .join("");
+    return bodyUnit(
+      `size_t ${name}_${group}(
+    OseoContext *context, ${typeName} *body
+) {
+${executable}}`,
+      units.assign(executable.length),
+    );
+  });
+  return { helpers, entries };
 }
 
 /**
@@ -83,14 +306,18 @@ export function boundBody(
   const statements: string[] = [];
   let depth = 0;
   let pending: string[] = [];
+  const maskedSource = syntax(lines.join("\n"));
+  let offset = 0;
   for (const line of lines) {
     pending.push(line);
-    const masked = syntax(line);
+    const masked = maskedSource.slice(offset, offset + line.length);
+    offset += line.length;
     for (const character of masked) {
       if (character === "{") depth += 1;
       if (character === "}") depth -= 1;
     }
-    if (depth === 0) {
+    const boundary = maskedSource[offset++];
+    if (depth === 0 && (boundary == null || boundary === "\n")) {
       statements.push(pending.join("\n"));
       pending = [];
     }
@@ -155,6 +382,10 @@ export function boundBody(
     bytes += unit.length;
   }
   const typeName = `${name}_state`;
+  let entryField = "entry_index";
+  while (fields.has(entryField) || staticNames.includes(entryField)) {
+    entryField += "_";
+  }
   const shared = [
     "roots",
     "result",
@@ -172,19 +403,25 @@ export function boundBody(
     ...[...fields.keys()].map((field) => `#define ${field} (body->${field})`),
     ...staticNames.map((field) => `#define ${field} ${name}_${field}`),
   ];
-  const helpers = chunks.map((chunk, index) => {
-    let source = chunk.join("\n");
-    source = replaceSyntax(source, /\bgoto\s+(bb\d+|abrupt);/gu, (label) => {
-      const target = labels.get(label!);
-      if (target == null) throw new Error(`Missing C label ${label}.`);
-      return `return ${target}u;`;
-    });
-    source = replaceSyntax(
-      source,
-      /\breturn result;/gu,
-      () => "return SIZE_MAX;",
-    );
-    const helper = `${units == null ? "static " : ""}size_t ${name}_${index}(
+  const grouped =
+    units == null
+      ? undefined
+      : groupBody(chunks, labels, name, typeName, entryField, units);
+  const helpers =
+    grouped?.helpers ??
+    chunks.map((chunk, index) => {
+      let source = chunk.join("\n");
+      source = replaceSyntax(source, /\bgoto\s+(bb\d+|abrupt);/gu, (label) => {
+        const target = labels.get(label!);
+        if (target == null) throw new Error(`Missing C label ${label}.`);
+        return `return ${target}u;`;
+      });
+      source = replaceSyntax(
+        source,
+        /\breturn result;/gu,
+        () => "return SIZE_MAX;",
+      );
+      const helper = `${units == null ? "static " : ""}size_t ${name}_${index}(
     OseoContext *context, ${typeName} *body
 ) {
     (void)context;
@@ -192,10 +429,10 @@ export function boundBody(
 ${source}
     return ${index + 1 < chunks.length ? `${index + 1}u` : "SIZE_MAX"};
 }`;
-    return units == null
-      ? helper
-      : bodyUnit(helper, units.assign(source.length));
-  });
+      return units == null
+        ? helper
+        : bodyUnit(helper, units.assign(source.length));
+    });
   const staticData = statics.map((source) => {
     if (units == null) return source;
     const masked = syntax(source);
@@ -212,7 +449,9 @@ ${declaration};
   const table = `static size_t (*const ${name}_chunks[])(
     OseoContext *, ${typeName} *
 ) = {
-${chunks.map((_, index) => `    ${name}_${index},`).join("\n")}
+${(grouped?.entries ?? chunks.map((_, index) => index))
+  .map((group) => `    ${name}_${group},`)
+  .join("\n")}
 };`;
   const declarations = `#if ${frameCost} <= OSEO_MAX_ACTIVE_FRAME_SLOTS
 typedef struct {
@@ -223,14 +462,16 @@ typedef struct {
     size_t argument_count;
     const OseoValue *arguments;
     OseoCompletionRecord *completion;
-${[...fields].map(([field, type]) => `    ${type} ${field};`).join("\n")}
+${units == null ? "" : `    size_t ${entryField};\n`}${[...fields]
+    .map(([field, type]) => `    ${type} ${field};`)
+    .join("\n")}
 } ${typeName};
 ${aliases.join("\n")}
 ${staticData.join("\n")}
 ${
   units == null
     ? ""
-    : chunks
+    : helpers
         .map(
           (_, index) =>
             `size_t ${name}_${index}(OseoContext *, ${typeName} *);`,
@@ -245,6 +486,11 @@ ${units == null ? table : bodyUnit(table, ownerUnit)}
 #endif
 `;
   const release = generator ? "" : "    oseo_roots_release(context, &frame);\n";
+  const entrySelection =
+    units == null ? "" : `        body.${entryField} = continuation;\n`;
+  const dispatchLine =
+    `        continuation = ${name}_chunks[continuation]` +
+    "(context, &body);\n";
   const execution = `    ${typeName} body = {
         .frame = ${generator ? "NULL" : "&frame"},
         .roots = roots, .result = result,
@@ -257,8 +503,7 @@ ${units == null ? table : bodyUnit(table, ownerUnit)}
     };
     size_t continuation = 0u;
     while (continuation != SIZE_MAX) {
-        continuation = ${name}_chunks[continuation](context, &body);
-    }
+${entrySelection}${dispatchLine}    }
 ${release}    return body.result;
 `;
   return { declarations, execution };

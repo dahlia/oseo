@@ -383,6 +383,15 @@ test("the checked-in M5c work graph is valid", () => {
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 54);
   assert.equal(summary.parked, 0);
+  const array = readImportAttributesNode(
+    "ordinary-array-indexed-lookup-performance",
+  );
+  assert.equal(array.landed, false);
+  assert.equal(array.status, "ready");
+  assert.deepEqual(array.dependencies, ["unsupported-ownership-audit"]);
+  assert.ok(
+    readImportAttributesNode("m5-exit-audit").dependencies.includes(array.id),
+  );
 });
 
 interface NodeContract extends PublicationNode {

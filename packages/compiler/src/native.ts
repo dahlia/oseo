@@ -41,7 +41,8 @@ export interface NativeSourceFile {
 export interface EmittedNativeSource extends NativeSourceFile {
   /**
    * Compile these files instead of the standalone source when present.
-   * Stage the standalone source beside them under sourceName for includes.
+   * Stage the standalone source beside them under sourceName; individual
+   * units may include it or materialize their selected definitions directly.
    */
   readonly compilationUnits?: readonly NativeSourceFile[];
 }

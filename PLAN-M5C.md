@@ -1455,3 +1455,31 @@ plus264 unreached paths remain preserved separately. All336 B18 paths remain
 unreviewed. Root owns actual D3, affected internal/ outer review judgment,
 final owners/exclusions, candidate gates and publication; no node is marked
 landed or final gate claimed here.
+
+
+Array source preparation on the B16/B17 candidate
+-------------------------------------------------
+
+Under D10.4, the complete existing Array source from successful Main
+`128d63fc` through fixed `74424e` is composed onto B16/B17 candidate
+`0bca89d005744c41081f2cbb52bd671188a33d5f`. Product/test blobs and modes and
+historical scheduling weights remain exact `74424e`, except for the separately
+authorized fourteen generated-C baseline digests. The original complete 44
+tuples and failed baseline check remain preserved; the current correction
+changes no fixture, HIR, MIR or assertion. No new implementation,
+Set/RegExp/TCO import or budget change is introduced. The bounded source
+contract and original execution qualifications are in
+[the Array evidence](./docs/m5c-graph/ordinary-array-indexed-lookup-performance.md).
+
+All candidate observations, subset entries, dependency tags, owners, inventory,
+features, accepted ADRs and existing prospective graph/test assertions remain.
+The added Array node stays ready and unlanded, with its original collisions
+and terminal-audit dependency. The derived graph has 90 nodes, 87 ready,
+3 blocked and the same 54 prospective landed flags.
+The preserved 29,901 rows include 754 B16/B17 additions: 636 passes,
+70 expected negatives and 48 unsupported. They are pending D3 and any required
+Full for this changed implementation; no old Array result partition is copied.
+Candidate prospective flags take effect only after its exact Main CI succeeds.
+Array remains unlanded, with no fresh native, Full, candidate or Main evidence
+from this source preparation. Root owns review retention, observation phase,
+exact Main reanchor and publication.

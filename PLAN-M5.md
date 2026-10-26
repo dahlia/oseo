@@ -8957,3 +8957,188 @@ native results above keep their original source identity. This composition
 claims no new native, model, Full or candidate/Main result. Affected review,
 source-bound native validation, actual D3 and any required observations
 remain Root-owned. F3 stays ready and unlanded.
+
+
+Physical completion storage and logical charges
+-----------------------------------------------
+
+The Array performance source correction separates physical completion
+storage from the existing logical native-frame model. Each emitted
+function or fragment phase maps its distinct completion storage identities
+to dense metadata and saved-value root slots. Generator entry and resumed
+bodies retain one shared layout across suspension. Logical control targets,
+cleanup depths and error provenance remain unchanged; every saved heap
+value stays traced for its original lifetime, without slot reuse.
+
+The backend retains its original logical completion/root counts and
+script binding-access charge. Dispatch, direct-call, continuation and
+fragment enter/leave pairs, callable multipliers and rejection guards keep
+those values even when physical allocations shrink. The runtime ABI,
+ceiling and collector policy do not change.
+
+
+Physical C translation units
+----------------------------
+
+The Array performance follow-up keeps standalone aggregate C emission and
+materializes each native translation unit from its existing unit selection.
+The backend resolves only its own `OSEO_C_BODY_UNIT` conditionals before
+writing a unit. Common declarations, static-data owner definitions and
+non-owner extern declarations stay in their original order. Native-frame
+resource conditions remain C preprocessor conditions with the same logical
+charges. Unit assignments, outlining boundaries and compilation flags do
+not change.
+
+Excluded branches become blank lines. Each physical unit defines its original
+selector and maps line one to the aggregate source name, preserving logical
+C file and line coordinates. Literal and comment text cannot introduce a
+selector. The public aggregate source remains unchanged; this changes only
+the materialized native unit inputs, without changing runtime ABI, roots,
+safepoints, completion layout, the property programs or their case budgets.
+The two private test backends that inject teardown assertions apply their
+unchanged replacement to the aggregate and every physical unit. Units without
+the original teardown site remain unchanged; assertions are not added at new
+sites. Pure tests cover split, unsplit and multiple-unit outputs, including
+resource guards and the result's original field shape.
+
+The motivating local ordinary diagnostic on `d2100e07` passed the complete
+12-draw Array property. Its sampled compiler CPU is a cost lead, not an exact
+phase profile or a measurement of this new representation. Pure source tests
+compare each unit's selected C tokens, declarations, static ownership and
+resource guards with the old aggregate selection. Native semantics, compiler
+cost benefit, cross-host deadlines and exact candidate/Main CI remain to be
+validated on the new source.
+
+
+Array-only composition on successful F3 Main
+--------------------------------------------
+
+This source preparation starts at successful Main `128d63fc`, tree
+`6753319f91a7e4805e63becb5e5f4db39586a767`, whose run `40205743337`
+completed all 78 jobs and the workflow successfully. It composes Array
+source `646fadd5` with that Main's corrected F3 contracts and both existing
+property domains. Earlier F3 evidence above retains its original source
+qualification. F3's runtime iterator, programs, assertions, generic-runtime
+omissions and family record remain exact Main.
+
+Array retains its indexed lookup, insertion and truncation paths, physical
+completion layout, general finally dispatch and zero-sentinel corrections,
+and selected physical C units. The shared test backend adds the original
+Array mapper to Main's unchanged public-context teardown assertion; both
+aggregate and actual compilation units receive the same replacement.
+The compiler native-source interface gains only its donor explanatory
+comment, with the existing field shape and adapter responsibilities intact.
+These backend and helper interactions require D1.9 impact assessment; prior
+source reviews do not certify this new composition automatically.
+
+No Set descriptor identities, native IDs or for-in metadata, RegExp helper
+restoration or license, or TCO protocol or admission is added. Every other
+runtime file stays exact Main. Original Array programs, both transition
+blocks, all oracles, specialization policies, seeds, twelve cases, forced
+collection and deadlines remain unchanged. This source phase executes no
+native code, complete test gate, extended gate or Full observation. Root
+owns further review retention, exact-source validation and publication.
+
+
+Array emission baseline on current Main
+---------------------------------------
+
+The complete original 44 family/name/specialization tuples were collected
+through compileSource, printHir, printMir and cBackend.emit on the new source.
+Fixture bytes, source IDs, policies, printed HIR and MIR remain exact the
+original
+[five-input audit](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission-tuple-proof.json)
+identified below. Every complete emitted object matches Array646 and the
+corrected `01f57d58` composition. Relative to the inherited Array646 baseline,
+30 records stay exact and 14 hashes change only because physical
+compilation-unit source materializes the existing selection; aggregate C and
+all other object fields stay exact its d210 predecessor. Main-to-Array's
+earlier 34 compaction changes remain distinct from those 14.
+
+The audit's
+[snapshot identities](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/snapshot-identities.json)
+and
+[collector](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-emission.mjs)
+identify five 44-row captures, 220 complete tuples in total. Each raw index
+names its original fixture, HIR, MIR, aggregate C, full emitted-C object and
+tuple files; each capture record retains the actual command.
+
+| Capture label | Source commit                              | Raw index and capture record                                                                                                                                                                                         |
+| ------------- | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| main          | `f100ab8edf91c981888311a31251b874801c374e` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/main/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-main/record.json)         |
+| d210          | `d2100e07df8fd3c3afa572d43dac114ca16e8b74` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/d210/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-d210/record.json)         |
+| array646      | `646fadd58e4f545669f4c944d309ea0de3a415ad` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/array646/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-array646/record.json) |
+| f3e234        | `e2345fbe33d8a0e591f1bed1fea166e3ba852ee2` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/f3e234/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-f3e234/record.json)     |
+| combined      | `01f57d58cb9d5843ece58b9df4fa13979973c9f6` | [Index](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/emission/combined/records.json), [capture](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/collect-combined/record.json) |
+
+The combined capture used a working snapshot before the baseline repair;
+its collector-loaded source files match those in the later `01f57d58`
+commit.
+It is not a capture of that commit's repaired baseline. The
+[physical-unit token proof](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/physical-unit-token-proof.json)
+retains the independent comparison of the selected C units. The current
+`6fd3c49d80b1acd7228e86422b1be9ef7c648340` source's
+[44-row raw index](/data/m5c-array-only-current-main-preparation-20261025/task_61d947a3473d/emission/current/records.json)
+and
+[tuple comparison](/data/m5c-array-only-current-main-preparation-20261025/task_61d947a3473d/tuple-proof.json)
+bind its equality to those original captures. The fourteen C-only digest rows
+represent seven fixture identities under two policies; they are separate from
+the fourteen original B16 Test262 subjects.
+
+The baseline is generated from these complete repository-API tuples using
+its unchanged full-object formula, with all 44 keys, order and policies
+preserved. No fixture, HIR, MIR, assertion or emitted C is normalized or
+truncated. The original pre-repair whole-Script baseline check's
+[exit-1 record](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/harness-emission-node/record.json)
+and
+[preserved failure stdout](/data/m5c-array-set-source-integration-20261025/task_4272c91dfada/harness-emission-node/FAILED-stdout-preserved)
+retain the function-prototype/enabled baseline mismatch. That failure precedes
+the `01f57d58` baseline repair and is not a failure of its repaired baseline or
+a CI result. Pure baseline equality supplies no native semantics or performance
+observation.
+
+
+Materialized continuation packing source contract
+-------------------------------------------------
+
+The subsequent Array source `74424e` groups helpers only for materialized
+bodies. Logical entry identities, destination returns, owner cleanup,
+completion maps, root lifetimes and logical frame costs remain unchanged.
+Private switch selection and local gotos preserve entry and exit behavior.
+Actual group length, including dispatch text, owns helper and unit budgets;
+the existing indivisible atomic-statement exception remains. No public MIR,
+runtime ABI, compiler flag or target changes. The source-qualified native,
+exact-input C bridge, cross-link and original full-shard observations are in
+[the Array contract](./docs/m5c-graph/ordinary-array-indexed-lookup-performance.md).
+They establish no current-composition execution, speedup or CI deadline fix.
+The earlier 44-tuple capture and historical weights remain preserved. The
+current baseline updates fourteen C-only tuple digests as documented below,
+without changing inputs, HIR, MIR or assertions.
+
+
+Packing baseline integration correction
+---------------------------------------
+
+The whole-Script baseline check on the complete `74424e` product source
+failed at `functions/function-prototype/enabled`. The retained prepacking
+44-tuple capture matches every old checked-in digest. A fresh complete capture
+on this composition preserves every fixture byte, source ID, specialization
+option, printed HIR and printed MIR. Thirty tuples stay byte-exact; fourteen
+change only aggregate C and physical compilation-unit source/count shape.
+The baseline is regenerated through the existing test's complete
+`JSON.stringify({ hir, mir, c })` SHA256 formula, preserving all keys and order.
+This accepts the intended emitted-C representation change without weakening
+any semantic assertion. Physical unit counts also change for
+`function-prototype/disabled` (2 to 3), `object-constructor/enabled` (5 to 6)
+and `object-define-properties/enabled` (4 to 5); the full emitted object is
+hashed in each case.
+
+[All 44 complete current tuples](/data/m5c-array-on-b16-b17-c20261026/task_d554859fefaf/ctx_acfd44ed00b3/emission/current/records.json),
+[the complete comparison](/data/m5c-array-on-b16-b17-c20261026/task_d554859fefaf/ctx_acfd44ed00b3/COMPLETE44-COMPARISON.json),
+[the generator](/data/m5c-array-on-b16-b17-c20261026/task_d554859fefaf/ctx_acfd44ed00b3/regenerate-baseline.mjs)
+and
+[the original failed stdout](/data/m5c-array-on-b16-b17-c20261026/task_d554859fefaf/ctx_acfd44ed00b3/pure-node1/stdout)
+retain exact inputs, hashes, old/new complete tuple paths and C diffs. All 43
+loaded source files are exact `74424e`; Node and Babel match the
+source-qualified prepacking capture. This pure integration repair executes no
+native program and supplies no new semantic or performance observation.

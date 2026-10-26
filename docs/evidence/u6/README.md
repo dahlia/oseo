@@ -994,3 +994,23 @@ estimates, not host costs, bounds or new native measurements. Main's Array
 candidate's 1119/638 costs are not F3 measurements and are not copied.
 Matching-host extended case sums and exact candidate gates remain required.
 No width, shard total, seed, case budget, timeout or scheduling rule changes.
+
+
+Array-only historical scheduling inputs
+---------------------------------------
+
+The Array-only composition on successful F3 Main `128d63fc` changes only
+Array constructor scheduling entries from Main's 674/543 to the original
+Array646 1,119/638 Linux/macOS seconds. CI run `40114537406` at historical
+Array C3 source `5107403544cb71626e20292bfb3d642745fa3f59` measured its one
+extended registration at 1,118,572.790749 milliseconds in Linux job
+`120933071940` and 637,818.339708 milliseconds in macOS job `120933072478`.
+Dividing by 1,000 and rounding up gives those retained weights. Raw logs
+remain in */data/m5c-array-ci-cost-refresh-20261025/*.
+
+These samples precede physical completion storage and C-unit materialization.
+They are historical scheduling inputs, not current-source host costs,
+performance bounds or deadline repair. Main's F3 sample retirement and all
+other entries and partition rules remain. The 135-entry tables retain their
+406/296 upper-median estimates. Matching-host exact-candidate extended CI
+must measure this source. No shard, case budget, seed or timeout changes.
