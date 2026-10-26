@@ -332,3 +332,23 @@ passes, 29 expected negatives and 29 unsupported results remain exact. All 31
 mixed-core remediation and 17 bounded existing ADR bindings across both batches
 remain exact. No new exclusion or landing is recorded. Affected independent
 review and Root's D3 decision remain pending.
+
+
+Fresh observation of the corrected tags
+---------------------------------------
+
+Root's fresh D3 selected the 20 repaired entries. One stock scoped UPDATE
+ran on clean T `1a040fe26557e3ef68c5f75bb3456812130fc011`, using baseline
+R `2609fcd5e8dcff6365e4db15a155676192de4c79`. It completed naturally on
+2026-10-26 with 19 passes and one expected negative, pool 8 and zero retries.
+It wrote zero partitions and retained all 6,688 index/partition files.
+All other 29,881 records and every dependency, observation and owner remain
+exact T values. Two owned empty drains were 15.100685 seconds apart.
+
+[The actual scoped run and drain records](/data/m5c-b16-b17-dependency-tag-repair-20261025/task_6fb3f44dbafb/ctx_869904f6cbc9/update20/)
+record this execution. The resulting provenance commit R20 has sole parent T;
+original U44d2c4f/R2609 and the leading run's later B18 failure remain
+historical evidence. All 754 original paths still total 636 passes, 70 expected
+negatives and 48 unsupported results, with the same 31 active remediation and
+17 bounded ADR assignments. Affected internal/outer review and Root's final D3,
+candidate gates and publication remain pending.
