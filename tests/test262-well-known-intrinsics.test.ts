@@ -377,6 +377,11 @@ async function filesBelow(directory: URL): Promise<string[]> {
     );
 }
 
+/** Script inputs only; licenses stay in the complete filesystem inventory. */
+function harnessScriptPaths(paths: readonly string[]): readonly string[] {
+  return paths.filter((path) => path.endsWith(".js"));
+}
+
 /** One upstream test whose decoded frontmatter names the include. */
 interface IncludeConsumer {
   readonly path: string;
@@ -444,6 +449,16 @@ function divergenceReasons(consumer: IncludeConsumer): string[] {
 }
 
 test("the consumer scan decodes frontmatter before selecting", () => {
+  const harnessFiles = ["LICENSE", "base.js", "nested/regExpUtils.js"];
+  assert.deepEqual(harnessScriptPaths(harnessFiles), [
+    "base.js",
+    "nested/regExpUtils.js",
+  ]);
+  assert.deepEqual(harnessFiles, [
+    "LICENSE",
+    "base.js",
+    "nested/regExpUtils.js",
+  ]);
   // The include name is spelled with a YAML escape, so the source text
   // never contains it literally, yet the runner would load the include.
   const escaped = "wellKnownIntrinsic\\u004fbjects.js";
@@ -498,6 +513,16 @@ test("no pinned consumer reaches the bounded divergence", async () => {
   // Both the upstream includes the consumers name and every reviewed
   // harness copy the runner can assemble ahead of them.
   const reviewedHarness = new URL("test262/harness/", import.meta.url);
+  const reviewedFiles = await filesBelow(reviewedHarness);
+  const reviewedScripts = harnessScriptPaths(reviewedFiles);
+  assert.ok(reviewedFiles.includes("LICENSE"));
+  assert.ok(!reviewedScripts.includes("LICENSE"));
+  assert.ok(reviewedScripts.includes("regExpUtils.js"));
+  assert.ok(
+    (await readFile(new URL("LICENSE", reviewedHarness), "utf8")).startsWith(
+      "Test262: ECMAScript Test Suite",
+    ),
+  );
   const harnessSources = await Promise.all([
     ...Array.from(
       includeNames,
@@ -507,7 +532,7 @@ test("no pinned consumer reaches the bounded divergence", async () => {
           await readFile(new URL(`harness/${name}`, root), "utf8"),
         ] as const,
     ),
-    ...(await filesBelow(reviewedHarness)).map(
+    ...reviewedScripts.map(
       async (name) =>
         [name, await readFile(new URL(name, reviewedHarness), "utf8")] as const,
     ),

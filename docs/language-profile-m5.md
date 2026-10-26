@@ -9547,3 +9547,50 @@ observations, macOS/sanitizer, extended and exact candidate/Main gates remain
 pending. The required Array CI failure blocked that historical bundle;
 it is not a standalone Set prerequisite. No family assessment, vocabulary,
 admission or classification changes.
+
+
+Proper tail call source on the current Array
+--------------------------------------------
+
+Initial preparation on Set `a111c31e` is preserved as TCO `54973309`.
+That base failed CI because its native prototype-root injection locator
+still matched three slots after Set changed that root frame to four.
+Current preparation carries the complete owned `9945b7b8` to `b1eaeff0`
+TCO delta onto Array U`cccb7195`, tree
+`89d907b342885089374ffadd53eff606d31e6131`. All thirteen Array paths,
+three runtime guard hunks, six coverage files and new worknote stay exact.
+Set's locator, state prose, Receiver/descriptor/identity/invariant rules
+remain inherited. All fifteen TCO product postimages stay exact `b1eaeff0`.
+At preparation, Main is still `cf0902db`/54; Set55 is prospective and Array
+is unlanded. Root's running Array Full excludes TCO; this source claims no
+Full result, Native pass or adoption. Prior TCO sources and reviews remain
+preserved, including the incomplete32 and known-Gate-only33 outcomes.
+Generic/host-tail, bound/Proxy Call forwarding, pending roots, derived/realm
+rules and four owner-local counters keep the full `m5-137` unit. The two
+changed internal interfaces retain Set metadata and all post-call checks.
+Main chunk/include/static/source-coordinate and logical frame contracts stay.
+The existing fifth Set Script/oracle and all four TCO subjects remain; only
+its deferred no-tail assertions become exact positive protocol checks.
+Old Set Full, TCO checks/reviews and Array proofs keep their own sources.
+Array's worknote describes its standalone source before this TCO overlay;
+its measurements and unchanged-compiler statements do not validate the
+combined implementation. Changed lookup/Set/coercion/truncation/pending-GC
+interfaces need bounded review and current-source execution. No rejected
+Array packing, completion-layout, B8 or RegExp implementation is imported.
+
+The new family indexes retained fixed, generated, structural and native
+contracts. Historical Array-bound author execution on `353a9f17` is recorded in
+*PLAN-M5C.md*, with its framework, host, target and policy limits. It does not
+validate this current Array/TCO composition.
+The single source-admission entry for `tail-call-optimization` stages the
+147-feature implementation. The two stored unsupported records and their
+expectations describe the historical 146-feature source. Those records are
+stale for this implementation; the current standards gate would reject the
+classification mismatch. All stored observations, owners and accepted
+exclusions stay unchanged. Full UPDATE evidence remains pending, with
+`--accept-promotions` accepting only actual observed passes. Source preparation
+supplies no candidate gate pass. The standards assessment stays omitted until
+fresh full observations and the required review.
+Native935 remains historical `05c1f074` evidence; the old 39/60 interruption
+is failed incomplete evidence. All 33 other pinned TCO paths remain
+unreviewed under batch32, whose accepted source plan remains separate.

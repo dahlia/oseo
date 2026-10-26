@@ -36,6 +36,12 @@
  * at `ef014905`. macOS uses the Linux number only as an unmeasured
  * scheduling placeholder, not a measured host ratio. See U6 provenance.
  *
+ * Proper tail calls retain historical planning weights: Linux 1726 from
+ * the complete local extended run at `87aeb56b`, macOS 286 from the then
+ * unknown-file fallback. The changed source is unmeasured; the old Linux
+ * CI liveness timeout and partial GC sample prove no current full cost.
+ * The restored source still needs complete matching-host measurements.
+ *
  * Computed-member-reference-key-order adds a Reference-order domain and
  * fixed cases to the compound-assignment file. Its Linux entry uses a local
  * extended whole-file case sum of seventeen registrations; macOS remains
@@ -61,8 +67,9 @@
  * F3 adds a second generator-throw domain. Retire its old 47/43 samples.
  * The 135-entry Main/F3 tables derived 406 Linux/296 macOS fallbacks.
  * Set/Annex deletion, integrity and enumeration change the workload; retire
- * its old 309/451 samples. The remaining 134 entries derive 409/296
- * fallbacks. Primitive Set has no explicit estimate. See U6 provenance.
+ * its old 309/451 samples. Its remaining 134 entries derived 409/296
+ * fallbacks; restoring TCO gives 135 entries with the same fallbacks.
+ * Primitive Set has no explicit estimate. See U6 provenance.
  * These are unmeasured scheduling estimates, not matching-host costs.
  * All other Main entries and partition rules remain unchanged. See U6.
  */
@@ -171,6 +178,7 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-intrinsic.property.test.ts": 944,
     // Unmeasured extended estimate; see U6 provenance.
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
+    "tests/property/m5-proper-tail-calls.property.test.ts": 1726,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 1559,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2299,
@@ -321,6 +329,7 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-intrinsic.property.test.ts": 669,
     // Unmeasured extended estimate; see U6 provenance.
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
+    "tests/property/m5-proper-tail-calls.property.test.ts": 286,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 441,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2283,

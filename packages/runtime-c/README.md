@@ -1152,6 +1152,39 @@ flags agree on `i`, `m`, `s`, `u`, and `v`; every other copy still parses
 its source dynamically. No entry point, public layout, heap kind,
 intrinsic slot, or built-in code ID is added.
 
+The `m5-136` ABI records proper tail calls. `OSEO_STATUS_TAIL_CALL` reports
+that a PrepareForTailCall site recorded the call it owes in the context.
+`oseo_tail_call` and `oseo_tail_call_derived` throw for a value that is not
+callable, as an ordinary call does, and otherwise record the callee, receiver,
+copied arguments, running realm, and, for a derived class constructor, its
+`this` binding cell. `oseo_call_function` and `oseo_call_complete` perform
+recorded calls in a loop, one rooted step at a time, so a chain of tail calls
+holds one step's native stack, call depth, frame budget, and roots.
+`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`
+record their final call, as their PrepareForTailCall steps require, and the
+[[Call]] of a bound function or a Proxy forwards the same way because it
+creates no execution context. A non-tail call through a bound function or
+Proxy therefore no longer adds a call-depth level for that wrapper.
+[[Construct]] is unchanged. The context gains one private record pointer.
+The existing host-tail entry points record direct `console.log`, `setTimeout`,
+and `clearTimeout` calls. The unpublished `m5-137` composition completes that
+contract with `OSEO_TAIL_HOST_CLEAR_TIMEOUT = 3`; values 1 and 2, all layouts,
+status values, and function signatures stay unchanged. Arguments finish
+before frame release. The clear-timeout step passes its first argument, or
+undefined when absent, to `oseo_clear_timeout`; evaluated extra arguments are
+ignored. Only numeric handles cancel a timer, and the result is undefined.
+Ordinary calls retain their direct entry point.
+
+The `m5-137` ABI adds four context counts for published ephemeron tables,
+weak-reference records, finalization registries, and finalization cells.
+Publication increments a count only after linking its object, and sweep
+decrements it when removing that object. Consumed and unreachable records
+remain counted until sweep. The collector skips its owner-local weak-edge,
+cleanup scheduling, and registry compaction scans only when their record
+kinds are absent. Root and ephemeron fixed-point tracing still visit foreign
+objects, and collection policy and phase order do not change. The context
+layout changes, so native artifacts must use the matching runtime headers.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

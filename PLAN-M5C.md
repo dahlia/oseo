@@ -169,7 +169,7 @@ manifest.
 | `node:regexp-pattern-extensions`           |     5 | `regexp-pattern-extension`                                    |
 | `node:frontmatter-feature-tags`            |     5 | `super` or `dynamic-import` tag the source does not use       |
 | `node:non-blocking-agent`                  |     2 | `non-blocking-agent`                                          |
-| `node:proper-tail-calls`                   |     2 | `tail-call-optimization` is unadmitted                        |
+| `node:proper-tail-calls`                   |     2 | Retained feature-gated unsupported observations               |
 | `node:regexp-split-coverage-remediation`   |     1 | mixed Annex B/core split coverage                             |
 
 Two accepted records initially owned 178 proposed exclusions. ADR 0016 owned
@@ -1655,3 +1655,261 @@ step. All inventory paths, reviewed observations, classifications, owners,
 exclusions, pins, budgets and graph state then remained exact Main; Set was
 ready and unlanded. Publication candidates mark landed prospectively; only
 successful equal-tree Main CI makes that state effective.
+
+
+Proper tail calls
+-----------------
+
+The `proper-tail-calls` node implements ECMA-262 15.10 rather than seeking an
+exclusion; no accepted record excludes it. A call is a tail call exactly when
+IsInTailPosition holds. Its body must be strict source code of an ordinary,
+arrow, method, accessor, or class constructor function. Generator and async
+bodies, class field initializers, static blocks, parameter defaults, and Script
+or Module code have none. Within a body, a `return` qualifies only outside every
+try Block, every Catch with a Finally, and every for-of body, which are the
+statement contexts HasCallInTailPosition excludes. The expression rules then
+select the returned call itself, both conditional arms, the right operand of
+`&&`, `||`, and `??`, the last comma operand, an optional chain ending in a
+call, and tagged templates of either form.
+
+A tail call records its callee, receiver, copied arguments, and running realm
+in the context and leaves its frame through the body's ordinary exit with
+`OSEO_STATUS_TAIL_CALL`. `oseo_call_function` performs recorded calls one rooted
+step at a time, so a chain of any length holds one step's native stack, call
+depth, frame budget, and roots. `Function.prototype.call`,
+`Function.prototype.apply`, and `Reflect.apply` record their final call as
+their PrepareForTailCall steps require. Bound function and Proxy [[Call]]
+forward the same way because neither creates an execution context. A derived
+constructor's tail call carries its `this` binding cell, so the constructor
+result rules apply to the chain's final value. `console.log`, `setTimeout`,
+and `clearTimeout` also run as recorded host steps in tail position. All
+arguments, including unused extras and spread iteration, evaluate before
+recording and releasing the frame. `clearTimeout` keeps its existing
+numeric-handle-only behavior and undefined result; no user conversion runs.
+PrepareForTailCall requires releasing transient resources before the target
+even when the target runs no user code or allocation.
+
+A call outside tail position keeps nesting its frame and the 256-call limit.
+A chain of wide frames can exhaust the active native frame budget first,
+which the host C compiler lane reaches sooner because it charges each slot
+past the 32-slot base eight times. Because forwarding no longer nests, a
+non-tail call through a bound function or Proxy now uses one call level fewer
+for that wrapper. A strict chain of tail calls with no base case now runs until
+it is stopped instead of reporting `OSEO2001`, as the specification requires.
+Runtime ABI `m5-136` reserved this contract; the composed source uses
+`m5-137` for the additional owner-local collector counts.
+
+The source implements proper tail calls and restores the reviewed
+*tests/test262/harness/tcoHelper.js* that keeps `$MAX_ITERATIONS` at
+100,000. It owns the two reviewed tagged-template paths
+*test/language/expressions/tagged-template/tco-call.js* and *tco-member.js*;
+their checked-in unsupported records and expectations describe the prior
+146-feature source. This preparation admits `tail-call-optimization` as the
+147th feature, so those records are stale for the staged implementation.
+The current `test:test262` gate would reject the classification mismatch;
+source preparation supplies no candidate gate pass. Focused author execution
+on `353a9f17` is recorded below. A full
+`mise run test262:update -- --accept-promotions` remains required. Only passes
+actually observed by that UPDATE may be promoted.
+The fixed inventory tags 35 paths with the feature, all applicable and none a
+negative test. The other 33 remain unreviewed and keep their
+`observation-batch-32` reservation, whose planning basis is unchanged.
+Evidence lives in *tests/property/m5-proper-tail-calls.property.test.ts*
+(seeds `0x60008900` through `0x60008902`), *tests/proper-tail-calls.test.ts*,
+*tests/native/fixtures/proper-tail-calls.ts*,
+*tests/runtime-tail-calls.test.ts*, and the structural tests the family record
+indexes. The native non-tail tests and the non-tail property draws predict
+which resource guard a chain reaches, if any, with
+*tests/proper-tail-call-resources.ts*. It replays the chain's calls against
+the runtime's frame contract, the toolchain's `-D` overrides, and the slot
+counts the backend declares in the emitted dispatcher, so it checks the
+runtime's accounting rather than the compiler's slot allocation. A draw
+predicted to exhaust the budget must stop with exactly that guard's
+diagnostic; every other draw keeps the exact semantic comparison, and both
+references always match the semantic model.
+
+The non-tail property's catch-finally context exposed a C backend defect that
+predates this node: it reproduces at the parent commit and in non-strict code
+with no tail call. A completion target is entered only through a
+`resume-completion` switch, which names every block emitted for its body, but
+reachability followed completion targets unconditionally. A body whose every
+`finally` leaves abruptly, such as one whose catch always returns or one that a
+`break` or `continue` crosses before returning, therefore emitted a label with
+no `goto`, and both toolchains' `-Werror` rejected the program. Reachability now
+defers completion targets until a `resume-completion` terminator is reachable in
+the same body, including generator entry and body partitions. The target block 0
+that a `return`, `throw`, or normal completion saves is a sentinel that no
+dispatch names, so reachability never defers it: a generator, async, or async
+generator body that starts after a non-simple parameter prologue does not emit
+that prologue's blocks again. Blocks it drops had no incoming jump; a function
+whose only dispatch lay in such dead code also loses that code, which can lower
+its declared frame slots. *tests/completion-target-labels.test.ts* checks the
+emitted labels and the dispatch it keeps, and the *proper-tail-calls* native
+fixture and *tests/proper-tail-calls.test.ts* run the affected shapes.
+
+
+Current TCO source on the Array base
+------------------------------------
+
+Initial preparation composed TCO `145819bd` on Set candidate
+`a111c31eacb22f07ee514dab4372504b7470b161`, tree
+`072862e2760631542d41cf777d4e75c5d6014924`. That candidate failed CI:
+the prototype-root allocation injection still matched `3u` instead of
+Set's actual `4u`. Its provisional TCO child `54973309` remains preserved.
+
+The complete owned TCO delta `9945b7b8` to `b1eaeff0` is now prepared on
+Array U`cccb7195c1eb01a3963ffa043bafe045c333ff73`, tree
+`89d907b342885089374ffadd53eff606d31e6131`. All thirteen Array paths remain
+exact, including three runtime hunks, six coverage files, graph contract
+and the final source-qualified worknote. Set's locator correction and both
+Root state-paragraph corrections remain. TCO `1a305507`/incomplete32 and
+`b1eaeff0`/normal33 keep their original targets and outcomes; neither is
+new-source execution or a complete admission gate.
+
+At this preparation, successful effective Main is `cf0902db` with 54 landed
+nodes. The base has prospective Set55; Array and TCO remain unlanded.
+Root's single Array Full is running on immutable `cccb7195`, which excludes
+TCO and has 146 features. No Full result, Native pass or adoption is claimed
+for this composition. All fifteen TCO production postimages stay exact
+`b1eaeff0`; thirteen product postimages
+remain exact `145819bd`/`baf6f7d7`. The header and Proxy merge only the TCO
+record declarations and two Call forwarding changes over Set's omitted
+accessor/signature/descriptor/identity/invariant state. Set/Get/descriptor
+traps retain post-call work; Construct is unchanged. GC `795d3c82` remains
+origin, not `baf6f7d7` or `833c99ef` ancestry; `ed7b5ddd` changed prose only.
+
+The original Main chunk/include/static/coordinate/frame contracts and both
+completion-reachability repairs remain. Complete Set Receiver/key/RHS/
+wrapper roots surround the setter's public call, which drains tail steps
+before returning normal; assignment returns its original RHS. The existing
+Set fifth Script/oracle retains all callbacks and source bytes, with exact
+positive tail/owner/host/fragment assertions replacing deferred no-tail
+checks. All four TCO programs, generator frame guards, policies and budgets
+remain. No old fifth-case replacement, rejected Array packing or B8/RegExp
+source is imported. The guarded Array lookup/insertion/truncation paths
+are preserved, including all generic fallbacks, coercion and rollback.
+
+Their interactions with apply argument-list roots, primitive Receiver/RHS,
+pending tail arguments, reentry and collector ownership require bounded
+D1.9 review. The Array worknote's compiler, Native and performance statements
+speak to its named standalone sources, including `cccb7195` before this TCO
+overlay. They are not new combined-source claims. Set U`071e447d`/R`868da1d6`,
+TCO `145819bd` checks, `b1eaeff0` reviews and frozen older Array proofs keep
+their exact sources. Pure checks, current-source Native, actual D3/Full/R,
+outer review and exact candidate/Main gates remain separate Root phases.
+
+The faithful helper keeps MAX\_ITERATIONS 100,000 with its original license.
+Only its runner entry and the one source feature admission return. The two
+reviewed subjects keep the historical 146-feature unsupported expectations
+and TCO remediation owners. All 29,901 stored observations and their parity,
+ledger, inventory, policy and ADRs remain unchanged. They do not describe the
+staged 147-feature implementation: the standards gate would reject the
+classification mismatch until fresh full observations and accepted actual
+promotions bring expectations and records into agreement. The historical
+Array-bound author runs below do not validate this composition; source
+preparation is no candidate gate pass. The other 33 TCO paths remain unreviewed
+under batch32. The accepted B32 source packet still covers 199 unreviewed
+paths/191 units; it grants no execution, admission or observation authority
+here.
+
+Historical internal24 Fable/outer14 Astra completed on `833c99ef`, retaining
+prior `05c1f074` scopes under D1.9. Native10's 76 passing registrations and
+935 hashes belong to `05c1f074`; matching donor/test bytes do not certify this
+new composition. Shared internal26 was a clean Set-profile review counted
+25/cap25, not new TCO execution or permission for another review. The old
+`1fd374f6`/CI40165660431 liveness interruption at 39/60 remains failed
+incomplete coverage, without a proven semantic counterexample, runner
+variance, new-source performance benefit or deadline margin.
+
+Root owns affected independent review and its permission, later source
+validation, actual D3, full observation, exact candidate/Main gates and
+adoption. The focused results below belong only to their fixed source; they
+are separate from restoration and this Main-specific composition.
+
+
+Focused TCO author execution on the Array source
+------------------------------------------------
+
+Six serial command vectors completed naturally with exit zero on
+`353a9f17631b808a5131f49fcff0b16396aa72f4`, tree
+`3f35347e3c680523283a978e2658520340d6e9ab`. Product, test and stored
+observation inputs stayed unchanged across these runs. The table gives
+actual UTC start/end times on 2026-10-26 and whole-command wall seconds,
+including normal build dependencies where present. Counts are framework
+registrations and overlap between vectors; they are not unique program or
+standards-path totals. Each linked command record retains the exact argv;
+the adjacent raw output retains the original framework results.
+
+| Vector and command record                                                                                                                                          | Framework result           | UTC start → end                   |  Wall seconds | Raw output                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------- | --------------------------------- | ------------: | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Runtime C, Node](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/runtime-c-native01/whole.json)                             | 3 passed                   | 06:42:46.034303 → 06:43:02.837694 |  16.803306844 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/runtime-c-native01/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/runtime-c-native01/whole.stderr)           |
+| [Seven files, Node/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native02-node/whole.json)                    | 27 passed                  | 07:01:43.038141 → 07:03:35.406845 | 112.368594562 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native02-node/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native02-node/whole.stderr)     |
+| [Seven files, Deno/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native03-deno/whole.json)                    | 27 passed                  | 07:06:02.940529 → 07:08:18.225431 | 135.284805903 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native03-deno/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/backend-native03-deno/whole.stderr)     |
+| [Sanitizer self then seven files, Node/host-cc](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused04-hostcc/whole.json) | 7 self + 27 focused passed | 07:24:18.929764 → 07:26:46.918346 | 147.988489038 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused04-hostcc/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused04-hostcc/whole.stderr)               |
+| [Ordinary TCO property, Node/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused05-property-node/whole.json)        | 4 passed                   | 07:32:43.187008 → 07:33:12.879089 |  29.692002525 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused05-property-node/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused05-property-node/whole.stderr) |
+| [Ordinary TCO property, Deno/Zig](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused06-property-deno/whole.json)        | 4 passed                   | 07:34:30.262674 → 07:35:02.645763 |  32.383001814 | [stdout](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused06-property-deno/whole.stdout), [stderr](/data/m5c-tco-on-array-source-preparation-20261026/task_5050fd25ca66/ctx_001ac7c9581a/focused06-property-deno/whole.stderr) |
+
+The runtime-C command used `mise run test:node --` with
+*tests/runtime-tail-calls.test.ts*, *tests/runtime-ephemeron.test.ts* and
+*tests/runtime-weak-collection.test.ts*. It compiled handwritten C fixtures
+for Linux AMD64 with the original ASan/UBSan flags and ordinary/forced-GC
+weak-record checks. Its two AArch64 Linux outputs were compile-link checks,
+not executions. It does not exercise backend-generated JavaScript bodies.
+
+The seven-file vectors retain this ordered whole-file input set:
+
+~~~~ text
+tests/proper-tail-calls.test.ts
+tests/test262-tail-call-optimization.test.ts
+tests/tco-generator-interop.test.ts
+tests/primitive-wrapper-objects.test.ts
+tests/materialized-body-native.test.ts
+tests/completion-target-native.test.ts
+tests/yield-star-throw-callability.test.ts
+~~~~
+
+The Node vector used `mise run test:node --`; Deno used `deno test -A`.
+The host-cc vector used the failclosed shell chain
+
+~~~~ sh
+mise run test:sanitizer:self &&
+  env OSEO_NATIVE_TOOLCHAIN=host-cc mise run test:node --
+~~~~
+
+with the same seven files. Its seven selftests include four genuine positive
+ASan/UBSan runtime/generated-C detections and three separate fake compiler
+selection controls. The focused host-cc run selected Clang and retained its
+normal sanitizer checks. All focused native execution targets Linux AMD64.
+The ordinary completion AArch64 cross-link remains a compile-link check;
+its existing host-cc guard omits that cross-link in the sanitizer vector.
+No macOS native execution is supplied by these runs.
+
+The whole files retain both specialization policies, their original forced
+collection and root/frame/balance/resource guards, all original upstream
+variants and materialized physical-unit assertions. Node versus Deno names
+the test framework. Under Deno, the TCO-subject, interop and F3 files select
+DenoHost; proper-tail, wrapper, materialized and completion files literally
+create NodeHost. Reference commands retain their original selection:
+`process.execPath` follows the framework executable, while explicit Node and
+Deno references keep their named executable. Framework counts establish no
+global equivalence between those host paths or other semantic families.
+
+The property vectors used `mise run test:node --` and `deno test -A` on the
+single *tests/property/m5-proper-tail-calls.property.test.ts* file. Each ran
+three native domains and one pure generator-contract registration. They
+retain the original 8/8/6 draws, seeds `0x60008900` through `0x60008902`,
+small size, 500-depth/6-extra-argument limits, shrinking/replay and 180-second
+per-domain interruption. Both policies and enabled forced collection remain
+active. No property override was set. The file literally creates NodeHost
+under both frameworks. These ordinary runs do not complete the historical
+failed extended 39/60 run, establish new scheduling weights or prove deadline
+margin. The frame ceiling, call limit and host-cc charge remain unchanged.
+
+Focused execution includes the two original pinned TCO subjects without
+changing their unsupported expectations or stored records. All 29,901 rows,
+parity, owners, the 147-feature source list and all seeds/budgets remain
+unchanged. `TCO-ADMIT-GATE` remains open: fresh Full observations, normal
+accepted promotions/R, affected review and exact candidate/Main gates are
+still required. Full UPDATE on this old Array-bound source has not run.
+Native935 remains evidence on `05c1f074`; these results cannot be relabeled
+as evidence on a later Array source or a completed internal review gate.

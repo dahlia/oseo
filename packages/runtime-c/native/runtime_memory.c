@@ -614,6 +614,27 @@ static void destroy_heap_object(OseoHeapObject *object) {
 }
 
 /*
+ * These record kinds never change after publication. Count only objects
+ * linked to this context, not foreign objects the marking worklist visits.
+ * Publication and sweep are their only heap-membership transitions;
+ * unregistering or consuming a cleanup record does not remove the object.
+ */
+static size_t *weak_record_count(OseoContext *context, OseoHeapKind kind) {
+    switch (kind) {
+    case OSEO_HEAP_EPHEMERON_TABLE:
+        return &context->ephemeron_table_count;
+    case OSEO_HEAP_WEAK_REFERENCE:
+        return &context->weak_reference_count;
+    case OSEO_HEAP_FINALIZATION_REGISTRY:
+        return &context->finalization_registry_count;
+    case OSEO_HEAP_FINALIZATION_CELL:
+        return &context->finalization_cell_count;
+    default:
+        return NULL;
+    }
+}
+
+/*
  * Drops every mark this heap carries. A mark belongs to one collection of
  * one context, but a context that holds a value another context owns in
  * its roots marks that value while collecting, and only the owning
@@ -669,10 +690,30 @@ void oseo_collect(OseoContext *context) {
          index += 1u) {
         mark_value(kept_objects[index], &worklist);
     }
+    const OseoTailCall *tail_call = context->tail_call;
+    if (tail_call != NULL && tail_call->pending) {
+        mark_value(tail_call->callee, &worklist);
+        mark_value(tail_call->receiver, &worklist);
+        mark_value(tail_call->realm_record, &worklist);
+        mark_value(tail_call->this_cell, &worklist);
+        for (size_t index = 0u;
+             index < tail_call->argument_count;
+             index += 1u) {
+            mark_value(tail_call->arguments[index], &worklist);
+        }
+    }
     trace_ephemeron_fixed_point(&worklist);
-    clear_dead_weak_edges(context);
-    schedule_finalization(context);
-    compact_finalization_registries(context);
+    if (context->ephemeron_table_count != 0u ||
+        context->weak_reference_count != 0u ||
+        context->finalization_cell_count != 0u) {
+        clear_dead_weak_edges(context);
+    }
+    if (context->finalization_cell_count != 0u) {
+        schedule_finalization(context);
+    }
+    if (context->finalization_registry_count != 0u) {
+        compact_finalization_registries(context);
+    }
     OseoHeapObject **link = &context->objects;
     while (*link != NULL) {
         OseoHeapObject *object = *link;
@@ -681,6 +722,8 @@ void oseo_collect(OseoContext *context) {
             link = &object->next;
         } else {
             *link = object->next;
+            size_t *count = weak_record_count(context, object->kind);
+            if (count != NULL) *count -= 1u;
             destroy_heap_object(object);
         }
     }
@@ -732,6 +775,11 @@ OseoResult oseo_internal_publish_heap(
             "The host cannot represent a heap address in 48 bits."
         );
     }
+    size_t *count = weak_record_count(context, kind);
+    if (count != NULL && *count == SIZE_MAX) {
+        free(object);
+        return failure(context, "OSEO2001", "Too many weak heap records.");
+    }
     object->next = context->objects;
     object->trace_next = NULL;
     object->ephemeron_pending = NULL;
@@ -739,6 +787,7 @@ OseoResult oseo_internal_publish_heap(
     object->marked = false;
     object->retained = false;
     context->objects = object;
+    if (count != NULL) *count += 1u;
     if (context->observe_specialization &&
         kind != OSEO_HEAP_ENVIRONMENT && kind != OSEO_HEAP_CELL &&
         kind != OSEO_HEAP_FUNCTION) {

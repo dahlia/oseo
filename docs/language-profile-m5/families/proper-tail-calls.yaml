@@ -1,0 +1,93 @@
+version: 1
+id: proper-tail-calls
+title: "Proper tail calls"
+scope:
+  - "Calls in tail position of strict ordinary, arrow, method, accessor, and
+    class constructor bodies, including the existing direct console.log,
+    setTimeout, and clearTimeout host targets, and the PrepareForTailCall
+    steps of Function.prototype.call, Function.prototype.apply, and
+    Reflect.apply."
+  - "Bound function and Proxy [[Call]] forwarding through the same
+    trampoline, derived constructor result rules after a tail call, and
+    the realm of errors a tail call raises."
+  - "Current integration ports complete TCO 9945b7b8 to b1eaeff0 onto
+    Array Ucccb7195, preserving all thirteen Array paths, three runtime
+    guard hunks, six coverage files and its source-qualified worknote.
+    Set Receiver, descriptor, invariant, locator and corrected state prose
+    stay inherited. Main chunks/include units and all fifteen TCO product
+    postimages remain exact b1eaeff0. Array apply/Set/coercion/truncation/GC
+    interactions need bounded review and current-source execution.
+    Earlier a111c31e failed its native locator; 54973309, e88f05cb/1a305507
+    and b1eaeff0/33 remain preserved with their exact sources and outcomes.
+    At preparation Main is cf0902db/54; Set55 is prospective and Array is
+    unlanded. Root's running Array Full excludes TCO; no result is claimed.
+    Main TCO 145819bd and Set U071/R868 evidence retain their own sources.
+    Array f8f3e2de structural proofs and Array 353a9f17 execution remain
+    historical with their source, framework, target, policy and GC limits.
+    No author Native or Full validates this new source. Historical Native935
+    belongs to 05c1f074. Source admission supplies no candidate gate pass or
+    adopted observation."
+owners:
+  - PLAN-M5C.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/proper-tail-calls.ts
+      - tests/proper-tail-calls.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/proper-tail-calls.test.ts
+      - tests/runtime-tail-calls.test.ts
+      - tests/fixtures/runtime-tail-calls.c
+      - tests/tco-generator-interop.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+      - tests/fixtures/runtime-tail-calls.c
+      - tests/tco-generator-interop.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard.
+      Tail calls use the generic tail call ABI or, for console.log,
+      setTimeout, and clearTimeout, the host-tail ABI under both policies."
+    replacements:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/proper-tail-calls.ts
+      - tests/tco-generator-interop.test.ts
+  standards:
+    status: omitted
+    reason: "The two owned pinned tagged-template paths retain unsupported
+      records and expectations from the historical 146-feature source.
+      They are stale for the staged 147-feature implementation; the current
+      test:test262 gate would reject the classification mismatch. Historical
+      original-subject execution on Array 353a9f17 does not validate this
+      source or adopt observations.
+      Full UPDATE with --accept-promotions remains pending; only its actual
+      observed passes may be promoted. Source preparation supplies no
+      candidate gate pass. Existing native and
+      property regressions retain their own source-qualified contracts."
+    replacements:
+      - tests/proper-tail-calls.test.ts
+      - tests/property/m5-proper-tail-calls.property.test.ts
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/tail-calls.test.ts
+      - packages/backend-c/tests/index.test.ts
+      - tests/proper-tail-calls-emission.test.ts
+      - tests/proper-tail-call-resources.test.ts
+      - tests/completion-target-labels.test.ts
+      - tests/tco-generator-interop-preparation.test.ts
+      - tests/tco-feature-admission-preparation.test.ts
+      - tests/tco-grouped-body-source.test.ts

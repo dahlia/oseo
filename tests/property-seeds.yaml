@@ -548,6 +548,10 @@ families:
     owner: tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts
     start: 0x60008800
     end: 0x600088ff
+  - family: m5-proper-tail-calls
+    owner: tests/property/m5-proper-tail-calls.property.test.ts
+    start: 0x60008900
+    end: 0x600089ff
   - family: m5-primitive-wrapper-objects
     owner: tests/property/m5-primitive-wrapper-objects.property.test.ts
     start: 0x60008a00

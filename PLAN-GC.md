@@ -222,6 +222,16 @@ when forced at every safepoint or when a context is destroyed, so in an
 ordinary run no weak target clears and no cleanup job runs. A pressure-driven
 collection trigger remains the policy work this plan owns.
 
+The context counts its published ephemeron tables, weak-reference records,
+finalization registries, and finalization cells until its sweep removes them.
+These exact owner-local counts let collection skip a weak-edge clearing,
+cleanup scheduling, or registry compaction scan only when that scan has no
+applicable records. Consuming or unregistering a cell does not decrement its
+count before sweep. Ordinary root tracing, ephemeron fixed-point tracing,
+phase order, sweep, and every forced collection remain unchanged. In
+particular, an empty local count cannot bypass tracing of foreign records
+reached through roots. Runtime ABI `m5-137` records the context layout.
+
 
 Tracing and object metadata
 ---------------------------

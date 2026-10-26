@@ -27,7 +27,7 @@ tests and 18,093 built-in tests are inside the 16th edition, while 6,290
 proposal, post-edition, or Annex B paths are outside it. The compact inventory
 remains separate from the result manifest.
 
-M5a and M5b are complete. The 148 indexed records in the normative
+M5a and M5b are complete. The 149 indexed records in the normative
 [*M5 language profile*](./docs/language-profile-m5.md) are the source of truth
 for admitted families and their evidence assessments. M5c is the remaining
 checkpoint and follows [*PLAN-M5C.md*](./PLAN-M5C.md) and its checked-in work
@@ -9251,3 +9251,72 @@ common oracle. Oseo's identities must still be nonconstructable native
 functions named get __proto__/set __proto__, and the unchanged upstream
 native-function matcher validates them. Neither reference is claimed to
 reject invoking the actual Annex accessor body.
+
+
+Proper tail call source on the current Array
+--------------------------------------------
+
+Initial source preparation composed the unit from `145819bd` on Set
+candidate `a111c31e`, tree `072862e2760631542d41cf777d4e75c5d6014924`.
+That candidate failed its native root-allocation injection: the test's
+three-slot locator no longer matched Set's four-slot prototype roots.
+The provisional TCO source `54973309` and its evidence remain preserved.
+
+Current source preparation ports the complete TCO delta from `9945b7b8`
+to `b1eaeff0` onto Array U`cccb7195`, tree
+`89d907b342885089374ffadd53eff606d31e6131`. All thirteen Array paths stay
+exact, including the three runtime guard hunks, six coverage files and
+source-qualified worknote. Set's corrected locator and historical versus
+prospective state paragraphs remain. TCO `b1eaeff0` and its internal33
+assessment stay bound to that Set-based source, not this composition.
+
+At preparation, effective Main remains `cf0902db` with 54 landed nodes;
+the base's Set55 mark is prospective and Array remains unlanded. Root's
+Array Full is running on immutable `cccb7195`, without this TCO delta;
+no result or pass is claimed here. Thirteen production preimages
+retain their original `ccde36cd`/Main identity and exact `baf6f7d7` TCO
+postimages. The internal header and Proxy Call merge only TCO declarations
+and forwarding hunks over Set's current descriptor signatures/metadata,
+invariants and Construct behavior. The two general completion repairs stay.
+
+Strict tail positions, full `m5-137` pending-call/realm/derived/host protocol
+and four owner-local collector counters remain complete. Main's bounded
+chunks, include-wrapper units, static owners, source coordinates and logical
+frame charges remain. Set's Receiver/key/RHS/wrapper roots stay live while
+public calls drain a strict setter's tail return; assignment keeps its RHS.
+The original fifth Set Script/oracle now has positive tail/owner/fragment
+checks without replacing any of the four independent TCO subjects.
+
+All Set and current Array behavior, fixtures, observations and ownership
+remain inherited with their own source identity. Set U`071e447d`/R`868da1d6`,
+Array's own worknote, measurements and Full, and older TCO checks do not
+validate this combined source. Array's unchanged-compiler descriptions
+refer to its standalone U before the TCO overlay. Frozen branches and
+packets remain. No rejected Array packing, completion-layout or RegExp
+implementation is imported. Array's guard preservation is not a current
+TCO performance or Native claim; changed apply/Set/GC interfaces need
+bounded review and current-source execution under later Root authority.
+
+The original property block `0x60008900` through `0x600089ff` returns with
+8, 8 and 6 ordinary draws, each with a 180-second limit, stable slots,
+shrinking and replay. Extended execution keeps scale ten, seed 1592590339,
+large size, depth 1,200, 12 extra arguments and the original 1,800-second
+limit. The frame ceiling 65,536, call-depth ceiling 256 and host C multiplier
+eight/base 32 remain. Historical Linux 1,726 and unmeasured macOS 286 weights
+remain scheduling inputs without a new-source cost or deadline claim.
+
+The single `tail-call-optimization` source-admission entry restores the
+faithful original 100,000-depth helper and two pinned tagged-template
+subjects in the staged 147-feature implementation. Both unsupported
+expectations and all 29,901 stored records still describe the historical
+146-feature source; their owners and the 41,091-path inventory stay unchanged.
+Those records are stale for this implementation, so the current standards
+gate would reject the classification mismatch. Source preparation supplies
+no candidate gate pass. Historical focused author Native execution on Array
+`353a9f17` is recorded in *PLAN-M5C.md*. A full UPDATE with
+`--accept-promotions` remains pending; only its actual observed passes may
+change expectations and results. The other 33 TCO paths retain their unreviewed
+batch32 reservations. Historical Native935 remains bound to `05c1f074`, not
+this composition. The old `1fd374f6` extended interruption at 39 of 60 liveness
+draws stays failed and incomplete. Source-qualified reviews, execution, actual
+D3/U/R and exact candidate/Main gates remain separate Root-owned work.
