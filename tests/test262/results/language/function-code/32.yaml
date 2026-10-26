@@ -1,0 +1,29 @@
+group: language/function-code
+key: "32"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/function-code/10.4.3-1-83gs.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+    observation:
+      detail: 'test/language/function-code/10.4.3-1-83gs.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/function-code/10.4.3-1-83gs.js:88:29:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

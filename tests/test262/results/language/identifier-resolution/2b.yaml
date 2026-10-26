@@ -1,0 +1,36 @@
+group: language/identifier-resolution
+key: 2b
+results:
+  - case:
+      async: false
+      expectedErrorType: ReferenceError
+      expectedFailurePhase: runtime
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/identifier-resolution/assign-to-global-undefined.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: ReferenceError
+      failedPhase: runtime
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

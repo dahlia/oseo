@@ -2,12 +2,15 @@ version: 1
 id: observation-batch-17
 title: Observe language/function-code/ and 3 more
 delivers: "Observes the 287 unreviewed paths that
-  docs/m5c-closure/observation-batches.yaml selects for observation-batch-17
-  (287 review units): admits them to the reviewed subset with dependency tags,
-  regenerates the manifest and the ledger, and assigns every unsupported
-  result an owner."
+  docs/m5c-closure/observation-batches.yaml selects for
+  observation-batch-17 (287 review units): admits them to the reviewed
+  subset with dependency tags, regenerates the manifest and the ledger,
+  and assigns every unsupported result an owner. The source-bound
+  admission preparation and remaining review/integration gates are
+  recorded in docs/m5c-graph/observation-batch-17.md; all originals
+  enter together and no B18 path is admitted."
 dependencies:
   - observation-batch-plan
   - script-module-declaration-early-error
-landed: false
+landed: true
 status: ready

@@ -219,9 +219,20 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 29,147 reviewed cases: 24,966 passes, 2,732
-expected negatives, and 1,449 unsupported profile features. It records no
+The current manifest contains 29,901 reviewed cases: 25,602 passes, 2,802
+expected negatives, and 1,497 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
+
+The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
+754 new paths. Their dependency totals become 48 abrupt-completion,
+559 functions, 404 var-bindings and 98 lexical-grammar; every other new
+path/tag remains unchanged. The
+[batch 16 repair account](./m5c-graph/observation-batch-16.md)
+links the complete per-path body audit. This metadata repair preserves
+all classifications and actual native observations from U44d2c4f/R2609fcd5,
+including their 636 passes, 70 expected negatives and 48 unsupported results.
+The latter retain 31 active remediation owners and 17 bounded existing ADR
+bindings. Affected independent review and Root's D3 decision remain pending.
 
 
 Normative family records

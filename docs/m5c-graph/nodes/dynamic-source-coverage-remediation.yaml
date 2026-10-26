@@ -1,90 +1,108 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 273 reviewed unsupported paths assigned to
-  node:dynamic-source-coverage-remediation in the derived closure ledger.
-  Select exactly those owners and their exclusion-audit path assessments:
-  the original 121 paths, 35 from cross-realm-host, 1 from runtime dynamic
-  source classification, 5 from observation-batch-07, 16 from batch 09,
-  19 from batch 11: 14 class tests that evaluate a class source string
-  repeatedly through a direct eval call or new Function to compare private
-  names and brands, one comma whitespace probe, one static field
-  initializer that reads this through eval,
-  test/language/expressions/class/subclass-builtins/subclass-Function.js,
-  whose class heritage instanceof assertions reach the Function constructor,
-  and the two class elements tests
+delivers: "Resolves the 304 reviewed unsupported paths assigned to
+  node:dynamic-source-coverage-remediation in the derived closure
+  ledger. Select exactly those owners and their exclusion-audit path
+  assessments: the original 121 paths, 35 from cross-realm-host, 1 from
+  runtime dynamic source classification, 5 from observation-batch-07, 16
+  from batch 09, 19 from batch 11: 14 class tests that evaluate a class
+  source string repeatedly through a direct eval call or new Function to
+  compare private names and brands, one comma whitespace probe, one
+  static field initializer that reads this through eval,
+  test/language/expressions/class/subclass-builtins/subclass-Function.j\
+  s, whose class heritage instanceof assertions reach the Function
+  constructor, and the two class elements tests
   nested-private-direct-eval-err-contains-newtarget.js and
   private-direct-eval-err-contains-newtarget.js, whose final assertion
   reads the ordinary public property c.x independent of the eval result,
   23 from batch 12 that use eval only as test scaffolding:
-  test/language/expressions/compound-assignment/11.13.2-N-s.js for N in 1,
-  2, 4, 5, 6, 8, 9, 10, and 11, which defer an unresolvable compound
+  test/language/expressions/compound-assignment/11.13.2-N-s.js for N in
+  1, 2, 4, 5, 6, 8, 9, 10, and 11, which defer an unresolvable compound
   assignment target into eval code;
-  test/language/expressions/compound-assignment/S11.13.2_A6.N_T1.js for N
-  from 1 through 11, which declare a more local var through eval while the
-  right operand runs; test/language/expressions/concatenation/S9.8_A1_T2.js,
-  whose third check reads the result of eval of var x; the whitespace probe
+  test/language/expressions/compound-assignment/S11.13.2_A6.N_T1.js for
+  N from 1 through 11, which declare a more local var through eval while
+  the right operand runs;
+  test/language/expressions/concatenation/S9.8_A1_T2.js, whose third
+  check reads the result of eval of var x; the whitespace probe
   test/language/expressions/conditional/S11.12_A1.js; and
-  test/language/expressions/delete/11.4.1-4.a-7.js, which deletes a global
-  var inside eval code, 30 from batch 13 that use eval or the Function
-  constructor only as test scaffolding under test/language/expressions/:
-  the whitespace probes division/S11.5.2_A1.js,
-  does-not-equals/S11.9.2_A1.js, greater-than/S11.8.2_A1.js,
-  greater-than-or-equal/S11.8.4_A1.js, grouping/S11.1.6_A1.js,
-  in/S11.8.7_A1.js, and instanceof/S11.8.6_A1.js; equals/S11.9.1_A6.1.js
-  and does-not-equals/S11.9.2_A6.1.js, whose third check reads the result of
+  test/language/expressions/delete/11.4.1-4.a-7.js, which deletes a
+  global var inside eval code, 30 from batch 13 that use eval or the
+  Function constructor only as test scaffolding under
+  test/language/expressions/: the whitespace probes
+  division/S11.5.2_A1.js, does-not-equals/S11.9.2_A1.js,
+  greater-than/S11.8.2_A1.js, greater-than-or-equal/S11.8.4_A1.js,
+  grouping/S11.1.6_A1.js, in/S11.8.7_A1.js, and
+  instanceof/S11.8.6_A1.js; equals/S11.9.1_A6.1.js and
+  does-not-equals/S11.9.2_A6.1.js, whose third check reads the result of
   eval of var x; division/no-magic-asi-from-block-eval.js, which reads a
   statement completion value through eval; function/ and generators/
   named-no-strict-reassign-fn-name-in-body-in-eval.js and
   named-strict-error-reassign-fn-name-in-body-in-eval.js, which reassign
-  the function name binding from eval code; function/name-eval-stricteval.js
-  and function/param-eval-stricteval.js, whose eval source carries an
-  ordinary strict mode function early error; and instanceof/S11.8.6_A7_T3.js
-  and instanceof/S15.3.5.3_AN.js for AN in 1_T1 through 1_T8, 2_T2, 2_T5,
-  2_T6, 3_T1, and 3_T2, which obtain their constructor from the Function
-  constructor, and 5 from batch 05 that use eval only as a vehicle:
+  the function name binding from eval code;
+  function/name-eval-stricteval.js and
+  function/param-eval-stricteval.js, whose eval source carries an
+  ordinary strict mode function early error; and
+  instanceof/S11.8.6_A7_T3.js and instanceof/S15.3.5.3_AN.js for AN in
+  1_T1 through 1_T8, 2_T2, 2_T5, 2_T6, 3_T1, and 3_T2, which obtain
+  their constructor from the Function constructor, and 5 from batch 05
+  that use eval only as a vehicle:
   test/language/arguments-object/10.5-1-s.js, a strict arguments
   assignment early error;
-  test/language/block-scope/leave/outermost-binding-updated-in-catch-\
-  block-nested-block-let-declaration-unseen-outside-of-block.js, a block
+  test/language/block-scope/leave/outermost-binding-updated-in-catch-bl\
+  ock-nested-block-let-declaration-unseen-outside-of-block.js, a block
   scope exit probe; test/language/comments/S7.4_A5.js and S7.4_A6.js,
   comment code unit probes; and
-  test/language/comments/mongolian-vowel-separator-single-eval.js, a U+180E
-  comment probe.
-  The complete UPDATE on clean source 6e54c5d5, recorded in f2c30668,
-  adds seven observation-batch-11 paths formerly owned by
-  eval-intrinsic-value under test/language/expressions/class/:
-  private-getter-brand-check-multiple-evaluations-of-class-eval-indirect.js,
-  private-method-brand-check-multiple-evaluations-of-class-eval-indirect.js,
-  private-setter-brand-check-multiple-evaluations-of-class-eval-indirect.js,
+  test/language/comments/mongolian-vowel-separator-single-eval.js, a
+  U+180E comment probe. The complete UPDATE on clean source 6e54c5d5,
+  recorded in f2c30668, adds seven observation-batch-11 paths formerly
+  owned by eval-intrinsic-value under test/language/expressions/class/:
+  private-getter-brand-check-multiple-evaluations-of-class-eval-indirec\
+  t.js,
+  private-method-brand-check-multiple-evaluations-of-class-eval-indirec\
+  t.js,
+  private-setter-brand-check-multiple-evaluations-of-class-eval-indirec\
+  t.js,
   private-static-field-multiple-evaluations-of-class-eval-indirect.js,
   private-static-getter-multiple-evaluations-of-class-eval-indirect.js,
-  private-static-method-brand-check-\
-  multiple-evaluations-of-class-eval-indirect.js, and
+  private-static-method-brand-check-multiple-evaluations-of-class-eval-\
+  indirect.js, and
   private-static-setter-multiple-evaluations-of-class-eval-indirect.js.
   Each passes the eval value to a helper that calls it on a class source
   string to create distinct classes. The observed run-time OSEO1001
   source-compilation rejection precedes their private name and brand
-  assertions. These non-source subjects remain inside the claim under the
-  existing fixture-construction assessment, not a whole-path exclusion.
-  The dynamic-source dependency tag grants no exclusion, and ADR 0016's
-  boundary and reopening triggers remain unchanged.
-  Batch 15 adds eight object-literal fixture subjects: 11.1.5-0-1.js,
-  11.1.5-0-2.js, 11.1.5_4-4-a-3.js, 11.1.5_4-4-b-1.js,
-  11.1.5_6-3-1.js, 11.1.5_6-3-2.js, 11.1.5_7-3-1.js, and
-  11.1.5_7-3-2.js under test/language/expressions/object/. Their getter,
-  setter, descriptor, and duplicate-property subjects remain in-claim.
-  Their eval or source constructor rejection is authorized, but non-source
-  subject coverage remains unresolved.
-  The 3 paths from well-known-intrinsics-harness assert AsyncFunction,
-  AsyncGeneratorFunction, and GeneratorFunction are constructible before
-  their trailing zero-argument construction reports the ADR 0016
-  run-time rejection, so their IsConstructor subject stays inside the
-  claim.
-  Obtain the maintainer accounting decision in
-  PLAN-M5C.md, then review equivalent ahead-of-time observation or replacement
-  evidence per original path; preserve all paths and assertions, never emulate
-  runtime eval or widen ADR 0016, and keep unresolved rows under remediation."
+  assertions. These non-source subjects remain inside the claim under
+  the existing fixture-construction assessment, not a whole-path
+  exclusion. The dynamic-source dependency tag grants no exclusion, and
+  ADR 0016's boundary and reopening triggers remain unchanged. Batch 15
+  adds eight object-literal fixture subjects: 11.1.5-0-1.js,
+  11.1.5-0-2.js, 11.1.5_4-4-a-3.js, 11.1.5_4-4-b-1.js, 11.1.5_6-3-1.js,
+  11.1.5_6-3-2.js, 11.1.5_7-3-1.js, and 11.1.5_7-3-2.js under
+  test/language/expressions/object/. Their getter, setter, descriptor,
+  and duplicate-property subjects remain in-claim. Their eval or source
+  constructor rejection is authorized, but non-source subject coverage
+  remains unresolved. The 3 paths from well-known-intrinsics-harness
+  assert AsyncFunction, AsyncGeneratorFunction, and GeneratorFunction
+  are constructible before their trailing zero-argument construction
+  reports the ADR 0016 run-time rejection, so their IsConstructor
+  subject stays inside the claim. Obtain the maintainer accounting
+  decision in PLAN-M5C.md, then review equivalent ahead-of-time
+  observation or replacement evidence per original path; preserve all
+  paths and assertions, never emulate runtime eval or widen ADR 0016,
+  and keep unresolved rows under remediation. Batch 16 preparation adds
+  exactly 17 disjoint mixed-core originals, source hashes and missing
+  contracts listed in docs/m5c-graph/observation-batch-16.md. Preserve
+  the previous 273 owners and all their contracts; these additions
+  retain active remediation and authorize no completed replacement or
+  whole-path exclusion. Required independent review and Root
+  integration/observation/publication gates remain pending. Batch 17
+  preparation adds exactly 14 disjoint mixed-core originals, source
+  hashes and missing contracts listed in
+  docs/m5c-graph/observation-batch-17.md. Preserve the previous 290
+  owners and all their contracts; these additions retain active
+  remediation and authorize no completed replacement or whole-path
+  exclusion. Required independent review and Root
+  integration/observation/publication gates remain pending."
 dependencies:
   - authorized-exclusion-audit
 landed: false
