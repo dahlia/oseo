@@ -536,7 +536,17 @@ jobs:
       - uses: ./.github/actions/runtime-archive-cache
       - if: matrix.shard == 1
         run: mise run test:property:extended:package
-      - run: >-
+      - if: matrix.target == 'linux-x86_64-gnu'
+        run: >-
+          mise run test:property:extended:native:shard
+          --shard ${{ matrix.shard }}/${{ matrix.total }}
+          --exclude-case-sharded
+          --exclude-dedicated-linux
+          tests/property/*.property.test.ts
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: matrix.target == 'macos-aarch64'
+        run: >-
           mise run test:property:extended:native:shard
           --shard ${{ matrix.shard }}/${{ matrix.total }}
           --exclude-case-sharded
@@ -678,6 +688,44 @@ jobs:
           path: ${{ runner.temp }}/oseo-native-*
           if-no-files-found: warn
 
+  test_array_constructor:
+    name: Array constructor (linux-x86_64-gnu)
+    # Only trusted push/manual runs in dahlia/oseo may use the repository
+    # variable's JSON label array. PRs, forks, and an unset variable use
+    # ubuntu-latest, so untrusted PR code never selects a self-hosted runner.
+    runs-on: >-
+      ${{ fromJSON(github.repository == 'dahlia/oseo' &&
+      (github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch') &&
+      vars.OSEO_ARRAY_RUNNER_LABELS || '["ubuntu-latest"]') }}
+    # Runs 40229359492 and 40262591240 stopped at the unchanged 1,800 s
+    # property limit after 97 and 92 of 120 cases with four file workers.
+    # The same source took about 614 s locally. Allow 30 min for the
+    # property plus 15 min for setup/build; this 45 min limit is a backstop.
+    timeout-minutes: 45
+    # The job may run on a self-hosted runner, so its token can only read.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:property:extended:native:shard
+          tests/property/m5-array-constructor.property.test.ts
+        env:
+          TMPDIR: ${{ runner.temp }}
+      - if: failure() || cancelled()
+        uses: actions/upload-artifact@v7
+        with:
+          name: array-constructor-linux-diagnostics
+          path: ${{ runner.temp }}/oseo-native-*
+          if-no-files-found: warn
+
   native:
     # The generator expands needs and replaces steps with success checks.
     if: ${{ always() }}
@@ -687,6 +735,7 @@ jobs:
       - test_native_support
       - test_property_case
       - test_reflect_case
+      - test_array_constructor
       - test_test262
     runs-on: ubuntu-latest
     steps:
@@ -694,4 +743,5 @@ jobs:
         run: |
           test "${{ needs.test_native.result }}" = success
           test "${{ needs.test_native_support.result }}" = success
+          test "${{ needs.test_array_constructor.result }}" = success
           test "${{ needs.test_test262.result }}" = success

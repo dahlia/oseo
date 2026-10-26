@@ -14,6 +14,15 @@ not change any language semantic or the amount of evidence a semantic unit
 must supply. Its one classification change is the named non-semantic
 infrastructure checkpoint required by ADR 0013.
 
+The Linux extended native properties use seven file shards with four file
+workers, excluding case-sharded files and `dedicatedLinuxNativeFiles` before
+cost partitioning. The latter list contains only
+*tests/property/m5-array-constructor.property.test.ts*. Its dedicated Linux
+job keeps all 120 extended cases and the 1,800-second property limit; the
+`native` aggregate requires it to succeed. macOS retains the Array file in
+its twelve file shards. Historical partition measurements below describe
+their recorded input sets.
+
 The measured before-state is recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). Three
 observations motivate the plan. Every native execution rebuilds a runtime

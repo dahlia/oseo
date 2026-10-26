@@ -17,6 +17,7 @@ import type { SpawnSyncReturns } from "node:child_process";
 import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { runInNewContext } from "node:vm";
 import { isNumber, isObject, isString } from "../tools/value-kinds.ts";
 import type {
   StructuredDataRecord,
@@ -288,6 +289,7 @@ test("every check name and concurrency policy is preserved", () => {
         { length: 7 },
         (_, index) => `native support (linux-x86_64-gnu, ${index + 1}/7)`,
       ),
+      "Array constructor (linux-x86_64-gnu)",
       ...Array.from(
         { length: 3 },
         (_, index) => `host C sanitizers (Linux, property, ${index + 1}/3)`,
@@ -303,7 +305,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 77);
+  assert.equal(names(after).length, 78);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -449,6 +451,7 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
     "test_test262",
     "test_native_support",
     "test_property_case",
+    "test_array_constructor",
   ]) {
     const original = before.jobs[id]!;
     const actual = after.jobs[id]!;
@@ -461,6 +464,100 @@ test("commands, timeouts, environments and artifacts are unchanged", () => {
         (row) => !expand(original["runs-on"], row).startsWith("macos-"),
       ),
     );
+  }
+});
+
+test("Array Linux job preserves the full extended invocation", () => {
+  const job = after.jobs.test_array_constructor!;
+  assert.deepEqual(job, before.jobs.test_array_constructor);
+  assert.equal(job["timeout-minutes"], 45);
+  assert.equal(job.env, undefined);
+  assert.equal(job.strategy, undefined);
+  assert.deepEqual(job.steps.slice(0, 3), [
+    { uses: "actions/checkout@v7", with: { "persist-credentials": false } },
+    { uses: "jdx/mise-action@v4", with: { install: true } },
+    { uses: "./.github/actions/runtime-archive-cache" },
+  ]);
+  assert.deepEqual(job.steps[3], {
+    run:
+      "mise run test:property:extended:native:shard " +
+      "tests/property/m5-array-constructor.property.test.ts",
+    env: { TMPDIR: "${{ runner.temp }}" },
+  });
+  assert.deepEqual(job.steps[4], {
+    if: "failure() || cancelled()",
+    uses: "actions/upload-artifact@v7",
+    with: {
+      name: "array-constructor-linux-diagnostics",
+      path: "${{ runner.temp }}/oseo-native-*",
+      "if-no-files-found": "warn",
+    },
+  });
+  // SAFETY: Generation retains the checked-in workflow schema.
+  const configured = parse(
+    generateMacosWorkflow(template, configuredSelfHostedLanes),
+  ) as Workflow;
+  assert.deepEqual(configured.jobs.test_array_constructor!.needs, [
+    "mac_ready",
+  ]);
+  assert.equal(
+    configured.jobs.test_array_constructor!.if,
+    "${{ !cancelled() }}",
+  );
+});
+
+test("Array runner labels are restricted to trusted repository events", () => {
+  const expression = after.jobs.test_array_constructor!["runs-on"];
+  assert.equal(
+    expression,
+    "${{ fromJSON(github.repository == 'dahlia/oseo' && " +
+      "(github.event_name == 'push' || " +
+      "github.event_name == 'workflow_dispatch') && " +
+      "vars.OSEO_ARRAY_RUNNER_LABELS || '[\"ubuntu-latest\"]') }}",
+  );
+  // This expression uses the shared JavaScript/Actions boolean subset.
+  // Execute the actual expression for every event/repository/variable pair.
+  for (const repository of ["dahlia/oseo", "contributor/oseo"]) {
+    for (const event of [
+      "push",
+      "workflow_dispatch",
+      "pull_request",
+      "pull_request_target",
+    ]) {
+      for (const labels of [undefined, "", '["self-hosted","oseo-array"]']) {
+        const actual: unknown = runInNewContext(expression.slice(3, -2), {
+          github: { repository, event_name: event },
+          vars: { OSEO_ARRAY_RUNNER_LABELS: labels },
+          fromJSON: JSON.parse,
+        });
+        const trusted =
+          repository === "dahlia/oseo" &&
+          (event === "push" || event === "workflow_dispatch");
+        assert.equal(
+          JSON.stringify(actual),
+          trusted && labels ? labels : '["ubuntu-latest"]',
+        );
+      }
+    }
+  }
+});
+
+test("only Linux file shards exclude dedicated Linux files", () => {
+  for (const planned of macosJobs().filter(
+    (job) => job.sourceId === "test_native_support",
+  )) {
+    const command = executedSteps(after.jobs[planned.id]!, {}).find((step) =>
+      String(step.run).includes("--exclude-case-sharded"),
+    )?.run;
+    assert.ok(isString(command));
+    assert.ok(!command.includes("--exclude-dedicated-linux"));
+  }
+  for (const row of entries(after.jobs.test_native_support!)) {
+    const command = executedSteps(after.jobs.test_native_support!, row).find(
+      (step) => String(step.run).includes("--exclude-case-sharded"),
+    )?.run;
+    assert.ok(isString(command));
+    assert.ok(command.includes("--exclude-dedicated-linux"));
   }
 });
 
@@ -558,7 +655,8 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
   }
   assert.deepEqual(needs.toSorted(), expected);
   assert.ok(needs.includes("test_sanitizer_property"));
-  assert.equal(expected.length, 39);
+  assert.ok(needs.includes("test_array_constructor"));
+  assert.equal(expected.length, 40);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -570,7 +668,14 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
       "node",
       ["-e", script[1]!],
       {
-        env: { ...process.env, RESULTS: JSON.stringify(["success", verdict]) },
+        env: {
+          ...process.env,
+          RESULTS: JSON.stringify(
+            needs.map((id) =>
+              id === "test_array_constructor" ? verdict : "success",
+            ),
+          ),
+        },
       },
     );
     assert.equal(result.error, undefined);
@@ -604,7 +709,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 40);
+  assert.equal(needs.length, 41);
 });
 
 test("committed workflow matches generator output exactly", () => {

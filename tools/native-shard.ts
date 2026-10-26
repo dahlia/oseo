@@ -24,6 +24,15 @@ export const caseShardedNativeFiles: readonly string[] = [
   "tests/property/m5-reflect-namespace.property.test.ts",
 ];
 
+/**
+ * Files with dedicated Linux jobs, excluded before Linux cost partitioning.
+ * Array construction reached its unchanged deadline beside other files;
+ * its dedicated job runs every case, while macOS keeps file sharding.
+ */
+export const dedicatedLinuxNativeFiles: readonly string[] = [
+  "tests/property/m5-array-constructor.property.test.ts",
+];
+
 /** Fixed host-specific scheduling model for native property partitions. */
 export interface NativeShardModel {
   readonly costs: Readonly<Record<string, number>>;
@@ -109,6 +118,15 @@ export function nativeTestArguments(
     ) {
       throw new Error("Excluding case-sharded files requires --shard.");
     }
+    if (
+      args.some(
+        (arg) =>
+          arg === "--exclude-dedicated-linux" ||
+          arg.startsWith("--exclude-dedicated-linux="),
+      )
+    ) {
+      throw new Error("Excluding dedicated Linux files requires --shard.");
+    }
     return args;
   }
   const parsed = parseArgs({
@@ -117,6 +135,7 @@ export function nativeTestArguments(
     options: {
       shard: { type: "string" },
       "exclude-case-sharded": { type: "boolean" },
+      "exclude-dedicated-linux": { type: "boolean" },
     },
     tokens: true,
   });
@@ -127,6 +146,12 @@ export function nativeTestArguments(
   );
   if (excludeFlags.length > 1) {
     throw new Error("Native sharding allows one exclusion flag.");
+  }
+  const dedicatedFlags = flags.filter(
+    (token) => token.name === "exclude-dedicated-linux",
+  );
+  if (dedicatedFlags.length > 1) {
+    throw new Error("Native sharding allows one dedicated Linux flag.");
   }
   if (shardFlags.length !== 1 || parsed.values.shard == null) {
     throw new Error("Native sharding requires exactly one --shard flag.");
@@ -140,11 +165,17 @@ export function nativeTestArguments(
   ) {
     throw new Error("Native sharding requires explicit property file paths.");
   }
-  const files = parsed.values["exclude-case-sharded"]
-    ? parsed.positionals.filter(
-        (path) => !caseShardedNativeFiles.includes(path),
-      )
-    : parsed.positionals;
+  const files = parsed.positionals.filter(
+    (path) =>
+      !(
+        parsed.values["exclude-case-sharded"] &&
+        caseShardedNativeFiles.includes(path)
+      ) &&
+      !(
+        parsed.values["exclude-dedicated-linux"] &&
+        dedicatedLinuxNativeFiles.includes(path)
+      ),
+  );
   const selected = selectNativeTestShard(files, shard!, platform);
   // Node without files discovers the full suite; never launch an empty shard.
   return selected;
