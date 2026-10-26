@@ -3,6 +3,19 @@ id: for-in
 title: "For-in statements"
 scope:
   - "For-in enumeration with simple declaration and assignment heads."
+  - "A later consumer correction prepares ordinary omitted-key metadata
+    in creation order, non-enumerable shadowing and rooted ToObject
+    reachability for all primitive kinds. New reference/fixed controls and
+    allocation-failure retry checks passed both hosts on 97f06518: six whole
+    commands, 12 actual registrations, both policies, forced GC, all five
+    primitive failure sweeps and balanced realm/root checks. The first eight
+    required commands retain 28 passes on 46933fd3; only the C fixture
+    observation flag changed, with all other 8,046 files/modes exact. The
+    original counter assertion failure remains recorded. Numeric GC counts
+    were not printed. Affected review and broader exact-source gates remain
+    pending. The required Array CI failure blocked that historical bundle,
+    not standalone Set preparation on Main cf0902db.
+    Existing domains, seeds, budgets and assessments remain unchanged."
 owners:
   - PLAN-M5.md
 evidence:
@@ -10,18 +23,30 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
+      - tests/annexb-for-in-preparation.test.ts
+      - tests/annexb-for-in.test.ts
+      - tests/helpers/annexb-for-in.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/objects.ts
+      - tests/annexb-for-in.test.ts
+      - tests/fixtures/annexb-for-in/allocation.c
+      - tests/helpers/annexb-for-in.ts
   forced-collection:
     status: covered
     references:
       - tests/property/m5-for-in.property.test.ts
+      - tests/annexb-for-in.test.ts
+      - tests/fixtures/annexb-for-in/allocation.c
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   generated:
     status: covered
     references:
       - tests/property/m5-for-in.property.test.ts
+      - tests/helpers/annexb-for-in.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   guard-fallback:
     status: omitted
     reason: "The family owns no specialized path or family-specific guard."
@@ -32,6 +57,8 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/objects.ts
+      - tests/annexb-for-in.test.ts
+      - tests/property/m5-annexb-proto-boundary.property.test.ts
   standards:
     status: covered
     references:
@@ -41,3 +68,4 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/for-in.test.ts
+      - tests/annexb-for-in-preparation.test.ts

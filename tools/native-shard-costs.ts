@@ -55,11 +55,14 @@
  * in the native extended file glob. Its Linux weight is a local extended
  * two-registration case sum; its unmeasured macOS placeholder retains the
  * historical 286-second assigned cost. The combined continuation-dispatch
- * estimates raise unknown-file upper medians to 406 Linux/296 macOS seconds.
+ * estimates gave Main upper medians of 406 Linux/296 macOS seconds.
  * Both Script entries await exact-candidate CI logs. See U6 provenance.
  *
  * F3 adds a second generator-throw domain. Retire its old 47/43 samples.
- * The 135-entry Main/F3 tables derive 406 Linux/296 macOS fallback weights.
+ * The 135-entry Main/F3 tables derived 406 Linux/296 macOS fallbacks.
+ * Set/Annex deletion, integrity and enumeration change the workload; retire
+ * its old 309/451 samples. The remaining 134 entries derive 409/296
+ * fallbacks. Primitive Set has no explicit estimate. See U6 provenance.
  * These are unmeasured scheduling estimates, not matching-host costs.
  * All other Main entries and partition rules remain unchanged. See U6.
  */
@@ -68,7 +71,6 @@ export const nativeShardCosts = {
     "tests/property/m4-async.property.test.ts": 464,
     "tests/property/m5-aggregate-error.property.test.ts": 265,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 318,
-    "tests/property/m5-annexb-proto-boundary.property.test.ts": 309,
     "tests/property/m5-arguments-object.property.test.ts": 647,
     "tests/property/m5-array-binding.property.test.ts": 171,
     "tests/property/m5-array-buffer.property.test.ts": 551,
@@ -219,7 +221,6 @@ export const nativeShardCosts = {
     "tests/property/m4-async.property.test.ts": 266,
     "tests/property/m5-aggregate-error.property.test.ts": 183,
     "tests/property/m5-annexb-legacy-lookup-boundary.property.test.ts": 281,
-    "tests/property/m5-annexb-proto-boundary.property.test.ts": 451,
     "tests/property/m5-arguments-object.property.test.ts": 436,
     "tests/property/m5-array-binding.property.test.ts": 108,
     "tests/property/m5-array-buffer.property.test.ts": 400,

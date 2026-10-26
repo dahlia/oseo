@@ -151,9 +151,14 @@ static OseoResult object_get(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
+        uint8_t omitted_accessors = 0u;
         if (oseo_internal_own_property_descriptor(
-            context, current, key, &value, &attributes, &getter, &setter)) {
+            context, current, key, &value, &attributes,
+            &getter, &setter, &omitted_accessors)) {
             if (attributes.accessor) {
+                if ((omitted_accessors & OSEO_OMITTED_GETTER) != 0u) {
+                    return oseo_internal_omitted_proto_error(context);
+                }
                 if (!is_callable(getter)) return normal(oseo_undefined());
                 OseoRootFrame frame = {NULL, NULL, 0u};
                 OseoResult result = oseo_roots_allocate(context, &frame, 1u);
@@ -181,6 +186,7 @@ static OseoResult object_get(
          * The immutable-prototype brand also identifies another realm's
          * %Object.prototype%; module namespaces are a separate exotic. */
         if (object->immutable_prototype && !object->module_namespace &&
+            !object->annexb_proto_deleted &&
             oseo_internal_string_is_ascii(key, "__proto__")) {
             return failure(
                 context,
@@ -287,7 +293,8 @@ OseoResult oseo_object_has_own(
             &value,
             &attributes,
             &getter,
-            &setter
+            &setter,
+            NULL
         );
         if (result.status != OSEO_STATUS_NORMAL) return result;
         return normal(oseo_boolean(found));
@@ -299,7 +306,8 @@ OseoResult oseo_object_has_own(
         &value,
         &attributes,
         &getter,
-        &setter
+        &setter,
+        NULL
     );
     if (exists) return normal(oseo_boolean(true));
     return normal(oseo_boolean(false));
@@ -315,13 +323,34 @@ OseoResult oseo_object_set(
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (!is_object(object_value)) {
-        if (is_nullish(object_value) || strict) {
+        if (is_nullish(object_value)) {
             return type_error(
                 context,
                 "Cannot set properties of a nullish or primitive value."
             );
         }
-        return normal(value);
+        /* PutValue uses ToObject only for lookup. Keep GetThisValue's
+         * primitive receiver, including across Proxy dispatch and a
+         * setter's call into its own realm. Full String wrappers retain
+         * the non-writable own index and length descriptors. */
+        OseoValue slots[4] = {object_value, key, value, oseo_undefined()};
+        OseoRootFrame frame = {NULL, slots, 4u};
+        oseo_roots_push(context, &frame);
+        OseoResult result = oseo_internal_to_object(context, slots[0]);
+        slots[3] = result.value;
+        const char *refusal = NULL;
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = oseo_internal_set_with_receiver(
+                context, slots[3], slots[1], slots[2], slots[0], &refusal
+            );
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = strict && refusal != NULL
+                ? type_error(context, refusal)
+                : normal(slots[2]);
+        }
+        oseo_roots_pop(context, &frame);
+        return result;
     }
     if (is_proxy(object_value)) {
         const char *refusal = NULL;
@@ -427,10 +456,14 @@ OseoResult oseo_object_set(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
+        uint8_t omitted_accessors = 0u;
         if (oseo_internal_own_property_descriptor(
             context, current, key, &own_value, &attributes, &getter,
-            &setter)) {
+            &setter, &omitted_accessors)) {
             if (attributes.accessor) {
+                if ((omitted_accessors & OSEO_OMITTED_SETTER) != 0u) {
+                    return oseo_internal_omitted_proto_error(context);
+                }
                 if (!is_callable(setter)) {
                     if (strict) {
                         return type_error(
@@ -514,6 +547,7 @@ OseoResult oseo_object_set(
          * setter. Own or inherited user properties, proxies, null
          * prototypes, and typed-array numeric keys were answered above. */
         if (owner->immutable_prototype && !owner->module_namespace &&
+            !owner->annexb_proto_deleted &&
             oseo_internal_string_is_ascii(key, "__proto__")) {
             return failure(
                 context,
@@ -556,6 +590,7 @@ OseoResult oseo_object_set(
     property->attributes = (OseoPropertyAttributes){true, true, true, false};
     property->key = key;
     property->value = value;
+    property->omitted_accessors = 0u;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     object->property_count += 1u;
@@ -616,10 +651,14 @@ OseoResult oseo_internal_set_with_receiver(
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
         OseoValue setter = oseo_undefined();
+        uint8_t omitted_accessors = 0u;
         if (oseo_internal_own_property_descriptor(
             context, current, key, &own_value, &attributes, &getter,
-            &setter)) {
+            &setter, &omitted_accessors)) {
             if (attributes.accessor) {
+                if ((omitted_accessors & OSEO_OMITTED_SETTER) != 0u) {
+                    return oseo_internal_omitted_proto_error(context);
+                }
                 if (!is_callable(setter)) {
                     *refusal = "Cannot set a property that has only a getter.";
                     return normal(value);
@@ -653,6 +692,7 @@ OseoResult oseo_internal_set_with_receiver(
          * prototypes, and typed-array numeric keys were answered above. */
         if (ordinary_object(current)->immutable_prototype &&
             !ordinary_object(current)->module_namespace &&
+            !ordinary_object(current)->annexb_proto_deleted &&
             oseo_internal_string_is_ascii(key, "__proto__")) {
             return failure(
                 context,
@@ -681,7 +721,8 @@ OseoResult oseo_internal_set_with_receiver(
             &receiver_value,
             &receiver_attributes,
             &receiver_getter,
-            &receiver_setter
+            &receiver_setter,
+            NULL
         )
         : normal(oseo_boolean(
             (receiver_found = oseo_internal_own_property_descriptor(
@@ -691,7 +732,8 @@ OseoResult oseo_internal_set_with_receiver(
                 &receiver_value,
                 &receiver_attributes,
                 &receiver_getter,
-                &receiver_setter
+                &receiver_setter,
+                NULL
             ))
         ));
     if (receiver_result.status != OSEO_STATUS_NORMAL) return receiver_result;

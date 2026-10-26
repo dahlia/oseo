@@ -7391,13 +7391,21 @@ inventory stays at 140 families. The behavior change moves the runtime ABI to
 `oseo-runtime-m5-125`; the node adds no component, code ID, realm intrinsic,
 heap kind, or graph-state change.
 
-M5c node `annexb-proto-dependency-classification` makes only a missing
-`__proto__` lookup reaching an intrinsic `Object.prototype` observable as
-`OSEO1001`. The existing immutable-prototype brand identifies that intrinsic
-across realms. Core properties named `__proto__`, null prototypes, proxy
-traps, and unrelated abrupt completions retain their behavior. No Annex B
-accessor is installed. The existing indexed Object prototype family records
-this rejection boundary and its generated ordinary-property evidence.
+M5c node `annexb-proto-dependency-classification` originally reported OSEO1001
+when an operation needed the omitted Object.prototype.__proto__ getter/setter
+behavior or identity. That historical identity-rejection boundary is
+superseded by the primitive Set reflection correction described under
+“Primitive Set and omitted accessor metadata” below. Core reflection now
+exposes stable, distinct callable identities that can be obtained, compared,
+copied and redefined without invoking either excluded body. Only operations
+that invoke an excluded getter/setter body retain source-located OSEO1001,
+including ordinary property access and calls through reflected identities.
+The immutable-prototype brand identifies that intrinsic across realms.
+Presence, attributes and creation order remain core metadata. A user
+definition replaces only the accessor halves it specifies. Real user halves,
+ordinary properties, null prototypes, proxy traps and unrelated abrupt
+completions keep their core behavior. No Annex B getter/setter body is
+implemented; ADR 0013's exclusion remains unchanged.
 
 The exact reviewed admission is
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
@@ -8641,10 +8649,12 @@ and the three `proxy-missing-checks` paths by the invariant each observes, and
 the behavior each tag needs. The current profile already meets it, so no
 compiler or runtime code changes. Literal U+2028 and U+2029 stay single code
 units of a string constant. The `__proto__` paths exercise only core
-object-initializer, class-definition, and proxy-forwarding behavior, and no
-Annex B accessor is installed. The `[[DefineOwnProperty]]`, `[[Delete]]`, and
-`[[GetOwnProperty]]` post-trap invariants already belong to the
-`proxy-exotic-object` family.
+object-initializer, class-definition, and proxy-forwarding behavior. At this
+admission, no Annex B accessor was installed. The later primitive Set
+reflection correction supplies callable identities while invocation of their
+excluded bodies remains unsupported. The `[[DefineOwnProperty]]`,
+`[[Delete]]`, and `[[GetOwnProperty]]` post-trap invariants already belong to
+the `proxy-exotic-object` family.
 
 No generated domain, seed, or budget changes because no behavior changes. The
 `proxy-exotic-object` native fixture adds the three invariant violations
@@ -8957,3 +8967,287 @@ native results above keep their original source identity. This composition
 claims no new native, model, Full or candidate/Main result. Affected review,
 source-bound native validation, actual D3 and any required observations
 remain Root-owned. F3 stays ready and unlanded.
+
+The following Set contracts are restored for the standalone source
+preparation on Main `cf0902db`. Every historical execution result remains
+bound to its named source; none validates this new composition. Fresh
+in-memory structural checks and CHECK/hooks are recorded in the source
+preparation report. Runtime, reference and native execution, affected review,
+fresh full observations and exact candidate/Main gates remain pending.
+
+
+Primitive receiver inherited Set source preparation
+---------------------------------------------------
+
+M5c node `primitive-receiver-inherited-set` prepares the bounded PutValue
+repair originally prepared on Main `de491133` and reanchored on successful
+Main `44c46bfc`. This Set-only preparation starts from exact successful
+Main `cf0902db05ee8a51a2801f5d70372bfc5ca37b48`. `oseo_object_set` now
+constructs a full intrinsic wrapper for lookup and passes the original
+primitive as Receiver to the existing receiver-carrying Set walk. This
+preserves String own index and length restrictions, inherited accessor and
+Proxy dispatch, data-write refusal, setter abrupt completion, and caller
+strictness only when Set reports false. A stack root frame keeps the original
+base, key, value, and wrapper live until a refusal has become a language error.
+Ordinary call entry still owns strict primitive this and sloppy boxing in the
+callee realm. No compiler guard, Reference lowering, runtime ABI, or
+object-receiver Set path changes.
+
+The minimized ordinary fixtures retain the strict Number counterexample
+and the computed Reference regression from the original intake. A separate
+structured domain reserves seed block `0x60008c00` through `0x60008cff`,
+using slot zero for 12 ordinary cases and a 240-second interrupt limit.
+Each case retains all five primitive kinds, object and nullish controls,
+two writes, independent caller/setter strictness, string/symbol/index/length
+keys, descriptor or Proxy outcomes, and up to two extra prototype levels.
+Its model computes expected traces without executing the rendered source.
+Record shrinking retains those invariants and the normal seed/path replay.
+Existing domains and their budgets remain unchanged.
+
+The unpublished native default moved from `0x60008b00` to `0x60008c00`
+on reanchor because Main already assigns the former block to Script/Module
+declarations. No native observations used the original default. The arbitrary,
+shrinking, replay controls, case budget, and deadline are unchanged. The pure
+suite retains its separate `0x60008b00` seed and all sixteen sample records
+for historical comparison. No landed seed or ratchet override changes.
+
+The native registration selects the bootstrap host's public Node.js or Deno
+adapter and names both reference engines explicitly under either bootstrap.
+This is host composition source; static checking does not prove native Deno
+execution. The isolated Script source and expected output are unchanged.
+
+The pure suite contains a Node.js/Deno reference matrix and MIR/C
+emission checks under both specialization policies. Reference execution
+is a separate later scope from this source preparation. Twenty-seven fixed
+native subjects guarantee strictness, descriptor/Proxy, key, and String
+boundaries independently of generated draws. Fixed native and property
+registrations are source only at this phase; their forced-collection assertions
+require positive counters when Root later executes them. A C fixture constructs
+foreign ordinary setters without dynamic source and sweeps warmed allocation
+failures with root/realm restoration and retry. It follows the generated
+call-entry contract checked by the pure structural test. No native execution,
+positive GC activity, sanitizer result, Test262 observation, or performance
+result is established here.
+
+The generic-only store adds no guard. The compound-assignment record's
+existing guard-fallback omission and named replacement evidence remain.
+The wrapper admission retains its forty-path scope; batches 28/29 retain
+first admission of their primitive PutValue/Proxy paths. Exact included
+ordinary accessor-setter coverage remains unknown. The original edcc and
+560162 observations remain historical raw counterexamples. At that initial
+preparation stage, full reviewed manifest regeneration, derived publication
+data, native and sanitizer validation, independent reviews, and exact
+candidate/main CI were still pending; the node was ready and unlanded.
+A publication candidate marks it landed prospectively. That state becomes
+effective only after successful equal-tree Main CI.
+
+
+Primitive Set and omitted accessor metadata
+-------------------------------------------
+
+The exact C2 Mac Node failure exposed a missing lifetime distinction in the
+legacy accessor rejection boundary. The original preserved-write Script
+installs a user setter on Object.prototype, deletes it, then writes through
+a primitive. Primitive Set now walks that prototype with the original
+Receiver; it must not revive a deleted dependency. The unchanged original
+Script and oracle passed the initial six Linux focused commands (20 test
+registrations) on the 1c96126b review target. Those raw observations remain
+under */data/m5c-primitive-set-annexb-repair-20261025/task\_f5c6ab875894/*.
+They do not validate the later integrity correction: a separate native
+review probe found that freeze/seal had not locked omitted metadata.
+
+The bounded correction keeps private presence, configurability,
+enumerability and initial creation order for the omitted accessor. Ordinary
+and Proxy integrity operations consume the same metadata. preventExtensions
+alone does not lock a configurable key; seal/freeze do. Successful deletion
+retires it; failed deletion changes nothing. Replacement keeps the initial
+position, while deletion followed by recreation appends a new ordinary key.
+A realm's metadata never changes another realm's intrinsic.
+
+Core reflection exposes stable, distinct native callable identities for the
+excluded getter and setter. Each realm stores them in its Object.prototype
+accessor property, using existing property-vector GC tracing. Their names,
+lengths, Function prototype, nonconstructability and native Function.toString
+shape follow the ordinary built-in contracts. They do not alias
+Object.getPrototypeOf or Object.setPrototypeOf. Describing, copying or
+redefining the same identity never invokes its excluded body. Ordinary
+access requiring an excluded half, or calling its reflected identity through
+call/apply/bind or an unhandled Proxy, still produces source-located OSEO1001.
+A user-defined replacement half retains ordinary behavior, and an explicit
+undefined half remains distinct from either callable. Descriptor round trips,
+partial replacement, deletion/recreation, seal/freeze and Proxy invariants use
+normal identity comparisons. No Annex accessor behavior or feature is admitted.
+
+The earlier public-descriptor rejection oracle was wrong: it caused the
+already reviewed intrinsic Function.toString walk to reject at
+Object.getOwnPropertyDescriptors without invoking a legacy accessor. That
+oracle and contract are superseded by positive core reflection assertions
+and separate negative excluded-call assertions. The original Test262 case,
+harness and expected pass are unchanged. This is a core reflection repair,
+not an exclusion or classification change.
+
+Two private Object native code IDs dispatch only to the existing Annex
+rejection. Ordinary property storage replaces the initial virtual metadata
+after Object bootstrap; existing getter/setter fields root the identities.
+No public intrinsic slot, object/property/realm layout, runtime entry point or
+ABI version changes. This Set-only composition retains Main
+`m5-135`, its ordinary call/GC/realm interfaces and backend source.
+The identity patch changes no version or tail-call protocol. Private bootstrap
+metadata still distinguishes an unavailable half from a genuine undefined value
+until that initial property is materialized.
+
+The proposed private fields use existing ordinary-object and property-record
+padding. Old-prefix and full old-property sizeof/offsetof assertions live in
+*tests/fixtures/primitive-receiver-inherited-set/allocation.c*. Compilation
+was pending at source preparation; the later focused result below covers
+only the selected Linux ABI, not macOS or all ABIs. GC value fields,
+call enter/leave order, logical native-frame policy
+and resource limits remain unchanged. Dynamic own-key/rest snapshots include
+one more key/root while the omitted own metadata is present; the unchanged
+root allocator still allocates from the actual key count. This is no claim
+of identical temporary allocation counts or costs. The original allocation/
+resource/root assertions remain intact. The Object bootstrap scratch frame
+now roots both callable identities while the property is installed.
+
+The existing Annex generator retains its original arbitrary, source/oracle
+prefix, seed, 12-case budget and 180,000-millisecond interrupt. Every old
+program still executes. One additional fresh program derives a structured
+integrity state from the same integer, preserving shrinking/replay and
+avoiding a frozen realm contaminating the old case. Fixed controls cover all
+22 states, reflected identities and realm isolation under both policies and
+forced GC. No new metadata specialization exists; the original generated
+false-hint, guard-miss and disabled-policy assertions remain mandatory.
+The pure semantic renderer/oracle is *tests/helpers/annexb-integrity.ts*.
+Its 22 states at four values, including the fixed value 7, match plain Node
+and Deno Script references (88 checks per host), retained as
+*integrity-final-reference-results.json* in the same packet. These are
+references, not native test registrations.
+
+At this preparation checkpoint, expanded native validation, normal hooks
+and affected review were pending for this integrity source. The earlier 20
+native registrations establish only their actual source. Numeric GC/root/frame
+counters and successful temporary C/MIR/binaries were not retained as output;
+positive assertions must not be relabeled as numeric observations. Fresh full
+observations, macOS/sanitizer lanes and exact candidate/Main gates remain
+Root-owned requirements. No timing or CI repair is established here.
+
+The scheduling table retires only the Annex generator's historical
+309-second Linux/451-second macOS entries. The existing fallback supplies
+409/296 from the remaining 134 entries per host. Earlier ordinary focused
+walls of 18.701/20.995 seconds do not measure the expanded integrity source,
+extended cost or macOS. *docs/evidence/u6/README.md* retains provenance.
+No shard, seed, case or interrupt rule changes.
+
+
+Set integrity focused native evidence
+-------------------------------------
+
+On Linux AMD64, exact source
+`eab6f36600fa8863d17a84533711392e07d9955f`, tree
+`2b70928606de831887956979f09e03d179da6db7`, passed eight whole
+Node.js/Deno commands once in order, with 28 actual registrations and
+natural owned-process/scope drain. The source remained unchanged throughout.
+*PLAN-M5C.md* records the commands, walls and raw evidence packet.
+
+Both hosts passed all nine fixed Annex registrations, the original
+12-case Annex property with its fresh integrity subject, all three Set
+registrations and the independent generic Set/Array driver. Both policies,
+original seeds and limits, forced-GC/guard/fallback assertions, allocation
+failure/retry and foreign-setter root/realm checks remain intact. The actual
+allocation fixture compiled its expanded sizeof/offsetof assertions on the
+selected Linux ABI. No numeric sizes or successful-case GC/frame counters
+were printed, and successful temporary C/MIR/binaries were not retained.
+
+The generic driver passed all seven native callback assertions under both
+policies, including positive allocations/collections and balanced teardown.
+The Script/oracle and applicable assertions remain original; TCO protocol
+checks remain deferred. These focused ordinary results establish no macOS,
+sanitizer, extended, test262 or exact candidate/Main gate result. Full
+consumer consistency still requires valid affected review, and the changed
+implementation still requires fresh full observations under Root ownership.
+
+
+Virtual metadata in for-in enumeration
+--------------------------------------
+
+The focused eab6 results above do not cover a later ordinary for-in
+counterexample: making the omitted intrinsic key enumerable exposed it to
+Object.keys and Proxy enumeration while ordinary enumeration omitted it.
+The bounded correction inserts that key into each ordinary level's candidate
+list at its existing creation position, including non-enumerable metadata
+needed for shadowing. Existing descriptor, visited-key, deletion/reachability,
+Proxy and prototype-chain processing remains in place. The synthesized key
+is rooted across allocation. No public ABI or resource policy changes.
+
+Enumeration acquisition now uses the existing rooted ToObject helper after
+the unchanged nullish early return. This replaces the old Symbol-only
+prototype shortcut so all five primitive kinds retain their actual prototype
+chain, including String own indices. The original primitive and resulting
+wrapper stay rooted until the enumeration owns its receiver and candidates.
+Allocation failures must unwind to the caller's root frame and realm and
+allow a successful retry; Proxy abrupt completions retain their identity.
+
+*tests/helpers/annexb-for-in.ts* supplies ten fresh fixed programs and
+independent literal oracles for ordering, inherited/non-enumerable shadowing,
+deletion/recreation, deletion during enumeration, real accessor replacement,
+seal/freeze, all five primitive kinds, nullish and abrupt controls. Separate
+preparation/native files check reference/MIR/C versus actual native behavior;
+the new C allocation fixture sweeps warmed acquisition failures and retry.
+The existing Annex property runs a third fresh subject after its exact old
+program and integrity subject. Its arbitrary, seed, 12 cases and 180-second
+limit stay unchanged, as do both existing for-in properties and their budgets.
+
+Focused Linux AMD64 validation now covers 40 required registrations with
+explicit source bindings. The first eight whole Node.js/Deno commands passed
+28 registrations on `46933fd3`; the six for-in follow-up commands passed
+12 on `97f06518`. The only intervening change enables the C fixture's existing
+collection counter. All other 8,046 tracked files/modes, including runtime,
+programs, oracles, generators and command flags, remain exact. The original
+command 9 failure on 46933 remains recorded; no fourteen-command pass on one
+new source is claimed. *PLAN-M5C.md* binds all commands, walls and raw facts.
+
+Both hosts passed the ten-state, both-policy forced-GC matrix and all five
+primitive acquisition allocation-failure sweeps, positive collection checks,
+OSEO2001, retry, realm/root preservation and balanced teardown. The ordinary
+Annex generator retains its exact old two subjects before the fresh for-in
+subject, original arbitrary, seed, 12 cases and 180-second limit. Both
+existing for-in properties retain their domains, seeds, cases and limits.
+Numeric GC counts and sizeof values were not printed. These are ordinary
+Linux results; affected review, fresh observations, macOS/sanitizer, extended
+and exact candidate/Main gates remain pending. In that historical bundle,
+the required Array CI failure blocked publication. It is not a dependency
+of this standalone Set candidate. Earlier PASS samples and scheduling
+estimates establish no current deadline bound.
+
+
+Reflected excluded accessor identity preparation
+------------------------------------------------
+
+The bounded primitive Set correction preserves the original 12-case generated
+subject and its independent oracle, then derives a fresh core reflection
+subject from the same integer. The arbitrary, seed 0x60008c00, shrinking,
+replay, case budget and 240-second deadline are unchanged. The fresh subject
+checks identity/metadata, partial and undefined halves, deletion/recreation,
+order, seal/freeze, descriptor round trips, Proxy invariants and intercepted
+Proxy calls. Both reference hosts execute only core operations; they are not
+claimed to exclude the actual Annex calls that Oseo still rejects.
+The whole Annex native suite also validates the unchanged upstream native
+function matcher and realm ownership. Focused execution and independent
+semantic review must be recorded against the new source before reuse; old
+review results for the superseded identity-rejection contract are historical.
+Canonical observations, owners, exclusions and graph state remain unchanged.
+
+
+Node/Deno reference metadata distinction
+----------------------------------------
+
+On the pinned Deno 2.9.7 reference Script, the reflected legacy accessors are
+JavaScript functions named __proto__, have own prototype properties and are
+constructable. Their Function.toString text is not native-function text.
+That observed host metadata discrepancy is labeled separately from Node and
+the normative native built-in identity contract. Descriptor mutation,
+identity, order, integrity and Proxy-interception checks retain their exact
+common oracle. Oseo's identities must still be nonconstructable native
+functions named get __proto__/set __proto__, and the unchanged upstream
+native-function matcher validates them. Neither reference is claimed to
+reject invoking the actual Annex accessor body.

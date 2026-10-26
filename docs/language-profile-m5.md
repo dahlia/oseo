@@ -57,18 +57,25 @@ guard-fallback, collection, and standards evidence in
 *tests/property/m5-import-attributes.property.test.ts* and
 *tests/fixtures/import-attributes/*.
 
-M5c node `annexb-proto-dependency-classification` makes only a missing
+M5c node `annexb-proto-dependency-classification` originally made a missing
 `__proto__` lookup reaching an intrinsic `Object.prototype` observable as
-`OSEO1001`. The existing immutable-prototype brand identifies that intrinsic
-across realms. Core properties named `__proto__`, null prototypes, proxy
-traps, and unrelated abrupt completions retain their behavior. No Annex B
-accessor is installed. The existing indexed Object prototype family records
-this rejection boundary and its generated ordinary-property evidence.
+`OSEO1001`, without installing an accessor. The immutable-prototype brand
+identified that intrinsic across realms. That historical lookup boundary
+is superseded by the current
+[omitted legacy accessor metadata contract](#omitted-legacy-accessor-metadata-boundary).
+Core reflection exposes stable, distinct native getter/setter identities that
+can be obtained, compared, copied and redefined without invoking their excluded
+bodies. Invoking either excluded body reports source-located `OSEO1001`; no
+Annex B getter/setter behavior is admitted. User properties named `__proto__`,
+null prototypes, proxy traps and unrelated abrupt completions retain their core
+behavior. The existing indexed Object prototype family records the boundary and
+ordinary-property evidence.
 
 The exact reviewed admission is
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
 observation remains owned by `node:typed-array-proto-coverage-remediation`;
-ADR 0013 excludes the accessor but does not close mixed core coverage. The
+ADR 0013 excludes the accessor behavior but does not close mixed core
+coverage. The
 fixed `typed-array-buffer-without-species-core` fixture preserves the original
 ArrayBuffer subclass, throwing constructor and species getter, TypedArray
 clone, and fresh buffer's intrinsic prototype and constructor. Core reflection
@@ -76,25 +83,32 @@ replaces only the incidental accessor observation. Bounded ordinary-property
 generation uses seed `0x60008500`, absent, truthful, and false hints, both
 specialization policies, deliberate shape-guard misses, generic fallback, and
 collection at every safepoint. Native diagnostic tests pin direct, computed,
-Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI is
-`oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary stay unchanged.
+Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI at
+that checkpoint was `oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary
+stay unchanged.
 
-Runtime ABI `oseo-runtime-m5-134` adds the write half of the same boundary. A
-`[[Set]]` of `"__proto__"` whose walk reaches an intrinsic `Object.prototype`
-without finding an own property there or earlier reports the same owned
+Runtime ABI `oseo-runtime-m5-134` added the write half of that historical
+boundary. A `[[Set]]` of `"__proto__"` whose walk reached an intrinsic
+`Object.prototype` without finding an own property there or earlier reported
+the same owned
 `OSEO1001`, because only the omitted normative-optional setter (16th edition
 20.1.3.8.2) would handle that write; without the guard it would silently
 create an own data property instead. Ordinary assignment, `Reflect.set`
 (including a distinct receiver), `super` assignment, a proxy without a `set`
-trap, and `Object.assign` share the guarded walks. Own and inherited user
+trap, and `Object.assign` shared the guarded walks. Own and inherited user
 data, accessor, and read-only properties, proxy `set` traps, null prototypes,
 typed-array numeric keys, and the object-literal prototype setter keep their
-behavior. A primitive base keeps its existing early return, so this is the
-boundary of these two walks, not a complete Annex B detector. Native tests in
-*tests/annexb-proto-boundary.test.ts* pin the guarded writes under both
-specialization policies with collection at every safepoint, and one program
-of answered writes whose output a reference host prints with or without the
-setter.
+behavior. At that checkpoint, a primitive base returned early; the guard
+covered only those two walks. The current
+[primitive receiver inherited Set contract](#primitive-receiver-inherited-set-preparation)
+supersedes that early return: wrapper lookup preserves the original primitive
+Receiver through inherited setter calls and Proxy Set dispatch. The current
+metadata contract linked above rejects invocation of an excluded setter body,
+including with a primitive Receiver; deletion and user replacement retain
+ordinary Set behavior. Native tests in *tests/annexb-proto-boundary.test.ts*
+cover the boundary under both specialization policies with collection at every
+safepoint, and one program of answered writes whose output a reference host
+prints with or without the setter.
 
 M5c node `annexb-legacy-lookup-dependency-classification` makes only a
 missing `__lookupGetter__` or `__lookupSetter__` lookup reaching an intrinsic
@@ -182,8 +196,12 @@ M5c node `minor-feature-tag-admission` admits the `json-superset`,
 compiler or runtime behavior. Literal U+2028 and U+2029 in a string literal
 are single code units of its value. The `__proto__` tag covers only core
 object-initializer, class, and proxy-forwarding behavior on keys named
-`__proto__`; no Annex B accessor is installed, and the existing `OSEO1001`
-rejection of a missing read at an intrinsic `Object.prototype` is unchanged.
+`__proto__`. At that admission, no Annex B accessor was installed, and the
+missing-read `OSEO1001` guard at an intrinsic `Object.prototype` was unchanged.
+The current [metadata contract](#omitted-legacy-accessor-metadata-boundary)
+exposes stable callable identities to core reflection while preserving
+`OSEO1001` for invocation of excluded bodies; this tag admits no Annex B
+getter/setter behavior.
 The existing Proxy family already enforces the `[[DefineOwnProperty]]`,
 `[[Delete]]`, and `[[GetOwnProperty]]` invariants that tag measures. The
 existing Proxy exotic object and object-literal prototype setter fixtures
@@ -9403,3 +9421,129 @@ throw branch changes. The extracted teardown helper uses existing public
 context fields, while Array/backend/layout, Set, RegExp and TCO source stay
 exact Main. Native validation, affected review, actual D3/full observations
 and exact candidate/Main gates remain pending under Root ownership.
+
+The following Set contracts are restored for the standalone source
+preparation on Main `cf0902db`. Every historical execution result remains
+bound to its named source; none validates this new composition. Fresh
+in-memory structural checks and CHECK/hooks are recorded in the source
+preparation report. Runtime, reference and native execution, affected review,
+fresh full observations and exact candidate/Main gates remain pending.
+
+
+Primitive receiver inherited Set preparation
+--------------------------------------------
+
+The `primitive-receiver-inherited-set` source prepares wrapper lookup with
+the original primitive Receiver, following ECMA-262 2025 PutValue,
+OrdinarySetWithOwnDescriptor, and OrdinaryCallBindThis. String own
+restrictions precede inherited descriptors; inherited callable setters and
+Proxy Set dispatch keep the primitive; data writes may still fail. Caller
+strictness affects a false Set result independently of setter strictness.
+The existing ordinary call boundary boxes sloppy this in the callee realm.
+
+*tests/primitive-receiver-inherited-set.test.ts* supplies pure reference and
+structural checks. The independent structured model and the source for
+later native evidence are in
+*tests/helpers/primitive-receiver-set.ts*,
+*tests/property/m5-primitive-receiver-inherited-set.property.test.ts*, and
+*tests/fixtures/primitive-receiver-inherited-set/allocation.c*.
+Native seed `0x60008c00` has 12 ordinary cases and a 240-second deadline; each
+case retains all primitive kinds and two writes while shrinking. The separate
+pure sixteen-sample seed remains `0x60008b00`; the unpublished native default
+moved to avoid Main's Script/Module seed block. Forced
+collection and allocation-failure assertions are pending native execution.
+This preparation changes no covered evidence assessment, compatibility
+observation, reviewed selector, or exclusion. The wrapper family's earlier
+coverage does not establish this Set repair. See *PLAN-M5.md* for the
+implementation contract and Root-owned validation and publication gates.
+
+
+Omitted legacy accessor metadata boundary
+-----------------------------------------
+
+The __proto__ rejection diagnoses required legacy getter/setter behavior.
+Core descriptor queries expose distinct, stable native getter/setter identities
+owned by their realm's Object.prototype. Existing property-vector tracing keeps
+them live; metadata, Function.toString, nonconstructability and Function
+prototype ownership follow the ordinary built-in contracts. They are distinct
+from Object.getPrototypeOf and Object.setPrototypeOf. Describing or copying an
+identity does not invoke its body. Actual calls, including forwarding through
+call/apply/bind and transparent Proxies, retain the source-located OSEO1001
+boundary; reference Node/Deno Annex behavior is not claimed equivalent.
+
+Partial definitions preserve the other identity, concrete user halves execute
+normally, and explicit undefined halves remain undefined. Core identity
+comparison governs descriptor round trips, integrity and Proxy invariants.
+Successful deletion removes the property, failed deletion changes nothing,
+and recreation uses new creation order. The earlier descriptor-query rejection
+contract conflicted with the existing intrinsic-walk pass and is replaced by
+positive reflection and negative excluded-call controls. No Annex body,
+accepted exclusion, feature, public ABI shape or family count is added.
+
+The original Annex and primitive Set assertions, apart from the superseded
+descriptor-identity rejection oracle above, remain. The initial six Linux
+commands passed 20 registrations on 1c96126b, then an independent native probe
+found a freeze/seal hole. Those passes are not evidence for the expanded
+metadata source. At preparation, its fixed/generated programs and layout
+assertions had only source/reference evidence; later focused results follow
+below. Affected review and fresh full observations remain pending.
+*PLAN-M5.md* names the files and exact raw packets.
+No numeric GC/frame or macOS/sanitizer/candidate/Main success is claimed, and
+no covered assessment or compatibility classification changes.
+
+
+Set-only generic interaction preparation
+----------------------------------------
+
+The earlier generic Set interaction preparation used Array/F3 base
+`f032576f`. This standalone composition instead starts from successful Main
+`cf0902db05ee8a51a2801f5d70372bfc5ca37b48`, retaining its `m5-135`
+interface and ordinary call/GC/realm/backend source. The original fifth
+dense-apply Script and literal oracle move to
+*tests/helpers/primitive-set-array-interop.ts*. Its separate preparation file
+checks reference/MIR/C contracts; its native driver retains both policies,
+positive forced-GC counters and balanced frame/call/root teardown. *PLAN-M5.md*
+names the exact contracts and paths. This preparation initially had no new
+native/layout or model review. The private metadata represents presence,
+attributes and accessor-half availability; reflected legacy identities are core
+metadata; only excluded behavior still requires OSEO1001.
+
+TCO remains deferred under D6.5. Its protocol-specific assertions and the
+complete original interaction module remain protected history; their
+requirements are not claimed tested or satisfied on this generic runtime.
+Original Set domains, seeds, budgets, programs, independent oracles and
+applicable semantic assertions remain. Current reviewed classifications,
+profile-family count, owners, exclusions and graph status stay exact base.
+
+The later focused Linux AMD64 run on exact `eab6f366` passed eight whole
+Node.js/Deno commands with 28 actual registrations and natural process/scope
+drain. All tracked source hashes/modes stayed exact. The original Annex/Set
+properties retain 12 cases, their seeds and limits, both policies, forced
+collection and applicable guard/fallback assertions. Both allocation fixture
+registrations compiled the expanded layout assertions on the selected Linux
+ABI; the independent generic driver retained its seven callback assertions
+and balanced teardown. Numeric sizes/GC/frame counters and successful
+temporary C/MIR/binaries were not printed or retained. *PLAN-M5C.md* binds
+the actual commands, walls and raw packet to eab6, not a later prose commit.
+Affected review, fresh observations, macOS/sanitizer and exact candidate/Main
+gates remain pending; no compatibility or evidence-vocabulary change follows.
+
+The later for-in consumer correction prepares creation-ordered ordinary
+virtual-key enumeration, hidden-own-key shadowing and rooted ToObject
+reachability for all primitive kinds. Its new independent fixed/reference
+subjects, allocation/root/realm retry fixture and fresh third Annex property
+subject preserve the earlier programs/oracles, seeds, cases and limits.
+The changed implementation now has 40 required focused registrations with
+explicit source bindings: the first eight whole commands passed 28 on
+46933fd3, and the six for-in follow-ups passed 12 on 97f06518. Only the
+C fixture observation flag changed between them; all other 8,046 files/modes,
+including runtime/program/oracle/generator/flag inputs, remain exact. The
+original command 9 counter assertion failure remains recorded. Both hosts
+passed the new both-policy forced-GC matrix and all five acquisition
+failure/retry sweeps with positive collection and balanced realm/root checks.
+Numeric GC counts and sizeof values were not printed. *PLAN-M5C.md* records
+all commands, walls and source-bound packets. Affected review, fresh full
+observations, macOS/sanitizer, extended and exact candidate/Main gates remain
+pending. The required Array CI failure blocked that historical bundle;
+it is not a standalone Set prerequisite. No family assessment, vocabulary,
+admission or classification changes.

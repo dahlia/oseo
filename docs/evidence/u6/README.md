@@ -994,3 +994,101 @@ estimates, not host costs, bounds or new native measurements. Main's Array
 candidate's 1119/638 costs are not F3 measurements and are not copied.
 Matching-host extended case sums and exact candidate gates remain required.
 No width, shard total, seed, case budget, timeout or scheduling rule changes.
+
+
+Annex prototype-boundary deletion extension
+-------------------------------------------
+
+The Annex prototype-boundary generator now includes user replacement and
+successful deletion of the omitted intrinsic dependency, strict primitive
+refusal and failed deletion of real descriptors. Its original domains, seed,
+12-case budget and 180,000-millisecond interrupt limit remain unchanged.
+The old 309-second Linux/451-second macOS samples from run 39070198868 at
+`c78d9df1` do not measure this changed source and are retired. At first-repair
+source 1c96126b, all remaining weights were unchanged. Its tables had 137
+entries; their upper median at index `floor(137/2) = 68` was 409 Linux/296
+macOS seconds. The existing unknown-file fallback assigns those values to the
+changed file without a new explicit estimate. No assignment algorithm or shard
+total changes.
+
+The whole ordinary file passed once under each Linux compiler host:
+`node --test tests/property/m5-annexb-proto-boundary.property.test.ts`
+completed in 18.700712190 seconds, and
+`deno test -A tests/property/m5-annexb-proto-boundary.property.test.ts`
+in 20.994590090 seconds. Each reported one test registration. These command
+walls are focused ordinary evidence, not extended case sums, CI weights,
+macOS measurements or conservative bounds. Exact commands, source hashes,
+resources and raw outputs remain under
+*/data/m5c-primitive-set-annexb-repair-20261025/task\_f5c6ab875894/*.
+The file requires matching-source extended CI case sums on both native hosts
+before assigning new measured weights. Historical source-run observations
+remain in *ci-39070198868.json.txt*.
+
+The later integrity-metadata correction adds one fresh bounded subject to
+each old Annex property case and leaves every old program, seed and budget
+intact. The 18.701/20.995-second ordinary walls above predate that source.
+No focused native or extended matching-host duration measures the expanded
+source yet; its existing unknown-file fallback remains an unmeasured
+scheduling value. No new weight, shard or timeout change is inferred from
+plain JavaScript reference checks.
+
+
+Set integrity focused ordinary Linux walls
+------------------------------------------
+
+Later, exact source `eab6f36600fa8863d17a84533711392e07d9955f` passed
+eight whole ordinary Node.js/Deno commands once on Linux AMD64, with
+28 actual registrations, unchanged source hashes/modes and natural owned
+process/scope drain. The Annex property walls were 35.376709 seconds under
+Node.js and 37.520988 under Deno; Set property-file walls were 111.521138
+and 131.585252. The fixed generic Set/Array driver walls were 1.903703 and
+4.741917. *PLAN-M5C.md* records all eight exact argv, counts and walls, with
+full raw evidence sealed under
+*/data/m5c-set-integrity-native8-20261025/task\_af9240358454/*.
+
+These ordinary command walls measure the expanded eab6 integrity source,
+separately from the earlier 1c96126b observations and source-only reference
+checks. Both properties retain their original 12 cases, seeds and limits;
+no filtering, scaling, timeout or retry was used. These are not extended
+case sums, macOS measurements, sanitizer proof or conservative bounds.
+The 134-entry 409/296 fallback remains an unmeasured composition estimate.
+No 900 Set entry or other cost-table, shard or budget change follows.
+Matching-source extended measurements on both native hosts and exact
+candidate/Main gates remain required before assigning measured weights.
+
+The subsequent for-in consumer correction adds a third fresh subject to the
+Annex property while retaining its original two programs, arbitrary, seed,
+12 cases and 180-second interrupt. Existing for-in generators retain their
+domains, seeds, cases and limits. The eab6 walls above do not measure this
+changed runtime/workload. Later
+ordinary Linux measurements are separately source-bound: Annex property
+64.951403/62.961854 seconds and Set property 153.286201/150.355762 on
+46933fd3; fixed for-in/allocation 14.573503/18.845015, general for-in
+30.717361/33.836163 and object-pattern for-in 36.476596/39.730977 on
+97f06518, each pair Node.js/Deno. *PLAN-M5C.md* records exact argv and the
+28-plus-12 registration composition, preserved failed command and raw packets.
+The only intervening change enables the fixture's observation counter;
+all runtime/program/generator/flag inputs for the retained first eight
+commands are exact. Every measured command passed unchanged-source and
+natural owned-process/scope-drain checks. No all-fourteen-on-97 result is
+claimed.
+
+These actual ordinary walls neither replace matching-host extended costs
+nor bound current deadlines. No weight, fallback, shard or budget changes
+follow. The required Array CI failure blocked that historical bundle;
+it is not a dependency of standalone Set preparation. An earlier PASS
+sample is not a current bound or publication clearance.
+
+
+Standalone Set scheduling preparation on Main
+---------------------------------------------
+
+This source composition starts from exact successful Main
+`cf0902db05ee8a51a2801f5d70372bfc5ca37b48`. Removing only the obsolete
+Annex 309/451 entries leaves 134 entries per host and upper-median fallback
+estimates of 409 Linux/296 macOS seconds. The primitive Set file uses that
+existing unknown-file rule; it receives no new explicit weight. All Main
+Array/TCO/F3 values and partition rules remain unchanged. The historical
+measurements above keep their original source identities and do not measure
+this composition or prove a deadline. Matching-host extended case sums and
+exact candidate/Main gates remain required; no budget or timeout changes.
