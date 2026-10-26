@@ -7212,8 +7212,17 @@ definition with the `harness-definition` capability. Both decisions read
 parsed syntax, never source text: a name inside a comment or string, a
 property key, a `typeof` operand, a name inside a `with` body, whose object
 may provide it, and a name the case declares itself never withhold execution.
-The reviewed *regExpUtils.js* still omits `buildString` and
-`testPropertyEscapes`. An unhandled rejection now reports the rejection
+Reg-only source preparation restores the pinned `buildString`,
+`testPropertyEscapes`, and `printCodePoint` operations in the reviewed
+*regExpUtils.js* on successful Array/B Main `d4d81be9`. Lone code points
+precede inclusive ranges in supplied order, conversion flushes at 10,000
+code points, and the property helper tests the aggregate before each iterated
+symbol on a miss. Assertion failures, diagnostic formatting, abrupt
+completion, and RegExp mutations, including `lastIndex`, remain observable.
+The 453 inherited harness-definition unsupported records await fresh
+canonical observation; source restoration establishes no new classifications.
+
+An unhandled rejection now reports the rejection
 boundary text, followed by a kind marker only when the reason itself or an
 object on its stored prototype chain is one of the current context realm's
 intrinsic error prototypes, the first one reached giving the kind, so

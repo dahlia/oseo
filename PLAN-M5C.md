@@ -1655,3 +1655,52 @@ step. All inventory paths, reviewed observations, classifications, owners,
 exclusions, pins, budgets and graph state then remained exact Main; Set was
 ready and unlanded. Publication candidates mark landed prospectively; only
 successful equal-tree Main CI makes that state effective.
+
+
+Reg helper source preparation on fixed Set/Array/B
+--------------------------------------------------
+
+This private Reg-only source starts from successful Array/B Main
+`d4d81be99c224af282f9e3da5945f6675958e4c5`, tree
+`7d8956d5748c925f2e143b937cb1cb82428cbeaf`. Its five Reg helper, BSD
+license and test blobs remain exact accepted source
+`78bdbd0fe1b05c5d28b0eaf1f7a74a441341d6bf`, which restored them from
+`2868cf66250c072e6f0d5072564b3e1ec64df2f4`. The JavaScript-only WKI scan
+retains the license in its filesystem inventory without parsing it as code.
+No compiler, runtime, Array, Set, TCO, scheduling, Unicode data or baseline
+change is imported from that old source.
+
+The helper keeps the original operations, 10,000-code-point chunks, data and
+assertions, aggregate matching and symbol fallback, UTF-16 behavior, abrupt
+effects and `lastIndex`. The pure suite retains all 441 supplied Unicode 17
+property sets and complements. The native suite retains all four whole
+registrations and 16 invocations; its presence is not a current execution.
+The original 44 whole-Script baseline remains blob
+`43a6e39af8dcd1695024e7d0a0b3e168d773ea19`. All Set/Array/B source and
+contracts, current observations, subset expectations, ledger owners, feature
+pins, profile classes outside the Reg hunks, seeds and budgets stay intact.
+
+All 453 inherited helper-owned rows remain harness-definition unsupported:
+441 property-escape paths and 12 CharacterClassEscapes paths. The old Full
+on source `2868cf66`, result `f68583d5`, observed 450 promotions and three
+matcher-limit results under its different compiler/runtime. Those records,
+promotions and owner transfers are not copied here. New classifications and
+any exact remaining matcher ownership require Root's fresh actual Full and
+judgment; Array performance alone establishes no matcher repair or exclusion.
+The historical prospective matcher plan and its graph/test-count changes
+remain deferred to Root's observation and ownership phase.
+
+Root confirmed Array Main `d4d81be9`, all 79 jobs and workflow success,
+with the exact candidate tree, before authorizing this port. Main's 90-node,
+56-landed graph and B's unchanged routing, aggregate, budgets and 137-file
+property inventory remain. No source, admission, observation or ownership
+from the separate TCO option enters this Reg-only preparation.
+
+All production packages, runner interfaces, toolchain and input data are
+compared with original accepted source `78bdbd0f`. Root owns D1.9 retention
+of that source's internal12, outer10 and author Native4/16 after the exact
+fidelity proof; no new model or Native is implied by a provenance port.
+Reg still requires a fresh Full on its actual source, actual observation
+and ownership review, source-qualified per-shard cost assessment, and exact
+candidate/Main gates. Old Full, review, Native and cost observations retain
+their original sources. Root owns all later execution and publication.
