@@ -10,6 +10,7 @@ import {
 
 import {
   caseShardedNativeFiles,
+  dedicatedLinuxNativeFiles,
   nativeTestArguments,
   selectNativeTestShard,
 } from "../tools/native-shard.ts";
@@ -108,6 +109,58 @@ test("case-sharded files leave both CI file partitions", async () => {
   assert.equal(reflectCaseShardCosts["macos-aarch64"], 761);
 });
 
+test("Linux jobs cover the real property inventory exactly once", async () => {
+  const files = (await readdir(new URL("property/", import.meta.url)))
+    .filter((path) => path.endsWith(".property.test.ts"))
+    .map((path) => `tests/property/${path}`);
+  const array = "tests/property/m5-array-constructor.property.test.ts";
+  assert.deepEqual(dedicatedLinuxNativeFiles, [array]);
+  const linux = Array.from({ length: 7 }, (_, index) =>
+    nativeTestArguments(
+      [
+        `--shard=${index + 1}/7`,
+        "--exclude-case-sharded",
+        "--exclude-dedicated-linux",
+        ...files,
+      ],
+      "linux",
+    ),
+  );
+  const remaining = files.filter(
+    (path) =>
+      !caseShardedNativeFiles.includes(path) &&
+      !dedicatedLinuxNativeFiles.includes(path),
+  );
+  for (const [index, shard] of linux.entries()) {
+    assert.ok(!shard.includes(array));
+    assert.deepEqual(
+      shard,
+      selectNativeTestShard(remaining, { index: index + 1, total: 7 }, "linux"),
+    );
+  }
+  const all = [
+    ...linux.flat(),
+    ...dedicatedLinuxNativeFiles,
+    ...caseShardedNativeFiles,
+  ];
+  assert.deepEqual(all.toSorted(), files.toSorted());
+  assert.equal(new Set(all).size, all.length);
+  const macos = Array.from({ length: 12 }, (_, index) =>
+    nativeTestArguments(
+      [`--shard=${index + 1}/12`, "--exclude-case-sharded", ...files],
+      "darwin",
+    ),
+  ).flat();
+  assert.equal(macos.filter((path) => path === array).length, 1);
+  assert.deepEqual(
+    [...macos, ...caseShardedNativeFiles].toSorted(),
+    files.toSorted(),
+  );
+  assert.equal(new Set(macos).size, macos.length);
+  // The dedicated invocation has no wrapper filter and keeps the full file.
+  assert.deepEqual(nativeTestArguments([array], "linux"), [array]);
+});
+
 test("native shards start the measured expensive batch first", () => {
   const files = [
     "tests/property/m5-object-own-keys.property.test.ts",
@@ -192,6 +245,15 @@ test("native wrapper translates shards and rejects ambiguous input", () => {
     ["--shard=1/12", "--test-shard=1/12", ...files],
     ["--exclude-case-sharded", ...files],
     ["--exclude-case-sharded=true", ...files],
+    ["--exclude-dedicated-linux", ...files],
+    ["--exclude-dedicated-linux=true", ...files],
+    ["--shard=1/7", "--exclude-dedicated-linux=true", ...files],
+    [
+      "--shard=1/7",
+      "--exclude-dedicated-linux",
+      "--exclude-dedicated-linux",
+      ...files,
+    ],
     [
       "--shard=1/12",
       "--exclude-case-sharded",
