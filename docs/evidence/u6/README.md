@@ -10,6 +10,235 @@ measurements below retain their original input sets; they do not measure the
 dedicated job.
 
 
+Current Linux weight source (2026-10-27)
+----------------------------------------
+
+The Linux table now uses three successful runs: main [40401101765] at
+`d4d81be9`, candidate [40442491966] at `98460f7c`, and [40454201429] at
+`6aab0fc8`. All three observed the same 134 included files, 286 test
+registrations per run, and four file workers per shard. Each entry is
+`ceil(median(per-run sum(case_ms)) / 1000)`: sum every reported test-case
+duration in a file within each run, take the median of those three sums,
+then divide by 1,000 and round up to whole seconds. These derived weights
+include concurrent test time; they are not isolated file latencies, job
+wall times, CPU time, or conservative bounds.
+
+The source job IDs, ordered by shard, are:
+
+| Shard | 40401101765 (`d4d81be9`) | 40442491966 (`98460f7c`) | 40454201429 (`6aab0fc8`) |
+| ----- | ------------------------ | ------------------------ | ------------------------ |
+| 1/7   | 121847031054             | 121985959542             | 122023722631             |
+| 2/7   | 121847031208             | 121985959637             | 122023722692             |
+| 3/7   | 121847031011             | 121985959527             | 122023722851             |
+| 4/7   | 121847031261             | 121985959575             | 122023722807             |
+| 5/7   | 121847031100             | 121985959675             | 122023722742             |
+| 6/7   | 121847030959             | 121985959612             | 122023722630             |
+| 7/7   | 121847030943             | 121985959670             | 122023722816             |
+
+[*linux-shard-weights.tsv*](./linux-shard-weights.tsv) retains the old
+weight, each run's unrounded summed milliseconds, and the refreshed weight
+for every file. A `-` in the old column means the file previously used the
+409-second upper-median fallback. All included files now have measurements,
+including the previously unlisted Annex prototype-boundary, generator-throw,
+and primitive receiver inherited-Set files. The 137-entry Linux table now
+has a 435-second upper-median fallback. No included file lacks a weight.
+
+Three excluded files have no observations in these file-shard logs:
+*tests/property/m5-array-constructor.property.test.ts*,
+*tests/property/m5-object-own-keys.property.test.ts*, and
+*tests/property/m5-reflect-namespace.property.test.ts*. They retain their
+674-, 3,327-, and 2,299-second weights, respectively. Their dedicated and
+case-shard jobs remain required. macOS entries and lanes are unchanged.
+The earlier observations and estimates below retain their historical
+provenance; this refresh supersedes their Linux file-shard values.
+
+[40401101765]: https://github.com/dahlia/oseo/actions/runs/40401101765
+[40442491966]: https://github.com/dahlia/oseo/actions/runs/40442491966
+[40454201429]: https://github.com/dahlia/oseo/actions/runs/40454201429
+
+### Reproduction and model comparison
+
+The downloaded inputs are *jobs.txt* and *<sha8>-<shard>.log* under
+*/home/dahlia/.local/state/oseo-m5c/aws-gate-work/linux-shard-logs/*.
+[*linux-shards.py*](./linux-shards.py) reads only these files and source
+text. It starts at the `native-shard` marker, excluding setup tests and
+package build output. Each complete reported title occurs in exactly one
+selected property source. The script rejects missing or ambiguous matches,
+empty file observations, duplicate membership, a missing shard, a changed
+worker count, and incomplete or nonpassing test counts. It reproduces the
+retained TSV and verifies the checked-in Linux table against the derivation.
+It never imports or executes a property file and needs no network access.
+
+~~~~ sh
+python3 docs/evidence/u6/linux-shards.py \
+  /home/dahlia/.local/state/oseo-m5c/aws-gate-work/linux-shard-logs \
+  > docs/evidence/u6/linux-shard-model.txt
+~~~~
+
+[*linux-shard-model.txt*](./linux-shard-model.txt) retains exact modeled
+seconds. The following loads are modeled minutes, ordered by shard index.
+Both comparisons use the current 134-file inventory, with all three
+excluded files omitted.
+The model preserves descending cost/path order, batches of four, the first
+least-loaded shard and worker on ties, and four workers per Linux shard.
+The old table keeps its original fallback for the three unlisted files.
+The script also verifies that the old seven-shard partition reproduces
+every source log's selected file order exactly.
+
+| Weights   | Total | Per-shard modeled minutes                                     | Mean  | Maximum | Maximum/mean |
+| --------- | ----- | ------------------------------------------------------------- | ----- | ------- | ------------ |
+| Old       | 7     | 44.12, 38.35, 39.28, 38.30, 37.90, 38.03, 39.98               | 39.42 | 44.12   | 1.119        |
+| Old       | 8     | 44.12, 32.62, 33.88, 32.62, 32.90, 32.82, 33.83, 33.77        | 34.57 | 44.12   | 1.276        |
+| Old       | 9     | 44.12, 29.43, 29.02, 29.42, 29.57, 28.78, 29.08, 29.15, 29.42 | 30.89 | 44.12   | 1.428        |
+| Refreshed | 7     | 69.33, 46.67, 46.25, 47.07, 48.12, 48.40, 47.70               | 50.50 | 69.33   | 1.373        |
+| Refreshed | 8     | 69.33, 39.75, 39.65, 40.25, 40.90, 40.88, 40.93, 40.85        | 44.07 | 69.33   | 1.573        |
+| Refreshed | 9     | 69.33, 35.62, 34.62, 35.88, 35.25, 35.35, 37.10, 35.02, 35.42 | 39.29 | 69.33   | 1.765        |
+
+The old table underestimates today's cost. Holding the refreshed costs
+fixed and replaying the partitions chosen by the old weights gives:
+
+| Total | Old partition scored with refreshed weights, minutes          | Maximum |
+| ----- | ------------------------------------------------------------- | ------- |
+| 7     | 44.55, 69.33, 35.67, 47.63, 58.10, 55.42, 36.38               | 69.33   |
+| 8     | 44.55, 69.33, 38.28, 34.88, 36.87, 58.07, 48.50, 38.30        | 69.33   |
+| 9     | 44.55, 69.33, 33.30, 34.70, 43.90, 34.58, 41.63, 42.07, 37.82 | 69.33   |
+
+Keep seven shards. None of 7, 8, or 9 has a refreshed modeled maximum
+within 15 percent of its mean or below today's modeled maximum.
+*tests/property/m5-compound-assignment.property.test.ts* alone has case
+sums of 4,376,166.421334, 4,136,065.359899, and 4,159,895.993499
+milliseconds, giving a 4,160-second median weight. That indivisible file
+sets the maximum for every total considered; more shards add jobs without
+lowering that maximum. The old partition places it on shard 2, while the
+refreshed partition places it on shard 1. Observed shard-2 runner walls
+were 72.95, 68.95, and 69.35 minutes. Refreshing the table alone does not
+establish a CI tail improvement. Reducing that tail requires a separate
+workload change beyond this file-weight refresh.
+
+The workflow matrix and generated workflow retain seven Linux file shards;
+no regeneration is needed. Worker counts, exclusions, budgets, seeds,
+and timeouts are unchanged. The unit tests check the chosen seven-shard
+union plus all three excluded files against the full 137-file inventory,
+reject duplicates, and require a positive measured weight for every
+included file. They also check the table against all three retained sums.
+
+### Combined with the compound assignment split
+
+The refresh above was measured at `b4775e0b`, before the
+`compound-assignment-property-cost` split and before main added two property
+files. The publication that combines them keeps every refreshed weight and
+changes the derivation's inventory in two ways:
+
+ -  *tests/property/m5-compound-assignment.property.test.ts* is rebucketed.
+    The script assigns each logged registration title from that file to the
+    current source that defines it, so the same three runs yield
+    2,086 seconds for the remaining file, 668 for
+    *tests/property/m5-compound-member-fixed.property.test.ts*, and 1,408 for
+    *tests/property/m5-computed-member-fixed.property.test.ts*. These equal
+    the split's historical estimates below. They omit the new pure model
+    properties' overhead and are not observations of the new files.
+ -  *tests/property/m5-host-script-bindings.property.test.ts* and
+    *tests/property/m5-proper-tail-calls.property.test.ts* landed after these
+    runs and have no observations in their logs. They retain their 596- and
+    1,726-second weights; the TSV records `-` samples for them, and the
+    membership replay omits them because the source runs never scheduled
+    them.
+
+The Linux table now has 141 entries and a 443-second upper-median fallback.
+[*linux-shard-model.txt*](./linux-shard-model.txt) is regenerated over the
+combined 138-file inventory and still verifies every source log's selected
+file order. Its old-table rows give the three split files no historical
+weight of their own, so only the refreshed rows are tabulated here:
+
+| Total | Per-shard modeled minutes                                     | Mean  | Maximum | Maximum/mean |
+| ----- | ------------------------------------------------------------- | ----- | ------- | ------------ |
+| 7     | 48.73, 48.87, 48.93, 48.77, 48.95, 48.82, 48.85               | 48.85 | 48.95   | 1.002        |
+| 8     | 44.55, 43.17, 41.93, 42.93, 43.05, 44.02, 43.55, 42.98        | 43.27 | 44.55   | 1.030        |
+| 9     | 44.55, 38.05, 36.90, 37.92, 38.25, 37.45, 37.42, 37.75, 38.48 | 38.53 | 44.55   | 1.156        |
+
+The seven-shard total is unchanged. This projection assumes the historical
+case costs persist; it is not a CI result.
+
+### Local validation
+
+The derivation reproduced the TSV and exact model output. A separate Node.js
+replay through `selectNativeTestShard` matched all six old/new load vectors
+at totals 7, 8, and 9, including exact coverage with no duplicates. The
+macOS table and following case-shard estimates matched the pre-change source
+byte for byte. No property suite, native suite, network request, commit,
+or push was used.
+
+Mise's default state directory is read-only in this sandbox. Use writable
+local state and skip automatic dependency installation for offline checks:
+
+~~~~ sh
+export MISE_STATE_DIR="$PWD/.oseo-validation/state"
+export MISE_CACHE_DIR="$PWD/.oseo-validation/cache"
+export MISE_OFFLINE=true
+mise run --no-deps check
+mise run --no-deps generate:macos-lanes --check
+~~~~
+
+The workflow generator check passed. The full check stopped at
+`check:lint`: aube found a missing workspace link for `@oseo/compiler` and
+could not lock its read-only shared virtual store. Its completed Actions,
+boundaries, evidence-lanes, inventory, line-length, and anti-slop checks
+passed. A direct full TypeScript check also found missing workspace
+dependencies and cascading diagnostics; no diagnostic named the changed
+shard files. A focused TypeScript project extending *tsconfig.json* with
+`include: []` and only *tests/native-shard.test.ts* in `files` passed.
+
+~~~~ sh
+node node_modules/typescript/bin/tsc --project tsconfig.json
+mkdir -p .oseo-validation
+cat > .oseo-validation/tsconfig-native-shard.json <<'JSON'
+{
+  "extends": "../tsconfig.json",
+  "include": [],
+  "files": ["../tests/native-shard.test.ts"]
+}
+JSON
+node node_modules/typescript/bin/tsc \
+  --project .oseo-validation/tsconfig-native-shard.json
+~~~~
+
+~~~~ sh
+node --test --test-isolation=none --test-reporter=spec \
+  tests/native-shard.test.ts
+node --test --test-isolation=none --test-reporter=spec \
+  tests/macos-lanes.test.ts
+node node_modules/oxlint/bin/oxlint \
+  tools/native-shard-costs.ts tests/native-shard.test.ts
+~~~~
+
+The in-process native shard tests had eight passes and one failure: the
+existing singleton subprocess test received empty stdout and missed its
+marker. A child-output probe also returned empty stdout. The macOS tests
+had 35 passes and three subprocess failures: two `spawnSync` calls reported
+`EPERM`, and the jactionlint subprocess timed out. These failures leave
+subprocess validation incomplete in this sandbox. The unchanged workflow
+passes direct jactionlint validation. Direct lint of
+both changed TypeScript files passed after removing an import shadow.
+
+The following checks avoid the affected subprocess tests. They passed seven
+native partition/provenance tests and six workflow contract tests:
+
+~~~~ sh
+native_pattern='native property shards|Linux isolates|case-sharded files|'
+native_pattern+='Linux jobs|Linux weights|native shards start|native wrapper'
+node --test --test-isolation=none --test-name-pattern="$native_pattern" \
+  tests/native-shard.test.ts
+macos_pattern='every check name and concurrency policy is preserved|'
+macos_pattern+='case duration contract|Linux|native support'
+node --test --test-isolation=none --test-name-pattern="$macos_pattern" \
+  tests/macos-lanes.test.ts
+~~~~
+
+Hongdown and Oxfmt checks, `node tools/check-lines.ts`, and
+`git diff --check` passed. Hongdown retained two existing undefined historical
+run-link warnings. Prose was reviewed locally under the no-network limit.
+
+
 Compound assignment property partition
 --------------------------------------
 
@@ -73,12 +302,14 @@ run's two fixed matrices took 702.317 and 1,102.713 seconds; the remaining
 registrations sum to 282.341 seconds. No candidate sanitizer result is
 inferred from this partition.
 
-A read-only replay of the optional `b4775e0b` refreshed Linux table,
-rebucketing only these unchanged registrations, reduces the seven-shard
-model's maximum from 4,160 to 2,866 seconds (69.33 to 47.77 minutes).
-That projection excludes the new pure properties' overhead, assumes the
-historical case costs persist, and is not a CI result. That optional
-branch is not merged here, and none of its other weights is adopted.
+A read-only replay of the `b4775e0b` refreshed Linux table, rebucketing
+only these unchanged registrations, reduced the seven-shard model's maximum
+from 4,160 to 2,866 seconds (69.33 to 47.77 minutes) over that table's
+inventory. That projection excludes the new pure properties' overhead,
+assumes the historical case costs persist, and is not a CI result. The
+publication that combines both changes adopts the refreshed table; its
+model, which also includes two later main files, is recorded above under
+the current Linux weight source.
 
 ### Local measurements and scheduling inputs
 
@@ -198,8 +429,8 @@ job timeout, existing property deadline, reviewed test262 row, or production
 package. Exact candidate CI, landing, and publication remain Root-owned.
 
 
-Historical shared weight source
--------------------------------
+Historical shared weight refresh (U39)
+--------------------------------------
 
 Refreshing the file weights lowers the modeled Linux maximum over seven
 shards from 47.3 minutes to 44.1, holding one run's measured case costs
@@ -287,10 +518,10 @@ These observations do not separate hardware, concurrency, file cohort and
 implementation change.
 
 
-Exceptions to the current table
--------------------------------
+Historical exceptions and estimates
+-----------------------------------
 
-The current weight-source runs above observed two families before later
+The U39 weight-source runs above observed two families before later
 changes grew them. The exceptions described below override that upstream table;
 all other refreshed weights, including compound assignment at 1,838 Linux
 and 1,242 macOS seconds, remain intact. None of the four changes file
@@ -428,8 +659,9 @@ python3 docs/evidence/u6/summarize.py
 case milliseconds divided by 1,000 are derived per-file scheduling weights,
 not measured subprocess lifetimes. Historically
 *tools/native-shard-costs.ts* kept the larger derived sum for each
-file/host across the two runs named above; the current table instead takes
-one run's sum, as the section on the current weight source records. Unknown
+file/host across the two runs named above; U39 instead took one run's sum.
+The current Linux refresh takes three runs' median sums as recorded above.
+Unknown
 files use the upper median of that host's table. Run-varying costs are
 outside canonical evidence, and no expected classification changes.
 

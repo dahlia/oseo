@@ -591,9 +591,12 @@ the wrapper flag instead.
 Weights are derived sums of concurrent test-case durations, not isolated file
 latencies or processor time. Refresh them from CI logs when the file set or
 relative costs change; *docs/evidence/u6/README.md* records their source and
-model limits. Raising totals adds approximately one derived macOS minute of
-fixed job cost per extra job in the current measured baseline. Keep every
-shard of every total and the complete input set when changing the partition.
+model limits. Linux file weights use the median of three runs' per-file sums,
+converted from milliseconds to seconds and rounded up. The total remains
+seven. Raising totals adds approximately
+one derived macOS minute of fixed job cost per extra job in the current
+measured baseline. Keep every shard of every total and the complete input set
+when changing the partition.
 
 
 Package manifests and versions

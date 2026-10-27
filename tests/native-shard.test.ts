@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readdir } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
 import {
@@ -11,6 +11,7 @@ import {
 import {
   caseShardedNativeFiles,
   dedicatedLinuxNativeFiles,
+  nativeShardModel,
   nativeTestArguments,
   selectNativeTestShard,
 } from "../tools/native-shard.ts";
@@ -114,6 +115,8 @@ test("Linux jobs cover the real property inventory exactly once", async () => {
     .filter((path) => path.endsWith(".property.test.ts"))
     .map((path) => `tests/property/${path}`);
   const array = "tests/property/m5-array-constructor.property.test.ts";
+  const { costs, width } = nativeShardModel("linux");
+  assert.equal(width, 4);
   assert.deepEqual(dedicatedLinuxNativeFiles, [array]);
   const linux = Array.from({ length: 7 }, (_, index) =>
     nativeTestArguments(
@@ -132,7 +135,12 @@ test("Linux jobs cover the real property inventory exactly once", async () => {
       !dedicatedLinuxNativeFiles.includes(path),
   );
   for (const [index, shard] of linux.entries()) {
+    assert.ok(shard.length > 0);
     assert.ok(!shard.includes(array));
+    for (const path of shard) {
+      assert.ok(!caseShardedNativeFiles.includes(path));
+      assert.ok(costs[path]! > 0, path);
+    }
     assert.deepEqual(
       shard,
       selectNativeTestShard(remaining, { index: index + 1, total: 7 }, "linux"),
@@ -159,6 +167,43 @@ test("Linux jobs cover the real property inventory exactly once", async () => {
   assert.equal(new Set(macos).size, macos.length);
   // The dedicated invocation has no wrapper filter and keeps the full file.
   assert.deepEqual(nativeTestArguments([array], "linux"), [array]);
+});
+
+test("Linux weights match the three-run median case sums", async () => {
+  const evidence = await readFile(
+    new URL("../docs/evidence/u6/linux-shard-weights.tsv", import.meta.url),
+    "utf8",
+  );
+  const rows = evidence.trimEnd().split("\n").slice(1);
+  const { costs } = nativeShardModel("linux");
+  // Added after the three source runs; they keep their earlier weights.
+  const retained = [
+    "tests/property/m5-host-script-bindings.property.test.ts",
+    "tests/property/m5-proper-tail-calls.property.test.ts",
+  ];
+  assert.deepEqual(
+    rows.map((row) => row.split("\t")[0]).toSorted(),
+    Object.keys(costs).toSorted(),
+  );
+  for (const row of rows) {
+    const [path, old, ...values] = row.split("\t");
+    const samples = values.slice(0, 3);
+    if (samples.includes("-")) {
+      assert.ok(
+        [
+          ...caseShardedNativeFiles,
+          ...dedicatedLinuxNativeFiles,
+          ...retained,
+        ].includes(path!),
+      );
+      assert.deepEqual(samples, ["-", "-", "-"]);
+      assert.equal(costs[path!], Number(old));
+    } else {
+      const median = samples.map(Number).toSorted((a, b) => a - b)[1]!;
+      assert.equal(costs[path!], Math.ceil(median / 1000), path);
+    }
+    assert.equal(costs[path!], Number(values[3]), path);
+  }
 });
 
 test("native shards start the measured expensive batch first", () => {
@@ -269,7 +314,7 @@ test("native wrapper translates shards and rejects ambiguous input", () => {
 
 test("native shard preserves order and reports failures", async () => {
   const { execFile } = await import("node:child_process");
-  const { mkdtemp, readFile, rm, writeFile } = await import("node:fs/promises");
+  const { mkdtemp, rm, writeFile } = await import("node:fs/promises");
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
