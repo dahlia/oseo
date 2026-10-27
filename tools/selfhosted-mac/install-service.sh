@@ -69,10 +69,11 @@ PY
 }
 
 # The generated workflow and the availability probe know only these lanes.
-[[ $runner_label =~ ^oseo-mac-[1-6]$ ]] || {
-  echo 'Runner label must be oseo-mac-1 through oseo-mac-6' >&2
+if [[ $runner_label == *$'\n'* ]] ||
+  ! grep -Fxq -- "$runner_label" "$script_dir/lane-labels.txt"; then
+  echo 'Runner label must be listed in lane-labels.txt' >&2
   exit 2
-}
+fi
 [[ $runner_root == /* && $runner_root != / ]] || {
   echo 'Runner root must be an absolute non-root path' >&2
   exit 2

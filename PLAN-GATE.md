@@ -3659,3 +3659,33 @@ at 47.30 in the branch run rather than 48.00, and at 45.47 and 48.80 in the
 two main runs. A `workflow_dispatch` repeat was canceled because the
 readiness probe runs only on push events and every Mac lane fell back to the
 hosted slots. *docs/evidence/u49/README.md* records the table.
+
+### Rented fourth Mac mini
+
+Configure eight optional lanes: `oseo-mac-1` through `oseo-mac-6` on the
+three owned machines, then `oseo-macrun-1` and `oseo-macrun-2` on one rented
+M6 Mac mini. The machine is rented for about one month and reachable
+over Tailscale. Its reported configuration has 12 CPU cores (4 performance and
+8 efficiency), 16 GB RAM, a 228 GiB disk, and macOS 27.0.1. Accounts
+`oseo-runner` and `oseo-runner2` retain the 30 GiB per-account Zig cache cap.
+Installation and registration are outside this repository change.
+
+The model reuses existing M6 per-family ratios, one-lane job walls, and
+within-machine pair slowdowns for the rented pair. This is a derived
+assumption, unmeasured on that machine, including memory and cache pressure.
+U30 and U35 record 16 GiB RAM for the second and third owned machines; no
+larger owned-machine RAM configuration is recorded here.
+
+`macosLaneEnds(macosLanes(count))`, divided by 60 and rounded to two decimals,
+gives these current-cost lane ends in minutes, hosted first and then Mac
+lanes in label order:
+
+| Mac lanes | Hosted lanes 1 to 5               | Mac lanes in label order                               | Maximum |
+| --------- | --------------------------------- | ------------------------------------------------------ | ------- |
+| 6         | 40.87, 38.95, 47.08, 38.88, 45.73 | 47.31, 46.04, 47.17, 47.23, 47.01, 47.29               | 47.31   |
+| 8         | 40.87, 38.95, 33.35, 37.68, 29.13 | 39.70, 38.40, 39.87, 39.26, 33.69, 38.13, 33.78, 38.68 | 40.87   |
+
+The eight-lane maximum is hosted. These are model outputs, not new CI
+measurements. Missing or offline runners fall back to hosted independently,
+so landing before registration preserves required work. Partial fallback
+wall time and the rented machine's runner-mode performance are unmeasured.

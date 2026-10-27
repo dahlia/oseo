@@ -5,6 +5,7 @@ import type {
   StructuredDataValue,
 } from "../structured-data.ts";
 import { parsedMapping } from "../structured-data.ts";
+import { selfHostedLaneLabels } from "../macos-lane-config.ts";
 import { isBoolean, isNumber, isString } from "../value-kinds.ts";
 
 const hosted = JSON.stringify("macos-15");
@@ -92,14 +93,6 @@ export interface ProbeOptions {
  */
 export const defaultRecheckDelayMilliseconds = 120_000;
 
-/** Mac lanes the generator may configure, one runner label each. */
-const maxLanes = 6;
-
-const laneLabels: readonly string[] = Array.from(
-  { length: maxLanes },
-  (_, index) => `oseo-mac-${index + 1}`,
-);
-
 /** What the probe saw of one lane in one pass over the API. */
 export interface LaneObservation {
   /** Registered once under its own name and label, online, no other lane. */
@@ -148,7 +141,7 @@ function suspicious(observation: LaneObservation): boolean {
 }
 
 /**
- * Lane `i` is usable only through the runner named `oseo-mac-i` when that
+ * A lane is usable only through the runner named for its label when that
  * runner is the sole carrier of the label, carries no other lane's label,
  * is online, and reports a Boolean `busy`. Busy is not a reason: a busy
  * lane queues the jobs that select it, and GitHub starts them when the
@@ -165,7 +158,7 @@ function usableRunner(
     runner.name === label &&
     runner.status === "online" &&
     runner.busy != null &&
-    laneLabels.every(
+    selfHostedLaneLabels.every(
       (other) => other === label || !runner.labels.includes(other),
     )
     ? runner
@@ -193,8 +186,14 @@ export async function runnerSelections(
   options: ProbeOptions = {},
 ): Promise<readonly string[]> {
   const count = Number(env.OSEO_SELFHOSTED_LANES);
-  if (!Number.isInteger(count) || count < 1 || count > maxLanes) {
-    throw new Error(`OSEO_SELFHOSTED_LANES must be 1 to ${maxLanes}`);
+  if (
+    !Number.isInteger(count) ||
+    count < 1 ||
+    count > selfHostedLaneLabels.length
+  ) {
+    throw new Error(
+      `OSEO_SELFHOSTED_LANES must be 1 to ${selfHostedLaneLabels.length}`,
+    );
   }
   const selections: string[] = Array.from({ length: count }, () => hosted);
   if (
@@ -282,7 +281,7 @@ export async function runnerSelections(
         "runners",
         runnerOf,
       );
-      const lanes = laneLabels
+      const lanes = selfHostedLaneLabels
         .slice(0, count)
         .map((label) => ({ label, runner: usableRunner(runners, label) }));
       const jobs = lanes.some((lane) => lane.runner != null)
@@ -322,7 +321,7 @@ export async function runnerSelections(
           "self-hosted",
           "macOS",
           "ARM64",
-          laneLabels[index],
+          selfHostedLaneLabels[index],
         ]);
       }
     }

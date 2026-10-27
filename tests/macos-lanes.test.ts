@@ -44,7 +44,10 @@ import {
   runnerSelections,
   wedged,
 } from "../tools/selfhosted-mac/availability.ts";
-import { configuredSelfHostedLanes } from "../tools/macos-lane-config.ts";
+import {
+  configuredSelfHostedLanes,
+  selfHostedLaneLabels,
+} from "../tools/macos-lane-config.ts";
 import {
   hostedFallbackTimeScale,
   hostedUnmeasuredAllowance,
@@ -787,7 +790,7 @@ test("one extra lane retains every job and aggregate dependency", () => {
       .flat()
       .some((job) => job.family === "host C sanitizers"),
   );
-  assert.throws(() => macosLanes(7));
+  assert.throws(() => macosLanes(9));
   const rendered = generateMacosWorkflow(template, 1);
   if (process.platform !== "win32") {
     // Two macOS candidate runs on 2026-10-21 stalled here for over an hour
@@ -1188,7 +1191,10 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
   // refreshed hosted entries raised it from 2820 by charging the hosted
   // lanes what they measured, which moved a `native support` shard off a
   // hosted lane; see PLAN-GATE.md (U49).
-  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2839);
+  assert.equal(Math.round(Math.max(...macosLaneEnds(macosLanes(6)))), 2839);
+  // The rented pair lowers the maximum to the hosted floor; it has no
+  // measured walls of its own yet.
+  assert.equal(Math.round(Math.max(...macosLaneEnds(lanes))), 2452);
 });
 
 test("only a tested hosted entry reaches a hosted lane", () => {
@@ -1270,8 +1276,8 @@ test("faster native support work uses additional capacity", () => {
   ).length;
   assert.ok(dedicatedNative > 0);
   assert.ok(dedicatedNative > hostedNative / 5);
-  for (const invalid of [-1, 1.5, 7]) {
-    assert.throws(() => macosLanes(invalid), /zero to six/);
+  for (const invalid of [-1, 1.5, 9]) {
+    assert.throws(() => macosLanes(invalid), /zero to 8/);
   }
 });
 
@@ -1383,10 +1389,20 @@ test("availability finds the one runner after a full page", async () => {
   );
 });
 
-test("six Mac lanes route each label with its own hosted fallback", () => {
-  assert.equal(configuredSelfHostedLanes, 6);
-  const lanes = macosLanes(6);
-  assert.equal(lanes.length, 11);
+test("eight Mac lanes route each label with its own hosted fallback", () => {
+  assert.equal(configuredSelfHostedLanes, 8);
+  assert.deepEqual(selfHostedLaneLabels, [
+    "oseo-mac-1",
+    "oseo-mac-2",
+    "oseo-mac-3",
+    "oseo-mac-4",
+    "oseo-mac-5",
+    "oseo-mac-6",
+    "oseo-macrun-1",
+    "oseo-macrun-2",
+  ]);
+  const lanes = macosLanes(8);
+  assert.equal(lanes.length, 13);
   assert.equal(lanes.flat().length, 40);
   assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 40);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
@@ -1427,12 +1443,14 @@ test("six Mac lanes route each label with its own hosted fallback", () => {
     "r4",
     "r5",
     "r6",
+    "r7",
+    "r8",
   ]);
   const probe = readiness.steps.find((step) => step.id === "probe");
   assert.ok(probe);
   assert.equal(
     parsedMapping(probe.env, "Probe environment").OSEO_SELFHOSTED_LANES,
-    6,
+    8,
   );
   assert.match(String(probe.if), /github\.event_name == 'push'/);
   for (const [index, lane] of lanes.entries()) {
@@ -1582,10 +1600,10 @@ test("Mac lane overlap applies measured pair slowdowns", () => {
   assert.throws(
     () =>
       selfHostedLaneEnds(
-        [[t262], [support], [own], [t262], [own], [support], [own]],
+        Array.from({ length: 9 }, () => [own]),
         seconds,
       ),
-    /More than six Mac lanes/,
+    /More than 8 Mac lanes/,
   );
   // Lanes three and four sit on the second Mac mini, so a job there neither
   // slows nor is slowed by the first machine's lanes.
@@ -1599,6 +1617,15 @@ test("Mac lane overlap applies measured pair slowdowns", () => {
     selfHostedLaneEnds([[], [], [t262], [support]], seconds).slice(2),
     paired,
   );
+  // The rented fourth machine reuses the pair factors without competing
+  // with any owned machine. All four pairs advance independently.
+  const allMachines = selfHostedLaneEnds(
+    Array.from({ length: 8 }, (_, index) =>
+      index % 2 === 0 ? [t262] : [support],
+    ),
+    seconds,
+  );
+  assert.deepEqual(allMachines, Array.from({ length: 4 }, () => paired).flat());
   // Both machines busy at once: each pair advances exactly as it would
   // alone, so four lanes are two independent two-lane simulations.
   const both = selfHostedLaneEnds(
@@ -1670,12 +1697,13 @@ const twoRunners: readonly FakeRunner[] = [
   },
 ];
 
-const fourRunners: readonly FakeRunner[] = [1, 2, 3, 4].map((index) => ({
-  name: `oseo-mac-${index}`,
+const allRunners: readonly FakeRunner[] = selfHostedLaneLabels.map((label) => ({
+  name: label,
   status: "online",
   busy: false,
-  labels: [{ name: "self-hosted" }, { name: `oseo-mac-${index}` }],
+  labels: [{ name: "self-hosted" }, { name: label }],
 }));
+const fourRunners = allRunners.slice(0, 4);
 
 const twoLaneEnv = {
   OSEO_SELFHOSTED_LANES: "2",
@@ -1763,10 +1791,10 @@ test("availability decides each Mac lane independently", async () => {
     [hosted, hosted],
   );
   await Promise.all(
-    ["0", "7", "1.5", ""].map((lanes) =>
+    ["0", "9", "1.5", ""].map((lanes) =>
       assert.rejects(
         select(twoRunners, { OSEO_SELFHOSTED_LANES: lanes }),
-        /must be 1 to 6/,
+        /must be 1 to 8/,
       ),
     ),
   );
@@ -1776,7 +1804,7 @@ function queuedLaneJob(id: number, status: string, lane: number): FakeJob {
   return {
     id,
     status,
-    labels: ["self-hosted", "macOS", "ARM64", `oseo-mac-${lane}`],
+    labels: ["self-hosted", "macOS", "ARM64", selfHostedLaneLabels[lane - 1]!],
   };
 }
 
@@ -2014,6 +2042,12 @@ test(
       { label: "oseo-mac-4", fixture: "oseo-mac-4", user: "oseo-runner4" },
       { label: "oseo-mac-5", fixture: "oseo-mac-5", user: "oseo-runner5" },
       { label: "oseo-mac-6", fixture: "oseo-mac-6", user: "oseo-runner6" },
+      { label: "oseo-macrun-1", fixture: "oseo-macrun-1", user: "oseo-runner" },
+      {
+        label: "oseo-macrun-2",
+        fixture: "oseo-macrun-2",
+        user: "oseo-runner2",
+      },
     ];
     for (const { label, fixture, user } of runners) {
       const inherited = Object.fromEntries(
@@ -2046,8 +2080,26 @@ test(
         dry.stdout,
         new RegExp(`org\\.oseo\\.runner\\.${fixture}\\.plist for ${user}`),
       );
+      if (process.platform !== "darwin") {
+        const health = spawnSync("bash", ["tools/selfhosted-mac/health.sh"], {
+          encoding: "utf8",
+          env,
+        });
+        assert.equal(health.status, 2);
+        assert.match(health.stderr, /macOS required/u);
+      }
     }
-    for (const invalid of ["oseo-mac-0", "oseo-mac-7", "oseo-mac-1 ", "x"]) {
+    for (const invalid of [
+      "oseo-mac-0",
+      "oseo-mac-7",
+      "oseo-mac-8",
+      "oseo-macrun-0",
+      "oseo-macrun-3",
+      "oseo-macrun-1 ",
+      "oseo-macrun-1\nx",
+      "oseo-mac-1 ",
+      "x",
+    ]) {
       const env = {
         ...process.env,
         OSEO_RUNNER_ROOT: "/tmp/oseo-runner",
@@ -2062,7 +2114,7 @@ test(
       ]) {
         const rejected = spawnSync("bash", args, { encoding: "utf8", env });
         assert.equal(rejected.status, 2, `${invalid}: ${args.join(" ")}`);
-        assert.match(rejected.stderr, /oseo-mac-1 through oseo-mac-6/u);
+        assert.match(rejected.stderr, /must be listed in lane-labels.txt/u);
       }
     }
   },
@@ -2635,3 +2687,78 @@ test(
     }
   },
 );
+
+test("rented Mac lanes select independently and reject ambiguity", async () => {
+  const select = (runners: readonly FakeRunner[]) =>
+    runnerSelections(
+      { ...twoLaneEnv, OSEO_SELFHOSTED_LANES: "8" },
+      fakeActionsApi(() => ({ runners })),
+      noSleep,
+    );
+  const expected = selfHostedLaneLabels.map((label) =>
+    JSON.stringify(["self-hosted", "macOS", "ARM64", label]),
+  );
+  assert.deepEqual(await select(allRunners), expected);
+  // Landing before registration keeps the six owned lanes and falls back
+  // only the rented pair. No API access occurs in these fake responses.
+  assert.deepEqual(await select(allRunners.slice(0, 6)), [
+    ...expected.slice(0, 6),
+    hostedSelection,
+    hostedSelection,
+  ]);
+  const checks: Promise<void>[] = [];
+  for (const index of [6, 7]) {
+    for (const change of [
+      { status: "offline" },
+      { name: "unknown" },
+      { labels: [{ name: "oseo-mac-7" }] },
+      { labels: [{ name: "oseo-macrun-1" }, { name: "oseo-macrun-2" }] },
+      {
+        labels: [
+          { name: selfHostedLaneLabels[index]! },
+          { name: "oseo-mac-1" },
+        ],
+      },
+    ]) {
+      const runners = allRunners.map((runner, at) =>
+        at === index ? { ...runner, ...change } : runner,
+      );
+      checks.push(
+        select(runners).then((selected) => {
+          assert.equal(selected[index], hostedSelection);
+          const other = index === 6 ? 7 : 6;
+          const shared = change.labels?.some(
+            (label) => label.name === selfHostedLaneLabels[other],
+          );
+          assert.equal(
+            selected[other],
+            shared ? hostedSelection : expected[other],
+          );
+        }),
+      );
+    }
+  }
+  await Promise.all(checks);
+  const duplicates = await select([...allRunners, allRunners[6]!]);
+  assert.equal(duplicates[6], hostedSelection);
+  assert.equal(duplicates[7], expected[7]);
+});
+
+test("job wall reports recognize only known Mac labels", () => {
+  const labels = [...selfHostedLaneLabels, "oseo-mac-7", "oseo-macrun-3"];
+  const attempt = parseAttempt(
+    "labels",
+    labels
+      .map(
+        (label) =>
+          `${label}\t${label}\t2026-10-27T00:00:00Z\t2026-10-27T00:01:00Z`,
+      )
+      .join("\n"),
+  );
+  for (const label of labels) {
+    assert.equal(
+      attempt.jobs.get(label)!.selfHosted,
+      selfHostedLaneLabels.includes(label),
+    );
+  }
+});
