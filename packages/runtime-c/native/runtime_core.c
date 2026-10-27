@@ -46,6 +46,7 @@ void oseo_internal_realm_init(OseoRealm *realm) {
         realm->intrinsics[index] = oseo_undefined();
     }
     realm->global_this = oseo_undefined();
+    realm->global_lexicals = oseo_undefined();
     realm->template_cache = NULL;
     realm->template_cache_count = 0u;
     realm->template_cache_capacity = 0u;
@@ -74,6 +75,7 @@ void oseo_internal_realm_release(OseoRealm *realm) {
         realm->intrinsics[index] = oseo_undefined();
     }
     realm->global_this = oseo_undefined();
+    realm->global_lexicals = oseo_undefined();
     free(realm->template_cache);
     realm->template_cache = NULL;
     realm->template_cache_count = 0u;
@@ -91,6 +93,8 @@ void oseo_context_init(
 ) {
     context->roots = NULL;
     context->objects = NULL;
+    context->host_scripts = NULL;
+    context->host_script_count = 0u;
     context->function_dispatcher = NULL;
     context->generator_dispatcher = NULL;
     context->async_call_capability = oseo_undefined();

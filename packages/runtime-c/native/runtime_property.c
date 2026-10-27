@@ -320,6 +320,21 @@ OseoResult oseo_object_set(
     OseoValue value,
     bool strict
 ) {
+    if (object_value == context->realm->global_lexicals &&
+        is_object(object_value)) {
+        size_t index = oseo_internal_own_property_index(
+            ordinary_object(object_value), key);
+        if (index != SIZE_MAX) {
+            OseoProperty *property =
+                &ordinary_object(object_value)->properties[index];
+            OseoResult read = oseo_cell_get(context, property->value);
+            if (read.status != OSEO_STATUS_NORMAL) return read;
+            if (!property->attributes.writable) {
+                return type_error(context, "Assignment to a constant binding.");
+            }
+            return oseo_cell_set(context, property->value, value);
+        }
+    }
     OseoResult valid = oseo_internal_require_property_key(context, key);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
     if (!is_object(object_value)) {

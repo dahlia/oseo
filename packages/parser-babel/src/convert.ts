@@ -2232,6 +2232,7 @@ export function statement(
             name,
             value: assigned,
           },
+          emptyCompletion: true,
           kind: "expression",
         });
       }

@@ -1015,6 +1015,8 @@ export type SyntaxStatement =
     })
   | (LocatedSyntax & {
       readonly expression: SyntaxExpression;
+      /** A lowered var initializer has an empty Statement completion. */
+      readonly emptyCompletion?: true;
       readonly kind: "expression";
     })
   | (LocatedSyntax & {

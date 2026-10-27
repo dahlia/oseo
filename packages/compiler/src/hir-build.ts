@@ -108,6 +108,7 @@ function resolveName(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
   name: string,
+  preserveGlobalBinding = false,
 ): NameResolution {
   const objectBindingIds: number[] = [];
   for (let index = scopes.length - 1; index >= 0; index -= 1) {
@@ -117,6 +118,13 @@ function resolveName(
     if (binding != null) {
       if (scope === state.scriptScope) state.globalReferences?.add(name);
       state.referencedBindingIds.add(binding.id);
+      if (
+        !preserveGlobalBinding &&
+        state.hostScriptBindings === true &&
+        state.globalObjectBindingIds.has(binding.id)
+      ) {
+        return { objectBindingIds };
+      }
       return { binding, objectBindingIds };
     }
     const objectBindingId = state.withScopes.get(scope);
@@ -200,7 +208,7 @@ function rejectGlobalObjectWithFallbackWrite(
   located: LocatedSyntax,
   state: ResolveState,
 ): boolean {
-  if (!isGlobalObjectResolvedName(name)) return false;
+  if (!isGlobalObjectResolvedName(name, state)) return false;
   const subject = isPropertyOwnedIntrinsicName(name)
     ? "property-owned intrinsic"
     : "global-object name";
@@ -304,7 +312,17 @@ function agentHoleAt(
   return hole;
 }
 
-function isGlobalObjectResolvedName(name: string): boolean {
+function isGlobalObjectResolvedName(
+  name: string,
+  state?: ResolveState,
+): boolean {
+  const declared = state?.scriptScope?.get(name);
+  if (
+    state?.hostScriptBindings === true &&
+    declared != null &&
+    state.globalObjectBindingIds.has(declared.id)
+  )
+    return true;
   if (isPropertyOwnedIntrinsicName(name)) return true;
   if (isRuntimeOwnedIntrinsicName(name)) return false;
   return !isStandardGlobalName(name);
@@ -390,7 +408,11 @@ function importMetaInitializer(
 function intrinsicGlobalObjectRead(
   range: SourceRange,
   state: ResolveState,
+  name?: string,
 ): HirExpression {
+  if (state.hostScriptBindings === true && name != null) {
+    return { kind: "global-environment", name, range };
+  }
   return bindingExpression(intrinsicGlobalObjectBinding(state), range);
 }
 
@@ -403,7 +425,7 @@ function intrinsicGlobalPropertyRead(
   return {
     key: { kind: "string", range, value: name },
     kind: "property-get",
-    object: intrinsicGlobalObjectRead(range, state),
+    object: intrinsicGlobalObjectRead(range, state, name),
     range,
   };
 }
@@ -419,7 +441,7 @@ function intrinsicGlobalPropertyExists(
     left: { kind: "string", range, value: name },
     operator: "in",
     range,
-    right: intrinsicGlobalObjectRead(range, state),
+    right: intrinsicGlobalObjectRead(range, state, name),
   };
 }
 
@@ -457,9 +479,14 @@ function intrinsicGlobalReference(
   name: string,
   state: ResolveState,
 ): HirGlobalReference {
-  if (!state.strict) return {};
+  const hostGlobal =
+    state.hostScriptBindings === true ? { hostGlobal: true as const } : {};
+  if (!state.strict) return hostGlobal;
   const fallback = missingIntrinsicBinding(name, state);
-  return { strictFallback: { bindingId: fallback.id, name: fallback.name } };
+  return {
+    ...hostGlobal,
+    strictFallback: { bindingId: fallback.id, name: fallback.name },
+  };
 }
 
 /** Resolve one assignment-pattern leaf to a mutable intrinsic property. */
@@ -515,12 +542,12 @@ function intrinsicGlobalIdentifierRead(
   range: SourceRange,
   state: ResolveState,
   unresolvable: HirExpression = missingIntrinsicRead(name, range, state),
-): HirExpression {
+): Extract<HirExpression, { readonly kind: "global-read" }> {
   return {
     globalReference: intrinsicGlobalReference(name, state),
     kind: "global-read",
     name,
-    object: intrinsicGlobalObjectRead(range, state),
+    object: intrinsicGlobalObjectRead(range, state, name),
     range,
     unresolvable,
   };
@@ -546,7 +573,7 @@ function identifierFallback(
       value: name === "NaN" ? NaN : Infinity,
     };
   }
-  if (isGlobalObjectResolvedName(name)) {
+  if (isGlobalObjectResolvedName(name, state)) {
     return intrinsicGlobalIdentifierRead(name, range, state);
   }
   return bindingExpression(withFallbackBinding(name, state, false), range);
@@ -661,7 +688,7 @@ function callsDynamicFunctionConstructor(
         ? target.callee.name
         : undefined;
   if (name !== "Function") return false;
-  const resolution = resolveName(scopes, state, name);
+  const resolution = resolveName(scopes, state, name, true);
   return resolution.binding == null && resolution.objectBindingIds.length === 0;
 }
 
@@ -693,7 +720,7 @@ function callsUnshadowedEval(
 ): boolean {
   if (name !== "eval") return false;
   if (callArguments[0]?.kind === "template-object") return false;
-  const resolution = resolveName(scopes, state, name);
+  const resolution = resolveName(scopes, state, name, true);
   return resolution.binding == null && resolution.objectBindingIds.length === 0;
 }
 
@@ -811,7 +838,7 @@ function resolveIdentifierDelete(
     fallback = {
       key: { kind: "string", range: argument.range, value: argument.name },
       kind: "property-delete",
-      object: intrinsicGlobalObjectRead(argument.range, state),
+      object: intrinsicGlobalObjectRead(argument.range, state, argument.name),
       range: expression.range,
     };
   } else if (resolution.binding != null) {
@@ -830,7 +857,7 @@ function resolveIdentifierDelete(
       range: expression.range,
       value: false,
     };
-  } else if (isGlobalObjectResolvedName(argument.name)) {
+  } else if (isGlobalObjectResolvedName(argument.name, state)) {
     // An absent property is an unresolvable reference, whose delete
     // answers true; only a resolved one reaches [[Delete]].
     fallback = {
@@ -838,7 +865,7 @@ function resolveIdentifierDelete(
       consequent: {
         key: { kind: "string", range: argument.range, value: argument.name },
         kind: "property-delete",
-        object: intrinsicGlobalObjectRead(argument.range, state),
+        object: intrinsicGlobalObjectRead(argument.range, state, argument.name),
         range: expression.range,
       },
       kind: "conditional",
@@ -936,7 +963,10 @@ function resolveTypeofIdentifier(
     const resolved = resolveExpression(argument, scopes, state);
     return resolved == null ? undefined : { ...expression, argument: resolved };
   }
-  if (isGlobalObjectResolvedName(argument.name) && resolution.binding == null) {
+  if (
+    isGlobalObjectResolvedName(argument.name, state) &&
+    resolution.binding == null
+  ) {
     // ResolveBinding's HasProperty decides resolvability, and `typeof`
     // answers an unresolvable name without reading it. GetBindingValue
     // then tests the property again, so a Proxy on the global object's
@@ -1034,7 +1064,7 @@ function resolveExpression(
     const resolution = resolveName(scopes, state, expression.name);
     const value = resolveExpression(expression.value, scopes, state);
     if (
-      isGlobalObjectResolvedName(expression.name) &&
+      isGlobalObjectResolvedName(expression.name, state) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -1110,11 +1140,22 @@ function resolveExpression(
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      isGlobalObjectResolvedName(expression.name)
+      isGlobalObjectResolvedName(expression.name, state)
     ) {
       const fallback = {
         name: expression.name,
         objectBindingId: intrinsicGlobalObjectBinding(state).id,
+        ...includePropertiesWhen(() =>
+          state.hostScriptBindings !== true
+            ? undefined
+            : {
+                object: intrinsicGlobalObjectRead(
+                  expression.range,
+                  state,
+                  expression.name,
+                ),
+              },
+        ),
       };
       if (expression.kind === "binding-set") {
         return {
@@ -1240,7 +1281,7 @@ function resolveExpression(
   if (expression.kind === "binding-step") {
     const resolution = resolveName(scopes, state, expression.name);
     if (
-      isGlobalObjectResolvedName(expression.name) &&
+      isGlobalObjectResolvedName(expression.name, state) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -1293,13 +1334,24 @@ function resolveExpression(
     if (
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
-      isGlobalObjectResolvedName(expression.name)
+      isGlobalObjectResolvedName(expression.name, state)
     ) {
       return {
         ...expression,
         fallback: {
           name: expression.name,
           objectBindingId: intrinsicGlobalObjectBinding(state).id,
+          ...includePropertiesWhen(() =>
+            state.hostScriptBindings !== true
+              ? undefined
+              : {
+                  object: intrinsicGlobalObjectRead(
+                    expression.range,
+                    state,
+                    expression.name,
+                  ),
+                },
+          ),
           read: intrinsicGlobalIdentifierRead(
             expression.name,
             expression.range,
@@ -1521,7 +1573,7 @@ function resolveExpression(
           range: expression.range,
         };
       }
-      if (isGlobalObjectResolvedName(expression.name)) {
+      if (isGlobalObjectResolvedName(expression.name, state)) {
         return intrinsicGlobalIdentifierRead(
           expression.name,
           expression.range,
@@ -1730,7 +1782,7 @@ function resolveExpression(
     const functionResolution =
       expression.callee.kind === "identifier" &&
       expression.callee.name === "Function"
-        ? resolveName(scopes, state, "Function")
+        ? resolveName(scopes, state, "Function", true)
         : undefined;
     if (
       functionResolution != null &&
@@ -1780,6 +1832,13 @@ function resolveExpression(
       state.agentTemplates.set(key, { range: expression.range, segments });
     }
   }
+  if (
+    state.hostScriptSources != null &&
+    hostScriptCallTarget(expression.target, scopes, state)
+  ) {
+    const segments = agentTemplateSegments(expression.arguments[0]);
+    if (segments?.length === 1) state.hostScriptSources.add(segments[0]!);
+  }
   const argumentValues: HirCallArgument[] = [];
   for (const argument of expression.arguments) {
     const resolved = resolveCallArgument(argument, scopes, state);
@@ -1788,11 +1847,36 @@ function resolveExpression(
   }
   let target: HirCallTarget;
   if (expression.target.kind === "console-log") {
-    const binding = resolveName(scopes, state, "console").binding;
+    const resolution = resolveName(scopes, state, "console", true);
+    const binding = resolution.binding;
     target =
       binding == null
-        ? { kind: "console-log" }
+        ? state.hostScriptBindings === true
+          ? {
+              kind: "host-runtime-intrinsic",
+              name: "console",
+              objectBindingIds: resolution.objectBindingIds,
+              reference: intrinsicGlobalIdentifierRead(
+                "console",
+                expression.target.range,
+                state,
+              ),
+            }
+          : { kind: "console-log" }
         : shadowedMethodTarget(binding, "log", expression.target.range);
+    if (binding != null && state.hostScriptBindings === true) {
+      const object = resolveExpression(
+        { kind: "identifier", name: "console", range: expression.target.range },
+        scopes,
+        state,
+      );
+      if (object == null) return undefined;
+      target = {
+        kind: "method",
+        key: { kind: "string", value: "log", range: expression.target.range },
+        object,
+      };
+    }
   } else if (expression.target.kind === "object-intrinsic") {
     const object = resolveExpression(
       {
@@ -1842,26 +1926,47 @@ function resolveExpression(
       object,
     };
   } else if (expression.target.kind === "timer-intrinsic") {
-    const binding = resolveName(
+    const resolution = resolveName(
       scopes,
       state,
       expression.target.method,
-    ).binding;
+      true,
+    );
+    const binding = resolution.binding;
     target =
       binding == null
-        ? {
-            kind: "timer-intrinsic",
-            method: expression.target.method,
-          }
+        ? state.hostScriptBindings === true
+          ? {
+              kind: "host-runtime-intrinsic",
+              name: expression.target.method,
+              objectBindingIds: resolution.objectBindingIds,
+              reference: intrinsicGlobalIdentifierRead(
+                expression.target.method,
+                expression.target.range,
+                state,
+              ),
+            }
+          : {
+              kind: "timer-intrinsic",
+              method: expression.target.method,
+            }
         : {
-            callee: {
-              bindingId: binding.id,
-              kind: "binding",
-              name: binding.name,
-              range: expression.target.range,
-            },
+            callee: bindingExpression(binding, expression.target.range),
             kind: "dynamic",
           };
+    if (binding != null && state.hostScriptBindings === true) {
+      const callee = resolveExpression(
+        {
+          kind: "identifier",
+          name: binding.name,
+          range: expression.target.range,
+        },
+        scopes,
+        state,
+      );
+      if (callee == null) return undefined;
+      target = { callee, kind: "dynamic" };
+    }
   } else if (expression.target.kind === "name") {
     if (
       callsUnshadowedEval(
@@ -1930,6 +2035,80 @@ function resolveExpression(
 }
 
 export type SyntaxStatementItem = SyntaxFunction | SyntaxStatement;
+
+/** A lexical const alias is usable only without an intervening with record. */
+function hostScriptAlias(
+  name: string,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): boolean {
+  const resolved = resolveName(scopes, state, name, true);
+  return (
+    resolved.binding?.mutable === false &&
+    resolved.objectBindingIds.length === 0 &&
+    state.hostScriptAliases?.has(resolved.binding.id) === true
+  );
+}
+
+/** Keep source discovery finite without treating unrelated calls as Scripts. */
+function hostScriptCallTarget(
+  target: SyntaxCallTarget,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): boolean {
+  if (target.kind === "property") {
+    return target.key.kind === "string" && target.key.value === "evalScript";
+  }
+  if (target.kind === "name")
+    return hostScriptAlias(target.name, scopes, state);
+  return (
+    target.kind === "dynamic" &&
+    target.callee.kind === "identifier" &&
+    hostScriptAlias(target.callee.name, scopes, state)
+  );
+}
+
+/**
+ * Record this scope's simple const aliases before resolving hoisted functions
+ * that may capture them. The fixed point admits const-to-const chains; cells
+ * still enforce initialization order, TDZ and assignment errors at runtime.
+ * A property read is conservative just like a direct evalScript call: a
+ * non-host receiver contributes only an unused, deferred source candidate.
+ */
+function recordHostScriptAliases(
+  statements: readonly SyntaxStatementItem[],
+  scope: ReadonlyMap<string, Binding>,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): void {
+  const aliases = state.hostScriptAliases;
+  if (aliases == null) return;
+  const declarations = statements.flatMap<SyntaxStatementItem>((statement) =>
+    statement.kind === "declaration-list"
+      ? statement.declarations
+      : [statement],
+  );
+  let changed: boolean;
+  do {
+    changed = false;
+    for (const declaration of declarations) {
+      if (declaration.kind !== "const") continue;
+      const binding = scope.get(declaration.name);
+      if (binding == null || binding.mutable || aliases.has(binding.id))
+        continue;
+      const value = declaration.initializer;
+      const captured =
+        (value.kind === "property-get" &&
+          value.key.kind === "string" &&
+          value.key.value === "evalScript") ||
+        (value.kind === "identifier" &&
+          hostScriptAlias(value.name, scopes, state));
+      if (!captured) continue;
+      aliases.add(binding.id);
+      changed = true;
+    }
+  } while (changed);
+}
 
 function syntaxBindingNames(
   pattern: SyntaxAssignmentPattern,
@@ -2177,6 +2356,7 @@ function buildFunctionInits(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): readonly HirStatement[] {
+  recordHostScriptAliases(statements, scope, scopes, state);
   const result: HirStatement[] = [];
   for (const statement of statements) {
     if (statement.kind !== "function" || statement.name == null) continue;
@@ -3239,7 +3419,7 @@ function resolveBindingPattern(
         : resolveName(scopes, state, pattern.name);
     if (
       mode === "write" &&
-      isGlobalObjectResolvedName(pattern.name) &&
+      isGlobalObjectResolvedName(pattern.name, state) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -3526,7 +3706,7 @@ function resolveForInTarget(
   if (target.kind === "binding") {
     const resolution = resolveName(scopes, state, target.name);
     if (
-      isGlobalObjectResolvedName(target.name) &&
+      isGlobalObjectResolvedName(target.name, state) &&
       resolution.binding == null &&
       resolution.objectBindingIds.length === 0
     ) {
@@ -4175,7 +4355,7 @@ function resolveStatement(
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
       if (
-        isGlobalObjectResolvedName(statement.target.name) &&
+        isGlobalObjectResolvedName(statement.target.name, state) &&
         resolution.binding == null &&
         resolution.objectBindingIds.length === 0
       ) {
@@ -4437,6 +4617,8 @@ export interface AgentHolePlaceholder {
  * the placeholders of its numeric holes in hole order.
  */
 export interface HirHostOptions {
+  /** Resolve later Script lexical declarations through the running realm. */
+  readonly hostScriptBindings?: boolean;
   /**
    * Each hole's placeholder name and the UTF-8 byte span the placeholder
    * occupies in the agent source, in hole order.
@@ -4480,6 +4662,9 @@ export function buildSeededHir(
   const scriptScope = new Map(seed.bindings);
   const state: ResolveState = {
     diagnostics,
+    hostScriptBindings: seed.hostScriptBindings,
+    hostScriptSources: seed.hostScriptBindings === true ? new Set() : undefined,
+    hostScriptAliases: seed.hostScriptBindings === true ? new Set() : undefined,
     globalObjectBindingIds: new Set(seed.globalObjectBindingIds),
     globalReferences: seed.globalReferences,
     scriptScope,
@@ -4585,6 +4770,11 @@ export function buildSeededHir(
       };
     }),
     program: {
+      ...includePropertiesWhen(() =>
+        state.hostScriptSources == null
+          ? undefined
+          : { hostScriptSources: [...state.hostScriptSources] },
+      ),
       ...includePropertiesWhen(() => {
         if (state.agentTemplates == null) return undefined;
         return { agentTemplates: [...state.agentTemplates.values()] };
@@ -4612,10 +4802,18 @@ export function buildSeededHir(
         ...body,
       ],
       functions: state.hirFunctions,
-      globalLexicalNames: (program.globalLexicalNames ?? []).map((entry) => ({
-        name: entry.name,
-        range: entry.range,
-      })),
+      globalLexicalNames: (program.globalLexicalNames ?? []).map((entry) => {
+        if (seed.hostScriptBindings !== true) {
+          return { name: entry.name, range: entry.range };
+        }
+        const binding = scriptScope.get(entry.name)!;
+        return {
+          id: binding.id,
+          mutable: binding.mutable,
+          name: entry.name,
+          range: entry.range,
+        };
+      }),
       globalBindings: [
         ...(state.intrinsicGlobalObjectBinding == null
           ? []

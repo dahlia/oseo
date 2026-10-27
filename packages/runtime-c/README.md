@@ -1251,4 +1251,19 @@ identifiers with explicit byte lengths, heap-backed root-frame ownership, and
 active frame-budget accounting. Embedded null bytes are preserved during native
 error output.
 
+The historical Host `m5-140` ABI composes the `m5-139` environment bitmap
+with Host Script
+realm layout: persistent `global_lexicals`, Script evaluator metadata and
+host builtin identities. Bitmap allocation, slot updates, cloning and
+tracing retain their final implementation. Host lexical installation uses
+the environment APIs, while realm tracing retains the lexical-record root.
+This layout composition introduces no new collector algorithm. Fresh
+combined native execution is required separately from source preparation.
+
+The combined `m5-141` ABI retains the TCO cost fix's `m5-140` weak string
+table and iterator path together with the Host Script realm additions.
+Both source branches used `m5-140` independently, so this composition uses
+the next unused identity after Main and both branches. Their ABI history
+notes retain their original source identities.
+
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md

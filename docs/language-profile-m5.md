@@ -2976,11 +2976,12 @@ non-extensible global is rejected before any earlier declaration can mutate
 the object. Function-local and Module declarations remain ordinary
 declarative bindings and do not enter this record.
 
-The record validates one independently compiled Script at a time. It does not
-retain `[[VarNames]]` or global declarative names across successive Script
-instantiations in the same realm, so cross-Script declaration collisions are
-outside this unit even though the runtime entry point can be called more than
-once for storage-level tests.
+ADR 0029 extends this record for the explicit test262 host with a finite
+set of ahead-of-time Scripts. Each invocation validates its declarations
+against persistent realm lexical cells and the existing global object before
+executing its body. Lexical names never become global-object properties;
+retained closures keep their cells and realm. The implementation and focused
+evidence sources are described in the host Script section below.
 
 M5b node `globalthis-binding` exposes this object as `globalThis` and gives a
 dynamically created global property the runtime lookup path recorded in that
@@ -4459,9 +4460,11 @@ outside that root move from unsupported to pass. The reviewed feature list
 gains `DataView`, `Float16Array`, and the eight `DataView.prototype.*` accessor
 features this node implements; the reviewed dependency vocabulary gains
 `data-view`; and the reviewed harness gains upstream's
-`byteConversionValues.js` data table and a `verifyPrimordialProperty` alias
-whose reviewed `verifyProperty` already restores what it probes. The complete
-manifest moves from 11,441 to 11,991 cases, from 8,468 to 8,918 passes, keeps
+`byteConversionValues.js` data table and a `verifyPrimordialProperty` alias.
+That historical helper restored its probes unconditionally; the host Script
+source correction below distinguishes default deletion from explicit restore.
+The complete manifest moves from 11,441 to 11,991 cases, from 8,468 to 8,918
+passes, keeps
 1,364 expected negatives, and moves from 1,609 to 1,709 unsupported profile
 features, with no semantic, harness, or infrastructure failures. The suite
 revision, 41,091-path inventory, manifest schema, and zero-override policy are
@@ -6210,7 +6213,8 @@ The reviewed *propertyHelper.js* harness gains the upstream
 the reviewed style, because this node's four `prop-desc.js` cases are the
 first reviewed paths that name them. Each checks the function-valued
 property and then the function's own `name` and `length` through the
-existing always-restoring `verifyProperty`.
+then-always-restoring `verifyProperty`. The later host Script source correction
+below forwards the explicit restore option to all three checks instead.
 
 Binding `parseInt` also makes one reviewed class case executable for the
 first time, and it exposed a SuperCall ordering gap. 13.3.7.1 reads the
@@ -8406,17 +8410,17 @@ another realm's `%Array%` as undefined before it reads `Symbol.species`, so an
 array whose constructor is another realm's `Array` keeps producing arrays of
 the running realm.
 
-Generated code always runs in the initial realm, because no source text is
-compiled for a created realm; a created realm runs only its own built-in
-functions and returns to generated code through an ordinary call. Every realm
-has a `%eval%` intrinsic, installed as the global object's writable,
-non-enumerable, configurable `eval` property with `length` 1 and `name`
-`"eval"`. It returns a non-String argument unchanged, as PerformEval does
-without parsing, and reports `OSEO1001` “eval compiles source text at run time,
-which is outside the admitted profile.” for a String, the boundary of
+ADR 0029 extends generated execution beyond the initial realm for its finite
+ahead-of-time host Script set. A created realm can evaluate one of those
+Scripts and create closures with its own globals, cells and intrinsic graph.
+Every realm has a `%eval%` intrinsic, installed as the global object's
+writable, non-enumerable, configurable `eval` property with `length` 1 and
+`name` `"eval"`. It returns a non-String argument unchanged, as PerformEval
+does without parsing, and reports `OSEO1001` “eval compiles source text at run
+time, which is outside the admitted profile.” for a String, the boundary of
 [ADR 0016](./adr/0016-dynamic-source-boundary.md); it never evaluates source.
-The `eval-intrinsic-value` node later admits the bare `eval` identifier as
-a value, while the unshadowed call position stays the ADR 0016 rejection.
+The `eval-intrinsic-value` node later admits the bare `eval` identifier as a
+value, while the unshadowed call position stays the ADR 0016 rejection.
 `%Function%`'s [[Call]] and [[Construct]] report the same boundary as
 `OSEO1001`, as the generator and async function constructors do.
 
@@ -8440,8 +8444,9 @@ the host objects' realm and shape, distinct Math.random sequences, the
 unresolvable `$262` of an ordinary build.
 
 The reviewed runner builds a case with the test262 host when it references
-`$262.agent`, `$262.createRealm`, or `$262.global`, or loads
-*atomicsHelper.js*; a case that reads any other `$262` member keeps the
+`$262.agent`, `$262.createRealm`, `$262.evalScript`, or `$262.global`,
+references `print`, or loads *atomicsHelper.js*; a case that reads any other
+`$262` member keeps the
 `host-binding` capability. `cross-realm` joins the supported features. Of the
 84 reviewed paths whose unadmitted feature was `cross-realm`, 43 move to
 `pass`. 40 reach the ADR 0016 boundary at run time, 30 through
@@ -8631,7 +8636,7 @@ complete. The remaining gaps retain their existing owners.
     all-miss simple, destructuring, `for-in`, and `for-of` writes to the
     runtime-owned call targets `console`, `setTimeout`, and `clearTimeout`
     also stay rejected, because their hidden cells cannot model strict
-    PutValue. Third,
+    PutValue. Third, outside the explicit host build described below,
     the record validates one independently compiled
     Script at a time and does not retain `[[VarNames]]` across Scripts.
     Two interactions sit outside this unit for different reasons. Annex B
@@ -8644,8 +8649,8 @@ complete. The remaining gaps retain their existing owners.
     for M5 completion while leaving the conformance label to its own later
     gate. A case that depends on either classifies unsupported under the
     record that owns it instead of blocking this unit. Reviewed test262
-    cases that reach the `$262` or `print` host bindings, which the reviewed
-    environment never installs, classify as unsupported with the
+    cases that reach a `$262` or `print` host binding absent from their
+    selected environment classify as unsupported with the
     `host-binding` capability named, and cases that call a definition the
     reviewed *regExpUtils.js* omits classify with the `harness-definition`
     capability, as the `globalthis-binding` section records. Owner: the
@@ -8717,10 +8722,9 @@ complete. The remaining gaps retain their existing owners.
     capabilities are admitted as recorded above, except that an agent whose
     [[CanBlock]] is false stays unsupported with the `non-blocking-agent`
     capability, an agent source that no ahead-of-time template describes
-    stays behind the dynamic source boundary, and a created realm runs no
-    source of its own, so a case that builds its cross-realm functions with
-    `$262.evalScript`, `eval`, or `Function` keeps the owner of that
-    capability.
+    stays behind the dynamic source boundary. ADR 0029 permits a created
+    realm to evaluate a member of the finite ahead-of-time host Script set.
+    Ordinary `eval` and `Function` source compilation retain ADR 0016.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
@@ -9624,3 +9628,111 @@ and promoted exactly *tco-call.js* and *tco-member.js* from unsupported to
 pass, with no demotion; the
 [evidence contract](evidence/proper-tail-calls-u68-20261027.md) records it.
 Affected reviews and publication remain Root-owned.
+
+
+Ahead-of-time host Script bindings
+----------------------------------
+
+The explicit `--test262-host` compilation admits `$262.evalScript` and
+`print` under [ADR 0029](./adr/0029-ahead-of-time-host-script-bindings.md).
+Literal string and literal-concatenation arguments at `evalScript` property
+call sites, including created-realm calls, form the closed Script source set.
+Direct calls through a simple lexical `const` initialized from an `evalScript`
+property read, or a chain of those immutable aliases, can add the same literal
+candidates. Binding identities preserve lexical shadowing and reject discovery
+through mutable, parameter-shadowed, or `with`-intercepted names. Hoisted
+closures can capture eligible aliases; TDZ and const assignment errors still
+run normally. Unproven indirect forms discover no new source, and unrelated
+ordinary/dynamic calls contribute no candidate strings.
+Nested Script call sites extend that set before native emission. Runtime
+selection compares exact UTF-16 strings; it never parses source. An unmatched
+String reports `OSEO1001`, while a matched parse error throws `SyntaxError`
+when invoked. The ordinary `eval` and constructor boundaries stay unchanged.
+
+Each Script has independent strictness, a fresh evaluation environment, and
+persistent global lexical cells in its host function's realm. Declaration
+permission checks precede all binding creation and body effects. Identifier
+references retain their Global Environment Record across a write's right
+operand and select its current lexical or object storage when SetMutableBinding
+runs. Script completion values, closure identity, abrupt completion, and realm
+restoration follow the same compiled execution path. `print` converts only its
+first argument to a string and emits one line; both host bindings are absent
+from ordinary builds.
+
+The fixed fixture source is
+*tests/native/fixtures/host-script-bindings.ts*. Independent Node.js and Deno
+Script observers use *tests/native/host-script-reference.ts*.
+*tests/host-script-bindings.test.ts* runs those fixtures and the unchanged
+fourteen original upstream subjects. The generated declaration-state and
+invalid-grammar domains reserve seeds `0x60008d00` and `0x60008d01` in
+*tests/property/m5-host-script-bindings.property.test.ts*, with both policies,
+false hints, guard misses, and forced collection. Source preparation does not
+claim fresh test262 classifications; those require the later full manifest
+update. Executed native evidence below retains its actual source identity.
+
+The fixed fixture for strict tail calls retains foreign Script lexicals
+through 768 calls, detached functions, Reflect.apply, bound/Proxy forwarding,
+nested evalScript, print and abrupt completion. Its structural check requires
+tail metadata on source functions and no tail metadata on synthesized Script
+evaluators, which must return their accumulated Script completion normally.
+Preparation began on TCO candidate `32363a70`, whose candidate CI later
+failed. That candidate is not successful Main; earlier native evidence below
+does not establish any later combined source's native/Main gates.
+
+The original global-var subject exposed a reviewed property-helper defect:
+after deleting a configurable property on a non-extensible global, the helper
+unconditionally tried to restore it. The bounded source correction retains
+all descriptor and behavioral probes, leaves a deleted property absent by
+default, and performs restoration only for an explicit `options.restore`.
+Requested restoration still performs DefineProperty and propagates its real
+errors. The primordial wrapper and callable property/name/length checks
+forward that option. Runtime global-declaration and non-extensibility rules
+are unchanged. *tests/test262-property-helper-source.test.ts* compares these
+bounded ordinary/Proxy, strictness, accessor and callable cases with the pinned
+upstream helper under Node and Deno; it claims no general helper equivalence.
+The source-qualified native results below remain separate from this later
+repair and from Full observations.
+
+In the explicit host build, direct calls to the existing runtime-owned
+`console.log`, `setTimeout` and `clearTimeout` targets first consult the
+current Script global record and intervening with records. A user binding
+supplies the callable and receiver before argument evaluation; only an
+initially missing binding selects the existing private intrinsic. Noncallable
+values and abrupt getters never fall back. Ordinary builds retain their
+private call targets and rejected unbound value/typeof/delete forms. This
+adds no public intrinsic global and changes no timer behavior. The bounded
+regressions are *tests/host-script-runtime-owned-source.test.ts* and
+*tests/host-script-runtime-owned.test.ts*, using
+*tests/native/fixtures/host-script-runtime-owned.ts*. Fresh native validation
+of this repair and Full observations remain pending.
+
+The earlier whole host suites passed twelve registrations per framework on
+`a93871cc`; ordinary properties passed two domains per framework on
+`ab8d5d5c`. That source's extended Node run passed 120 cases per domain,
+measuring a 510-second Linux scheduling weight; macOS remains unmeasured at
+the 296-second fallback. See *docs/evidence/u6/README.md*. Those results
+retain their actual source identities and do not validate this later repair.
+
+
+Host Script and final GC bitmap source composition
+--------------------------------------------------
+
+The complete Host source on `918a6d93` is prepared on fixed TCO/Reg source
+`beea6880c6db826ad3420cb9a021a1a124bfe2d4` (tree
+`c0c65bed5eb9cafc26334d4355b0e28900ab5ca3`). Root reserved ABI `m5-140`
+for the combined environment bitmap and Host realm/Script layout. The
+`m5-139` create/set/clone/tracer bitmap implementation remains intact;
+Host lexical installation uses the environment APIs and adds its persistent
+realm roots. The final f5 leaf proposal remains absent. The runtime-owned
+HIR/MIR call-target repair and all original fixed programs, assertions,
+generated domains, seeds, budgets, policies and depths are preserved.
+
+The new runtime-owned-call suites passed eight registrations per framework
+on `918a6d93`, with both policies, false hints, guard misses and forced GC.
+Those measurements remain bound to that source. Earlier a938, ab8d, f5 and
+U68 evidence also retains its actual identity; none validates this composed
+source. The historical Linux scheduling weight remains 510 seconds and
+macOS remains unmeasured at 296. Fresh composed native execution, affected
+internal reviews and Full remain pending. Reg's existing observations and
+matcher owners, both TCO unsupported expectations and all fourteen Host
+unsupported expectations are preserved; no promotion is predicted here.

@@ -18,20 +18,32 @@ scope:
   - "A with object that supplies eval but loses it before GetBindingValue
     reads undefined in non-strict code and throws ReferenceError in strict
     code; the with-statement family owns that lookup contract."
-  - "Each independently compiled Script is validated in isolation; global
-    var and lexical declaration names are not retained across successive
-    Script instantiations in one realm."
+  - "The test262 host compiles a finite literal Script source set ahead of
+    time under ADR 0029. Successive Scripts retain realm lexical cells,
+    validate all declaration permissions before mutation, preserve completion
+    values and thrown identity, and create closures in the evaluated realm.
+    Simple immutable lexical evalScript aliases can discover literal sources;
+    shadowed, mutable and unproven call targets cannot add candidates.
+    Unmatched source and ordinary eval retain the ADR 0016 boundary.
+    Runtime-owned console and timer calls honor current Script and with
+    bindings before arguments; only an initial miss uses a private intrinsic,
+    without installing public intrinsic globals."
 owners:
   - PLAN-M5.md
+  - docs/adr/0029-ahead-of-time-host-script-bindings.md
 evidence:
   differential:
     status: covered
     references:
+      - tests/host-script-bindings.test.ts
+      - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native/fixtures/global-object-record.ts
       - tests/property/m5-global-object-record.property.test.ts
   fixed:
     status: covered
     references:
+      - tests/host-script-bindings.test.ts
+      - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native/fixtures/global-object-record.ts
       - tests/native/fixtures/with-get-binding-value.ts
       - tests/native.ts
@@ -39,22 +51,30 @@ evidence:
   forced-collection:
     status: covered
     references:
+      - tests/host-script-bindings.test.ts
+      - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native.ts
       - tests/property/m5-global-object-record.property.test.ts
   generated:
     status: covered
     references:
+      - tests/host-script-bindings.test.ts
+      - tests/property/m5-host-script-bindings.property.test.ts
       - tests/property-seeds.yaml
       - tests/property/m5-global-object-record.property.test.ts
   guard-fallback:
     status: covered
     references:
+      - tests/host-script-bindings.test.ts
+      - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native.ts
       - tests/native/fixtures/global-object-record.ts
       - tests/property/m5-global-object-record.property.test.ts
   specialization:
     status: covered
     references:
+      - tests/host-script-bindings.test.ts
+      - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native.ts
       - tests/property/m5-global-object-record.property.test.ts
   standards:
@@ -65,6 +85,12 @@ evidence:
   structural:
     status: covered
     references:
+      - tests/host-script-runtime-owned-source.test.ts
+      - tests/host-script-runtime-owned.test.ts
+      - packages/cli/tests/host-scripts.test.ts
+      - tests/test262-property-helper-source.test.ts
+      - tests/host-script-bindings.test.ts
+      - tests/property/m5-host-script-bindings.property.test.ts
       - packages/backend-c/tests/index.test.ts
       - packages/compiler/tests/hir.test.ts
       - packages/parser-babel/tests/bindings.test.ts

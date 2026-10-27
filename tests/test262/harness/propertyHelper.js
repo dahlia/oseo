@@ -66,7 +66,7 @@ function __oseoIsConfigurable(object, name) {
   return __oseoGetOwnPropertyDescriptor(object, name) === undefined;
 }
 
-function verifyProperty(object, name, descriptor) {
+function verifyProperty(object, name, descriptor, options) {
   const actual = __oseoGetOwnPropertyDescriptor(object, name);
   if (descriptor === undefined) {
     assert.sameValue(actual, undefined);
@@ -145,20 +145,20 @@ function verifyProperty(object, name, descriptor) {
     const configurable =
       __oseoGetOwnPropertyDescriptor(object, name) === undefined;
     assert.sameValue(configurable, descriptor.configurable);
-    if (configurable) __oseoDefineProperty(object, name, actual);
   }
+  // The pinned upstream default leaves a configurable property deleted.
+  // An explicit restore request must perform DefineProperty and propagate
+  // its real failure, including on a now non-extensible object.
+  if (options && options.restore) __oseoDefineProperty(object, name, actual);
   return true;
 }
 
 /*
- * The upstream helper's primordial variant asks `verifyProperty` to
- * restore whatever its writability and configurability probes changed,
- * so that verifying a property of a shared intrinsic leaves that
- * intrinsic as it found it. This reviewed `verifyProperty` always
- * restores, so the two are the same check.
+ * The pinned upstream primordial name aliases verifyProperty. Forward its
+ * explicit restore option; the primordial name alone requests no restore.
  */
-function verifyPrimordialProperty(object, name, descriptor) {
-  return verifyProperty(object, name, descriptor);
+function verifyPrimordialProperty(object, name, descriptor, options) {
+  return verifyProperty(object, name, descriptor, options);
 }
 
 /*
@@ -170,9 +170,9 @@ function verifyPrimordialProperty(object, name, descriptor) {
  * non-writable, non-enumerable, configurable attributes SetFunctionName
  * and SetFunctionLength define. A symbol key needs an explicit
  * `functionName`, because symbol description reflection is outside the
- * admitted profile. `options` is accepted for upstream call
- * compatibility; this reviewed `verifyProperty` always restores, so the
- * upstream restore option is implied.
+ * admitted profile. The supported `options.restore` is forwarded to the
+ * property and the function's own name and length checks; without it,
+ * their configurable-property probes may delete those properties.
  */
 function verifyCallableProperty(
   object,
@@ -196,7 +196,7 @@ function verifyCallableProperty(
   } else if (!("value" in expected) && !("get" in expected)) {
     expected.value = value;
   }
-  verifyProperty(object, name, expected);
+  verifyProperty(object, name, expected, options);
   let expectedName = functionName;
   if (expectedName === undefined) {
     if (typeof name === "symbol") {
@@ -206,18 +206,28 @@ function verifyCallableProperty(
     }
     expectedName = name;
   }
-  verifyProperty(value, "name", {
-    value: expectedName,
-    writable: false,
-    enumerable: false,
-    configurable: expected.configurable,
-  });
-  verifyProperty(value, "length", {
-    value: functionLength,
-    writable: false,
-    enumerable: false,
-    configurable: expected.configurable,
-  });
+  verifyProperty(
+    value,
+    "name",
+    {
+      value: expectedName,
+      writable: false,
+      enumerable: false,
+      configurable: expected.configurable,
+    },
+    options,
+  );
+  verifyProperty(
+    value,
+    "length",
+    {
+      value: functionLength,
+      writable: false,
+      enumerable: false,
+      configurable: expected.configurable,
+    },
+    options,
+  );
   return true;
 }
 

@@ -633,6 +633,17 @@ OseoResult oseo_global_object_create(
         );
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoValue lexicals = context->realm->global_lexicals;
+        if (is_object(lexicals) &&
+            oseo_internal_own_property_index(
+                ordinary_object(lexicals), frame.slots[1]
+            ) != SIZE_MAX) {
+            result = oseo_internal_throw_error(
+                context, OSEO_ERROR_SYNTAX,
+                "A Script declaration conflicts with a lexical binding."
+            );
+            break;
+        }
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
@@ -671,6 +682,17 @@ OseoResult oseo_global_object_create(
         );
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoValue lexicals = context->realm->global_lexicals;
+        if (is_object(lexicals) &&
+            oseo_internal_own_property_index(
+                ordinary_object(lexicals), frame.slots[1]
+            ) != SIZE_MAX) {
+            result = oseo_internal_throw_error(
+                context, OSEO_ERROR_SYNTAX,
+                "A Script declaration conflicts with a lexical binding."
+            );
+            break;
+        }
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
@@ -872,4 +894,48 @@ OseoResult oseo_global_function_initialize(
     }
     cell->value = value;
     return normal(value);
+}
+
+/* ResolveBinding selects its record before any assignment operand runs. */
+OseoResult oseo_global_environment(OseoContext *context, OseoValue key) {
+    OseoValue lexicals = context->realm->global_lexicals;
+    if (is_object(lexicals) && oseo_internal_own_property_index(
+            ordinary_object(lexicals), key) != SIZE_MAX) {
+        return normal(lexicals);
+    }
+    return global_this_object(context);
+}
+
+OseoResult oseo_script_lexicals_install(
+    OseoContext *context, OseoValue environment, size_t count,
+    const uint16_t *const *names, const size_t *lengths,
+    const size_t *ids, const bool *mutable_bindings
+) {
+    OseoValue slots[3] = {environment, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    if (!is_object(context->realm->global_lexicals)) {
+        result = oseo_object_create(context, oseo_null());
+        if (result.status == OSEO_STATUS_NORMAL) {
+            context->realm->global_lexicals = result.value;
+            ordinary_object(result.value)->global_object = true;
+            ordinary_object(result.value)->dictionary = true;
+        }
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < count; index += 1u) {
+        result = oseo_string_from_units(context, names[index], lengths[index]);
+        slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_environment_get(context, slots[0], ids[index]);
+        slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(context, context->realm->global_lexicals,
+            slots[1], slots[2],
+            (OseoPropertyAttributes){false, false, mutable_bindings[index],
+                false});
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }

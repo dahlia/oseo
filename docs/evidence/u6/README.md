@@ -1121,3 +1121,79 @@ TCO source on the pending Set candidate retains the Set retirement of Annex
 samples309/451 and adds only historical TCO1726/286. The resulting135-entry
 host tables keep409/296 upper-median fallbacks. No case, width, shard or
 measurement claim changes; Set Full and old TCO execution stay source-bound.
+
+
+Host Script bindings local Linux extended cost
+----------------------------------------------
+
+On October 27, 2026, source
+`ab8d5d5c8b529abd46ba7c8b6b8fff28a040096e` (tree
+`742a642a9e9de51663d93f99c3f42c0cb23f267b`) completed the existing focused
+task once on Linux AMD64:
+
+~~~~ sh
+mise run test:property:extended:native:shard --shard 1/1 \
+  tests/property/m5-host-script-bindings.property.test.ts
+~~~~
+
+The unchanged task uses `OSEO_PROPERTY_RUN_SCALE=10`,
+`OSEO_PROPERTY_SEED=1592590339` and `OSEO_PROPERTY_SIZE=large`, one file
+worker, and both original domains at 120 cases each. Each unchanged
+240,000-millisecond base interrupt limit scales normally to 2,400,000.
+Both specialization policies, forced collection, false hints, guard misses,
+realm identity and abrupt results remain in every applicable generated case.
+The two registrations passed with no failures, skips or cancellations.
+
+Their measured durations were 299,418.921195 and 209,886.770563
+milliseconds: sum 509,305.691758 milliseconds, divided by 1,000 and rounded
+up to the new 510-second Linux weight. Gate wall time was
+510.643981080 seconds and is not the weight. This is one complete local
+extended observation, not CI, a macOS measurement, a speedup, a conservative
+bound or an estimate of variation.
+
+Before this entry, both host tables had 135 values. The existing unknown-file
+upper median used index `floor(135/2) = 67`: 409 Linux/296 macOS seconds.
+The macOS entry preserves that file's 296-second assignment as an explicitly
+unmeasured scheduling placeholder, with no invented host ratio. After adding
+only these two entries, the unchanged median rule derives 415 Linux/296
+macOS seconds over 136 values. No other table entry, partition algorithm,
+width, shard total, case, seed, size or interrupt limit changed.
+
+The complete raw record, source snapshots and tool hashes remain under
+*/data/m5c-host-script-bindings-20261027/*, task
+`task_2d22aad7a394`, dispatch `ctx_60b42a8e012e`. Its
+*native-property-extended01-unarmed/run/* directory holds the original five
+raw files and three identical source snapshots; Root's accepted measurement
+is *ROOT-ACCEPTED.json*. The separate
+*cost-source-update/host-script-bindings-local-20261027.json* records the
+exact source, physical input hash, argv, task controls, raw paths and hashes,
+case-sum rounding and prior/resulting medians. Original raw SHA-256 values:
+
+~~~~ text
+gate.stdout.raw
+1b3a6099c2765c247f3ecd0036943b138031d3e977842c9703997f26c5eb7f0a
+gate.stderr.raw
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+commands/whole.stdout
+a46dde3b43713647a9cabe0ebf5215cc7d959334a7a88e6dc6db6afbf81018f0
+commands/whole.stderr
+30222c44807d1c0cb5446169c30aed97d67cee4ef9595c081a0b49f1e2b414c9
+commands/whole.json
+1b3a6099c2765c247f3ecd0036943b138031d3e977842c9703997f26c5eb7f0a
+~~~~
+
+The process exited naturally and both actual process/scope drains were empty,
+15.056243110 seconds apart. The measurement retains its ab8d source identity;
+later metadata commits and any future GC composition are not new executions.
+Matching-host candidate CI remains required to replace the macOS placeholder.
+
+The later runtime-owned-call repair changes compiler inputs after this
+measurement. The 510-second Linux weight remains the measured `ab8d5d5c`
+scheduling baseline; it is not a fresh measurement or native pass for that
+repair. macOS remains unmeasured at the 296-second fallback. A new
+measurement requires the separately serialized author-heavy slot.
+
+The subsequent Host/GC source composition on `beea6880` uses ABI `m5-140`
+and likewise has no fresh property-cost measurement. The eight-case Node
+and Deno runtime-owned-call passes belong to Host source `918a6d93`; they
+are fixed correctness observations, not property scheduling measurements.

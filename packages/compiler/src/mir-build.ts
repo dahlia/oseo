@@ -6,6 +6,7 @@ import type {
   HirBindingIdentifier,
   HirBindingPattern,
   HirCallArgument,
+  HirCallTarget,
   HirClassField,
   HirClassMethod,
   HirExpression,
@@ -978,6 +979,24 @@ function lowerGlobalBindingValue(
   return recordRoot(builder, result, range);
 }
 
+/** Select the current subrecord of the persistent Global Environment. */
+function lowerHostGlobalEnvironment(
+  key: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const id = builder.nextValue++;
+  builder.current.operations.push({
+    arguments: [key],
+    detail: "global record",
+    id,
+    kind: "global-environment",
+    range,
+  });
+  appendMirMetadata(builder, "check-status", "global environment", [id], range);
+  return recordRoot(builder, id, range);
+}
+
 /**
  * GetValue of an identifier reference that the global Environment Record
  * resolves through the realm global object: ResolveBinding's HasProperty,
@@ -991,16 +1010,21 @@ function lowerGlobalBindingValue(
 function lowerGlobalRead(
   expression: HirGlobalRead,
   builder: MirBuilder,
+  selectedObject?: number,
+  initiallyResolved?: number,
+  useValue?: (value: number) => number,
+  unresolvableValue?: () => number,
 ): number {
   const range = expression.range;
-  const object = lowerExpression(expression.object, builder);
+  const object = selectedObject ?? lowerExpression(expression.object, builder);
   const literalKey = {
     kind: "string" as const,
     range,
     value: expression.name,
   };
   const key = lowerExpression(literalKey, builder);
-  const resolved = lowerBinaryValues(key, "in", object, range, builder);
+  const resolved =
+    initiallyResolved ?? lowerBinaryValues(key, "in", object, range, builder);
   const bindingBlock = createMirBlock(builder);
   const unresolvableBlock = createMirBlock(builder);
   const readBlock = createMirBlock(builder);
@@ -1016,7 +1040,11 @@ function lowerGlobalRead(
     whenTrue: bindingBlock.id,
   };
   builder.current = bindingBlock;
-  const exists = lowerBinaryValues(key, "in", object, range, builder);
+  const bindingObject =
+    expression.globalReference.hostGlobal === true
+      ? lowerHostGlobalEnvironment(key, range, builder)
+      : object;
+  const exists = lowerBinaryValues(key, "in", bindingObject, range, builder);
   builder.current.terminator = {
     kind: "branch",
     test: exists,
@@ -1031,27 +1059,31 @@ function lowerGlobalRead(
     };
   };
   builder.current = readBlock;
-  join(
+  const read =
     builder.specialization === "enabled"
       ? lowerSpecializedPropertyGet(
-          object,
+          bindingObject,
           literalKey,
           range,
           builder,
           undefined,
           key,
         )
-      : lowerPropertyRead(object, key, range, builder),
-  );
+      : lowerPropertyRead(bindingObject, key, range, builder);
+  join(useValue == null ? read : useValue(read));
   builder.current = missingBlock;
   const fallback = expression.globalReference.strictFallback;
-  join(
+  const missing =
     fallback == null
       ? lowerSyntheticUndefined(range, builder)
-      : lowerBindingRead(fallback.bindingId, fallback.name, range, builder),
-  );
+      : lowerBindingRead(fallback.bindingId, fallback.name, range, builder);
+  join(useValue == null ? missing : useValue(missing));
   builder.current = unresolvableBlock;
-  join(lowerExpression(expression.unresolvable, builder));
+  join(
+    unresolvableValue == null
+      ? lowerExpression(expression.unresolvable, builder)
+      : unresolvableValue(),
+  );
   builder.current = joinBlock;
   return recordRoot(builder, result, range);
 }
@@ -1076,6 +1108,40 @@ function lowerGlobalReferenceWrite(
   range: SourceRange,
   builder: MirBuilder,
 ): number {
+  // ResolveBinding fixes the Global Environment Record, not its current
+  // object/declarative subrecord. An RHS can introduce a lexical binding.
+  if (reference.hostGlobal === true) {
+    if (resolved == null) {
+      object = lowerHostGlobalEnvironment(key, range, builder);
+    } else {
+      const bindingBlock = createMirBlock(builder);
+      const missingBlock = createMirBlock(builder);
+      const joinBlock = createMirBlock(builder);
+      const selected = builder.nextValue++;
+      joinBlock.parameters = [selected];
+      builder.current.terminator = {
+        kind: "branch",
+        test: resolved,
+        whenTrue: bindingBlock.id,
+        whenFalse: missingBlock.id,
+      };
+      builder.current = bindingBlock;
+      const current = lowerHostGlobalEnvironment(key, range, builder);
+      builder.current.terminator = {
+        kind: "jump",
+        target: joinBlock.id,
+        values: [current],
+      };
+      builder.current = missingBlock;
+      builder.current.terminator = {
+        kind: "jump",
+        target: joinBlock.id,
+        values: [object],
+      };
+      builder.current = joinBlock;
+      object = recordRoot(builder, selected, range);
+    }
+  }
   const stillExists = () =>
     lowerBinaryValues(key, "in", object, range, builder);
   const exists =
@@ -1132,6 +1198,7 @@ interface LoweredWithReference {
    * PutValue. It is meaningful only where `property` is false.
    */
   readonly globalResolved?: number;
+  readonly globalObject?: number;
 }
 
 /** Keep semantic `IsObject` distinct from a removable specialization guard. */
@@ -1173,10 +1240,17 @@ function lowerWithReference(
   builder.nextValue += 1;
   const globalResolved = globalFallback == null ? undefined : builder.nextValue;
   if (globalResolved != null) builder.nextValue += 1;
+  const globalObject =
+    globalFallback?.object == null ? undefined : builder.nextValue++;
   joinBlock.parameters =
     globalResolved == null
       ? [selectedObject, selectedProperty]
-      : [selectedObject, selectedProperty, globalResolved];
+      : [
+          selectedObject,
+          selectedProperty,
+          globalResolved,
+          ...(globalObject == null ? [] : [globalObject]),
+        ];
   for (const bindingId of reference.objectBindingIds) {
     const object = lowerBindingRead(
       bindingId,
@@ -1250,25 +1324,33 @@ function lowerWithReference(
     selectedBlock.terminator = {
       kind: "jump",
       target: joinBlock.id,
-      values: globalResolved == null ? [object, found] : [object, found, found],
+      values:
+        globalResolved == null
+          ? [object, found]
+          : [object, found, found, ...(globalObject == null ? [] : [object])],
     };
     builder.current = nextBlock;
   }
   // An all-miss chain continues to the global Environment Record, whose
   // HasBinding tests the global object's property while the reference is
   // resolved, before a write's right-hand side runs.
+  const fallbackObject =
+    globalFallback?.object == null
+      ? undefined
+      : lowerExpression(globalFallback.object, builder);
   const globalFound =
     globalFallback == null
       ? undefined
       : lowerBinaryValues(
           key,
           "in",
-          lowerBindingRead(
-            globalFallback.objectBindingId,
-            intrinsicGlobalObjectName,
-            reference.range,
-            builder,
-          ),
+          fallbackObject ??
+            lowerBindingRead(
+              globalFallback.objectBindingId,
+              intrinsicGlobalObjectName,
+              reference.range,
+              builder,
+            ),
           reference.range,
           builder,
         );
@@ -1283,7 +1365,12 @@ function lowerWithReference(
     values:
       globalFound == null
         ? [noObject, noProperty]
-        : [noObject, noProperty, globalFound],
+        : [
+            noObject,
+            noProperty,
+            globalFound,
+            ...(fallbackObject == null ? [] : [fallbackObject]),
+          ],
   };
   builder.current = joinBlock;
   recordRoot(builder, selectedObject, reference.range);
@@ -1295,6 +1382,9 @@ function lowerWithReference(
       if (globalResolved == null) return undefined;
       return { globalResolved };
     }),
+    ...includePropertiesWhen(() =>
+      globalObject == null ? undefined : { globalObject },
+    ),
     key,
     object: selectedObject,
     property: selectedProperty,
@@ -1448,7 +1538,14 @@ function lowerWithBindingRead(
   builder.current = fallbackBlock;
   const fallbackValue =
     globalRead != null
-      ? lowerExpression(globalRead, builder)
+      ? selected.globalObject != null && globalRead.kind === "global-read"
+        ? lowerGlobalRead(
+            globalRead,
+            builder,
+            selected.globalObject,
+            selected.globalResolved,
+          )
+        : lowerExpression(globalRead, builder)
       : "bindingId" in fallback
         ? lowerBindingRead(fallback.bindingId, fallback.name, range, builder)
         : undefined;
@@ -1480,13 +1577,16 @@ function lowerWithGlobalObjectWrite(
   range: SourceRange,
   builder: MirBuilder,
   reference: HirGlobalReference,
+  selectedObject?: number,
 ): number {
-  const object = lowerBindingRead(
-    fallback.objectBindingId,
-    intrinsicGlobalObjectName,
-    range,
-    builder,
-  );
+  const object =
+    selectedObject ??
+    lowerBindingRead(
+      fallback.objectBindingId,
+      intrinsicGlobalObjectName,
+      range,
+      builder,
+    );
   const key = lowerExpression(
     { kind: "string", range, value: fallback.name },
     builder,
@@ -1528,7 +1628,9 @@ function lowerWithBindingWrite(
     selected.object,
     selected.key,
     value,
-    reference,
+    reference.strictFallback == null
+      ? {}
+      : { strictFallback: reference.strictFallback },
     range,
     builder,
   );
@@ -1547,6 +1649,7 @@ function lowerWithBindingWrite(
           range,
           builder,
           reference,
+          selected.globalObject,
         )
       : lowerBindingWrite({ ...fallback, range }, value, builder);
   // The global-object write branches on its binding tests, so the jump
@@ -4019,6 +4122,28 @@ function lowerExpression(
     );
     return recordRoot(builder, id, expression.range);
   }
+  if (expression.kind === "global-environment") {
+    const key = lowerExpression(
+      { kind: "string", value: expression.name, range: expression.range },
+      builder,
+    );
+    const id = builder.nextValue++;
+    builder.current.operations.push({
+      arguments: [key],
+      detail: expression.name,
+      id,
+      kind: "global-environment",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "global environment",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
   if (expression.kind === "this") {
     return expression.thisMode === "strict"
       ? lowerReceiver(expression.range, builder)
@@ -5242,6 +5367,9 @@ function lowerExpression(
   let argumentListId: number | undefined;
   let callTarget: MirCallTarget;
   let detail: string;
+  if (expression.target.kind === "host-runtime-intrinsic") {
+    return lowerHostRuntimeCall(expression, expression.target, builder);
+  }
   if (expression.target.kind === "console-log") {
     const lowered = lowerCallArguments(
       expression.arguments,
@@ -5384,6 +5512,25 @@ function lowerExpression(
     callTarget = { kind: "dynamic" };
     detail = "dynamic function value";
   }
+  return appendCallResult(
+    expression,
+    callArguments,
+    argumentListId,
+    callTarget,
+    detail,
+    builder,
+  );
+}
+
+/** Emit a call after its target and argument values have been selected. */
+function appendCallResult(
+  expression: Extract<HirExpression, { readonly kind: "call" }>,
+  callArguments: readonly number[],
+  argumentListId: number | undefined,
+  callTarget: MirCallTarget,
+  detail: string,
+  builder: MirBuilder,
+): number {
   const safepointArguments =
     argumentListId == null ? callArguments : [...callArguments, argumentListId];
   const safepointId = builder.nextValue;
@@ -5420,6 +5567,106 @@ function lowerExpression(
     expression.range,
   );
   return recordRoot(builder, id, expression.range);
+}
+
+/**
+ * Select an accepted Script/with binding before evaluating call arguments.
+ * Only an initial miss reaches the unchanged private runtime call target;
+ * an undefined, non-callable, deleted-after-resolution or abrupt binding
+ * never falls back. No intrinsic value is installed as a public global.
+ */
+function lowerHostRuntimeCall(
+  expression: Extract<HirExpression, { readonly kind: "call" }>,
+  target: Extract<HirCallTarget, { readonly kind: "host-runtime-intrinsic" }>,
+  builder: MirBuilder,
+): number {
+  const range = expression.range;
+  const invoke = (value: number, withReceiver?: number) => {
+    let callee = value;
+    let receiver = withReceiver ?? lowerSyntheticUndefined(range, builder);
+    if (target.name === "console") {
+      receiver = value;
+      const keyExpression = { kind: "string" as const, value: "log", range };
+      const keyInput = lowerExpression(keyExpression, builder);
+      const object = lowerReferenceBase(value, keyExpression, range, builder);
+      const key = convertPropertyKey(keyInput, range, builder);
+      callee = lowerPropertyRead(object, key, range, builder);
+    }
+    const lowered = lowerCallArguments(expression.arguments, range, builder);
+    return appendCallResult(
+      expression,
+      [callee, receiver, ...lowered.ids],
+      lowered.list,
+      { kind: "dynamic" },
+      "host Script runtime-owned binding",
+      builder,
+    );
+  };
+  const fallback = () => {
+    const lowered = lowerCallArguments(expression.arguments, range, builder);
+    return appendCallResult(
+      expression,
+      lowered.ids,
+      lowered.list,
+      target.name === "console"
+        ? { kind: "console-log" }
+        : { kind: "timer-intrinsic", method: target.name },
+      `host intrinsic fallback ${target.name}`,
+      builder,
+    );
+  };
+  const global = () =>
+    lowerGlobalRead(
+      target.reference,
+      builder,
+      undefined,
+      undefined,
+      (value) => invoke(value),
+      fallback,
+    );
+  if (target.objectBindingIds.length === 0) return global();
+  const selected = lowerWithReference(
+    {
+      name: target.name,
+      objectBindingIds: target.objectBindingIds,
+      range,
+    },
+    builder,
+  );
+  const propertyBlock = createMirBlock(builder);
+  const fallbackBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue++;
+  joinBlock.parameters = [result];
+  builder.current.terminator = {
+    kind: "branch",
+    test: selected.property,
+    whenTrue: propertyBlock.id,
+    whenFalse: fallbackBlock.id,
+  };
+  builder.current = propertyBlock;
+  const property = lowerGlobalBindingValue(
+    selected.object,
+    selected.key,
+    target.reference.globalReference,
+    range,
+    builder,
+  );
+  const called = invoke(property, selected.object);
+  builder.current.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [called],
+  };
+  builder.current = fallbackBlock;
+  const calledGlobal = global();
+  builder.current.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [calledGlobal],
+  };
+  builder.current = joinBlock;
+  return recordRoot(builder, result, range);
 }
 
 /**
@@ -5461,6 +5708,7 @@ function collectTailCalls(
       target.kind === "dynamic" ||
       target.kind === "method" ||
       target.kind === "private-method" ||
+      target.kind === "host-runtime-intrinsic" ||
       target.kind === "console-log" ||
       target.kind === "timer-intrinsic"
     ) {

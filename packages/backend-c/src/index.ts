@@ -7,6 +7,7 @@ import type {
   MirConstant,
   MirFunction,
   MirGlobalLexicalName,
+  MirHostScript,
   MirAgentTemplate,
   MirGlobalObjectBinding,
   MirOperation,
@@ -2969,6 +2970,15 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       state,
       renderC(emittedC.operation.rootsAssignReceiverStatement, operation.id),
     );
+  } else if (operation.kind === "global-environment") {
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(
+      state,
+      `result = oseo_global_environment(context, ` +
+        `roots[${operation.arguments[0]}]);`,
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (operation.kind === "global-this") {
     // The runtime owns the nullish-receiver substitution and the one
     // global this object it resolves to, so generated C never decides
@@ -3781,7 +3791,12 @@ function reachableFunctions(input: MirProgram): readonly MirFunction[] {
   const functions = new Map(
     input.functions.map((functionValue) => [functionValue.id, functionValue]),
   );
-  const pending = [...calledFunctionIds(input.script)];
+  const pending = [
+    ...calledFunctionIds(input.script),
+    ...(input.test262Host?.scripts ?? []).flatMap((entry) =>
+      entry.functionId == null ? [] : [entry.functionId],
+    ),
+  ];
   const reachable = new Set<number>();
   while (pending.length > 0) {
     const id = pending.pop();
@@ -3929,6 +3944,7 @@ function emitGlobalObject(
   state: Pick<EmitState, "lines" | "environmentSlot">,
   lexicalNames: readonly MirGlobalLexicalName[],
   bindings: readonly MirGlobalObjectBinding[],
+  hostScript = false,
 ): void {
   if (lexicalNames.length === 0 && bindings.length === 0) return;
   const lexical = emitGlobalNameTable(state, "global_lexical", lexicalNames);
@@ -3978,6 +3994,27 @@ function emitGlobalObject(
       `${functionDeclarations});`,
   );
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  if (hostScript && lexicalNames.length > 0) {
+    line(
+      state,
+      "static const size_t lexical_ids[] = {" +
+        lexicalNames.map((entry) => `${entry.id}u`).join(", ") +
+        "};",
+    );
+    line(
+      state,
+      "static const bool lexical_mutable[] = {" +
+        lexicalNames.map((entry) => String(entry.mutable)).join(", ") +
+        "};",
+    );
+    line(
+      state,
+      "result = oseo_script_lexicals_install(context, " +
+        `roots[${state.environmentSlot}], ${lexicalNames.length}u, ` +
+        `${lexical.names}, ${lexical.lengths}, lexical_ids, lexical_mutable);`,
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  }
 }
 
 /**
@@ -4071,7 +4108,7 @@ function emitPrologue(
     line(state, `roots[${environmentSlot}] = callee;`);
     return;
   }
-  if (functionValue.id < 0) {
+  if (functionValue.id < 0 || functionValue.hostScript != null) {
     line(
       state,
       renderC(
@@ -4114,8 +4151,13 @@ function emitPrologue(
     );
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   }
-  if (functionValue.id < 0) {
-    emitGlobalObject(state, globalLexicalNames, globalObjectBindings);
+  if (functionValue.id < 0 || functionValue.hostScript != null) {
+    emitGlobalObject(
+      state,
+      functionValue.hostScript?.lexical ?? globalLexicalNames,
+      functionValue.hostScript?.objects ?? globalObjectBindings,
+      functionValue.hostScript != null,
+    );
   }
   if (functionValue.selfBindingId != null) {
     line(
@@ -4799,11 +4841,55 @@ function nativeSource(
   return { source, sourceName, compilationUnits };
 }
 
+/** Immutable source table; callbacks share the complete function dispatcher. */
+function emitHostScriptTables(
+  scripts: readonly MirHostScript[],
+  costs: ReadonlyMap<number, number>,
+): string {
+  if (scripts.length === 0) return "";
+  const lines: string[] = [];
+  const entries = scripts.map((script, index) => {
+    const units = utf16Units(script.source);
+    lines.push(
+      `static const uint16_t host_source_${index}[] = {` +
+        (units.length === 0 ? "0" : units.join(", ")) +
+        "};",
+    );
+    return (
+      `{host_source_${index}, ${units.length}u, ` +
+      (script.functionId == null
+        ? "NULL, 0u, "
+        : `oseo_function_${script.functionId}, ` +
+          `OSEO_CALLABLE_FRAME_COST(${costs.get(script.functionId)}u), `) +
+      `${script.error === "syntax" ? "true" : "false"}, ` +
+      `${
+        script.message == null ? "NULL" : `"${escapeCString(script.message)}"`
+      }}`
+    );
+  });
+  lines.push(
+    "static const OseoHostScript oseo_host_scripts[] = {" +
+      entries.join(",\n") +
+      "};\n",
+  );
+  return lines.join("\n");
+}
+
 export const cBackend: NativeBackend = {
   emit(input) {
     const originalFunctions = reachableFunctions(input);
     const declaredFunctions = originalFunctions.map(compactRootIds);
-    const script = compactRootIds(input.script);
+    const script = compactRootIds(
+      input.test262Host == null
+        ? input.script
+        : {
+            ...input.script,
+            hostScript: {
+              lexical: input.globalLexicalNames ?? [],
+              objects: input.globalObjectBindings,
+            },
+          },
+    );
     const functions = [...declaredFunctions, script];
     const operationCount = functions.reduce(
       (count, fn) =>
@@ -4813,7 +4899,10 @@ export const cBackend: NativeBackend = {
     );
     const units = operationCount > 2048 ? new BodyUnits() : undefined;
     const globalLexicalNames = input.globalLexicalNames ?? [];
-    const globalObjectBindings = input.globalObjectBindings;
+    const globalObjectBindings = [
+      ...input.globalObjectBindings,
+      ...(input.hostObjectBindings ?? []),
+    ];
     // Native-stack charges remain separate from dense heap root layouts.
     // Non-recursive scripts also retain expression temporaries on the stack.
     const functionFrameCosts = new Map([
@@ -4851,7 +4940,7 @@ export const cBackend: NativeBackend = {
     for (const binding of input.globalBindings) {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
-    for (const binding of input.globalObjectBindings) {
+    for (const binding of globalObjectBindings) {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
     // A hidden fallback binding stands for one unresolvable global
@@ -4953,7 +5042,19 @@ export const cBackend: NativeBackend = {
       );
     }
     const host = input.test262Host;
-    const hostTables = host == null ? empty : emitAgentTables(host.agents);
+    const scriptTables =
+      host == null
+        ? empty
+        : emitHostScriptTables(host.scripts ?? [], functionFrameCosts);
+    const hostTables =
+      host == null ? empty : emitAgentTables(host.agents) + scriptTables;
+    const scriptInstall =
+      host == null
+        ? empty
+        : `    context.host_scripts = ${
+            host.scripts?.length ? "oseo_host_scripts" : "NULL"
+          };\n` +
+          `    context.host_script_count = ${host.scripts?.length ?? 0}u;\n`;
     const hostInstall =
       host == null
         ? empty
@@ -4977,7 +5078,7 @@ export const cBackend: NativeBackend = {
         sourceId,
         sourceIdByteLength,
         generatorRegistration,
-        specializationObservation + hostInstall,
+        specializationObservation + scriptInstall + hostInstall,
         scriptRootCount,
         scriptRootCount,
         observations,

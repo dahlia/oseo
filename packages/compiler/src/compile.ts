@@ -1,5 +1,6 @@
 import { agentSourceId, compileAgentTemplate } from "./agent-programs.ts";
-import { buildHir } from "./hir-build.ts";
+import { compileHostScripts } from "./host-scripts.ts";
+import { buildSeededHir } from "./hir-build.ts";
 import type { CompilerOptions, MirAgentTemplate, MirProgram } from "./mir.ts";
 import { buildMir } from "./mir-build.ts";
 import type { CompilationResult } from "./module-compile.ts";
@@ -21,9 +22,9 @@ export function compileSource(
     return { diagnostics: frontendResult.diagnostics };
   }
   const host = options.test262Host === true;
-  const hirResult = buildHir(
+  const hirResult = buildSeededHir(
     frontendResult.program,
-    host ? { collectAgentTemplates: true } : {},
+    host ? { collectAgentTemplates: true, hostScriptBindings: true } : {},
   );
   if (hirResult.program == null) {
     return {
@@ -64,11 +65,25 @@ export function compileSource(
       sourceId: agentSourceId(input.sourceId, index),
     });
   }
+  const scripts = compileHostScripts(
+    frontend,
+    frontendResult.program,
+    options,
+    hirResult.nextBindingId,
+    hirResult.nextFunctionId,
+    hirResult.program.hostScriptSources ?? [],
+  );
   return {
     agents,
     diagnostics: [],
     hir: hirResult.program,
-    mir: { ...mir, test262Host: { agents: templates } },
+    mir: {
+      ...mir,
+      functions: [...mir.functions, ...scripts.functions],
+      globalBindings: [...mir.globalBindings, ...scripts.globals],
+      hostObjectBindings: scripts.objects,
+      test262Host: { agents: templates, scripts: scripts.scripts },
+    },
     syntax: frontendResult.program,
   };
 }

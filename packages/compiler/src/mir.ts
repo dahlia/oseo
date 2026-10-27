@@ -54,7 +54,8 @@ export interface CompilerOptions {
   /**
    * Compile the Script for the test262 host: `$262` reads the host object
    * the runtime installs, and every `$262.agent.start` source template the
-   * Script contains becomes an agent program compiled beside it.
+   * Script contains becomes an agent program compiled beside it. Literal
+   * evalScript sources join its dispatcher as ahead-of-time evaluators.
    */
   readonly test262Host?: boolean;
 }
@@ -68,8 +69,17 @@ export interface MirAgentTemplate {
   readonly sourceId: string;
 }
 
+/** One source in the closed set of ahead-of-time host Scripts. */
+export interface MirHostScript {
+  readonly source: string;
+  readonly functionId?: number;
+  readonly error?: "syntax" | "unsupported";
+  readonly message?: string;
+}
+
 /** The test262 host a main program installs before its Script runs. */
 export interface MirTest262Host {
+  readonly scripts?: readonly MirHostScript[];
   /** Agent program templates, indexed as each agent program's entry. */
   readonly agents: readonly MirAgentTemplate[];
 }
@@ -98,6 +108,8 @@ export interface MirGlobalBinding {
 
 /** One source-located Script lexical name checked against the global object. */
 export interface MirGlobalLexicalName {
+  readonly id?: number;
+  readonly mutable?: boolean;
   readonly name: string;
   readonly range: SourceRange;
 }
@@ -185,6 +197,7 @@ export interface MirOperation {
     | "enumerate-get"
     | "enumerate-next"
     | "function-create"
+    | "global-environment"
     | "global-this"
     | "guard-object"
     | "guard-shape"
@@ -446,6 +459,11 @@ export interface MirSpecialization {
 
 /** MIR for one declared function or script. */
 export interface MirFunction extends LocatedSyntax {
+  /** Declaration set for a host Script evaluator with a fresh environment. */
+  readonly hostScript?: {
+    readonly lexical: readonly MirGlobalLexicalName[];
+    readonly objects: readonly MirGlobalObjectBinding[];
+  };
   /**
    * The implicit `arguments` binding initialized by the backend from the
    * generic call ABI, present for every function form except an arrow.
@@ -511,6 +529,8 @@ export interface MirFunction extends LocatedSyntax {
 
 /** Backend-neutral MIR for one source script. */
 export interface MirProgram {
+  /** Other host Script global binding identities for shared emission. */
+  readonly hostObjectBindings?: readonly MirGlobalObjectBinding[];
   readonly functions: readonly MirFunction[];
   readonly globalBindings: readonly MirGlobalBinding[];
   /** Script lexical names checked against restricted global properties. */

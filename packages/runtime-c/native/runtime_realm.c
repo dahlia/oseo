@@ -10,9 +10,9 @@
  * every later realm is a collected heap record. All realms of a context
  * share the heap, the collector, the job queues, the well-known symbols,
  * and the symbol registry; each owns its intrinsic graph, global object,
- * literal caches, and Math.random state. Generated code always runs in
- * the initial realm, because no source text is compiled for a created
- * realm; a created realm runs only its own built-in functions.
+ * literal caches, and Math.random state. ADR 0029 adds the finite
+ * ahead-of-time host Script set: its evaluators and newly created
+ * closures run in the realm of the host evalScript function.
  */
 
 OseoResult oseo_internal_function_realm(
@@ -266,11 +266,32 @@ OseoResult oseo_internal_realm_host_install(
         );
     }
     if (result.status == OSEO_STATUS_NORMAL) {
+        result = realm_function(context, OSEO_HOST_EVAL_SCRIPT_CODE_ID,
+            "evalScript", 1u);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_realm_property(
+            context, slots[0], "evalScript", slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
         result = oseo_this_value(context, oseo_undefined());
         slots[1] = result.value;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = define_realm_property(context, slots[0], "global", slots[1]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_realm_property(context, context->realm->global_this,
+            "$262", slots[0]);
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = realm_function(context, OSEO_HOST_PRINT_CODE_ID, "print", 1u);
+        slots[1] = result.value;
+    }
+    if (result.status == OSEO_STATUS_NORMAL) {
+        result = define_realm_property(context, context->realm->global_this,
+            "print", slots[1]);
     }
     oseo_roots_pop(context, &frame);
     return result;
@@ -304,6 +325,40 @@ static OseoResult create_realm(OseoContext *context) {
     return result;
 }
 
+/* Source selection is exact UTF-16 equality, never runtime compilation. */
+static OseoResult host_eval_script(OseoContext *context, OseoValue source) {
+    if (!is_string(source)) {
+        return oseo_internal_throw_error(context, OSEO_ERROR_TYPE,
+            "evalScript requires a String source.");
+    }
+    const OseoString *string = string_object(source);
+    for (size_t index = 0u; index < context->host_script_count; index += 1u) {
+        const OseoHostScript *script = &context->host_scripts[index];
+        if (string->length != script->source_length ||
+            (string->length > 0u && memcmp(string->units, script->source,
+                string->length * sizeof(uint16_t)) != 0)) continue;
+        if (script->evaluate == NULL) {
+            if (script->syntax_error) {
+                return oseo_internal_throw_error(context, OSEO_ERROR_SYNTAX,
+                    script->message == NULL
+                        ? "Invalid Script." : script->message);
+            }
+            return failure(context, "OSEO1001", script->message == NULL ?
+                "Host Script syntax is outside the admitted profile." :
+                script->message);
+        }
+        OseoResult result = oseo_frame_enter(context, script->frame_cost);
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        result = script->evaluate(context, oseo_undefined(), oseo_undefined(),
+            0u, NULL, oseo_undefined());
+        oseo_frame_leave(context, script->frame_cost);
+        return result;
+    }
+    return failure(context, "OSEO1001",
+        "Host Script source outside the ahead-of-time Script set "
+        "is not admitted.");
+}
+
 OseoResult oseo_internal_realm_builtin_dispatch(
     OseoContext *context,
     size_t code_id,
@@ -334,5 +389,20 @@ OseoResult oseo_internal_realm_builtin_dispatch(
         );
     }
     if (code_id == OSEO_CREATE_REALM_CODE_ID) return create_realm(context);
+    if (code_id == OSEO_HOST_EVAL_SCRIPT_CODE_ID) {
+        return host_eval_script(context,
+            argument_count > 0u ? arguments[0] : oseo_undefined());
+    }
+    if (code_id == OSEO_HOST_PRINT_CODE_ID) {
+        OseoResult result = oseo_internal_value_string(context,
+            argument_count > 0u ? arguments[0] : oseo_undefined());
+        if (result.status != OSEO_STATUS_NORMAL) return result;
+        OseoValue string = result.value;
+        OseoRootFrame frame = {NULL, &string, 1u};
+        oseo_roots_push(context, &frame);
+        result = oseo_console_log(context, 1u, &string);
+        oseo_roots_pop(context, &frame);
+        return result;
+    }
     return oseo_unknown_function(context, code_id);
 }

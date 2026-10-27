@@ -71,6 +71,10 @@
  * fallbacks; restoring TCO gives 135 entries with the same fallbacks.
  * Primitive Set has no explicit estimate. See U6 provenance.
  * These are unmeasured scheduling estimates, not matching-host costs.
+ *
+ * Host Script bindings use a complete local Linux extended two-case sum
+ * at `ab8d5d5c`. macOS preserves its prior unknown-file assignment of
+ * 296 seconds as an explicitly unmeasured placeholder. See U6 provenance.
  * All other Main entries and partition rules remain unchanged. See U6.
  */
 export const nativeShardCosts = {
@@ -140,6 +144,9 @@ export const nativeShardCosts = {
     "tests/property/m5-globalthis-binding.property.test.ts": 2647,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 590,
     "tests/property/m5-harness-promise-helper.property.test.ts": 578,
+    // Local Linux extended case sum: 509.305691758 s, rounded up.
+    // October 27, 2026; not CI or file wall time. See U6 provenance.
+    "tests/property/m5-host-script-bindings.property.test.ts": 510,
     "tests/property/m5-import-attributes.property.test.ts": 354,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 334,
     "tests/property/m5-iterator-helpers-eager.property.test.ts": 285,
@@ -291,6 +298,9 @@ export const nativeShardCosts = {
     "tests/property/m5-globalthis-binding.property.test.ts": 855,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 479,
     "tests/property/m5-harness-promise-helper.property.test.ts": 548,
+    // UNMEASURED: preserve the prior unknown-file upper median, 296 s.
+    // Scheduling placeholder only; no macOS observation. See U6 provenance.
+    "tests/property/m5-host-script-bindings.property.test.ts": 296,
     "tests/property/m5-import-attributes.property.test.ts": 131,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 162,
     "tests/property/m5-iterator-helpers-eager.property.test.ts": 340,

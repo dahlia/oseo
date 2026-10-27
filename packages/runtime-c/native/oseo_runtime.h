@@ -102,6 +102,16 @@ typedef OseoResult (*OseoFunctionDispatcher)(
     OseoValue new_target
 );
 
+/* One immutable host Script, compiled and linked before execution. */
+typedef struct {
+    const uint16_t *source;
+    size_t source_length;
+    OseoFunctionDispatcher evaluate;
+    size_t frame_cost;
+    bool syntax_error;
+    const char *message;
+} OseoHostScript;
+
 /*
  * Enters one generator body at its saved resume point. The runtime
  * never resumes a generator without this dispatcher, which generated
@@ -544,6 +554,8 @@ typedef struct {
      * every non-strict nullish receiver observe one identity.
      */
     OseoValue global_this;
+    /* Private declarative storage, never exposed as global properties. */
+    OseoValue global_lexicals;
     /*
      * Realm-local GetTemplateObject cache, which is the realm's
      * [[TemplateMap]]. The private entry layout stays behind this public
@@ -572,6 +584,8 @@ typedef struct {
 } OseoRealm;
 
 struct OseoContext {
+    const OseoHostScript *host_scripts;
+    size_t host_script_count;
     OseoRootFrame *roots;
     OseoHeapObject *objects;
     OseoFunctionDispatcher function_dispatcher;
@@ -1074,6 +1088,15 @@ OseoResult oseo_global_object_create(
  * equivalent property assignment fails: with a TypeError in strict code
  * and silently outside it.
  */
+/* Resolve an identifier against persistent Script lexicals, then globals. */
+OseoResult oseo_global_environment(OseoContext *context, OseoValue key);
+/* Publish validated Script lexical cells from a fresh Script environment. */
+OseoResult oseo_script_lexicals_install(
+    OseoContext *context, OseoValue environment, size_t count,
+    const uint16_t *const *names, const size_t *lengths,
+    const size_t *ids, const bool *mutable_bindings
+);
+
 OseoResult oseo_global_binding_set(
     OseoContext *context,
     OseoValue cell,

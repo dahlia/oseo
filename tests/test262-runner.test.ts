@@ -2320,11 +2320,9 @@ test("builds a case that writes or deletes a host member", async () => {
 
 test("withholds a case that references the $262 host binding", async () => {
   const cases = [
-    "$262.evalScript('1;');\n",
     "assert.throws(ReferenceError, () => { $262.gc(); });\n",
     "const host = $262;\n",
     "$262.agent.start(''); $262.detachArrayBuffer;\n",
-    "$262.createRealm().global; $262.evalScript('1;');\n",
     // A declaration in another scope does not shadow the reference.
     "function local($262) {}\nassert.throws(Error, () => $262.gc());\n",
     "{ let $262; }\n$262.gc();\n",
@@ -3199,5 +3197,36 @@ test("classifies module negatives by owned diagnostic phase", async () => {
     );
   } finally {
     await rm(directory, { force: true, recursive: true });
+  }
+});
+
+test("executes Script bindings with the native test262 host", async () => {
+  // Each case uses an isolated fake executor.
+
+  for (const body of [
+    "$262.evalScript('1;');",
+    "$262.createRealm().global; $262.evalScript('1;');",
+    "Array.print = print;",
+  ]) {
+    const source = `/*---\n---*/\n${body}`;
+    const parsed = parseTest262Case(source, "test/host.js", revision);
+    const hosts: boolean[] = [];
+    // eslint-disable-next-line no-await-in-loop
+    const result = await executeTest262Case(
+      source,
+      parsed,
+      new Set(),
+      harnesses,
+      {
+        async execute(request) {
+          hosts.push(request.test262Host === true);
+          return { exitStatus: 0, stdout: "", stderr: "" };
+        },
+      },
+      [],
+    );
+    assert.equal(result.classification, "pass");
+    assert.equal(hosts.length, 4);
+    assert.ok(hosts.every(Boolean));
   }
 });

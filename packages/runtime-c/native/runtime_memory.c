@@ -32,6 +32,7 @@ static void mark_realm(const OseoRealm *realm, OseoHeapObject **worklist) {
         mark_value(realm->intrinsics[index], worklist);
     }
     mark_value(realm->global_this, worklist);
+    mark_value(realm->global_lexicals, worklist);
     const OseoTemplateCacheEntry *template_cache = realm->template_cache;
     for (size_t index = 0u; index < realm->template_cache_count; index += 1u) {
         mark_value(template_cache[index].object, worklist);

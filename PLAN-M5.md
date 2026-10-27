@@ -9368,3 +9368,82 @@ and promoted exactly *tco-call.js* and *tco-member.js* from unsupported to
 pass, with no demotion; the
 [evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md) records it.
 Affected reviews and publication remain Root-owned.
+
+
+Ahead-of-time host Script source preparation
+--------------------------------------------
+
+M5c node `test262-host-script-bindings` prepares the finite host Script
+architecture of
+[ADR 0029](./docs/adr/0029-ahead-of-time-host-script-bindings.md). It extends
+the existing global-object and realm records with persistent Script lexical
+cells, declaration permissions checked before effects, completion values, and
+retained cross-Script function identity. `print` exposes its first argument's
+string value through the explicit host. Ordinary eval and unmatched source
+retain ADR 0016; no new exclusion is approved. The fixed and generated sources
+are named in the normative global record. Source preparation leaves all
+fourteen original observations and owners intact pending actual focused
+execution and full regeneration.
+
+The host source was prepared on TCO candidate `32363a70`, whose candidate
+CI later failed; that candidate is not successful Main. The combined source
+preserves strict tail metadata, the pending-call trampoline and collector
+roots, completion-target reachability, and bounded generated body units.
+Its additive fixed fixture runs 768 strict tail calls through persistent
+main and foreign Script lexicals, detached functions, Reflect.apply,
+bound/Proxy forwarding, nested evalScript, print, and an abrupt thrown token.
+The initial Host ABI `m5-138` includes the complete TCO `m5-137` context
+additions and the host Script/realm additions. The later GC composition
+below uses separately reserved ABI `m5-140`.
+
+The first whole host Node suite on `24213167` remains failed evidence:
+ten framework registrations passed and two failed. The correction on
+`a93871cc` adds statically resolved immutable const-alias discovery and
+repairs the property helper's default versus explicit restoration contract.
+The latter was a preexisting harness defect exposed by the original
+non-extensible-global subject. The unchanged whole host suites then passed
+all twelve registrations under Node and Deno on `a93871cc`. On `ab8d5d5c`,
+the ordinary generated suites passed both domains under each framework;
+the extended Node run passed 120 declaration-state and 120 invalid-grammar
+cases with the original seeds, policies, hints, guards and forced collection.
+Its measured Linux scheduling weight is 510 seconds; the unmeasured macOS
+weight is 296 seconds. The source and raw evidence are recorded in
+*docs/evidence/u6/README.md*. These observations retain their actual source
+identities and do not validate later compiler repairs or a combined tree.
+
+Internal pass 1 on `7fa707fb` found a cross-Script call-target defect:
+`console.log`, `setTimeout`, and `clearTimeout` could bypass a later
+var/function declaration. The bounded repair consults the existing global
+and with records before selecting a callable and receiver, then evaluates
+arguments. Only an initially missing binding selects the unchanged private
+intrinsic. Undefined, noncallable and abrupt user bindings never fall back.
+The separate fixed runtime-owned-call fixtures cover declaration kinds,
+forwarding, strict tail marking, argument order, with lookup and realm
+boundaries. Their pure reference/emission checks are source preparation;
+fresh author native execution, affected internal reviews and Full remain
+pending. Original subjects, assertions, independent oracles, generated
+domains, seeds, budgets, and failed evidence are preserved.
+
+
+Host Script and final GC bitmap source composition
+--------------------------------------------------
+
+The complete Host source on `918a6d93` is prepared on fixed TCO/Reg source
+`beea6880c6db826ad3420cb9a021a1a124bfe2d4` (tree
+`c0c65bed5eb9cafc26334d4355b0e28900ab5ca3`). Root reserved ABI `m5-140`
+for the combined environment bitmap and Host realm/Script layout. The
+`m5-139` create/set/clone/tracer bitmap implementation remains intact;
+Host lexical installation uses the environment APIs and adds its persistent
+realm roots. The final f5 leaf proposal remains absent. The runtime-owned
+HIR/MIR call-target repair and all original fixed programs, assertions,
+generated domains, seeds, budgets, policies and depths are preserved.
+
+The new runtime-owned-call suites passed eight registrations per framework
+on `918a6d93`, with both policies, false hints, guard misses and forced GC.
+Those measurements remain bound to that source. Earlier a938, ab8d, f5 and
+U68 evidence also retains its actual identity; none validates this composed
+source. The historical Linux scheduling weight remains 510 seconds and
+macOS remains unmeasured at 296. Fresh composed native execution, affected
+internal reviews and Full remain pending. Reg's existing observations and
+matcher owners, both TCO unsupported expectations and all fourteen Host
+unsupported expectations are preserved; no promotion is predicted here.

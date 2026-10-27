@@ -64,6 +64,7 @@ export const importMetaName = "*import.meta*";
  * no later reference would observe.
  */
 export interface HirWithGlobalObjectFallback {
+  readonly object?: HirExpression;
   readonly name: string;
   readonly objectBindingId: number;
   /**
@@ -97,6 +98,8 @@ export interface HirStrictGlobalFallback {
  * still writes.
  */
 export interface HirGlobalReference {
+  /** The base is the persistent host Global Environment Record. */
+  readonly hostGlobal?: true;
   readonly strictFallback?: HirStrictGlobalFallback;
 }
 
@@ -501,6 +504,13 @@ export function anonymousDefinition(expression: HirExpression): boolean {
 /** A resolved call target in HIR. */
 export type HirCallTarget =
   | {
+      /** A host Script binding can shadow an otherwise private call target. */
+      readonly kind: "host-runtime-intrinsic";
+      readonly name: "console" | "setTimeout" | "clearTimeout";
+      readonly objectBindingIds: readonly number[];
+      readonly reference: HirGlobalRead;
+    }
+  | {
       readonly kind: "console-log";
     }
   | {
@@ -729,6 +739,10 @@ export interface HirClassThisBinding {
 
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
+  | (LocatedSyntax & {
+      readonly kind: "global-environment";
+      readonly name: string;
+    })
   | (LocatedSyntax & {
       readonly argument: HirExpression;
       readonly kind: "await";
@@ -1163,6 +1177,8 @@ export type HirStatement =
     })
   | (LocatedSyntax & {
       readonly expression: HirExpression;
+      /** A lowered var initializer has an empty Statement completion. */
+      readonly emptyCompletion?: true;
       readonly kind: "expression";
     })
   | (LocatedSyntax & {
@@ -1320,6 +1336,8 @@ export interface HirGlobalBinding {
 
 /** One source-located Script lexical name checked against the global object. */
 export interface HirGlobalLexicalName {
+  readonly id?: number;
+  readonly mutable?: boolean;
   readonly name: string;
   readonly range: SourceRange;
 }
@@ -1336,6 +1354,7 @@ export interface HirGlobalObjectBinding extends HirGlobalBinding {
 
 /** A normalized script and its statically callable functions. */
 export interface HirProgram {
+  readonly hostScriptSources?: readonly string[];
   /**
    * The distinct `$262.agent.start` source templates of a Script resolved
    * for the test262 host, in the order resolution met them.
@@ -1399,6 +1418,10 @@ export interface Binding {
 }
 
 export interface ResolveState {
+  readonly hostScriptSources?: Set<string> | undefined;
+  /** Immutable lexical aliases initialized from an evalScript property read. */
+  readonly hostScriptAliases?: Set<number> | undefined;
+  readonly hostScriptBindings?: boolean | undefined;
   /** Optional fragment analysis; absent on the whole-Script path. */
   readonly globalReferences?: Set<string> | undefined;
   readonly scriptScope?: ReadonlyMap<string, Binding> | undefined;
