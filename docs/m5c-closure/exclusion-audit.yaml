@@ -13579,7 +13579,7 @@ paths:
       1a18c1d8969df"
     observationDigest: "35201d6ddcff4f84bbfeae05516fcdd6bdf5\
       39ab7a6286bb7eb3b0f17fb7472b"
-    missingDynamicTag: true
+    missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Dynamic import can't preempt DFS evaluation order"
     assessment: "observation-train-dynamic-source"

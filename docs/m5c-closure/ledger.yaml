@@ -31930,7 +31930,7 @@ paths:
   test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, lexical-bindings, module-linking, promise-settlement, top-level-await]]
   test/language/module-code/top-level-await/void-await-expr.js: [pass, observation]
   test/language/module-code/top-level-await/while-dynamic-evaluation.js: [pass, observation]
-  test/language/module-code/verify-dfs.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [functions, module-linking]]
+  test/language/module-code/verify-dfs.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, module-linking]]
   test/language/punctuators/S7.7_A1.js: [pass, observation]
   test/language/punctuators/S7.7_A2_T1.js: [expected-negative, observation]
   test/language/punctuators/S7.7_A2_T10.js: [expected-negative, observation]
