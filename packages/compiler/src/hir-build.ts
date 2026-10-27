@@ -254,6 +254,29 @@ function hostScriptWithGlobalFallback(
   };
 }
 
+/**
+ * Whether a host Script's simple `var` loop head writes through the
+ * persistent Global Environment Record. Its hoisted binding is the realm
+ * global object's property, but a later Script can declare a lexical
+ * binding over that property when it is configurable, so each PutValue
+ * resolves the name again, as an assignment head or a `var` pattern head
+ * already does. A head inside a `with` statement keeps its hoisted
+ * binding write; its object-environment resolution is not decided here.
+ */
+function hostScriptGlobalVarHead(
+  name: string,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): boolean {
+  if (state.hostScriptBindings !== true) return false;
+  const resolution = resolveName(scopes, state, name);
+  return (
+    resolution.binding == null &&
+    resolution.objectBindingIds.length === 0 &&
+    isGlobalObjectResolvedName(name, state)
+  );
+}
+
 /** Whether the mutable global object property owns this intrinsic value. */
 function isPropertyOwnedIntrinsicName(name: string): boolean {
   return (
@@ -2114,18 +2137,42 @@ function recordHostScriptAliases(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): void {
+  recordHostScriptAliasDeclarations(
+    statements.flatMap((statement) => {
+      if (statement.kind === "declaration-list") {
+        return statement.declarations.flatMap((declaration) =>
+          declaration.kind === "const" ? [declaration] : [],
+        );
+      }
+      return statement.kind === "const" ? [statement] : [];
+    }),
+    scope,
+    scopes,
+    state,
+  );
+}
+
+/**
+ * Record the simple const aliases of one lexical declaration position: a
+ * statement list or a classic for statement head. Every position whose
+ * const bindings the resolver creates must record them here, or a call
+ * through the alias loses its literal Script source.
+ */
+function recordHostScriptAliasDeclarations(
+  declarations: readonly {
+    readonly initializer: SyntaxExpression;
+    readonly name: string;
+  }[],
+  scope: ReadonlyMap<string, Binding>,
+  scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
+): void {
   const aliases = state.hostScriptAliases;
   if (aliases == null) return;
-  const declarations = statements.flatMap<SyntaxStatementItem>((statement) =>
-    statement.kind === "declaration-list"
-      ? statement.declarations
-      : [statement],
-  );
   let changed: boolean;
   do {
     changed = false;
     for (const declaration of declarations) {
-      if (declaration.kind !== "const") continue;
       const binding = scope.get(declaration.name);
       if (binding == null || binding.mutable || aliases.has(binding.id))
         continue;
@@ -3737,6 +3784,12 @@ function resolveForInTarget(
     return pattern == null ? undefined : { ...target, pattern };
   }
   if (target.kind === "declaration") {
+    if (
+      declaredBinding == null &&
+      hostScriptGlobalVarHead(target.name, scopes, state)
+    ) {
+      return intrinsicGlobalLoopTarget(target.name, target.range, state);
+    }
     const binding = declaredBinding ?? findBinding(scopes, state, target.name);
     if (binding == null) {
       state.diagnostics.push(
@@ -4164,6 +4217,17 @@ function resolveStatement(
           state.nextBindingId += 1;
         }
       }
+      recordHostScriptAliasDeclarations(
+        statement.declarations.flatMap((declaration) =>
+          declaration.declarationKind === "const" &&
+          declaration.kind === "binding"
+            ? [declaration]
+            : [],
+        ),
+        forScope,
+        forScopes,
+        state,
+      );
       declarations = [];
       for (const declaration of statement.declarations) {
         const declarationScopes =
@@ -4174,6 +4238,24 @@ function resolveStatement(
           state,
         );
         if (initializer == null) return undefined;
+        if (
+          declaration.kind === "binding" &&
+          declaration.declarationKind === "var" &&
+          hostScriptGlobalVarHead(declaration.name, scopes, state)
+        ) {
+          declarations.push({
+            declarationKind: "var",
+            initializer: inferFunctionName(initializer, declaration.name),
+            kind: "pattern",
+            pattern: intrinsicGlobalPatternTarget(
+              declaration.name,
+              declaration,
+              state,
+            ),
+            range: declaration.range,
+          });
+          continue;
+        }
         if (declaration.kind === "binding") {
           const binding =
             declaration.declarationKind === "var"
@@ -4370,7 +4452,17 @@ function resolveStatement(
     }
     const iterable = resolveExpression(statement.iterable, forScopes, state);
     let target: HirForOfTarget | undefined;
-    if (statement.target.kind === "declaration") {
+    if (
+      statement.target.kind === "declaration" &&
+      declaredBinding == null &&
+      hostScriptGlobalVarHead(statement.target.name, scopes, state)
+    ) {
+      target = intrinsicGlobalLoopTarget(
+        statement.target.name,
+        statement.target.range,
+        state,
+      );
+    } else if (statement.target.kind === "declaration") {
       const binding =
         declaredBinding ?? findBinding(scopes, state, statement.target.name);
       if (binding == null) {

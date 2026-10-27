@@ -153,6 +153,48 @@ console.log(typeof held, Object === $262.global.Object);
       "4 true true 3 5\n4 true true\ntrue\ntail host\nundefined\n" +
       "undefined true\n",
   },
+  // A later Script's lexical declaration over a configurable global
+  // property captures every simple `var` loop-head write. Deno's vm keeps
+  // the legacy var-name check that the generated model also qualifies, so
+  // it rejects that declaration and its loops write the properties.
+  {
+    name: "var loop heads resolve later lexical declarations",
+    source: `
+globalThis.a = globalThis.b = globalThis.c = 0;
+globalThis.d = globalThis.e = globalThis.f = 0;
+$262.evalScript('var a, b, c, d, e, f; try { $262.evalScript(' +
+  '"let a = 1, b = 1, c = 1; const d = 1, e = 1, f = 1;"); }' +
+  ' catch (error) { console.log("shadow", error.constructor.name); }' +
+  ' for (var a of [2]) {} for (var b in { 2: 0 }) {}' +
+  ' for (var c = 2; false; ) {}' +
+  ' try { for (var d of [2]) {} } catch (error) { console.log(error.name); }' +
+  ' try { for (var e in { 2: 0 }) {} }' +
+  ' catch (error) { console.log(error.name); }' +
+  ' try { for (var f = 2; false; ) {} }' +
+  ' catch (error) { console.log(error.name); }' +
+  ' console.log(a, b, c, d, e, f, globalThis.a, globalThis.b, globalThis.c,' +
+  ' globalThis.d, globalThis.e, globalThis.f);');
+$262.evalScript('"use strict"; for (var s of [3]) {}' +
+  ' for (var t = function () {}; false; ) {}' +
+  ' console.log(s, globalThis.s, t.name, globalThis.t === t);');
+`,
+    expected:
+      "TypeError\nTypeError\nTypeError\n2 2 2 1 1 1 0 0 0 0 0 0\n" +
+      "3 3 t true\n",
+    denoExpected: "shadow SyntaxError\n2 2 2 2 2 2 2 2 2 2 2 2\n3 3 t true\n",
+  },
+  {
+    name: "for-initializer const aliases keep literal Scripts",
+    source: `
+for (const evaluate = $262.evalScript, again = evaluate; ; ) {
+  console.log(evaluate('1;'), (() => again('2;'))());
+  break;
+}
+$262.evalScript('for (const nested = $262.evalScript; ; ) {' +
+  ' console.log(nested("3;")); break; }');
+`,
+    expected: "1 2\n3\n",
+  },
   // The with-hit `for (var x in/of ...)` head is a known outside-scope
   // defect on both targets, owned by the separate remediation node
   // `with-var-loop-head-resolution`; this fixture does not cover it.

@@ -7770,9 +7770,15 @@ function lowerStatements(
         }
       }
       for (const declaration of declarations) {
-        const value = lowerExpression(declaration.initializer, builder);
         const mode =
           declaration.declarationKind === "var" ? "write" : "initialize";
+        // A host Script's global `var` name is one property leaf, whose
+        // reference resolves before its initializer runs.
+        const reference =
+          declaration.kind === "pattern"
+            ? lowerAssignmentReference(declaration.pattern, mode, builder)
+            : undefined;
+        const value = lowerExpression(declaration.initializer, builder);
         if (declaration.kind === "binding") {
           lowerBindingTarget(
             forDeclarationBindings(declaration)[0]!,
@@ -7781,7 +7787,13 @@ function lowerStatements(
             builder,
           );
         } else {
-          lowerBindingTarget(declaration.pattern, value, mode, builder);
+          lowerBindingTarget(
+            declaration.pattern,
+            value,
+            mode,
+            builder,
+            reference,
+          );
         }
       }
       if (statement.init != null) lowerExpression(statement.init, builder);

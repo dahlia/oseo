@@ -180,6 +180,17 @@ Linux weight replacing 607; macOS remains unmeasured at 296. See
 *docs/evidence/u6/README.md*. Full/classification, outer reviews, admission
 and candidate/Main gates remain pending.
 
+Outer review pass 2 found two more defects on `f3e2c1e6`. A host Script's
+simple `var` head in a `for`, `for-in` or `for-of` statement wrote its hoisted
+cell, so a lexical declaration a later Script made over the configurable
+global property did not capture it and a `const` one did not throw
+TypeError. With no intervening `with` record, those heads now resolve through
+the persistent Global Environment Record like other identifier writes. A
+`const` declarator in a classic `for` head is now a recognized alias
+position, like a statement-list declarator. A `var` head inside a `with`
+statement keeps the pre-existing defect owned by
+`with-var-loop-head-resolution`.
+
 The literal source set cannot admit runtime-created source. Agents retain
 ADR 0026's separate precompiled source tables and contexts; this change does
 not transfer values or dispatchers across agent boundaries. Any future source

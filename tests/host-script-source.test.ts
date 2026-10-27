@@ -146,3 +146,32 @@ test("host Script functions tail-call; evaluators retain completion", () => {
     assert.match(emitted, /oseo_script_lexicals_install\(context/u);
   }
 });
+
+test("for-initializer const aliases enter the host Script table", () => {
+  const fixture = fixtures.hostScriptBindingFixtures.find(
+    (entry) =>
+      entry.name === "for-initializer const aliases keep literal Scripts",
+  )!;
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source: fixture.source, sourceId: "for-alias.js" },
+      { specialization, test262Host: true },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    const scripts = compiled.mir!.test262Host!.scripts!;
+    assert.deepEqual(
+      scripts.map((script) => [script.source, script.error]).toSorted(),
+      [
+        ["1;", undefined],
+        ["2;", undefined],
+        ["3;", undefined],
+        [
+          "for (const nested = $262.evalScript; ; ) {" +
+            ' console.log(nested("3;")); break; }',
+          undefined,
+        ],
+      ],
+    );
+  }
+});

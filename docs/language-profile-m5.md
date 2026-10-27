@@ -9823,3 +9823,33 @@ remains unmeasured at 296. *evidence/u6/README.md* records raw paths,
 hashes and limits. Internal review pass 4 of the with-fallback scope was
 clean at both stages. Outer reviews, Full/classification, admission and
 exact candidate/Main gates remain pending, and no promotion is predicted.
+
+
+Host Script loop-head and alias repairs
+---------------------------------------
+
+Outer review pass 2 found two defects on `f3e2c1e6`. A host Script's simple
+`var` head in a `for`, `for-in` or `for-of` statement wrote the hoisted
+binding cell directly, so after a later Script declared a lexical binding
+over the configurable global property, the loop still wrote the property,
+and a `const` declaration did not produce TypeError. When no `with` record
+intervenes, these heads now resolve the name through the persistent Global
+Environment Record, as assignment heads and `var` pattern heads already
+did; a classic `for` initializer resolves the reference before evaluating
+its initializer. Separately, statement lists recorded simple `const`
+aliases of `evalScript` but classic `for` heads did not, so a call through
+`for (const evaluate = $262.evalScript; ; )` lost its literal source and
+reported `OSEO1001`. The `for` head now records its `const` declarators
+with the same fixed point. Ordinary-target output is unchanged.
+*tests/native/fixtures/host-script-bindings.ts* adds one fixture for each
+defect, run with Node.js and Deno references under both policies with
+forced collection; *tests/host-script-source.test.ts* checks the Script
+table. Deno's vm rejects the shadowing declaration through its legacy
+var-name check, as the generated model already qualifies, so its loops
+write the unshadowed properties.
+
+A simple `var` loop head inside a `with` statement still writes the hoisted
+cell, whether the `with` object supplies the name or not, so a later
+lexical declaration does not capture it there. That is the same
+pre-existing defect as the with-hit head above, owned by
+`with-var-loop-head-resolution` and not covered by this node.

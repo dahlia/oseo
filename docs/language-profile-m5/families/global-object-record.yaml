@@ -33,6 +33,12 @@ scope:
     rest, default and loop-head writes that miss every with object on the
     realm global object's property, as simple and compound writes do. The
     with-hit simple var loop head belongs to with-var-loop-head-resolution."
+  - "A host Script's simple var for, for-in and for-of head outside every
+    with statement writes through the persistent Global Environment Record,
+    so a later Script's lexical declaration captures it and a const one
+    throws TypeError. A const declarator in a classic for head is an
+    evalScript alias position. A var head inside a with statement belongs
+    to with-var-loop-head-resolution."
 owners:
   - PLAN-M5.md
   - docs/adr/0029-ahead-of-time-host-script-bindings.md
