@@ -18,6 +18,7 @@ dependencies:
   - cross-realm-host
   - destructuring-binding-target-order
   - dynamic-import
+  - dynamic-import-early-error-precedence
   - dynamic-import-staged-plan
   - dynamic-source-callable-family
   - dynamic-source-coverage-remediation

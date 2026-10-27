@@ -1,0 +1,11 @@
+version: 1
+id: dynamic-import-early-error-precedence
+title: Report dynamic import early errors first
+delivers: >-
+  Reports the early SyntaxError of the 21 observed dynamic-import
+  parse-negative paths before Oseo's ImportExpression unsupported diagnostic,
+  so their expected negative is observed.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
