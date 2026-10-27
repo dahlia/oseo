@@ -7,6 +7,7 @@ delivers: Verifies that the manifest covers all 41,091 applicable paths, that
   required gates pass without claiming unqualified ECMA-262 conformance.
 dependencies:
   - annexb-proto-dependency-classification
+  - array-generated-property-cost-remediation
   - array-sort-stability
   - array-tolocalestring-arguments
   - authorized-exclusion-audit

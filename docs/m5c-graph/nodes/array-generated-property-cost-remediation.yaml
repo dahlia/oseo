@@ -1,0 +1,12 @@
+version: 1
+id: array-generated-property-cost-remediation
+title: Reduce Array generated property native cost
+delivers: >-
+  Removes the native cost growth of the ordinary Array generated property
+  suite (macOS 40.3 s to 173 s against its 180 s interrupt) without lowering
+  cases, seeds, generator domains or the interrupt. The work note retains the
+  exact Root decision and raw pointer.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
