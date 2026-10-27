@@ -20,6 +20,7 @@ results:
       - functions
       - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
       - top-level-await
       - var-bindings

@@ -41,6 +41,7 @@ results:
     classification: pass
     dependencies:
       - module-linking
+      - object-properties
       - promise-settlement
       - regular-expressions
       - top-level-await

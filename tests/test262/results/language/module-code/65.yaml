@@ -15,9 +15,11 @@ results:
     classification: pass
     dependencies:
       - async-functions
+      - expression-operators
       - functions
       - generators
       - module-linking
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

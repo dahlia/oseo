@@ -15,6 +15,7 @@ results:
     classification: pass
     dependencies:
       - module-linking
+      - object-properties
       - var-bindings
     execution:
       harnessIncludes:

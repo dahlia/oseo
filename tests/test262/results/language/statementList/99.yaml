@@ -20,7 +20,9 @@ results:
       - classes
       - control-flow
       - dynamic-source
+      - expression-operators
       - functions
+      - lexical-bindings
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-class-expr-arrow-function-boo\

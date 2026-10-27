@@ -801,10 +801,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - dynamic-source
       - functions
       - lexical-bindings
       - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-block-import-catch-specifier-tostring-abrupt-rejects.js
         non-strict disabled failed (1): stdout=""
@@ -829,10 +833,16 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
+      - control-flow
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
       - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-while-import-catch-specifier-tostring-abrupt-rejects.js
         non-strict disabled failed (1): stdout=""
@@ -858,7 +868,9 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: expected-negative
     dependencies:
+      - control-flow
       - dynamic-source
+      - functions
       - lexical-bindings
     observation:
       errorType: SyntaxError
@@ -883,6 +895,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - functions
       - object-literals
     observation:
       errorType: SyntaxError

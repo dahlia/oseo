@@ -847,9 +847,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
+      - control-flow
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-else-import-catch-file-does-not-exist.js
         non-strict disabled failed (1): stdout=""
@@ -874,9 +879,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - dynamic-source
+      - error-intrinsics
+      - expression-operators
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - reflect-namespace
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-exported-init-strict.js
@@ -932,6 +942,8 @@ results:
       - async-functions
       - dynamic-source
       - functions
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-function-return-await-is-call-expression-square-brackets.js

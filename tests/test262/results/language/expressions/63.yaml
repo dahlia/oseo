@@ -1158,8 +1158,11 @@ results:
     dependencies:
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/assignment-expression/call-expr-expr.js
@@ -1189,6 +1192,8 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/assignment-expression/tagged-function-call.js

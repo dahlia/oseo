@@ -14,6 +14,9 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - expression-operators
       - functions
       - module-linking
       - var-bindings
@@ -50,10 +53,13 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - control-flow
       - iterator-protocol
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
+      - symbols
       - top-level-await
       - var-bindings
     execution:

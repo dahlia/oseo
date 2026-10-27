@@ -17,6 +17,8 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - functions
+      - object-properties
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-block-array-literal.js

@@ -1122,8 +1122,11 @@ results:
     dependencies:
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/assignment-expression/additive-expr.js
@@ -1150,9 +1153,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
       - object-properties
+      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-get-own-property-str-found-init.js
@@ -1178,10 +1183,15 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - dynamic-source
+      - error-intrinsics
+      - expression-operators
       - functions
       - module-linking
       - object-literals
+      - object-properties
+      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-set-prototype-of.js
@@ -1209,6 +1219,9 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-block-import-then-returns-thenable.js
         non-strict disabled failed (1): stdout=""

@@ -19,6 +19,7 @@ results:
       - classes
       - control-flow
       - dynamic-source
+      - functions
       - lexical-bindings
       - var-bindings
     observation:

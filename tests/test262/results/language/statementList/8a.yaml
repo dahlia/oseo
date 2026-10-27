@@ -50,6 +50,9 @@ results:
       - classes
       - control-flow
       - dynamic-source
+      - functions
+      - lexical-bindings
+      - object-properties
       - regular-expressions
       - var-bindings
     observation:

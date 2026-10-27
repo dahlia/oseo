@@ -1451,7 +1451,9 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - functions
       - lexical-bindings
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/always-create-new-promise.js
@@ -1504,6 +1506,7 @@ results:
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-arrow-function-await-eval-gtbndng-indirect-update-dflt.js

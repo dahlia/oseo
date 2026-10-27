@@ -16,7 +16,11 @@ results:
     classification: pass
     dependencies:
       - classes
+      - control-flow
+      - expression-operators
       - functions
+      - lexical-bindings
+      - object-properties
       - rest-parameters
       - var-bindings
     execution:

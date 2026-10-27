@@ -15,6 +15,9 @@ results:
     classification: pass
     dependencies:
       - classes
+      - control-flow
+      - expression-operators
+      - lexical-bindings
       - module-linking
       - var-bindings
     execution:
@@ -49,6 +52,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: expected-negative
     dependencies:
+      - abrupt-completion
       - functions
       - module-linking
     execution:
@@ -121,6 +125,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - control-flow
       - lexical-bindings
       - module-linking
       - promise-settlement
@@ -158,6 +163,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - abrupt-completion
       - module-linking
       - promise-settlement
       - top-level-await

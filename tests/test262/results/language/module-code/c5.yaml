@@ -96,12 +96,15 @@ results:
     classification: pass
     dependencies:
       - async-iteration
+      - control-flow
       - functions
       - iterator-protocol
       - lexical-bindings
       - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
+      - symbols
       - top-level-await
       - var-bindings
     execution:

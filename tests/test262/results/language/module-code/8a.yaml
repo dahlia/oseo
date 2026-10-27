@@ -62,6 +62,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - control-flow
       - lexical-bindings
       - module-linking
       - promise-settlement
@@ -100,6 +101,7 @@ results:
     classification: pass
     dependencies:
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
     execution:
@@ -134,6 +136,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - expression-operators
       - module-linking
       - promise-settlement
       - top-level-await

@@ -18,6 +18,7 @@ results:
       - control-flow
       - dynamic-source
       - functions
+      - object-properties
       - regular-expressions
       - var-bindings
     observation:

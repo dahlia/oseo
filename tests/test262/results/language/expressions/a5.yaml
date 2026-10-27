@@ -945,10 +945,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-function-file-does-not-exist.js
         non-strict disabled failed (1): stdout=""
@@ -998,6 +1002,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
       - object-literals
     observation:
       errorType: SyntaxError
@@ -1070,7 +1075,11 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - control-flow
       - dynamic-source
+      - functions
+      - object-properties
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-else-nested-imports.js
         non-strict disabled failed (1): stdout=""
@@ -1098,6 +1107,8 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-block-import-then-eval-script-code-host-resolves-module-code.js

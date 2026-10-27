@@ -896,8 +896,10 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - lexical-bindings
       - object-literals
+      - object-properties
     observation:
       detail: 'test/language/expressions/dynamic-import/assignment-expression/unary-expr.js
         non-strict disabled failed (1): stdout=""

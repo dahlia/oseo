@@ -18,6 +18,7 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - expression-operators
       - functions
       - var-bindings
     observation:

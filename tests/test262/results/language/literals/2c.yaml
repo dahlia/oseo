@@ -16,6 +16,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - functions
       - lexical-grammar
     observation:
       detail: "test/language/literals/string/mongolian-vowel-separator-eval.js

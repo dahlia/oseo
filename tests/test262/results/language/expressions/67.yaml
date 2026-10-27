@@ -1259,7 +1259,9 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/assignment-expression/call-expr-identifier.js
@@ -1313,8 +1315,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - reflect-namespace
       - symbols
     observation:
@@ -1344,6 +1349,7 @@ results:
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: "test/language/expressions/dynamic-import/usage-from-eval.js

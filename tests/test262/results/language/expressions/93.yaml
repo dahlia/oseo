@@ -796,6 +796,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
     observation:
       errorType: SyntaxError
@@ -821,6 +822,8 @@ results:
       - async-functions
       - dynamic-source
       - functions
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-function-return-await-returns-thenable.js

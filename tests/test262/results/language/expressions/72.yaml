@@ -585,11 +585,15 @@ results:
       - async-functions
       - async-iteration
       - dynamic-source
+      - expression-operators
       - functions
       - generators
       - lexical-bindings
+      - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-gen-await-specifier-tostring.js
         non-strict disabled failed (1): stdout=""

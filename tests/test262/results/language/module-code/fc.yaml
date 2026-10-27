@@ -19,6 +19,7 @@ results:
       - functions
       - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
       - top-level-await
     execution:
@@ -55,10 +56,13 @@ results:
     classification: pass
     dependencies:
       - async-iteration
+      - control-flow
       - iterator-protocol
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
+      - symbols
       - top-level-await
       - var-bindings
     execution:

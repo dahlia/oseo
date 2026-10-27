@@ -17,6 +17,7 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - functions
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-block-block.js non-strict
@@ -42,6 +43,7 @@ results:
     classification: pass
     dependencies:
       - control-flow
+      - expression-operators
       - functions
     execution:
       harnessIncludes:

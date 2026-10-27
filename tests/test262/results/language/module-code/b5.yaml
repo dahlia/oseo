@@ -18,6 +18,7 @@ results:
       - functions
       - generators
       - module-linking
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

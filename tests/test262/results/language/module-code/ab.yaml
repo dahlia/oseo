@@ -67,9 +67,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
     observation:

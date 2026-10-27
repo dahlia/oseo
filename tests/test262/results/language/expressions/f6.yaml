@@ -1075,9 +1075,12 @@ results:
       - async-functions
       - async-iteration
       - dynamic-source
+      - expression-operators
       - functions
       - generators
       - lexical-bindings
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-gen-await-is-call-expression-square-brackets.js

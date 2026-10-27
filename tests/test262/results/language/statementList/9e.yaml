@@ -19,7 +19,9 @@ results:
     dependencies:
       - classes
       - control-flow
+      - expression-operators
       - functions
+      - lexical-bindings
     execution:
       harnessIncludes:
         - base.js

@@ -611,9 +611,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
       - object-properties
+      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-get-own-property-str-not-found.js
@@ -642,7 +644,11 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/top-level-import-then-specifier-tostring.js
         non-strict disabled failed (1): stdout=""

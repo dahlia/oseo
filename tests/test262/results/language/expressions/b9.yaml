@@ -668,10 +668,13 @@ results:
     dependencies:
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/await-ns-prototype.js
         non-strict disabled failed (1): stdout=""
@@ -699,7 +702,11 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-block-import-then-specifier-tostring.js
         non-strict disabled failed (1): stdout=""
@@ -727,6 +734,8 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-function-import-then-eval-script-code-host-resolves-module-code.js
@@ -752,9 +761,12 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - control-flow
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-if-braceless-eval-script-code-host-resolves-module-code.js

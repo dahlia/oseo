@@ -18,6 +18,7 @@ results:
       - control-flow
       - dynamic-source
       - functions
+      - object-properties
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-fn-array-literal.js non-strict

@@ -691,9 +691,11 @@ results:
     dependencies:
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
       - symbols
     observation:
@@ -722,8 +724,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - reflect-namespace
       - symbols
       - var-bindings

@@ -59,6 +59,7 @@ results:
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
     execution:

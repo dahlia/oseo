@@ -1191,6 +1191,7 @@ results:
     dependencies:
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
       - module-linking

@@ -1014,9 +1014,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
       - object-properties
+      - promise-settlement
       - symbols
       - var-bindings
     observation:

@@ -876,6 +876,8 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-get-str-not-found.js
@@ -904,7 +906,11 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-specifier-tostring.js
         non-strict disabled failed (1): stdout=""

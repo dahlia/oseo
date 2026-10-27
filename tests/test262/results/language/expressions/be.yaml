@@ -914,11 +914,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - async-functions
       - dynamic-source
+      - error-intrinsics
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-instn-iee-err-circular.js

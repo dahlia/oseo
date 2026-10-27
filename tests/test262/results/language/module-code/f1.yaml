@@ -18,6 +18,10 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - abrupt-completion
+      - control-flow
+      - error-intrinsics
+      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
@@ -60,7 +64,10 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - expression-operators
+      - functions
       - module-linking
+      - object-properties
       - reflect-namespace
       - symbols
     execution:
@@ -94,7 +101,10 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - expression-operators
+      - functions
       - module-linking
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

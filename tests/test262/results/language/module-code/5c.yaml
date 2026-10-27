@@ -42,6 +42,7 @@ results:
     classification: pass
     dependencies:
       - classes
+      - expression-operators
       - functions
       - lexical-bindings
       - module-linking

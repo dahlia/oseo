@@ -1034,9 +1034,12 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - control-flow
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-do-while-eval-gtbndng-indirect-update-dflt.js
         non-strict disabled failed (1): stdout=""
@@ -1063,6 +1066,9 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/top-level-import-then-returns-thenable.js
         non-strict disabled failed (1): stdout=""

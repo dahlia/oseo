@@ -616,6 +616,8 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: "test/language/expressions/dynamic-import/eval-export-dflt-expr\
         -cls-anon.js:134:1: error[OSEO1001]: ImportExpression is outside
@@ -641,11 +643,15 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - async-functions
       - dynamic-source
+      - error-intrinsics
+      - expression-operators
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
       - reflect-namespace
       - symbols
@@ -675,7 +681,9 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: expected-negative
     dependencies:
+      - control-flow
       - dynamic-source
+      - functions
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -700,6 +708,8 @@ results:
       - async-functions
       - dynamic-source
       - functions
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-function-await-returns-thenable.js

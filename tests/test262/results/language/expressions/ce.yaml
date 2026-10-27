@@ -988,9 +988,13 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/top-level-import-catch-file-does-not-exist.js
         non-strict disabled failed (1): stdout=""
@@ -1043,6 +1047,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - lexical-bindings
     observation:
@@ -1067,7 +1072,9 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: expected-negative
     dependencies:
+      - control-flow
       - dynamic-source
+      - expression-operators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -1093,6 +1100,8 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-arrow-function-await-returns-thenable.js

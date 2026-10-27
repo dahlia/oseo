@@ -824,10 +824,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - dynamic-source
+      - error-intrinsics
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-instn-iee-err-ambiguous-import.js
         non-strict disabled failed (1): stdout=""
@@ -876,6 +880,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -896,7 +901,11 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - control-flow
       - dynamic-source
+      - functions
+      - object-properties
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-do-while-nested-imports.js
         non-strict disabled failed (1): stdout=""
@@ -920,6 +929,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - control-flow
       - dynamic-source
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-if-braceless-empty-str-is-valid-assign-expr.js

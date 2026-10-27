@@ -17,6 +17,7 @@ results:
       - classes
       - functions
       - module-linking
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

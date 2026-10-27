@@ -1011,9 +1011,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
+      - control-flow
       - dynamic-source
+      - error-intrinsics
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-block-labeled-instn-iee-err-circular.js
         non-strict disabled failed (1): stdout=""
@@ -1041,7 +1046,6 @@ results:
     dependencies:
       - dynamic-source
       - functions
-      - iterator-protocol
     observation:
       errorType: SyntaxError
       failedPhase: parse

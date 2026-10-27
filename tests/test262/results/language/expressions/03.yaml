@@ -633,9 +633,14 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
+      - control-flow
       - dynamic-source
+      - error-intrinsics
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-else-import-catch-instn-iee-err-ambiguous-import.js
         non-strict disabled failed (1): stdout=""
@@ -664,6 +669,8 @@ results:
       - functions
       - generators
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: "test/language/expressions/dynamic-import/eval-export-dflt-expr\
         -gen-anon.js:134:1: error[OSEO1001]: ImportExpression is outside
@@ -688,6 +695,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -737,6 +745,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - functions
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -757,6 +766,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - control-flow
       - dynamic-source
       - functions
       - var-bindings

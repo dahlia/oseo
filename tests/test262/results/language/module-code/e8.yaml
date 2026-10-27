@@ -14,6 +14,8 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - expression-operators
+      - functions
       - module-linking
       - object-properties
       - var-bindings
@@ -50,7 +52,10 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - abrupt-completion
+      - functions
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
       - var-bindings
@@ -126,7 +131,9 @@ results:
     dependencies:
       - classes
       - functions
+      - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
     execution:
@@ -161,6 +168,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - abrupt-completion
       - module-linking
       - promise-settlement
       - top-level-await

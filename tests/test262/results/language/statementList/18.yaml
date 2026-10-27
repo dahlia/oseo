@@ -17,6 +17,7 @@ results:
     classification: pass
     dependencies:
       - control-flow
+      - expression-operators
       - functions
     execution:
       harnessIncludes:

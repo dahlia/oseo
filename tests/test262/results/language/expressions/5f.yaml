@@ -1132,6 +1132,7 @@ results:
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
       - var-bindings
     observation:

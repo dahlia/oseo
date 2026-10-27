@@ -41,6 +41,7 @@ results:
     dependencies:
       - functions
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
       - var-bindings

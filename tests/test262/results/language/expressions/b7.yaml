@@ -1209,6 +1209,7 @@ results:
     dependencies:
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - promise-settlement
     observation:
@@ -1236,6 +1237,7 @@ results:
     dependencies:
       - async-functions
       - dynamic-source
+      - expression-operators
       - functions
       - generators
       - promise-settlement

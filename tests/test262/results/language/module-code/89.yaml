@@ -16,6 +16,7 @@ results:
     dependencies:
       - functions
       - module-linking
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

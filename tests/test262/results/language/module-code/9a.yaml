@@ -57,6 +57,7 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
     observation:

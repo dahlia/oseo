@@ -40,6 +40,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - control-flow
       - module-linking
       - promise-settlement
       - top-level-await
@@ -75,9 +76,11 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - abrupt-completion
       - functions
       - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
       - top-level-await
     execution:

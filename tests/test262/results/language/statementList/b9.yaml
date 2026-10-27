@@ -51,6 +51,9 @@ results:
       - classes
       - control-flow
       - dynamic-source
+      - functions
+      - lexical-bindings
+      - object-properties
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-class-array-literal.js

@@ -19,6 +19,8 @@ results:
       - classes
       - control-flow
       - dynamic-source
+      - functions
+      - lexical-bindings
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-class-block.js non-strict

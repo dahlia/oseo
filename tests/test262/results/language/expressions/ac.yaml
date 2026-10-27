@@ -833,10 +833,13 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: unsupported-profile-feature
     dependencies:
+      - abrupt-completion
       - async-functions
       - dynamic-source
+      - error-intrinsics
       - functions
       - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-circular.js
@@ -866,6 +869,8 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-get-sym-not-found.js

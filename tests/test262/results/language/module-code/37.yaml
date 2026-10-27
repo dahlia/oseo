@@ -22,6 +22,7 @@ results:
       - functions
       - lexical-bindings
       - module-linking
+      - object-properties
       - promise-settlement
       - top-level-await
     observation:
@@ -49,6 +50,7 @@ results:
       - destructuring-bindings
       - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
       - top-level-await
       - var-bindings

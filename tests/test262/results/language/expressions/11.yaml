@@ -1139,6 +1139,8 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/default-property-not-set-own.js
         non-strict disabled failed (1): stdout=""
@@ -1164,8 +1166,11 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - module-linking
+      - object-properties
+      - promise-settlement
       - reflect-namespace
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-has-property-str-found-init.js
@@ -1194,7 +1199,11 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-arrow-import-then-specifier-tostring.js
         non-strict disabled failed (1): stdout=""

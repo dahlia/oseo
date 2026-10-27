@@ -879,6 +879,8 @@ results:
       - dynamic-source
       - functions
       - generators
+      - module-linking
+      - object-properties
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-gen-return-await-is-call-expression-square-brackets.js
