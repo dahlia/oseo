@@ -7837,12 +7837,14 @@ with counting, throwing, or string keys, and logical, simple, and update
 controls with string keys. It has 20 ordinary cases and a 240-second
 interrupt limit. Shrinking keeps the strictness and each subject's operator,
 base, key, and bounded values. Native runs use both specialization policies
-with collection at every safepoint. Fixed cases in the same file cover every
-arithmetic operator over every base and key kind in both strictness modes,
-every control over every base, and the S11.13.2\_A7 T4 shape, a key whose
-conversions name different properties, through both `toString` and
-`Symbol.toPrimitive`, plus a member compound assignment whose right operand
-awaits, which keeps the checked base and converted key across suspension. The
+with collection at every safepoint. The fixed matrix now lives in
+*m5-compound-member-fixed.property.test.ts* and covers every arithmetic
+operator over every base and key kind in both strictness modes and every
+control over every base. The original file keeps the S11.13.2\_A7 T4
+shape, a key whose conversions name different properties, through both
+`toString` and `Symbol.toPrimitive`, plus a member compound assignment whose
+right operand awaits, which keeps the checked base and converted key across
+suspension. The
 `compound-assignments` native fixture now checks the nullish-base order for all
 twelve operators instead of the double-converting `+=` case, which moved to
 those fixed cases. The repair adds no specialized path or guard, so the
@@ -7854,19 +7856,20 @@ form and null, undefined, number, string, and object bases, and over
 `super` reads, `+=`, `||=`, and `++` with a null or ordinary home
 prototype, each with counting, throwing, string, or literal keys. It has 20
 ordinary cases and a 240-second interrupt limit, and its independent model
-labels both V8 discrepancies separately. Fixed cases run every form over
-every admitted base, key kind, and falsy, truthy, or null current value in
-both strictness modes, plus for-of and for-in heads around an iterator whose
-`return` is observed, and primitive receivers seen by a getter and a method.
-The changing-key update subject of the `update-expressions` native fixture
-and the taken logical subject of `compound-assignments` moved there
-verbatim with fixed expected values, because both observed the V8 second
-conversion; those fixtures now use string-returning keys. Slot `0x60002e00`
-of *m5-update-expression.property.test.ts* keeps its generator and budget;
-its program also prints the slot it reads, its native model expects one
-conversion that writes the slot it read, and its references must equal the
-labeled V8 model that writes the slot a second conversion selects. Every
-native run of the Reference domain and its fixed cases uses both
+labels both V8 discrepancies separately. The fixed matrix now lives in
+*m5-computed-member-fixed.property.test.ts* and runs every form over every
+admitted base, key kind, and falsy, truthy, or null current value in both
+strictness modes. The original file keeps for-of and for-in heads around
+an iterator whose `return` is observed, and primitive receivers seen by a
+getter and a method. The changing-key update subject of the
+`update-expressions` native fixture and the taken logical subject of
+`compound-assignments` moved there verbatim with fixed expected values, because
+both observed the V8 second conversion; those fixtures now use string-returning
+keys. Slot `0x60002e00` of *m5-update-expression.property.test.ts* keeps its
+generator and budget; its program also prints the slot it reads, its native
+model expects one conversion that writes the slot it read, and its references
+must equal the labeled V8 model that writes the slot a second conversion
+selects. Every native run of the Reference domain and its fixed cases uses both
 specialization policies with collection at every safepoint; the change adds no
 specialized path or guard, so the guard-fallback omission and its replacement
 evidence remain.

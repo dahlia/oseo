@@ -42,10 +42,11 @@
  * CI liveness timeout and partial GC sample prove no current full cost.
  * The restored source still needs complete matching-host measurements.
  *
- * Computed-member-reference-key-order adds a Reference-order domain and
- * fixed cases to the compound-assignment file. Its Linux entry uses a local
- * extended whole-file case sum of seventeen registrations; macOS remains
- * an unmeasured provisional estimate. See U6 provenance.
+ * Compound assignment's two fixed matrices now have separate files. Their
+ * three weights per host rebucket unchanged historical CI registrations:
+ * the median of three Linux runs, and one same-base macOS run. They are
+ * partition estimates that omit the new pure model-property overhead,
+ * pending candidate CI; they are not fresh file measurements. See U6.
  *
  * The two entries in `caseShardedNativeFiles` are retained from the
  * earlier source. CI excludes them from the file shards, so this run did
@@ -113,9 +114,11 @@ export const nativeShardCosts = {
     "tests/property/m5-catch-binding.property.test.ts": 163,
     "tests/property/m5-class-early-errors.property.test.ts": 56,
     "tests/property/m5-class.property.test.ts": 711,
-    // Local Linux extended case sum: 1,229.239865193 s, rounded up.
-    // October 23, 2026; not CI or file wall time. See U6 provenance.
-    "tests/property/m5-compound-assignment.property.test.ts": 1230,
+    // Historical CI registrations rebucketed; new pure overhead omitted.
+    // Median over runs 40401101765, 40442491966, 40454201429. See U6.
+    "tests/property/m5-compound-assignment.property.test.ts": 2086,
+    "tests/property/m5-compound-member-fixed.property.test.ts": 668,
+    "tests/property/m5-computed-member-fixed.property.test.ts": 1408,
     "tests/property/m5-cross-realm.property.test.ts": 186,
     "tests/property/m5-data-view.property.test.ts": 523,
     "tests/property/m5-date-family.property.test.ts": 609,
@@ -267,9 +270,11 @@ export const nativeShardCosts = {
     "tests/property/m5-catch-binding.property.test.ts": 197,
     "tests/property/m5-class-early-errors.property.test.ts": 45,
     "tests/property/m5-class.property.test.ts": 350,
-    // Provisional estimate: ceil(1230 * 1242/1838), the ratio the earlier
-    // 390 used; not a macOS observation. Refresh from CI.
-    "tests/property/m5-compound-assignment.property.test.ts": 832,
+    // Run 40454201429 registrations rebucketed; new pure overhead omitted.
+    // Historical partition estimates; refresh from candidate CI. See U6.
+    "tests/property/m5-compound-assignment.property.test.ts": 687,
+    "tests/property/m5-compound-member-fixed.property.test.ts": 109,
+    "tests/property/m5-computed-member-fixed.property.test.ts": 181,
     "tests/property/m5-cross-realm.property.test.ts": 221,
     "tests/property/m5-data-view.property.test.ts": 296,
     "tests/property/m5-date-family.property.test.ts": 423,

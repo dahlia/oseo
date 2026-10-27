@@ -12,6 +12,9 @@ const nativeHelpers = new Set([
   "runNativeFixture",
   "runNativeCli",
   "withNativeFixture",
+  "assertNativeMemberReference",
+  "assertMemberReferenceCase",
+  "assertReferenceCase",
   "runNativeUnits",
   "prepareHarnessObject",
   "createTest262FragmentExecutor",
@@ -298,6 +301,9 @@ function nativeCall(
   }
   if (
     name === "withNativeFixture" ||
+    name === "assertNativeMemberReference" ||
+    name === "assertMemberReferenceCase" ||
+    name === "assertReferenceCase" ||
     name === "buildHostCcFixture" ||
     name === "buildClockProgram" ||
     name === "runClockProbe" ||

@@ -15,6 +15,37 @@ import test from "node:test";
 import { withNativeFixture } from "../../packages/testkit/src/index.ts";
 `;
 
+test("compound Reference imports require a native host guard", () => {
+  for (const helper of [
+    "assertNativeMemberReference",
+    "assertMemberReferenceCase",
+    "assertReferenceCase",
+  ]) {
+    const prefix = `
+import test from "node:test";
+import { ${helper} as observe } from
+  "./property/compound-assignment-support.ts";
+const nativeTarget = targetForExecutionHost(executionHost);
+`;
+    const guarded = `${prefix}
+test("guarded Reference", {
+  skip: nativeTarget == null ? "requires a supported native host" : false,
+}, async () => { await observe({}); });
+`;
+    const unguarded = `${prefix}
+test("unguarded Reference", async () => { await observe({}); });
+`;
+    const unused = `${prefix}
+async function unusedReference() { await observe({}); }
+test("pure model", () => { modelReferenceSubject({}); });
+`;
+    const path = "tests/property/reference.property.test.ts";
+    assert.deepEqual(checkNativeHostGuardSource(path, guarded), []);
+    assert.equal(checkNativeHostGuardSource(path, unguarded).length, 1);
+    assert.deepEqual(checkNativeHostGuardSource(path, unused), []);
+  }
+});
+
 test("accepts a guarded native property test", () => {
   const source = `${imports}
 const nativeTarget = targetForExecutionHost(executionHost);

@@ -10,8 +10,196 @@ measurements below retain their original input sets; they do not measure the
 dedicated job.
 
 
-Current weight source
----------------------
+Compound assignment property partition
+--------------------------------------
+
+The `compound-assignment-property-cost` node moves only the complete fixed
+compound-member and computed-member matrices into
+*m5-compound-member-fixed.property.test.ts* and
+*m5-computed-member-fixed.property.test.ts*. The shared
+*compound-assignment-support.ts* retains their models, generators, printers,
+and native/reference helpers. All seventeen original registration bodies
+and the runtime syntax of all 76 original declarations compare equal to
+base `6aab0fc8`; only exports and three required type annotations are added.
+The matrices retain all 26 and 40 programs, respectively, both policies,
+forced collection, reference discrepancies, expected observations, and
+failure context. No program is batched or deleted. A separate pure audit
+compares 660 structured samples and their printed source bytes across the
+four original domains under ordinary and extended seeds and counts; all
+match. This checks generator/printer fidelity without executing native
+programs.
+
+Every original generated domain, seed, case count, size, and deadline stays
+in *m5-compound-assignment.property.test.ts*. Each new file adds a pure
+model substitution property: a successful counting key converts exactly
+once on a non-nullish base and never on a nullish base, and replacing it
+with its returned string preserves the modeled outcome, event order, and
+stored value after removing that conversion event. Each property generates
+one structured subject, strictness, and an index in 0..100, with 64 ordinary
+cases and a 30,000-millisecond interrupt limit. Their new blocks start at
+`0x60008e00` and `0x60008f00`; all old assignments remain unchanged. The
+ratchet reports 207 domains, 207 seeds, and 8,036 ordinary cases, up from
+205, 205, and 7,908 on main `04aa14b3`, with zero overrides.
+
+### Historical CI observations
+
+The three Linux source jobs are 121847031208 in run 40401101765,
+121985959637 in run 40442491966, and 122023722692 in run 40454201429.
+The same-base macOS job is 122023721831 in run 40454201429. Every row
+below sums the original registration durations, in seconds. The remaining
+column subtracts exactly the two moved registrations; it is a workload
+projection, not an observation of the new file partition.
+
+| Source           | Whole file | Compound fixed | Computed fixed | Remaining original |
+| ---------------- | ---------: | -------------: | -------------: | -----------------: |
+| `d4d81be9`       |   4376.166 |        714.709 |       1469.589 |           2191.869 |
+| `98460f7c`       |   4136.065 |        667.810 |       1388.887 |           2079.369 |
+| `6aab0fc8`       |   4159.896 |        666.760 |       1407.595 |           2085.541 |
+| macOS `6aab0fc8` |    975.957 |        108.819 |        180.367 |            686.771 |
+
+The downloaded Linux inputs remain under
+*/home/dahlia/.local/state/oseo-m5c/aws-gate-work/linux-shard-logs/*.
+The macOS input, parsed per-registration records, sanitizer inputs, local
+commands, source digests, and phase records remain under
+*/data/m5c-compound-property-cost/*. CI reports registration totals only;
+it does not report C generation, compiler, and execution phases separately.
+The local phase measurements supply that distinction without inferring
+unrecorded CI phase times.
+
+The three Linux sanitizer property jobs measured 1,797.537, 1,464.219,
+and 2,087.372 seconds for the original file. These are ordinary case sums,
+separate from the native-support extended observations above. The last
+run's two fixed matrices took 702.317 and 1,102.713 seconds; the remaining
+registrations sum to 282.341 seconds. No candidate sanitizer result is
+inferred from this partition.
+
+A read-only replay of the optional `b4775e0b` refreshed Linux table,
+rebucketing only these unchanged registrations, reduces the seven-shard
+model's maximum from 4,160 to 2,866 seconds (69.33 to 47.77 minutes).
+That projection excludes the new pure properties' overhead, assumes the
+historical case costs persist, and is not a CI result. That optional
+branch is not merged here, and none of its other weights is adopted.
+
+### Local measurements and scheduling inputs
+
+The local Linux x86-64 baseline used Node.js 24.21.0, Deno 2.9.7,
+Zig 0.16.0, the `generous` capacity prefix with no CPU quota and
+`MemoryMax=104G`, and the worktree-specific Zig cache. Its whole ordinary
+run passed all seventeen registrations in 456.923 seconds; the extended
+baseline passed all seventeen in 1,145.765 seconds. These are wrapper
+walls, separate from the registration sums used for scheduling.
+
+The ordinary baseline used an external Node load hook to time front-end/C
+generation, toolchain subprocesses, native execution, and reference-host
+execution. The extended baseline additionally separated C emission from
+the front end. Its hook loads the frozen original module bytes, whose Git
+blob equals the property at `6aab0fc8`, at the original module URL; later
+test extraction therefore cannot change the running baseline. Production
+packages remain unchanged. Instrumentation adds timing overhead and is
+not used in the candidate runs.
+
+The extended command was `mise run test:property:extended:native:shard`
+with `--import /data/m5c-compound-property-cost/phase-frozen-loader.mjs`,
+`--test-reporter=spec`, and the original property file. With one explicit
+file, the wrapper's Node test concurrency still executes only one file.
+The task retains scale 10, seed 1592590339, size `large`, every original
+case budget, and every original hard interrupt. It sets no case shard,
+replay path, or time scale.
+
+The measured extended phases below are seconds. Toolchain time includes
+its identity/cache/archive requests when invoked; native execution
+includes child-process startup and forced collection. Total is the
+registration callback wall and also includes the front end, references,
+fixture staging, and cleanup. Across the complete file the front end took
+2.656 seconds, C emission 15.032, toolchain subprocesses 600.952, native
+execution 451.539, and reference hosts 32.609. C generation alone is a
+small part of this workload; splitting retains the large compilation and
+execution observations unchanged.
+
+| Registration                                                           | C generation | Toolchain | Native execution |   Total |
+| ---------------------------------------------------------------------- | -----------: | --------: | ---------------: | ------: |
+| compound assignment model keeps short-circuit writes conditional       |        0.000 |     0.000 |            0.000 |   0.000 |
+| generated compound assignments match the M5 property model             |        0.363 |    26.983 |           26.304 |  63.564 |
+| member reference model throws before a nullish base key                |        0.000 |     0.000 |            0.000 |   0.000 |
+| fixed compound member references follow the ECMA-262 model             |        2.850 |    67.488 |           49.649 | 123.410 |
+| fixed changing-key compound members convert once against V8            |        0.039 |     3.381 |            6.323 |  11.170 |
+| generated compound member references convert their key once            |        2.137 |   170.966 |          110.627 | 305.286 |
+| fixed awaited compound member keeps one converted key                  |        0.005 |     0.398 |            0.550 |   1.057 |
+| fixed BigInt compound member keeps one converted key                   |        0.003 |     0.244 |            0.513 |   0.861 |
+| computed member Reference model orders base, key, and value            |        0.000 |     0.000 |            0.000 |   0.000 |
+| fixed computed member References follow the ECMA-262 model             |        6.806 |   114.617 |           86.621 | 213.708 |
+| fixed relocated changing-key subjects convert once against V8          |        0.006 |     0.555 |            1.040 |   1.796 |
+| fixed for-in and for-of member heads close before their errors         |        0.007 |     0.767 |            0.665 |   1.536 |
+| fixed computed member References keep a primitive receiver             |        0.004 |     0.350 |            0.532 |   0.992 |
+| fixed nullish computed member References report one diagnostic         |        0.007 |     0.579 |            0.636 |   1.277 |
+| generated computed member References check the base, then convert once |        2.539 |   190.013 |          113.827 | 328.353 |
+| assignment naming model names only bare identifier targets             |        0.000 |     0.000 |            0.000 |   0.000 |
+| generated parenthesized assignment targets leave values unnamed        |        0.265 |    24.611 |           54.250 |  91.277 |
+
+The candidate ordinary commands use `mise exec -- node --test` with
+`--test-reporter=spec` and one explicit file each. All three pass without
+skips: original 15 registrations in 95.970 seconds, compound fixed two in
+123.347 seconds, and computed fixed two in 222.303 seconds. These are
+wrapper walls. The baseline's first ordinary run also populated runtime
+cache entries, while later commands reuse the cache. Light static checks
+ran alongside some native work. These serial observations neither isolate
+a total-work speedup nor predict concurrent CI file latency.
+
+The candidate extended commands use the canonical task with
+`--shard 1/1` and one explicit file each, retaining scale 10, seed
+1592590339, size `large`, and the original per-domain limits. There is one
+file worker and no native overlap. The original file passed all fifteen
+registrations in 815.055 seconds, compound fixed passed two
+in 129.477, and computed fixed passed two in
+231.926. Their Node runner summaries were
+813.663, 128.023,
+and 230.515 seconds. All six candidate
+ordinary/extended commands retained unchanged hashes of the three test
+files and their support module.
+
+The three serial extended walls sum to 1176.459
+seconds against the 1,145.765-second instrumented baseline; their largest
+file wall is 815.055 seconds. These observations show the
+partition, not a reduction in total native work or proof of a CI wall
+improvement. The new pure properties pass under both Node.js and Deno,
+and 92 focused tooling tests pass. Full capacity-wrapped
+`mise run check` passes; normal commit hooks repeat the check on the final
+source.
+
+The affected scheduling entries instead use the historical CI
+registrations above. For each Linux partition, sum only its unchanged
+registrations within each run, take the median of those three sums, divide
+by 1,000, then round up: original 2,086 seconds, compound fixed 668, and
+computed fixed 1,408. On macOS, divide the same-base source registration
+sums by 1,000 and round up: original 687, compound fixed 109, and computed
+fixed 181. These are historical partition estimates, not fresh candidate
+file measurements or conservative bounds. They omit the new pure
+properties' overhead and do not measure new file setup or placement.
+Refresh from the first exact-candidate CI logs. All unrelated table entries
+remain unchanged. In this `6aab0fc8`-based preparation, adding the two
+entries grows each host's table from 134 to 136 entries. The unchanged
+upper-median fallback consequently moves from 409 to 415 seconds on Linux and
+stays at 296 on macOS. The three still-unlisted Annex prototype-boundary,
+generator-throw, and primitive receiver inherited-Set files receive that
+existing fallback rule; this is not a new measurement of those families.
+
+The two new seed blocks were checked free at `6aab0fc8`, combined TCO+Host
+`28d57fc5`, and observation train `f3360d7d`. Root identified the
+`0x60008d00` host-script reservation before candidate native validation;
+only the new families moved, to `0x60008e00` and `0x60008f00`, with no
+old seed migration or override. The source, collision, and test-boundary
+proofs remain in the raw packet. An initial baseline import failure before
+any semantic registration ran required the new checkout's normal package
+build; the failed preparation log remains preserved. The first static
+check found two export-induced line-length violations, now corrected.
+
+This changes no CI workflow, shard total, case-sharded or dedicated list,
+job timeout, existing property deadline, reviewed test262 row, or production
+package. Exact candidate CI, landing, and publication remain Root-owned.
+
+
+Historical shared weight source
+-------------------------------
 
 Refreshing the file weights lowers the modeled Linux maximum over seven
 shards from 47.3 minutes to 44.1, holding one run's measured case costs

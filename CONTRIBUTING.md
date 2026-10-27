@@ -343,7 +343,9 @@ selected by `targetForExecutionHost`:
 The check follows calls and named callbacks through functions in the same file,
 including enclosing registration functions and Promise/array callbacks.
 It recognizes value imports, including aliases, of `runNativeCli`,
-`withNativeFixture`, and `buildHostCcFixture`; `runNativeUnits` and
+`withNativeFixture`, and `buildHostCcFixture`; the compound Reference helpers
+`assertNativeMemberReference`, `assertMemberReferenceCase`, and
+`assertReferenceCase`; `runNativeUnits` and
 `prepareHarnessObject` with the imported `nativeToolchain`; execution through
 `createTest262FragmentExecutor` with that toolchain; consumption of
 a `nativeToolchain.createBuildPlan` result's `executablePath` or iterated
