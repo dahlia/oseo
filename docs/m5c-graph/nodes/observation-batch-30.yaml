@@ -8,6 +8,7 @@ delivers: "Observes the 535 unreviewed paths that
   every unsupported result an owner."
 dependencies:
   - dynamic-import
+  - dynamic-import-early-error-precedence
   - observation-batch-plan
 landed: false
-status: ready
+status: blocked

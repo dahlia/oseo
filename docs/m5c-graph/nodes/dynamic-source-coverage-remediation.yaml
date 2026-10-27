@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 306 reviewed unsupported paths assigned to
+delivers: "Resolves the 765 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -124,7 +124,15 @@ delivers: "Resolves the 306 reviewed unsupported paths assigned to
   test/built-ins/Iterator/proto-from-ctor-realm.js. Its Function source
   rejection leaves the non-source realm/constructor contract as active
   coverage debt; no exclusion or replacement evidence is claimed.
-  ADR 0016 and ADR 0019 remain unchanged."
+  ADR 0016 and ADR 0019 remain unchanged.
+  B19/B20/B30 add exactly 459 paths: 66 observed OSEO1001 Unknown binding
+  eval rejections and 393 observed OSEO1001 ImportExpression outside M1
+  rejections. Preserve the existing 306 paths and dependencies; the combined
+  scope is 765. The exact per-batch counts, original paths, full diagnostics
+  and raw pointers are in
+  docs/m5c-graph/dynamic-source-coverage-remediation.md. These additions
+  remain active remediation; no exclusion or change to ADR 0016 or ADR 0019
+  is authorized."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family
