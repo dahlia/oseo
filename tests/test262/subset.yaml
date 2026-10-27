@@ -136514,7 +136514,7 @@ tests:
       ]
   - path: test/language/module-code/verify-dfs.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [functions, module-linking]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/punctuators/S7.7_A1.js
     expectedClassification: pass
     dependencies: [lexical-grammar, object-literals]

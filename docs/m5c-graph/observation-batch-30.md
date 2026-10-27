@@ -13,12 +13,12 @@ malformed sources that cannot produce an AST. A tag changes no actual
 classification and authorizes no exclusion. Every expected-negative comes
 from the saved phase/type-correct runner classification.
 
-| Evidence                               | Pointer                                                                                        |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Raw observations, first segment        | /data/m5c-b19-b20-b30-20261027/observation-6aab/raw/observations.json                          |
-| Raw observations, continuation         | /data/m5c-b19-b20-b30-20261027/observation-6aab/continuation/raw/observations.json             |
-| Raw observations, remaining 904        | /data/m5c-b19-b20-b30-20261027/observation-6aab/remaining-904/raw/observations.json            |
-| Exact source hashes and tag derivation | /data/m5c-b19-b20-b30-20261027/task\_fdd834e1b3d1/ctx\_56a3678b5060/reviewed-tag-evidence.json |
+| Evidence                               | Pointer                                                                                              |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Raw observations, first segment        | /data/m5c-b19-b20-b30-20261027/observation-6aab/raw/observations.json                                |
+| Raw observations, continuation         | /data/m5c-b19-b20-b30-20261027/observation-6aab/continuation/raw/observations.json                   |
+| Raw observations, remaining 904        | /data/m5c-b19-b20-b30-20261027/observation-6aab/remaining-904/raw/observations.json                  |
+| Exact source hashes and tag derivation | /data/m5c-b19-b20-b30-20261027/task\_fdd834e1b3d1/ctx\_56a3678b5060/reviewed-tag-evidence-final.json |
 
 The 66 unknown-eval and 393 ImportExpression rejections across this train
 belong to `dynamic-source-coverage-remediation`. The 12 await-in-top-level
@@ -59,3 +59,12 @@ assign their exact remediation responsibilities to the named nodes; this
 batch stays blocked and unlanded pending later observations. Root accepted
 this arrangement without a tooling change permitting unreviewed paths to
 have remediation node ledger owners.
+
+The fixture-import tag audit found one missing dependency among all 1,409
+admissions: `verify-dfs.js` imports `verify-dfs-a_FIXTURE.js`, whose line 6
+contains ImportExpression. The source-derived `dynamic-source` tag is
+added without changing its actual unsupported classification. The 81
+entries with imports cover 42 distinct imported files, all byte-identical
+to the pinned archive; no other dynamic fixture tag miss was found. A
+fresh stock scoped UPDATE must verify this corrected metadata before
+review completion.
