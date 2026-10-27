@@ -10,7 +10,7 @@ delivers: "Admits the $262.evalScript and print host bindings, so the 14
   these 14 paths as pass: 12 global-code script-decl-* cases and the
   RegExp Symbol.replace coerce-global.js case. The remaining
   script-decl-lex-var-declared-via-eval.js stays unsupported for ordinary
-  eval under ADR 0016. This node retains active remediation ownership of
+  eval under ADR 0016. The active node dynamic-source-coverage-remediation owns
   that path; no whole-path exclusion or completed coverage is claimed."
 dependencies:
   - unsupported-ownership-audit

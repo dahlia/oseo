@@ -9597,8 +9597,10 @@ The two TCO tagged-template paths retain their passes.
 Thirteen of the Host node's fourteen paths now pass.
 `test/language/global-code/script-decl-lex-var-declared-via-eval.js`
 remains unsupported for ordinary eval, the ADR 0016 dynamic-source
-boundary. Its existing owner `node:test262-host-script-bindings` retains
-active remediation of the non-source declaration contract. No new exclusion
+boundary. Active owner `node:dynamic-source-coverage-remediation` retains
+remediation of the non-source declaration contract (304 -> 305 paths).
+The exact diagnostic is `:104:1: error[OSEO1001]: Unknown binding 'eval'.`
+No new exclusion
 or completed replacement evidence is claimed. The ledger, observation
 batches and graph baseline derive from this accepted manifest.
 

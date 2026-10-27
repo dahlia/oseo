@@ -141,8 +141,18 @@ owners:
       Observation-batch-15 adds eight object-literal fixtures built with
       direct eval, covering getter/setter operation, duplicate
       properties, and property descriptors. Their ordinary
-      object-literal subjects remain inside the claim."
-    paths: 304
+      object-literal subjects remain inside the claim. The accepted Host
+      Full on U 28d57fc5 observes 13 of 14 Host paths as pass and adds
+      exactly one unsupported path to this active owner (304 -> 305):
+      test/language/global-code/script-decl-lex-var-declared-via-eval.j\
+      s. Exact diagnostic: :104:1: error[OSEO1001]: Unknown binding
+      'eval'. Its ordinary eval requirement is under ADR 0016; the
+      non-source declaration contract remains in-claim pending
+      remediation, with no exclusion or completed replacement evidence.
+      ADR 0016 and ADR 0019 are unchanged. Raw Full:
+      /data/m5c-tco-host-compose-20261027/remote-20261027T105544Z-904e1\
+      0b15d52/."
+    paths: 305
   node:iterator-helpers:
     note: Only unsupported frontmatter feature is iterator-helpers (392), or
       iterator-helpers once cross-realm was admitted, in
@@ -271,13 +281,6 @@ owners:
       ownership until the maintainer accounting decision and reviewed
       replacement evidence bound core coverage; Annex B remains
       excluded.
-    paths: 1
-  node:test262-host-script-bindings:
-    note: The accepted Full on U 28d57fc5 promotes 13 of the original 14
-      Host paths. script-decl-lex-var-declared-via-eval.js remains
-      unsupported for ordinary eval under ADR 0016. Retain active
-      remediation for its non-source declaration contract; no whole-path
-      exclusion or completed replacement evidence is claimed.
     paths: 1
   node:typed-array-proto-coverage-remediation:
     note: The full update on 2e3d973f adds 2 RAB cases whose prototype read
@@ -30430,7 +30433,7 @@ paths:
   test/language/global-code/script-decl-lex-deletion.js: [pass, observation]
   test/language/global-code/script-decl-lex-lex.js: [pass, observation]
   test/language/global-code/script-decl-lex-restricted-global.js: [pass, observation]
-  test/language/global-code/script-decl-lex-var-declared-via-eval.js: [unsupported-profile-feature, node:test262-host-script-bindings, [dynamic-source, lexical-bindings, var-bindings]]
+  test/language/global-code/script-decl-lex-var-declared-via-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, lexical-bindings, var-bindings]]
   test/language/global-code/script-decl-lex-var.js: [pass, observation]
   test/language/global-code/script-decl-lex.js: [pass, observation]
   test/language/global-code/script-decl-var-collision.js: [pass, observation]

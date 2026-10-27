@@ -8195,6 +8195,23 @@ paths:
       bindings; the original inner/outer x assertion is
       unresolved.
     assessment: parameter-expression-variable-environment
+  - path: test/language/global-code/script-decl-lex-var-declared-via-eval.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ce9644b3e5a41836f50e358710331e62782ddab5d3\
+      f29481d79acfa00393352c"
+    observationDigest: "536255dcdd740338ac9678eb4e440c020e31b1b450\
+      23435456fac55625bb08ed"
+    missingDynamicTag: false
+    section: ECMA-262 GlobalDeclarationInstantiation and PerformEval
+    subject: "Global lexical declarations must not collide with prior
+      var and function declarations introduced through ordinary
+      eval: strict eval uses a separate variable environment, while
+      non-strict direct eval creates configurable global
+      properties. The original assertions read the later let and
+      const bindings through $262.evalScript; their declaration
+      contract remains in-claim pending remediation."
+    assessment: fixture-construction
   - path: "test/language/import/import-attributes/json-idempote\
       ncy.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
