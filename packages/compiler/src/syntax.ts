@@ -1132,6 +1132,8 @@ export interface SyntaxGlobalLexicalName extends LocatedSyntax {
 /** One owned M1 script, with no parser-specific values. */
 export interface SyntaxProgram extends LocatedSyntax {
   readonly body: readonly (SyntaxFunction | SyntaxStatement)[];
+  /** Last directive's cooked value, retained for host Script completion. */
+  readonly directiveCompletion?: Extract<SyntaxExpression, { kind: "string" }>;
   /**
    * Script lexical names that HasRestrictedGlobalProperty checks before
    * creating any binding. A module frontend leaves this absent.

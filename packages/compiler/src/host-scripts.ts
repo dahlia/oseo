@@ -27,6 +27,7 @@ function completionBlock(
 function withCompletion(
   program: HirProgram,
   allocate: () => number,
+  directiveCompletion: SyntaxProgram["directiveCompletion"],
 ): HirProgram {
   const id = allocate();
   const range = program.range;
@@ -145,7 +146,7 @@ function withCompletion(
       {
         bindingId: id,
         hint: undefined,
-        initializer: { kind: "undefined", range },
+        initializer: directiveCompletion ?? { kind: "undefined", range },
         kind: "let",
         name: "*Script completion*",
         range,
@@ -211,7 +212,11 @@ export function compileHostScripts(
       continue;
     }
     pending.push(...(hir.program.hostScriptSources ?? []));
-    const completed = withCompletion(hir.program, () => nextBinding++);
+    const completed = withCompletion(
+      hir.program,
+      () => nextBinding++,
+      parsed.program.directiveCompletion,
+    );
     const mir = buildMir(completed, options);
     const functionId = nextFunction++;
     scripts.push({ functionId, source });
