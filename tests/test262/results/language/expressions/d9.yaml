@@ -693,6 +693,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
       - symbols
     observation:
@@ -722,6 +723,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
       - reflect-namespace
       - symbols
       - var-bindings

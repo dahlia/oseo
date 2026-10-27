@@ -69,6 +69,7 @@ results:
     classification: pass
     dependencies:
       - object-literals
+      - object-properties
       - regular-expressions
       - var-bindings
     execution:

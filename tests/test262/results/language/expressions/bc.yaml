@@ -1099,6 +1099,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
       - reflect-namespace
       - symbols

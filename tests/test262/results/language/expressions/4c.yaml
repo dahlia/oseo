@@ -1032,6 +1032,7 @@ results:
       - functions
       - iterator-protocol
       - lexical-bindings
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/for-await-resolution-and-error.js
         non-strict disabled failed (1): stdout=""

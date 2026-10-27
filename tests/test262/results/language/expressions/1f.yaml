@@ -1174,6 +1174,7 @@ results:
       - async-functions
       - dynamic-source
       - functions
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-ambiguous-import.js

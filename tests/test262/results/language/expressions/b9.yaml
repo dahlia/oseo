@@ -670,6 +670,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/await-ns-prototype.js
@@ -725,6 +726,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-function-import-then-eval-script-code-host-resolves-module-code.js
@@ -752,6 +754,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-if-braceless-eval-script-code-host-resolves-module-code.js

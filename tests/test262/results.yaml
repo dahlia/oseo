@@ -21286,7 +21286,7 @@ summary:
       expectedNegatives: 212
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 284
+      passes: 281
       semanticFailures: 0
       unsupportedProfileFeatures: 16
     - dependency: module-linking
@@ -21295,7 +21295,7 @@ summary:
       infrastructureFailures: 0
       passes: 341
       semanticFailures: 0
-      unsupportedProfileFeatures: 116
+      unsupportedProfileFeatures: 305
     - dependency: object-literals
       expectedNegatives: 197
       harnessFailures: 0
@@ -21314,14 +21314,14 @@ summary:
       expectedNegatives: 581
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 15717
+      passes: 15725
       semanticFailures: 0
-      unsupportedProfileFeatures: 125
+      unsupportedProfileFeatures: 137
     - dependency: promise-settlement
       expectedNegatives: 121
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2133
+      passes: 2132
       semanticFailures: 0
       unsupportedProfileFeatures: 204
     - dependency: property-enumeration
@@ -21386,7 +21386,7 @@ summary:
       infrastructureFailures: 0
       passes: 222
       semanticFailures: 0
-      unsupportedProfileFeatures: 23
+      unsupportedProfileFeatures: 24
     - dependency: typed-array-constructors
       expectedNegatives: 0
       harnessFailures: 0

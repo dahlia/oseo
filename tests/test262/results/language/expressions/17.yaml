@@ -1151,6 +1151,8 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
+      - object-properties
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-get-own-property-str-found-init.js
@@ -1178,6 +1180,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
       - object-literals
       - var-bindings
     observation:

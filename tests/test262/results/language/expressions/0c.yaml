@@ -812,6 +812,7 @@ results:
       - async-functions
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-function-eval-rqstd-abrupt-typeerror.js
         non-strict disabled failed (1): stdout=""
@@ -840,6 +841,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
       - reflect-namespace
     observation:

@@ -1098,6 +1098,7 @@ results:
       - functions
       - generators
       - lexical-bindings
+      - module-linking
       - promise-settlement
       - var-bindings
     observation:

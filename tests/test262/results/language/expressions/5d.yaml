@@ -867,6 +867,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-block-import-catch-instn-iee-err-circular.js
         non-strict disabled failed (1): stdout=""

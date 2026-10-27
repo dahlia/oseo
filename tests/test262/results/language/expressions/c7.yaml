@@ -890,7 +890,9 @@ results:
       - functions
       - iterator-protocol
       - lexical-bindings
+      - module-linking
       - object-literals
+      - object-properties
       - promise-settlement
       - reflect-namespace
       - symbols

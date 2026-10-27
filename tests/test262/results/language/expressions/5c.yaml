@@ -818,6 +818,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-while-import-catch-instn-iee-err-ambiguous-import.js
         non-strict disabled failed (1): stdout=""

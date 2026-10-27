@@ -1104,6 +1104,7 @@ results:
       - async-functions
       - dynamic-source
       - functions
+      - module-linking
       - promise-settlement
       - var-bindings
     observation:

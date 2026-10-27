@@ -620,6 +620,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-file-does-not-exist.js
@@ -647,6 +648,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-rqstd-abrupt-urierror.js
         non-strict disabled failed (1): stdout=""
@@ -699,6 +701,7 @@ results:
       - destructuring-bindings
       - dynamic-source
       - functions
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js

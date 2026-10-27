@@ -1015,6 +1015,8 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
+      - object-properties
       - symbols
       - var-bindings
     observation:

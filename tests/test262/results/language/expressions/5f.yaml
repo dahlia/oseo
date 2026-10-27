@@ -1131,6 +1131,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
       - var-bindings
     observation:

@@ -76,6 +76,7 @@ results:
     classification: pass
     dependencies:
       - module-linking
+      - object-properties
       - symbols
       - var-bindings
     execution:

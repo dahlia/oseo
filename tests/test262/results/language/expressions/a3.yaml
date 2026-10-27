@@ -1240,6 +1240,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/top-level-import-catch-eval-rqstd-abrupt-urierror.js
         non-strict disabled failed (1): stdout=""

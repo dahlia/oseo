@@ -732,6 +732,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-rqstd-abrupt-typeerror.js
         non-strict disabled failed (1): stdout=""
@@ -762,6 +763,7 @@ results:
       - dynamic-source
       - functions
       - generators
+      - module-linking
       - promise-settlement
       - var-bindings
     observation:

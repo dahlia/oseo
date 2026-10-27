@@ -714,6 +714,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
       - reflect-namespace
       - symbols
       - var-bindings

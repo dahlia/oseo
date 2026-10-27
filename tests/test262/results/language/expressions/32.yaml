@@ -1269,6 +1269,7 @@ results:
       - functions
       - generators
       - lexical-bindings
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-async-gen-await-eval-gtbndng-indirect-update-dflt.js

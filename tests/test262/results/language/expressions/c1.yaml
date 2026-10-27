@@ -1132,6 +1132,7 @@ results:
       - dynamic-source
       - functions
       - generators
+      - module-linking
       - promise-settlement
       - var-bindings
     observation:

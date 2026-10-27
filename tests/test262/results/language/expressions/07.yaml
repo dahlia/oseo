@@ -849,6 +849,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-else-import-catch-file-does-not-exist.js
         non-strict disabled failed (1): stdout=""
@@ -875,6 +876,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
       - reflect-namespace
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-exported-init-strict.js

@@ -867,6 +867,7 @@ results:
       - dynamic-source
       - functions
       - generators
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-instn-iee-err-ambiguous-import.js
@@ -925,6 +926,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
       - reflect-namespace
       - symbols
@@ -955,6 +957,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-get-str-found.js
         non-strict disabled failed (1): stdout=""

@@ -1235,6 +1235,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-eval-rqstd-abrupt-typeerror.js
         non-strict disabled failed (1): stdout=""
@@ -1261,6 +1262,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
       - reflect-namespace
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-exported-init-no-strict.js

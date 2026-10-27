@@ -1366,6 +1366,8 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
+      - object-properties
       - promise-settlement
       - symbols
       - var-bindings

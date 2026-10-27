@@ -1029,6 +1029,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-block-import-catch-instn-iee-err-ambiguous-import.js
         non-strict disabled failed (1): stdout=""
@@ -1055,6 +1056,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-function-import-catch-eval-rqstd-abrupt-urierror.js
         non-strict disabled failed (1): stdout=""
@@ -1083,6 +1085,7 @@ results:
       - async-functions
       - dynamic-source
       - functions
+      - module-linking
       - promise-settlement
       - top-level-await
       - var-bindings

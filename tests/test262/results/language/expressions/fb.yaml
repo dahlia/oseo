@@ -1147,6 +1147,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-do-while-file-does-not-exist.js
         non-strict disabled failed (1): stdout=""

@@ -21,7 +21,9 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
+      - top-level-await
     observation:
       detail: 'test/language/module-code/top-level-await/dynamic-import-of-waiting-module.js
         non-strict disabled failed (1): stdout=""

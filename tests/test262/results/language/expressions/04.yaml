@@ -838,6 +838,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - module-linking
     observation:
       detail: 'test/language/expressions/dynamic-import/usage/nested-if-import-then-eval-gtbndng-indirect-update-dflt.js
         non-strict disabled failed (1): stdout=""

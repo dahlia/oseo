@@ -801,6 +801,7 @@ results:
       - dynamic-source
       - functions
       - generators
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-instn-iee-err-circular.js
@@ -830,6 +831,7 @@ results:
       - dynamic-source
       - functions
       - lexical-bindings
+      - module-linking
       - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/namespace/await-ns-get-str-found.js

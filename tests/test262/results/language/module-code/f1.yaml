@@ -23,6 +23,7 @@ results:
       - lexical-bindings
       - module-linking
       - object-literals
+      - object-properties
       - reflect-namespace
       - symbols
       - var-bindings
