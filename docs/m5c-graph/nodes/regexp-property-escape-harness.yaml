@@ -8,5 +8,5 @@ delivers: "Adds buildString and testPropertyEscapes to the reviewed
   test/built-ins/RegExp/CharacterClassEscapes/) are observed."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

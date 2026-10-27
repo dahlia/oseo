@@ -570,7 +570,7 @@ test("Linux sanitizer split retains every suite and its preflight", () => {
     "host C sanitizers (Linux, property, ${{ matrix.shard }}/3)",
   );
   assert.equal(native["timeout-minutes"], 45);
-  assert.equal(property["timeout-minutes"], 45);
+  assert.equal(property["timeout-minutes"], 60);
   assert.deepEqual(entries(native), [{ shard: 1 }, { shard: 2 }, { shard: 3 }]);
   assert.deepEqual(entries(property), [
     { shard: 1 },

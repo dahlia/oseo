@@ -73,6 +73,7 @@ dependencies:
   - primitive-wrapper-objects
   - promise-feature-admission
   - proper-tail-calls
+  - regexp-anchored-repeat-state-remediation
   - regexp-pattern-extensions
   - regexp-property-escape-harness
   - regexp-split-coverage-remediation

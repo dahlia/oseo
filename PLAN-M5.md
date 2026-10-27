@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-29,901 reviewed cases: 25,602 passes, 2,802 expected negatives, and 1,497
+29,901 reviewed cases: 26,052 passes, 2,802 expected negatives, and 1,047
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -7212,8 +7212,22 @@ definition with the `harness-definition` capability. Both decisions read
 parsed syntax, never source text: a name inside a comment or string, a
 property key, a `typeof` operand, a name inside a `with` body, whose object
 may provide it, and a name the case declares itself never withhold execution.
-The reviewed *regExpUtils.js* still omits `buildString` and
-`testPropertyEscapes`. An unhandled rejection now reports the rejection
+Reg-only source preparation restores the pinned `buildString`,
+`testPropertyEscapes`, and `printCodePoint` operations in the reviewed
+*regExpUtils.js* on successful Array/B Main `d4d81be9`. Lone code points
+precede inclusive ranges in supplied order, conversion flushes at 10,000
+code points, and the property helper tests the aggregate before each iterated
+symbol on a miss. Assertion failures, diagnostic formatting, abrupt
+completion, and RegExp mutations, including `lastIndex`, remain observable.
+Fresh normal Full on source `6e5ebf2e` observed all 453 inherited
+helper-owned paths: 441 property-escape paths and nine CharacterClassEscapes
+paths passed all four variants. The three remaining CharacterClassEscapes
+positive subjects report `regexp-matcher-limit` and belong to the active,
+blocked *regexp-anchored-repeat-state-remediation* node. Its worknote records
+the exact subjects and bounded future evidence; no matcher repair or exclusion
+is implied. Source restoration alone established no classifications.
+
+An unhandled rejection now reports the rejection
 boundary text, followed by a kind marker only when the reason itself or an
 object on its stored prototype chain is one of the current context realm's
 intrinsic error prototypes, the first one reached giving the kind, so

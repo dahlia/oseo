@@ -1,0 +1,27 @@
+version: 1
+id: regexp-anchored-repeat-state-remediation
+title: Bound state for anchored capture-free repetitions
+delivers: Remediates the three original CharacterClassEscapes non-digit,
+  non-whitespace and non-word positive-case paths listed in
+  docs/m5c-graph/regexp-anchored-repeat-state-remediation.md. Prove the
+  applicability of a deterministic whole-pattern anchored capture-free greedy
+  single-consuming-set scan before selecting that candidate in both TypeScript
+  and C executors; preserve ^/$ assertion semantics, actual result spans,
+  lastIndex, surrogate traversal, explicit unchanged limits and counters, and
+  generic fallback on every guard miss without delegating to a host matcher.
+  Non-multiline $ requires the current index to equal InputLength; only
+  multiline mode permits a line-terminator boundary. Keep original source data,
+  assertions, standard/u/v patterns, strictness modes, specialization policies,
+  seeds and budgets. Obtain actual original-test and regression evidence before
+  changing observations. The undo-trail diagnosis is static, not an observed
+  internal counter; this node admits no exclusion or predicted promotion.
+  Fresh normal Full on Reg-only source
+  6e5ebf2effdcedc5f0205e1af22f71606d7b9726 retained exactly these three
+  subjects as regexp-matcher-limit unsupported; they now belong to this
+  blocked owner. The linked worknote binds the actual observations, bounded
+  remedy, affected evidence and publication qualifications.
+dependencies:
+  - regexp-property-escape-harness
+  - unsupported-ownership-audit
+landed: false
+status: ready

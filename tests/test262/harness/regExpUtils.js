@@ -1,5 +1,47 @@
 /* eslint-disable no-unused-vars -- Harness globals are used after assembly. */
 
+// Copyright (C) 2017 Mathias Bynens. All rights reserved.
+// These three helpers retain the pinned test262 regExpUtils.js operations.
+// Upstream's BSD license is retained in tests/test262/harness/LICENSE.
+function buildString(args) {
+  const loneCodePoints = args.loneCodePoints;
+  const ranges = args.ranges;
+  const CHUNK_SIZE = 10000;
+  let result = String.fromCodePoint.apply(null, loneCodePoints);
+  for (let i = 0; i < ranges.length; i++) {
+    let range = ranges[i];
+    let start = range[0];
+    let end = range[1];
+    let codePoints = [];
+    for (let length = 0, codePoint = start; codePoint <= end; codePoint++) {
+      codePoints[length++] = codePoint;
+      if (length === CHUNK_SIZE) {
+        result += String.fromCodePoint.apply(null, codePoints);
+        codePoints.length = length = 0;
+      }
+    }
+    result += String.fromCodePoint.apply(null, codePoints);
+  }
+  return result;
+}
+
+function printCodePoint(codePoint) {
+  const hex = codePoint.toString(16).toUpperCase().padStart(6, "0");
+  return `U+${hex}`;
+}
+
+function testPropertyEscapes(regExp, string, expression) {
+  if (!regExp.test(string)) {
+    for (let symbol of string) {
+      let formatted = printCodePoint(symbol.codePointAt(0));
+      assert(
+        regExp.test(symbol),
+        `\`${expression}\` should match ${formatted} (\`${symbol}\`)`,
+      );
+    }
+  }
+}
+
 /*
  * The reviewed UnicodeSets cases exercise literal patterns and need only the
  * success-path aggregation from upstream's property-of-strings helper. Keep
