@@ -12,6 +12,7 @@ dependencies:
   - authorized-exclusion-audit
   - class-duplicate-constructor-early-error
   - class-private-accessor-lookup-coverage-remediation
+  - compound-assignment-property-cost
   - compound-member-assignment-key-order
   - computed-member-reference-key-order
   - cross-realm-host
