@@ -4,7 +4,10 @@ import { parse } from "yaml";
 import type { StructuredDataValue } from "./structured-data.ts";
 import { parsedMapping } from "./structured-data.ts";
 import { isNumber, isString } from "./value-kinds.ts";
-import { configuredSelfHostedLanes } from "./macos-lane-config.ts";
+import {
+  configuredSelfHostedLanes,
+  selfHostedLaneLabels,
+} from "./macos-lane-config.ts";
 import {
   hostedFallbackTimeScale,
   hostedUnmeasuredAllowance,
@@ -310,7 +313,7 @@ function refineLanes(
  * The probe runs for about twenty seconds, but it holds every Mac lane:
  * each lane job reads its outputs to choose a runner. When hosted demand
  * reaches the account's concurrency ceiling the probe queues like any
- * other job, and every minute it waits is added to all six lane ends.
+ * other job, and every minute it waits is added to all Mac lane ends.
  * Runs 39234170440 and 39244971256 measured 2.43 and 6.97 minutes of that
  * wait, and they are exactly the two runs whose observed hosted
  * concurrency reached the ceiling; the five runs before them measured 0.02
@@ -371,15 +374,16 @@ function hostedFallbackEnvironment(
 /**
  * Lanes beyond the hosted ones are grouped by machine, two per Mac mini in
  * lane order: lanes one and two on the first, three and four on the
- * second, five and six on the third. The pair factors in
- * `selfHostedPairSlowdowns` describe two lanes sharing one machine, so
+ * second, five and six on the third, seven and eight on the rented fourth.
+ * The pair factors in `selfHostedPairSlowdowns` describe two lanes sharing
+ * one machine, so
  * they apply within a machine and not across them. Three lanes on one
  * machine is outside that model.
  */
 const selfHostedLanesPerMachine = 2;
 
-/** Three Mac minis, two lanes each. */
-const maxSelfHostedLanes = 6;
+/** Four Mac minis, two lanes each; the rented pair is unmeasured. */
+const maxSelfHostedLanes = selfHostedLaneLabels.length;
 
 /** The Mac mini a self-hosted lane offset belongs to. */
 function selfHostedMachine(laneOffset: number): number {
@@ -437,7 +441,9 @@ export function selfHostedLaneEnds(
   seconds: MacosJobSeconds = modeledJobSeconds,
 ): readonly number[] {
   if (lanes.length > maxSelfHostedLanes) {
-    throw new Error("More than six Mac lanes were not measured");
+    throw new Error(
+      `More than ${maxSelfHostedLanes} Mac lanes are not modeled`,
+    );
   }
   const ends = lanes.map(() => selfHostedProbeSeconds);
   const next = lanes.map(() => 0);
@@ -516,7 +522,9 @@ export function macosLanes(
     selfHostedCount < 0 ||
     selfHostedCount > maxSelfHostedLanes
   ) {
-    throw new Error("Self-hosted Mac lanes must be zero to six");
+    throw new Error(
+      `Self-hosted Mac lanes must be zero to ${maxSelfHostedLanes}`,
+    );
   }
   const lanes: MacosLaneJob[][] = Array.from(
     { length: hostedLaneCount + selfHostedCount },

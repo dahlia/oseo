@@ -381,6 +381,10 @@ export const macosFixedSetupSeconds = 60;
  * uniform factor over six lanes, the 33 jobs' 242.6 one-lane minutes come
  * to an illustrative 53.0 minutes of wall clock. See
  * *docs/evidence/u42/README.md*.
+ *
+ * The rented fourth M6 Mac mini reuses these factors and the per-family
+ * ratios as a derived assumption. Its 16 GB RAM may affect contention;
+ * neither one-lane walls nor pair slowdowns were measured on that machine.
  */
 interface SelfHostedPairSlowdowns {
   readonly [family: string]: Readonly<Record<string, number>>;

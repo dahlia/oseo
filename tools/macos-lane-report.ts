@@ -1,7 +1,10 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
-import { configuredSelfHostedLanes } from "./macos-lane-config.ts";
+import {
+  configuredSelfHostedLanes,
+  selfHostedLaneLabels,
+} from "./macos-lane-config.ts";
 import type { MacosJobSeconds, MacosLaneJob } from "./generate-macos-lanes.ts";
 import {
   macosLaneEnds,
@@ -31,7 +34,8 @@ export interface MacosAttempt {
 
 /**
  * Parse a jobs-API export: check name, runner name, `started_at`, and
- * `completed_at`, tab-separated. A runner named `oseo-mac-*` is a Mac wall.
+ * `completed_at`, tab-separated. A runner in the lane-label allow-list
+ * is a Mac wall.
  */
 export function parseAttempt(id: string, text: string): MacosAttempt {
   const jobs = new Map<string, AttemptJob>();
@@ -45,7 +49,10 @@ export function parseAttempt(id: string, text: string): MacosAttempt {
     if (!Number.isFinite(seconds) || seconds < 0) {
       throw new Error(`Invalid job wall in ${id}: ${name}`);
     }
-    jobs.set(name, { seconds, selfHosted: runner.startsWith("oseo-mac-") });
+    jobs.set(name, {
+      seconds,
+      selfHosted: selfHostedLaneLabels.includes(runner),
+    });
   }
   return { id, jobs };
 }

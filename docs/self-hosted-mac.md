@@ -1,10 +1,12 @@
 Self-hosted Mac capacity lane
 =============================
 
-Status: configured for six persistent runners on three Mac minis, two per
-machine in label order, disabled by the repository variable
-`OSEO_SELFHOSTED_MAC_ENABLED`. The three machines add six lanes to the five
-hosted macOS lanes, one per runner. `oseo-mac-1` was registered earliest and
+Status: configured for eight persistent runners on four Mac minis, two per
+machine in label order: six on three owned machines and two on a rented
+machine. The repository variable `OSEO_SELFHOSTED_MAC_ENABLED` controls
+selection; installation and registration of the rented pair happen outside
+this change. The four machines add eight optional lanes to the five hosted
+macOS lanes, one per runner. `oseo-mac-1` was registered earliest and
 `oseo-mac-2` on 2026-10-06; the second machine's runners followed on
 2026-10-14. A lane whose runner is offline, disabled, or wedged falls back to
 hosted; a busy lane queues its jobs on the runner. Branch run `37398055382`
@@ -18,34 +20,38 @@ pushes. The operator checklist is outside the repository.
 Scheduling
 ----------
 
-*tools/macos-lane-config.ts* configures six optional Mac lanes,
-`oseo-mac-1` through `oseo-mac-6`. The generator places only Zig-backed
-`macos-aarch64` test262,
-extended native property, own-key case, and native fixture jobs there. Apple
-clang host sanitizer jobs and `macos-latest` Node.js/Deno jobs always use
-hosted runners. Every generated macOS job logs `sw_vers -productVersion` before
-its test steps. The existing check names, targets, shard totals, seeds,
-commands, timeouts, and native aggregate remain required.
+*tools/macos-lane-config.ts* configures eight optional Mac lanes using the
+ordered labels in *tools/selfhosted-mac/lane-labels.txt*: `oseo-mac-1`
+through `oseo-mac-6`, followed by `oseo-macrun-1` and `oseo-macrun-2`.
+The generator, availability probe, installer, health check, and job-wall
+report share that allow-list. The generator places only Zig-backed
+`macos-aarch64` test262, extended native property, own-key case, and native
+fixture jobs there. Apple clang host sanitizer jobs and `macos-latest`
+Node.js/Deno jobs always use hosted runners. Every generated macOS job logs
+`sw_vers -productVersion` before its test steps. The existing check names,
+targets, shard totals, seeds, commands, timeouts, and native aggregate remain
+required.
 
-The weights in *tools/macos-job-costs.ts* are measured medians of hosted job
-walls from seven CI run attempts, two all-hosted and five with the Mac lane
-on. A job that has run on `oseo-mac-1` is modeled there by its measured
-median Mac wall. Other eligible jobs convert their hosted median by derived
-family ratios pooled from those runner-mode attempts: 4.2 for test262, 3.2
-for native support, and 3.1 for native fixtures, applied only after a
-derived 60-second fixed setup share. The generator places the three own-key
-case shards on the `oseo-mac-1` lane first, then the rest longest first. It
-starts each Mac lane with an estimated 60-second availability probe.
+The weights in *tools/macos-job-costs.ts* combine hosted job medians and
+one-lane M6 job walls; their comments identify the source attempts. A job
+with a Mac entry uses that wall. Other eligible jobs convert their hosted
+median by a derived family ratio after a 60-second fixed setup share.
+Every current eligible job has a Mac entry. The generator places the three
+own-key case shards on the `oseo-mac-1` lane first, then the rest longest
+first. It starts each Mac lane with an estimated 60-second availability
+probe.
 Lanes are grouped by machine, two per Mac mini in lane order: one and two
-on the first, three and four on the second, five and six on the third. Because
-the two lanes of one machine share its cores, the model slows a Mac job while
+on the first, three and four on the second, five and six on the third,
+and seven and eight on the rented fourth. Because the two lanes of one
+machine share its cores, the model slows a Mac job while
 its partner lane is busy, by the derived pair factor in
 `selfHostedPairSlowdowns` for its family and its partner's, and runs it at its
 one-lane speed while that partner is idle. Lanes on different machines do not
 slow each other down. The pair factors are derived from the first machine's
 measurements, with conservative substitutes for the pairings that were never
-measured, and they are reused for the second machine; three lanes on one
-machine is outside the model, and the generator refuses more than four lanes.
+measured, and reused for the other M6 machines. For the rented machine this
+is a model input not yet validated on that machine. Three lanes on one
+machine is outside the model, and the generator refuses more than eight lanes.
 *PLAN-GATE.md* records the factors and the derived makespans;
 `node tools/macos-lane-report.ts` prints them. The earlier U21 one-machine
 ratios are kept in [U21 evidence]; *PLAN-GATE.md* records why they were
@@ -81,7 +87,7 @@ slower hosted runners. The repository variable must equal `true`, the event
 must be a push to `dahlia/oseo` (any branch or tag), and both the secret and
 the workflow token must exist. Only collaborators with write access can push
 there. Otherwise the job emits hosted `macos-15`. Pull requests, including
-fork PRs, always fall back. An API failure falls back for both lanes; an
+fork PRs, always fall back. An API failure falls back for all lanes; an
 offline, unregistered, or ambiguously labeled runner falls back for its own
 lane only. Each lane decides independently.
 
@@ -494,6 +500,45 @@ two-lane measurements in *PLAN-GATE.md*. Expect the first attempt to be
 slower than the second: in branch run `38551733723` the second machine's
 `oseo-mac-3` took a measured 81 min of serial work for its five jobs with an
 empty Zig cache and 60.3 min for the same five with a warm one.
+
+
+Adding the rented Mac mini
+--------------------------
+
+The fourth machine is rented for about one month and reachable over the
+maintainer's Tailscale network. Its reported configuration is an Apple M6
+with 12 CPU cores (4 performance and 8 efficiency), 16 GB RAM, a 228 GiB
+disk, and macOS 27.0.1. This repository change does not install or register
+runners on it.
+
+Use two separate standard accounts on that machine: `oseo-runner` for runner
+name and sole custom label `oseo-macrun-1`, and `oseo-runner2` for
+`oseo-macrun-2`. They occupy model lanes seven and eight on one machine.
+Follow the existing installation and **Developer Tools** steps, substituting
+these labels and accounts. Keep the 30 GiB Zig cache cap per account. The
+LaunchDaemons are `org.oseo.runner.oseo-macrun-1` and
+`org.oseo.runner.oseo-macrun-2`; compare them with the matching property
+lists under *tests/fixtures/selfhosted-mac/*. The installer and health check
+must run from a checkout that includes *tools/selfhosted-mac/lane-labels.txt*.
+
+The lane model reuses the M6 per-family ratios, one-lane job walls, and pair
+slowdowns for this machine. These model inputs have not been validated on
+the rented machine, and its memory and cache pressure are also unmeasured;
+measure runner-mode walls, memory pressure, swap, and cache
+behavior before treating the forecast as observed performance. Its 16 GB
+RAM may constrain two concurrent jobs. U30 and U35 in *PLAN-GATE.md* record
+16 GiB for the second and third owned machines; the setup section for the
+second owned machine describes the first owned machine as the same hardware
+class. No larger owned-machine RAM
+configuration is recorded here.
+
+With current costs, the six-lane model ends at 47.31 min and the eight-lane
+model at 40.87 min, limited by a hosted lane. These are modeled values;
+partial hosted fallback and the rented machine's actual performance remain
+unmeasured. Landing before registration preserves required work: the probe
+emits hosted
+`macos-15` independently for each missing or offline runner. After the rental
+ends, absent runners take that same fallback path.
 
 
 Security and activation

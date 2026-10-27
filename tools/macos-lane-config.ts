@@ -1,6 +1,16 @@
+import { readFileSync } from "node:fs";
+
 /**
- * Generate six optional Mac lanes, `oseo-mac-1` through `oseo-mac-6`, two
- * on each of three Mac minis; the repository variable keeps all of them
- * off.
+ * Ordered runner labels, two per Mac mini. The shell tools read this same
+ * allow-list, so registration checks and readiness decisions cannot drift.
+ * The final pair belongs to the rented fourth machine.
  */
-export const configuredSelfHostedLanes = 6;
+export const selfHostedLaneLabels: readonly string[] = readFileSync(
+  new URL("./selfhosted-mac/lane-labels.txt", import.meta.url),
+  "utf8",
+)
+  .trimEnd()
+  .split("\n");
+
+/** Eight optional lanes; the repository variable keeps all of them off. */
+export const configuredSelfHostedLanes: number = selfHostedLaneLabels.length;

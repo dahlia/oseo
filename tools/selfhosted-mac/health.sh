@@ -2,10 +2,12 @@
 set -euo pipefail
 root=${OSEO_RUNNER_ROOT:?Set OSEO_RUNNER_ROOT}
 label=${OSEO_RUNNER_LABEL:-oseo-mac-1}
-[[ $label =~ ^oseo-mac-[1-6]$ ]] || {
-  echo 'Runner label must be oseo-mac-1 through oseo-mac-6' >&2
+script_dir=$(cd "$(dirname "$0")" && pwd)
+if [[ $label == *$'\n'* ]] ||
+  ! grep -Fxq -- "$label" "$script_dir/lane-labels.txt"; then
+  echo 'Runner label must be listed in lane-labels.txt' >&2
   exit 2
-}
+fi
 [[ $(uname -s) == Darwin ]] || { echo 'macOS required' >&2; exit 2; }
 [[ $EUID -eq 0 ]] || { echo 'Run health check with sudo' >&2; exit 2; }
 echo "Host OS: $(sw_vers -productVersion)"
