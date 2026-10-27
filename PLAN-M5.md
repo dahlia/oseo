@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-29,901 reviewed cases: 26,067 passes, 2,802 expected negatives, and 1,032
+29,901 reviewed cases: 26,456 passes, 2,802 expected negatives, and 643
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -9643,3 +9643,18 @@ a function from source in another realm. The
 [IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
 binds the raw evidence. These are focused observations, not a regenerated
 manifest or completed publication gate.
+
+
+Accepted IH-A full observation
+------------------------------
+
+Root accepted the full UPDATE on U `a678c85e`, with natural exit zero:
+all 29,901 reviewed paths were observed, yielding 26,456 passes, 2,802
+expected negatives and 643 unsupported paths. There are 389 promotions
+and no demotions or failure classifications. The three missing
+*temporalHelpers.js* paths belong to `temporal-helpers-harness` (IH-B);
+*Iterator/proto-from-ctor-realm.js* remains active non-source coverage
+debt under `dynamic-source-coverage-remediation`. Earlier focused and
+source-qualified observations remain historical. The
+[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+binds the raw Full packet; candidate/Main gates and landing remain pending.

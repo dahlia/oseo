@@ -11,15 +11,18 @@ This record backs the M5c graph node `iterator-helpers-tag-activation`
 Selection rule
 --------------
 
-This node owns the 393 paths assigned to `node:iterator-helpers` in the
-derived closure ledger, except these three, which include
+At the split baseline, this node selected the 393 paths assigned to
+`node:iterator-helpers` in the derived closure ledger, except these three,
+which include
 *temporalHelpers.js* and belong to `temporal-helpers-harness`:
 
  -  *test/built-ins/Iterator/from/get-return-method-when-call-return.js*
  -  *test/built-ins/Iterator/from/return-method-calls-base-return-method.js*
  -  *test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js*
 
-That leaves 390 paths. The umbrella owns all 393 until this node lands.
+That leaves 390 IH-A paths at the split baseline. The accepted full
+UPDATE below replaces the original umbrella ownership with observations
+and the four bounded remediation assignments.
 
 
 Evidence obligations
@@ -150,3 +153,33 @@ and *runner-final/* records 80/80 runner registrations under each host.
 including the compatibility ratchet with zero overrides and unchanged
 205 domains, 205 seeds and 7,908 ordinary cases. Earlier CHECK packets
 retain the domain-key, line-length and lint failures corrected before U.
+
+
+Accepted full UPDATE and result accounting
+------------------------------------------
+
+Root accepted the local Full on U
+`a678c85ef80db5ca50e0a4105d183747786bb1ac`. It ran naturally from
+2026-10-27 17:10:15Z to 18:52:11Z with pool eight and zero retries:
+29,901/29,901 reviewed paths, 26,456 passes (previously 26,067), 2,802
+expected negatives and 643 unsupported paths (previously 1,032). It
+records 389 promotions, no demotions and no semantic, harness or
+infrastructure failures. Raw argv, capacity, timing and natural exit zero
+are in */data/m5c-iha/full-local/full.json*; *full.stdout* and
+*full.stderr* in that directory preserve the unfiltered output.
+
+The three *Iterator/from/* paths listed in the selection rule retain
+unsupported observations for the absent *temporalHelpers.js* include and
+now belong to `node:temporal-helpers-harness` (IH-B).
+*test/built-ins/Iterator/proto-from-ctor-realm.js* retains the Function
+source-constructor rejection and belongs to
+`node:dynamic-source-coverage-remediation`: its non-source contract
+remains active coverage debt, with no exclusion claim. The other 389
+paths now belong to `observation`, including all 184 lazy and 173 eager
+method paths. Repository tasks regenerate the ledger and observation
+batches; the graph baseline reflects the same accepted manifest.
+
+The accepted UPDATE output is preserved byte for byte. This local Full
+does not supply candidate/Main CI, macOS execution, outer review, graph
+landing or publication. The earlier preparation and focused-run statements
+above describe their original source and phase.

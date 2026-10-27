@@ -2110,9 +2110,10 @@ pool eight, no retries and no failure classifications. The
 [IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
 records the exact paths, raw packets and remaining remediation boundaries.
 
-No stored expectation, manifest, ledger owner, exclusion or landed state
-changes here. The 393 original umbrella owners remain until Root's full
-UPDATE and resulting ownership review. The three *temporalHelpers.js*
-paths are assigned to IH-B in the notes; the source-constructor path
-remains active coverage debt pending its path audit. The feature and runner
-changes require full D3 regeneration, which Root schedules after U review.
+Root accepted the full UPDATE on U `a678c85e`: 389 promotions, no
+demotions, 26,456 passes, 2,802 expected negatives and 643 unsupported
+paths across all 29,901 reviewed cases. The ledger assigns the three
+*temporalHelpers.js* paths to `temporal-helpers-harness` (IH-B) and
+*Iterator/proto-from-ctor-realm.js* to
+`dynamic-source-coverage-remediation`. All promoted paths belong to their
+observations. The graph remains unlanded pending the later gates.

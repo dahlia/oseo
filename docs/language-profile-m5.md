@@ -237,8 +237,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 29,901 reviewed cases: 26,067 passes, 2,802
-expected negatives, and 1,032 unsupported profile features. It records no
+The current manifest contains 29,901 reviewed cases: 26,456 passes, 2,802
+expected negatives, and 643 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -9919,6 +9919,7 @@ results. Three await IH-B's *temporalHelpers.js* harness; the fourth reaches
 the existing source-constructor boundary. Missing includes are named
 `harness-include` capabilities before assembly, not admitted harnesses.
 [The IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
-records the source-bound observations. The stored manifest still describes
-the earlier source until Root's full UPDATE; no new pass, exclusion or
-landing is claimed from the feature list alone.
+records the source-bound observations and accepted full UPDATE on U
+`a678c85e`. That Full confirms 389 promotions and four unsupported paths;
+the ledger assigns three to `temporal-helpers-harness` and one to
+`dynamic-source-coverage-remediation`. No exclusion or landing is claimed.

@@ -2327,6 +2327,18 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: dynamic-construction
+  - path: test/built-ins/Iterator/proto-from-ctor-realm.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "88818a66151356f654bf25456e3eea99f410815f\
+      2cd0900ef5db1cf111582a9a"
+    observationDigest: "0e5355955e935a814283fca18ff9608b78e8fd83\
+      6d6d449f6c4e440156d2f144"
+    missingDynamicTag: true
+    section: sec-iterator
+    subject: Default [[Prototype]] value derived from realm of
+      the newTarget
+    assessment: fixture-construction
   - path: test/built-ins/Map/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

@@ -20065,9 +20065,9 @@ summary:
   expectedNegatives: 2802
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 26067
+  passes: 26456
   semanticFailures: 0
-  unsupportedProfileFeatures: 1032
+  unsupportedProfileFeatures: 643
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 7
@@ -20199,9 +20199,9 @@ summary:
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3361
+      passes: 3746
       semanticFailures: 0
-      unsupportedProfileFeatures: 405
+      unsupportedProfileFeatures: 20
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -20255,9 +20255,9 @@ summary:
       expectedNegatives: 581
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 15673
+      passes: 15677
       semanticFailures: 0
-      unsupportedProfileFeatures: 129
+      unsupportedProfileFeatures: 125
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -20536,9 +20536,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5
+      passes: 390
       semanticFailures: 0
-      unsupportedProfileFeatures: 389
+      unsupportedProfileFeatures: 4
     - group: built-ins/JSON
       expectedNegatives: 0
       harnessFailures: 0
@@ -20592,9 +20592,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3310
+      passes: 3314
       semanticFailures: 0
-      unsupportedProfileFeatures: 14
+      unsupportedProfileFeatures: 10
     - group: built-ins/Promise
       expectedNegatives: 0
       harnessFailures: 0

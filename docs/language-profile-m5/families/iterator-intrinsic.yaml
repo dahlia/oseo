@@ -12,8 +12,9 @@ scope:
     domain also covers bounded strings with paired and lone surrogates,
     preserving its seed and 12-case budget. IH-A precheck evidence and the
     four remaining unsupported paths are recorded in
-    docs/m5c-graph/iterator-helpers-tag-activation.md; the full manifest
-    UPDATE remains Root-owned."
+    docs/m5c-graph/iterator-helpers-tag-activation.md; the accepted full
+    manifest UPDATE on U a678c85e confirms 389 promotions and four
+    unsupported paths."
 owners:
   - PLAN-M5.md
 evidence:

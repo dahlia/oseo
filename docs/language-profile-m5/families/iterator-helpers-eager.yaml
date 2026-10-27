@@ -18,10 +18,10 @@ scope:
     test/built-ins/Iterator/prototype/toArray/. The IH-A focused precheck
     observes all 173 as pass after admitting iterator-helpers. Its raw
     inputs and observations are recorded in
-    docs/m5c-graph/iterator-helpers-tag-activation.md. The checked-in
-    manifest retains the prior feature-gated records until Root's full
-    UPDATE. String iteration and the bounded Iterator.from primitive
-    repair remove the historical String blockers; temporalHelpers.js
+    docs/m5c-graph/iterator-helpers-tag-activation.md. The accepted full
+    UPDATE on U a678c85e records these method paths as pass. String
+    iteration and the bounded Iterator.from primitive repair remove the
+    historical String blockers; temporalHelpers.js
     remains unadmitted and its three paths belong to IH-B."
 owners:
   - PLAN-M5.md
