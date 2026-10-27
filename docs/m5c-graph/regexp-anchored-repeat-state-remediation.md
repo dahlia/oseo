@@ -78,12 +78,18 @@ of the 4,194,304-entry trail on iteration 2,097,152, before the step/backtrack
 bounds. These are static calculations. The actual diagnostic names no internal
 counter, and no measured subject length or counter trace proves the lead.
 
-The TypeScript matcher, C pattern emitter and C runtime matcher are byte-
-and mode-identical between old result `f68583d5` and current U. Their Git
-blobs are respectively `adcc1f802c56d90db103456752cb74fa8f9f6070`,
-`b61fbc005325950a6b36577f3eea9fa8a9c3943a` and
-`9ed4f73c4ff958fac59844880e73d113aaf19e2a`. This preserves the static
-lead's source basis; it does not measure which internal counter failed.
+The sources below are byte- and mode-identical between old result
+`f68583d5`, Full input U `6e5ebf2e` and result `376067d9`.
+
+| Role                   | Source path                                            | Git blob                                   |
+| ---------------------- | ------------------------------------------------------ | ------------------------------------------ |
+| TypeScript matcher     | *packages/compiler/src/regexp-matcher.ts*              | `adcc1f802c56d90db103456752cb74fa8f9f6070` |
+| C pattern emitter      | *packages/backend-c/src/regexp-program.ts*             | `b61fbc005325950a6b36577f3eea9fa8a9c3943a` |
+| C wrapper              | *packages/runtime-c/native/runtime\_regexp.c*          | `9ed4f73c4ff958fac59844880e73d113aaf19e2a` |
+| C repeat/undo executor | *packages/runtime-c/native/runtime\_regexp\_matcher.c* | `b5d45fb3f8cb7d43cbc9f0f0f7c9d7ebecfa9b81` |
+
+The repeat/undo executor identity preserves the static lead's source basis;
+it does not measure which internal counter failed.
 
 A candidate remedy is a deterministic scan for a proved complete-pattern
 shape: start anchor, one capture-free greedy single-consuming-set `+`, and
