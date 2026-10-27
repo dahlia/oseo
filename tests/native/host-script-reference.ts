@@ -1,3 +1,4 @@
+import { realpath } from "node:fs/promises";
 import type {
   CompilerHost,
   ProcessObservation,
@@ -45,12 +46,21 @@ realm().evalScript(${JSON.stringify(source)});
 `;
 }
 
-/** Run independent Node and Deno Script observers, retaining failed inputs. */
+/**
+ * Run independent Node and Deno Script observers, retaining failed inputs.
+ * Deno's CommonJS loader canonicalizes the main module before reading it but
+ * grants implicit read access only to the path it was given, so the observer
+ * runs from the canonical directory. A temporary directory behind a symbolic
+ * link, such as macOS /var/folders, or an 8.3 short name, such as the
+ * Windows runner profile, would otherwise fail before evaluating the subject.
+ */
 export async function hostScriptReferences(
   host: CompilerHost,
   source: string,
 ): Promise<readonly ProcessObservation[]> {
-  const directory = await host.makeTemporaryDirectory("oseo-host-script-ref-");
+  const directory = await realpath(
+    await host.makeTemporaryDirectory("oseo-host-script-ref-"),
+  );
   const path = `${directory}/reference.cjs`;
   let succeeded = false;
   try {

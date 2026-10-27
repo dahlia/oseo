@@ -129,28 +129,87 @@ test(`${fixture.name}: pure generic MIR/C contracts`, () => {
     )?.bindingId;
     assert.ok(helperBinding != null);
     const setterOperations = setter.blocks.flatMap((block) => block.operations);
-    // The dynamic callee must be the value read from the binding initialized
-    // with this helper, rather than the unrelated events.push method value.
-    const helperReads = setterOperations.filter(
+    // The dynamic callee must be the value resolved for this helper's name,
+    // rather than the unrelated events.push method value. A host build
+    // resolves the name through the persistent Global Environment Record,
+    // whose object record holds the binding initialized above (ADR 0029), so
+    // trace the callee through block parameters to every producer.
+    const tailCalls = setterOperations.filter(
       (operation) =>
-        operation.kind === "read" && operation.bindingId === helperBinding,
+        operation.kind === "call" &&
+        operation.target?.kind === "dynamic" &&
+        operation.tail === true,
     );
-    assert.equal(helperReads.length, 1);
-    const helperRead = helperReads[0];
-    assert.ok(helperRead != null);
-    assert.equal(
-      setterOperations.filter(
+    assert.equal(tailCalls.length, 1);
+    const operationById = new Map(
+      setterOperations.map((operation) => [operation.id, operation]),
+    );
+    const producers = (value: number): readonly number[] => {
+      if (operationById.has(value)) return [value];
+      const joinBlock = setter.blocks.find((block) =>
+        block.parameters?.includes(value),
+      );
+      assert.ok(joinBlock != null, `%${value} has a producer`);
+      const index = joinBlock.parameters?.indexOf(value) ?? -1;
+      return setter.blocks.flatMap((block) => {
+        const terminator = block.terminator;
+        if (terminator.kind !== "jump" || terminator.target !== joinBlock.id) {
+          return [];
+        }
+        const incoming = terminator.values?.[index];
+        assert.ok(incoming != null);
+        return producers(incoming);
+      });
+    };
+    const namesHelper = (value: number | undefined): boolean => {
+      const operation = value == null ? undefined : operationById.get(value);
+      return (
+        operation?.kind === "constant" &&
+        operation.constant?.kind === "string" &&
+        operation.constant.value === helper.name
+      );
+    };
+    const globalRecord = (value: number | undefined): boolean => {
+      const operation = value == null ? undefined : operationById.get(value);
+      return (
+        operation?.kind === "global-environment" &&
+        namesHelper(operation.arguments[0])
+      );
+    };
+    const callee = tailCalls[0]?.arguments[0];
+    assert.ok(callee != null);
+    const sources = producers(callee).map((id) => operationById.get(id)!);
+    assert.ok(
+      sources.some(
         (operation) =>
-          operation.kind === "call" &&
-          operation.target?.kind === "dynamic" &&
-          operation.arguments[0] === helperRead.id &&
-          operation.tail === true,
-      ).length,
-      1,
-      "the inherited setter tail-calls the exact original helper",
+          operation.kind === "property-get" &&
+          globalRecord(operation.arguments[0]) &&
+          namesHelper(operation.arguments[1]),
+      ),
+      "the generic path gets the helper's name from the global record",
     );
-    const start = emitted.source.indexOf(
-      `static OseoResult oseo_function_${setter.id}(\n`,
+    for (const operation of sources) {
+      assert.ok(
+        ((operation.kind === "property-get" ||
+          operation.kind === "load-fixed-slot") &&
+          globalRecord(operation.arguments[0]) &&
+          (operation.kind === "load-fixed-slot" ||
+            namesHelper(operation.arguments[1]))) ||
+          (operation.kind === "read" &&
+            operation.detail === `*missing intrinsic:${helper.name}*`),
+        "the inherited setter tail-calls the exact original helper",
+      );
+    }
+    // A program above the backend's body-unit threshold gives its functions
+    // external linkage and a source-name prefix. The host build's global
+    // record lookups put this Script above it under the enabled policy;
+    // the definition is otherwise unchanged.
+    const start = emitted.source.search(
+      new RegExp(
+        String.raw`^(?:static OseoResult |OseoResult \w+_)` +
+          String.raw`oseo_function_${setter.id}\(\n`,
+        "mu",
+      ),
     );
     assert.ok(start >= 0);
     const body = emitted.source.slice(
