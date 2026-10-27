@@ -1305,9 +1305,10 @@ mise run test:property:extended:native:shard --shard 1/1 \
 ~~~~
 
 The property file, its model, the seed registry and the test kit are
-unchanged since `20d6119b`, so seeds `0x60008d00` and `0x60008d01`, 120
-cases per domain, scale 10, large size, policies, false hints, guard misses,
-forced collection and deadlines are the original ones. The wrapper selected
+unchanged since `20d6119b`. The stock task again retained scale 10, large
+size, shared seed 1592590339, namespace seed inputs `0x60008d00` and
+`0x60008d01`, and 120 cases per domain, with the original policies, false
+hints, guard misses, forced collection and deadlines. The wrapper selected
 this single file with one worker; both registrations passed, with no
 failures, skips, cancellations or TODOs.
 
