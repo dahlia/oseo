@@ -73,7 +73,8 @@
  * These are unmeasured scheduling estimates, not matching-host costs.
  *
  * Host Script bindings use a complete local Linux extended two-case sum
- * at `20d6119b`; the earlier `ab8d5d5c` result stays source-qualified.
+ * at `ce8ae0c8`; the earlier `20d6119b` and `ab8d5d5c` results stay
+ * source-qualified.
  * macOS preserves its prior unknown-file assignment of 296 seconds as
  * an explicitly unmeasured placeholder. See U6 provenance.
  * All other Main entries and partition rules remain unchanged. See U6.
