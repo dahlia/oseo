@@ -2905,6 +2905,35 @@ OseoResult oseo_internal_tail_call(
 void oseo_internal_tail_call_release(OseoContext *context);
 
 /*
+ * Live strings of at most OSEO_STRING_TABLE_MAX_UNITS code units that the
+ * context has allocated, which later requests for the same units share
+ * instead of allocating again. A string is immutable and can be neither a
+ * WeakRef target nor a weak collection key, so sharing one is not
+ * observable. Property names dominate these requests: every function's
+ * `length` and `name` keys, iterator result keys, array index keys, and
+ * generated literals. Entries are weak: the table roots nothing, and each
+ * collection drops the entries whose strings it frees. `entries` and
+ * `hashes` are parallel arrays in insertion order. `slots` is an
+ * open-addressing index whose nonzero values are one plus an entry
+ * position; its capacity is a power of two at least twice `count`.
+ * Defined in runtime_string.c.
+ */
+#define OSEO_STRING_TABLE_MAX_UNITS 32u
+typedef struct {
+    OseoValue *entries;
+    uint32_t *hashes;
+    size_t count;
+    size_t capacity;
+    uint32_t *slots;
+    size_t slot_capacity;
+} OseoStringTable;
+
+/* Drops entries whose strings are unmarked; runs before the sweep. */
+void oseo_internal_string_table_sweep(OseoContext *context);
+/* Frees the context's string table during context destruction. */
+void oseo_internal_string_table_release(OseoContext *context);
+
+/*
  * Prepares one realm's state and releases the caches it owns. Realm
  * initialization takes the next process-wide realm ordinal, which seeds
  * the realm's Math.random. Defined in runtime_core.c.

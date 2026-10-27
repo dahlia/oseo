@@ -1198,6 +1198,30 @@ Root scanning and weak-edge phase order remain unchanged. This is a
 source-only candidate; native correctness and workload benefit remain
 unmeasured.
 
+The `m5-140` ABI adds one private string-table pointer to the context.
+A string of at most 32 code units that the context allocates is recorded
+in the table, and while that string lives, a later request for the same
+code units returns it instead of allocating, publishing, or reaching a
+safepoint. Strings are immutable and cannot be WeakRef targets or weak
+collection keys, so the sharing is not observable. The table is weak: it
+roots nothing, and each collection removes the entries of the strings its
+sweep frees after marking is final, so an unrooted heap still collects to
+empty. Table growth uses the ordinary allocator without a safepoint,
+counts no allocation attempt, and on failure only leaves a string unshared.
+Context destruction releases the table. `oseo_function_create` keeps its
+own name and key strings out of the specialization allocation count
+whether the table shares them or not.
+
+`oseo_iterator_next` performs a step whose captured next method is the
+intrinsic `%ArrayIteratorPrototype%.next` and whose receiver is an array
+iterator without creating the iterator result object. It enters the next
+method's realm and one call level as [[Call]] would, and performs the same
+`length` and element `Get` steps in the same order. The skipped object
+would be fresh, with own `done` and `value` data properties, so
+IteratorComplete and IteratorValue observe nothing else. Any other next
+method, including a replacement installed before GetIterator read it,
+takes the generic path.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or

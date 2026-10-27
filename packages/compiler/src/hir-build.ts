@@ -81,11 +81,15 @@ export function sourceDiagnostic(
 
 function findBinding(
   scopes: readonly Map<string, Binding>[],
+  state: ResolveState,
   name: string,
 ): Binding | undefined {
   for (let index = scopes.length - 1; index >= 0; index -= 1) {
     const binding = scopes[index]?.get(name);
-    if (binding != null) return binding;
+    if (binding != null) {
+      state.referencedBindingIds.add(binding.id);
+      return binding;
+    }
   }
   return undefined;
 }
@@ -112,6 +116,7 @@ function resolveName(
     const binding = scope.get(name);
     if (binding != null) {
       if (scope === state.scriptScope) state.globalReferences?.add(name);
+      state.referencedBindingIds.add(binding.id);
       return { binding, objectBindingIds };
     }
     const objectBindingId = state.withScopes.get(scope);
@@ -615,7 +620,7 @@ function resolvePrivateName(
   scopes: readonly Map<string, Binding>[],
   state: ResolveState,
 ): HirPrivateName | undefined {
-  const binding = findBinding(scopes, name);
+  const binding = findBinding(scopes, state, name);
   if (binding == null) {
     state.diagnostics.push(
       sourceDiagnostic(
@@ -2403,6 +2408,20 @@ function resolveFunction(
   state.labels.push(...outerLabels);
   state.thisBinding = outerThisBinding;
   state.strict = outerStrict;
+  const bodyBindingIds = declaredHirBindingIds(body);
+  // FunctionDeclarationInstantiation creates the object only to
+  // initialize this binding. Unless a reference, including one from a
+  // nested arrow, resolved to it or the body redeclares it, nothing can
+  // observe the object, so the function neither creates it nor
+  // allocates the binding's cell.
+  if (
+    argumentsBinding != null &&
+    !state.referencedBindingIds.has(argumentsBinding.id) &&
+    !bodyBindingIds.includes(argumentsBinding.id)
+  ) {
+    parameterScope.delete("arguments");
+    argumentsBinding = undefined;
+  }
   // CreateMappedArgumentsObject is reachable only from
   // FunctionDeclarationInstantiation's non-strict, simple-parameter-list
   // branch; every other eligible form takes the unmapped snapshot.
@@ -2450,7 +2469,7 @@ function resolveFunction(
         ...Array.from(parameterScope.values(), (binding) => binding.id),
         ...(selfBinding == null ? [] : [selfBinding.id]),
         ...(derivedThisBinding == null ? [] : [derivedThisBinding.bindingId]),
-        ...declaredHirBindingIds(body),
+        ...bodyBindingIds,
       ]),
     ],
     name: functionValue.name ?? `<anonymous-${id}>`,
@@ -3491,7 +3510,7 @@ function resolveForInTarget(
     return pattern == null ? undefined : { ...target, pattern };
   }
   if (target.kind === "declaration") {
-    const binding = declaredBinding ?? findBinding(scopes, target.name);
+    const binding = declaredBinding ?? findBinding(scopes, state, target.name);
     if (binding == null) {
       state.diagnostics.push(
         sourceDiagnostic(
@@ -3629,7 +3648,7 @@ function resolveStatement(
     const initializer = resolveExpression(statement.initializer, scopes, state);
     const binding =
       statement.kind === "binding-init"
-        ? findBinding(scopes, statement.name)
+        ? findBinding(scopes, state, statement.name)
         : scopes.at(-1)?.get(statement.name);
     if (binding == null || initializer == null) return undefined;
     return {
@@ -3919,7 +3938,7 @@ function resolveStatement(
         if (declaration.kind === "binding") {
           const binding =
             declaration.declarationKind === "var"
-              ? findBinding(scopes, declaration.name)
+              ? findBinding(scopes, state, declaration.name)
               : forScope.get(declaration.name);
           if (binding == null) return undefined;
           declarations.push({
@@ -4114,7 +4133,7 @@ function resolveStatement(
     let target: HirForOfTarget | undefined;
     if (statement.target.kind === "declaration") {
       const binding =
-        declaredBinding ?? findBinding(scopes, statement.target.name);
+        declaredBinding ?? findBinding(scopes, state, statement.target.name);
       if (binding == null) {
         state.diagnostics.push(
           sourceDiagnostic(
@@ -4486,6 +4505,7 @@ export function buildSeededHir(
     strict: program.strict === true,
     withFallbacks: [],
     withInitializingFallbackNames: new Set(),
+    referencedBindingIds: new Set(),
     withScopes: new Map(),
   };
   predeclareBindings(

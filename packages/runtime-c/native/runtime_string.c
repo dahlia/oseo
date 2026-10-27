@@ -33,6 +33,124 @@ OseoResult oseo_internal_validate_string_length(
     return normal(oseo_undefined());
 }
 
+/* FNV-1a over the code units, for the string table's index. */
+static uint32_t string_table_hash(const uint16_t *units, size_t length) {
+    uint32_t hash = UINT32_C(2166136261);
+    for (size_t index = 0u; index < length; index += 1u) {
+        hash = (hash ^ (uint32_t)units[index]) * UINT32_C(16777619);
+    }
+    return hash;
+}
+
+/* Returns the shared string with exactly these units, or zero. */
+static OseoValue string_table_find(
+    const OseoStringTable *table,
+    uint32_t hash,
+    const uint16_t *units,
+    size_t length
+) {
+    if (table == NULL || table->slot_capacity == 0u) return 0u;
+    size_t mask = table->slot_capacity - 1u;
+    for (size_t slot = hash & mask;; slot = (slot + 1u) & mask) {
+        uint32_t position = table->slots[slot];
+        if (position == 0u) return 0u;
+        OseoValue entry = table->entries[position - 1u];
+        const OseoString *string = string_object(entry);
+        if (string->length == length &&
+            (length == 0u ||
+             memcmp(string->units, units, length * sizeof(uint16_t)) == 0)) {
+            return entry;
+        }
+    }
+}
+
+/* Places entry `position` in an index with at least one empty slot. */
+static void string_table_index(OseoStringTable *table, size_t position) {
+    size_t mask = table->slot_capacity - 1u;
+    size_t slot = table->hashes[position] & mask;
+    while (table->slots[slot] != 0u) slot = (slot + 1u) & mask;
+    table->slots[slot] = (uint32_t)(position + 1u);
+}
+
+/* Rebuilds the index of a table whose entries moved. */
+static void string_table_reindex(OseoStringTable *table) {
+    memset(table->slots, 0, table->slot_capacity * sizeof(*table->slots));
+    for (size_t position = 0u; position < table->count; position += 1u) {
+        string_table_index(table, position);
+    }
+}
+
+/*
+ * Shares a freshly published string. Growth uses the ordinary allocator
+ * without a safepoint, and a failed growth only leaves the string
+ * unshared, so neither path changes what the caller observes.
+ */
+static void string_table_insert(
+    OseoContext *context,
+    OseoValue value,
+    uint32_t hash
+) {
+    OseoStringTable *table = context->string_table;
+    if (table == NULL) {
+        table = calloc(1u, sizeof(*table));
+        if (table == NULL) return;
+        context->string_table = table;
+    }
+    if (table->count == UINT32_MAX - 1u) return;
+    if (table->count == table->capacity) {
+        size_t capacity = table->capacity == 0u ? 64u : table->capacity * 2u;
+        if (capacity > SIZE_MAX / sizeof(OseoValue)) return;
+        OseoValue *entries =
+            realloc(table->entries, capacity * sizeof(*entries));
+        if (entries == NULL) return;
+        table->entries = entries;
+        uint32_t *hashes = realloc(table->hashes, capacity * sizeof(*hashes));
+        if (hashes == NULL) return;
+        table->hashes = hashes;
+        table->capacity = capacity;
+    }
+    if ((table->count + 1u) * 2u > table->slot_capacity) {
+        size_t slot_capacity =
+            table->slot_capacity == 0u ? 128u : table->slot_capacity * 2u;
+        if (slot_capacity > SIZE_MAX / sizeof(uint32_t)) return;
+        uint32_t *slots = calloc(slot_capacity, sizeof(*slots));
+        if (slots == NULL) return;
+        free(table->slots);
+        table->slots = slots;
+        table->slot_capacity = slot_capacity;
+        string_table_reindex(table);
+    }
+    table->entries[table->count] = value;
+    table->hashes[table->count] = hash;
+    string_table_index(table, table->count);
+    table->count += 1u;
+}
+
+void oseo_internal_string_table_sweep(OseoContext *context) {
+    OseoStringTable *table = context->string_table;
+    if (table == NULL) return;
+    size_t kept = 0u;
+    for (size_t position = 0u; position < table->count; position += 1u) {
+        if (!heap_object(table->entries[position])->marked) continue;
+        table->entries[kept] = table->entries[position];
+        table->hashes[kept] = table->hashes[position];
+        kept += 1u;
+    }
+    if (kept == table->count) return;
+    table->count = kept;
+    string_table_reindex(table);
+}
+
+void oseo_internal_string_table_release(OseoContext *context) {
+    OseoStringTable *table = context->string_table;
+    if (table == NULL) return;
+    free(table->entries);
+    free(table->hashes);
+    free(table->slots);
+    free(table);
+    context->string_table = NULL;
+}
+
 OseoResult oseo_internal_allocate_string(
     OseoContext *context,
     const uint16_t *units,
@@ -40,6 +158,13 @@ OseoResult oseo_internal_allocate_string(
 ) {
     OseoResult valid = oseo_internal_validate_string_length(context, length);
     if (valid.status != OSEO_STATUS_NORMAL) return valid;
+    bool shareable = length <= OSEO_STRING_TABLE_MAX_UNITS;
+    uint32_t hash = shareable ? string_table_hash(units, length) : 0u;
+    if (shareable) {
+        OseoValue shared =
+            string_table_find(context->string_table, hash, units, length);
+        if (shared != 0u) return normal(shared);
+    }
     if (length > (SIZE_MAX - sizeof(OseoString)) / sizeof(uint16_t)) {
         return failure(context, "OSEO2001", "String allocation is too large.");
     }
@@ -50,8 +175,12 @@ OseoResult oseo_internal_allocate_string(
     }
     object->length = length;
     if (length > 0u) memcpy(object->units, units, length * sizeof(uint16_t));
-    return oseo_internal_publish_heap(
+    OseoResult published = oseo_internal_publish_heap(
         context, &object->header, OSEO_HEAP_STRING);
+    if (published.status == OSEO_STATUS_NORMAL && shareable) {
+        string_table_insert(context, published.value, hash);
+    }
+    return published;
 }
 
 OseoResult oseo_string_from_units(

@@ -1476,6 +1476,13 @@ export interface ResolveState {
    */
   readonly withInitializingFallbackNames: Set<string>;
   /**
+   * Every binding a name reference has resolved to so far, read or
+   * written. A function whose implicit `arguments` binding never appears
+   * here, and that declares no `arguments` of its own, skips creating the
+   * object: the profile rejects direct eval, so no other path reaches it.
+   */
+  readonly referencedBindingIds: Set<number>;
+  /**
    * Hidden fallback bindings owned by each currently resolved `with`
    * statement, ordered outermost first.
    */

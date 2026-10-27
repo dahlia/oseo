@@ -2033,20 +2033,16 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (fixture.name === "specialization-hit" && mode === "enabled") {
-            // The function and its environment allocate six objects. The
-            // Script global record contributes the eleven standard-object
-            // and value-property allocations plus forty-three admitted
-            // standard global property names shared by every Script, with
-            // Proxy adding one allocation in each group and Date, JSON,
-            // and Set adding only their property names, because the
-            // observation excludes the allocations of their intrinsic
-            // builds. The twelve concrete TypedArray constructors add
-            // twelve property-name allocations, SharedArrayBuffer and
-            // Atomics add one each, WeakMap, WeakSet, WeakRef, and
-            // FinalizationRegistry add four more, the global object's own
-            // `globalThis` property adds its name, and so does `%eval%`'s
-            // global `eval` property (ADR 0027).
-            assert.equal(native.counters.allocations, 69);
+            // The Script global record allocates the global object and
+            // the names of its `Infinity`, `undefined`, and `globalThis`
+            // properties. Every other standard global name is already a
+            // live string from its intrinsic build, whose allocations the
+            // observation excludes, so the runtime shares it. The
+            // function's own keys stay outside the count, and `add` reads
+            // no `arguments`, so it creates no arguments object. Its
+            // source text, longer than the 32 code units the runtime
+            // shares, is the fifth allocation.
+            assert.equal(native.counters.allocations, 5);
             assert.equal(native.counters.genericAdditionCalls, 0);
           }
           if (fixture.name === "unused-function") {

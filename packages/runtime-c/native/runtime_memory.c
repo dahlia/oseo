@@ -749,6 +749,9 @@ void oseo_collect(OseoContext *context) {
     if (context->finalization_registry_count != 0u) {
         compact_finalization_registries(context);
     }
+    /* Marking is final here, so the table forgets exactly the strings the
+     * sweep below frees. */
+    oseo_internal_string_table_sweep(context);
     OseoHeapObject **link = &context->objects;
     while (*link != NULL) {
         OseoHeapObject *object = *link;

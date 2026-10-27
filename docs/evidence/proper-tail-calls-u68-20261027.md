@@ -277,3 +277,65 @@ records the natural exit, source proofs and two empty drains. Root audited the
 raw counts and promotions before the result commit. This Full is not a
 candidate/Main gate pass and supplies no macOS execution. Root owns affected
 review and exact candidate/Main gates.
+
+
+Native fixture cost on the TCO result
+-------------------------------------
+
+Candidate CI run 40465633091 for `1149964d` exceeded the 45-minute limit of
+`host C sanitizers (Linux, 2/3)`. Its progress log gives the
+`proper-tail-calls` native fixture 896.7 seconds of disabled-policy
+preparation, build and execution and 894.4 enabled seconds; the same shard
+took 11.3 minutes in total on Main `6aab0fc8`. The fixture's program, its
+1,500-step chains, `grow(300)`, both policies and collection at every
+safepoint are unchanged below.
+
+On result source `722cdd8c`, a one-fixture driver timed each step through
+the heavy lock on Linux AMD64. With `/usr/bin/clang-22` 22.1.8 and the
+host-cc ASan/UBSan flags, disabled-policy C generation took 0.09 seconds,
+runtime compilation and archiving 12.9, the final compile and link 1.65,
+and execution 475.0. Stock Zig 0.16.0 executed the policies in 587.8 and
+591.4 seconds. Execution performed 1,213,914 forced collections for 757,665
+counted allocations, so the cost was the number of safepoints times the
+live heap each collection traced, not generated-C size or build time.
+
+An instrumented, unsanitized copy of the same program sampled the
+collector. Live heap averaged 15,224 objects per collection and peaked at
+32,625; strings were 54% of them. Arguments objects that no code read
+caused 36% of the collections, each with fresh `"0"`, `length` and
+`callee` key strings. Array iteration in `grow(300)` caused 33%: every
+spread element made an iterator result, its property table, fresh `value`
+and `done` keys for the result and for each read of it, and two index
+keys. Those collections ran after the fixture's 1,500 closures were
+retained; with arguments objects already elided, that raised the live
+heap from about 4,600 to 23,000 objects.
+
+Three generic changes remove that work without changing what a program
+observes. A function whose body, including nested arrows, never resolves
+`arguments` and never redeclares it creates no arguments object or binding
+cell; the profile rejects direct eval. Runtime ABI `m5-140` shares each
+live string of at most 32 code units through a weak per-context table, so
+property names and index keys are allocated once while they live. An
+iterator step through the intrinsic `%ArrayIteratorPrototype%.next` on an
+array iterator enters the callee realm and one call level, performs the
+same `length` and element `Get` steps, and skips only the fresh result
+object, whose own `done` and `value` data properties nothing can observe.
+A replaced `next` keeps the generic path.
+
+After the change the same driver measured 32.1 and 32.2 seconds of
+sanitizer execution and 43.4 and 43.0 seconds under Zig, each with 265,038
+forced collections and output matching Node.js. The original
+`mise run test:sanitizer:native --shard 23/186`, which selects this fixture
+and `specialization-hit`, completed in 91.0 seconds; the TCO fixture took
+34.5 and 35.5 seconds with every original assertion, both reference
+engines and the `collections > 0` check. Hosted CI took 1.83 times the
+local sanitizer time before the change, which projects about two minutes
+for this fixture; that is a projection, not a CI observation.
+
+`specialization-hit` now counts 5 allocations instead of 69: standard
+global names are live strings the realm shares, and `add` creates no
+arguments object. The raw step logs and profiles are under
+*/data/m5c-tco-native-cost-20261027/*. These changes alter compiler and
+runtime execution inputs after the reviewed-corpus Full above, so its
+observations need a new reuse decision or a new Full before they describe
+this source.

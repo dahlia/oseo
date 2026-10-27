@@ -661,6 +661,13 @@ struct OseoContext {
      * pending.
      */
     void *tail_call;
+    /*
+     * Live short strings this context shares instead of allocating again,
+     * NULL until the first one. The private table layout stays behind
+     * this public generated-code boundary; its entries are weak, and each
+     * collection forgets the strings it frees.
+     */
+    void *string_table;
     const char *source_id;
     size_t source_id_length;
     const char *error_code;

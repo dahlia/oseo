@@ -43,6 +43,12 @@ scope:
     29,901 reviewed paths and promoted exactly the two owned strict
     tagged-template paths from unsupported to pass, with no demotion. It is
     no candidate/Main gate pass and no macOS execution."
+  - "The native fixture's forced-collection cost was reduced without
+    changing its program, depths, policies or safepoint collection: unread
+    arguments objects are not created, runtime ABI m5-140 shares live short
+    strings through a weak table, and intrinsic array iterator steps skip
+    their unobservable result object. These execution-input changes follow
+    the Full above, which needs a new reuse decision or a new Full."
 owners:
   - PLAN-M5C.md
 evidence:
@@ -51,6 +57,7 @@ evidence:
     references:
       - tests/native/fixtures/proper-tail-calls.ts
       - tests/proper-tail-calls.test.ts
+      - tests/allocation-paths.test.ts
   fixed:
     status: covered
     references:
@@ -63,6 +70,7 @@ evidence:
     references:
       - tests/property/m5-proper-tail-calls.property.test.ts
       - tests/fixtures/runtime-tail-calls.c
+      - tests/fixtures/runtime-string-table.c
       - tests/tco-generator-interop.test.ts
   generated:
     status: covered

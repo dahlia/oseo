@@ -1473,16 +1473,14 @@ OseoResult oseo_function_create(
         static const uint16_t length_name[] = {
             'l', 'e', 'n', 'g', 't', 'h',
         };
+        size_t counted = context->allocations;
         result = oseo_internal_allocate_string(
             context,
             length_name,
             sizeof(length_name) / sizeof(*length_name)
         );
         frame.slots[3] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL &&
-            context->observe_specialization && context->allocations > 0u) {
-            context->allocations -= 1u;
-        }
+        context->allocations = counted;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoPropertyAttributes attributes = {true, false, false, false};
@@ -1496,53 +1494,45 @@ OseoResult oseo_function_create(
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         static const uint16_t name_name[] = {'n', 'a', 'm', 'e'};
+        size_t counted = context->allocations;
         result = oseo_internal_allocate_string(
             context,
             name_name,
             sizeof(name_name) / sizeof(*name_name)
         );
         frame.slots[4] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL &&
-            context->observe_specialization && context->allocations > 0u) {
-            context->allocations -= 1u;
-        }
+        context->allocations = counted;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         tag_of(frame.slots[5]) == OSEO_TAG_UNDEFINED) {
+        size_t counted = context->allocations;
         result =
             oseo_internal_allocate_string(context, name_units, name_length);
         frame.slots[5] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL &&
-            context->observe_specialization && context->allocations > 0u) {
-            context->allocations -= 1u;
-        }
+        context->allocations = counted;
     }
     /* SetFunctionName wraps a symbol key's description in brackets,
      * producing "[description]", or an empty name for a
      * descriptionless symbol. */
     if (result.status == OSEO_STATUS_NORMAL && is_symbol(frame.slots[5])) {
+        size_t counted = context->allocations;
         result = oseo_internal_symbol_name(context, frame.slots[5]);
         frame.slots[5] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL &&
-            context->observe_specialization && context->allocations > 0u) {
-            context->allocations -= 1u;
-        }
+        context->allocations = counted;
     }
     if (result.status == OSEO_STATUS_NORMAL && !is_string(frame.slots[5])) {
         result = failure(context, "OSEO2001", "Invalid function name.");
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         name_prefix != OSEO_FUNCTION_NAME_PREFIX_NONE) {
+        size_t counted = context->allocations;
         result = accessor_function_name(
             context,
             frame.slots[5],
             name_prefix == OSEO_FUNCTION_NAME_PREFIX_SET
         );
         frame.slots[5] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL &&
-            context->observe_specialization && context->allocations > 0u) {
-            context->allocations -= 1u;
-        }
+        context->allocations = counted;
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         OseoPropertyAttributes attributes = {true, false, false, false};
@@ -1564,16 +1554,14 @@ OseoResult oseo_function_create(
         static const uint16_t constructor_name[] = {
             'c', 'o', 'n', 's', 't', 'r', 'u', 'c', 't', 'o', 'r',
         };
+        size_t counted = context->allocations;
         result = oseo_internal_allocate_string(
             context,
             constructor_name,
             sizeof(constructor_name) / sizeof(*constructor_name)
         );
         frame.slots[6] = result.value;
-        if (result.status == OSEO_STATUS_NORMAL &&
-            context->observe_specialization && context->allocations > 0u) {
-            context->allocations -= 1u;
-        }
+        context->allocations = counted;
     }
     if (result.status == OSEO_STATUS_NORMAL &&
         !bootstrapping_function_prototype &&
