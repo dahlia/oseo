@@ -107044,6 +107044,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107055,6 +107056,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107066,6 +107068,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107077,6 +107080,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107088,6 +107092,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107099,6 +107104,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107110,6 +107116,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107122,6 +107129,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107133,6 +107141,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107144,6 +107153,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107155,6 +107165,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107166,6 +107177,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107177,6 +107189,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107188,6 +107201,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107416,6 +107430,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107428,6 +107443,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -107442,6 +107458,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         iterator-protocol,
@@ -107813,6 +107830,7 @@ tests:
         functions,
         lexical-bindings,
         module-linking,
+        object-own-keys,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -108085,6 +108103,7 @@ tests:
         dynamic-source,
         functions,
         module-linking,
+        object-own-keys,
         reflect-namespace,
         symbols,
         var-bindings,
@@ -109312,6 +109331,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -109324,6 +109344,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -109337,6 +109358,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -109348,6 +109370,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -109359,6 +109382,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         dynamic-source,
         functions,
         generators,
@@ -109371,6 +109395,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         destructuring-bindings,
         dynamic-source,
         functions,
@@ -109383,6 +109408,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         destructuring-bindings,
         dynamic-source,
         functions,
@@ -109396,6 +109422,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         destructuring-bindings,
         dynamic-source,
         functions,
@@ -109407,6 +109434,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         destructuring-bindings,
         dynamic-source,
         functions,
@@ -109418,6 +109446,7 @@ tests:
     dependencies:
       [
         async-functions,
+        async-iteration,
         destructuring-bindings,
         dynamic-source,
         functions,
@@ -133400,7 +133429,7 @@ tests:
     dependencies: [dynamic-source, functions, regular-expressions]
   - path: test/language/literals/regexp/7.8.5-1gs.js
     expectedClassification: pass
-    dependencies: [regular-expressions, var-bindings]
+    dependencies: [lexical-grammar, regular-expressions, var-bindings]
   - path: test/language/literals/regexp/7.8.5-2gs.js
     expectedClassification: pass
     dependencies: [regular-expressions, var-bindings]
@@ -134739,7 +134768,7 @@ tests:
     dependencies: [module-linking]
   - path: test/language/module-code/instn-named-id-name.js
     expectedClassification: pass
-    dependencies: [dynamic-source, module-linking, var-bindings]
+    dependencies: [module-linking, var-bindings]
   - path: test/language/module-code/instn-named-iee-cycle.js
     expectedClassification: pass
     dependencies: [module-linking, var-bindings]
@@ -134781,7 +134810,7 @@ tests:
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-id-name.js
     expectedClassification: pass
-    dependencies: [dynamic-source, module-linking, var-bindings]
+    dependencies: [module-linking, var-bindings]
   - path: test/language/module-code/instn-star-iee-cycle.js
     expectedClassification: pass
     dependencies: [module-linking, var-bindings]
@@ -134920,13 +134949,21 @@ tests:
       [
         lexical-bindings,
         module-linking,
+        object-own-keys,
         reflect-namespace,
         symbols,
         var-bindings,
       ]
   - path: test/language/module-code/namespace/internals/own-property-keys-sort.js
     expectedClassification: pass
-    dependencies: [module-linking, reflect-namespace, symbols, var-bindings]
+    dependencies:
+      [
+        module-linking,
+        object-own-keys,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/module-code/namespace/internals/prevent-extensions.js
     expectedClassification: pass
     dependencies: [module-linking, reflect-namespace]
@@ -136006,6 +136043,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136017,6 +136055,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -136029,6 +136068,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136040,6 +136080,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136051,6 +136092,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136062,6 +136104,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136073,6 +136116,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -136085,6 +136129,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136096,6 +136141,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -136109,6 +136155,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136121,6 +136168,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -136132,6 +136180,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        async-iteration,
         iterator-protocol,
         lexical-bindings,
         module-linking,
@@ -137070,10 +137119,10 @@ tests:
     dependencies: [control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-block-arrow-function-assignment-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-block-arrow-function-functionbody.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-block-block-with-labels.js
     expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, dynamic-source, var-bindings]
@@ -137082,16 +137131,18 @@ tests:
     dependencies: [control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-block-expr-arrow-function-boolean-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-block-let-declaration.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, lexical-bindings, var-bindings]
   - path: test/language/statementList/eval-block-regexp-literal-flags.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [control-flow, dynamic-source, regular-expressions, var-bindings]
   - path: test/language/statementList/eval-block-regexp-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [control-flow, dynamic-source, regular-expressions, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-array-literal-with-item.js
     expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, dynamic-source, var-bindings]
@@ -137100,10 +137151,10 @@ tests:
     dependencies: [control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-arrow-function-assignment-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-arrow-function-functionbody.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-block-with-labels.js
     expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, dynamic-source, var-bindings]
@@ -137112,76 +137163,99 @@ tests:
     dependencies: [control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-expr-arrow-function-boolean-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-let-declaration.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, lexical-bindings, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-regexp-literal-flags.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [control-flow, dynamic-source, regular-expressions, var-bindings]
   - path: test/language/statementList/eval-block-with-statment-regexp-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [control-flow, dynamic-source, regular-expressions, var-bindings]
   - path: test/language/statementList/eval-class-array-literal-with-item.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [classes, control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-class-array-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [classes, control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-class-arrow-function-assignment-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [classes, control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-class-arrow-function-functionbody.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [classes, control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-class-block-with-labels.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [classes, control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-class-block.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [classes, control-flow, dynamic-source, var-bindings]
   - path: test/language/statementList/eval-class-expr-arrow-function-boolean-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [classes, control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-class-let-declaration.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [classes, control-flow, dynamic-source, lexical-bindings, var-bindings]
   - path: test/language/statementList/eval-class-regexp-literal-flags.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [classes, control-flow, dynamic-source, regular-expressions, var-bindings]
   - path: test/language/statementList/eval-class-regexp-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [classes, control-flow, dynamic-source, regular-expressions, var-bindings]
   - path: test/language/statementList/eval-fn-array-literal-with-item.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-fn-array-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-fn-arrow-function-assignment-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-fn-arrow-function-functionbody.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-fn-block-with-labels.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-fn-block.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-fn-expr-arrow-function-boolean-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies: [control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/statementList/eval-fn-let-declaration.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [control-flow, dynamic-source, functions, lexical-bindings, var-bindings]
   - path: test/language/statementList/eval-fn-regexp-literal-flags.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [
+        control-flow,
+        dynamic-source,
+        functions,
+        regular-expressions,
+        var-bindings,
+      ]
   - path: test/language/statementList/eval-fn-regexp-literal.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [control-flow, dynamic-source, var-bindings]
+    dependencies:
+      [
+        control-flow,
+        dynamic-source,
+        functions,
+        regular-expressions,
+        var-bindings,
+      ]
   - path: test/language/statementList/fn-array-literal-with-item.js
     expectedClassification: pass
     dependencies: [control-flow, functions]
