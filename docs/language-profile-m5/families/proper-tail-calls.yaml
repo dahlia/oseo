@@ -35,10 +35,14 @@ scope:
   - "Current source preparation carries final f5bdd44d compiler/runtime,
     programs, assertions and stable generators onto Reg publication candidate
     98460f7c. Reg observations, all per-path expectations and ledger owners
-    remain exact that candidate; the two TCO expectations are not promoted.
-    The source list admits tail-call-optimization, but no fresh Full or
-    native execution of this composition is claimed. Earlier U68 and f5
-    evidence keeps its exact source and scope in the evidence contract."
+    remained exact that candidate at preparation, without promoting the two
+    TCO expectations. The source list admits tail-call-optimization. Earlier
+    U68 and f5 evidence keeps its exact source and scope in the evidence
+    contract."
+  - "The later Full on accepted U e2dba363, tree add0cbfc, observed all
+    29,901 reviewed paths and promoted exactly the two owned strict
+    tagged-template paths from unsupported to pass, with no demotion. It is
+    no candidate/Main gate pass and no macOS execution."
 owners:
   - PLAN-M5C.md
 evidence:

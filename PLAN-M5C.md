@@ -2066,8 +2066,9 @@ and ABI `m5-139` retain final f5 source. The separate leaf proposal is absent.
 The source admission adds only the original U`68e298a9`
 `tail-call-optimization` entry. Reg's 29,901 complete records, 450 observed
 promotions, three matcher-limit owners, 41,091 ledger paths and 11,190
-unreviewed reservations stay exact. Both TCO path expectations remain
-unsupported until a new Full actually observes promotions. No historical
+unreviewed reservations stayed exact at source preparation. Both TCO path
+expectations then remained unsupported until a new Full actually observed
+promotions. No historical
 R`7cb0ce0d` output or publication state is transplanted. The approved
 sanitizer property job backstop remains 60 minutes; ordinary fixture
 limits, seeds, budgets, depths and shard totals remain unchanged.
@@ -2076,3 +2077,15 @@ The evidence contract records source-bound f5 author checks and their
 limits. They did not run on this composition. New implementation inputs
 require fresh Full observations under D3; Root owns the actual decision,
 execution, affected independent review and publication.
+
+After Root accepted the source review of U`e2dba363`, one unchanged
+`mise run test262:update -- --accept-promotions` ran on that clean source
+from 2026-10-27T04:28:26Z to 06:22:20Z and exited zero. It observed all
+29,901 reviewed paths: 26,054 pass, 2,802 expected negatives and 1,045
+unsupported, with zero retries. Exactly the two owned tagged-template paths
+were promoted from unsupported to pass, with no demotion. The result commit
+keeps that output unchanged and derives ledger ownership, batch counts and
+the graph baseline from it; the node stays unlanded pending affected review
+and exact candidate/Main gates. The
+[TCO evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md)
+records the raw packet and limits.

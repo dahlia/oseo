@@ -242,7 +242,38 @@ These are source-bound author executions, distinct from any optional
 reviewer-overlay probe. They did not execute the later source composition
 on Reg candidate `98460f7c`. The historical U68 Full and R`7cb0ce0d`, the
 failed C`32363a70`/CI40421004911 and the f5 author evidence keep their exact
-sources and outcomes. The composed source retains Reg's complete records
-and TCO unsupported expectations pending an actual new Full; source
-admission predicts no promotion. Root owns fresh D3/Full, affected review
-and exact candidate/Main gates.
+sources and outcomes. At source preparation, the composed source retained
+Reg's complete records and TCO unsupported expectations pending an actual
+new Full; source admission predicted no promotion.
+
+
+Full reviewed-corpus observation on the Reg composition
+-------------------------------------------------------
+
+After Root accepted the source review of U`e2dba363`, tree
+`add0cbfc57c38c22fcca3b3a66ad06e62216d948`, the same whole command ran
+once on that clean source:
+
+~~~~ sh
+mise run test262:update -- --accept-promotions
+~~~~
+
+It ran from 2026-10-27T04:28:26.260071Z to 06:22:20.206408Z and completed
+naturally with exit zero after 6,833.946249858 wrapper seconds. The runner
+reported target `linux-x86_64-gnu`, suite revision
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`, the stock eight-worker pool and
+zero retries. It observed all 29,901 reviewed paths: 26,054 pass, 2,802
+expected negatives and 1,045 unsupported. The only promotions were
+*test/language/expressions/tagged-template/tco-call.js* and *tco-member.js*,
+from unsupported to pass, with no demotion. Their records retain the
+*tcoHelper.js* include and both strict specialization policies. The five
+generated files are preserved unchanged as the result commit's manifest
+output; the closure ledger, observation batch counts and graph baseline are
+derived from it.
+
+The
+[raw packet](/data/m5c-tco-on-reg-source-20261027/task_a3465c4fec88/ctx_4892b5f41887/full-update-unarmed/RESULT.json)
+records the natural exit, source proofs and two empty drains. Root audited the
+raw counts and promotions before the result commit. This Full is not a
+candidate/Main gate pass and supplies no macOS execution. Root owns affected
+review and exact candidate/Main gates.

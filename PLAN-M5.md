@@ -9354,12 +9354,17 @@ Final bitmap source `f5bdd44d` is prepared on Reg publication candidate
 `98460f7c`, based on successful Main `d4d81be9`, under D10.4. Reg remains
 prospective and TCO remains unlanded. All compiler/runtime programs and
 generators retain f5, including ABI `m5-139`; the leaf proposal is absent.
-Only the original source feature admission is carried. Reg's complete
-observations, owners and per-path expectations stay unchanged pending a
-new Full, including both unsupported TCO expectations.
+Only the original source feature admission is carried. At source
+preparation, Reg's complete observations, owners and per-path expectations
+stayed unchanged pending a new Full, including both unsupported TCO
+expectations.
 
 *PLAN-M5C.md* defines this preparation phase. The existing
 [TCO evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md)
 records f5 author execution with exact sources and one-pair timing limits.
 Those checks and the historical U68 Full did not run on this composition.
-Fresh D3/Full, affected reviews and publication remain Root-owned.
+The later Full on accepted U`e2dba363` observed all 29,901 reviewed paths
+and promoted exactly *tco-call.js* and *tco-member.js* from unsupported to
+pass, with no demotion; the
+[evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md) records it.
+Affected reviews and publication remain Root-owned.
