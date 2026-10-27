@@ -189,7 +189,10 @@ the persistent Global Environment Record like other identifier writes. A
 `const` declarator in a classic `for` head is now a recognized alias
 position, like a statement-list declarator. A `var` head inside a `with`
 statement keeps the pre-existing defect owned by
-`with-var-loop-head-resolution`.
+`with-var-loop-head-resolution`. Source `16bb5e91` passed the same nine
+focused author commands once each, with whole Host suites at fifteen
+registrations and a 596-second extended Linux weight replacing 593; its
+internal review and later gates remain pending.
 
 The literal source set cannot admit runtime-created source. Agents retain
 ADR 0026's separate precompiled source tables and contexts; this change does

@@ -1340,3 +1340,50 @@ a225e29f4af61041935ca2fac5b9e60dc01315147ca8285e69c07a62f66c9162
 These are Linux source-qualified correctness observations on `ce8ae0c8`.
 They establish no Full classification, admission or Main gate, and the
 later metadata commit that records them is not a new execution.
+
+
+Host loop-head and alias repair local Linux extended cost
+---------------------------------------------------------
+
+`16bb5e917afbe90ab050805af151a5eacfb98dac` (tree
+`cf9a53e9dae174604962a790d2374a294081b641`) resolves host Script `var` loop
+heads through the Global Environment Record and records `const` aliases in
+classic `for` heads. It changes compiled product inputs, so the 593-second
+weight above no longer describes the current source.
+
+On October 27, 2026, `16bb5e91` completed the same stock extended command
+once under the heavy lock. The property file, its model, the seed registry,
+the test kit and *mise.toml* are unchanged since `20d6119b`, so the task
+kept its scale, size, shared seed, namespace seed inputs, 120 cases per
+domain, policies, false hints, guard misses, forced collection and
+deadlines. Both registrations passed, with no failures, skips,
+cancellations or TODOs.
+
+Measured leaf durations were 367,035.592429 and 228,307.203798
+milliseconds. Their sum is 595,342.796227 milliseconds, or 595.342796227
+seconds; rounding up gives the 596-second Linux weight that replaces 593.
+Gate wall was 596.6 seconds and is not the weight. macOS remains
+unmeasured at its 296-second placeholder, every other weight is unchanged,
+and both tables keep 136 entries. This is one-run scheduling data, not a
+performance comparison or CI time.
+
+The same source passed the other eight focused vectors, each a single
+natural run: directive completion four registrations, whole Host suites
+fifteen, and runtime-owned calls eight, each under Node and Deno; ordinary
+generated domains two under each. The Host suites include the fourteen
+original subjects and the two new loop-head and alias fixtures. Raw output
+is under */data/m5c-host-script-bindings-20261027/claude-native/*, one
+*16bb5e9-NAME01/* directory per vector, with *SUMMARY-16bb5e9.json*
+recording each command, exit status, and the clean `16bb5e91` identity.
+*SHA256SUMS-16bb5e9.txt* lists every raw file's hash. The extended raw
+hashes, in stdout, stderr and gate JSON order, are:
+
+~~~~ text
+fed73b867fc80e4e913f92d21797a1d9a49240d907b1f4fac7e85472a00452de
+2b41a9c1e6e00966dd409097d2889b39142cd3ae1a2abc8803dd2f0e5baf5318
+3768137cbd2a9a553a85135f1931e7deb73690dc5a3317a6e247053eb46d47c2
+~~~~
+
+These are Linux source-qualified correctness observations on `16bb5e91`,
+made before its internal review. They establish no review verdict, Full
+classification, admission or Main gate.

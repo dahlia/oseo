@@ -9853,3 +9853,18 @@ cell, whether the `with` object supplies the name or not, so a later
 lexical declaration does not capture it there. That is the same
 pre-existing defect as the with-hit head above, owned by
 `with-var-loop-head-resolution` and not covered by this node.
+
+`16bb5e917afbe90ab050805af151a5eacfb98dac` (tree
+`cf9a53e9dae174604962a790d2374a294081b641`) completed the same nine focused
+author commands on Linux, each once under the heavy lock with natural exit
+0: directive suites four registrations, whole Host suites fifteen and
+runtime-owned-call suites eight, each under Node and Deno; ordinary
+generated domains two under each; and the extended task with its unchanged
+cases, seeds, budgets, policies, hints, guards, forced collection and
+deadlines. The extended leaf sum is 595.342796227 seconds, a 596-second
+Linux weight replacing 593; macOS remains unmeasured at 296.
+*evidence/u6/README.md* records raw paths, hashes and limits. These
+runs precede the fix's internal review: pass 8 of scope `outer2-blockers`
+against base `f3e2c1e6` could not start because the reviewer's
+authentication was revoked, and it remains pending with outer reviews,
+Full/classification, admission and exact candidate/Main gates.
