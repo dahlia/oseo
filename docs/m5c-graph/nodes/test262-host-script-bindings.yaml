@@ -14,5 +14,5 @@ delivers: "Admits the $262.evalScript and print host bindings, so the 14
   that path; no whole-path exclusion or completed coverage is claimed."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
