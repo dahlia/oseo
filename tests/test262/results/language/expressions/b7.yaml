@@ -1208,6 +1208,7 @@ results:
     classification: expected-negative
     dependencies:
       - async-functions
+      - dynamic-source
       - functions
       - promise-settlement
     observation:
@@ -1234,6 +1235,7 @@ results:
     classification: expected-negative
     dependencies:
       - async-functions
+      - dynamic-source
       - functions
       - generators
       - promise-settlement

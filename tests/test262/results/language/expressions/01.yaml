@@ -839,6 +839,7 @@ results:
     classification: expected-negative
     dependencies:
       - async-functions
+      - dynamic-source
       - functions
       - promise-settlement
     observation:

@@ -1212,6 +1212,7 @@ results:
     classification: expected-negative
     dependencies:
       - async-functions
+      - dynamic-source
       - functions
     observation:
       errorType: SyntaxError

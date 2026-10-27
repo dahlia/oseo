@@ -21220,7 +21220,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 33
     - dependency: dynamic-source
-      expectedNegatives: 114
+      expectedNegatives: 126
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 32
