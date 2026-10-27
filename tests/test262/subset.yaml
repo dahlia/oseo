@@ -93,6 +93,7 @@ supportedFeatures:
   - globalThis
   - hashbang
   - import.meta
+  - iterator-helpers
   - let
   - logical-assignment-operators
   - new.target

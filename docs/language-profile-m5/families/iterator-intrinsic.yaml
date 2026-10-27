@@ -5,7 +5,15 @@ scope:
   - "The realm-owned %Iterator% and %IteratorPrototype%, including their
     standard descriptors and prototype links."
   - "Iterator.from and the wrap-for-valid-iterator object used by iterator
-    helper methods."
+    helper methods. Iterator.from accepts a String primitive through
+    GetV and calls its iterator method with that primitive receiver;
+    other primitives retain TypeError. The fixed fixture observes replaced,
+    non-callable and abrupt String iterator lookups. The existing generated
+    domain also covers bounded strings with paired and lone surrogates,
+    preserving its seed and 12-case budget. IH-A precheck evidence and the
+    four remaining unsupported paths are recorded in
+    docs/m5c-graph/iterator-helpers-tag-activation.md; the full manifest
+    UPDATE remains Root-owned."
 owners:
   - PLAN-M5.md
 evidence:

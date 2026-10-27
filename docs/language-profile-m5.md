@@ -9902,3 +9902,23 @@ Raw evidence remains under
 Earlier source-qualified observations and pending-at-the-time statements
 remain historical. This Full supplies no candidate/Main gate, macOS
 execution, graph landing or publication; Root owns those later gates.
+
+
+Iterator helpers tag activation preparation
+-------------------------------------------
+
+M5c IH-A admits `iterator-helpers` in the reviewed feature list and removes
+an obsolete `Iterator.from` rejection of String primitives. Lookup and Call
+preserve the primitive receiver, including when a user replaces
+`String.prototype[Symbol.iterator]`; other primitives still throw
+`TypeError`. The existing Iterator intrinsic fixture and property cover
+this bounded repair under both policies and forced collection.
+
+A focused 393-path precheck observes 389 passes and four unsupported
+results. Three await IH-B's *temporalHelpers.js* harness; the fourth reaches
+the existing source-constructor boundary. Missing includes are named
+`harness-include` capabilities before assembly, not admitted harnesses.
+[The IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+records the source-bound observations. The stored manifest still describes
+the earlier source until Root's full UPDATE; no new pass, exclusion or
+landing is claimed from the feature list alone.

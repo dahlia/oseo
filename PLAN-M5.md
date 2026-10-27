@@ -9613,3 +9613,33 @@ Raw evidence remains under
 Earlier source-qualified observations and pending-at-the-time statements
 remain historical. This Full supplies no candidate/Main gate, macOS
 execution, graph landing or publication; Root owns those later gates.
+
+
+Iterator helpers feature admission preparation
+----------------------------------------------
+
+M5c IH-A admits the `iterator-helpers` tag after focused observation of
+its 393 owned reviewed paths. The first completed precheck found two
+remaining `Iterator.from` String primitive failures, despite the existing
+String iterator implementation. Root authorized removing that obsolete
+rejection: a String primitive now reaches GetV of `@@iterator` and Call
+with its primitive receiver, followed by the existing result-object check.
+Other primitives retain their TypeError; boxed strings retain their object
+receiver. No other String iteration surface changes.
+
+The existing Iterator intrinsic fixture adds empty strings, supplementary
+characters and lone surrogates, observable replacement getter/method
+receivers, non-callable/nullish methods, a primitive result and an abrupt
+getter. The existing Iterator intrinsic property adds bounded strings to
+its original wrapper domain without changing seed `0x60003400`, its
+12 cases or its 180-second limit. Both native policies and forced
+collection remain. The lazy/eager property seeds, budgets and domains are
+unchanged.
+
+The repaired focused precheck observes 389 passes and four unsupported
+results, with no failure classification. Three need the unadmitted
+*temporalHelpers.js* include and belong to IH-B; the fourth still constructs
+a function from source in another realm. The
+[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+binds the raw evidence. These are focused observations, not a regenerated
+manifest or completed publication gate.

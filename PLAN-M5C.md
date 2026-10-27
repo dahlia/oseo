@@ -2089,3 +2089,30 @@ the graph baseline from it; the node stays unlanded pending affected review
 and exact candidate/Main gates. The
 [TCO evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md)
 records the raw packet and limits.
+
+
+Iterator helpers tag activation preparation
+-------------------------------------------
+
+IH-A adds only `iterator-helpers` to `supportedFeatures`. A generic runner
+check classifies an unadmitted include as `unsupported-profile-feature`
+with capability `harness-include` before assembly; admitted includes and
+raw cases keep their existing behavior and all dependency tags remain.
+This follows ADR 0013's named-capability distinction between unavailable
+harness support and defects in an admitted harness. The include itself
+is not admitted.
+
+The first completed 393-row precheck found two semantic failures in
+`Iterator.from` for String primitives. Root authorized the bounded repair
+and its fixed/generated evidence, described in *PLAN-M5.md*. The next
+single precheck observed 389 passes and four unsupported results with
+pool eight, no retries and no failure classifications. The
+[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+records the exact paths, raw packets and remaining remediation boundaries.
+
+No stored expectation, manifest, ledger owner, exclusion or landed state
+changes here. The 393 original umbrella owners remain until Root's full
+UPDATE and resulting ownership review. The three *temporalHelpers.js*
+paths are assigned to IH-B in the notes; the source-constructor path
+remains active coverage debt pending its path audit. The feature and runner
+changes require full D3 regeneration, which Root schedules after U review.
