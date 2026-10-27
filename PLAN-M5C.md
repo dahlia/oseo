@@ -1732,13 +1732,19 @@ Each contains only the first deciding non-strict/disabled variant; no later
 strictness, policy or standard/Unicode-pattern result is inferred.
 
 Canonical ledger derivation makes the 450 passes ordinary observations.
-Only the three remaining unsupported owners then move to the blocked,
-unlanded *regexp-anchored-repeat-state-remediation* node. Its linked
-worknote preserves the bounded historical plan and qualifies its static
-undo-trail lead against unchanged matcher sources. This adds no runtime
-repair, accepted exclusion or predicted promotion. The graph remains
-56 landed, with 91 nodes, 87 ready and four blocked; existing nodes retain
-their status and landing marks. Root owns final publication state.
+At result preparation, only the three remaining unsupported owners moved
+to the then-blocked, unlanded
+*regexp-anchored-repeat-state-remediation* node. Its linked worknote
+preserves the bounded historical plan and qualifies its static undo-trail
+lead against unchanged matcher sources. This adds no runtime repair,
+accepted exclusion or predicted promotion. That result-preparation graph
+had 56 landed, 91 nodes, 87 ready and four blocked.
+
+The preserved publication candidate `98460f7c` instead records 91 nodes,
+88 ready, three blocked and 57 prospective landed marks. It marks Reg
+landed prospectively and the remediation ready and unlanded. These marks
+are not evidence of successful exact merge/Main CI; Root owns effective
+landing and final publication state.
 
 This single Linux Full is neither a current hosted-CI cost measurement nor
 a macOS observation. The 1,803 actual Reg variants are 450 times four plus

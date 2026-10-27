@@ -7222,10 +7222,13 @@ completion, and RegExp mutations, including `lastIndex`, remain observable.
 Fresh normal Full on source `6e5ebf2e` observed all 453 inherited
 helper-owned paths: 441 property-escape paths and nine CharacterClassEscapes
 paths passed all four variants. The three remaining CharacterClassEscapes
-positive subjects report `regexp-matcher-limit` and belong to the active,
-blocked *regexp-anchored-repeat-state-remediation* node. Its worknote records
-the exact subjects and bounded future evidence; no matcher repair or exclusion
-is implied. Source restoration alone established no classifications.
+positive subjects report `regexp-matcher-limit` and retain the
+*regexp-anchored-repeat-state-remediation* owner. That node was blocked at
+result preparation; the preserved Reg publication candidate marks it ready
+and unlanded. Its worknote records the exact subjects and bounded future
+evidence; no matcher repair or exclusion is implied. Source restoration
+alone established no classifications. The candidate's Reg landing mark is
+prospective until successful exact merge/Main CI.
 
 An unhandled rejection now reports the rejection
 boundary text, followed by a kind marker only when the reason itself or an
