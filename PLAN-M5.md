@@ -19,7 +19,7 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-29,901 reviewed cases: 26,067 passes, 2,802 expected negatives, and 1,032
+29,901 reviewed cases: 26,456 passes, 2,802 expected negatives, and 643
 unsupported profile features with no semantic, harness, or infrastructure
 failures. [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes
 the M5a denominator at 41,091 paths from 47,381 candidates: 22,998 language
@@ -7837,12 +7837,14 @@ with counting, throwing, or string keys, and logical, simple, and update
 controls with string keys. It has 20 ordinary cases and a 240-second
 interrupt limit. Shrinking keeps the strictness and each subject's operator,
 base, key, and bounded values. Native runs use both specialization policies
-with collection at every safepoint. Fixed cases in the same file cover every
-arithmetic operator over every base and key kind in both strictness modes,
-every control over every base, and the S11.13.2\_A7 T4 shape, a key whose
-conversions name different properties, through both `toString` and
-`Symbol.toPrimitive`, plus a member compound assignment whose right operand
-awaits, which keeps the checked base and converted key across suspension. The
+with collection at every safepoint. The fixed matrix now lives in
+*m5-compound-member-fixed.property.test.ts* and covers every arithmetic
+operator over every base and key kind in both strictness modes and every
+control over every base. The original file keeps the S11.13.2\_A7 T4
+shape, a key whose conversions name different properties, through both
+`toString` and `Symbol.toPrimitive`, plus a member compound assignment whose
+right operand awaits, which keeps the checked base and converted key across
+suspension. The
 `compound-assignments` native fixture now checks the nullish-base order for all
 twelve operators instead of the double-converting `+=` case, which moved to
 those fixed cases. The repair adds no specialized path or guard, so the
@@ -7854,19 +7856,20 @@ form and null, undefined, number, string, and object bases, and over
 `super` reads, `+=`, `||=`, and `++` with a null or ordinary home
 prototype, each with counting, throwing, string, or literal keys. It has 20
 ordinary cases and a 240-second interrupt limit, and its independent model
-labels both V8 discrepancies separately. Fixed cases run every form over
-every admitted base, key kind, and falsy, truthy, or null current value in
-both strictness modes, plus for-of and for-in heads around an iterator whose
-`return` is observed, and primitive receivers seen by a getter and a method.
-The changing-key update subject of the `update-expressions` native fixture
-and the taken logical subject of `compound-assignments` moved there
-verbatim with fixed expected values, because both observed the V8 second
-conversion; those fixtures now use string-returning keys. Slot `0x60002e00`
-of *m5-update-expression.property.test.ts* keeps its generator and budget;
-its program also prints the slot it reads, its native model expects one
-conversion that writes the slot it read, and its references must equal the
-labeled V8 model that writes the slot a second conversion selects. Every
-native run of the Reference domain and its fixed cases uses both
+labels both V8 discrepancies separately. The fixed matrix now lives in
+*m5-computed-member-fixed.property.test.ts* and runs every form over every
+admitted base, key kind, and falsy, truthy, or null current value in both
+strictness modes. The original file keeps for-of and for-in heads around
+an iterator whose `return` is observed, and primitive receivers seen by a
+getter and a method. The changing-key update subject of the
+`update-expressions` native fixture and the taken logical subject of
+`compound-assignments` moved there verbatim with fixed expected values, because
+both observed the V8 second conversion; those fixtures now use string-returning
+keys. Slot `0x60002e00` of *m5-update-expression.property.test.ts* keeps its
+generator and budget; its program also prints the slot it reads, its native
+model expects one conversion that writes the slot it read, and its references
+must equal the labeled V8 model that writes the slot a second conversion
+selects. Every native run of the Reference domain and its fixed cases uses both
 specialization policies with collection at every safepoint; the change adds no
 specialized path or guard, so the guard-fallback omission and its replacement
 evidence remain.
@@ -9613,3 +9616,48 @@ Raw evidence remains under
 Earlier source-qualified observations and pending-at-the-time statements
 remain historical. This Full supplies no candidate/Main gate, macOS
 execution, graph landing or publication; Root owns those later gates.
+
+
+Iterator helpers feature admission preparation
+----------------------------------------------
+
+M5c IH-A admits the `iterator-helpers` tag after focused observation of
+its 393 owned reviewed paths. The first completed precheck found two
+remaining `Iterator.from` String primitive failures, despite the existing
+String iterator implementation. Root authorized removing that obsolete
+rejection: a String primitive now reaches GetV of `@@iterator` and Call
+with its primitive receiver, followed by the existing result-object check.
+Other primitives retain their TypeError; boxed strings retain their object
+receiver. No other String iteration surface changes.
+
+The existing Iterator intrinsic fixture adds empty strings, supplementary
+characters and lone surrogates, observable replacement getter/method
+receivers, non-callable/nullish methods, a primitive result and an abrupt
+getter. The existing Iterator intrinsic property adds bounded strings to
+its original wrapper domain without changing seed `0x60003400`, its
+12 cases or its 180-second limit. Both native policies and forced
+collection remain. The lazy/eager property seeds, budgets and domains are
+unchanged.
+
+The repaired focused precheck observes 389 passes and four unsupported
+results, with no failure classification. Three need the unadmitted
+*temporalHelpers.js* include and belong to IH-B; the fourth still constructs
+a function from source in another realm. The
+[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+binds the raw evidence. These are focused observations, not a regenerated
+manifest or completed publication gate.
+
+
+Accepted IH-A full observation
+------------------------------
+
+Root accepted the full UPDATE on U `a678c85e`, with natural exit zero:
+all 29,901 reviewed paths were observed, yielding 26,456 passes, 2,802
+expected negatives and 643 unsupported paths. There are 389 promotions
+and no demotions or failure classifications. The three missing
+*temporalHelpers.js* paths belong to `temporal-helpers-harness` (IH-B);
+*Iterator/proto-from-ctor-realm.js* remains active non-source coverage
+debt under `dynamic-source-coverage-remediation`. Earlier focused and
+source-qualified observations remain historical. The
+[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+binds the raw Full packet; candidate/Main gates and landing remain pending.

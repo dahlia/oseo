@@ -1,0 +1,20 @@
+version: 1
+id: iterator-helpers-tag-activation
+title: Activate the iterator helpers tag
+delivers: "IH-A of the iterator-helpers split approved by the maintainer
+  decision of 2026-10-28, item 4. Admits the iterator-helpers feature tag
+  and observes the iterator-helpers paths in the derived closure ledger,
+  except the 3 paths that include temporalHelpers.js, which move to
+  temporal-helpers-harness, as
+  docs/m5c-graph/iterator-helpers-tag-activation.md records.
+  Tag activation is atomic, so the node cannot split by method; split
+  review scopes by Iterator.prototype method directory instead. If the
+  runner cannot classify a missing include as unsupported, add that
+  bounded runner change here and regenerate the full manifest. Observe
+  actual classifications, apply the reviewed exclusion-audit procedure,
+  and assign every still-unsupported path a bounded remediation or
+  authorized exclusion owner; do not predict passes."
+dependencies:
+  - unsupported-ownership-audit
+landed: true
+status: ready

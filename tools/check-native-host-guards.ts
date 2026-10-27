@@ -12,6 +12,9 @@ const nativeHelpers = new Set([
   "runNativeFixture",
   "runNativeCli",
   "withNativeFixture",
+  "assertNativeMemberReference",
+  "assertMemberReferenceCase",
+  "assertReferenceCase",
   "runNativeUnits",
   "prepareHarnessObject",
   "createTest262FragmentExecutor",
@@ -129,6 +132,20 @@ function collectImports(
             processHelpers.has(identifierName(specifier.imported) ?? "")))
       ) {
         helpers.set(local, identifierName(specifier.imported)!);
+      }
+      if (source === "fast-check") {
+        if (
+          specifier.type === "ImportDefaultSpecifier" ||
+          specifier.type === "ImportNamespaceSpecifier"
+        ) {
+          helpers.set(local, "fast-check");
+        } else if (
+          ["property", "asyncProperty"].includes(
+            identifierName(specifier.imported) ?? "",
+          )
+        ) {
+          helpers.set(local, "fast-check.property");
+        }
       }
       if (
         source === "node:test" &&
@@ -298,6 +315,9 @@ function nativeCall(
   }
   if (
     name === "withNativeFixture" ||
+    name === "assertNativeMemberReference" ||
+    name === "assertMemberReferenceCase" ||
+    name === "assertReferenceCase" ||
     name === "buildHostCcFixture" ||
     name === "buildClockProgram" ||
     name === "runClockProbe" ||
@@ -406,6 +426,24 @@ function executesPlanRequests(
   return executes;
 }
 
+/** Resolve predicates only for constructors imported from fast-check. */
+function fastCheckPredicate(
+  node: SyntaxNode,
+  imports: ReadonlyMap<string, string>,
+): readonly StructuredDataValue[] {
+  const callee = syntaxNode(node.callee);
+  const constructor = imports.get(identifierName(callee) ?? "");
+  const namespace = imports.get(identifierName(callee?.object) ?? "");
+  if (
+    constructor === "fast-check.property" ||
+    (namespace === "fast-check" &&
+      ["property", "asyncProperty"].includes(memberName(callee) ?? ""))
+  ) {
+    return argumentsOf(node).slice(-1);
+  }
+  return [];
+}
+
 function reachesNativeHelper<Candidate>(
   value: Candidate,
   helpers: ReadonlyMap<string, string>,
@@ -441,20 +479,24 @@ function reachesNativeHelper<Candidate>(
       (isZigCompile(node) && callsProcess(node, helpers, functions))
     )
       return true;
-    if (
-      ["then", "catch", "finally", "map", "flatMap", "forEach"].includes(
-        memberName(node.callee) ?? "",
-      )
-    ) {
-      for (const argument of argumentsOf(node)) {
-        if (
-          nativeCall(
-            { type: "CallExpression", callee: argument, arguments: [] },
-            helpers,
-          )
+    const callbacks = [
+      "then",
+      "catch",
+      "finally",
+      "map",
+      "flatMap",
+      "forEach",
+    ].includes(memberName(node.callee) ?? "")
+      ? argumentsOf(node)
+      : fastCheckPredicate(node, helpers);
+    for (const argument of callbacks) {
+      if (
+        nativeCall(
+          { type: "CallExpression", callee: argument, arguments: [] },
+          helpers,
         )
-          return true;
-      }
+      )
+        return true;
     }
     const callee = syntaxNode(node.callee);
     if (

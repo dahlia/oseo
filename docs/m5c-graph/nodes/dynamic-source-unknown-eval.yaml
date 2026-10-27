@@ -1,0 +1,21 @@
+version: 1
+id: dynamic-source-unknown-eval
+title: Resolve unknown eval binding coverage
+delivers: "DS-3 of the dynamic-source-coverage-remediation split approved
+  by the maintainer decision of 2026-10-28, item 4. Owns exactly the 66
+  paths that observation-batch-19, observation-batch-20, and
+  observation-batch-30 add to the umbrella with the observed OSEO1001
+  Unknown binding 'eval' rejection, listed in
+  docs/m5c-graph/dynamic-source-unknown-eval.md. The umbrella owns them
+  once those batches land and until this node lands; the node selects
+  nothing before then. Assesses each path separately, because a
+  statementList eval probe and a RegExp literal probe can reach different
+  conclusions. A path closes under adr:0016-dynamic-source-boundary only
+  by the item 1 rule, with a fresh-digest exclusion-audit record naming
+  replacement evidence for every non-source subject; otherwise it stays in
+  remediation. Never counts a pass, emulates eval, or widens ADR 0016; ADR
+  0016 and ADR 0019 remain unchanged."
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready

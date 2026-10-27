@@ -1,0 +1,23 @@
+version: 1
+id: dynamic-source-module-semantics
+title: Cover module semantics reached through import()
+delivers: "DS-2 of the dynamic-source-coverage-remediation split approved
+  by the maintainer decision of 2026-10-28, items 2 and 4. Owns the
+  observation-batch-20 and observation-batch-30 ImportExpression rejections
+  whose normative subject is a module namespace object, module evaluation
+  order, top-level await, or JSON module identity, selected as
+  docs/m5c-graph/dynamic-source-module-semantics.md records: the
+  dynamic-import namespace/ directory, the module-code paths, and other
+  dynamic-import paths a reviewed assessment places there. It selects
+  nothing before those batches land. Reviews
+  replacement evidence that observes each non-source subject through
+  static imports, preserving every original path and assertion. A path
+  closes under adr:0016-dynamic-source-boundary only by the item 1 rule,
+  with a fresh-digest exclusion-audit record naming that evidence and
+  showing that only source evaluation remains; otherwise it stays in
+  remediation. Never counts a pass, emulates dynamic import, or widens ADR
+  0016; ADR 0016 and ADR 0019 remain unchanged."
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready

@@ -32,6 +32,8 @@ interface IteratorIntrinsicCase {
   readonly iterable: boolean;
   readonly returnPresent: boolean;
   readonly step: number;
+  /** A complementary String traversal, retaining the wrapper domain key. */
+  readonly stringValue: string;
 }
 
 const caseArbitrary: fc.Arbitrary<IteratorIntrinsicCase> = fc.record({
@@ -40,6 +42,11 @@ const caseArbitrary: fc.Arbitrary<IteratorIntrinsicCase> = fc.record({
   iterable: fc.boolean(),
   returnPresent: fc.boolean(),
   step: fc.integer({ max: 5, min: -5 }),
+  stringValue: fc
+    .array(fc.constantFrom("a", "b", "😀", "\ud800", "\udc00"), {
+      maxLength: 4,
+    })
+    .map((units) => units.join("")),
 });
 
 const host = createNodeHost();
@@ -105,6 +112,8 @@ if (${testCase.returnPresent}) {
   const result = iterator.return();
   console.log("return", result.value, result.done, returnGets, returnCalls);
 }
+const stringInput = ${JSON.stringify(testCase.stringValue)};
+console.log("string", JSON.stringify(Iterator.from(stringInput).toArray()));
 const originalFrom = Iterator.from;
 let turn = 0;
 while (turn < 2) {
@@ -126,6 +135,7 @@ function expected(testCase: IteratorIntrinsicCase): string {
       ? `return ${testCase.base - testCase.step} true 1 1`
       : "return undefined true 0 0",
   );
+  lines.push(`string ${JSON.stringify([...testCase.stringValue])}`);
   lines.push("guard true", "guard true", "");
   return lines.join("\n");
 }
@@ -248,7 +258,8 @@ test(
         seed: 0x6000_3400,
         sizeLimit:
           "one iterator record, at most four yielded values, one optional " +
-          "return call, and two repeated intrinsic property observations",
+          "return call, at most four String pieces, and two repeated " +
+          "intrinsic property observations",
         timeLimitMilliseconds: 180_000,
       },
     );

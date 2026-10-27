@@ -1040,7 +1040,7 @@ test("keeps a compile-stage probe free of execution evidence", async () => {
   assert.deepEqual(started, ["disabled"]);
 });
 
-test("separates infrastructure failures from harness defects", async () => {
+test("separates infrastructure failures from missing includes", async () => {
   const infrastructureSource = "/*---\nflags: [noStrict]\n---*/\n";
   const infrastructure = await executeTest262Case(
     infrastructureSource,
@@ -1064,8 +1064,9 @@ test("separates infrastructure failures from harness defects", async () => {
     harnesses,
     { execute: () => Promise.resolve(successfulResult()) },
   );
-  assert.equal(harness.classification, "harness-failure");
-  assert.equal(harness.observation.failureKind, "harness");
+  assert.equal(harness.classification, "unsupported-profile-feature");
+  assert.equal(harness.observation.unsupportedCapability, "harness-include");
+  assert.equal(harness.observation.failureKind, undefined);
 });
 
 test("stops assigning reviewed work after a worker failure", async () => {
@@ -2465,6 +2466,61 @@ test("executes a module that only re-exports $262", async () => {
   } finally {
     await rm(directory, { force: true, recursive: true });
   }
+});
+
+test("withholds missing includes but executes admitted/raw cases", async () => {
+  let executions = 0;
+  const run = async (
+    include: string,
+    flags: string = "",
+  ): Promise<Test262Result> => {
+    const source = `/*---
+includes: [${include}]
+${flags}---*/
+assert(true);
+`;
+    return await executeTest262Case(
+      source,
+      parseTest262Case(source, "test/missing-include.js", revision),
+      new Set<string>(),
+      harnesses,
+      {
+        execute: async (request) => {
+          executions += 1;
+          if (include === "propertyHelper.js") {
+            assert.match(request.source, /function verifyProperty/u);
+          } else {
+            assert.equal(request.source, source);
+          }
+          return await Promise.resolve(successfulResult());
+        },
+      },
+      ["iterator-protocol"],
+    );
+  };
+  const withheld = await Promise.all(
+    ["temporalHelpers.js", "unknownHelper.js"].map((include) => run(include)),
+  );
+  for (const result of withheld) {
+    assert.equal(result.classification, "unsupported-profile-feature");
+    assert.equal(result.observation.unsupportedCapability, "harness-include");
+    assert.equal(
+      result.observation.detail,
+      "Not executed: the case requires the unadmitted harness " +
+        `${result.case.includes[0]}.`,
+    );
+    assert.deepEqual(result.dependencies, ["iterator-protocol"]);
+    assert.equal(result.observation.failureKind, undefined);
+  }
+  assert.equal(executions, 0);
+  assert.equal((await run("propertyHelper.js")).classification, "pass");
+  const admittedExecutions = executions;
+  assert.ok(admittedExecutions > 0);
+  assert.equal(
+    (await run("unknownHelper.js", "flags: [raw]\n")).classification,
+    "pass",
+  );
+  assert.ok(executions > admittedExecutions);
 });
 
 test("withholds a case that reads an omitted harness definition", async () => {

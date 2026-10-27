@@ -7,13 +7,21 @@ exclusion, or a pass. The node is unlanded and depends on
 `eval-intrinsic-value` and `proper-tail-calls`, and `m5-exit-audit` depends
 on it, so M5 cannot exit while the defect remains.
 
+The maintainer decision of 2026-10-28 on the big-node split review
+(*20261028-m5c-scope-big-node-split.md*) keeps this node as an umbrella.
+`with-optional-call-receiver-non-tail` (WOC-1) repairs calls outside tail
+position, and `with-optional-call-receiver-tail` (WOC-2), which depends on
+WOC-1 and `proper-tail-calls`, covers strict tail-position optional calls.
+The umbrella depends on both and lands once both have landed. The contract
+below is the union of their contracts.
+
 `eval-intrinsic-value` establishes the GetBindingValue order this repair
 keeps. `proper-tail-calls` is a prerequisite because strict code nested in
 a sloppy `with` body can return `f?.()`. HasCallInTailPosition (ECMA-262
 2025 15.10.2) puts an optional chain whose last link is a call in tail
 position, and that node lowers such a call through its tail call
 trampoline. The repaired receiver must therefore reach a call whose
-execution contract that node defines. That prerequisite remains unlanded;
+execution contract that node defines. That prerequisite has since landed;
 the trampoline is not part of this source preparation.
 
 

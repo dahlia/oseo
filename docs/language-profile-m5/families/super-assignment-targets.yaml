@@ -15,11 +15,13 @@ evidence:
     references:
       - tests/native/fixtures/classes.ts
       - tests/property/m5-compound-assignment.property.test.ts
+      - tests/property/m5-computed-member-fixed.property.test.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/classes.ts
       - tests/property/m5-compound-assignment.property.test.ts
+      - tests/property/m5-computed-member-fixed.property.test.ts
   forced-collection:
     status: covered
     references:
@@ -39,6 +41,7 @@ evidence:
       - tests/native.ts
       - tests/native/fixtures/classes.ts
       - tests/property/m5-compound-assignment.property.test.ts
+      - tests/property/m5-computed-member-fixed.property.test.ts
   standards:
     status: covered
     references:

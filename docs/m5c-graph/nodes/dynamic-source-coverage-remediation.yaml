@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 305 reviewed unsupported paths assigned to
+delivers: "Resolves the 306 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -81,7 +81,16 @@ delivers: "Resolves the 305 reviewed unsupported paths assigned to
   test/language/expressions/object/. Their getter, setter, descriptor,
   and duplicate-property subjects remain in-claim. Their eval or source
   constructor rejection is authorized, but non-source subject coverage
-  remains unresolved. The 3 paths from well-known-intrinsics-harness
+  remains unresolved. The maintainer decision of 2026-10-28 keeps this
+  node as an umbrella over dynamic-source-importcall-accounting,
+  dynamic-source-module-semantics, dynamic-source-unknown-eval,
+  dynamic-source-callable-family,
+  dynamic-source-lexical-completion-family,
+  dynamic-source-private-binding-family, and
+  dynamic-source-realm-string-family; their work notes select the paths
+  each owns. Ownership moves to a child only in that child's landing, and
+  this node lands when it owns zero paths. The 3 paths from
+  well-known-intrinsics-harness
   assert AsyncFunction, AsyncGeneratorFunction, and GeneratorFunction
   are constructible before their trailing zero-argument construction
   reports the ADR 0016 run-time rejection, so their IsConstructor
@@ -111,8 +120,19 @@ delivers: "Resolves the 305 reviewed unsupported paths assigned to
   remediation, with no exclusion or completed replacement evidence.
   Raw Full evidence is under
   /data/m5c-tco-host-compose-20261027/remote-20261027T105544Z-904e10b15d52/.
+  The accepted IH-A Full on U a678c85e adds exactly one path:
+  test/built-ins/Iterator/proto-from-ctor-realm.js. Its Function source
+  rejection leaves the non-source realm/constructor contract as active
+  coverage debt; no exclusion or replacement evidence is claimed.
   ADR 0016 and ADR 0019 remain unchanged."
 dependencies:
   - authorized-exclusion-audit
+  - dynamic-source-callable-family
+  - dynamic-source-importcall-accounting
+  - dynamic-source-lexical-completion-family
+  - dynamic-source-module-semantics
+  - dynamic-source-private-binding-family
+  - dynamic-source-realm-string-family
+  - dynamic-source-unknown-eval
 landed: false
-status: ready
+status: blocked

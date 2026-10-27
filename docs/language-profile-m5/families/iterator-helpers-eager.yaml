@@ -15,26 +15,14 @@ scope:
     test/built-ins/Iterator/prototype/forEach/,
     test/built-ins/Iterator/prototype/reduce/,
     test/built-ins/Iterator/prototype/some/, and
-    test/built-ins/Iterator/prototype/toArray/. Every one of them carries the
-    upstream iterator-helpers feature tag, which stays unsupported, so each
-    reviewed path records an explicit prerequisite boundary rather than a
-    pass. Fixed and generated native differential evidence proves the
-    admitted behavior for the same contracts in the meantime."
-  - "The measured remaining blockers for that feature tag are outside this
-    family. Enabling iterator-helpers over the reviewed Iterator paths leaves
-    test/built-ins/Iterator/from/primitives.js,
-    test/built-ins/Iterator/from/supports-iterable.js, and
-    test/built-ins/Iterator/prototype/flatMap/strings-are-not-flattened.js as
-    semantic failures, because all three iterate a String or a String
-    wrapper. The string-iterator node now supplies that prerequisite, and
-    each of the three still declares the unsupported iterator-helpers
-    feature, and
-    test/built-ins/Iterator/from/get-return-method-when-call-return.js,
-    test/built-ins/Iterator/from/return-method-calls-base-return-method.js,
-    and
-    test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js as
-    harness failures, because all three include temporalHelpers.js, which
-    the reviewed harness set does not supply."
+    test/built-ins/Iterator/prototype/toArray/. The IH-A focused precheck
+    observes all 173 as pass after admitting iterator-helpers. Its raw
+    inputs and observations are recorded in
+    docs/m5c-graph/iterator-helpers-tag-activation.md. The accepted full
+    UPDATE on U a678c85e records these method paths as pass. String
+    iteration and the bounded Iterator.from primitive repair remove the
+    historical String blockers; temporalHelpers.js
+    remains unadmitted and its three paths belong to IH-B."
 owners:
   - PLAN-M5.md
 evidence:

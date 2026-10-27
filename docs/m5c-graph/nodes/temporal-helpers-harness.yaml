@@ -1,0 +1,17 @@
+version: 1
+id: temporal-helpers-harness
+title: Review the temporalHelpers.js harness
+delivers: "IH-B of the iterator-helpers split approved by the maintainer
+  decision of 2026-10-28, item 4. Owns the 3 iterator-helpers paths that
+  include temporalHelpers.js after iterator-helpers-tag-activation assigns
+  them here, as docs/m5c-graph/temporal-helpers-harness.md records.
+  Decides
+  whether the reviewed harness set admits the upstream file unchanged or a
+  reviewed subset that provides the propertyBagObserver and observeMethod
+  helpers these paths use, without admitting Temporal or Intl behavior.
+  Observes the 3 paths and assigns any still-unsupported path a bounded
+  owner; do not predict passes."
+dependencies:
+  - iterator-helpers-tag-activation
+landed: false
+status: ready

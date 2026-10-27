@@ -718,6 +718,14 @@ function unsupportedStructuralCapability(
   }
   if (parsed.flags.includes("raw")) return undefined;
   for (const include of parsed.case.includes) {
+    // ADR 0013 keeps unavailable harness capabilities explicit without
+    // treating an unadmitted include as a defect in an admitted harness.
+    if (!harnesses.includes.has(include)) {
+      return {
+        capability: "harness-include",
+        detail: `the case requires the unadmitted harness ${include}.`,
+      };
+    }
     const omitted = omittedHarnessDefinitions(include, parsed, harnesses)
       .filter((name) => references.has(name))
       .toSorted();

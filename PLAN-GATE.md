@@ -23,6 +23,23 @@ job keeps all 120 extended cases and the 1,800-second property limit; the
 its twelve file shards. Historical partition measurements below describe
 their recorded input sets.
 
+The 2026-10-27 Linux weight refresh takes the median per-file case sum from
+runs 40401101765 (`d4d81be9`), 40442491966 (`98460f7c`), and 40454201429
+(`6aab0fc8`), then converts milliseconds to whole seconds rounded up.
+All 134 included files now have measurements. Configurations with seven,
+eight, and nine file shards all have a modeled maximum of 69.33 minutes, set by
+compound assignment's 4,160-second weight. Their maximum/mean ratios are 1.373,
+1.573, and 1.765; none meets the 15-percent balance target or reduces the
+current maximum. Keep seven shards because additional jobs cannot split that
+file. This refresh establishes no CI tail improvement; reducing the tail
+requires a separate workload change. *docs/evidence/u6/README.md* records all
+source job IDs, sums, old/new modeled loads, and the unchanged exclusions.
+The compound assignment split then rebucketed that file's logged
+registrations into three files weighing 2,086, 668, and 1,408 seconds. Over
+the combined inventory, which also retains two later main files' weights,
+the seven-shard model's maximum is 48.95 minutes with a maximum/mean ratio
+of 1.002. This is a historical-cost projection, not a CI result.
+
 The measured before-state is recorded in
 [*docs/gate-cost-baseline.md*](./docs/gate-cost-baseline.md). Three
 observations motivate the plan. Every native execution rebuilds a runtime

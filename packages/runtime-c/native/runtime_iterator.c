@@ -764,14 +764,9 @@ static OseoResult iterator_from(
     OseoContext *context,
     OseoValue value
 ) {
-    if (is_string(value)) {
-        return failure(
-            context,
-            "OSEO2001",
-            "String iteration is not admitted yet."
-        );
-    }
-    if (!is_object(value)) {
+    // GetIteratorFlattenable permits String primitives, preserving the
+    // primitive receiver for GetV and the iterator method call below.
+    if (!is_object(value) && !is_string(value)) {
         return iterator_type_error(
             context,
             "Iterator.from requires an object or string."

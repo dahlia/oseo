@@ -2089,3 +2089,31 @@ the graph baseline from it; the node stays unlanded pending affected review
 and exact candidate/Main gates. The
 [TCO evidence contract](docs/evidence/proper-tail-calls-u68-20261027.md)
 records the raw packet and limits.
+
+
+Iterator helpers tag activation preparation
+-------------------------------------------
+
+IH-A adds only `iterator-helpers` to `supportedFeatures`. A generic runner
+check classifies an unadmitted include as `unsupported-profile-feature`
+with capability `harness-include` before assembly; admitted includes and
+raw cases keep their existing behavior and all dependency tags remain.
+This follows ADR 0013's named-capability distinction between unavailable
+harness support and defects in an admitted harness. The include itself
+is not admitted.
+
+The first completed 393-row precheck found two semantic failures in
+`Iterator.from` for String primitives. Root authorized the bounded repair
+and its fixed/generated evidence, described in *PLAN-M5.md*. The next
+single precheck observed 389 passes and four unsupported results with
+pool eight, no retries and no failure classifications. The
+[IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
+records the exact paths, raw packets and remaining remediation boundaries.
+
+Root accepted the full UPDATE on U `a678c85e`: 389 promotions, no
+demotions, 26,456 passes, 2,802 expected negatives and 643 unsupported
+paths across all 29,901 reviewed cases. The ledger assigns the three
+*temporalHelpers.js* paths to `temporal-helpers-harness` (IH-B) and
+*Iterator/proto-from-ctor-realm.js* to
+`dynamic-source-coverage-remediation`. All promoted paths belong to their
+observations. The graph remains unlanded pending the later gates.

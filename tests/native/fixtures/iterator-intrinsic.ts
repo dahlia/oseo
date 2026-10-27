@@ -30,6 +30,48 @@ for (const value of [undefined, null, true, 0, 0n, Symbol()]) {
     console.log("primitive", error instanceof TypeError);
   }
 }
+for (const text of ["", "ab", "a😀b", "\\ud800x\\udc00"]) {
+  console.log("string", Iterator.from(text).toArray().join("|"));
+}
+const savedStringIterator = String.prototype[Symbol.iterator];
+let stringReceiver;
+Object.defineProperty(String.prototype, Symbol.iterator, {
+  configurable: true,
+  get() {
+    "use strict";
+    stringReceiver = typeof this;
+    return function () {
+      "use strict";
+      console.log("string method receiver", typeof this);
+      return savedStringIterator.call(this);
+    };
+  },
+});
+console.log("string getter", Iterator.from("xy").toArray().join("|"));
+console.log("primitive receiver", stringReceiver);
+Iterator.from(new String("xy"));
+console.log("boxed receiver", stringReceiver);
+for (const method of [null, undefined, 1, () => 1]) {
+  Object.defineProperty(String.prototype, Symbol.iterator, {
+    configurable: true,
+    value: method,
+  });
+  try { Iterator.from("x"); } catch (error) {
+    console.log("invalid string iterator", error instanceof TypeError);
+  }
+}
+Object.defineProperty(String.prototype, Symbol.iterator, {
+  configurable: true,
+  get() { throw new RangeError("string iterator getter"); },
+});
+try { Iterator.from("x"); } catch (error) {
+  console.log("abrupt string iterator", error instanceof RangeError);
+}
+Object.defineProperty(String.prototype, Symbol.iterator, {
+  configurable: true,
+  writable: true,
+  value: savedStringIterator,
+});
 try { Iterator(); } catch (error) {
   console.log("call", error instanceof TypeError);
 }

@@ -568,3 +568,11 @@ families:
     owner: tests/property/m5-host-script-bindings.property.test.ts
     start: 0x60008d00
     end: 0x60008dff
+  - family: m5-compound-member-fixed
+    owner: tests/property/m5-compound-member-fixed.property.test.ts
+    start: 0x60008e00
+    end: 0x60008eff
+  - family: m5-computed-member-fixed
+    owner: tests/property/m5-computed-member-fixed.property.test.ts
+    start: 0x60008f00
+    end: 0x60008fff

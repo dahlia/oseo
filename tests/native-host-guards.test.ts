@@ -15,6 +15,131 @@ import test from "node:test";
 import { withNativeFixture } from "../../packages/testkit/src/index.ts";
 `;
 
+test("compound Reference imports require a native host guard", () => {
+  for (const helper of [
+    "assertNativeMemberReference",
+    "assertMemberReferenceCase",
+    "assertReferenceCase",
+  ]) {
+    const prefix = `
+import test from "node:test";
+import { ${helper} as observe } from
+  "./property/compound-assignment-support.ts";
+const nativeTarget = targetForExecutionHost(executionHost);
+`;
+    const guarded = `${prefix}
+test("guarded Reference", {
+  skip: nativeTarget == null ? "requires a supported native host" : false,
+}, async () => { await observe({}); });
+`;
+    const unguarded = `${prefix}
+test("unguarded Reference", async () => { await observe({}); });
+`;
+    const unused = `${prefix}
+async function unusedReference() { await observe({}); }
+test("pure model", () => { modelReferenceSubject({}); });
+`;
+    const path = "tests/property/reference.property.test.ts";
+    assert.deepEqual(checkNativeHostGuardSource(path, guarded), []);
+    assert.equal(checkNativeHostGuardSource(path, unguarded).length, 1);
+    assert.deepEqual(checkNativeHostGuardSource(path, unused), []);
+  }
+});
+
+for (const [declaration, constructor] of [
+  ['import fc from "fast-check";', "fc.property"],
+  ['import fc from "fast-check";', "fc.asyncProperty"],
+  ['import * as generated from "fast-check";', "generated.asyncProperty"],
+  ['import { property as generated } from "fast-check";', "generated"],
+  ['import { asyncProperty as generated } from "fast-check";', "generated"],
+]) {
+  test(`requires a guard for imported ${constructor} predicates`, () => {
+    const prefix = `
+import test from "node:test";
+import { assertReferenceCase as observe } from "./reference-support.ts";
+${declaration}
+const nativeTarget = targetForExecutionHost(executionHost);
+`;
+    const body = `await fc.assert(${constructor}(domain, observe));`;
+    const path = "tests/property/callback.property.test.ts";
+    assert.deepEqual(
+      checkNativeHostGuardSource(
+        path,
+        `${prefix}test("unguarded", async () => { ${body} });`,
+      ).map((problem) => problem.testName),
+      ["unguarded"],
+    );
+    assert.deepEqual(
+      checkNativeHostGuardSource(
+        path,
+        `${prefix}test("guarded", {
+  skip: nativeTarget == null ? "requires a supported native host" : false,
+}, async () => { ${body} });`,
+      ),
+      [],
+    );
+  });
+}
+
+for (const [declaration, body] of [
+  ['import fc from "fast-check";', "fc.property(domain, pureModel)"],
+  ['import fc from "fast-check";', "fc.asyncProperty(domain, pureModel)"],
+  ['import fc from "fast-check";', "fc.property(observe, pureModel)"],
+  ['import fc from "fast-check";', "fc.configureGlobal(observe)"],
+  ['import fc from "./model.ts";', "fc.property(domain, observe)"],
+  ['import fc from "./model.ts";', "fc.asyncProperty(domain, observe)"],
+  ['import { property } from "./model.ts";', "property(domain, observe)"],
+  ['import fc from "fast-check";', "assert.equal(observe, expected)"],
+]) {
+  test(`does not require a guard for non-building ${body}`, () => {
+    const source = `
+import test from "node:test";
+import { assertReferenceCase as observe } from "./reference-support.ts";
+${declaration}
+test("pure", () => { ${body}; });
+`;
+    assert.deepEqual(
+      checkNativeHostGuardSource("tests/unit.test.ts", source),
+      [],
+    );
+  });
+}
+
+test("detects removed guards across compound helper extraction", async () => {
+  const file = "property/m5-compound-assignment.property.test.ts";
+  const extracted = await readFile(new URL(file, import.meta.url), "utf8");
+  const inline = extracted
+    .replace(
+      "fc.asyncProperty(memberReferenceArbitrary, assertMemberReferenceCase)",
+      `fc.asyncProperty(memberReferenceArbitrary,
+        async (sample) => { await assertMemberReferenceCase(sample); })`,
+    )
+    .replace(
+      "fc.asyncProperty(referenceCaseArbitrary, assertReferenceCase)",
+      `fc.asyncProperty(referenceCaseArbitrary,
+        async (sample) => { await assertReferenceCase(sample); })`,
+    );
+  assert.notEqual(inline, extracted);
+  const names = [
+    "generated compound member references convert their key once",
+    "generated computed member References check the base, then convert once",
+  ];
+  for (const source of [inline, extracted]) {
+    assert.deepEqual(checkNativeHostGuardSource(file, source), []);
+    const unguarded = source.replaceAll(
+      '"requires a supported native host"',
+      '"wrong skip"',
+    );
+    const reported = checkNativeHostGuardSource(file, unguarded).map(
+      (problem) => problem.testName,
+    );
+    assert.deepEqual(
+      reported.filter((name) => names.includes(name)),
+      names,
+    );
+  }
+});
+
 test("accepts a guarded native property test", () => {
   const source = `${imports}
 const nativeTarget = targetForExecutionHost(executionHost);

@@ -1,0 +1,15 @@
+version: 1
+id: compound-assignment-property-cost
+title: Split or speed up the compound assignment property suite
+delivers: "Removes tests/property/m5-compound-assignment.property.test.ts as
+  the single CI tail (Linux native support shard 2/7 at 69-73 min, Linux
+  sanitizer property shard 2/3 at 26-36 min) by splitting its fixed
+  computed-member and compound-member tests into separately reviewed
+  property files or reducing their native compile cost, without lowering
+  case counts, seeds or budgets; decision
+  ~/.local/state/oseo-m5c/decisions/done/ci-capacity-macrun-and-compound.md\
+  ."
+dependencies:
+  - unsupported-ownership-audit
+landed: true
+status: ready

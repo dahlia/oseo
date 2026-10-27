@@ -12,14 +12,22 @@ dependencies:
   - authorized-exclusion-audit
   - class-duplicate-constructor-early-error
   - class-private-accessor-lookup-coverage-remediation
+  - compound-assignment-property-cost
   - compound-member-assignment-key-order
   - computed-member-reference-key-order
   - cross-realm-host
   - destructuring-binding-target-order
   - dynamic-import
   - dynamic-import-staged-plan
+  - dynamic-source-callable-family
   - dynamic-source-coverage-remediation
+  - dynamic-source-importcall-accounting
+  - dynamic-source-lexical-completion-family
+  - dynamic-source-module-semantics
+  - dynamic-source-private-binding-family
+  - dynamic-source-realm-string-family
   - dynamic-source-retagging
+  - dynamic-source-unknown-eval
   - eval-intrinsic-value
   - fn-global-object-harness
   - frontmatter-feature-tags
@@ -30,6 +38,7 @@ dependencies:
   - import-attributes-dynamic-coverage-remediation
   - import-meta
   - iterator-helpers
+  - iterator-helpers-tag-activation
   - iterator-next-callability
   - minor-feature-tag-admission
   - module-export-forms
@@ -81,6 +90,7 @@ dependencies:
   - resizable-array-buffer-harness
   - runtime-dynamic-source-classification
   - script-module-declaration-early-error
+  - temporal-helpers-harness
   - test262-host-script-bindings
   - typed-array-construction-order
   - typed-array-feature-admission
@@ -89,6 +99,8 @@ dependencies:
   - unhandled-rejection-observation
   - well-known-intrinsics-harness
   - with-optional-call-receiver
+  - with-optional-call-receiver-non-tail
+  - with-optional-call-receiver-tail
   - with-strict-assignment-fallback
   - yield-star-throw-callability
 landed: false

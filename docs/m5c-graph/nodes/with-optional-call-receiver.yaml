@@ -29,9 +29,15 @@ delivers: "Repairs a native-confirmed defect in admitted optional calls through
   manifest path; already-reviewed paths may move only toward pass, and
   unreviewed paths stay reserved for their owning batches. This is a
   preexisting generic optional-call correction, not an eval source
-  evaluation admission or an exclusion."
+  evaluation admission or an exclusion. The maintainer decision of
+  2026-10-28 keeps this node as an umbrella over
+  with-optional-call-receiver-non-tail and
+  with-optional-call-receiver-tail, which deliver the non-tail and strict
+  tail-position parts of this contract; it lands once both have landed."
 dependencies:
   - eval-intrinsic-value
   - proper-tail-calls
+  - with-optional-call-receiver-non-tail
+  - with-optional-call-receiver-tail
 landed: false
-status: ready
+status: blocked

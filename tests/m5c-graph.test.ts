@@ -381,11 +381,11 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 59);
+  assert.ok(summary.landed >= 61);
   assert.equal(summary.parked, 0);
-  assert.equal(summary.nodes, 91);
-  assert.equal(summary.ready, 90);
-  assert.equal(summary.blocked, 1);
+  assert.equal(summary.nodes, 103);
+  assert.equal(summary.ready, 98);
+  assert.equal(summary.blocked, 5);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -586,14 +586,30 @@ test("the with optional-call receiver defect stays on the exit path", () => {
   const remediationId = "with-optional-call-receiver";
   const remediation = readNode(remediationId);
   // GetBindingValue order comes from eval-intrinsic-value, and strict
-  // tail-position optional calls run under proper-tail-calls.
-  const prerequisites = ["eval-intrinsic-value", "proper-tail-calls"].map(
-    readNode,
-  );
+  // tail-position optional calls run under proper-tail-calls. The
+  // 2026-10-28 split delivers the repair through the two child nodes.
+  const nonTailId = "with-optional-call-receiver-non-tail";
+  const tailId = "with-optional-call-receiver-tail";
+  const prerequisites = [
+    "eval-intrinsic-value",
+    "proper-tail-calls",
+    nonTailId,
+    tailId,
+  ].map(readNode);
   assert.deepEqual(
     remediation.dependencies,
     prerequisites.map((node) => node.id),
   );
+  const nonTail = readNode(nonTailId);
+  const tail = readNode(tailId);
+  assert.deepEqual(nonTail.dependencies, ["eval-intrinsic-value"]);
+  assert.deepEqual(tail.dependencies, ["proper-tail-calls", nonTailId]);
+  assert.match(tail.delivers, /strict tail-position\s+optional calls/u);
+  for (const child of [nonTail, tail]) {
+    assert.match(child.delivers, /Owns no manifest path/u);
+    assert.match(child.delivers, /or an exclusion/u);
+    assert.ok(readNode("m5-exit-audit").dependencies.includes(child.id));
+  }
   assert.equal(
     remediation.status,
     prerequisites.every((node) => node.landed) ? "ready" : "blocked",
