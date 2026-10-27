@@ -7219,8 +7219,13 @@ precede inclusive ranges in supplied order, conversion flushes at 10,000
 code points, and the property helper tests the aggregate before each iterated
 symbol on a miss. Assertion failures, diagnostic formatting, abrupt
 completion, and RegExp mutations, including `lastIndex`, remain observable.
-The 453 inherited harness-definition unsupported records await fresh
-canonical observation; source restoration establishes no new classifications.
+Fresh normal Full on source `6e5ebf2e` observed all 453 inherited
+helper-owned paths: 441 property-escape paths and nine CharacterClassEscapes
+paths passed all four variants. The three remaining CharacterClassEscapes
+positive subjects report `regexp-matcher-limit` and belong to the active,
+blocked *regexp-anchored-repeat-state-remediation* node. Its worknote records
+the exact subjects and bounded future evidence; no matcher repair or exclusion
+is implied. Source restoration alone established no classifications.
 
 An unhandled rejection now reports the rejection
 boundary text, followed by a kind marker only when the reason itself or an

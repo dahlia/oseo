@@ -1677,10 +1677,12 @@ property sets and complements. The native suite retains all four whole
 registrations and 16 invocations; its presence is not a current execution.
 The original 44 whole-Script baseline remains blob
 `43a6e39af8dcd1695024e7d0a0b3e168d773ea19`. All Set/Array/B source and
-contracts, current observations, subset expectations, ledger owners, feature
-pins, profile classes outside the Reg hunks, seeds and budgets stay intact.
+contracts, observations, subset expectations, ledger owners, feature pins,
+profile classes outside the Reg hunks, seeds and budgets stayed intact at
+that source preparation step.
 
-All 453 inherited helper-owned rows remain harness-definition unsupported:
+At that source preparation step, all 453 inherited helper-owned rows
+remained harness-definition unsupported:
 441 property-escape paths and 12 CharacterClassEscapes paths. The old Full
 on source `2868cf66`, result `f68583d5`, observed 450 promotions and three
 matcher-limit results under its different compiler/runtime. Those records,
@@ -1688,7 +1690,7 @@ promotions and owner transfers are not copied here. New classifications and
 any exact remaining matcher ownership require Root's fresh actual Full and
 judgment; Array performance alone establishes no matcher repair or exclusion.
 The historical prospective matcher plan and its graph/test-count changes
-remain deferred to Root's observation and ownership phase.
+were deferred to Root's observation and ownership phase.
 
 Root confirmed Array Main `d4d81be9`, all 79 jobs and workflow success,
 with the exact candidate tree, before authorizing this port. Main's 90-node,
@@ -1700,7 +1702,50 @@ All production packages, runner interfaces, toolchain and input data are
 compared with original accepted source `78bdbd0f`. Root owns D1.9 retention
 of that source's internal12, outer10 and author Native4/16 after the exact
 fidelity proof; no new model or Native is implied by a provenance port.
-Reg still requires a fresh Full on its actual source, actual observation
-and ownership review, source-qualified per-shard cost assessment, and exact
-candidate/Main gates. Old Full, review, Native and cost observations retain
-their original sources. Root owns all later execution and publication.
+At source preparation, Reg still required a fresh Full on its actual source.
+Old Full, review, Native and cost observations retain their original sources.
+Root owns review retention, later execution and publication.
+
+
+Reg helper fresh result and bounded matcher ownership
+-----------------------------------------------------
+
+The normal Full read clean Reg-only U
+`6e5ebf2effdcedc5f0205e1af22f71606d7b9726`, tree
+`1675bcb961d0a54b3dadeddd2d50cea307a42bac`, on successful Main
+`d4d81be99c224af282f9e3da5945f6675958e4c5`. The stock
+`mise run test262:update -- --accept-promotions` ran from
+2026-10-26T22:52:48.301365Z to 2026-10-27T00:42:18.272375Z and exited
+naturally zero after 6,569.970938 seconds. Root accepted the preserved raw
+outputs and two empty descendant drains before result preparation. The
+source-qualified packet is *FULL-RAW-REPORT.md* under
+[the source-bound packet](/data/m5c-regexp-source-finisher-20261027/task_b37691673a89/ctx_5a047fc6c8f8/solo-source-preparation/FULL-RAW-REPORT.md).
+
+Actual totals are 29,901 reviewed, 26,052 passes, 2,802 expected negatives
+and 1,047 unsupported, with no semantic, harness or infrastructure failure.
+Exactly 450 paths promoted: all 441 property escapes and nine
+CharacterClassEscapes, each with all four actual variants. All other 29,448
+complete records remain byte-identical to U, and all 11,190 unreviewed paths
+remain unobserved. The original three positive non-digit, non-whitespace
+and non-word CharacterClassEscapes subjects retain matcher-limit diagnostics.
+Each contains only the first deciding non-strict/disabled variant; no later
+strictness, policy or standard/Unicode-pattern result is inferred.
+
+Canonical ledger derivation makes the 450 passes ordinary observations.
+Only the three remaining unsupported owners then move to the blocked,
+unlanded *regexp-anchored-repeat-state-remediation* node. Its linked
+worknote preserves the bounded historical plan and qualifies its static
+undo-trail lead against unchanged matcher sources. This adds no runtime
+repair, accepted exclusion or predicted promotion. The graph remains
+56 landed, with 91 nodes, 87 ready and four blocked; existing nodes retain
+their status and landing marks. Root owns final publication state.
+
+This single Linux Full is neither a current hosted-CI cost measurement nor
+a macOS observation. The 1,803 actual Reg variants are 450 times four plus
+three deciding variants. The unchanged reviewed path order still partitions
+into eight Linux and twelve macOS test262 shards. Current per-shard duration,
+variance and Mac cost remain unknown until source-qualified candidate CI.
+The helper adds no property file or weight change; B's 79-job workflow,
+40 Mac jobs, 137 property files and all budgets remain unchanged. Actual
+result/ownership internal and outer review, D3, final CHECK/canonical and
+exact candidate/Main gates remain Root-owned pending work.

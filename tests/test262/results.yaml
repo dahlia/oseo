@@ -20065,9 +20065,9 @@ summary:
   expectedNegatives: 2802
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 25602
+  passes: 26052
   semanticFailures: 0
-  unsupportedProfileFeatures: 1497
+  unsupportedProfileFeatures: 1047
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 7
@@ -20185,9 +20185,9 @@ summary:
       expectedNegatives: 739
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 9936
+      passes: 10386
       semanticFailures: 0
-      unsupportedProfileFeatures: 766
+      unsupportedProfileFeatures: 316
     - dependency: generators
       expectedNegatives: 265
       harnessFailures: 0
@@ -20620,9 +20620,9 @@ summary:
       expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1224
+      passes: 1674
       semanticFailures: 0
-      unsupportedProfileFeatures: 463
+      unsupportedProfileFeatures: 13
     - group: built-ins/RegExpStringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0

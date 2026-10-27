@@ -30,10 +30,14 @@ scope:
   - "The initial M5b checkpoint classified all 625 reviewed paths under
     the CharacterClassEscapes and property-escapes inventory roots: 142
     expected parse negatives and 483 explicit prerequisites. Current
-    classifications remain in the reviewed manifest. M5c source preparation
-    adds the pinned buildString and testPropertyEscapes harness operations;
-    the existing 453 harness-definition unsupported records await fresh
-    canonical observation. This source change admits no semantic family."
+    classifications remain in the reviewed manifest. M5c restores the pinned
+    buildString and testPropertyEscapes harness operations. Fresh normal Full
+    on source 6e5ebf2e observes 450 passes among the 453 helper-owned paths:
+    441 property escapes and nine CharacterClassEscapes, each in four
+    variants. The three remaining CharacterClassEscapes positive subjects
+    report regexp-matcher-limit and retain active bounded ownership under
+    regexp-anchored-repeat-state-remediation. No matcher repair, exclusion
+    or new semantic family is admitted."
 owners:
   - PLAN-M5.md
   - PLAN-REGEXP.md
