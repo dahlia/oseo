@@ -109,6 +109,7 @@ dependencies:
   - with-optional-call-receiver-non-tail
   - with-optional-call-receiver-tail
   - with-strict-assignment-fallback
+  - with-var-loop-head-resolution
   - yield-star-throw-callability
 landed: false
 status: blocked
