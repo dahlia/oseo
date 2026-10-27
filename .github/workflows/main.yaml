@@ -217,7 +217,14 @@ jobs:
     # 45-minute limit after 149 passing tests. Its runner was about 1.70x
     # slower than the same-tree candidate, where the shard took about
     # 27 minutes. Three shards add margin for that runner variation.
-    timeout-minutes: 45
+    # Shard 2/3 still took 32 to 43 minutes on main from 2026-10-24 to
+    # 2026-10-26, and candidate run 40382931062 hit the limit at 45m11s
+    # after all 99 tests passed. Two fixed tests in
+    # tests/property/m5-compound-assignment.property.test.ts take about
+    # 26 to 36 minutes together and must share one file shard, so this
+    # job timeout allows extra time for them; every property keeps its
+    # own interrupt limit.
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:

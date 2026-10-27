@@ -3474,6 +3474,21 @@ aggregate now requires the sanitizer property matrix. The timeout stays at
 45 minutes; seeds, case counts, budgets, time scale, concurrency, and each
 shard's instrumentation preflight stay unchanged.
 
+On 2026-10-27, that job's limit rose from 45 to 60 minutes. Shard `2/3`
+took 32 to 43 minutes on the five main runs from `f100ab8e` to `d4d81be9`,
+while the other two took 8 to 18. In candidate run 40382931062, the job
+was canceled at 45 minutes 11 seconds, after all 99 of its tests had
+passed. Per-test durations in the logs attribute most of that shard's
+runtime to two fixed tests in
+*tests/property/m5-compound-assignment.property.test.ts*: 919 and 672
+seconds on `d4d81be9`, and 36 minutes together on `6a7f8462`.
+Both tests sit in one file, so no file partition can separate them, and
+case sharding would repeat them in every shard. The job limit is a
+backstop: every property keeps its own interrupt limit, and seeds, case
+counts, budgets, time scale, concurrency, and the shard split are unchanged.
+Splitting those fixed tests across files is left to M5c, because it moves
+evidence that the language profile records cite.
+
 ### Making the readiness probe the first stage (U47)
 
 `macOS self-hosted availability` runs for about twenty seconds and holds
