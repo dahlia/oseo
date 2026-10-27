@@ -1283,3 +1283,59 @@ one-file/one-worker selection and unchanged case budgets remain explicit.
 Compiled product and native fixture inputs stay exact `20d6119b`, while the
 entire wrapper import closure is not claimed byte-identical. Matching-host
 candidate CI and macOS measurements remain separate requirements.
+
+
+Repaired Host source local Linux extended cost
+----------------------------------------------
+
+Two compiler repairs followed the `20d6119b` measurement: directive
+completion values on `da99d0dd`, and global-object fallbacks for host Script
+`with` pattern and loop-head writes on
+`ce8ae0c84a632e414729872b5de928bac5ed4d2e` (tree
+`42ebc5603083b92c9675dfbf04e7a65ef0ddd652`). Both change compiled product
+inputs, so the 607-second weight above no longer describes the current
+source. No author native command ran on `da99d0dd` itself.
+
+On October 27, 2026, `ce8ae0c8` completed the same stock command once under
+the heavy lock:
+
+~~~~ sh
+mise run test:property:extended:native:shard --shard 1/1 \
+  tests/property/m5-host-script-bindings.property.test.ts
+~~~~
+
+The property file, its model, the seed registry and the test kit are
+unchanged since `20d6119b`, so seeds `0x60008d00` and `0x60008d01`, 120
+cases per domain, scale 10, large size, policies, false hints, guard misses,
+forced collection and deadlines are the original ones. The wrapper selected
+this single file with one worker; both registrations passed, with no
+failures, skips, cancellations or TODOs.
+
+Measured leaf durations were 366,133.017177 and 226,633.282946
+milliseconds. Their sum is 592,766.300123 milliseconds, or 592.766300123
+seconds; rounding up gives the 593-second Linux weight that replaces 607.
+Gate wall was 594.017580763 seconds and is not the weight. macOS remains
+unmeasured at its 296-second placeholder, every other weight is unchanged,
+and both tables keep 136 entries. This is one-run scheduling data, not a
+performance comparison or CI time.
+
+The same source passed the other eight focused vectors listed for this node,
+each a single natural run: directive completion four registrations, whole
+Host suites thirteen, and runtime-owned calls eight, each under Node and
+Deno; ordinary generated domains two under each. The Host suites include the
+fourteen original subjects and the new with-fallback fixture. Raw output is
+under */data/m5c-host-script-bindings-20261027/claude-native/*, one
+*ce8a-NAME01/* directory per vector, with *SUMMARY-ce8a.json* recording each
+command, exit status, and the clean `ce8ae0c8` identity before and after.
+*SHA256SUMS-ce8a.txt* lists every raw file's hash. The extended raw hashes,
+in stdout, stderr and gate JSON order, are:
+
+~~~~ text
+f8faf73ddb8eb5e6943060d1b1b4e6840d4c38739f91582a82ddae6b6ccc2d18
+5b80f44ebc4c36cd5b2883baa45c5db4e7b1a0ae3c15726db5dd19bf21288fcc
+a225e29f4af61041935ca2fac5b9e60dc01315147ca8285e69c07a62f66c9162
+~~~~
+
+These are Linux source-qualified correctness observations on `ce8ae0c8`.
+They establish no Full classification, admission or Main gate, and the
+later metadata commit that records them is not a new execution.

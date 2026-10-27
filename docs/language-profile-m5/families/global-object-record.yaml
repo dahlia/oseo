@@ -28,6 +28,11 @@ scope:
     Runtime-owned console and timer calls honor current Script and with
     bindings before arguments; only an initial miss uses a private intrinsic,
     without installing public intrinsic globals."
+  - "A host Script's completion value includes its last directive's cooked
+    string, and its own var and function names receive destructuring,
+    rest, default and loop-head writes that miss every with object on the
+    realm global object's property, as simple and compound writes do. The
+    with-hit simple var loop head belongs to with-var-loop-head-resolution."
 owners:
   - PLAN-M5.md
   - docs/adr/0029-ahead-of-time-host-script-bindings.md
@@ -36,6 +41,8 @@ evidence:
     status: covered
     references:
       - tests/host-script-bindings.test.ts
+      - tests/host-script-source.test.ts
+      - tests/host-script-directives-source.test.ts
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native/fixtures/global-object-record.ts
       - tests/property/m5-global-object-record.property.test.ts
@@ -43,6 +50,9 @@ evidence:
     status: covered
     references:
       - tests/host-script-bindings.test.ts
+      - tests/native/fixtures/host-script-bindings.ts
+      - tests/host-script-directives.test.ts
+      - tests/native/fixtures/host-script-directives.ts
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native/fixtures/global-object-record.ts
       - tests/native/fixtures/with-get-binding-value.ts
@@ -85,6 +95,8 @@ evidence:
   structural:
     status: covered
     references:
+      - tests/host-script-source.test.ts
+      - tests/host-script-directives-source.test.ts
       - tests/host-script-runtime-owned-source.test.ts
       - tests/host-script-runtime-owned.test.ts
       - packages/cli/tests/host-scripts.test.ts

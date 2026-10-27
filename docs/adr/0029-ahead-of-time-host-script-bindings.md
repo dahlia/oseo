@@ -136,8 +136,8 @@ host suites subsequently passed twelve registrations per framework on
 `a93871cc`; ordinary properties passed both domains per framework on
 `ab8d5d5c`, whose extended Node run passed 120 cases per domain. A later
 compiler repair addresses runtime-owned call targets across Scripts. The
-composed-source native validation below is complete; affected review and
-shared-harness Full evidence remain pending.
+composed-source `20d6119b` native validation below is complete for that
+source; affected review and shared-harness Full evidence remain pending.
 
 The actual `ab8d5d5c` extended run supplies a 510-second Linux scheduling
 weight in *docs/evidence/u6/README.md*. macOS is unmeasured and retains the
@@ -160,6 +160,25 @@ extended leaf sum is 606.907057926 seconds: Linux weight 607, macOS still
 unmeasured at 296. See *docs/evidence/u6/README.md* for source-bound provenance.
 These observations do not establish Full/classification, affected internal
 or outer reviews, admission, candidate/Main gates or later-source execution.
+
+Two later compiler repairs change product inputs. `da99d0dd` seeds a host
+Script's completion with its last directive's cooked string, which the
+bootstrap parser otherwise drops from the body. `ce8ae0c8` gives a Script's
+own `var` and function names, whose binding is the global object's property,
+the global-object fallback on destructuring and loop-head writes that miss
+every `with` object; `da99d0dd` had rejected them with `OSEO1001` although
+the ordinary target accepts them. Undeclared names keep their rejection.
+A with-hit simple `for (var x in/of ...)` head is a separate pre-existing
+defect on both targets, owned by `with-var-loop-head-resolution` and not
+covered here. Source `ce8ae0c84a632e414729872b5de928bac5ed4d2e` (tree
+`42ebc5603083b92c9675dfbf04e7a65ef0ddd652`) passed all nine focused author
+commands once each: directive, whole Host and runtime-owned-call suites
+under Node and Deno, ordinary generated domains under each, and the
+original extended domains. No author native command ran on `da99d0dd`
+itself. The extended leaf sum of 592.766300123 seconds gives a 593-second
+Linux weight replacing 607; macOS remains unmeasured at 296. See
+*docs/evidence/u6/README.md*. Full/classification, outer reviews, admission
+and candidate/Main gates remain pending.
 
 The literal source set cannot admit runtime-created source. Agents retain
 ADR 0026's separate precompiled source tables and contexts; this change does

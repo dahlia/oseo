@@ -145,9 +145,9 @@ export const nativeShardCosts = {
     "tests/property/m5-globalthis-binding.property.test.ts": 2647,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 590,
     "tests/property/m5-harness-promise-helper.property.test.ts": 578,
-    // Local Linux extended case sum: 606.907057926 s, rounded up.
-    // October 27, 2026; not CI or file wall time. See U6 provenance.
-    "tests/property/m5-host-script-bindings.property.test.ts": 607,
+    // Local Linux extended case sum: 592.766300123 s, rounded up.
+    // October 27, 2026 on ce8ae0c8; not CI or file wall time. See U6.
+    "tests/property/m5-host-script-bindings.property.test.ts": 593,
     "tests/property/m5-import-attributes.property.test.ts": 354,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 334,
     "tests/property/m5-iterator-helpers-eager.property.test.ts": 285,

@@ -9765,9 +9765,61 @@ cancellations. Raw output, three exact source snapshots and two actual empty
 drains were retained for each, and Root accepted the measurements.
 
 This execution belongs to `20d6119b`, not to later evidence commits. The
-compiled product inputs are preserved by the cost/document update; its cost
-module differs within the extended wrapper's import closure, whose observed
-selection was one file and one worker. Affected internal and outer reviews,
+cost/document update that recorded it preserved the compiled product inputs;
+its cost module differed within the extended wrapper's import closure, whose
+observed selection was one file and one worker. The later `da99d0dd` and
+`ce8ae0c8` repairs below do change compiled product inputs, so this evidence
+does not describe the current source. Affected internal and outer reviews,
 Full/classification, admission and exact candidate/Main gates remain pending.
 Reg's existing records, both TCO unsupported expectations and all fourteen
 Host unsupported expectations are preserved, with no predicted promotions.
+
+
+Host Script directive and with-fallback repairs
+-----------------------------------------------
+
+Two compiler repairs follow the composed evidence. `da99d0dd` keeps the last
+directive's cooked string and location in the owned syntax program and seeds
+only host Script completion with it, because the bootstrap parser removes
+directive statements from the body. Directive-only Scripts and directives
+before declarations therefore return the directive value; ordinary HIR, MIR
+and C output are unchanged. *tests/host-script-directives-source.test.ts* and
+*tests/host-script-directives.test.ts* with
+*tests/native/fixtures/host-script-directives.ts* are its regressions.
+
+Host bindings make a Script's own `var` and function names resolve through
+the realm global object, so `da99d0dd` rejected destructuring leaves and
+assignment loop heads that missed every `with` object with `OSEO1001`, while
+baseline and the ordinary target accept them. `ce8ae0c8` gives those leaves
+the global-object fallback that simple, compound and update `with` writes
+already use: the reference is resolved with the chain, and PutValue reaches
+the property through the persistent Global Environment Record. Array and
+object patterns with defaults, rests and nesting, `for-in`, `for-of` and
+`for await` heads and their patterns, `var` initializers and patterns,
+function names and strict inner functions are covered by
+*tests/host-script-source.test.ts* under both targets, with Node.js and Deno
+references, and by a combined native fixture in
+*tests/native/fixtures/host-script-bindings.ts*. Undeclared names keep the
+existing rejection on both targets, and ordinary output is unchanged.
+
+A with-hit simple `for (var x in/of ...)` head writes the hoisted cell
+instead of the `with` object on both targets. That defect predates this node
+and is owned by the separate `with-var-loop-head-resolution` node; the new
+fixture does not cover it. Raw evidence is under
+*/data/m5c-host-script-bindings-20261027/claude-native/diag-with02/*.
+
+`ce8ae0c84a632e414729872b5de928bac5ed4d2e` (tree
+`42ebc5603083b92c9675dfbf04e7a65ef0ddd652`) completed the nine focused
+author commands on Linux, each once under the heavy lock with natural exit
+0: directive suites four registrations, whole Host suites thirteen and
+runtime-owned-call suites eight, each under Node and Deno; ordinary
+generated domains two under each; and the extended task at 120 cases per
+domain with the original seeds, budgets, policies, hints, guards, forced
+collection and deadlines. The whole Host suites keep all fourteen original
+subjects: thirteen expected passes and the ordinary-eval ADR 0016 boundary.
+No author native command ran on `da99d0dd` itself. The extended leaf sum
+is 592.766300123 seconds, a 593-second Linux weight replacing 607; macOS
+remains unmeasured at 296. *evidence/u6/README.md* records raw paths,
+hashes and limits. Internal review pass 4 of the with-fallback scope was
+clean at both stages. Outer reviews, Full/classification, admission and
+exact candidate/Main gates remain pending, and no promotion is predicted.
