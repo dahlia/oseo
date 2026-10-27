@@ -16604,10 +16604,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/from/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/from/non-constructible.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16616,7 +16616,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/from/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16640,16 +16640,16 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/newtarget-or-active-function-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/proto-from-ctor-realm.js
     expectedClassification: unsupported-profile-feature
     dependencies: [iterator-protocol]
@@ -16709,7 +16709,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/drop/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/drop/limit-equals-total.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16730,7 +16730,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/drop/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/drop/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16751,7 +16751,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/drop/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/drop/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16817,10 +16817,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/every/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/every/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/every/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16868,7 +16868,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/every/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/every/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16916,10 +16916,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/filter/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/filter/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/filter/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -16961,7 +16961,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/filter/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/filter/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17027,10 +17027,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/find/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/find/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/find/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17078,7 +17078,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/find/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/find/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17138,7 +17138,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/flatMap/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/flatMap/mapper-args.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17159,7 +17159,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/flatMap/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/flatMap/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17183,7 +17183,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/flatMap/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/flatMap/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17261,10 +17261,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/forEach/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/forEach/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/forEach/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17288,7 +17288,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/forEach/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/forEach/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17306,7 +17306,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/initial-value.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/map/argument-effect-order.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17339,7 +17339,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/map/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/map/mapper-args.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17354,7 +17354,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/map/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/map/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17378,7 +17378,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/map/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/map/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17447,10 +17447,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/reduce/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/reduce/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/reduce/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17474,7 +17474,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/reduce/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/reduce/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17537,10 +17537,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/some/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/some/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/some/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17588,7 +17588,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/some/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/some/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17630,7 +17630,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/take/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/take/limit-greater-than-or-equal-to-total.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17648,7 +17648,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/take/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/take/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17669,7 +17669,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/take/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/take/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17720,10 +17720,10 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/toArray/length.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/toArray/name.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/toArray/next-method-returns-non-object.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
@@ -17744,7 +17744,7 @@ tests:
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/prototype/toArray/prop-desc.js
     expectedClassification: pass
-    dependencies: [iterator-protocol]
+    dependencies: [iterator-protocol, object-properties]
   - path: test/built-ins/Iterator/prototype/toArray/proto.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
