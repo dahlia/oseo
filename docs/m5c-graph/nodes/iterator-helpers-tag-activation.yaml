@@ -16,5 +16,5 @@ delivers: "IH-A of the iterator-helpers split approved by the maintainer
   authorized exclusion owner; do not predict passes."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
