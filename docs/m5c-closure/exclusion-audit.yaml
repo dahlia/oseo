@@ -421,6 +421,14 @@ assessments:
       binding visibility assertions pending independent
       evidence or a maintainer accounting decision; no
       exclusion is authorized.
+  observation-train-dynamic-source:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: Root retains all 459 B19/B20/B30 unknown-eval and ImportExpression
+      rejections as active coverage remediation. Original source, subjects and
+      assertions remain visible; the observation does not establish equivalent
+      replacement evidence or authorize a whole-path exclusion. ADR 0016 and
+      ADR 0019 are unchanged, including their reopening triggers.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -8472,3 +8480,245 @@ paths:
     subject: Retainment of existing variable environment for
       `catch` parameter
     assessment: variable-environment
+  - path: "test/language/literals/numeric/7.8.3-3gs.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "228d3bb4d12ad6e0c00ebae60417f32c924e9cf94416f34e649e59ca4d963c50"
+    observationDigest: "a5bfe6588c4d64a36fc1bb4f730d9c0671ef5482c3f4320c55ef320c738f507b"
+    missingDynamicTag: false
+    section: "Original es5id: 7.8.3-3gs"
+    subject: "Strict Mode - octal extension is forbidden in strict mode (after a
+      hex number is assigned to a variable from an eval)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/7.8.5-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a6be59e7fd42dc2a0120b6feac8da0e2591f6f8a4b248f41213ecaf607a8b8d9"
+    observationDigest: "360228b569a541e02872857538ef428fcc1b98985e896483e8eb19f0810f648b"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionBackslashSequence"
+    subject: "A RegularExpressionBackslashSequence may not contain a LineTerminator."
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.1_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d390daa8a7d708348f4c3164dce87d46bb4414a2ab57d3cc9fb007947b515367"
+    observationDigest: "e4f68e16387f789607a008c0a14d24e4a0653490c5c3bdb3fc2f1f737a6e8ead"
+    missingDynamicTag: false
+    section: "Original es5id: 7.8.5_A1.1_T2"
+    subject: "Complex test with eval, using syntax pattern"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.3_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dd3b70471bac6f4a9394eb0a40fd6fde9fc26092b9b896dead78e7fd3eca3371"
+    observationDigest: "856917c981f140c634f0e2ca7d056934e7ff8012e0e4cf7cb1927137a59d0090"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "The first character of a regular expression may not be a <LF>
+      (\\u000A), evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.3_T4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b1aeb423feb6713d95e1fd6ca58a7340f0a3a37b48154c735c0eecac0fda13d4"
+    observationDigest: "ee7183932000e51c68106e605d582e507ffe4806b4e8c952aab4b373a05c5045"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "The first character of a regular expression may not be a <CR>,
+      (\\u000D), evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.3_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d2821f3fa9de01e860dec5e9d7c39853e587baaee1282c75987f83bea5dc92eb"
+    observationDigest: "f1334f7765a9e1fc6bca1e9f01525789ae6bb09bf4a0117bca3d2a69f8124449"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "The first character of a regular expression may not be a <LS>,
+      (\\u2028), evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.3_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9ee65d856b659043eb6f69487a5716624bb7e16de91f3f771da97a7701e20339"
+    observationDigest: "f62c327fa49e27f2b9ffd772292cede553d52e143b466a580e10ecdc32984474"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "The first character of a regular expression may not be a <LS>,
+      (\\u2028), evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0de2b7c36d7aeacf749dc1942f2a60301095339842cb3d924d67d0a55fe96b59"
+    observationDigest: "fe7526ed5be331068a464bb1b19ce9d023c110fe2491a4765ed62f4939e42c6a"
+    missingDynamicTag: false
+    section: "Original es5id: 7.8.5_A1.4_T2"
+    subject: "Complex test with eval, using syntax pattern"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.5_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "041a59362cd045000c151f75265f611e5ba754a83aaa67e965688a6367df67b3"
+    observationDigest: "c17200648d162353d34e3a15916d12d5be007451464fa16da5b214a66df709c1"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionBackslashSequence"
+    subject: "A RegularExpressionBackslashSequence may not contain a <LF>, evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.5_T4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "df812550aa0fdf7d02a0a1167026fa4ec1522bf628b62dfde2b6c814de0e17a0"
+    observationDigest: "c250fd291794e4cf99a9a4dc2caa9511d3083e757a5e2ba9e1cd45549b5d6adb"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionBackslashSequence"
+    subject: "A RegularExpressionBackslashSequence may not contain a <CR>, evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.5_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ee7ff79ff0eaccc6f234fef57c240f570c7d0e383826b13aa2a18b7ae6bba981"
+    observationDigest: "fceb35f991365e29dcf35c4c3d2ac00d1ece6ac8387b778140f5c1cabec6b0aa"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "The first character of a regular expression may not be a <LS>,
+      (\\u2028), evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A1.5_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ce5590ba72f7b4b95ee1ed7bb760944b166f6adae57d940fa342800df72358ee"
+    observationDigest: "31df7c5a8c58b98b8b97667698b4eef18c0e4487147086d7671705e9fda2142c"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "The first character of a regular expression may not be a <PS>,
+      (\\u2029), evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.1_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "05511c8a3fadbcaa16092552d0f90178846a29f088dfd6da843f2d722345fcff"
+    observationDigest: "9e0be9608772d937846d20172747fd7b2c6c0c9300daac3487904429e1f793fa"
+    missingDynamicTag: false
+    section: "Original es5id: 7.8.5_A2.1_T2"
+    subject: "Complex test with eval, using syntax pattern"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.3_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "184db7e0ffc74c569aa69a626a259a996ea6fe5cc033f05f3c1cee1d03bfa95b"
+    observationDigest: "8114d1efa56f13fca043ca6efe1d6a7e7a32f84897e5f30df55a4b29e18e22ba"
+    missingDynamicTag: false
+    section: "sec-literals-regular-expression-literals"
+    subject: "A regular expression may not contain a <LF> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.3_T4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a27901bd70394f22b7971aeb45b5c4ac08e558e9445acd72e49c6ee8301b7e0d"
+    observationDigest: "6ca1dbaaa09101d599143c4912f24426d7bc28b0c2d1e9e7b1262c639ba83b59"
+    missingDynamicTag: false
+    section: "sec-literals-regular-expression-literals"
+    subject: "A regular expression may not contain a <CR> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.3_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "abb9d17ac402148dc109db33e4a4f4426a5c016e195b059f692bf022a848533b"
+    observationDigest: "b3734bead70c8abf753067bca40ed5f1251b90a53884ff045f7b9db7abafcf8c"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "A regular expression may not contain a <LS> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.3_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f889fe2a683ac2e9d5597d4113f1e59d020e71cd11cf960fb6e2f6d9ed5b09d4"
+    observationDigest: "f0c1270b40b25cac08a33bc32fbbb28df0d3d339681e2c99512e31df06bd2579"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionNonTerminator"
+    subject: "A regular expression may not contain a <PS> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a81734f3c0609fa8fb61345a8f917fc6aa6f9ab9dacd82430aad254a6a23ee4d"
+    observationDigest: "f4d9265f6522aa54cb861cb9b0a0b44a737df9bd4e65edc617316bb7a9f26160"
+    missingDynamicTag: false
+    section: "Original es5id: 7.8.5_A2.4_T2"
+    subject: "Complex test with eval, using syntax pattern"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.5_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e21c74ffbbb70216c703fded54dd487382eb9ae957a44f2a195d877dbd269449"
+    observationDigest: "97504d1f7a2d20da13bfe3d5db254ed3bb9c0e99ed0a7812724ba7bdccfc82ee"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionBackslashSequence"
+    subject: "A regular expression may not contain a <LF> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.5_T4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2ae8906d591cffaaff47d0bce0cd4ea4aceb8bd919b59efc4624c12a7b575e3b"
+    observationDigest: "173e91a89fe8f48d0725b5213a271f609580ebf8bfd67c346649fcf0a39f7929"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionBackslashSequence"
+    subject: "A regular expression may not contain a <LF> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.5_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "519f96b0fd183b5fefee07b927562a2e7e8e796b2ff657ea029e3c947a708513"
+    observationDigest: "3aa8575a9b7de0f71c491416ead6b22aa8280c63146c6d219e695e0af487bbea"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionBackslashSequence"
+    subject: "A regular expression may not contain a <LS> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/S7.8.5_A2.5_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d324e3e0177fde19a2865877858cfdbfe94f7179beaab42d79b0dd3505a57312"
+    observationDigest: "e396ee3e82561af74c98da28f483e4eb8205c31b4509be1088ffddfc490412f5"
+    missingDynamicTag: false
+    section: "prod-RegularExpressionBackslashSequence"
+    subject: "A regular expression may not contain a <PS> as a SourceCharacter,
+      evaluated"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/mongolian-vowel-separator-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "203ffcfe642a721b6a2299d9f0be40413f086a54746dae97bf39c83c425459f0"
+    observationDigest: "0c4049dde8f58981a37234db72f2b149ba23402009ba9e9af0ab8e0d55486c9a"
+    missingDynamicTag: false
+    section: "sec-unicode-format-control-characters"
+    subject: "Mongolian Vowel Separator can appear in regular expression
+      literals (eval code)."
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/regexp/named-groups/invalid-lone-surrogate-gr\
+      oupname.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "de193a558c653c4bad094ea68bcbaa38173bc4522481df5fc44982f3d912639d"
+    observationDigest: "80085cb835e5ab1d6029cf9c02e15656fd300ef32e38efa70270338a4bfe4e4c"
+    missingDynamicTag: false
+    section: "prod-GroupSpecifier"
+    subject: "Lone surrogates in RegExp group names"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/literals/string/mongolian-vowel-separator-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f5f093528822b336757025357245c4d65173b9a9100d3dc9c683936463a6ddeb"
+    observationDigest: "fd14c9f04e1188215493a95790134853c19458368f9226cad11300c22bcd0996"
+    missingDynamicTag: false
+    section: "sec-unicode-format-control-characters"
+    subject: "Mongolian Vowel Separator can appear in string literals (eval code)."
+    assessment: "observation-train-dynamic-source"
