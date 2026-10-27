@@ -20255,7 +20255,7 @@ summary:
       expectedNegatives: 581
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 15677
+      passes: 15717
       semanticFailures: 0
       unsupportedProfileFeatures: 125
     - dependency: promise-settlement

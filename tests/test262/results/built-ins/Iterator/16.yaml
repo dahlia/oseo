@@ -50,6 +50,7 @@ results:
     classification: pass
     dependencies:
       - iterator-protocol
+      - object-properties
     execution:
       harnessIncludes:
         - base.js

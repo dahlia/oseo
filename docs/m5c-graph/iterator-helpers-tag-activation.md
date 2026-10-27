@@ -179,7 +179,33 @@ paths now belong to `observation`, including all 184 lazy and 173 eager
 method paths. Repository tasks regenerate the ledger and observation
 batches; the graph baseline reflects the same accepted manifest.
 
-The accepted UPDATE output is preserved byte for byte. This local Full
+R `73d78890` preserves the accepted UPDATE output byte for byte. This Full
 does not supply candidate/Main CI, macOS execution, outer review, graph
 landing or publication. The earlier preparation and focused-run statements
 above describe their original source and phase.
+
+
+D16 dependency accounting repair
+--------------------------------
+
+D16 on R `73d78890` against U found 40 promoted Iterator descriptor
+paths whose recorded *propertyHelper.js* include requires
+`object-properties`, missing from their `iterator-protocol` dependency
+lists. Root authorized a separate tag-only repair and one scoped UPDATE.
+The sweep covered all 389 promotions and found exactly those 40 rows.
+U2 `34a1430d` changes only their subset dependency tags.
+
+The single scoped UPDATE against R ran naturally from 2026-10-27
+19:07:53Z to 19:08:22Z: selected 40 of 29,901 paths, all 40 pass,
+160 split variants, pool eight and zero retries. Its raw packet is
+*/data/m5c-iha/result/scoped-update/update.{json,stdout,stderr}*;
+*scoped-wait.json* records the single *m5c-wait* completion. The gate
+used the local heavy lock, fresh capacity prefix, jobs one and this
+worktree's Zig cache, with no budget or workload override.
+
+*tag-sweep.json*, *before-scoped-records.json* and
+*scoped-preservation.json* in the same result directory prove that all
+29,901 records preserve every non-dependency field, including their
+classifications and observations. Exactly 40 dependency lists change.
+The manifest summaries and target-parity digest derive from that union;
+current totals and the four remediation owners remain unchanged.
