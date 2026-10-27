@@ -1101,3 +1101,23 @@ Array/TCO/F3 values and partition rules remain unchanged. The historical
 measurements above keep their original source identities and do not measure
 this composition or prove a deadline. Matching-host extended case sums and
 exact candidate/Main gates remain required; no budget or timeout changes.
+
+
+TCO source restoration on successful Main
+-----------------------------------------
+
+The Main-based source restores only historical TCO planning weights: Linux
+1,726 from the complete local extended run on `87aeb56b`, and macOS 286 from
+the then unknown-file fallback. Neither measures or bounds this source.
+All other weights, widths, shard totals and case membership stay exact Main.
+
+Original 8/8/6 draws, stable seeds, shrinking, replay and extended budgets
+remain. Old `1fd374f6`/CI40165660431 interrupted 39/60 liveness draws; it is
+failed incomplete coverage, not proof of runner variance or deadline margin.
+No Array packing or indexed-runtime performance source is imported. Complete
+matching-host candidate measurements remain required to replace weights.
+
+TCO source on the pending Set candidate retains the Set retirement of Annex
+samples309/451 and adds only historical TCO1726/286. The resulting135-entry
+host tables keep409/296 upper-median fallbacks. No case, width, shard or
+measurement claim changes; Set Full and old TCO execution stay source-bound.

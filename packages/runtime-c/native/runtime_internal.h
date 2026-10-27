@@ -1140,9 +1140,18 @@ typedef struct {
     uint32_t limbs[];
 } OseoBigInt;
 
+/*
+ * The value slots are followed in the same allocation by heap_word_count
+ * uint64_t bitmap words. Bit i describes whether slot i is a tagged heap
+ * value, not whether its referent is marked. Create/set/clone own every
+ * slot write and keep the bitmap exact; unused bits in its last word are
+ * zero. Binding-cell mutation does not change the environment's edge to
+ * the cell. No collection can occur between a slot store and its bit store.
+ */
 typedef struct {
     OseoHeapObject header;
     size_t slot_count;
+    size_t heap_word_count;
     OseoValue slots[];
 } OseoEnvironment;
 
@@ -2303,6 +2312,10 @@ static inline OseoString *string_object(OseoValue value) {
 static inline OseoEnvironment *environment_object(OseoValue value) {
     return (OseoEnvironment *)heap_object(value);
 }
+/* OseoValue is uint64_t, so the suffix needs no alignment or alias cast. */
+static inline uint64_t *environment_heap_bitmap(OseoEnvironment *environment) {
+    return environment->slots + environment->slot_count;
+}
 static inline OseoOrdinaryObject *ordinary_object(OseoValue value) {
     return (OseoOrdinaryObject *)heap_object(value);
 }
@@ -2851,6 +2864,45 @@ void oseo_internal_realm_enter(
     OseoValue realm_value
 );
 void oseo_internal_realm_leave(OseoContext *context, OseoRealmScope *scope);
+
+/*
+ * The one call a PrepareForTailCall site owes after it discarded its own
+ * frame (ECMA-262 15.10.3). `realm_record` is the running realm at that
+ * site, which stays the realm of any error the call itself raises before
+ * a callee switches to its own. A nonzero `host` names the OseoTailHost
+ * intrinsic to run instead of calling `callee`. `this_cell` is the `this`
+ * binding of a derived class constructor when `derived` is set.
+ * `arguments` is a private buffer whose capacity only grows; only its
+ * first `argument_count` entries are live, and only while `pending`.
+ */
+typedef struct {
+    OseoValue callee;
+    OseoValue receiver;
+    OseoValue realm_record;
+    OseoValue this_cell;
+    OseoValue *arguments;
+    size_t argument_count;
+    size_t argument_capacity;
+    unsigned host;
+    bool pending;
+    bool derived;
+} OseoTailCall;
+
+/*
+ * Records a call that a runtime PrepareForTailCall site owes once it has
+ * checked that `callee` is callable, and returns OSEO_STATUS_TAIL_CALL.
+ * `arguments` may point anywhere, including into memory the caller
+ * releases right after this returns. Defined in runtime_function.c.
+ */
+OseoResult oseo_internal_tail_call(
+    OseoContext *context,
+    OseoValue callee,
+    OseoValue receiver,
+    size_t argument_count,
+    const OseoValue *arguments
+);
+/* Frees the context's tail call record during context destruction. */
+void oseo_internal_tail_call_release(OseoContext *context);
 
 /*
  * Prepares one realm's state and releases the caches it owns. Realm

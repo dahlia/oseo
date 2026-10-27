@@ -14,7 +14,7 @@ manifest is published. This roadmap uses capability gates rather than
 calendar dates.
 
 M5a and M5b are complete. The normative
-[*M5 language profile*](./docs/language-profile-m5.md) records all 148 admitted
+[*M5 language profile*](./docs/language-profile-m5.md) records all 149 admitted
 families and their evidence assessments. M5c remains open under
 [*PLAN-M5C.md*](./PLAN-M5C.md).
 

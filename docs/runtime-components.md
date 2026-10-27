@@ -344,6 +344,35 @@ dynamically constructed pattern decides its group names as a literal does.
 No entry point, public layout, heap kind, intrinsic slot, or code ID is
 added.
 
+The `m5-136` runtime identity records proper tail calls.
+`OSEO_STATUS_TAIL_CALL`, `oseo_tail_call`,
+`oseo_tail_call_derived`, `oseo_tail_host_call`,
+`oseo_tail_host_call_derived`, and `oseo_call_complete` are generated-code ABI
+entry points. The context gains one private pointer to its pending tail call
+record, which the collector traces while a call is pending. The trampoline in
+`oseo_call_function` moves each record into a root frame of its own before the
+call runs, so nested calls never overwrite it, and releases that step's frame,
+realm scope, call depth, and frame budget before the next.
+`Function.prototype.call`, `Function.prototype.apply`, `Reflect.apply`, and the
+[[Call]] of bound functions and Proxies record their final call instead of
+nesting it. No heap kind, intrinsic slot, or built-in code ID is added.
+
+The composed `m5-137` runtime identity adds four owner-local counts of
+published ephemeron tables, weak-reference records, finalization registries,
+and finalization cells. Publication rejects overflow before linking a record;
+consumed, queued, and unreachable records remain counted until their owner's
+sweep removes them. Empty local counts skip only the corresponding weak
+clearing, cleanup scheduling, and registry compaction scans. Ephemeron
+fixed-point tracing remains unconditional for foreign-heap activation, and
+root tracing, forced safepoints, and sweep retain their existing behavior.
+The same unpublished identity completes the host-tail enum with
+`OSEO_TAIL_HOST_CLEAR_TIMEOUT = 3`, preserving values 1 and 2 and every layout,
+status value, and signature. Tail calls to `clearTimeout` evaluate all
+arguments before releasing the caller's frame, then run the direct intrinsic
+as one rooted trampoline step in the recorded realm. Missing handles become
+undefined; extras are ignored after evaluation. Numeric-only cancellation
+and the undefined result remain the existing host contract.
+
 Array literal spread also shares iterator get and next, then calls the
 `oseo_array_append` and `oseo_array_append_hole` generated-code ABI operations
 owned by *runtime\_array.c*. The append operations preserve monotonic own

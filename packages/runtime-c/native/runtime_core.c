@@ -119,9 +119,14 @@ void oseo_context_init(
     context->finalization_tail = oseo_undefined();
     context->next_finalization_order = 0u;
     context->finalization_pending_count = 0u;
+    context->ephemeron_table_count = 0u;
+    context->weak_reference_count = 0u;
+    context->finalization_registry_count = 0u;
+    context->finalization_cell_count = 0u;
     context->kept_objects = NULL;
     context->kept_object_count = 0u;
     context->kept_object_capacity = 0u;
+    context->tail_call = NULL;
     context->source_id = source_id;
     context->source_id_length = source_id_length;
     oseo_context_clear_language_error(context);
@@ -214,6 +219,7 @@ void oseo_context_destroy(OseoContext *context) {
     context->kept_objects = NULL;
     context->kept_object_count = 0u;
     context->kept_object_capacity = 0u;
+    oseo_internal_tail_call_release(context);
     /*
      * A mark another context set while it rooted one of this context's
      * values is still set here, and no sweep of that context ever clears

@@ -1,6 +1,7 @@
 /* eslint-disable no-await-in-loop -- Native fixture builds are isolated. */
 
 import assert from "node:assert/strict";
+import { writeSync } from "node:fs";
 import process from "node:process";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,6 +53,7 @@ import * as iteratorFixtures from "./native/fixtures/iterator-intrinsic.ts";
 import * as mapFixtures from "./native/fixtures/map-intrinsic.ts";
 import * as numberFixtures from "./native/fixtures/number-intrinsic.ts";
 import { objectFixtures } from "./native/fixtures/objects.ts";
+import { properTailCallFixtures } from "./native/fixtures/proper-tail-calls.ts";
 const { primitiveReceiverSetFixtures } =
   await import("./native/fixtures/primitive-receiver-inherited-set.ts");
 import * as promiseFixtures from "./native/fixtures/promise-intrinsic.ts";
@@ -165,6 +167,18 @@ if (nativeArguments.help) {
   process.exit(0);
 }
 
+const nativeProgressStart = performance.now();
+
+/** Flush runner boundaries without changing fixture observations or errors. */
+function nativeProgress(message: string): void {
+  try {
+    const elapsed = (performance.now() - nativeProgressStart).toFixed(1);
+    writeSync(process.stderr.fd, `native progress +${elapsed}ms ${message}\n`);
+  } catch {
+    // A diagnostic write must not replace the runner's original outcome.
+  }
+}
+
 /*
  * Oseo's realm reports UTC as its local time zone until the PLAN-NIO clock
  * and wakeup checkpoint supplies a host one. Both reference commands
@@ -207,6 +221,7 @@ Object.defineProperty(globalThis, "console", {
 
 const fixtures: readonly Fixture[] = [
   ...functionFixtures,
+  ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   ...globalThisFixture.globalThisBindingFixtures,
   ...objectFixtures,
@@ -284,8 +299,11 @@ const fixtures: readonly Fixture[] = [
   ...asyncGeneratorFixtures,
 ];
 
+nativeProgress("common-prelude begin");
+
 // Dynamic arity reaches the same admitted Object.create contract as fixed
 // positional arguments, so a spread descriptor map defines its properties.
+nativeProgress(`cli spread-descriptor-map.ts policy=enabled begin`);
 const spreadDescriptorMap = await runNativeCli(
   {
     args: ["spread-descriptor-map.ts"],
@@ -297,6 +315,7 @@ const spreadDescriptorMap = await runNativeCli(
   },
   host,
 );
+nativeProgress(`cli spread-descriptor-map.ts policy=enabled end`);
 assert.equal(spreadDescriptorMap.exitStatus, 0, spreadDescriptorMap.stderr);
 assert.equal(spreadDescriptorMap.stdout, "3 null\n");
 assert.equal(spreadDescriptorMap.stderr, "");
@@ -312,6 +331,7 @@ assert.equal(spreadDescriptorMap.stderr, "");
  * two reference hosts disagree, because Node.js still reports the earlier
  * behavior for the suspended case while Deno reports the specified one.
  */
+nativeProgress(`cli iterator-helper-reentry.ts policy=enabled begin`);
 const helperReentry = await runNativeCli(
   {
     args: ["iterator-helper-reentry.ts"],
@@ -343,6 +363,7 @@ probe(false);
   },
   host,
 );
+nativeProgress(`cli iterator-helper-reentry.ts policy=enabled end`);
 assert.equal(helperReentry.exitStatus, 0, helperReentry.stderr);
 assert.equal(
   helperReentry.stdout,
@@ -382,6 +403,7 @@ for (const deferredRegExp of [
     source: 'new RegExp("[\\\\é]");',
   },
 ]) {
+  nativeProgress(`cli ${deferredRegExp.name} policy=enabled begin`);
   const deferred = await runNativeCli(
     {
       args: [deferredRegExp.name],
@@ -391,6 +413,7 @@ for (const deferredRegExp of [
     },
     host,
   );
+  nativeProgress(`cli ${deferredRegExp.name} policy=enabled end`);
   assert.equal(deferred.exitStatus, 1);
   assert.equal(deferred.stdout, "");
   assert.match(
@@ -477,6 +500,12 @@ for (const dynamicSource of [
     ? ([[], ["--no-specialization"]] as const)
     : ([[]] as const);
   for (const specializationArgs of policies) {
+    nativeProgress(
+      `cli ${dynamicSource.name}` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } begin`,
+    );
     const rejected = await runNativeCli(
       {
         args: [...specializationArgs, dynamicSource.name],
@@ -485,6 +514,12 @@ for (const dynamicSource of [
         version: "0.1.0",
       },
       host,
+    );
+    nativeProgress(
+      `cli ${dynamicSource.name}` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } end`,
     );
     assert.equal(rejected.exitStatus, 1);
     assert.equal(rejected.stdout, "");
@@ -524,6 +559,7 @@ for (const shadowedRegExpPlaceholder of [
 Object.prototype[Symbol.${shadowedRegExpPlaceholder.symbol}] = () => 1;
 ${shadowedRegExpPlaceholder.expression};
 `;
+  nativeProgress(`cli ${shadowedRegExpPlaceholder.name} policy=enabled begin`);
   const native = await runNativeCli(
     {
       args: [shadowedRegExpPlaceholder.name],
@@ -533,11 +569,13 @@ ${shadowedRegExpPlaceholder.expression};
     },
     host,
   );
+  nativeProgress(`cli ${shadowedRegExpPlaceholder.name} policy=enabled end`);
   assert.equal(native.exitStatus, 0, native.stderr);
   assert.equal(native.stdout, shadowedRegExpPlaceholder.expected);
   assert.equal(native.stderr, "");
 }
 
+nativeProgress(`cli regexp-core-class-backreference.ts policy=enabled begin`);
 const coreClassBackreference = await runNativeCli(
   {
     args: ["regexp-core-class-backreference.ts"],
@@ -553,6 +591,7 @@ try {
   },
   host,
 );
+nativeProgress(`cli regexp-core-class-backreference.ts policy=enabled end`);
 assert.equal(coreClassBackreference.exitStatus, 0);
 assert.equal(coreClassBackreference.stdout, "true\n");
 assert.equal(coreClassBackreference.stderr, "");
@@ -564,6 +603,7 @@ assert.equal(coreClassBackreference.stderr, "");
 // The pinned Node.js host stops its generic replace after one execution
 // while Deno and the edition continue, so the two reference hosts disagree
 // and this cannot be a differential fixture.
+nativeProgress(`cli regexp-replace-source-position.ts policy=enabled begin`);
 const replaceSourcePosition = await runNativeCli(
   {
     args: ["regexp-replace-source-position.ts"],
@@ -587,6 +627,7 @@ console.log(String(calls));
   },
   host,
 );
+nativeProgress(`cli regexp-replace-source-position.ts policy=enabled end`);
 assert.equal(replaceSourcePosition.exitStatus, 0, replaceSourcePosition.stderr);
 assert.equal(replaceSourcePosition.stdout, "<R>\n3\n");
 assert.equal(replaceSourcePosition.stderr, "");
@@ -606,6 +647,7 @@ for (const annexBPattern of [
     "} catch (error) {\n" +
     "  console.log(error instanceof SyntaxError);\n" +
     "}\n";
+  nativeProgress(`cli ${annexBPattern.name} policy=enabled begin`);
   const rejected = await runNativeCli(
     {
       args: [annexBPattern.name],
@@ -615,6 +657,7 @@ for (const annexBPattern of [
     },
     host,
   );
+  nativeProgress(`cli ${annexBPattern.name} policy=enabled end`);
   assert.equal(rejected.exitStatus, 0, rejected.stderr);
   assert.equal(rejected.stdout, "true\n");
   assert.equal(rejected.stderr, "");
@@ -625,6 +668,7 @@ for (const annexBPattern of [
 // full requested width. The reviewed ceiling is Oseo's own resource
 // boundary rather than a specified one, so it is checked here instead of
 // in a fixture that also has to match the reference hosts.
+nativeProgress(`cli bigint-width-ceiling.ts policy=enabled begin`);
 const bigintWidthCeiling = await runNativeCli(
   {
     args: ["bigint-width-ceiling.ts"],
@@ -639,6 +683,7 @@ const bigintWidthCeiling = await runNativeCli(
   },
   host,
 );
+nativeProgress(`cli bigint-width-ceiling.ts policy=enabled end`);
 assert.equal(bigintWidthCeiling.exitStatus, 0, bigintWidthCeiling.stderr);
 assert.equal(
   bigintWidthCeiling.stdout,
@@ -653,7 +698,9 @@ async function requireSuccess(
   readonly stderr: string;
   readonly stdout: string;
 }> {
+  nativeProgress(`reference ${command} begin`);
   const result = await host.run({ args, command, cwd: root });
+  nativeProgress(`reference ${command} end`);
   if (result.exitStatus !== 0) {
     throw new Error(`${command} reference fixture failed:\n${result.stderr}`);
   }
@@ -674,6 +721,7 @@ async function references(fixture: Fixture): Promise<
     },
   ]
 > {
+  nativeProgress(`fixture ${fixture.name} reference preparation begin`);
   const directory = await host.makeTemporaryDirectory("oseo-reference-");
   const path = `${directory}/${fixture.name}.ts`;
   try {
@@ -690,12 +738,15 @@ async function references(fixture: Fixture): Promise<
           : "") +
         source,
     );
+    nativeProgress(`fixture ${fixture.name} reference preparation end`);
     return [
       await requireSuccess(process.execPath, [path]),
       await requireSuccess("deno", ["run", "--quiet", path]),
     ];
   } finally {
+    nativeProgress(`fixture ${fixture.name} reference cleanup begin`);
     await host.remove(directory);
+    nativeProgress(`fixture ${fixture.name} reference cleanup end`);
   }
 }
 
@@ -718,6 +769,12 @@ const proxyMissingDescriptorExpected =
 for (const specializationArgs of [[], ["--no-specialization"]] as const) {
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   try {
+    nativeProgress(
+      `cli proxy-missing-descriptor-extensibility.ts` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } begin`,
+    );
     const native = await runNativeCli(
       {
         args: [
@@ -729,6 +786,12 @@ for (const specializationArgs of [[], ["--no-specialization"]] as const) {
         version: "0.1.0",
       },
       host,
+    );
+    nativeProgress(
+      `cli proxy-missing-descriptor-extensibility.ts` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } end`,
     );
     assert.equal(native.exitStatus, 0, native.stderr);
     assert.equal(native.stdout, proxyMissingDescriptorExpected);
@@ -823,6 +886,12 @@ setTimeout(() => console.log("unreachable timer", pressure.length), 0);
 for (const specializationArgs of [[], ["--no-specialization"]] as const) {
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   try {
+    nativeProgress(
+      `cli weak-cleanup.ts` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } begin`,
+    );
     const cleanup = await runNativeCli(
       {
         args: [...specializationArgs, "weak-cleanup.ts"],
@@ -832,9 +901,21 @@ for (const specializationArgs of [[], ["--no-specialization"]] as const) {
       },
       host,
     );
+    nativeProgress(
+      `cli weak-cleanup.ts` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } end`,
+    );
     assert.equal(cleanup.exitStatus, 0, cleanup.stderr);
     assert.equal(cleanup.stdout, weakCleanupExpected);
     assert.equal(cleanup.stderr, "");
+    nativeProgress(
+      `cli weak-cleanup-throw.ts` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } begin`,
+    );
     const thrown = await runNativeCli(
       {
         args: [...specializationArgs, "weak-cleanup-throw.ts"],
@@ -843,6 +924,12 @@ for (const specializationArgs of [[], ["--no-specialization"]] as const) {
         version: "0.1.0",
       },
       host,
+    );
+    nativeProgress(
+      `cli weak-cleanup-throw.ts` +
+        ` policy=${
+          specializationArgs.length === 0 ? "enabled" : "disabled"
+        } end`,
     );
     assert.notEqual(thrown.exitStatus, 0);
     assert.equal(thrown.stdout, "");
@@ -930,6 +1017,10 @@ fallbackControls();
  * environment selection must survive actual collections.
  */
 for (const specialization of ["disabled", "enabled"] as const) {
+  nativeProgress(
+    `common with-keyed-binding-target-order` +
+      ` policy=${specialization} source compile begin`,
+  );
   const compiled = compileSource(
     defaultComponents.frontend,
     {
@@ -938,10 +1029,18 @@ for (const specialization of ["disabled", "enabled"] as const) {
     },
     { observeSpecialization: true, specialization },
   );
+  nativeProgress(
+    `common with-keyed-binding-target-order` +
+      ` policy=${specialization} source compile end`,
+  );
   assert.deepEqual(compiled.diagnostics, []);
   assert(compiled.mir != null, "with keyed binding MIR");
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   try {
+    nativeProgress(
+      `common with-keyed-binding-target-order` +
+        ` policy=${specialization} native prepare/build/execute begin`,
+    );
     await withNativeFixture(
       {
         backend: cBackend,
@@ -954,6 +1053,11 @@ for (const specialization of ["disabled", "enabled"] as const) {
         toolchain: nativeToolchain,
       },
       (native) => {
+        nativeProgress(
+          `common with-keyed-binding-target-order` +
+            ` policy=${specialization} native prepare/build/execute end; ` +
+            "inspection begin",
+        );
         assertMatchingObservations([
           {
             exitStatus: 0,
@@ -968,7 +1072,15 @@ for (const specialization of ["disabled", "enabled"] as const) {
           assert.equal(native.counters.guardHits, 0);
           assert.equal(native.counters.guardMisses, 0);
         }
+        nativeProgress(
+          `common with-keyed-binding-target-order` +
+            ` policy=${specialization} inspection end`,
+        );
       },
+    );
+    nativeProgress(
+      `common with-keyed-binding-target-order` +
+        ` policy=${specialization} native fixture end`,
     );
   } finally {
     delete process.env.OSEO_GC_EVERY_SAFEPOINT;
@@ -984,6 +1096,10 @@ for (const specialization of ["disabled", "enabled"] as const) {
  * Both policies force collection at every safepoint.
  */
 for (const specialization of ["disabled", "enabled"] as const) {
+  nativeProgress(
+    `common with-get-binding-value` +
+      ` policy=${specialization} source compile begin`,
+  );
   const compiled = compileSource(
     defaultComponents.frontend,
     {
@@ -992,10 +1108,17 @@ for (const specialization of ["disabled", "enabled"] as const) {
     },
     { observeSpecialization: true, specialization },
   );
+  nativeProgress(
+    `common with-get-binding-value policy=${specialization} source compile end`,
+  );
   assert.deepEqual(compiled.diagnostics, []);
   assert(compiled.mir != null, "with GetBindingValue MIR");
   process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   try {
+    nativeProgress(
+      `common with-get-binding-value` +
+        ` policy=${specialization} native prepare/build/execute begin`,
+    );
     await withNativeFixture(
       {
         backend: cBackend,
@@ -1008,6 +1131,11 @@ for (const specialization of ["disabled", "enabled"] as const) {
         toolchain: nativeToolchain,
       },
       (native) => {
+        nativeProgress(
+          `common with-get-binding-value` +
+            ` policy=${specialization} native prepare/build/execute end; ` +
+            "inspection begin",
+        );
         assertMatchingObservations([
           { exitStatus: 0, stderr: "", stdout: withGetBindingValueExpected },
           native,
@@ -1018,15 +1146,26 @@ for (const specialization of ["disabled", "enabled"] as const) {
           assert.equal(native.counters.guardHits, 0);
           assert.equal(native.counters.guardMisses, 0);
         }
+        nativeProgress(
+          `common with-get-binding-value` +
+            ` policy=${specialization} inspection end`,
+        );
       },
+    );
+    nativeProgress(
+      `common with-get-binding-value` +
+        ` policy=${specialization} native fixture end`,
     );
   } finally {
     delete process.env.OSEO_GC_EVERY_SAFEPOINT;
   }
 }
 
+nativeProgress("common-prelude end");
+
 const selectedFixtures = selectTestShard(fixtures, nativeArguments.shard);
 for (const fixture of selectedFixtures) {
+  nativeProgress(`fixture ${fixture.name} begin`);
   if (fixture.name === "iterator-next-callability") {
     // ECMA-262 2025 propagates failed next calls before these algorithms
     // can reach IteratorClose. Both hosts close in these four cases, so
@@ -1039,6 +1178,10 @@ for (const fixture of selectedFixtures) {
     for (const args of [[], ["--no-specialization"]] as const) {
       process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
       try {
+        nativeProgress(
+          `cli iterator-next-consumer-controls.ts` +
+            ` policy=${args.length === 0 ? "enabled" : "disabled"} begin`,
+        );
         const native = await runNativeCli(
           {
             args: [...args, "iterator-next-consumer-controls.ts"],
@@ -1047,6 +1190,10 @@ for (const fixture of selectedFixtures) {
             version: "0.1.0",
           },
           host,
+        );
+        nativeProgress(
+          `cli iterator-next-consumer-controls.ts` +
+            ` policy=${args.length === 0 ? "enabled" : "disabled"} end`,
         );
         assert.equal(native.exitStatus, 0, native.stderr);
         assert.equal(native.stdout, expected);
@@ -1059,6 +1206,7 @@ for (const fixture of selectedFixtures) {
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
   const test262Host = fixture.test262Host === true;
+  nativeProgress(`fixture ${fixture.name} source compile disabled begin`);
   const disabledCompilation = compileSource(
     defaultComponents.frontend,
     {
@@ -1067,6 +1215,8 @@ for (const fixture of selectedFixtures) {
     },
     { observeSpecialization: true, specialization: "disabled", test262Host },
   );
+  nativeProgress(`fixture ${fixture.name} source compile disabled end`);
+  nativeProgress(`fixture ${fixture.name} source compile enabled begin`);
   const enabledCompilation = compileSource(
     defaultComponents.frontend,
     {
@@ -1075,6 +1225,7 @@ for (const fixture of selectedFixtures) {
     },
     { observeSpecialization: true, specialization: "enabled", test262Host },
   );
+  nativeProgress(`fixture ${fixture.name} source compile enabled end`);
   assert.deepEqual(disabledCompilation.diagnostics, [], fixture.name);
   assert.deepEqual(enabledCompilation.diagnostics, [], fixture.name);
   const disabledMir = disabledCompilation.mir;
@@ -1240,6 +1391,17 @@ for (const fixture of selectedFixtures) {
     for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
       assert.match(text, /global-this global this/u);
       assert.match(text, /= receiver this/u);
+    }
+  }
+
+  if (fixture.name === "proper-tail-calls") {
+    // Both policies lower the same tail calls; no specialized path
+    // replaces the generic tail call ABI.
+    for (const text of [printMir(disabledMir), printMir(enabledMir)]) {
+      assert.match(text, /= call tail dynamic function value/u);
+      assert.match(text, /= call tail this=%b\d+ dynamic function value/u);
+      assert.match(text, /= call tail console_log/u);
+      assert.match(text, /= call tail setTimeout/u);
     }
   }
 
@@ -1444,6 +1606,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "json-stringify" ||
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals" ||
+    fixture.name === "proper-tail-calls" ||
     fixture.name.startsWith("cross-realm-")
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
@@ -1453,6 +1616,10 @@ for (const fixture of selectedFixtures) {
       ["disabled", disabledMir, disabledCompilation.agents],
       ["enabled", enabledMir, enabledCompilation.agents],
     ] as const) {
+      nativeProgress(
+        `fixture ${fixture.name} policy=${mode}` +
+          ` native prepare/build/execute begin`,
+      );
       await withNativeFixture(
         {
           agents: agents ?? [],
@@ -1466,6 +1633,10 @@ for (const fixture of selectedFixtures) {
           toolchain: nativeToolchain,
         },
         (native) => {
+          nativeProgress(
+            `fixture ${fixture.name} policy=${mode}` +
+              ` native prepare/build/execute end; inspection begin`,
+          );
           if (fixture.name === "object-constructor") {
             // ECMA-262 2025 toString steps 3 and 15 Get from ToObject.
             // Keep V8's measured primitive receiver as a reference control.
@@ -1490,7 +1661,12 @@ for (const fixture of selectedFixtures) {
           }
           assert(native.counters != null, `${fixture.name}: counters`);
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
-          if (fixture.name === "iterator-next-callability") {
+          if (
+            fixture.name === "iterator-next-callability" ||
+            fixture.name === "proper-tail-calls"
+          ) {
+            // Forced collection runs while tail call records and the
+            // trampoline's steps hold the only references to arguments.
             assert.ok(native.counters.collections > 0);
           }
           if (mode === "disabled") {
@@ -1885,7 +2061,13 @@ for (const fixture of selectedFixtures) {
               .every((line) => line.includes(zigNativeTarget)),
             "native compiler invocation records an explicit target",
           );
+          nativeProgress(
+            `fixture ${fixture.name} policy=${mode} inspection end`,
+          );
         },
+      );
+      nativeProgress(
+        `fixture ${fixture.name} policy=${mode} native fixture end`,
       );
     }
   } finally {
@@ -1900,6 +2082,7 @@ for (const fixture of selectedFixtures) {
           [enabledMir, enabledCompilation.agents],
         ] as const);
   for (const [compilation, agents] of hostCcLane ? [] : crossCompilations) {
+    nativeProgress(`fixture ${fixture.name} cross prepare/build begin`);
     await withNativeFixture(
       {
         agents: agents ?? [],
@@ -1913,42 +2096,54 @@ for (const fixture of selectedFixtures) {
         toolchain: nativeToolchain,
       },
       (cross) => {
+        nativeProgress(
+          `fixture ${fixture.name} cross prepare/build end; inspection begin`,
+        );
         assert(
           cross.compilerInvocation
             .filter((line) => line.startsWith("zig cc "))
             .every((line) => line.includes("aarch64-linux-musl")),
           "cross compiler invocation records an explicit target",
         );
+        nativeProgress(`fixture ${fixture.name} inspection end`);
       },
     );
+    nativeProgress(`fixture ${fixture.name} cross fixture end`);
   }
+  nativeProgress(`fixture ${fixture.name} end`);
 }
 
 if (isTestShardPosition(0, nativeArguments.shard)) {
+  nativeProgress("scenario 0 begin");
   await runNativeScenario0({
     host,
     nativeTarget,
     root,
     zigNativeTarget,
   });
+  nativeProgress("scenario 0 end");
 }
 
 if (isTestShardPosition(1, nativeArguments.shard)) {
+  nativeProgress("scenario 1 begin");
   await runNativeScenario1({
     host,
     nativeTarget,
     root,
     zigNativeTarget,
   });
+  nativeProgress("scenario 1 end");
 }
 
 if (isTestShardPosition(2, nativeArguments.shard)) {
+  nativeProgress("scenario 2 begin");
   await runNativeScenario2({
     host,
     nativeTarget,
     root,
     zigNativeTarget,
   });
+  nativeProgress("scenario 2 end");
 }
 
 console.log(

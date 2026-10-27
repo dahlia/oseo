@@ -18,16 +18,31 @@ OseoResult oseo_environment_create(OseoContext *context, size_t slot_count) {
             "Environment allocation is too large."
         );
     }
-    size_t size = sizeof(OseoEnvironment) +
-        slot_count * sizeof(OseoValue);
+    size_t slot_bytes = slot_count * sizeof(OseoValue);
+    size_t word_count = slot_count / 64u + (slot_count % 64u != 0u);
+    if (word_count >
+        (SIZE_MAX - sizeof(OseoEnvironment) - slot_bytes) / sizeof(uint64_t)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Environment allocation is too large."
+        );
+    }
+    size_t size = sizeof(OseoEnvironment) + slot_bytes +
+        word_count * sizeof(uint64_t);
     OseoEnvironment *environment =
         oseo_internal_allocate_heap_bytes(context, size);
     if (environment == NULL) {
         return failure(context, "OSEO2001", "Environment allocation failed.");
     }
     environment->slot_count = slot_count;
+    environment->heap_word_count = word_count;
     for (size_t index = 0u; index < slot_count; index += 1u) {
         environment->slots[index] = oseo_undefined();
+    }
+    uint64_t *bitmap = environment_heap_bitmap(environment);
+    for (size_t index = 0u; index < word_count; index += 1u) {
+        bitmap[index] = UINT64_C(0);
     }
     return oseo_internal_publish_heap(
         context,
@@ -65,6 +80,13 @@ OseoResult oseo_environment_set(
         return failure(context, "OSEO2001", "Environment index is invalid.");
     }
     environment->slots[index] = value;
+    uint64_t *word = &environment_heap_bitmap(environment)[index / 64u];
+    uint64_t bit = UINT64_C(1) << (index % 64u);
+    if (tag_of(value) == OSEO_TAG_HEAP) {
+        *word |= bit;
+    } else {
+        *word &= ~bit;
+    }
     return normal(value);
 }
 
@@ -85,6 +107,13 @@ OseoResult oseo_environment_clone(
             target->slots,
             source->slots,
             slot_count * sizeof(*target->slots)
+        );
+    }
+    if (source->heap_word_count > 0u) {
+        memcpy(
+            environment_heap_bitmap(target),
+            environment_heap_bitmap(source),
+            source->heap_word_count * sizeof(uint64_t)
         );
     }
     return created;

@@ -9547,3 +9547,75 @@ observations, macOS/sanitizer, extended and exact candidate/Main gates remain
 pending. The required Array CI failure blocked that historical bundle;
 it is not a standalone Set prerequisite. No family assessment, vocabulary,
 admission or classification changes.
+
+
+Historical TCO source on the Array base
+---------------------------------------
+
+Initial preparation on Set `a111c31e` is preserved as TCO `54973309`.
+That base failed CI because its native prototype-root injection locator
+still matched three slots after Set changed that root frame to four.
+Current preparation carries the complete owned `9945b7b8` to `b1eaeff0`
+TCO delta onto Array U`cccb7195`, tree
+`89d907b342885089374ffadd53eff606d31e6131`. All thirteen Array paths,
+three runtime guard hunks, six coverage files and new worknote stay exact.
+Set's locator, state prose, Receiver/descriptor/identity/invariant rules
+remain inherited. All fifteen TCO product postimages stay exact `b1eaeff0`.
+At initial preparation, Main was `cf0902db`/54; Set55 was prospective and
+Array was unlanded. Root's then-running standalone Array Full excluded TCO.
+The later combined-source U`68e298a9` evidence is distinct. Prior TCO sources
+and reviews remain
+preserved, including the incomplete32 and known-Gate-only33 outcomes.
+Generic/host-tail, bound/Proxy Call forwarding, pending roots, derived/realm
+rules and four owner-local counters keep the full `m5-137` unit. The two
+changed internal interfaces retain Set metadata and all post-call checks.
+Main chunk/include/static/source-coordinate and logical frame contracts stay.
+The existing fifth Set Script/oracle and all four TCO subjects remain; only
+its deferred no-tail assertions become exact positive protocol checks.
+Old Set Full, TCO checks/reviews and Array proofs keep their own sources.
+Array's worknote describes its standalone source before this TCO overlay;
+its measurements and unchanged-compiler statements do not validate the
+combined implementation. Changed lookup/Set/coercion/truncation/pending-GC
+interfaces received bounded interaction review and current-source execution.
+No rejected
+Array packing, completion-layout, B8 or RegExp implementation is imported.
+
+The new family indexes retained fixed, generated, structural and native
+contracts. Historical Array-bound author execution on `353a9f17` is recorded in
+*PLAN-M5C.md*, with its framework, host, target and policy limits. It does not
+validate this current Array/TCO composition.
+The single source-admission entry for `tail-call-optimization` remains
+in the 147-feature implementation. The six focused vectors and original
+full UPDATE ran on source `68e298a9a96a6d22dc2e33b9e70b7c6a86720e41`, tree
+`dcca1b0bf57b63d0446fab54c676f42a2ca19739`. The Full observed 29,901 paths:
+25,604 pass, 2,802 expected negatives and 1,495 unsupported, with no semantic,
+harness or infrastructure failures. Its only promotions are the two owned
+strict tagged-template TCO subjects, using the unchanged 100,000-depth helper
+and both specialization policies. All other 29,899 result records stay
+byte-identical. Derived observation ownership replaces remediation only for
+those two passes; other owners, inventory, policy and exclusions stay exact.
+The standards assessment cites these actual observations. Admission data
+review, candidate/Main gates and adoption remain separate requirements;
+source admission alone supplies no candidate gate pass.
+See [*current U68 evidence*](evidence/proper-tail-calls-u68-20261027.md).
+Native935 remains historical `05c1f074` evidence; the old 39/60 interruption
+is failed incomplete evidence. All 33 other pinned TCO paths remain
+unreviewed under batch32, whose accepted source plan remains separate.
+
+
+TCO source preparation on the fixed Reg candidate
+-------------------------------------------------
+
+Final bitmap source `f5bdd44d` is prepared on Reg publication candidate
+`98460f7c`, based on successful Main `d4d81be9`, under D10.4. Reg remains
+prospective and TCO remains unlanded. All compiler/runtime programs and
+generators retain f5, including ABI `m5-139`; the leaf proposal is absent.
+Only the original source feature admission is carried. Reg's complete
+observations, owners and per-path expectations stay unchanged pending a
+new Full, including both unsupported TCO expectations.
+
+*PLAN-M5C.md* defines this preparation phase. The existing
+[TCO evidence contract](evidence/proper-tail-calls-u68-20261027.md)
+records f5 author execution with exact sources and one-pair timing limits.
+Those checks and the historical U68 Full did not run on this composition.
+Fresh D3/Full, affected reviews and publication remain Root-owned.

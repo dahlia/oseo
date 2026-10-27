@@ -609,6 +609,27 @@ export const emittedC = {
       ["u));"],
     ],
     oseoCallLeaveContextStatement: [["    oseo_call_leave(context);"]],
+    callCompleteStatement: [
+      ["    result = oseo_call_complete(context, result);"],
+    ],
+    tailCallPrefix: [["result = oseo_tail_call(context, roots["], ["], "]],
+    tailCallDerivedPrefix: [
+      ["result = oseo_tail_call_derived(context, roots["],
+      ["], "],
+    ],
+    tailHostCallPrefix: [
+      ["result = oseo_tail_host_call(context, "],
+      [", "],
+      [", "],
+    ],
+    tailHostCallDerivedPrefix: [
+      ["result = oseo_tail_host_call_derived(context, "],
+      [", "],
+      [", "],
+    ],
+    tailHostConsoleLog: [["OSEO_TAIL_HOST_CONSOLE_LOG"]],
+    tailHostSetTimeout: [["OSEO_TAIL_HOST_SET_TIMEOUT"]],
+    tailHostClearTimeout: [["OSEO_TAIL_HOST_CLEAR_TIMEOUT"]],
   },
   objectOperation: {
     resultAssignOseoArrayCreateContextU: [

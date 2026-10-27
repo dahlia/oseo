@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop -- Reference observations are ordered. */
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
 import test from "node:test";
@@ -17,6 +17,7 @@ import {
   targetForExecutionHost,
 } from "../packages/compiler/src/index.ts";
 import { babelFrontend } from "../packages/parser-babel/src/index.ts";
+import { cRuntimeProvider } from "../packages/runtime-c/src/index.ts";
 import { createDenoHost, createNodeHost } from "../packages/host/src/index.ts";
 import { balancedInteropBackend } from "./helpers/balanced-backend.ts";
 import {
@@ -37,6 +38,17 @@ const nativeTarget = targetForExecutionHost(
 );
 const report = process.env.OSEO_SET_ARRAY_PREPARATION_DIR;
 const fixture = primitiveSetArrayCase;
+
+/**
+ * Inspect the exact runtime caller without executing or selecting a compiler.
+ */
+function runtimeSource(name: string): string {
+  const asset = cRuntimeProvider
+    .getRuntimeInput()
+    .assets.find((candidate) => candidate.name === name);
+  assert.ok(asset, name);
+  return readFileSync(asset.url, "utf8");
+}
 
 /** Retain pure evidence only when a caller supplies a directory. */
 function retain(name: string, contents: string): void {
@@ -131,10 +143,11 @@ test(`${fixture.name}: pure generic MIR/C contracts`, () => {
         (operation) =>
           operation.kind === "call" &&
           operation.target?.kind === "dynamic" &&
-          operation.arguments[0] === helperRead.id,
+          operation.arguments[0] === helperRead.id &&
+          operation.tail === true,
       ).length,
       1,
-      "the inherited setter retains its ordinary helper call",
+      "the inherited setter tail-calls the exact original helper",
     );
     const start = emitted.source.indexOf(
       `static OseoResult oseo_function_${setter.id}(\n`,
@@ -144,11 +157,79 @@ test(`${fixture.name}: pure generic MIR/C contracts`, () => {
       start,
       emitted.source.indexOf("\n}\n", start),
     );
-    assert.match(body, /oseo_(?:call_function|function_\d+)\(/u);
+    assert.equal(
+      setterOperations.filter((operation) => operation.tail === true).length,
+      1,
+      "the setter has exactly one tail position",
+    );
+    assert.match(
+      body,
+      new RegExp(
+        String.raw`result = oseo_tail_call\([^;]+;\s*` +
+          String.raw`roots\[\d+\] = result.value;\s*` +
+          String.raw`if \(result.status != OSEO_STATUS_NORMAL\) goto abrupt;`,
+        "u",
+      ),
+    );
+    const exitStart = body.lastIndexOf("abrupt:");
+    assert.ok(exitStart >= 0, "the ordinary owner has a real abrupt exit");
+    const exit = body.slice(exitStart);
+    assert.match(
+      exit,
+      new RegExp(
+        String.raw`abrupt:\s*oseo_roots_release\(context, &frame\);` +
+          String.raw`\s*return result;`,
+        "u",
+      ),
+    );
+    assert.equal(exit.match(/oseo_roots_release/gu)?.length, 1);
+    assert.doesNotMatch(exit, /result\s*=|oseo_call_complete/u);
+    const runtime = runtimeSource("runtime_function.c");
+    const publicCall = runtime.slice(
+      runtime.indexOf("OseoResult oseo_call_function("),
+    );
+    assert.match(
+      publicCall,
+      /return oseo_call_complete\(\s*context,\s*call_once\(/u,
+    );
+    const complete = runtime.slice(
+      runtime.indexOf("OseoResult oseo_call_complete("),
+      runtime.indexOf("OseoResult oseo_call_function("),
+    );
+    assert.match(
+      complete,
+      new RegExp(
+        String.raw`if \(result.status != OSEO_STATUS_TAIL_CALL\) ` +
+          String.raw`return result;\s*return run_tail_calls\(context\);`,
+        "u",
+      ),
+    );
+    const property = runtimeSource("runtime_property.c");
+    assert.match(
+      property,
+      new RegExp(
+        String.raw`OseoValue slots\[4\] = \{object_value, key, value, ` +
+          String.raw`oseo_undefined\(\)\};`,
+        "u",
+      ),
+    );
+    const setReceiver = property.slice(
+      property.indexOf("OseoResult oseo_internal_set_with_receiver("),
+    );
+    assert.match(
+      setReceiver,
+      new RegExp(
+        String.raw`result = oseo_call_function\([\s\S]*?` +
+          String.raw`oseo_roots_release\(context, &frame\);\s*` +
+          String.raw`if \(result.status != OSEO_STATUS_NORMAL\) ` +
+          String.raw`return result;\s*return normal\(value\);`,
+        "u",
+      ),
+    );
     assert.match(instrumented.source, /context\.roots != NULL/u);
     assert.match(instrumented.source, /context\.call_depth != 0u/u);
     assert.match(instrumented.source, /context\.active_frame_slots != 0u/u);
-    assert.doesNotMatch(emitted.source, /oseo_tail_call|OSEO_TAIL_HOST/u);
+    assert.match(emitted.source, /OSEO_TAIL_HOST_CLEAR_TIMEOUT/u);
     const mirText = printMir(mir);
     const harness = compileHarnessFragment(
       babelFrontend,
@@ -170,10 +251,8 @@ test(`${fixture.name}: pure generic MIR/C contracts`, () => {
       bodyLineOffset: 1,
     });
     assert.match(fragments.body.source, /oseo_case_resume/u);
-    assert.doesNotMatch(
-      fragments.body.source,
-      /oseo_tail_call|OSEO_TAIL_HOST/u,
-    );
+    assert.match(fragments.body.source, /oseo_tail_call\(/u);
+    assert.match(fragments.body.source, /OSEO_TAIL_HOST_CLEAR_TIMEOUT/u);
     retain(`${fixture.name}-${policy}.fragment.c`, fragments.body.source);
     retain(`${fixture.name}-${policy}.mir`, mirText);
     retain(`${fixture.name}-${policy}.c`, emitted.source);
