@@ -1,0 +1,100 @@
+group: language/module-code
+key: "34"
+results:
+  - case:
+      async: true
+      features:
+        - top-level-await
+      flags:
+        - module
+        - async
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/module-sync-import-async-resolution-ticks.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+      - promise-settlement
+      - top-level-await
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
+          id: test/language/module-code/top-level-await/module-sync-import-async-resolution-ticks.js
+          sourceHash: fnv1a64:1295288297623930
+        - dependencies: []
+          id: test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
+          sourceHash: fnv1a64:911c90c83a970ad1
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+        - dynamic-import
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/syntax/await-expr-dy\
+        n-import.js:112:9: error[OSEO1001]: ImportExpression is outside
+        the M1 profile."
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - top-level-await
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-body.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/syntax/early-does-no\
+        t-propagate-to-fn-expr-body.js:104:3: error[OSEO0001]: Source
+        could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

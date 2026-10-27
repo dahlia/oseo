@@ -1,0 +1,43 @@
+group: language/module-code
+key: "82"
+results:
+  - case:
+      async: false
+      features:
+        - Reflect
+        - Symbol
+        - Symbol.toStringTag
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/namespace/internals/set.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+      - reflect-namespace
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/namespace/internals/set.js
+          id: test/language/module-code/namespace/internals/set.js
+          sourceHash: fnv1a64:05297fbf762d7bb8
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -3,6 +3,41 @@ key: "05"
 results:
   - case:
       async: false
+      features:
+        - generators
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-gen-named-semi.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - generators
+      - module-linking
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/eval-export-dflt-gen-named-semi.js
+          sourceHash: fnv1a64:e2b48378352a74d7
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features: []
@@ -53,6 +88,77 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-star-id-name.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - dynamic-source
+      - module-linking
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-star-id-name.js
+          id: test/language/module-code/instn-star-id-name.js
+          sourceHash: fnv1a64:c9d8b5b6fd54ee8f
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Reflect
+        - Symbol.toStringTag
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/namespace/internals/own-property-keys-sort.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - reflect-namespace
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/namespace/internals/own-property-keys-sort.js
+          id: test/language/module-code/namespace/internals/own-property-keys-sort.js
+          sourceHash: fnv1a64:c77850e8399d2311
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features: []
@@ -73,5 +179,145 @@ results:
       errorType: SyntaxError
       failedPhase: parse
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+        - class
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-new-expr.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-new-expr.js
+          sourceHash: fnv1a64:92753fc5de83497d
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+        - class
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-obj-literal.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - module-linking
+      - object-literals
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-obj-literal.js
+          sourceHash: fnv1a64:ba93245aaffba8f6
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/export-var-await-expr-identifier.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - destructuring-bindings
+      - module-linking
+      - object-literals
+      - promise-settlement
+      - top-level-await
+      - var-bindings
+    observation:
+      detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
+        ait-expr-identifier.js:140:12: error[OSEO1001]: Await inside a
+        module top-level binding or assignment pattern is unsupported."
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/typeof-await-expr-literal-string.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/typeof-await-expr-literal-string.js
+          sourceHash: fnv1a64:f3600c304a7b208e
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

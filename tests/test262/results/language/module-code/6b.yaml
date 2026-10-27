@@ -1,0 +1,114 @@
+group: language/module-code
+key: 6b
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-iee-bndng-cls.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - functions
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-iee-bndng-cls_FIXTURE.js
+          id: test/language/module-code/instn-iee-bndng-cls.js
+          sourceHash: fnv1a64:4fd1be14c2afcbc1
+        - dependencies:
+            - test/language/module-code/instn-iee-bndng-cls.js
+          id: test/language/module-code/instn-iee-bndng-cls_FIXTURE.js
+          sourceHash: fnv1a64:ee04dcc70fe7885e
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-obj-literal.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+      - object-literals
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/if-expr-await-expr-obj-literal.js
+          sourceHash: fnv1a64:1435df4c65bfe9dd
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-this.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/if-expr-await-expr-this.js
+          sourceHash: fnv1a64:6c35b9fa899da4cd
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

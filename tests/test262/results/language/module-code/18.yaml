@@ -8,6 +8,75 @@ results:
         - module
       includes: []
       mode: module
+      path: test/language/module-code/eval-export-cls-semi.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - module-linking
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/eval-export-cls-semi.js
+          sourceHash: fnv1a64:27ea982b81c18ebd
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: Test262Error
+      expectedFailurePhase: runtime
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-export-dflt-expr-err-eval.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/eval-export-dflt-expr-err-eval.js
+          sourceHash: fnv1a64:8b36795b18f609c3
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: Test262Error
+      failedPhase: runtime
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
       path: test/language/module-code/instn-iee-trlng-comma.js
       strictness:
         - strict
@@ -27,6 +96,78 @@ results:
         - dependencies: []
           id: test/language/module-code/instn-iee-trlng-comma_FIXTURE.js
           sourceHash: fnv1a64:65cdb4c3debe13e6
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/for-await-expr-null.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - lexical-bindings
+      - module-linking
+      - promise-settlement
+      - top-level-await
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/for-await-expr-null.js
+          sourceHash: fnv1a64:38684247cbc52d23
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/try-await-expr-null.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/try-await-expr-null.js
+          sourceHash: fnv1a64:e80bccaeb2410027
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

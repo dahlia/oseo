@@ -1,0 +1,43 @@
+group: language/module-code
+key: a3
+results:
+  - case:
+      async: true
+      features:
+        - top-level-await
+      flags:
+        - module
+        - async
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/module-self-import-async-resolution-ticks.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+      - promise-settlement
+      - top-level-await
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/top-level-await/module-self-import-async-resolution-ticks.js
+          id: test/language/module-code/top-level-await/module-self-import-async-resolution-ticks.js
+          sourceHash: fnv1a64:911f5ada015bae50
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

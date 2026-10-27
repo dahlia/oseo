@@ -3,6 +3,41 @@ key: de
 results:
   - case:
       async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-gtbndng-indirect-trlng-comma.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/eval-gtbndng-indirect-trlng-comma_FIXTURE.js
+          id: test/language/module-code/eval-gtbndng-indirect-trlng-comma.js
+          sourceHash: fnv1a64:c578f5412f391be3
+        - dependencies: []
+          id: test/language/module-code/eval-gtbndng-indirect-trlng-comma_FIXTURE.js
+          sourceHash: fnv1a64:f45593db9ac345d5
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features: []
@@ -89,6 +124,42 @@ results:
             - test/language/module-code/top-level-await/dfs-invariant-direct-1_FIXTURE.js
           id: test/language/module-code/top-level-await/dfs-invariant-indirect_FIXTURE.js
           sourceHash: fnv1a64:6dae4af0edb7eb77
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/top-level-await-expr-new-expr.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/top-level-await-expr-new-expr.js
+          sourceHash: fnv1a64:bb983d6b23eb4c17
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

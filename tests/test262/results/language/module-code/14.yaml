@@ -74,4 +74,48 @@ results:
     observation:
       passed: true
     unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Reflect
+        - Symbol.toStringTag
+        - let
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/namespace/internals/own-property-keys-binding-types.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - lexical-bindings
+      - module-linking
+      - reflect-namespace
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/namespace/internals/own-property-keys-binding-types.js
+            - test/language/module-code/namespace/internals/own-property-keys-binding-types_FIXTURE.js
+          id: test/language/module-code/namespace/internals/own-property-keys-binding-types.js
+          sourceHash: fnv1a64:6ba2acf122ff9052
+        - dependencies:
+            - test/language/module-code/namespace/internals/own-property-keys-binding-types.js
+          id: test/language/module-code/namespace/internals/own-property-keys-binding-types_FIXTURE.js
+          sourceHash: fnv1a64:6088e147a536299d
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -830,6 +830,78 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-rest-param.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - iterator-protocol
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/invalid/nested-else-no-new-call-expression.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - dynamic-source
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-assignment-expr-not-optional.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - dynamic-source
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

@@ -1,0 +1,50 @@
+group: language/module-code
+key: ce
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - lexical-grammar
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_export-from_FIXTURE.js
+            - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_import-and-export_FIXTURE.js
+            - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
+          id: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
+          sourceHash: fnv1a64:124b768f5daacfad
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_FIXTURE.js
+          id: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_export-from_FIXTURE.js
+          sourceHash: fnv1a64:3831639a4d2c1f7f
+        - dependencies: []
+          id: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_FIXTURE.js
+          sourceHash: fnv1a64:cfac59d1ab3dfc62
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_FIXTURE.js
+          id: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_import-and-export_FIXTURE.js
+          sourceHash: fnv1a64:820a61a96a5c25a7
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

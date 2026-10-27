@@ -1,0 +1,81 @@
+group: language/module-code
+key: 2b
+results:
+  - case:
+      async: false
+      expectedErrorType: RangeError
+      expectedFailurePhase: runtime
+      features:
+        - top-level-await
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/module-import-rejection-tick.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/top-level-await/module-import-rejection-tick_FIXTURE.js
+          id: test/language/module-code/top-level-await/module-import-rejection-tick.js
+          sourceHash: fnv1a64:4a667648c9b3ccd4
+        - dependencies: []
+          id: test/language/module-code/top-level-await/module-import-rejection-tick_FIXTURE.js
+          sourceHash: fnv1a64:d19ee743ac7ead82
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: RangeError
+      failedPhase: runtime
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - top-level-await
+      flags:
+        - generated
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/top-level-await/syntax/while-await-expr-literal-number.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - promise-settlement
+      - top-level-await
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/top-level-await/syntax/while-await-expr-literal-number.js
+          sourceHash: fnv1a64:f11cb8e80b09e505
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

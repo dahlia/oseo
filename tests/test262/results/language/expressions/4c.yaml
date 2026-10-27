@@ -1012,6 +1012,112 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: true
+      features:
+        - dynamic-import
+      flags:
+        - async
+      includes:
+        - compareArray.js
+      mode: script
+      path: test/language/expressions/dynamic-import/for-await-resolution-and-error.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+    observation:
+      detail: 'test/language/expressions/dynamic-import/for-await-resolution-and-error.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/for-await-resolution-and-error.js:136:7:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-typeof-import.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/valid/nested-arrow-assignment-expression-nested-imports.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - lexical-bindings
+    observation:
+      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-arrow-assignment-expression-nested-imports.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-arrow-assignment-expression-nested-imports.js:100:15:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/valid/nested-arrow-script-code-valid.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - lexical-bindings
+      - var-bindings
+    observation:
+      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-arrow-script-code-valid.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-arrow-script-code-valid.js:105:3:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: false
       features:
         - Symbol.toPrimitive
