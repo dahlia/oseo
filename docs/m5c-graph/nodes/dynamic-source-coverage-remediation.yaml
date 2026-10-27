@@ -81,7 +81,16 @@ delivers: "Resolves the 305 reviewed unsupported paths assigned to
   test/language/expressions/object/. Their getter, setter, descriptor,
   and duplicate-property subjects remain in-claim. Their eval or source
   constructor rejection is authorized, but non-source subject coverage
-  remains unresolved. The 3 paths from well-known-intrinsics-harness
+  remains unresolved. The maintainer decision of 2026-10-28 keeps this
+  node as an umbrella over dynamic-source-importcall-accounting,
+  dynamic-source-module-semantics, dynamic-source-unknown-eval,
+  dynamic-source-callable-family,
+  dynamic-source-lexical-completion-family,
+  dynamic-source-private-binding-family, and
+  dynamic-source-realm-string-family; their work notes select the paths
+  each owns. Ownership moves to a child only in that child's landing, and
+  this node lands when it owns zero paths. The 3 paths from
+  well-known-intrinsics-harness
   assert AsyncFunction, AsyncGeneratorFunction, and GeneratorFunction
   are constructible before their trailing zero-argument construction
   reports the ADR 0016 run-time rejection, so their IsConstructor
@@ -114,5 +123,12 @@ delivers: "Resolves the 305 reviewed unsupported paths assigned to
   ADR 0016 and ADR 0019 remain unchanged."
 dependencies:
   - authorized-exclusion-audit
+  - dynamic-source-callable-family
+  - dynamic-source-importcall-accounting
+  - dynamic-source-lexical-completion-family
+  - dynamic-source-module-semantics
+  - dynamic-source-private-binding-family
+  - dynamic-source-realm-string-family
+  - dynamic-source-unknown-eval
 landed: false
-status: ready
+status: blocked

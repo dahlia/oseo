@@ -1,0 +1,26 @@
+version: 1
+id: dynamic-source-importcall-accounting
+title: Account ImportCall-subject dynamic import paths
+delivers: "DS-1 of the dynamic-source-coverage-remediation split approved
+  by the maintainer decision of 2026-10-28, item 2. Selects, by a
+  path-by-path reviewed assessment, the observation-batch-20 and
+  observation-batch-30 ImportExpression rejections under
+  test/language/expressions/dynamic-import/ whose normative subject is
+  ImportCall itself, including EvaluateImportCall and ContinueDynamicImport,
+  as docs/m5c-graph/dynamic-source-importcall-accounting.md records; it
+  selects nothing before those batches land. A
+  directory name or feature tag alone does not qualify. Each selected path
+  moves from the umbrella to adr:0016-dynamic-source-boundary with a
+  reviewed exclusion-audit record with fresh source and observation
+  digests, under the PLAN-M5C.md ImportCall rule and the 2026-10-22
+  import-attributes option A conditions. Audit records and ledger owners
+  only; no product change. Keeps all 41,091 inventory paths and counts none
+  as a pass. Module namespace, evaluation order, top-level await, and JSON
+  module identity subjects stay with the umbrella or
+  dynamic-source-module-semantics. An accepted ADR 0016 amendment admitting
+  any form of dynamic import reopens the exclusion. Approves no dynamic
+  import implementation; ADR 0016 and ADR 0019 remain unchanged."
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready

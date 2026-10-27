@@ -1,0 +1,24 @@
+version: 1
+id: with-optional-call-receiver-non-tail
+title: Preserve with receivers through non-tail optional calls
+delivers: "WOC-1 of the with-optional-call-receiver split approved by the
+  maintainer decision of 2026-10-28, item 4. Repairs the receiver defect
+  recorded in docs/m5c-graph/with-optional-call-receiver.md, scoped by
+  docs/m5c-graph/with-optional-call-receiver-non-tail.md, outside tail
+  position: for a non-nullish selected function, f?.() retains
+  WithBaseObject as its receiver after GetBindingValue. Covers selected,
+  inherited, unscopables-blocked, and all-miss references, nested with
+  environments, nullish short-circuiting, argument ordering, strict
+  GetBindingValue completion, and abrupt traps, with fixed native examples,
+  an independent generated oracle, both specialization policies, forced
+  collection, MIR structural evidence, and the optional-chaining and
+  with-statement family records and profile. Preserves ordinary identifier
+  calls, optional member calls, and lexical and global fallback behavior.
+  Strict tail-position optional calls belong to
+  with-optional-call-receiver-tail. Owns no manifest path; this is a
+  generic optional-call correction, not an eval source evaluation
+  admission or an exclusion."
+dependencies:
+  - eval-intrinsic-value
+landed: false
+status: ready

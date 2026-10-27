@@ -1,0 +1,24 @@
+version: 1
+id: dynamic-source-realm-string-family
+title: Cover realm, string, and intrinsic dynamic source subjects
+delivers: "DS-7 of the dynamic-source-coverage-remediation split approved by
+  the maintainer decision of 2026-10-28, item 4. Owns exactly the 80
+  existing umbrella paths listed in
+  docs/m5c-graph/dynamic-source-realm-string-family.md: foreign-realm
+  callables and constructors (34), template sites and realms (6), RegExp
+  round trips and flags (7), string inputs, global properties, intrinsic
+  lookup, deletion, and block exit (27), and intrinsic IsConstructor and
+  mixed static and dynamic functions (6), as grouped by the 2026-10-24 audit
+  families and, for later additions, by their recorded missing contracts.
+  The umbrella owns them until this node lands. For each path, reviews
+  ahead-of-time observation or replacement evidence for every non-source
+  subject. A path closes under adr:0016-dynamic-source-boundary only by the
+  item 1 rule, with a fresh-digest exclusion-audit record naming that
+  evidence and showing that only source evaluation remains; otherwise it
+  stays in remediation. Preserves all paths and assertions; never counts a
+  pass, emulates eval or source construction, or widens ADR 0016; ADR 0016
+  and ADR 0019 remain unchanged."
+dependencies:
+  - authorized-exclusion-audit
+landed: false
+status: ready

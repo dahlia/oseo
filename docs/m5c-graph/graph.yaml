@@ -20,9 +20,9 @@ baseline:
   unreviewedPaths: 11190
   unsupportedProfileFeatures: 1032
 summary:
-  nodes: 91
-  ready: 90
-  blocked: 1
+  nodes: 102
+  ready: 96
+  blocked: 6
   parked: 0
   landed: 59
 serializationPoints:
@@ -57,6 +57,152 @@ serializationPoints:
       digest together; never merge a digest from another observation
       set."
 collisions:
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-callable-family
+      - dynamic-source-importcall-accounting
+      - dynamic-source-lexical-completion-family
+      - dynamic-source-module-semantics
+      - dynamic-source-private-binding-family
+      - dynamic-source-realm-string-family
+      - dynamic-source-retagging
+      - dynamic-source-unknown-eval
+      - iterator-helpers-tag-activation
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-14
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - regexp-anchored-repeat-state-remediation
+      - regexp-split-coverage-remediation
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+      - with-optional-call-receiver-non-tail
+    note: "The 2026-10-28 split children of
+      dynamic-source-coverage-remediation, iterator-helpers, and
+      with-optional-call-receiver publish ledger owners, audit records, or
+      manifest observations independently of these lanes. Serialize their
+      publication; each child's ordered sibling is in a separate group."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - dynamic-source-callable-family
+      - dynamic-source-importcall-accounting
+      - dynamic-source-lexical-completion-family
+      - dynamic-source-module-semantics
+      - dynamic-source-private-binding-family
+      - dynamic-source-realm-string-family
+      - dynamic-source-retagging
+      - dynamic-source-unknown-eval
+      - module-top-level-await-patterns
+      - non-blocking-agent
+      - observation-batch-01
+      - observation-batch-03
+      - observation-batch-06
+      - observation-batch-08
+      - observation-batch-14
+      - observation-batch-18
+      - observation-batch-19
+      - observation-batch-20
+      - observation-batch-21
+      - observation-batch-22
+      - observation-batch-23
+      - observation-batch-24
+      - observation-batch-25
+      - observation-batch-26
+      - observation-batch-27
+      - observation-batch-28
+      - observation-batch-29
+      - observation-batch-30
+      - observation-batch-31
+      - observation-batch-32
+      - regexp-anchored-repeat-state-remediation
+      - regexp-split-coverage-remediation
+      - temporal-helpers-harness
+      - typed-array-proto-coverage-remediation
+      - unhandled-rejection-observation
+      - with-optional-call-receiver-tail
+    note: "The 2026-10-28 split children of
+      dynamic-source-coverage-remediation, iterator-helpers, and
+      with-optional-call-receiver publish ledger owners, audit records, or
+      manifest observations independently of these lanes. Serialize their
+      publication; each child's ordered sibling is in a separate group."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-callable-family
+      - dynamic-source-importcall-accounting
+      - dynamic-source-lexical-completion-family
+      - dynamic-source-module-semantics
+      - dynamic-source-private-binding-family
+      - dynamic-source-realm-string-family
+      - dynamic-source-unknown-eval
+      - iterator-helpers
+      - with-optional-call-receiver
+    note: "Each split umbrella follows only its own children, so it stays
+      independent of the other umbrellas' children. Serialize their
+      publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - iterator-helpers-tag-activation
+      - with-optional-call-receiver-tail
+    note: "Each split umbrella follows only its own children, so it stays
+      independent of the other umbrellas' children. Serialize their
+      publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - temporal-helpers-harness
+      - with-optional-call-receiver-non-tail
+    note: "Each split umbrella follows only its own children, so it stays
+      independent of the other umbrellas' children. Serialize their
+      publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers-tag-activation
+      - with-optional-call-receiver
+    note: "Each split umbrella follows only its own children, so it stays
+      independent of the other umbrellas' children. Serialize their
+      publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - with-optional-call-receiver-non-tail
+    note: "Each split umbrella follows only its own children, so it stays
+      independent of the other umbrellas' children. Serialize their
+      publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - with-optional-call-receiver-tail
+    note: "Each split umbrella follows only its own children, so it stays
+      independent of the other umbrellas' children. Serialize their
+      publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - temporal-helpers-harness
+      - with-optional-call-receiver
+    note: "Each split umbrella follows only its own children, so it stays
+      independent of the other umbrellas' children. Serialize their
+      publication."
   - path: docs/m5c-closure/exclusion-audit.yaml
     nodes:
       - dynamic-source-coverage-remediation

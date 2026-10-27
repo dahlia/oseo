@@ -1,0 +1,22 @@
+version: 1
+id: with-optional-call-receiver-tail
+title: Preserve with receivers through tail optional calls
+delivers: "WOC-2 of the with-optional-call-receiver split approved by the
+  maintainer decision of 2026-10-28, item 4. Extends the
+  with-optional-call-receiver-non-tail repair recorded in
+  docs/m5c-graph/with-optional-call-receiver.md, scoped by
+  docs/m5c-graph/with-optional-call-receiver-tail.md, to strict tail-position
+  optional calls through a selected with environment, such as return
+  f?.(args()) in strict code nested in a sloppy with body: normal and
+  abrupt completion, argument order, and the receiver, each beside an
+  ordinary strict tail call control, under both specialization policies,
+  with forced collection evidence that the proper-tail-calls trampoline
+  keeps the receiver, callee, and arguments rooted and live, and MIR
+  structural evidence that the call stays a tail call returned directly.
+  Owns no manifest path; this is a generic optional-call correction, not an
+  eval source evaluation admission or an exclusion."
+dependencies:
+  - proper-tail-calls
+  - with-optional-call-receiver-non-tail
+landed: false
+status: blocked

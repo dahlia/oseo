@@ -8,8 +8,15 @@ delivers: "Admits the ES2025 iterator helpers for the 393 reviewed unsupported
   cross-realm-host landed. Observe actual classifications, including the
   latter path's remaining source-constructor rejection. Apply the reviewed
   exclusion-audit procedure and assign every still-unsupported path its
-  bounded remediation or authorized exclusion owner; do not predict passes."
+  bounded remediation or authorized exclusion owner; do not predict passes.
+  The maintainer decision of 2026-10-28 keeps this node as an umbrella
+  over iterator-helpers-tag-activation and temporal-helpers-harness, as
+  docs/m5c-graph/iterator-helpers.md records. Ownership moves to a child
+  only in that child's landing, and this node lands when it owns zero
+  paths."
 dependencies:
+  - iterator-helpers-tag-activation
+  - temporal-helpers-harness
   - unsupported-ownership-audit
 landed: false
-status: ready
+status: blocked
