@@ -211,6 +211,11 @@ const wellKnownIntrinsicObjectsHarnessPath = join(
   "tests/test262/harness/wellKnownIntrinsicObjects.js",
 );
 
+const tcoHelperHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/tcoHelper.js",
+);
+
 const canonicalTarget = canonicalTest262Target;
 const runnerHost = createNodeHost();
 const executionTarget = targetForExecutionHost(
@@ -627,10 +632,12 @@ function unsupportedHostCapability(
  * the reviewed runner builds it with that host. The host provides the
  * `$262.agent` multi-agent capability of ADR 0026, whose agent programs
  * are compiled from the case's `$262.agent.start` templates, and the
- * `$262.createRealm` and `$262.global` realm members of ADR 0027. A case
- * that reads nothing of `$262` keeps an ordinary build, where the name
- * stays unresolvable. A case reads the agent capability through the
- * atomicsHelper.js include, which builds on it at load time, or references
+ * `$262.createRealm` and `$262.global` realm members of ADR 0027, plus
+ * `$262.evalScript` and unresolved `print` under ADR 0029. A case that
+ * reads neither a host member nor unresolved `print` keeps an ordinary
+ * build, where those host names stay unresolvable. A case reads the
+ * agent capability through atomicsHelper.js, which builds on it at load
+ * time, or references
  * one of those members itself, which reads `$262` even to write or delete
  * the member. The member is found in the parsed syntax rather than in the
  * text, so the name inside a comment or a string never withholds
@@ -643,7 +650,8 @@ export function needsTest262Host(
 ): boolean {
   return (
     parsed.case.includes.includes("atomicsHelper.js") ||
-    referencesHostMember(source, parsed.case.mode)
+    referencesHostMember(source, parsed.case.mode) ||
+    unresolvedReferenceNames(source, parsed.case.mode).has("print")
   );
 }
 
@@ -689,7 +697,8 @@ function referencesHostMember(
  * executes as usual.
  *
  * `$262` outside the members the native test262 host installs, which are
- * `agent`, `createRealm`, and `global`, names a host binding this profile
+ * `agent`, `createRealm`, `global`, and `evalScript`, names a host binding
+ * this profile
  * never provides. A harness definition is one an upstream include lists in its
  * `defines` metadata while no reviewed harness the case loads declares
  * it. Each stays an explicit unsupported result naming the missing
@@ -1894,6 +1903,7 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
         "resizableArrayBufferUtils.js",
         await readFile(resizableArrayBufferUtilsHarnessPath, "utf8"),
       ],
+      ["tcoHelper.js", await readFile(tcoHelperHarnessPath, "utf8")],
       ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
       ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
       [

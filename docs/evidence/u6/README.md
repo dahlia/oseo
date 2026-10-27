@@ -1101,3 +1101,289 @@ Array/TCO/F3 values and partition rules remain unchanged. The historical
 measurements above keep their original source identities and do not measure
 this composition or prove a deadline. Matching-host extended case sums and
 exact candidate/Main gates remain required; no budget or timeout changes.
+
+
+TCO source restoration on successful Main
+-----------------------------------------
+
+The Main-based source restores only historical TCO planning weights: Linux
+1,726 from the complete local extended run on `87aeb56b`, and macOS 286 from
+the then unknown-file fallback. Neither measures or bounds this source.
+All other weights, widths, shard totals and case membership stay exact Main.
+
+Original 8/8/6 draws, stable seeds, shrinking, replay and extended budgets
+remain. Old `1fd374f6`/CI40165660431 interrupted 39/60 liveness draws; it is
+failed incomplete coverage, not proof of runner variance or deadline margin.
+No Array packing or indexed-runtime performance source is imported. Complete
+matching-host candidate measurements remain required to replace weights.
+
+TCO source on the pending Set candidate retains the Set retirement of Annex
+samples309/451 and adds only historical TCO1726/286. The resulting135-entry
+host tables keep409/296 upper-median fallbacks. No case, width, shard or
+measurement claim changes; Set Full and old TCO execution stay source-bound.
+
+
+Host Script bindings local Linux extended cost
+----------------------------------------------
+
+On October 27, 2026, source
+`ab8d5d5c8b529abd46ba7c8b6b8fff28a040096e` (tree
+`742a642a9e9de51663d93f99c3f42c0cb23f267b`) completed the existing focused
+task once on Linux AMD64:
+
+~~~~ sh
+mise run test:property:extended:native:shard --shard 1/1 \
+  tests/property/m5-host-script-bindings.property.test.ts
+~~~~
+
+The unchanged task uses `OSEO_PROPERTY_RUN_SCALE=10`,
+`OSEO_PROPERTY_SEED=1592590339` and `OSEO_PROPERTY_SIZE=large`, one file
+worker, and both original domains at 120 cases each. Each unchanged
+240,000-millisecond base interrupt limit scales normally to 2,400,000.
+Both specialization policies, forced collection, false hints, guard misses,
+realm identity and abrupt results remain in every applicable generated case.
+The two registrations passed with no failures, skips or cancellations.
+
+Their measured durations were 299,418.921195 and 209,886.770563
+milliseconds: sum 509,305.691758 milliseconds, divided by 1,000 and rounded
+up to the new 510-second Linux weight. Gate wall time was
+510.643981080 seconds and is not the weight. This is one complete local
+extended observation, not CI, a macOS measurement, a speedup, a conservative
+bound or an estimate of variation.
+
+Before this entry, both host tables had 135 values. The existing unknown-file
+upper median used index `floor(135/2) = 67`: 409 Linux/296 macOS seconds.
+The macOS entry preserves that file's 296-second assignment as an explicitly
+unmeasured scheduling placeholder, with no invented host ratio. After adding
+only these two entries, the unchanged median rule derives 415 Linux/296
+macOS seconds over 136 values. No other table entry, partition algorithm,
+width, shard total, case, seed, size or interrupt limit changed.
+
+The complete raw record, source snapshots and tool hashes remain under
+*/data/m5c-host-script-bindings-20261027/*, task
+`task_2d22aad7a394`, dispatch `ctx_60b42a8e012e`. Its
+*native-property-extended01-unarmed/run/* directory holds the original five
+raw files and three identical source snapshots; Root's accepted measurement
+is *ROOT-ACCEPTED.json*. The separate
+*cost-source-update/host-script-bindings-local-20261027.json* records the
+exact source, physical input hash, argv, task controls, raw paths and hashes,
+case-sum rounding and prior/resulting medians. Original raw SHA-256 values:
+
+~~~~ text
+gate.stdout.raw
+1b3a6099c2765c247f3ecd0036943b138031d3e977842c9703997f26c5eb7f0a
+gate.stderr.raw
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+commands/whole.stdout
+a46dde3b43713647a9cabe0ebf5215cc7d959334a7a88e6dc6db6afbf81018f0
+commands/whole.stderr
+30222c44807d1c0cb5446169c30aed97d67cee4ef9595c081a0b49f1e2b414c9
+commands/whole.json
+1b3a6099c2765c247f3ecd0036943b138031d3e977842c9703997f26c5eb7f0a
+~~~~
+
+The process exited naturally and both actual process/scope drains were empty,
+15.056243110 seconds apart. The measurement retains its ab8d source identity;
+later metadata commits and any future GC composition are not new executions.
+Matching-host candidate CI remains required to replace the macOS placeholder.
+
+The later runtime-owned-call repair changes compiler inputs after this
+measurement. The 510-second Linux weight remains the measured `ab8d5d5c`
+scheduling baseline; it is not a fresh measurement or native pass for that
+repair. macOS remains unmeasured at the 296-second fallback. A new
+measurement requires the separately serialized author-heavy slot.
+
+The subsequent Host/GC preparation on `beea6880` uses ABI `m5-140`. At
+preparation it had no fresh property-cost measurement. The eight-case Node
+and Deno runtime-owned-call passes on Host source `918a6d93` remain fixed
+correctness observations, not property scheduling measurements. The later
+composed-source measurement follows below.
+
+
+Composed Host/GC local Linux extended cost
+------------------------------------------
+
+On October 27, 2026, source
+`20d6119bac41c5a6c819a268476dec017a2475d6`, tree
+`fbb16dadcaee5047ac692200d28efbc5ca56bd71`, ABI `m5-140`, completed once:
+
+~~~~ sh
+mise run test:property:extended:native:shard --shard 1/1 \
+  tests/property/m5-host-script-bindings.property.test.ts
+~~~~
+
+The physical input SHA-256 was:
+
+~~~~ text
+30ee9e7bca3cdae7b96e081dbc6d0105df4bd7fee46546366c0be58be554b404
+~~~~
+
+The stock task retained scale 10, large size, shared seed 1592590339,
+namespace seed inputs `0x60008d00` and `0x60008d01`, and 120 cases in each
+of the original declaration-state and malformed-Script domains. Both
+specialization policies, false hints, guard misses, forced collection,
+independent oracles, shrinking and original budgets remain. Each
+240,000-millisecond base deadline scales normally to 2,400,000. The actual
+wrapper selected this single file with one worker; both registrations passed,
+with no failures, skips, cancellations or TODOs.
+
+Measured leaf durations were 375,794.693417 and 231,112.364509 milliseconds.
+Their sum is 606,907.057926 milliseconds, or 606.907057926 seconds; rounding
+seconds up gives the 607-second Linux weight. Gate wall was 608.559741115
+seconds and is not the weight. The older ab8d 510-second observation above
+retains its exact source identity. This replaces only the owning Linux
+entry. All other weights and scheduling algorithms stay exact; both tables
+still have 136 entries and derive upper-median fallbacks of 415 Linux/296
+macOS seconds. macOS is unmeasured and retains its 296-second placeholder.
+No host ratio, conservative bound, speed comparison or CI time is inferred.
+
+The same fixed source also passed the handwritten runtime-C tail-call
+fixture, new eight-case Node and Deno runtime-owned-call suites, original
+twelve-registration Host suites under each framework, and ordinary generated
+domains under each. All fourteen original subjects stay intact: thirteen
+expected passes and the separate ordinary-eval ADR 0016 unsupported case.
+These eight exact focused commands are Linux source-qualified correctness
+observations; they establish no Full classification, admission or Main gate.
+
+The durable packet remains under
+*/data/m5c-host-script-bindings-20261027/*, task `task_2d22aad7a394`, dispatch
+`ctx_60b42a8e012e`. The *native-composed-extended01/run/* directory holds the
+five original raw files, three identical complete source snapshots, original
+process identities and two actual empty drains; Root acceptance is
+*ROOT-ACCEPTED.json*. Its parent *MEASURED-COST.json* records the exact
+command/task inputs, source/physical identities and case-sum derivation.
+The *integration-beea/FOCUSED-FIRST3-SUMMARY.json* and
+*FOCUSED-LAST5-SUMMARY.json* record the full focused vector. Original raw
+SHA-256 values, in gate stdout/stderr and command stdout/stderr/JSON order:
+
+~~~~ text
+gate.stdout.raw
+d44b9812b83ca4d188d398c32ab81b6b5ac9040032ce0822b28ca21f7d07f6bc
+gate.stderr.raw
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+commands/whole.stdout
+288fda0ad7597f0c95efc0db2d36fd325f7f0ea475f67812e5ec86b283adea9c
+commands/whole.stderr
+7c0ace3e3238bd03664e0f321b1fa97c3bd204aae470a947c819c11f860d8b6c
+commands/whole.json
+d44b9812b83ca4d188d398c32ab81b6b5ac9040032ce0822b28ca21f7d07f6bc
+~~~~
+
+The gate exited naturally at 04:12:45.466304 UTC, root PID 1182015 with
+start tick 48837315; 1,387 PID/start identities were sampled, not an
+exhaustive execution count. The actual empty drains were
+04:12:46.536409 and 04:13:01.592510 UTC, 15.056101484050 seconds apart.
+Kernel ownership and controls passed with no foreign actor. Source snapshots
+include exact tracked modes/bytes, dist/maps and dependency/tool identities.
+The task's normal package build regenerated identical dist contents.
+
+Later metadata commits do not become new executions. The cost module is
+an actual extended-wrapper import and changes in this update; the observed
+one-file/one-worker selection and unchanged case budgets remain explicit.
+Compiled product and native fixture inputs stay exact `20d6119b`, while the
+entire wrapper import closure is not claimed byte-identical. Matching-host
+candidate CI and macOS measurements remain separate requirements.
+
+
+Repaired Host source local Linux extended cost
+----------------------------------------------
+
+Two compiler repairs followed the `20d6119b` measurement: directive
+completion values on `da99d0dd`, and global-object fallbacks for host Script
+`with` pattern and loop-head writes on
+`ce8ae0c84a632e414729872b5de928bac5ed4d2e` (tree
+`42ebc5603083b92c9675dfbf04e7a65ef0ddd652`). Both change compiled product
+inputs, so the 607-second weight above no longer describes the current
+source. No author native command ran on `da99d0dd` itself.
+
+On October 27, 2026, `ce8ae0c8` completed the same stock command once under
+the heavy lock:
+
+~~~~ sh
+mise run test:property:extended:native:shard --shard 1/1 \
+  tests/property/m5-host-script-bindings.property.test.ts
+~~~~
+
+The property file, its model, the seed registry and the test kit are
+unchanged since `20d6119b`. The stock task again retained scale 10, large
+size, shared seed 1592590339, namespace seed inputs `0x60008d00` and
+`0x60008d01`, and 120 cases per domain, with the original policies, false
+hints, guard misses, forced collection and deadlines. The wrapper selected
+this single file with one worker; both registrations passed, with no
+failures, skips, cancellations or TODOs.
+
+Measured leaf durations were 366,133.017177 and 226,633.282946
+milliseconds. Their sum is 592,766.300123 milliseconds, or 592.766300123
+seconds; rounding up gives the 593-second Linux weight that replaces 607.
+Gate wall was 594.017580763 seconds and is not the weight. macOS remains
+unmeasured at its 296-second placeholder, every other weight is unchanged,
+and both tables keep 136 entries. This is one-run scheduling data, not a
+performance comparison or CI time.
+
+The same source passed the other eight focused vectors listed for this node,
+each a single natural run: directive completion four registrations, whole
+Host suites thirteen, and runtime-owned calls eight, each under Node and
+Deno; ordinary generated domains two under each. The Host suites include the
+fourteen original subjects and the new with-fallback fixture. Raw output is
+under */data/m5c-host-script-bindings-20261027/claude-native/*, one
+*ce8a-NAME01/* directory per vector, with *SUMMARY-ce8a.json* recording each
+command, exit status, and the clean `ce8ae0c8` identity before and after.
+*SHA256SUMS-ce8a.txt* lists every raw file's hash. The extended raw hashes,
+in stdout, stderr and gate JSON order, are:
+
+~~~~ text
+f8faf73ddb8eb5e6943060d1b1b4e6840d4c38739f91582a82ddae6b6ccc2d18
+5b80f44ebc4c36cd5b2883baa45c5db4e7b1a0ae3c15726db5dd19bf21288fcc
+a225e29f4af61041935ca2fac5b9e60dc01315147ca8285e69c07a62f66c9162
+~~~~
+
+These are Linux source-qualified correctness observations on `ce8ae0c8`.
+They establish no Full classification, admission or Main gate, and the
+later metadata commit that records them is not a new execution.
+
+
+Host loop-head and alias repair local Linux extended cost
+---------------------------------------------------------
+
+`16bb5e917afbe90ab050805af151a5eacfb98dac` (tree
+`cf9a53e9dae174604962a790d2374a294081b641`) resolves host Script `var` loop
+heads through the Global Environment Record and records `const` aliases in
+classic `for` heads. It changes compiled product inputs, so the 593-second
+weight above no longer describes the current source.
+
+On October 27, 2026, `16bb5e91` completed the same stock extended command
+once under the heavy lock. The property file, its model, the seed registry,
+the test kit and *mise.toml* are unchanged since `20d6119b`, so the task
+kept its scale, size, shared seed, namespace seed inputs, 120 cases per
+domain, policies, false hints, guard misses, forced collection and
+deadlines. Both registrations passed, with no failures, skips,
+cancellations or TODOs.
+
+Measured leaf durations were 367,035.592429 and 228,307.203798
+milliseconds. Their sum is 595,342.796227 milliseconds, or 595.342796227
+seconds; rounding up gives the 596-second Linux weight that replaces 593.
+Gate wall was 596.6 seconds and is not the weight. macOS remains
+unmeasured at its 296-second placeholder, every other weight is unchanged,
+and both tables keep 136 entries. This is one-run scheduling data, not a
+performance comparison or CI time.
+
+The same source passed the other eight focused vectors, each a single
+natural run: directive completion four registrations, whole Host suites
+fifteen, and runtime-owned calls eight, each under Node and Deno; ordinary
+generated domains two under each. The Host suites include the fourteen
+original subjects and the two new loop-head and alias fixtures. Raw output
+is under */data/m5c-host-script-bindings-20261027/claude-native/*, one
+*16bb5e9-NAME01/* directory per vector, with *SUMMARY-16bb5e9.json*
+recording each command, exit status, and the clean `16bb5e91` identity.
+*SHA256SUMS-16bb5e9.txt* lists every raw file's hash. The extended raw
+hashes, in stdout, stderr and gate JSON order, are:
+
+~~~~ text
+fed73b867fc80e4e913f92d21797a1d9a49240d907b1f4fac7e85472a00452de
+2b41a9c1e6e00966dd409097d2889b39142cd3ae1a2abc8803dd2f0e5baf5318
+3768137cbd2a9a553a85135f1931e7deb73690dc5a3317a6e247053eb46d47c2
+~~~~
+
+These are Linux source-qualified correctness observations on `16bb5e91`,
+made before its internal review. They establish no review verdict, Full
+classification, admission or Main gate.

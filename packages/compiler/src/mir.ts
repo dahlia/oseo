@@ -1,4 +1,4 @@
-import type { ErrorIntrinsicName } from "./hir.ts";
+import type { ErrorIntrinsicName, HirExpression } from "./hir.ts";
 import type { RegExpMatcherProgram } from "./regexp-matcher.ts";
 import type { SourceRange } from "./source.ts";
 import type {
@@ -54,7 +54,8 @@ export interface CompilerOptions {
   /**
    * Compile the Script for the test262 host: `$262` reads the host object
    * the runtime installs, and every `$262.agent.start` source template the
-   * Script contains becomes an agent program compiled beside it.
+   * Script contains becomes an agent program compiled beside it. Literal
+   * evalScript sources join its dispatcher as ahead-of-time evaluators.
    */
   readonly test262Host?: boolean;
 }
@@ -68,8 +69,17 @@ export interface MirAgentTemplate {
   readonly sourceId: string;
 }
 
+/** One source in the closed set of ahead-of-time host Scripts. */
+export interface MirHostScript {
+  readonly source: string;
+  readonly functionId?: number;
+  readonly error?: "syntax" | "unsupported";
+  readonly message?: string;
+}
+
 /** The test262 host a main program installs before its Script runs. */
 export interface MirTest262Host {
+  readonly scripts?: readonly MirHostScript[];
   /** Agent program templates, indexed as each agent program's entry. */
   readonly agents: readonly MirAgentTemplate[];
 }
@@ -98,6 +108,8 @@ export interface MirGlobalBinding {
 
 /** One source-located Script lexical name checked against the global object. */
 export interface MirGlobalLexicalName {
+  readonly id?: number;
+  readonly mutable?: boolean;
   readonly name: string;
   readonly range: SourceRange;
 }
@@ -185,6 +197,7 @@ export interface MirOperation {
     | "enumerate-get"
     | "enumerate-next"
     | "function-create"
+    | "global-environment"
     | "global-this"
     | "guard-object"
     | "guard-shape"
@@ -238,6 +251,21 @@ export interface MirOperation {
   readonly mutable?: boolean;
   readonly namespaceBindingIds?: readonly number[];
   readonly namespaceNames?: readonly string[];
+  /**
+   * Marks a `call` in tail position (ECMA-262 15.10). Its block returns
+   * its value directly, with only `check-status` and `root-store`
+   * metadata between, so the backend may discard the frame before the
+   * call runs. Dynamic, console, and timer targets carry it; host targets
+   * use the host tail-call ABI without a first-class callable value.
+   */
+  readonly tail?: true;
+  /**
+   * The `this` binding of the derived class constructor a tail `call`
+   * leaves. The constructor's result rules then apply to the value the
+   * whole tail call chain returns, in place of the `derived-return` the
+   * frame can no longer run.
+   */
+  readonly tailThisBindingId?: number;
   /** Cooked strings for one cached tagged-template object. */
   readonly templateCooked?: readonly (string | undefined)[];
   /** Raw strings paired with `templateCooked`. */
@@ -431,6 +459,11 @@ export interface MirSpecialization {
 
 /** MIR for one declared function or script. */
 export interface MirFunction extends LocatedSyntax {
+  /** Declaration set for a host Script evaluator with a fresh environment. */
+  readonly hostScript?: {
+    readonly lexical: readonly MirGlobalLexicalName[];
+    readonly objects: readonly MirGlobalObjectBinding[];
+  };
   /**
    * The implicit `arguments` binding initialized by the backend from the
    * generic call ABI, present for every function form except an arrow.
@@ -496,6 +529,8 @@ export interface MirFunction extends LocatedSyntax {
 
 /** Backend-neutral MIR for one source script. */
 export interface MirProgram {
+  /** Other host Script global binding identities for shared emission. */
+  readonly hostObjectBindings?: readonly MirGlobalObjectBinding[];
   readonly functions: readonly MirFunction[];
   readonly globalBindings: readonly MirGlobalBinding[];
   /** Script lexical names checked against restricted global properties. */
@@ -582,4 +617,17 @@ export interface MirBuilder {
    * their failures instead of ignoring them.
    */
   strictCode: boolean;
+  /** True while lowering a body whose HIR function admits tail calls. */
+  readonly tailCalls: boolean;
+  /**
+   * The derived class constructor `this` binding a tail call carries,
+   * set only while lowering such a constructor.
+   */
+  readonly derivedThisBindingId?: number;
+  /**
+   * The HIR call and optional-chain expressions the current `return`
+   * lowers in tail position. Lowering one of those exact nodes marks its
+   * `call` as `tail`.
+   */
+  readonly pendingTailCalls: Set<HirExpression>;
 }

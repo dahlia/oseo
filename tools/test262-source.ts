@@ -245,12 +245,13 @@ export function agentSyntaxNode<Candidate>(
 
 /**
  * The `$262` members the native test262 host installs: `agent` (ADR 0026)
- * and `createRealm` and `global` (ADR 0027). Any other member, such as
- * `evalScript` or `detachArrayBuffer`, stays a missing host binding.
+ * and `createRealm` and `global` (ADR 0027), plus the finite ahead-of-time
+ * `evalScript` set (ADR 0029). Other members stay missing host bindings.
  */
 export const test262HostMembers: ReadonlySet<string> = new Set([
   "agent",
   "createRealm",
+  "evalScript",
   "global",
 ]);
 

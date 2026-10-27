@@ -518,3 +518,62 @@ test(
     );
   },
 );
+
+test(
+  "strict tail forwarding binds fresh primitive wrapper callees",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    const source = `
+const values = [false, -0, "live", Symbol("live"), 1234567890123456789n];
+const intrinsics = [Boolean, Number, String, Symbol, BigInt];
+function box(first = this) {
+  return [this, first, () => this];
+}
+function forward(target, value, depth) {
+  "use strict";
+  if (depth > 0) return forward(target, value, depth - 1);
+  return Reflect.apply(target, value, []);
+}
+function strict() { "use strict"; return this; }
+for (let index = 0; index < values.length; index++) {
+  const value = values[index];
+  const bound = box.bind(value);
+  const proxy = new Proxy(box, {});
+  const trap = new Proxy(box, {
+    apply(target, receiver, args) {
+      return Reflect.apply(target, receiver, args);
+    },
+  });
+  for (const target of [box, bound, proxy, trap]) {
+    const a = forward(target, value, 128);
+    const b = forward(target, value, 128);
+    console.log("tail box", typeof a[0], a[0] === a[1], a[2]() === a[0],
+      a[0] !== b[0],
+      Object.getPrototypeOf(a[0]) === intrinsics[index].prototype,
+      Object.is(intrinsics[index].prototype.valueOf.call(a[0]), value));
+  }
+  console.log("tail strict", Object.is(forward(strict, value, 128), value));
+}
+`;
+    const compiled = compileSource(babelFrontend, {
+      source,
+      sourceId: "tail-wrapper-structural.js",
+    });
+    assert.deepEqual(compiled.diagnostics, []);
+    assert.ok(compiled.mir != null);
+    const forward = compiled.mir.functions.find((fn) => fn.name === "forward");
+    assert.ok(forward != null);
+    assert.ok(
+      forward.blocks.some((block) =>
+        block.operations.some((operation) => operation.tail === true),
+      ),
+      "strict forwarding emits actual tail-call MIR",
+    );
+    assert.match(cBackend.emit(compiled.mir).source, /oseo_tail_call\(/u);
+    const expected = (
+      "tail box object true true true true true\n".repeat(4) +
+      "tail strict true\n"
+    ).repeat(5);
+    await compare(source, expected);
+  },
+);

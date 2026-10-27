@@ -7,7 +7,7 @@ import type {
 } from "../../packages/compiler/src/index.ts";
 import { babelFrontend } from "../../packages/parser-babel/src/index.ts";
 
-/** The original Set/Array subject, independent of the deferred TCO protocol. */
+/** The original Set Script/oracle, shared with the TCO call protocol. */
 export const primitiveSetDenseApplySource = `"use strict";
 const events = [], key = Symbol("payload");
 const values = [2, { value: 17 }, { value: -1 }, { value: -2 }];

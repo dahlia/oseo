@@ -2141,17 +2141,20 @@ OseoResult oseo_internal_iterator_result(
     return result;
 }
 
-OseoResult oseo_internal_array_iterator_next(
+/*
+ * %ArrayIteratorPrototype%.next's steps for an array iterator receiver,
+ * up to the iterator result it would create: `*value` and `*done` receive
+ * that result's fields. Both callers create nothing between this return
+ * and their own use of `*value`.
+ */
+static OseoResult array_iterator_step(
     OseoContext *context,
-    OseoValue iterator
+    OseoValue iterator,
+    OseoValue *value,
+    bool *done
 ) {
-    if (!is_array_iterator(iterator)) {
-        return oseo_internal_throw_error(
-            context,
-            OSEO_ERROR_TYPE,
-            "Array iterator next requires an array iterator receiver."
-        );
-    }
+    *value = oseo_undefined();
+    *done = true;
     /*
      * The iterated target and the cursor are both snapshotted before
      * LengthOfArrayLike, because its `Get` can run an accessor that
@@ -2161,9 +2164,7 @@ OseoResult oseo_internal_array_iterator_next(
      * the following index rather than retrying the one it failed to read.
      */
     OseoOrdinaryObject *state = ordinary_object(iterator);
-    if (!is_object(state->iterator_target)) {
-        return oseo_internal_iterator_result(context, oseo_undefined(), true);
-    }
+    if (!is_object(state->iterator_target)) return normal(oseo_undefined());
     OseoValue slots[4] = {
         iterator,
         oseo_undefined(),
@@ -2195,7 +2196,7 @@ OseoResult oseo_internal_array_iterator_next(
     if ((double)index >= length) {
         ordinary_object(slots[0])->iterator_target = oseo_undefined();
         oseo_roots_pop(context, &frame);
-        return oseo_internal_iterator_result(context, oseo_undefined(), true);
+        return normal(oseo_undefined());
     }
     ordinary_object(slots[0])->iterator_index = index + 1u;
     if (kind == OSEO_ARRAY_ITERATOR_KEY) {
@@ -2224,10 +2225,29 @@ OseoResult oseo_internal_array_iterator_next(
         if (result.status == OSEO_STATUS_NORMAL) slots[1] = slots[3];
     }
     if (result.status == OSEO_STATUS_NORMAL) {
-        result = oseo_internal_iterator_result(context, slots[1], false);
+        *value = slots[1];
+        *done = false;
     }
     oseo_roots_pop(context, &frame);
     return result;
+}
+
+OseoResult oseo_internal_array_iterator_next(
+    OseoContext *context,
+    OseoValue iterator
+) {
+    if (!is_array_iterator(iterator)) {
+        return oseo_internal_throw_error(
+            context,
+            OSEO_ERROR_TYPE,
+            "Array iterator next requires an array iterator receiver."
+        );
+    }
+    OseoValue value = oseo_undefined();
+    bool done = true;
+    OseoResult result = array_iterator_step(context, iterator, &value, &done);
+    if (result.status != OSEO_STATUS_NORMAL) return result;
+    return oseo_internal_iterator_result(context, value, done);
 }
 
 /*
@@ -2471,6 +2491,35 @@ OseoResult oseo_iterator_next(
 ) {
     *value = oseo_undefined();
     *done = true;
+    if (is_array_iterator(iterator) && is_function(next_method) &&
+        function_object(next_method)->code_id ==
+            OSEO_ARRAY_ITERATOR_NEXT_CODE_ID) {
+        /*
+         * The intrinsic next's [[Call]] enters its realm and one call
+         * level, then returns a fresh ordinary object whose own `done` and
+         * `value` are data properties, so IteratorComplete and
+         * IteratorValue observe nothing but those fields. The step keeps
+         * every observable Get; only the unobservable object is skipped.
+         */
+        OseoRealmScope scope;
+        oseo_internal_realm_enter(
+            context,
+            &scope,
+            function_object(next_method)->realm
+        );
+        OseoResult result = oseo_call_enter(context);
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = array_iterator_step(context, iterator, value, done);
+            oseo_call_leave(context);
+        }
+        oseo_internal_realm_leave(context, &scope);
+        if (result.status != OSEO_STATUS_NORMAL) {
+            *value = oseo_undefined();
+            *done = true;
+            return result;
+        }
+        return normal(oseo_boolean(!*done));
+    }
     /* The next method captured by GetIterator is reused every step. */
     OseoValue slots[3] = {iterator, oseo_undefined(), oseo_undefined()};
     OseoRootFrame frame = {NULL, slots, 3u};

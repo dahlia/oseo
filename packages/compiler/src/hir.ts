@@ -28,6 +28,12 @@ export interface HirBindingIdentifier extends LocatedSyntax {
    * lexical fallback when the target occurs inside `with`.
    */
   readonly withObjectBindingIds?: readonly number[];
+  /**
+   * The realm global-object property an all-miss write leaf reaches
+   * instead of the lexical cell, as for a host Script's `var` or
+   * function name whose binding is that property.
+   */
+  readonly withGlobalFallback?: HirWithGlobalObjectFallback;
   /** Strict SetMutableBinding for a selected with object on a write leaf. */
   readonly globalReference?: HirGlobalReference;
 }
@@ -64,6 +70,7 @@ export const importMetaName = "*import.meta*";
  * no later reference would observe.
  */
 export interface HirWithGlobalObjectFallback {
+  readonly object?: HirExpression;
   readonly name: string;
   readonly objectBindingId: number;
   /**
@@ -97,6 +104,8 @@ export interface HirStrictGlobalFallback {
  * still writes.
  */
 export interface HirGlobalReference {
+  /** The base is the persistent host Global Environment Record. */
+  readonly hostGlobal?: true;
   readonly strictFallback?: HirStrictGlobalFallback;
 }
 
@@ -253,6 +262,8 @@ export type HirForOfTarget =
       readonly name: string;
       readonly range: SourceRange;
       readonly withObjectBindingIds?: readonly number[];
+      /** The global-object property an all-miss write reaches instead. */
+      readonly withGlobalFallback?: HirWithGlobalObjectFallback;
       /** Strict SetMutableBinding for a selected with object. */
       readonly globalReference?: HirGlobalReference;
     }
@@ -501,6 +512,13 @@ export function anonymousDefinition(expression: HirExpression): boolean {
 /** A resolved call target in HIR. */
 export type HirCallTarget =
   | {
+      /** A host Script binding can shadow an otherwise private call target. */
+      readonly kind: "host-runtime-intrinsic";
+      readonly name: "console" | "setTimeout" | "clearTimeout";
+      readonly objectBindingIds: readonly number[];
+      readonly reference: HirGlobalRead;
+    }
+  | {
       readonly kind: "console-log";
     }
   | {
@@ -729,6 +747,10 @@ export interface HirClassThisBinding {
 
 /** A resolved, normalized HIR expression. */
 export type HirExpression =
+  | (LocatedSyntax & {
+      readonly kind: "global-environment";
+      readonly name: string;
+    })
   | (LocatedSyntax & {
       readonly argument: HirExpression;
       readonly kind: "await";
@@ -1163,6 +1185,8 @@ export type HirStatement =
     })
   | (LocatedSyntax & {
       readonly expression: HirExpression;
+      /** A lowered var initializer has an empty Statement completion. */
+      readonly emptyCompletion?: true;
       readonly kind: "expression";
     })
   | (LocatedSyntax & {
@@ -1294,6 +1318,15 @@ export interface HirFunction extends LocatedSyntax {
   readonly sourceText?: string;
   readonly selfBindingId?: number;
   readonly strict?: boolean;
+  /**
+   * True when the body is an ECMA-262 FunctionBody or ConciseBody whose
+   * tail position calls are proper tail calls (15.10.1): strict source
+   * code of an ordinary, arrow, method, accessor, or class constructor
+   * function. Generator and async bodies never set it, and neither does
+   * any function the compiler synthesizes, such as a class field
+   * initializer, whose `return` stands for no source ReturnStatement.
+   */
+  readonly tailCalls?: true;
 }
 
 /** One script environment cell required outside the script statement list. */
@@ -1311,6 +1344,8 @@ export interface HirGlobalBinding {
 
 /** One source-located Script lexical name checked against the global object. */
 export interface HirGlobalLexicalName {
+  readonly id?: number;
+  readonly mutable?: boolean;
   readonly name: string;
   readonly range: SourceRange;
 }
@@ -1327,6 +1362,7 @@ export interface HirGlobalObjectBinding extends HirGlobalBinding {
 
 /** A normalized script and its statically callable functions. */
 export interface HirProgram {
+  readonly hostScriptSources?: readonly string[];
   /**
    * The distinct `$262.agent.start` source templates of a Script resolved
    * for the test262 host, in the order resolution met them.
@@ -1390,6 +1426,10 @@ export interface Binding {
 }
 
 export interface ResolveState {
+  readonly hostScriptSources?: Set<string> | undefined;
+  /** Immutable lexical aliases initialized from an evalScript property read. */
+  readonly hostScriptAliases?: Set<number> | undefined;
+  readonly hostScriptBindings?: boolean | undefined;
   /** Optional fragment analysis; absent on the whole-Script path. */
   readonly globalReferences?: Set<string> | undefined;
   readonly scriptScope?: ReadonlyMap<string, Binding> | undefined;
@@ -1466,6 +1506,13 @@ export interface ResolveState {
    * and throw before any write, so they never enter this set.
    */
   readonly withInitializingFallbackNames: Set<string>;
+  /**
+   * Every binding a name reference has resolved to so far, read or
+   * written. A function whose implicit `arguments` binding never appears
+   * here, and that declares no `arguments` of its own, skips creating the
+   * object: the profile rejects direct eval, so no other path reaches it.
+   */
+  readonly referencedBindingIds: Set<number>;
   /**
    * Hidden fallback bindings owned by each currently resolved `with`
    * statement, ordered outermost first.

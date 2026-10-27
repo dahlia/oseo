@@ -7,6 +7,7 @@ import type {
   MirConstant,
   MirFunction,
   MirGlobalLexicalName,
+  MirHostScript,
   MirAgentTemplate,
   MirGlobalObjectBinding,
   MirOperation,
@@ -1505,7 +1506,9 @@ function emitCall(state: EmitState, operation: MirOperation): void {
   location(state, operation.range);
   state.usesAbrupt = true;
   const argumentsValue = emitArguments(state, callArguments);
-  if (target.kind === "console-log") {
+  if (operation.tail === true) {
+    emitTailCall(state, operation, argumentsValue);
+  } else if (target.kind === "console-log") {
     line(
       state,
       renderC(
@@ -1711,9 +1714,89 @@ function emitCall(state: EmitState, operation: MirOperation): void {
     );
     line(state, renderC(emittedC.common.indentedCloseBlock));
     line(state, renderC(emittedC.call.oseoCallLeaveContextStatement));
+    // A direct call bypasses `oseo_call_function`, so it completes any
+    // tail call chain the callee's body ended in here.
+    line(state, renderC(emittedC.call.callCompleteStatement));
     line(state, renderC(emittedC.common.closeBlock));
   }
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
+}
+
+/**
+ * Emits a call MIR marks as being in tail position. The runtime records
+ * it and returns OSEO_STATUS_TAIL_CALL, so the following status check
+ * leaves through the body's ordinary abrupt exit, which releases the
+ * frame's roots and returns that result to the trampoline. A tail call
+ * never has a handler in its own body, so that exit is the body's
+ * return. A derived class constructor passes its `this` binding cell
+ * along for the result rules the frame can no longer apply.
+ */
+function emitTailCall(
+  state: EmitState,
+  operation: MirOperation,
+  argumentsValue: { readonly count: number | string; readonly name: string },
+): void {
+  const target = operation.target;
+  const thisBindingId = operation.tailThisBindingId;
+  if (thisBindingId != null) {
+    line(
+      state,
+      renderC(emittedC.common.resultAssignOseoEnvironmentGetContext) +
+        renderC(
+          emittedC.common.rootsUStatement,
+          state.environmentSlot,
+          thisBindingId,
+        ),
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  }
+  const derived = thisBindingId != null;
+  if (target?.kind === "dynamic") {
+    const callee = operationArgument(operation, 0);
+    const receiver = operationArgument(operation, 1);
+    const prefix = derived
+      ? emittedC.call.tailCallDerivedPrefix
+      : emittedC.call.tailCallPrefix;
+    line(
+      state,
+      renderC(prefix, callee) +
+        renderC(
+          emittedC.common.twoRootsWithComma,
+          receiver,
+          argumentsValue.count,
+        ) +
+        (derived
+          ? renderC(emittedC.common.valueWithComma, argumentsValue.name) +
+            renderC(emittedC.derivedReturn.resultValueStatement)
+          : renderC(emittedC.common.callSuffix, argumentsValue.name)),
+    );
+    return;
+  }
+  let host: string;
+  if (target?.kind === "console-log") {
+    host = renderC(emittedC.call.tailHostConsoleLog);
+  } else if (target?.kind === "timer-intrinsic") {
+    host = renderC(
+      target.method === "setTimeout"
+        ? emittedC.call.tailHostSetTimeout
+        : emittedC.call.tailHostClearTimeout,
+    );
+  } else {
+    throw new Error(
+      `MIR tail call %${operation.id} has a target with no tail call ABI.`,
+    );
+  }
+  const prefix = derived
+    ? emittedC.call.tailHostCallDerivedPrefix
+    : emittedC.call.tailHostCallPrefix;
+  line(
+    state,
+    renderC(prefix, host, argumentsValue.count) +
+      (derived
+        ? renderC(emittedC.common.valueWithComma, argumentsValue.name) +
+          renderC(emittedC.derivedReturn.resultValueStatement)
+        : renderC(emittedC.common.callSuffix, argumentsValue.name)),
+  );
 }
 
 function emitObjectOperation(state: EmitState, operation: MirOperation): void {
@@ -2887,6 +2970,15 @@ function emitOperation(state: EmitState, operation: MirOperation): void {
       state,
       renderC(emittedC.operation.rootsAssignReceiverStatement, operation.id),
     );
+  } else if (operation.kind === "global-environment") {
+    location(state, operation.range);
+    state.usesAbrupt = true;
+    line(
+      state,
+      `result = oseo_global_environment(context, ` +
+        `roots[${operation.arguments[0]}]);`,
+    );
+    line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
   } else if (operation.kind === "global-this") {
     // The runtime owns the nullish-receiver substitution and the one
     // global this object it resolves to, so generated C never decides
@@ -3600,6 +3692,23 @@ function scriptFrameCost(functionValue: MirFunction): number {
   return rootCount(compact) + 2 * bindingAccesses;
 }
 
+/**
+ * Blocks of `functionValue` that C control can enter from `start`,
+ * without crossing `excluded`.
+ *
+ * A completion target is entered only through a `resume-completion`
+ * terminator, whose switch names every block emitted for the same body.
+ * Targets are therefore deferred until such a terminator is reachable;
+ * targets found before or after it join the fixed point together. When
+ * every `finally` in the body leaves abruptly, no dispatch exists, and
+ * emitting the targets would leave labels that no `goto` names.
+ *
+ * Block 0 as a target is the sentinel that a `return`, `throw`, or normal
+ * completion without a jump destination saves (`enterFinalizer`); the
+ * dispatch switch never names it. It is not deferred, so a generator body
+ * that starts after the call-time parameter prologue does not take in the
+ * prologue's entry block.
+ */
 function reachableBlocksFrom(
   functionValue: MirFunction,
   start: number,
@@ -3610,7 +3719,13 @@ function reachableBlocksFrom(
   );
   const pending = [start];
   const reachable = new Set<number>();
-  while (pending.length > 0) {
+  const completionTargets: number[] = [];
+  let resumesCompletion = false;
+  while (
+    pending.length > 0 ||
+    (resumesCompletion && completionTargets.length > 0)
+  ) {
+    if (pending.length === 0) pending.push(...completionTargets.splice(0));
     const id = pending.pop();
     if (id == null || reachable.has(id) || excluded.has(id)) continue;
     const block = blocks.get(id);
@@ -3632,11 +3747,8 @@ function reachableBlocksFrom(
       }
     } else if (block.terminator.kind === "branch") {
       pending.push(block.terminator.whenFalse, block.terminator.whenTrue);
-    } else if (
-      block.terminator.kind === "resume-completion" &&
-      (block.terminator.outerAbrupt != null ||
-        block.terminator.outerFinalizer != null)
-    ) {
+    } else if (block.terminator.kind === "resume-completion") {
+      resumesCompletion = true;
       if (block.terminator.outerAbrupt != null) {
         pending.push(block.terminator.outerAbrupt.blockId);
       }
@@ -3648,8 +3760,11 @@ function reachableBlocksFrom(
       if (operation.abruptTarget != null) {
         pending.push(operation.abruptTarget.blockId);
       }
-      if (operation.completionTarget != null) {
-        pending.push(operation.completionTarget.blockId);
+      if (
+        operation.completionTarget != null &&
+        operation.completionTarget.blockId !== 0
+      ) {
+        completionTargets.push(operation.completionTarget.blockId);
       }
     }
   }
@@ -3676,7 +3791,12 @@ function reachableFunctions(input: MirProgram): readonly MirFunction[] {
   const functions = new Map(
     input.functions.map((functionValue) => [functionValue.id, functionValue]),
   );
-  const pending = [...calledFunctionIds(input.script)];
+  const pending = [
+    ...calledFunctionIds(input.script),
+    ...(input.test262Host?.scripts ?? []).flatMap((entry) =>
+      entry.functionId == null ? [] : [entry.functionId],
+    ),
+  ];
   const reachable = new Set<number>();
   while (pending.length > 0) {
     const id = pending.pop();
@@ -3824,6 +3944,7 @@ function emitGlobalObject(
   state: Pick<EmitState, "lines" | "environmentSlot">,
   lexicalNames: readonly MirGlobalLexicalName[],
   bindings: readonly MirGlobalObjectBinding[],
+  hostScript = false,
 ): void {
   if (lexicalNames.length === 0 && bindings.length === 0) return;
   const lexical = emitGlobalNameTable(state, "global_lexical", lexicalNames);
@@ -3873,6 +3994,27 @@ function emitGlobalObject(
       `${functionDeclarations});`,
   );
   line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  if (hostScript && lexicalNames.length > 0) {
+    line(
+      state,
+      "static const size_t lexical_ids[] = {" +
+        lexicalNames.map((entry) => `${entry.id}u`).join(", ") +
+        "};",
+    );
+    line(
+      state,
+      "static const bool lexical_mutable[] = {" +
+        lexicalNames.map((entry) => String(entry.mutable)).join(", ") +
+        "};",
+    );
+    line(
+      state,
+      "result = oseo_script_lexicals_install(context, " +
+        `roots[${state.environmentSlot}], ${lexicalNames.length}u, ` +
+        `${lexical.names}, ${lexical.lengths}, lexical_ids, lexical_mutable);`,
+    );
+    line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
+  }
 }
 
 /**
@@ -3966,7 +4108,7 @@ function emitPrologue(
     line(state, `roots[${environmentSlot}] = callee;`);
     return;
   }
-  if (functionValue.id < 0) {
+  if (functionValue.id < 0 || functionValue.hostScript != null) {
     line(
       state,
       renderC(
@@ -4009,8 +4151,13 @@ function emitPrologue(
     );
     line(state, renderC(emittedC.common.gotoAbruptUnlessNormal));
   }
-  if (functionValue.id < 0) {
-    emitGlobalObject(state, globalLexicalNames, globalObjectBindings);
+  if (functionValue.id < 0 || functionValue.hostScript != null) {
+    emitGlobalObject(
+      state,
+      functionValue.hostScript?.lexical ?? globalLexicalNames,
+      functionValue.hostScript?.objects ?? globalObjectBindings,
+      functionValue.hostScript != null,
+    );
   }
   if (functionValue.selfBindingId != null) {
     line(
@@ -4694,11 +4841,55 @@ function nativeSource(
   return { source, sourceName, compilationUnits };
 }
 
+/** Immutable source table; callbacks share the complete function dispatcher. */
+function emitHostScriptTables(
+  scripts: readonly MirHostScript[],
+  costs: ReadonlyMap<number, number>,
+): string {
+  if (scripts.length === 0) return "";
+  const lines: string[] = [];
+  const entries = scripts.map((script, index) => {
+    const units = utf16Units(script.source);
+    lines.push(
+      `static const uint16_t host_source_${index}[] = {` +
+        (units.length === 0 ? "0" : units.join(", ")) +
+        "};",
+    );
+    return (
+      `{host_source_${index}, ${units.length}u, ` +
+      (script.functionId == null
+        ? "NULL, 0u, "
+        : `oseo_function_${script.functionId}, ` +
+          `OSEO_CALLABLE_FRAME_COST(${costs.get(script.functionId)}u), `) +
+      `${script.error === "syntax" ? "true" : "false"}, ` +
+      `${
+        script.message == null ? "NULL" : `"${escapeCString(script.message)}"`
+      }}`
+    );
+  });
+  lines.push(
+    "static const OseoHostScript oseo_host_scripts[] = {" +
+      entries.join(",\n") +
+      "};\n",
+  );
+  return lines.join("\n");
+}
+
 export const cBackend: NativeBackend = {
   emit(input) {
     const originalFunctions = reachableFunctions(input);
     const declaredFunctions = originalFunctions.map(compactRootIds);
-    const script = compactRootIds(input.script);
+    const script = compactRootIds(
+      input.test262Host == null
+        ? input.script
+        : {
+            ...input.script,
+            hostScript: {
+              lexical: input.globalLexicalNames ?? [],
+              objects: input.globalObjectBindings,
+            },
+          },
+    );
     const functions = [...declaredFunctions, script];
     const operationCount = functions.reduce(
       (count, fn) =>
@@ -4708,7 +4899,10 @@ export const cBackend: NativeBackend = {
     );
     const units = operationCount > 2048 ? new BodyUnits() : undefined;
     const globalLexicalNames = input.globalLexicalNames ?? [];
-    const globalObjectBindings = input.globalObjectBindings;
+    const globalObjectBindings = [
+      ...input.globalObjectBindings,
+      ...(input.hostObjectBindings ?? []),
+    ];
     // Native-stack charges remain separate from dense heap root layouts.
     // Non-recursive scripts also retain expression temporaries on the stack.
     const functionFrameCosts = new Map([
@@ -4746,7 +4940,7 @@ export const cBackend: NativeBackend = {
     for (const binding of input.globalBindings) {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
-    for (const binding of input.globalObjectBindings) {
+    for (const binding of globalObjectBindings) {
       totalBindingCount = Math.max(totalBindingCount, binding.id + 1);
     }
     // A hidden fallback binding stands for one unresolvable global
@@ -4848,7 +5042,19 @@ export const cBackend: NativeBackend = {
       );
     }
     const host = input.test262Host;
-    const hostTables = host == null ? empty : emitAgentTables(host.agents);
+    const scriptTables =
+      host == null
+        ? empty
+        : emitHostScriptTables(host.scripts ?? [], functionFrameCosts);
+    const hostTables =
+      host == null ? empty : emitAgentTables(host.agents) + scriptTables;
+    const scriptInstall =
+      host == null
+        ? empty
+        : `    context.host_scripts = ${
+            host.scripts?.length ? "oseo_host_scripts" : "NULL"
+          };\n` +
+          `    context.host_script_count = ${host.scripts?.length ?? 0}u;\n`;
     const hostInstall =
       host == null
         ? empty
@@ -4872,7 +5078,7 @@ export const cBackend: NativeBackend = {
         sourceId,
         sourceIdByteLength,
         generatorRegistration,
-        specializationObservation + hostInstall,
+        specializationObservation + scriptInstall + hostInstall,
         scriptRootCount,
         scriptRootCount,
         observations,

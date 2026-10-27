@@ -15,6 +15,15 @@ const range: SourceRange = {
   start: { column: 1, line: 1 },
 };
 
+/** A body that reads `arguments`, so the function keeps its object. */
+const readsArguments: readonly SyntaxStatement[] = [
+  {
+    expression: { kind: "identifier", name: "arguments", range },
+    kind: "return",
+    range,
+  },
+];
+
 /**
  * The printed presence-checked global-object read that `typeof` of an
  * unresolved `name` performs, as a regular expression source.
@@ -1396,7 +1405,7 @@ test("threads argumentsMapped from HIR into MIR unchanged", () => {
   const mappedSyntax: SyntaxProgram = {
     body: [
       {
-        body: [],
+        body: readsArguments,
         kind: "function",
         name: "simple",
         parameters: [{ hints: [], name: "value", range }],
@@ -1418,7 +1427,7 @@ test("threads argumentsMapped from HIR into MIR unchanged", () => {
   const restSyntax: SyntaxProgram = {
     body: [
       {
-        body: [],
+        body: readsArguments,
         kind: "function",
         name: "rest",
         parameters: [{ hints: [], name: "value", range, rest: true }],
@@ -1441,7 +1450,7 @@ test("threads argumentsMapped from HIR into MIR unchanged", () => {
   const strictSyntax: SyntaxProgram = {
     body: [
       {
-        body: [],
+        body: readsArguments,
         kind: "function",
         name: "strictSimple",
         parameters: [{ hints: [], name: "value", range }],
@@ -1466,7 +1475,7 @@ test("threads argumentsMapped from HIR into MIR unchanged", () => {
   const asyncGeneratorSyntax: SyntaxProgram = {
     body: [
       {
-        body: [],
+        body: readsArguments,
         functionKind: "async-generator",
         kind: "function",
         name: "owner",

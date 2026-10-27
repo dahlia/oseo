@@ -1,0 +1,116 @@
+version: 1
+id: proper-tail-calls
+title: "Proper tail calls"
+scope:
+  - "Calls in tail position of strict ordinary, arrow, method, accessor, and
+    class constructor bodies, including the existing direct console.log,
+    setTimeout, and clearTimeout host targets, and the PrepareForTailCall
+    steps of Function.prototype.call, Function.prototype.apply, and
+    Reflect.apply."
+  - "Bound function and Proxy [[Call]] forwarding through the same
+    trampoline, derived constructor result rules after a tail call, and
+    the realm of errors a tail call raises."
+  - "Historical integration ported complete TCO 9945b7b8 to b1eaeff0 onto
+    Array Ucccb7195, preserving all thirteen Array paths, three runtime
+    guard hunks, six coverage files and its source-qualified worknote.
+    Set Receiver, descriptor, invariant, locator and corrected state prose
+    stay inherited. Main chunks/include units and all fifteen TCO product
+    postimages remain exact b1eaeff0. Array apply/Set/coercion/truncation/GC
+    interactions have current-source focused execution and the full
+    reviewed-corpus observation on U68e298a9, as recorded below.
+    Earlier a111c31e failed its native locator; 54973309, e88f05cb/1a305507
+    and b1eaeff0/33 remain preserved with their exact sources and outcomes.
+    At initial preparation Main was cf0902db/54; Set55 was prospective
+    and the standalone Array Full excluded TCO. Those are historical
+    preparation identities, not the later combined-source observations.
+    Main TCO 145819bd and Set U071/R868 evidence retain their own sources.
+    Array f8f3e2de structural proofs and Array 353a9f17 execution remain
+    historical with their source, framework, target, policy and GC limits.
+    Six focused author vectors and the full reviewed corpus ran on
+    68e298a9a96a6d22dc2e33b9e70b7c6a86720e41, tree
+    dcca1b0bf57b63d0446fab54c676f42a2ca19739. The Full observed only the
+    two owned strict tagged-template promotions. Historical Native935
+    belongs to 05c1f074. These observations supply no candidate/Main gate
+    pass; the admission data gate requires the actual result and review."
+  - "Current source preparation carries final f5bdd44d compiler/runtime,
+    programs, assertions and stable generators onto Reg publication candidate
+    98460f7c. Reg observations, all per-path expectations and ledger owners
+    remained exact that candidate at preparation, without promoting the two
+    TCO expectations. The source list admits tail-call-optimization. Earlier
+    U68 and f5 evidence keeps its exact source and scope in the evidence
+    contract."
+  - "The later Full on accepted U e2dba363, tree add0cbfc, observed all
+    29,901 reviewed paths and promoted exactly the two owned strict
+    tagged-template paths from unsupported to pass, with no demotion. It is
+    no candidate/Main gate pass and no macOS execution."
+  - "The native fixture's forced-collection cost was reduced without
+    changing its program, depths, policies or safepoint collection: unread
+    arguments objects are not created, runtime ABI m5-140 shares live short
+    strings through a weak table, and intrinsic array iterator steps skip
+    their unobservable result object. These execution-input changes follow
+    the Full above, which needs a new reuse decision or a new Full."
+  - "The accepted remote Full on U 28d57fc5, job
+    20261027T105544Z-904e10b15d52, observes all 29,901 paths: 26,067
+    pass, 2,802 expected negatives and 1,032 unsupported. It promotes 12
+    Host global-code paths and RegExp Symbol.replace/coerce-global.js;
+    the two TCO paths retain pass. The Host eval path stays unsupported
+    with active Host-node remediation under the ADR 0016 boundary.
+    This Full supplies no candidate/Main gate or graph landing."
+owners:
+  - PLAN-M5C.md
+evidence:
+  differential:
+    status: covered
+    references:
+      - tests/native/fixtures/proper-tail-calls.ts
+      - tests/proper-tail-calls.test.ts
+      - tests/allocation-paths.test.ts
+  fixed:
+    status: covered
+    references:
+      - tests/proper-tail-calls.test.ts
+      - tests/runtime-tail-calls.test.ts
+      - tests/fixtures/runtime-tail-calls.c
+      - tests/tco-generator-interop.test.ts
+  forced-collection:
+    status: covered
+    references:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+      - tests/fixtures/runtime-tail-calls.c
+      - tests/fixtures/runtime-string-table.c
+      - tests/tco-generator-interop.test.ts
+  generated:
+    status: covered
+    references:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+  guard-fallback:
+    status: omitted
+    reason: "The family owns no specialized path or family-specific guard.
+      Tail calls use the generic tail call ABI or, for console.log,
+      setTimeout, and clearTimeout, the host-tail ABI under both policies."
+    replacements:
+      - tests/property/m5-proper-tail-calls.property.test.ts
+  specialization:
+    status: covered
+    references:
+      - tests/native.ts
+      - tests/native/fixtures/proper-tail-calls.ts
+      - tests/tco-generator-interop.test.ts
+  standards:
+    status: covered
+    references:
+      - tests/test262/results/language/expressions/03.yaml
+      - tests/test262/results/language/expressions/b7.yaml
+      - tests/test262/subset.yaml
+      - docs/evidence/proper-tail-calls-u68-20261027.md
+  structural:
+    status: covered
+    references:
+      - packages/parser-babel/tests/tail-calls.test.ts
+      - packages/backend-c/tests/index.test.ts
+      - tests/proper-tail-calls-emission.test.ts
+      - tests/proper-tail-call-resources.test.ts
+      - tests/completion-target-labels.test.ts
+      - tests/tco-generator-interop-preparation.test.ts
+      - tests/tco-feature-admission-preparation.test.ts
+      - tests/tco-grouped-body-source.test.ts

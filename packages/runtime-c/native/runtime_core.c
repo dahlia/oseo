@@ -46,6 +46,7 @@ void oseo_internal_realm_init(OseoRealm *realm) {
         realm->intrinsics[index] = oseo_undefined();
     }
     realm->global_this = oseo_undefined();
+    realm->global_lexicals = oseo_undefined();
     realm->template_cache = NULL;
     realm->template_cache_count = 0u;
     realm->template_cache_capacity = 0u;
@@ -74,6 +75,7 @@ void oseo_internal_realm_release(OseoRealm *realm) {
         realm->intrinsics[index] = oseo_undefined();
     }
     realm->global_this = oseo_undefined();
+    realm->global_lexicals = oseo_undefined();
     free(realm->template_cache);
     realm->template_cache = NULL;
     realm->template_cache_count = 0u;
@@ -91,6 +93,8 @@ void oseo_context_init(
 ) {
     context->roots = NULL;
     context->objects = NULL;
+    context->host_scripts = NULL;
+    context->host_script_count = 0u;
     context->function_dispatcher = NULL;
     context->generator_dispatcher = NULL;
     context->async_call_capability = oseo_undefined();
@@ -119,9 +123,15 @@ void oseo_context_init(
     context->finalization_tail = oseo_undefined();
     context->next_finalization_order = 0u;
     context->finalization_pending_count = 0u;
+    context->ephemeron_table_count = 0u;
+    context->weak_reference_count = 0u;
+    context->finalization_registry_count = 0u;
+    context->finalization_cell_count = 0u;
     context->kept_objects = NULL;
     context->kept_object_count = 0u;
     context->kept_object_capacity = 0u;
+    context->tail_call = NULL;
+    context->string_table = NULL;
     context->source_id = source_id;
     context->source_id_length = source_id_length;
     oseo_context_clear_language_error(context);
@@ -214,6 +224,8 @@ void oseo_context_destroy(OseoContext *context) {
     context->kept_objects = NULL;
     context->kept_object_count = 0u;
     context->kept_object_capacity = 0u;
+    oseo_internal_tail_call_release(context);
+    oseo_internal_string_table_release(context);
     /*
      * A mark another context set while it rooted one of this context's
      * values is still set here, and no sweep of that context ever clears

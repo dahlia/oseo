@@ -1,0 +1,177 @@
+/* eslint-disable no-await-in-loop -- Reference realms are isolated. */
+import assert from "node:assert/strict";
+import test from "node:test";
+import { cBackend } from "../packages/backend-c/src/index.ts";
+import { compileSource, printHir } from "../packages/compiler/src/index.ts";
+import { createNodeHost } from "../packages/host/src/index.ts";
+import { babelFrontend } from "../packages/parser-babel/src/index.ts";
+import { assertMatchingObservations } from "../packages/testkit/src/index.ts";
+import * as fixtures from "./native/fixtures/host-script-bindings.ts";
+import { hostScriptReferences } from "./native/host-script-reference.ts";
+
+const host = createNodeHost();
+
+test("fixed host Scripts agree with Node and Deno", async () => {
+  for (const fixture of fixtures.hostScriptBindingFixtures) {
+    const references = await hostScriptReferences(host, fixture.source);
+    assertMatchingObservations([
+      { stdout: fixture.expected, stderr: "", exitStatus: 0 },
+      references[0]!,
+    ]);
+    assertMatchingObservations([
+      {
+        stdout: fixture.denoExpected ?? fixture.expected,
+        stderr: "",
+        exitStatus: 0,
+      },
+      references[1]!,
+    ]);
+  }
+});
+
+test("with fallback write forms agree with Node and Deno", async () => {
+  for (const fixture of fixtures.withFallbackWriteCases) {
+    const expected = { stdout: fixture.expected, stderr: "", exitStatus: 0 };
+    assertMatchingObservations([
+      expected,
+      ...(await hostScriptReferences(host, fixture.source)),
+    ]);
+  }
+});
+
+test("with fallback write forms compile under both targets", () => {
+  // Only the Host target routes a declared global's write leaf to the
+  // global object's property; the ordinary target keeps the script cell
+  // that its global property already names.
+  const fallback = /fallback %b\d+\(\*intrinsic global object\*\)\["v"\]/u;
+  for (const fixture of fixtures.withFallbackWriteCases) {
+    for (const test262Host of [false, true]) {
+      for (const specialization of ["disabled", "enabled"] as const) {
+        const compiled = compileSource(
+          babelFrontend,
+          { source: fixture.source, sourceId: `${fixture.name}.js` },
+          { specialization, test262Host },
+        );
+        const label = `${fixture.name} host=${test262Host}`;
+        assert.deepEqual(compiled.diagnostics, [], label);
+        assert.ok(compiled.mir != null, label);
+        const hir = printHir(compiled.hir!);
+        if (!test262Host) assert.doesNotMatch(hir, fallback, label);
+        else if (!fixture.name.startsWith("var for-in")) {
+          assert.match(hir, fallback, label);
+        }
+      }
+    }
+  }
+});
+
+test("undeclared with fallback pattern writes stay rejected", () => {
+  for (const test262Host of [false, true]) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source: "with ({}) { [u] = [3]; }", sourceId: "undeclared.js" },
+      { test262Host },
+    );
+    assert.equal(compiled.mir, undefined);
+    assert.deepEqual(
+      compiled.diagnostics.map((diagnostic) => diagnostic.code),
+      ["OSEO1001"],
+    );
+  }
+});
+
+test("fixed host Scripts emit under both policies", () => {
+  for (const fixture of fixtures.hostScriptBindingFixtures) {
+    for (const specialization of ["disabled", "enabled"] as const) {
+      const compiled = compileSource(
+        babelFrontend,
+        { source: fixture.source, sourceId: `${fixture.name}.js` },
+        { specialization, test262Host: true },
+      );
+      assert.deepEqual(compiled.diagnostics, [], fixture.name);
+      const emitted = cBackend.emit(compiled.mir!);
+      assert.ok(
+        emitted.source.includes("oseo_test262_host_install"),
+        fixture.name,
+      );
+    }
+  }
+});
+
+test("host Script functions tail-call; evaluators retain completion", () => {
+  const fixture = fixtures.hostScriptBindingFixtures.find(
+    (entry) =>
+      entry.name === "strict tail calls retain foreign Script lexicals",
+  )!;
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source: fixture.source, sourceId: "host-tail-interaction.js" },
+      { specialization, test262Host: true },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    const mir = compiled.mir!;
+    for (const evaluator of [
+      mir.script,
+      ...mir.functions.filter((fn) => fn.hostScript != null),
+    ]) {
+      assert.ok(
+        evaluator.blocks.every((block) =>
+          block.operations.every((operation) => operation.tail !== true),
+        ),
+        evaluator.name,
+      );
+    }
+    for (const name of [
+      "tail",
+      "fail",
+      "forward",
+      "nested",
+      "say",
+      "mainTail",
+    ]) {
+      const fn = mir.functions.find((entry) => entry.name === name)!;
+      assert.ok(fn, name);
+      assert.ok(
+        fn.blocks.some((block) =>
+          block.operations.some((operation) => operation.tail === true),
+        ),
+        name,
+      );
+    }
+    const emitted = cBackend.emit(mir).source;
+    assert.match(emitted, /oseo_tail_call\(context/u);
+    assert.match(emitted, /oseo_call_function\(context/u);
+    assert.match(emitted, /oseo_global_environment\(context/u);
+    assert.match(emitted, /oseo_script_lexicals_install\(context/u);
+  }
+});
+
+test("for-initializer const aliases enter the host Script table", () => {
+  const fixture = fixtures.hostScriptBindingFixtures.find(
+    (entry) =>
+      entry.name === "for-initializer const aliases keep literal Scripts",
+  )!;
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source: fixture.source, sourceId: "for-alias.js" },
+      { specialization, test262Host: true },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    const scripts = compiled.mir!.test262Host!.scripts!;
+    assert.deepEqual(
+      scripts.map((script) => [script.source, script.error]).toSorted(),
+      [
+        ["1;", undefined],
+        ["2;", undefined],
+        ["3;", undefined],
+        [
+          "for (const nested = $262.evalScript; ; ) {" +
+            ' console.log(nested("3;")); break; }',
+          undefined,
+        ],
+      ],
+    );
+  }
+});

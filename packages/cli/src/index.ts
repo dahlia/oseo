@@ -115,7 +115,7 @@ const runtimeArchiveReuseParser = withDefault(
 const test262HostParser = withDefault(
   map(
     flag("--test262-host", {
-      description: message`Provide the test262 host object and its agents.`,
+      description: message`Provide the test262 host bindings and AOT sources.`,
     }),
     () => true,
   ),

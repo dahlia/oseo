@@ -36,6 +36,12 @@
  * at `ef014905`. macOS uses the Linux number only as an unmeasured
  * scheduling placeholder, not a measured host ratio. See U6 provenance.
  *
+ * Proper tail calls retain historical planning weights: Linux 1726 from
+ * the complete local extended run at `87aeb56b`, macOS 286 from the then
+ * unknown-file fallback. The changed source is unmeasured; the old Linux
+ * CI liveness timeout and partial GC sample prove no current full cost.
+ * The restored source still needs complete matching-host measurements.
+ *
  * Computed-member-reference-key-order adds a Reference-order domain and
  * fixed cases to the compound-assignment file. Its Linux entry uses a local
  * extended whole-file case sum of seventeen registrations; macOS remains
@@ -61,9 +67,16 @@
  * F3 adds a second generator-throw domain. Retire its old 47/43 samples.
  * The 135-entry Main/F3 tables derived 406 Linux/296 macOS fallbacks.
  * Set/Annex deletion, integrity and enumeration change the workload; retire
- * its old 309/451 samples. The remaining 134 entries derive 409/296
- * fallbacks. Primitive Set has no explicit estimate. See U6 provenance.
+ * its old 309/451 samples. Its remaining 134 entries derived 409/296
+ * fallbacks; restoring TCO gives 135 entries with the same fallbacks.
+ * Primitive Set has no explicit estimate. See U6 provenance.
  * These are unmeasured scheduling estimates, not matching-host costs.
+ *
+ * Host Script bindings use a complete local Linux extended two-case sum
+ * at `16bb5e91`; the earlier `ce8ae0c8`, `20d6119b` and `ab8d5d5c`
+ * results stay source-qualified.
+ * macOS preserves its prior unknown-file assignment of 296 seconds as
+ * an explicitly unmeasured placeholder. See U6 provenance.
  * All other Main entries and partition rules remain unchanged. See U6.
  */
 export const nativeShardCosts = {
@@ -133,6 +146,9 @@ export const nativeShardCosts = {
     "tests/property/m5-globalthis-binding.property.test.ts": 2647,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 590,
     "tests/property/m5-harness-promise-helper.property.test.ts": 578,
+    // Local Linux extended case sum: 595.342796227 s, rounded up.
+    // October 27, 2026 on 16bb5e91; not CI or file wall time. See U6.
+    "tests/property/m5-host-script-bindings.property.test.ts": 596,
     "tests/property/m5-import-attributes.property.test.ts": 354,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 334,
     "tests/property/m5-iterator-helpers-eager.property.test.ts": 285,
@@ -171,6 +187,7 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-intrinsic.property.test.ts": 944,
     // Unmeasured extended estimate; see U6 provenance.
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
+    "tests/property/m5-proper-tail-calls.property.test.ts": 1726,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 1559,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2299,
@@ -283,6 +300,9 @@ export const nativeShardCosts = {
     "tests/property/m5-globalthis-binding.property.test.ts": 855,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 479,
     "tests/property/m5-harness-promise-helper.property.test.ts": 548,
+    // UNMEASURED: preserve the prior unknown-file upper median, 296 s.
+    // Scheduling placeholder only; no macOS observation. See U6 provenance.
+    "tests/property/m5-host-script-bindings.property.test.ts": 296,
     "tests/property/m5-import-attributes.property.test.ts": 131,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 162,
     "tests/property/m5-iterator-helpers-eager.property.test.ts": 340,
@@ -321,6 +341,7 @@ export const nativeShardCosts = {
     "tests/property/m5-promise-intrinsic.property.test.ts": 669,
     // Unmeasured extended estimate; see U6 provenance.
     "tests/property/m5-primitive-wrapper-objects.property.test.ts": 900,
+    "tests/property/m5-proper-tail-calls.property.test.ts": 286,
     "tests/property/m5-proxy-exotic-object.property.test.ts": 441,
     // Retained; case-sharded out of the file shards.
     "tests/property/m5-reflect-namespace.property.test.ts": 2283,

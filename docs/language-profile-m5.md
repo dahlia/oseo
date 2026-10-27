@@ -23,7 +23,7 @@ admits or measures behavior updates this document in the same change.
 Unlike the frozen M3 and M4 profiles, this document changes throughout M5.
 A group's status describes tested current behavior, never intended behavior.
 
-M5a is complete. The normative family records described below inventory 148
+M5a is complete. The normative family records described below inventory 149
 admitted M5 families and assess every evidence class. M5 remains active through
 its M5b and M5c checkpoints.
 
@@ -237,8 +237,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 29,901 reviewed cases: 26,052 passes, 2,802
-expected negatives, and 1,047 unsupported profile features. It records no
+The current manifest contains 29,901 reviewed cases: 26,067 passes, 2,802
+expected negatives, and 1,032 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -2976,11 +2976,12 @@ non-extensible global is rejected before any earlier declaration can mutate
 the object. Function-local and Module declarations remain ordinary
 declarative bindings and do not enter this record.
 
-The record validates one independently compiled Script at a time. It does not
-retain `[[VarNames]]` or global declarative names across successive Script
-instantiations in the same realm, so cross-Script declaration collisions are
-outside this unit even though the runtime entry point can be called more than
-once for storage-level tests.
+ADR 0029 extends this record for the explicit test262 host with a finite
+set of ahead-of-time Scripts. Each invocation validates its declarations
+against persistent realm lexical cells and the existing global object before
+executing its body. Lexical names never become global-object properties;
+retained closures keep their cells and realm. The implementation and focused
+evidence sources are described in the host Script section below.
 
 M5b node `globalthis-binding` exposes this object as `globalThis` and gives a
 dynamically created global property the runtime lookup path recorded in that
@@ -4459,9 +4460,11 @@ outside that root move from unsupported to pass. The reviewed feature list
 gains `DataView`, `Float16Array`, and the eight `DataView.prototype.*` accessor
 features this node implements; the reviewed dependency vocabulary gains
 `data-view`; and the reviewed harness gains upstream's
-`byteConversionValues.js` data table and a `verifyPrimordialProperty` alias
-whose reviewed `verifyProperty` already restores what it probes. The complete
-manifest moves from 11,441 to 11,991 cases, from 8,468 to 8,918 passes, keeps
+`byteConversionValues.js` data table and a `verifyPrimordialProperty` alias.
+That historical helper restored its probes unconditionally; the host Script
+source correction below distinguishes default deletion from explicit restore.
+The complete manifest moves from 11,441 to 11,991 cases, from 8,468 to 8,918
+passes, keeps
 1,364 expected negatives, and moves from 1,609 to 1,709 unsupported profile
 features, with no semantic, harness, or infrastructure failures. The suite
 revision, 41,091-path inventory, manifest schema, and zero-override policy are
@@ -6210,7 +6213,8 @@ The reviewed *propertyHelper.js* harness gains the upstream
 the reviewed style, because this node's four `prop-desc.js` cases are the
 first reviewed paths that name them. Each checks the function-valued
 property and then the function's own `name` and `length` through the
-existing always-restoring `verifyProperty`.
+then-always-restoring `verifyProperty`. The later host Script source correction
+below forwards the explicit restore option to all three checks instead.
 
 Binding `parseInt` also makes one reviewed class case executable for the
 first time, and it exposed a SuperCall ordering gap. 13.3.7.1 reads the
@@ -8406,17 +8410,17 @@ another realm's `%Array%` as undefined before it reads `Symbol.species`, so an
 array whose constructor is another realm's `Array` keeps producing arrays of
 the running realm.
 
-Generated code always runs in the initial realm, because no source text is
-compiled for a created realm; a created realm runs only its own built-in
-functions and returns to generated code through an ordinary call. Every realm
-has a `%eval%` intrinsic, installed as the global object's writable,
-non-enumerable, configurable `eval` property with `length` 1 and `name`
-`"eval"`. It returns a non-String argument unchanged, as PerformEval does
-without parsing, and reports `OSEO1001` “eval compiles source text at run time,
-which is outside the admitted profile.” for a String, the boundary of
+ADR 0029 extends generated execution beyond the initial realm for its finite
+ahead-of-time host Script set. A created realm can evaluate one of those
+Scripts and create closures with its own globals, cells and intrinsic graph.
+Every realm has a `%eval%` intrinsic, installed as the global object's
+writable, non-enumerable, configurable `eval` property with `length` 1 and
+`name` `"eval"`. It returns a non-String argument unchanged, as PerformEval
+does without parsing, and reports `OSEO1001` “eval compiles source text at run
+time, which is outside the admitted profile.” for a String, the boundary of
 [ADR 0016](./adr/0016-dynamic-source-boundary.md); it never evaluates source.
-The `eval-intrinsic-value` node later admits the bare `eval` identifier as
-a value, while the unshadowed call position stays the ADR 0016 rejection.
+The `eval-intrinsic-value` node later admits the bare `eval` identifier as a
+value, while the unshadowed call position stays the ADR 0016 rejection.
 `%Function%`'s [[Call]] and [[Construct]] report the same boundary as
 `OSEO1001`, as the generator and async function constructors do.
 
@@ -8440,8 +8444,9 @@ the host objects' realm and shape, distinct Math.random sequences, the
 unresolvable `$262` of an ordinary build.
 
 The reviewed runner builds a case with the test262 host when it references
-`$262.agent`, `$262.createRealm`, or `$262.global`, or loads
-*atomicsHelper.js*; a case that reads any other `$262` member keeps the
+`$262.agent`, `$262.createRealm`, `$262.evalScript`, or `$262.global`,
+references `print`, or loads *atomicsHelper.js*; a case that reads any other
+`$262` member keeps the
 `host-binding` capability. `cross-realm` joins the supported features. Of the
 84 reviewed paths whose unadmitted feature was `cross-realm`, 43 move to
 `pass`. 40 reach the ADR 0016 boundary at run time, 30 through
@@ -8631,7 +8636,7 @@ complete. The remaining gaps retain their existing owners.
     all-miss simple, destructuring, `for-in`, and `for-of` writes to the
     runtime-owned call targets `console`, `setTimeout`, and `clearTimeout`
     also stay rejected, because their hidden cells cannot model strict
-    PutValue. Third,
+    PutValue. Third, outside the explicit host build described below,
     the record validates one independently compiled
     Script at a time and does not retain `[[VarNames]]` across Scripts.
     Two interactions sit outside this unit for different reasons. Annex B
@@ -8644,8 +8649,8 @@ complete. The remaining gaps retain their existing owners.
     for M5 completion while leaving the conformance label to its own later
     gate. A case that depends on either classifies unsupported under the
     record that owns it instead of blocking this unit. Reviewed test262
-    cases that reach the `$262` or `print` host bindings, which the reviewed
-    environment never installs, classify as unsupported with the
+    cases that reach a `$262` or `print` host binding absent from their
+    selected environment classify as unsupported with the
     `host-binding` capability named, and cases that call a definition the
     reviewed *regExpUtils.js* omits classify with the `harness-definition`
     capability, as the `globalthis-binding` section records. Owner: the
@@ -8717,10 +8722,9 @@ complete. The remaining gaps retain their existing owners.
     capabilities are admitted as recorded above, except that an agent whose
     [[CanBlock]] is false stays unsupported with the `non-blocking-agent`
     capability, an agent source that no ahead-of-time template describes
-    stays behind the dynamic source boundary, and a created realm runs no
-    source of its own, so a case that builds its cross-realm functions with
-    `$262.evalScript`, `eval`, or `Function` keeps the owner of that
-    capability.
+    stays behind the dynamic source boundary. ADR 0029 permits a created
+    realm to evaluate a member of the finite ahead-of-time host Script set.
+    Ordinary `eval` and `Function` source compilation retain ADR 0016.
  -  The reviewed harness implements *base.js*, *doneprintHandle.js*,
     *asyncHelpers.js*, *compareArray.js*, *decimalToHexString.js*,
     *fnGlobalObject.js*, *nans.js*, *nativeFunctionMatcher.js*,
@@ -9547,3 +9551,354 @@ observations, macOS/sanitizer, extended and exact candidate/Main gates remain
 pending. The required Array CI failure blocked that historical bundle;
 it is not a standalone Set prerequisite. No family assessment, vocabulary,
 admission or classification changes.
+
+
+Historical TCO source on the Array base
+---------------------------------------
+
+Initial preparation on Set `a111c31e` is preserved as TCO `54973309`.
+That base failed CI because its native prototype-root injection locator
+still matched three slots after Set changed that root frame to four.
+Current preparation carries the complete owned `9945b7b8` to `b1eaeff0`
+TCO delta onto Array U`cccb7195`, tree
+`89d907b342885089374ffadd53eff606d31e6131`. All thirteen Array paths,
+three runtime guard hunks, six coverage files and new worknote stay exact.
+Set's locator, state prose, Receiver/descriptor/identity/invariant rules
+remain inherited. All fifteen TCO product postimages stay exact `b1eaeff0`.
+At initial preparation, Main was `cf0902db`/54; Set55 was prospective and
+Array was unlanded. Root's then-running standalone Array Full excluded TCO.
+The later combined-source U`68e298a9` evidence is distinct. Prior TCO sources
+and reviews remain
+preserved, including the incomplete32 and known-Gate-only33 outcomes.
+Generic/host-tail, bound/Proxy Call forwarding, pending roots, derived/realm
+rules and four owner-local counters keep the full `m5-137` unit. The two
+changed internal interfaces retain Set metadata and all post-call checks.
+Main chunk/include/static/source-coordinate and logical frame contracts stay.
+The existing fifth Set Script/oracle and all four TCO subjects remain; only
+its deferred no-tail assertions become exact positive protocol checks.
+Old Set Full, TCO checks/reviews and Array proofs keep their own sources.
+Array's worknote describes its standalone source before this TCO overlay;
+its measurements and unchanged-compiler statements do not validate the
+combined implementation. Changed lookup/Set/coercion/truncation/pending-GC
+interfaces received bounded interaction review and current-source execution.
+No rejected
+Array packing, completion-layout, B8 or RegExp implementation is imported.
+
+The new family indexes retained fixed, generated, structural and native
+contracts. Historical Array-bound author execution on `353a9f17` is recorded in
+*PLAN-M5C.md*, with its framework, host, target and policy limits. It does not
+validate this current Array/TCO composition.
+The single source-admission entry for `tail-call-optimization` remains
+in the 147-feature implementation. The six focused vectors and original
+full UPDATE ran on source `68e298a9a96a6d22dc2e33b9e70b7c6a86720e41`, tree
+`dcca1b0bf57b63d0446fab54c676f42a2ca19739`. The Full observed 29,901 paths:
+25,604 pass, 2,802 expected negatives and 1,495 unsupported, with no semantic,
+harness or infrastructure failures. Its only promotions are the two owned
+strict tagged-template TCO subjects, using the unchanged 100,000-depth helper
+and both specialization policies. All other 29,899 result records stay
+byte-identical. Derived observation ownership replaces remediation only for
+those two passes; other owners, inventory, policy and exclusions stay exact.
+The standards assessment cites these actual observations. Admission data
+review, candidate/Main gates and adoption remain separate requirements;
+source admission alone supplies no candidate gate pass.
+See [*current U68 evidence*](evidence/proper-tail-calls-u68-20261027.md).
+Native935 remains historical `05c1f074` evidence; the old 39/60 interruption
+is failed incomplete evidence. All 33 other pinned TCO paths remain
+unreviewed under batch32, whose accepted source plan remains separate.
+
+
+TCO source preparation on the fixed Reg candidate
+-------------------------------------------------
+
+Final bitmap source `f5bdd44d` is prepared on Reg publication candidate
+`98460f7c`, based on successful Main `d4d81be9`, under D10.4. Reg remains
+prospective and TCO remains unlanded. All compiler/runtime programs and
+generators retain f5, including ABI `m5-139`; the leaf proposal is absent.
+Only the original source feature admission is carried. At source
+preparation, Reg's complete observations, owners and per-path expectations
+stayed unchanged pending a new Full, including both unsupported TCO
+expectations.
+
+*PLAN-M5C.md* defines this preparation phase. The existing
+[TCO evidence contract](evidence/proper-tail-calls-u68-20261027.md)
+records f5 author execution with exact sources and one-pair timing limits.
+Those checks and the historical U68 Full did not run on this composition.
+The later Full on accepted U`e2dba363` observed all 29,901 reviewed paths
+and promoted exactly *tco-call.js* and *tco-member.js* from unsupported to
+pass, with no demotion; the
+[evidence contract](evidence/proper-tail-calls-u68-20261027.md) records it.
+Affected reviews and publication remain Root-owned.
+
+
+Ahead-of-time host Script bindings
+----------------------------------
+
+The explicit `--test262-host` compilation admits `$262.evalScript` and
+`print` under [ADR 0029](./adr/0029-ahead-of-time-host-script-bindings.md).
+Literal string and literal-concatenation arguments at `evalScript` property
+call sites, including created-realm calls, form the closed Script source set.
+Direct calls through a simple lexical `const` initialized from an `evalScript`
+property read, or a chain of those immutable aliases, can add the same literal
+candidates. Binding identities preserve lexical shadowing and reject discovery
+through mutable, parameter-shadowed, or `with`-intercepted names. Hoisted
+closures can capture eligible aliases; TDZ and const assignment errors still
+run normally. Unproven indirect forms discover no new source, and unrelated
+ordinary/dynamic calls contribute no candidate strings.
+Nested Script call sites extend that set before native emission. Runtime
+selection compares exact UTF-16 strings; it never parses source. An unmatched
+String reports `OSEO1001`, while a matched parse error throws `SyntaxError`
+when invoked. The ordinary `eval` and constructor boundaries stay unchanged.
+
+Each Script has independent strictness, a fresh evaluation environment, and
+persistent global lexical cells in its host function's realm. Declaration
+permission checks precede all binding creation and body effects. Identifier
+references retain their Global Environment Record across a write's right
+operand and select its current lexical or object storage when SetMutableBinding
+runs. Script completion values, closure identity, abrupt completion, and realm
+restoration follow the same compiled execution path. `print` converts only its
+first argument to a string and emits one line; both host bindings are absent
+from ordinary builds.
+
+The fixed fixture source is
+*tests/native/fixtures/host-script-bindings.ts*. Independent Node.js and Deno
+Script observers use *tests/native/host-script-reference.ts*.
+*tests/host-script-bindings.test.ts* runs those fixtures and the unchanged
+fourteen original upstream subjects. The generated declaration-state and
+invalid-grammar domains reserve seeds `0x60008d00` and `0x60008d01` in
+*tests/property/m5-host-script-bindings.property.test.ts*, with both policies,
+false hints, guard misses, and forced collection. Source preparation does not
+claim fresh test262 classifications; those require the later full manifest
+update. Executed native evidence below retains its actual source identity.
+
+The fixed fixture for strict tail calls retains foreign Script lexicals
+through 768 calls, detached functions, Reflect.apply, bound/Proxy forwarding,
+nested evalScript, print and abrupt completion. Its structural check requires
+tail metadata on source functions and no tail metadata on synthesized Script
+evaluators, which must return their accumulated Script completion normally.
+Preparation began on TCO candidate `32363a70`, whose candidate CI later
+failed. That candidate is not successful Main; earlier native evidence below
+does not establish any later combined source's native/Main gates.
+
+The original global-var subject exposed a reviewed property-helper defect:
+after deleting a configurable property on a non-extensible global, the helper
+unconditionally tried to restore it. The bounded source correction retains
+all descriptor and behavioral probes, leaves a deleted property absent by
+default, and performs restoration only for an explicit `options.restore`.
+Requested restoration still performs DefineProperty and propagates its real
+errors. The primordial wrapper and callable property/name/length checks
+forward that option. Runtime global-declaration and non-extensibility rules
+are unchanged. *tests/test262-property-helper-source.test.ts* compares these
+bounded ordinary/Proxy, strictness, accessor and callable cases with the pinned
+upstream helper under Node and Deno; it claims no general helper equivalence.
+The source-qualified native results below remain separate from this later
+repair and from Full observations.
+
+In the explicit host build, direct calls to the existing runtime-owned
+`console.log`, `setTimeout` and `clearTimeout` targets first consult the
+current Script global record and intervening with records. A user binding
+supplies the callable and receiver before argument evaluation; only an
+initially missing binding selects the existing private intrinsic. Noncallable
+values and abrupt getters never fall back. Ordinary builds retain their
+private call targets and rejected unbound value/typeof/delete forms. This
+adds no public intrinsic global and changes no timer behavior. The bounded
+regressions are *tests/host-script-runtime-owned-source.test.ts* and
+*tests/host-script-runtime-owned.test.ts*, using
+*tests/native/fixtures/host-script-runtime-owned.ts*. Source-qualified native
+validation is recorded below; Full observations remain pending.
+
+The earlier whole host suites passed twelve registrations per framework on
+`a93871cc`; ordinary properties passed two domains per framework on
+`ab8d5d5c`. That source's extended Node run passed 120 cases per domain,
+measuring a 510-second Linux scheduling weight; macOS remains unmeasured at
+the 296-second fallback. See *docs/evidence/u6/README.md*. Those results
+retain their actual source identities and do not validate this later repair.
+
+
+Host Script and final GC bitmap source composition
+--------------------------------------------------
+
+The complete Host source on `918a6d93` is prepared on fixed TCO/Reg source
+`beea6880c6db826ad3420cb9a021a1a124bfe2d4` (tree
+`c0c65bed5eb9cafc26334d4355b0e28900ab5ca3`). Root reserved ABI `m5-140`
+for the combined environment bitmap and Host realm/Script layout. The
+`m5-139` create/set/clone/tracer bitmap implementation remains intact;
+Host lexical installation uses the environment APIs and adds its persistent
+realm roots. The final f5 leaf proposal remains absent. The runtime-owned
+HIR/MIR call-target repair and all original fixed programs, assertions,
+generated domains, seeds, budgets, policies and depths are preserved.
+
+The new runtime-owned-call suites passed eight registrations per framework
+on `918a6d93`, with both policies, false hints, guard misses and forced GC.
+Those measurements remain bound to that source. Earlier a938, ab8d, f5 and
+U68 evidence also retains its actual identity; none validates this composed
+source. The historical ab8d Linux weight is 510 seconds; the later
+20d measurement below supplies 607. macOS remains unmeasured at 296.
+Affected internal reviews and Full remain pending. Reg's existing observations
+and matcher owners, both TCO unsupported expectations and all fourteen Host
+unsupported expectations are preserved; no promotion is predicted here.
+
+
+Composed Host focused evidence
+------------------------------
+
+Source `20d6119bac41c5a6c819a268476dec017a2475d6`, tree
+`fbb16dadcaee5047ac692200d28efbc5ca56bd71`, completed eight exact focused
+commands on Linux with ABI `m5-140`. The handwritten runtime tail-call C
+fixture passed its one registration. The new runtime-owned-call suites
+passed eight registrations under Node and eight under Deno; the unchanged
+whole Host suites passed twelve under each. Those whole suites traverse
+all fourteen original subjects: thirteen expected passes and the separate
+ordinary-eval ADR 0016 unsupported boundary, while preserving the
+checked-in manifest records.
+The unchanged ordinary properties passed both domains under each framework,
+with twelve cases per domain. The existing extended task passed both domains
+at 120 cases each, scale 10, large size and shared seed 1592590339.
+Original policies, false hints, guard misses, forced collection, oracles,
+seeds, budgets and normal scaled deadlines remain intact.
+
+The extended leaf durations sum to 606.907057926 seconds, giving a measured
+Linux scheduling weight of 607 after rounding up; macOS remains unmeasured
+at 296. These are one-run scheduling data, not a comparative performance or
+CI claim. *evidence/u6/README.md* records the exact task, raw provenance
+and limits. All commands exited naturally with no failures, skips or
+cancellations. Raw output, three exact source snapshots and two actual empty
+drains were retained for each, and Root accepted the measurements.
+
+This execution belongs to `20d6119b`, not to later evidence commits. The
+cost/document update that recorded it preserved the compiled product inputs;
+its cost module differed within the extended wrapper's import closure, whose
+observed selection was one file and one worker. The later `da99d0dd` and
+`ce8ae0c8` repairs below do change compiled product inputs, so this evidence
+does not describe the current source. Affected internal and outer reviews,
+Full/classification, admission and exact candidate/Main gates remain pending.
+Reg's existing records, both TCO unsupported expectations and all fourteen
+Host unsupported expectations are preserved, with no predicted promotions.
+
+
+Host Script directive and with-fallback repairs
+-----------------------------------------------
+
+Two compiler repairs follow the composed evidence. `da99d0dd` keeps the last
+directive's cooked string and location in the owned syntax program and seeds
+only host Script completion with it, because the bootstrap parser removes
+directive statements from the body. Directive-only Scripts and directives
+before declarations therefore return the directive value; ordinary HIR, MIR
+and C output are unchanged. *tests/host-script-directives-source.test.ts* and
+*tests/host-script-directives.test.ts* with
+*tests/native/fixtures/host-script-directives.ts* are its regressions.
+
+Host bindings make a Script's own `var` and function names resolve through
+the realm global object, so `da99d0dd` rejected destructuring leaves and
+assignment loop heads that missed every `with` object with `OSEO1001`, while
+baseline and the ordinary target accept them. `ce8ae0c8` gives those leaves
+the global-object fallback that simple, compound and update `with` writes
+already use: the reference is resolved with the chain, and PutValue reaches
+the property through the persistent Global Environment Record. Array and
+object patterns with defaults, rests and nesting, `for-in`, `for-of` and
+`for await` heads and their patterns, `var` initializers and patterns,
+function names and strict inner functions are covered by
+*tests/host-script-source.test.ts* under both targets, with Node.js and Deno
+references, and by a combined native fixture in
+*tests/native/fixtures/host-script-bindings.ts*. Undeclared names keep the
+existing rejection on both targets, and ordinary output is unchanged.
+
+A with-hit simple `for (var x in/of ...)` head writes the hoisted cell
+instead of the `with` object on both targets. That defect predates this node
+and is owned by the separate `with-var-loop-head-resolution` node; the new
+fixture does not cover it. Raw evidence is under
+*/data/m5c-host-script-bindings-20261027/claude-native/diag-with02/*.
+
+`ce8ae0c84a632e414729872b5de928bac5ed4d2e` (tree
+`42ebc5603083b92c9675dfbf04e7a65ef0ddd652`) completed the nine focused
+author commands on Linux, each once under the heavy lock with natural exit
+0: directive suites four registrations, whole Host suites thirteen and
+runtime-owned-call suites eight, each under Node and Deno; ordinary
+generated domains two under each; and the extended task at 120 cases per
+domain with the original seeds, budgets, policies, hints, guards, forced
+collection and deadlines. The whole Host suites keep all fourteen original
+subjects: thirteen expected passes and the ordinary-eval ADR 0016 boundary.
+No author native command ran on `da99d0dd` itself. The extended leaf sum
+is 592.766300123 seconds, a 593-second Linux weight replacing 607; macOS
+remains unmeasured at 296. *evidence/u6/README.md* records raw paths,
+hashes and limits. Internal review pass 4 of the with-fallback scope was
+clean at both stages. Outer reviews, Full/classification, admission and
+exact candidate/Main gates remain pending, and no promotion is predicted.
+
+
+Host Script loop-head and alias repairs
+---------------------------------------
+
+Outer review pass 2 found two defects on `f3e2c1e6`. A host Script's simple
+`var` head in a `for`, `for-in` or `for-of` statement wrote the hoisted
+binding cell directly, so after a later Script declared a lexical binding
+over the configurable global property, the loop still wrote the property,
+and a `const` declaration did not produce TypeError. When no `with` record
+intervenes, these heads now resolve the name through the persistent Global
+Environment Record, as assignment heads and `var` pattern heads already
+did; a classic `for` initializer resolves the reference before evaluating
+its initializer. Separately, statement lists recorded simple `const`
+aliases of `evalScript` but classic `for` heads did not, so a call through
+`for (const evaluate = $262.evalScript; ; )` lost its literal source and
+reported `OSEO1001`. The `for` head now records its `const` declarators
+with the same fixed point. Ordinary-target output is unchanged.
+*tests/native/fixtures/host-script-bindings.ts* adds one fixture for each
+defect, run with Node.js and Deno references under both policies with
+forced collection; *tests/host-script-source.test.ts* checks the Script
+table. Deno's vm rejects the shadowing declaration through its legacy
+var-name check, as the generated model already qualifies, so its loops
+write the unshadowed properties.
+
+A simple `var` loop head inside a `with` statement still writes the hoisted
+cell, whether the `with` object supplies the name or not, so a later
+lexical declaration does not capture it there. That is the same
+pre-existing defect as the with-hit head above, owned by
+`with-var-loop-head-resolution` and not covered by this node.
+
+`16bb5e917afbe90ab050805af151a5eacfb98dac` (tree
+`cf9a53e9dae174604962a790d2374a294081b641`) completed the same nine focused
+author commands on Linux, each once under the heavy lock with natural exit
+0: directive suites four registrations, whole Host suites fifteen and
+runtime-owned-call suites eight, each under Node and Deno; ordinary
+generated domains two under each; and the extended task with its unchanged
+cases, seeds, budgets, policies, hints, guards, forced collection and
+deadlines. The extended leaf sum is 595.342796227 seconds, a 596-second
+Linux weight replacing 593; macOS remains unmeasured at 296.
+*evidence/u6/README.md* records raw paths, hashes and limits. These
+runs precede the fix's internal review: pass 8 of scope `outer2-blockers`
+against base `f3e2c1e6` could not start because the reviewer's
+authentication was revoked, and it remains pending with outer reviews,
+Full/classification, admission and exact candidate/Main gates.
+
+
+Accepted remote Full on the TCO and Host composition
+----------------------------------------------------
+
+Root accepted remote job `20261027T105544Z-904e10b15d52` on source
+U `28d57fc50ce3cda616459175715ddf82ad9db1f8`, tree
+`52e37c63`. The original `mise run test262:update -- --accept-promotions`
+completed naturally with exit 0, pool 8 and zero retries. All 29,901
+reviewed paths were observed: 26,067 pass, 2,802 expected negatives and
+1,032 unsupported, with no semantic, harness or infrastructure failure.
+The 13 promotions are 12 Host global-code `script-decl-*` paths and
+`test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js`.
+The two TCO tagged-template paths retain their passes.
+
+Thirteen of the Host node's fourteen paths now pass.
+`test/language/global-code/script-decl-lex-var-declared-via-eval.js`
+remains unsupported for ordinary eval, the ADR 0016 dynamic-source
+boundary. Active owner `node:dynamic-source-coverage-remediation` retains
+remediation of the non-source declaration contract (304 -> 305 paths).
+The exact diagnostic is `:104:1: error[OSEO1001]: Unknown binding 'eval'.`
+No new exclusion
+or completed replacement evidence is claimed. The ledger, observation
+batches and graph baseline derive from this accepted manifest.
+
+The result manifest is remote commit
+`787d1a682f49d12af12931ddff23e37c34d682ef`, tree
+`6703d46daa08fc0391007030f7666f11305dd7a4`, directly on U. Applying its
+binary diff reproduced that tree before derived-data or prose edits.
+Raw evidence remains under
+*/data/m5c-tco-host-compose-20261027/remote-20261027T105544Z-904e10b15d52/*.
+Earlier source-qualified observations and pending-at-the-time statements
+remain historical. This Full supplies no candidate/Main gate, macOS
+execution, graph landing or publication; Root owns those later gates.

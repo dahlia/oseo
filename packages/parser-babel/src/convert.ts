@@ -2232,6 +2232,7 @@ export function statement(
             name,
             value: assigned,
           },
+          emptyCompletion: true,
           kind: "expression",
         });
       }
@@ -4170,6 +4171,17 @@ export function program(
 ): SyntaxProgram | undefined {
   const programNode = node(file.program) ?? file;
   const strict = hasUseStrictDirective(programNode);
+  const lastDirective = nodes(programNode.directives).at(-1);
+  const directiveLiteral = node(lastDirective?.value);
+  const directiveValue = node(directiveLiteral?.extra)?.expressionValue;
+  const directiveCompletion: SyntaxProgram["directiveCompletion"] =
+    directiveLiteral != null && isString(directiveValue)
+      ? {
+          ...location(context, directiveLiteral),
+          kind: "string",
+          value: directiveValue,
+        }
+      : undefined;
   const body: (SyntaxFunction | SyntaxStatement)[] = [];
   context.strictStack.push(strict);
   const items = nodes(programNode.body);
@@ -4218,6 +4230,9 @@ export function program(
   return {
     ...location(context, programNode),
     body,
+    ...includePropertiesWhen(() =>
+      directiveCompletion == null ? undefined : { directiveCompletion },
+    ),
     globalLexicalNames: lexicalNames,
     globalObjectNames,
     kind: "program",

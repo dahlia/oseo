@@ -6,6 +6,7 @@ import type {
   HirBindingIdentifier,
   HirBindingPattern,
   HirCallArgument,
+  HirCallTarget,
   HirClassField,
   HirClassMethod,
   HirExpression,
@@ -978,6 +979,24 @@ function lowerGlobalBindingValue(
   return recordRoot(builder, result, range);
 }
 
+/** Select the current subrecord of the persistent Global Environment. */
+function lowerHostGlobalEnvironment(
+  key: number,
+  range: SourceRange,
+  builder: MirBuilder,
+): number {
+  const id = builder.nextValue++;
+  builder.current.operations.push({
+    arguments: [key],
+    detail: "global record",
+    id,
+    kind: "global-environment",
+    range,
+  });
+  appendMirMetadata(builder, "check-status", "global environment", [id], range);
+  return recordRoot(builder, id, range);
+}
+
 /**
  * GetValue of an identifier reference that the global Environment Record
  * resolves through the realm global object: ResolveBinding's HasProperty,
@@ -991,16 +1010,21 @@ function lowerGlobalBindingValue(
 function lowerGlobalRead(
   expression: HirGlobalRead,
   builder: MirBuilder,
+  selectedObject?: number,
+  initiallyResolved?: number,
+  useValue?: (value: number) => number,
+  unresolvableValue?: () => number,
 ): number {
   const range = expression.range;
-  const object = lowerExpression(expression.object, builder);
+  const object = selectedObject ?? lowerExpression(expression.object, builder);
   const literalKey = {
     kind: "string" as const,
     range,
     value: expression.name,
   };
   const key = lowerExpression(literalKey, builder);
-  const resolved = lowerBinaryValues(key, "in", object, range, builder);
+  const resolved =
+    initiallyResolved ?? lowerBinaryValues(key, "in", object, range, builder);
   const bindingBlock = createMirBlock(builder);
   const unresolvableBlock = createMirBlock(builder);
   const readBlock = createMirBlock(builder);
@@ -1016,7 +1040,11 @@ function lowerGlobalRead(
     whenTrue: bindingBlock.id,
   };
   builder.current = bindingBlock;
-  const exists = lowerBinaryValues(key, "in", object, range, builder);
+  const bindingObject =
+    expression.globalReference.hostGlobal === true
+      ? lowerHostGlobalEnvironment(key, range, builder)
+      : object;
+  const exists = lowerBinaryValues(key, "in", bindingObject, range, builder);
   builder.current.terminator = {
     kind: "branch",
     test: exists,
@@ -1031,27 +1059,31 @@ function lowerGlobalRead(
     };
   };
   builder.current = readBlock;
-  join(
+  const read =
     builder.specialization === "enabled"
       ? lowerSpecializedPropertyGet(
-          object,
+          bindingObject,
           literalKey,
           range,
           builder,
           undefined,
           key,
         )
-      : lowerPropertyRead(object, key, range, builder),
-  );
+      : lowerPropertyRead(bindingObject, key, range, builder);
+  join(useValue == null ? read : useValue(read));
   builder.current = missingBlock;
   const fallback = expression.globalReference.strictFallback;
-  join(
+  const missing =
     fallback == null
       ? lowerSyntheticUndefined(range, builder)
-      : lowerBindingRead(fallback.bindingId, fallback.name, range, builder),
-  );
+      : lowerBindingRead(fallback.bindingId, fallback.name, range, builder);
+  join(useValue == null ? missing : useValue(missing));
   builder.current = unresolvableBlock;
-  join(lowerExpression(expression.unresolvable, builder));
+  join(
+    unresolvableValue == null
+      ? lowerExpression(expression.unresolvable, builder)
+      : unresolvableValue(),
+  );
   builder.current = joinBlock;
   return recordRoot(builder, result, range);
 }
@@ -1076,6 +1108,40 @@ function lowerGlobalReferenceWrite(
   range: SourceRange,
   builder: MirBuilder,
 ): number {
+  // ResolveBinding fixes the Global Environment Record, not its current
+  // object/declarative subrecord. An RHS can introduce a lexical binding.
+  if (reference.hostGlobal === true) {
+    if (resolved == null) {
+      object = lowerHostGlobalEnvironment(key, range, builder);
+    } else {
+      const bindingBlock = createMirBlock(builder);
+      const missingBlock = createMirBlock(builder);
+      const joinBlock = createMirBlock(builder);
+      const selected = builder.nextValue++;
+      joinBlock.parameters = [selected];
+      builder.current.terminator = {
+        kind: "branch",
+        test: resolved,
+        whenTrue: bindingBlock.id,
+        whenFalse: missingBlock.id,
+      };
+      builder.current = bindingBlock;
+      const current = lowerHostGlobalEnvironment(key, range, builder);
+      builder.current.terminator = {
+        kind: "jump",
+        target: joinBlock.id,
+        values: [current],
+      };
+      builder.current = missingBlock;
+      builder.current.terminator = {
+        kind: "jump",
+        target: joinBlock.id,
+        values: [object],
+      };
+      builder.current = joinBlock;
+      object = recordRoot(builder, selected, range);
+    }
+  }
   const stillExists = () =>
     lowerBinaryValues(key, "in", object, range, builder);
   const exists =
@@ -1132,6 +1198,7 @@ interface LoweredWithReference {
    * PutValue. It is meaningful only where `property` is false.
    */
   readonly globalResolved?: number;
+  readonly globalObject?: number;
 }
 
 /** Keep semantic `IsObject` distinct from a removable specialization guard. */
@@ -1173,10 +1240,17 @@ function lowerWithReference(
   builder.nextValue += 1;
   const globalResolved = globalFallback == null ? undefined : builder.nextValue;
   if (globalResolved != null) builder.nextValue += 1;
+  const globalObject =
+    globalFallback?.object == null ? undefined : builder.nextValue++;
   joinBlock.parameters =
     globalResolved == null
       ? [selectedObject, selectedProperty]
-      : [selectedObject, selectedProperty, globalResolved];
+      : [
+          selectedObject,
+          selectedProperty,
+          globalResolved,
+          ...(globalObject == null ? [] : [globalObject]),
+        ];
   for (const bindingId of reference.objectBindingIds) {
     const object = lowerBindingRead(
       bindingId,
@@ -1250,25 +1324,33 @@ function lowerWithReference(
     selectedBlock.terminator = {
       kind: "jump",
       target: joinBlock.id,
-      values: globalResolved == null ? [object, found] : [object, found, found],
+      values:
+        globalResolved == null
+          ? [object, found]
+          : [object, found, found, ...(globalObject == null ? [] : [object])],
     };
     builder.current = nextBlock;
   }
   // An all-miss chain continues to the global Environment Record, whose
   // HasBinding tests the global object's property while the reference is
   // resolved, before a write's right-hand side runs.
+  const fallbackObject =
+    globalFallback?.object == null
+      ? undefined
+      : lowerExpression(globalFallback.object, builder);
   const globalFound =
     globalFallback == null
       ? undefined
       : lowerBinaryValues(
           key,
           "in",
-          lowerBindingRead(
-            globalFallback.objectBindingId,
-            intrinsicGlobalObjectName,
-            reference.range,
-            builder,
-          ),
+          fallbackObject ??
+            lowerBindingRead(
+              globalFallback.objectBindingId,
+              intrinsicGlobalObjectName,
+              reference.range,
+              builder,
+            ),
           reference.range,
           builder,
         );
@@ -1283,7 +1365,12 @@ function lowerWithReference(
     values:
       globalFound == null
         ? [noObject, noProperty]
-        : [noObject, noProperty, globalFound],
+        : [
+            noObject,
+            noProperty,
+            globalFound,
+            ...(fallbackObject == null ? [] : [fallbackObject]),
+          ],
   };
   builder.current = joinBlock;
   recordRoot(builder, selectedObject, reference.range);
@@ -1295,6 +1382,9 @@ function lowerWithReference(
       if (globalResolved == null) return undefined;
       return { globalResolved };
     }),
+    ...includePropertiesWhen(() =>
+      globalObject == null ? undefined : { globalObject },
+    ),
     key,
     object: selectedObject,
     property: selectedProperty,
@@ -1448,7 +1538,14 @@ function lowerWithBindingRead(
   builder.current = fallbackBlock;
   const fallbackValue =
     globalRead != null
-      ? lowerExpression(globalRead, builder)
+      ? selected.globalObject != null && globalRead.kind === "global-read"
+        ? lowerGlobalRead(
+            globalRead,
+            builder,
+            selected.globalObject,
+            selected.globalResolved,
+          )
+        : lowerExpression(globalRead, builder)
       : "bindingId" in fallback
         ? lowerBindingRead(fallback.bindingId, fallback.name, range, builder)
         : undefined;
@@ -1480,13 +1577,16 @@ function lowerWithGlobalObjectWrite(
   range: SourceRange,
   builder: MirBuilder,
   reference: HirGlobalReference,
+  selectedObject?: number,
 ): number {
-  const object = lowerBindingRead(
-    fallback.objectBindingId,
-    intrinsicGlobalObjectName,
-    range,
-    builder,
-  );
+  const object =
+    selectedObject ??
+    lowerBindingRead(
+      fallback.objectBindingId,
+      intrinsicGlobalObjectName,
+      range,
+      builder,
+    );
   const key = lowerExpression(
     { kind: "string", range, value: fallback.name },
     builder,
@@ -1528,7 +1628,9 @@ function lowerWithBindingWrite(
     selected.object,
     selected.key,
     value,
-    reference,
+    reference.strictFallback == null
+      ? {}
+      : { strictFallback: reference.strictFallback },
     range,
     builder,
   );
@@ -1547,6 +1649,7 @@ function lowerWithBindingWrite(
           range,
           builder,
           reference,
+          selected.globalObject,
         )
       : lowerBindingWrite({ ...fallback, range }, value, builder);
   // The global-object write branches on its binding tests, so the jump
@@ -3757,6 +3860,11 @@ function lowerOptionalChain(
       kind: "call",
       range: link.range,
       target: { kind: "dynamic" },
+      ...tailCallProperties(
+        index === expression.links.length - 1 &&
+          builder.pendingTailCalls.has(expression),
+        builder,
+      ),
     });
     appendMirMetadata(
       builder,
@@ -4009,6 +4117,28 @@ function lowerExpression(
       builder,
       "check-status",
       "normal -> continue, abrupt -> return",
+      [id],
+      expression.range,
+    );
+    return recordRoot(builder, id, expression.range);
+  }
+  if (expression.kind === "global-environment") {
+    const key = lowerExpression(
+      { kind: "string", value: expression.name, range: expression.range },
+      builder,
+    );
+    const id = builder.nextValue++;
+    builder.current.operations.push({
+      arguments: [key],
+      detail: expression.name,
+      id,
+      kind: "global-environment",
+      range: expression.range,
+    });
+    appendMirMetadata(
+      builder,
+      "check-status",
+      "global environment",
       [id],
       expression.range,
     );
@@ -5237,6 +5367,9 @@ function lowerExpression(
   let argumentListId: number | undefined;
   let callTarget: MirCallTarget;
   let detail: string;
+  if (expression.target.kind === "host-runtime-intrinsic") {
+    return lowerHostRuntimeCall(expression, expression.target, builder);
+  }
   if (expression.target.kind === "console-log") {
     const lowered = lowerCallArguments(
       expression.arguments,
@@ -5379,6 +5512,25 @@ function lowerExpression(
     callTarget = { kind: "dynamic" };
     detail = "dynamic function value";
   }
+  return appendCallResult(
+    expression,
+    callArguments,
+    argumentListId,
+    callTarget,
+    detail,
+    builder,
+  );
+}
+
+/** Emit a call after its target and argument values have been selected. */
+function appendCallResult(
+  expression: Extract<HirExpression, { readonly kind: "call" }>,
+  callArguments: readonly number[],
+  argumentListId: number | undefined,
+  callTarget: MirCallTarget,
+  detail: string,
+  builder: MirBuilder,
+): number {
   const safepointArguments =
     argumentListId == null ? callArguments : [...callArguments, argumentListId];
   const safepointId = builder.nextValue;
@@ -5405,6 +5557,7 @@ function lowerExpression(
     kind: "call",
     range: expression.range,
     target: callTarget,
+    ...tailCallProperties(builder.pendingTailCalls.has(expression), builder),
   });
   appendMirMetadata(
     builder,
@@ -5414,6 +5567,168 @@ function lowerExpression(
     expression.range,
   );
   return recordRoot(builder, id, expression.range);
+}
+
+/**
+ * Select an accepted Script/with binding before evaluating call arguments.
+ * Only an initial miss reaches the unchanged private runtime call target;
+ * an undefined, non-callable, deleted-after-resolution or abrupt binding
+ * never falls back. No intrinsic value is installed as a public global.
+ */
+function lowerHostRuntimeCall(
+  expression: Extract<HirExpression, { readonly kind: "call" }>,
+  target: Extract<HirCallTarget, { readonly kind: "host-runtime-intrinsic" }>,
+  builder: MirBuilder,
+): number {
+  const range = expression.range;
+  const invoke = (value: number, withReceiver?: number) => {
+    let callee = value;
+    let receiver = withReceiver ?? lowerSyntheticUndefined(range, builder);
+    if (target.name === "console") {
+      receiver = value;
+      const keyExpression = { kind: "string" as const, value: "log", range };
+      const keyInput = lowerExpression(keyExpression, builder);
+      const object = lowerReferenceBase(value, keyExpression, range, builder);
+      const key = convertPropertyKey(keyInput, range, builder);
+      callee = lowerPropertyRead(object, key, range, builder);
+    }
+    const lowered = lowerCallArguments(expression.arguments, range, builder);
+    return appendCallResult(
+      expression,
+      [callee, receiver, ...lowered.ids],
+      lowered.list,
+      { kind: "dynamic" },
+      "host Script runtime-owned binding",
+      builder,
+    );
+  };
+  const fallback = () => {
+    const lowered = lowerCallArguments(expression.arguments, range, builder);
+    return appendCallResult(
+      expression,
+      lowered.ids,
+      lowered.list,
+      target.name === "console"
+        ? { kind: "console-log" }
+        : { kind: "timer-intrinsic", method: target.name },
+      `host intrinsic fallback ${target.name}`,
+      builder,
+    );
+  };
+  const global = () =>
+    lowerGlobalRead(
+      target.reference,
+      builder,
+      undefined,
+      undefined,
+      (value) => invoke(value),
+      fallback,
+    );
+  if (target.objectBindingIds.length === 0) return global();
+  const selected = lowerWithReference(
+    {
+      name: target.name,
+      objectBindingIds: target.objectBindingIds,
+      range,
+    },
+    builder,
+  );
+  const propertyBlock = createMirBlock(builder);
+  const fallbackBlock = createMirBlock(builder);
+  const joinBlock = createMirBlock(builder);
+  const result = builder.nextValue++;
+  joinBlock.parameters = [result];
+  builder.current.terminator = {
+    kind: "branch",
+    test: selected.property,
+    whenTrue: propertyBlock.id,
+    whenFalse: fallbackBlock.id,
+  };
+  builder.current = propertyBlock;
+  const property = lowerGlobalBindingValue(
+    selected.object,
+    selected.key,
+    target.reference.globalReference,
+    range,
+    builder,
+  );
+  const called = invoke(property, selected.object);
+  builder.current.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [called],
+  };
+  builder.current = fallbackBlock;
+  const calledGlobal = global();
+  builder.current.terminator = {
+    kind: "jump",
+    target: joinBlock.id,
+    values: [calledGlobal],
+  };
+  builder.current = joinBlock;
+  return recordRoot(builder, result, range);
+}
+
+/**
+ * The `tail` marking of one `call`, and the derived constructor `this`
+ * binding it carries when the running body is such a constructor.
+ */
+function tailCallProperties(
+  tail: boolean,
+  builder: MirBuilder,
+): Pick<MirOperation, "tail" | "tailThisBindingId"> {
+  if (!tail) return {};
+  return {
+    tail: true,
+    ...includePropertiesWhen(() => {
+      if (builder.derivedThisBindingId == null) return undefined;
+      return {
+        tailThisBindingId: builder.derivedThisBindingId,
+      };
+    }),
+  };
+}
+
+/**
+ * Collects the calls HasCallInTailPosition (ECMA-262 15.10.2) finds in a
+ * returned expression: the expression itself when it is a call, both
+ * arms of a conditional, the right operand of `&&`, `||`, and `??`, the
+ * last element of a comma expression, and an optional chain whose last
+ * link is a call. HIR keeps no parentheses, and a tagged template is
+ * already a call. A `super()` call and a call that lowering does not
+ * route through the generic or host call ABI never qualify.
+ */
+function collectTailCalls(
+  expression: HirExpression,
+  calls: Set<HirExpression>,
+): void {
+  if (expression.kind === "call") {
+    const target = expression.target;
+    if (
+      target.kind === "dynamic" ||
+      target.kind === "method" ||
+      target.kind === "private-method" ||
+      target.kind === "host-runtime-intrinsic" ||
+      target.kind === "console-log" ||
+      target.kind === "timer-intrinsic"
+    ) {
+      calls.add(expression);
+    }
+  } else if (expression.kind === "conditional") {
+    collectTailCalls(expression.consequent, calls);
+    collectTailCalls(expression.alternate, calls);
+  } else if (expression.kind === "logical") {
+    collectTailCalls(expression.right, calls);
+  } else if (expression.kind === "sequence") {
+    const last = expression.expressions.at(-1);
+    if (last != null) collectTailCalls(last, calls);
+  } else if (
+    expression.kind === "optional-chain" &&
+    expression.delete !== true &&
+    expression.links.at(-1)?.kind === "call"
+  ) {
+    calls.add(expression);
+  }
 }
 
 /**
@@ -5856,10 +6171,11 @@ function lowerForHeadTarget(
         range: target.range,
       },
       builder,
+      target.withGlobalFallback,
     );
     lowerWithBindingWrite(
       selected,
-      target,
+      target.withGlobalFallback ?? target,
       value,
       target.range,
       builder,
@@ -6544,10 +6860,11 @@ function lowerBindingTarget(
               range: pattern.range,
             },
             builder,
+            pattern.withGlobalFallback,
           );
     lowerWithBindingWrite(
       selected,
-      pattern,
+      pattern.withGlobalFallback ?? pattern,
       value,
       pattern.range,
       builder,
@@ -6719,6 +7036,7 @@ function lowerKeyedAssignmentReference(
         range: pattern.range,
       },
       builder,
+      pattern.withGlobalFallback,
     ),
   };
 }
@@ -7134,6 +7452,22 @@ function lowerStatements(
       recordRoot(builder, id, statement.range);
     } else if (statement.kind === "expression") {
       lowerExpression(statement.expression, builder);
+    } else if (
+      statement.kind === "return" &&
+      statement.expression != null &&
+      builder.tailCalls &&
+      builder.finalizers.length === 0 &&
+      builder.abruptTargets.length === 0
+    ) {
+      // With no enclosing `finally`, catch handler, or iterator close in
+      // this body, the ReturnStatement is in tail position by the
+      // statement rules of HasCallInTailPosition: only a try Block, a
+      // Catch with a Finally, and a for-of body push those targets.
+      collectTailCalls(statement.expression, builder.pendingTailCalls);
+      const value = lowerExpression(statement.expression, builder);
+      builder.pendingTailCalls.clear();
+      builder.current.terminator = { kind: "return", value };
+      return true;
     } else if (statement.kind === "return") {
       const returned =
         statement.expression == null
@@ -7436,9 +7770,15 @@ function lowerStatements(
         }
       }
       for (const declaration of declarations) {
-        const value = lowerExpression(declaration.initializer, builder);
         const mode =
           declaration.declarationKind === "var" ? "write" : "initialize";
+        // A host Script's global `var` name is one property leaf, whose
+        // reference resolves before its initializer runs.
+        const reference =
+          declaration.kind === "pattern"
+            ? lowerAssignmentReference(declaration.pattern, mode, builder)
+            : undefined;
+        const value = lowerExpression(declaration.initializer, builder);
         if (declaration.kind === "binding") {
           lowerBindingTarget(
             forDeclarationBindings(declaration)[0]!,
@@ -7447,7 +7787,13 @@ function lowerStatements(
             builder,
           );
         } else {
-          lowerBindingTarget(declaration.pattern, value, mode, builder);
+          lowerBindingTarget(
+            declaration.pattern,
+            value,
+            mode,
+            builder,
+            reference,
+          );
         }
       }
       if (statement.init != null) lowerExpression(statement.init, builder);
@@ -7656,6 +8002,9 @@ function routeDerivedReturns(
   for (const block of blocks) {
     const terminator = block.terminator;
     if (terminator?.kind !== "return") continue;
+    // The trampoline applies these rules to a tail call's eventual
+    // value through the `this` binding the call carries.
+    if (tailCallReturned(block) != null) continue;
     const id = builder.nextValue;
     builder.nextValue += 1;
     block.operations.push({
@@ -7667,6 +8016,114 @@ function routeDerivedReturns(
       range,
     });
     block.terminator = { kind: "return", value: id };
+  }
+}
+
+/** Metadata that may separate a tail call from the `return` of its value. */
+function tailMetadata(operation: MirOperation): boolean {
+  return operation.kind === "check-status" || operation.kind === "root-store";
+}
+
+/**
+ * The tail call whose value the block's `return` returns, when only
+ * metadata follows that call in the block.
+ */
+function tailCallReturned(block: MutableMirBlock): MirOperation | undefined {
+  const terminator = block.terminator;
+  if (terminator?.kind !== "return") return undefined;
+  for (let index = block.operations.length - 1; index >= 0; index -= 1) {
+    const operation = block.operations[index]!;
+    if (operation.kind === "call" && operation.tail === true) {
+      return operation.id === terminator.value ? operation : undefined;
+    }
+    if (!tailMetadata(operation)) return undefined;
+  }
+  return undefined;
+}
+
+/**
+ * Replaces the jump that carries a tail call's value through the join
+ * blocks of `?:`, `&&`, `||`, `??`, and `?.` with a direct `return` of
+ * that value. A join block forwards when its only parameter is its
+ * value, it holds only `join` and root metadata, and it returns that
+ * parameter or forwards it again. The skipped joins compute nothing, so
+ * returning early is the same completion; a join left without a
+ * predecessor is unreachable and never emitted.
+ */
+function returnTailCallsDirectly(blocks: readonly MutableMirBlock[]): void {
+  const byId = new Map(blocks.map((block) => [block.id, block]));
+  const returnsParameter = (start: number): boolean => {
+    const seen = new Set<number>();
+    let current = byId.get(start);
+    while (current != null && !seen.has(current.id)) {
+      seen.add(current.id);
+      const parameter = current.parameters?.[0];
+      if (current.parameters?.length !== 1 || parameter == null) return false;
+      if (
+        current.operations.some(
+          (operation) =>
+            operation.kind !== "join" && operation.kind !== "root-store",
+        )
+      ) {
+        return false;
+      }
+      const terminator = current.terminator;
+      if (terminator?.kind === "return") return terminator.value === parameter;
+      if (
+        terminator?.kind !== "jump" ||
+        terminator.values?.length !== 1 ||
+        terminator.values[0] !== parameter
+      ) {
+        return false;
+      }
+      current = byId.get(terminator.target);
+    }
+    return false;
+  };
+  for (const block of blocks) {
+    const terminator = block.terminator;
+    if (terminator?.kind !== "jump" || terminator.values?.length !== 1) {
+      continue;
+    }
+    const value = terminator.values[0];
+    let call: MirOperation | undefined;
+    for (let index = block.operations.length - 1; index >= 0; index -= 1) {
+      const operation = block.operations[index]!;
+      if (operation.kind === "call" && operation.tail === true) {
+        if (operation.id === value) call = operation;
+        break;
+      }
+      if (!tailMetadata(operation)) break;
+    }
+    if (call == null || !returnsParameter(terminator.target)) continue;
+    block.terminator = { kind: "return", value: call.id };
+  }
+}
+
+/**
+ * Rejects a tail call that lowering left anywhere but directly before
+ * the `return` of its own value, or on a target the backend cannot
+ * leave the frame for. A frame discarded before such a call would lose
+ * work the call's caller still owed.
+ */
+function validateTailCalls(blocks: readonly MutableMirBlock[]): void {
+  for (const block of blocks) {
+    const returned = tailCallReturned(block);
+    for (const operation of block.operations) {
+      if (operation.kind !== "call" || operation.tail !== true) continue;
+      const target = operation.target?.kind;
+      if (
+        operation !== returned ||
+        (target !== "dynamic" &&
+          target !== "console-log" &&
+          target !== "timer-intrinsic")
+      ) {
+        throw new Error(
+          `MIR tail call %${operation.id} does not return its value ` +
+            `directly from bb${block.id}.`,
+        );
+      }
+    }
   }
 }
 
@@ -7690,6 +8147,7 @@ function buildMirFunction(
   argumentsBindingId?: number,
   generatorCallStatementCount = 0,
   argumentsMapped = false,
+  tailCalls = false,
 ): MirFunction {
   const entry: MutableMirBlock = {
     id: 0,
@@ -7715,8 +8173,16 @@ function buildMirFunction(
     initializesInstanceElements,
     nextValue: 0,
     pendingLabels: [],
+    pendingTailCalls: new Set<HirExpression>(),
     specialization,
     strictCode: strict,
+    tailCalls,
+    ...includePropertiesWhen(() => {
+      if (derivedThisBindingId == null) return undefined;
+      return {
+        derivedThisBindingId,
+      };
+    }),
   };
   // A base constructor initializes its class's fields before its body
   // runs, which is where [[Construct]] performs InitializeInstanceElements
@@ -7751,9 +8217,11 @@ function buildMirFunction(
     const value = lowerSyntheticUndefined(range, builder);
     builder.current.terminator = { kind: "return", value };
   }
+  returnTailCallsDirectly(builder.blocks);
   if (derivedThisBindingId != null) {
     routeDerivedReturns(builder.blocks, derivedThisBindingId, builder, range);
   }
+  validateTailCalls(builder.blocks);
   const mirParameters: readonly MirParameter[] = parameters.map(
     (parameter) => ({
       bindingId: parameter.bindingId,
@@ -7914,6 +8382,7 @@ export function buildMir(
         functionValue.argumentsBindingId,
         functionValue.generatorCallStatementCount,
         functionValue.argumentsMapped === true,
+        functionValue.tailCalls === true,
       );
       return specialization === "enabled"
         ? specializeAddition(generic, functionValue)

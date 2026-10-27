@@ -1152,6 +1152,76 @@ flags agree on `i`, `m`, `s`, `u`, and `v`; every other copy still parses
 its source dynamically. No entry point, public layout, heap kind,
 intrinsic slot, or built-in code ID is added.
 
+The `m5-136` ABI records proper tail calls. `OSEO_STATUS_TAIL_CALL` reports
+that a PrepareForTailCall site recorded the call it owes in the context.
+`oseo_tail_call` and `oseo_tail_call_derived` throw for a value that is not
+callable, as an ordinary call does, and otherwise record the callee, receiver,
+copied arguments, running realm, and, for a derived class constructor, its
+`this` binding cell. `oseo_call_function` and `oseo_call_complete` perform
+recorded calls in a loop, one rooted step at a time, so a chain of tail calls
+holds one step's native stack, call depth, frame budget, and roots.
+`Function.prototype.call`, `Function.prototype.apply`, and `Reflect.apply`
+record their final call, as their PrepareForTailCall steps require, and the
+[[Call]] of a bound function or a Proxy forwards the same way because it
+creates no execution context. A non-tail call through a bound function or
+Proxy therefore no longer adds a call-depth level for that wrapper.
+[[Construct]] is unchanged. The context gains one private record pointer.
+The existing host-tail entry points record direct `console.log`, `setTimeout`,
+and `clearTimeout` calls. The unpublished `m5-137` composition completes that
+contract with `OSEO_TAIL_HOST_CLEAR_TIMEOUT = 3`; values 1 and 2, all layouts,
+status values, and function signatures stay unchanged. Arguments finish
+before frame release. The clear-timeout step passes its first argument, or
+undefined when absent, to `oseo_clear_timeout`; evaluated extra arguments are
+ignored. Only numeric handles cancel a timer, and the result is undefined.
+Ordinary calls retain their direct entry point.
+
+The `m5-137` ABI adds four context counts for published ephemeron tables,
+weak-reference records, finalization registries, and finalization cells.
+Publication increments a count only after linking its object, and sweep
+decrements it when removing that object. Consumed and unreachable records
+remain counted until sweep. The collector skips its owner-local weak-edge,
+cleanup scheduling, and registry compaction scans only when their record
+kinds are absent. Root and ephemeron fixed-point tracing still visit foreign
+objects, and collection policy and phase order do not change. The context
+layout changes, so native artifacts must use the matching runtime headers.
+
+The `m5-139` ABI adds an inline heap-slot bitmap to each environment.
+Creation initializes every slot and bit, setting a slot updates its bit
+without allocating or collecting, and cloning copies slots and bits into
+one fresh allocation. Tracing visits bitmap words and their heap-valued
+slots; it preserves every strong edge without rescanning primitive slots.
+The bitmap adds one `size_t` field and `ceil(slot_count / 64)` words of
+`uint64_t` storage to each environment. For valid-size requests, allocation
+attempts, safepoints and forced-collection policy remain unchanged. The
+overflow guard rejects impossible slot counts before allocation or GC.
+Root scanning and weak-edge phase order remain unchanged. This is a
+source-only candidate; native correctness and workload benefit remain
+unmeasured.
+
+The `m5-140` ABI adds one private string-table pointer to the context.
+A string of at most 32 code units that the context allocates is recorded
+in the table, and while that string lives, a later request for the same
+code units returns it instead of allocating, publishing, or reaching a
+safepoint. Strings are immutable and cannot be WeakRef targets or weak
+collection keys, so the sharing is not observable. The table is weak: it
+roots nothing, and each collection removes the entries of the strings its
+sweep frees after marking is final, so an unrooted heap still collects to
+empty. Table growth uses the ordinary allocator without a safepoint,
+counts no allocation attempt, and on failure only leaves a string unshared.
+Context destruction releases the table. `oseo_function_create` keeps its
+own name and key strings out of the specialization allocation count
+whether the table shares them or not.
+
+`oseo_iterator_next` performs a step whose captured next method is the
+intrinsic `%ArrayIteratorPrototype%.next` and whose receiver is an array
+iterator without creating the iterator result object. It enters the next
+method's realm and one call level as [[Call]] would, and performs the same
+`length` and element `Get` steps in the same order. The skipped object
+would be fresh, with own `done` and `value` data properties, so
+IteratorComplete and IteratorValue observe nothing else. Any other next
+method, including a replacement installed before GetIterator read it,
+takes the generic path.
+
 Lexical bindings use a private uninitialized sentinel for runtime TDZ checks.
 Catchable runtime-generated language errors are instances of the named
 error intrinsics with the applicable `TypeError`, `RangeError`, or
@@ -1180,5 +1250,20 @@ program output cannot observe them. The context also carries diagnostic source
 identifiers with explicit byte lengths, heap-backed root-frame ownership, and
 active frame-budget accounting. Embedded null bytes are preserved during native
 error output.
+
+The historical Host `m5-140` ABI composes the `m5-139` environment bitmap
+with Host Script
+realm layout: persistent `global_lexicals`, Script evaluator metadata and
+host builtin identities. Bitmap allocation, slot updates, cloning and
+tracing retain their final implementation. Host lexical installation uses
+the environment APIs, while realm tracing retains the lexical-record root.
+This layout composition introduces no new collector algorithm. Fresh
+combined native execution is required separately from source preparation.
+
+The combined `m5-141` ABI retains the TCO cost fix's `m5-140` weak string
+table and iterator path together with the Host Script realm additions.
+Both source branches used `m5-140` independently, so this composition uses
+the next unused identity after Main and both branches. Their ABI history
+notes retain their original source identities.
 
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md

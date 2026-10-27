@@ -18,16 +18,31 @@ OseoResult oseo_environment_create(OseoContext *context, size_t slot_count) {
             "Environment allocation is too large."
         );
     }
-    size_t size = sizeof(OseoEnvironment) +
-        slot_count * sizeof(OseoValue);
+    size_t slot_bytes = slot_count * sizeof(OseoValue);
+    size_t word_count = slot_count / 64u + (slot_count % 64u != 0u);
+    if (word_count >
+        (SIZE_MAX - sizeof(OseoEnvironment) - slot_bytes) / sizeof(uint64_t)) {
+        return failure(
+            context,
+            "OSEO2001",
+            "Environment allocation is too large."
+        );
+    }
+    size_t size = sizeof(OseoEnvironment) + slot_bytes +
+        word_count * sizeof(uint64_t);
     OseoEnvironment *environment =
         oseo_internal_allocate_heap_bytes(context, size);
     if (environment == NULL) {
         return failure(context, "OSEO2001", "Environment allocation failed.");
     }
     environment->slot_count = slot_count;
+    environment->heap_word_count = word_count;
     for (size_t index = 0u; index < slot_count; index += 1u) {
         environment->slots[index] = oseo_undefined();
+    }
+    uint64_t *bitmap = environment_heap_bitmap(environment);
+    for (size_t index = 0u; index < word_count; index += 1u) {
+        bitmap[index] = UINT64_C(0);
     }
     return oseo_internal_publish_heap(
         context,
@@ -65,6 +80,13 @@ OseoResult oseo_environment_set(
         return failure(context, "OSEO2001", "Environment index is invalid.");
     }
     environment->slots[index] = value;
+    uint64_t *word = &environment_heap_bitmap(environment)[index / 64u];
+    uint64_t bit = UINT64_C(1) << (index % 64u);
+    if (tag_of(value) == OSEO_TAG_HEAP) {
+        *word |= bit;
+    } else {
+        *word &= ~bit;
+    }
     return normal(value);
 }
 
@@ -85,6 +107,13 @@ OseoResult oseo_environment_clone(
             target->slots,
             source->slots,
             slot_count * sizeof(*target->slots)
+        );
+    }
+    if (source->heap_word_count > 0u) {
+        memcpy(
+            environment_heap_bitmap(target),
+            environment_heap_bitmap(source),
+            source->heap_word_count * sizeof(uint64_t)
         );
     }
     return created;
@@ -604,6 +633,17 @@ OseoResult oseo_global_object_create(
         );
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoValue lexicals = context->realm->global_lexicals;
+        if (is_object(lexicals) &&
+            oseo_internal_own_property_index(
+                ordinary_object(lexicals), frame.slots[1]
+            ) != SIZE_MAX) {
+            result = oseo_internal_throw_error(
+                context, OSEO_ERROR_SYNTAX,
+                "A Script declaration conflicts with a lexical binding."
+            );
+            break;
+        }
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
@@ -642,6 +682,17 @@ OseoResult oseo_global_object_create(
         );
         frame.slots[1] = result.value;
         if (result.status != OSEO_STATUS_NORMAL) break;
+        OseoValue lexicals = context->realm->global_lexicals;
+        if (is_object(lexicals) &&
+            oseo_internal_own_property_index(
+                ordinary_object(lexicals), frame.slots[1]
+            ) != SIZE_MAX) {
+            result = oseo_internal_throw_error(
+                context, OSEO_ERROR_SYNTAX,
+                "A Script declaration conflicts with a lexical binding."
+            );
+            break;
+        }
         OseoValue value = oseo_undefined();
         OseoPropertyAttributes attributes = {false, false, false, false};
         OseoValue getter = oseo_undefined();
@@ -843,4 +894,48 @@ OseoResult oseo_global_function_initialize(
     }
     cell->value = value;
     return normal(value);
+}
+
+/* ResolveBinding selects its record before any assignment operand runs. */
+OseoResult oseo_global_environment(OseoContext *context, OseoValue key) {
+    OseoValue lexicals = context->realm->global_lexicals;
+    if (is_object(lexicals) && oseo_internal_own_property_index(
+            ordinary_object(lexicals), key) != SIZE_MAX) {
+        return normal(lexicals);
+    }
+    return global_this_object(context);
+}
+
+OseoResult oseo_script_lexicals_install(
+    OseoContext *context, OseoValue environment, size_t count,
+    const uint16_t *const *names, const size_t *lengths,
+    const size_t *ids, const bool *mutable_bindings
+) {
+    OseoValue slots[3] = {environment, oseo_undefined(), oseo_undefined()};
+    OseoRootFrame frame = {NULL, slots, 3u};
+    oseo_roots_push(context, &frame);
+    OseoResult result = normal(oseo_undefined());
+    if (!is_object(context->realm->global_lexicals)) {
+        result = oseo_object_create(context, oseo_null());
+        if (result.status == OSEO_STATUS_NORMAL) {
+            context->realm->global_lexicals = result.value;
+            ordinary_object(result.value)->global_object = true;
+            ordinary_object(result.value)->dictionary = true;
+        }
+    }
+    for (size_t index = 0u;
+         result.status == OSEO_STATUS_NORMAL && index < count; index += 1u) {
+        result = oseo_string_from_units(context, names[index], lengths[index]);
+        slots[1] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_environment_get(context, slots[0], ids[index]);
+        slots[2] = result.value;
+        if (result.status != OSEO_STATUS_NORMAL) break;
+        result = oseo_object_define(context, context->realm->global_lexicals,
+            slots[1], slots[2],
+            (OseoPropertyAttributes){false, false, mutable_bindings[index],
+                false});
+    }
+    oseo_roots_pop(context, &frame);
+    return result;
 }

@@ -176,12 +176,12 @@ compare with “the” intrinsic, such as the `RegExp.prototype` flag getters,
 compare with the running realm's, which the call switch makes the getter's
 own realm.
 
-**Generated code runs in the initial realm.** No source text is compiled
-for a created realm, so every generated function belongs to the initial
-realm, and the global bindings, the literal caches, and the sloppy-mode
-`this` that generated code reaches are the initial realm's. A created
-realm runs only its own built-in functions and calls back into generated
-code only through `oseo_call_function`, which restores the initial realm.
+**Generated code and realm ownership.** Originally only the initial realm
+ran generated source. [ADR 0029](./0029-ahead-of-time-host-script-bindings.md)
+extends this to the finite host Script set: the host function enters its own
+realm before its compiled evaluator runs, global lexical state belongs to
+that realm, and closures record that realm when created. Ordinary eval and
+source-compiling constructors retain ADR 0016.
 
 **`%eval%`.** Every realm has a `%eval%` intrinsic, installed as the global
 object's writable, non-enumerable, configurable `eval` property, with
@@ -204,7 +204,7 @@ belongs to the new realm. A created realm's host object has no `agent`,
 because agents belong to the cluster's main host object. The reviewed
 runner builds a case with the test262 host when it references `$262.agent`,
 `$262.createRealm`, or `$262.global`, or loads *atomicsHelper.js*; any
-other `$262` member, such as `evalScript` or `detachArrayBuffer`, remains
+other `$262` member, such as `detachArrayBuffer`, remains
 the `host-binding` capability. The manifest schema and classification
 vocabulary are unchanged.
 
@@ -223,19 +223,16 @@ Consequences
     realm pointer, one more indirection than before.
  -  The main realm's global object gains `eval`, which a program can now
     read as `globalThis.eval`.
- -  Created realms observe no Script of their own, so a case that needs
-    `$262.evalScript` or source evaluation in another realm keeps its
-    current owner.
+ -  ADR 0029 later supplies the finite ahead-of-time `$262.evalScript`
+    capability; ordinary source evaluation retains its current boundary.
 
 
 Failure modes and replacement triggers
 --------------------------------------
 
- -  Admitting any dynamic source form, including `$262.evalScript`, would
-    let a created realm run code of its own and requires generated code to
-    run in a realm other than the initial one: the global bindings, the
-    literal caches, and the realm a compiled closure records would then
-    follow the running realm instead of the initial realm.
+ -  Any dynamic source admission still requires a separate decision.
+    ADR 0029 establishes running-realm bindings, caches, and closure ownership
+    only for its closed ahead-of-time host Script set.
  -  A reviewed case whose observable result depends on a realm this record
     places differently, such as the realm of an object created by a job
     without a handler, reopens the job realm rule.

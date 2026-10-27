@@ -103,6 +103,9 @@ function globalReadSteps(expression: HirGlobalRead): HirExpression {
 }
 
 function printHirExpression(expression: HirExpression): string {
+  if (expression.kind === "global-environment") {
+    return `global-environment ${JSON.stringify(expression.name)}`;
+  }
   if (expression.kind === "binding-set") {
     return (
       `%b${expression.bindingId} ${expression.name} = ` +
@@ -419,21 +422,23 @@ function printHirExpression(expression: HirExpression): string {
     );
   }
   const target =
-    expression.target.kind === "console-log"
-      ? "intrinsic console.log"
-      : expression.target.kind === "promise-intrinsic"
-        ? `intrinsic Promise.${expression.target.method}`
-        : expression.target.kind === "timer-intrinsic"
-          ? `intrinsic ${expression.target.method}`
-          : expression.target.kind === "dynamic"
-            ? printHirExpression(expression.target.callee)
-            : expression.target.kind === "super"
-              ? `super -> %b${expression.target.thisBinding.bindingId} this`
-              : expression.target.kind === "private-method"
-                ? `${printHirExpression(expression.target.object)}.` +
-                  printHirPrivateName(expression.target.privateName)
-                : `${printHirExpression(expression.target.object)}[` +
-                  `${printHirExpression(expression.target.key)}]`;
+    expression.target.kind === "host-runtime-intrinsic"
+      ? `host ${expression.target.name} (intrinsic fallback)`
+      : expression.target.kind === "console-log"
+        ? "intrinsic console.log"
+        : expression.target.kind === "promise-intrinsic"
+          ? `intrinsic Promise.${expression.target.method}`
+          : expression.target.kind === "timer-intrinsic"
+            ? `intrinsic ${expression.target.method}`
+            : expression.target.kind === "dynamic"
+              ? printHirExpression(expression.target.callee)
+              : expression.target.kind === "super"
+                ? `super -> %b${expression.target.thisBinding.bindingId} this`
+                : expression.target.kind === "private-method"
+                  ? `${printHirExpression(expression.target.object)}.` +
+                    printHirPrivateName(expression.target.privateName)
+                  : `${printHirExpression(expression.target.object)}[` +
+                    `${printHirExpression(expression.target.key)}]`;
   return (
     `call ${target}(` +
     expression.arguments.map(printHirCallArgument).join(", ") +
@@ -455,7 +460,12 @@ function printHirBindingPattern(pattern: HirBindingPattern): string {
     );
   }
   if (pattern.kind === "binding-identifier") {
-    return `%b${pattern.bindingId} ${pattern.name}${hintText(pattern.hints)}`;
+    return (
+      `%b${pattern.bindingId} ${pattern.name}${hintText(pattern.hints)}` +
+      (pattern.withGlobalFallback == null
+        ? ""
+        : withGlobalFallbackText(pattern.withGlobalFallback))
+    );
   }
   if (pattern.kind === "object-binding-pattern") {
     const properties = pattern.properties.map(
@@ -602,7 +612,10 @@ function appendHirStatement(
           : statement.target.kind === "assignment-pattern"
             ? printHirBindingPattern(statement.target.pattern)
             : statement.target.kind === "binding"
-              ? `%b${statement.target.bindingId} ${statement.target.name}`
+              ? `%b${statement.target.bindingId} ${statement.target.name}` +
+                (statement.target.withGlobalFallback == null
+                  ? ""
+                  : withGlobalFallbackText(statement.target.withGlobalFallback))
               : statement.target.kind === "private"
                 ? `${printHirExpression(statement.target.object)}.` +
                   printHirPrivateName(statement.target.privateName)
@@ -624,7 +637,10 @@ function appendHirStatement(
           : statement.target.kind === "assignment-pattern"
             ? printHirBindingPattern(statement.target.pattern)
             : statement.target.kind === "binding"
-              ? `%b${statement.target.bindingId} ${statement.target.name}`
+              ? `%b${statement.target.bindingId} ${statement.target.name}` +
+                (statement.target.withGlobalFallback == null
+                  ? ""
+                  : withGlobalFallbackText(statement.target.withGlobalFallback))
               : statement.target.kind === "private"
                 ? `${printHirExpression(statement.target.object)}.` +
                   printHirPrivateName(statement.target.privateName)

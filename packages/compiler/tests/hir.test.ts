@@ -3,7 +3,11 @@ import test from "node:test";
 
 import { buildHir, buildMir, printHir, printMir } from "../src/index.ts";
 import { intrinsicGlobalKind } from "../src/hir.ts";
-import type { SourceRange, SyntaxProgram } from "../src/index.ts";
+import type {
+  SourceRange,
+  SyntaxProgram,
+  SyntaxStatement,
+} from "../src/index.ts";
 
 function includePropertiesWhen<const Properties extends object>(
   properties: () => Properties | undefined,
@@ -15,6 +19,15 @@ const range: SourceRange = {
   end: { column: 2, line: 1 },
   start: { column: 1, line: 1 },
 };
+
+/** A body that reads `arguments`, so the function keeps its object. */
+const readsArguments: readonly SyntaxStatement[] = [
+  {
+    expression: { kind: "identifier", name: "arguments", range },
+    kind: "return",
+    range,
+  },
+];
 
 type MalformedSyntaxValue =
   | MalformedSyntaxRecord
@@ -545,7 +558,7 @@ test("admits the mapped arguments object only for a simple list", () => {
   const mapped = buildHir({
     body: [
       {
-        body: [],
+        body: readsArguments,
         kind: "function",
         name: "simple",
         parameters: [
@@ -569,7 +582,7 @@ test("admits the mapped arguments object only for a simple list", () => {
   const unmapped = buildHir({
     body: [
       {
-        body: [],
+        body: readsArguments,
         kind: "function",
         name: "rest",
         parameters: [{ hints: [], name: "a", range, rest: true }],
@@ -589,7 +602,7 @@ test("admits the mapped arguments object only for a simple list", () => {
   const strict = buildHir({
     body: [
       {
-        body: [],
+        body: readsArguments,
         kind: "function",
         name: "strictSimple",
         parameters: [{ hints: [], name: "a", range }],
@@ -624,7 +637,7 @@ test("gives every function form except an arrow its own arguments", () => {
     const result = buildHir({
       body: [
         {
-          body: [],
+          body: readsArguments,
           functionKind,
           kind: "function",
           name: "owner",
@@ -670,6 +683,103 @@ test("gives every function form except an arrow its own arguments", () => {
     );
     assert.equal(result.program?.functions[0]?.argumentsMapped, undefined);
   }
+});
+
+test("creates no arguments object that no reference can reach", () => {
+  // FunctionDeclarationInstantiation initializes the implicit binding
+  // only for references to read; direct eval is outside the profile, so a
+  // function whose body names no `arguments` never observes the object.
+  const unread = buildHir({
+    body: [
+      {
+        body: [],
+        kind: "function",
+        name: "unread",
+        parameters: [{ hints: [], name: "a", range }],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "arguments-unread.js",
+  });
+  assert.deepEqual(unread.diagnostics, []);
+  const unreadFunction = unread.program?.functions[0];
+  assert.equal(unreadFunction?.argumentsBindingId, undefined);
+  assert.equal(unreadFunction?.argumentsMapped, undefined);
+  assert.equal(unreadFunction?.localBindingIds.length, 1);
+
+  // A nested ordinary function's own `arguments` is a different binding,
+  // so it neither keeps the outer object nor loses its own.
+  const nested = buildHir({
+    body: [
+      {
+        body: [
+          {
+            body: readsArguments,
+            kind: "function",
+            name: "inner",
+            parameters: [],
+            range,
+            returnHints: [],
+            simpleParameterList: true,
+          },
+        ],
+        kind: "function",
+        name: "outer",
+        parameters: [],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "arguments-nested-owner.js",
+  });
+  assert.deepEqual(nested.diagnostics, []);
+  const outer = nested.program?.functions.find(
+    (functionValue) => functionValue.name === "outer",
+  );
+  const inner = nested.program?.functions.find(
+    (functionValue) => functionValue.name === "inner",
+  );
+  assert.equal(outer?.argumentsBindingId, undefined);
+  assert.ok(inner?.argumentsBindingId != null);
+
+  // An assignment is a reference too: sloppy code that writes the binding
+  // without reading it keeps the object the write replaces.
+  const written = buildHir({
+    body: [
+      {
+        body: [
+          {
+            expression: {
+              kind: "binding-set",
+              name: "arguments",
+              range,
+              value: { kind: "number", range, value: 1 },
+            },
+            kind: "expression",
+            range,
+          },
+        ],
+        kind: "function",
+        name: "written",
+        parameters: [],
+        range,
+        returnHints: [],
+        simpleParameterList: true,
+      },
+    ],
+    kind: "program",
+    range,
+    sourceId: "arguments-written.js",
+  });
+  assert.deepEqual(written.diagnostics, []);
+  assert.ok(written.program?.functions[0]?.argumentsBindingId != null);
 });
 
 test("resolves an arrow's arguments to the enclosing function binding", () => {
