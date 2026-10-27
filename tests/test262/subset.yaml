@@ -108012,7 +108012,7 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -108025,7 +108025,7 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies:
@@ -108056,7 +108056,8 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, functions, promise-settlement]
+    dependencies:
+      [async-functions, dynamic-source, functions, promise-settlement]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies:
@@ -108087,7 +108088,8 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, functions, promise-settlement]
+    dependencies:
+      [async-functions, dynamic-source, functions, promise-settlement]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -108121,7 +108123,8 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, functions, promise-settlement]
+    dependencies:
+      [async-functions, dynamic-source, functions, promise-settlement]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -108162,10 +108165,11 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, functions, promise-settlement]
+    dependencies:
+      [async-functions, dynamic-source, functions, promise-settlement]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, functions]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies:
@@ -108210,7 +108214,14 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [async-functions, functions, generators, promise-settlement]
+    dependencies:
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        generators,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source]
@@ -108312,10 +108323,10 @@ tests:
     dependencies: [dynamic-source, functions, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [functions]
+    dependencies: [dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [functions]
+    dependencies: [dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source]
@@ -108360,7 +108371,7 @@ tests:
     dependencies: [dynamic-source, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-while-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [lexical-bindings]
+    dependencies: [dynamic-source, lexical-bindings]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, object-literals]
@@ -108390,7 +108401,7 @@ tests:
     dependencies: [dynamic-source, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-typeof-import.js
     expectedClassification: expected-negative
-    dependencies: [object-literals]
+    dependencies: [dynamic-source, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/top-level-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source]
