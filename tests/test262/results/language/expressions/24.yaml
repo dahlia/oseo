@@ -947,6 +947,7 @@ results:
       - dynamic-source
       - functions
       - module-linking
+      - object-own-keys
       - reflect-namespace
       - symbols
       - var-bindings

@@ -49,6 +49,7 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - functions
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-fn-arrow-function-assignment-\

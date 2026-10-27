@@ -92,6 +92,7 @@ results:
     dependencies:
       - lexical-bindings
       - module-linking
+      - object-own-keys
       - reflect-namespace
       - symbols
       - var-bindings

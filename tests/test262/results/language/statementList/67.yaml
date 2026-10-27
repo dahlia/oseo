@@ -17,6 +17,7 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - regular-expressions
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-block-regexp-literal-flags.js

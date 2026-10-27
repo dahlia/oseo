@@ -1092,6 +1092,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - async-functions
+      - async-iteration
       - destructuring-bindings
       - dynamic-source
       - functions

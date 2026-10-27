@@ -18,6 +18,7 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - functions
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-block-arrow-function-assignme\
@@ -45,6 +46,7 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - functions
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-block-with-statment-arrow-fun\

@@ -17,6 +17,8 @@ results:
     dependencies:
       - control-flow
       - dynamic-source
+      - functions
+      - regular-expressions
       - var-bindings
     observation:
       detail: "test/language/statementList/eval-fn-regexp-literal.js
