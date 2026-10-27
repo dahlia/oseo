@@ -20065,9 +20065,9 @@ summary:
   expectedNegatives: 2802
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 26054
+  passes: 26067
   semanticFailures: 0
-  unsupportedProfileFeatures: 1045
+  unsupportedProfileFeatures: 1032
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 7
@@ -20164,9 +20164,9 @@ summary:
       expectedNegatives: 3
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 18
+      passes: 30
       semanticFailures: 0
-      unsupportedProfileFeatures: 447
+      unsupportedProfileFeatures: 435
     - dependency: error-intrinsics
       expectedNegatives: 6
       harnessFailures: 0
@@ -20185,9 +20185,9 @@ summary:
       expectedNegatives: 739
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 10386
+      passes: 10390
       semanticFailures: 0
-      unsupportedProfileFeatures: 316
+      unsupportedProfileFeatures: 312
     - dependency: generators
       expectedNegatives: 265
       harnessFailures: 0
@@ -20220,9 +20220,9 @@ summary:
       expectedNegatives: 243
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 855
+      passes: 861
       semanticFailures: 0
-      unsupportedProfileFeatures: 27
+      unsupportedProfileFeatures: 21
     - dependency: lexical-grammar
       expectedNegatives: 95
       harnessFailures: 0
@@ -20255,9 +20255,9 @@ summary:
       expectedNegatives: 581
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 15665
+      passes: 15673
       semanticFailures: 0
-      unsupportedProfileFeatures: 137
+      unsupportedProfileFeatures: 129
     - dependency: promise-settlement
       expectedNegatives: 90
       harnessFailures: 0
@@ -20290,9 +20290,9 @@ summary:
       expectedNegatives: 2
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 517
+      passes: 518
       semanticFailures: 0
-      unsupportedProfileFeatures: 3
+      unsupportedProfileFeatures: 2
     - dependency: rest-parameters
       expectedNegatives: 55
       harnessFailures: 0
@@ -20381,9 +20381,9 @@ summary:
       expectedNegatives: 164
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4776
+      passes: 4780
       semanticFailures: 0
-      unsupportedProfileFeatures: 120
+      unsupportedProfileFeatures: 116
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0
@@ -20620,9 +20620,9 @@ summary:
       expectedNegatives: 192
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1674
+      passes: 1675
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 12
     - group: built-ins/RegExpStringIteratorPrototype
       expectedNegatives: 0
       harnessFailures: 0
@@ -20872,9 +20872,9 @@ summary:
       expectedNegatives: 15
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 14
+      passes: 26
       semanticFailures: 0
-      unsupportedProfileFeatures: 13
+      unsupportedProfileFeatures: 1
     - group: language/identifier-resolution
       expectedNegatives: 2
       harnessFailures: 0

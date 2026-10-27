@@ -49,6 +49,13 @@ scope:
     strings through a weak table, and intrinsic array iterator steps skip
     their unobservable result object. These execution-input changes follow
     the Full above, which needs a new reuse decision or a new Full."
+  - "The accepted remote Full on U 28d57fc5, job
+    20261027T105544Z-904e10b15d52, observes all 29,901 paths: 26,067
+    pass, 2,802 expected negatives and 1,032 unsupported. It promotes 12
+    Host global-code paths and RegExp Symbol.replace/coerce-global.js;
+    the two TCO paths retain pass. The Host eval path stays unsupported
+    with active Host-node remediation under the ADR 0016 boundary.
+    This Full supplies no candidate/Main gate or graph landing."
 owners:
   - PLAN-M5C.md
 evidence:

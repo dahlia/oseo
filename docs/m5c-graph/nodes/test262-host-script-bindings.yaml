@@ -5,7 +5,13 @@ delivers: "Admits the $262.evalScript and print host bindings, so the 14
   reviewed paths with the host-binding unsupported capability are observed:
   13 global-code cases calling $262.evalScript and 1 RegExp case reading
   print. ADR 0016 names no host binding; literal scripts can be compiled
-  ahead of time as ADR 0026 does for agent sources."
+  ahead of time as ADR 0026 does for agent sources. The accepted remote
+  Full on U 28d57fc5, job 20261027T105544Z-904e10b15d52, observes 13 of
+  these 14 paths as pass: 12 global-code script-decl-* cases and the
+  RegExp Symbol.replace coerce-global.js case. The remaining
+  script-decl-lex-var-declared-via-eval.js stays unsupported for ordinary
+  eval under ADR 0016. This node retains active remediation ownership of
+  that path; no whole-path exclusion or completed coverage is claimed."
 dependencies:
   - unsupported-ownership-audit
 landed: false

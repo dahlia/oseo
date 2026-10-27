@@ -37858,7 +37858,7 @@ tests:
     expectedClassification: pass
     dependencies: [functions, regular-expressions]
   - path: test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties, regular-expressions]
   - path: test/built-ins/RegExp/prototype/Symbol.replace/coerce-lastindex-err.js
     expectedClassification: pass
@@ -129580,43 +129580,43 @@ tests:
     expectedClassification: expected-negative
     dependencies: [control-flow]
   - path: test/language/global-code/script-decl-func-dups.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, functions]
   - path: test/language/global-code/script-decl-func-err-non-configurable.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/global-code/script-decl-func-err-non-extensible.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/global-code/script-decl-func.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/global-code/script-decl-lex-deletion.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, lexical-bindings]
   - path: test/language/global-code/script-decl-lex-lex.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, lexical-bindings]
   - path: test/language/global-code/script-decl-lex-restricted-global.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, lexical-bindings, object-properties]
   - path: test/language/global-code/script-decl-lex-var-declared-via-eval.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, lexical-bindings, var-bindings]
   - path: test/language/global-code/script-decl-lex-var.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, lexical-bindings, var-bindings]
   - path: test/language/global-code/script-decl-lex.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, lexical-bindings, object-properties]
   - path: test/language/global-code/script-decl-var-collision.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, lexical-bindings, var-bindings]
   - path: test/language/global-code/script-decl-var-err.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, object-properties, var-bindings]
   - path: test/language/global-code/script-decl-var.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, object-properties, var-bindings]
   - path: test/language/global-code/super-call-arrow.js
     expectedClassification: expected-negative

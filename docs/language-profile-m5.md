@@ -237,8 +237,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 29,901 reviewed cases: 26,054 passes, 2,802
-expected negatives, and 1,045 unsupported profile features. It records no
+The current manifest contains 29,901 reviewed cases: 26,067 passes, 2,802
+expected negatives, and 1,032 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -9868,3 +9868,35 @@ runs precede the fix's internal review: pass 8 of scope `outer2-blockers`
 against base `f3e2c1e6` could not start because the reviewer's
 authentication was revoked, and it remains pending with outer reviews,
 Full/classification, admission and exact candidate/Main gates.
+
+
+Accepted remote Full on the TCO and Host composition
+----------------------------------------------------
+
+Root accepted remote job `20261027T105544Z-904e10b15d52` on source
+U `28d57fc50ce3cda616459175715ddf82ad9db1f8`, tree
+`52e37c63`. The original `mise run test262:update -- --accept-promotions`
+completed naturally with exit 0, pool 8 and zero retries. All 29,901
+reviewed paths were observed: 26,067 pass, 2,802 expected negatives and
+1,032 unsupported, with no semantic, harness or infrastructure failure.
+The 13 promotions are 12 Host global-code `script-decl-*` paths and
+`test/built-ins/RegExp/prototype/Symbol.replace/coerce-global.js`.
+The two TCO tagged-template paths retain their passes.
+
+Thirteen of the Host node's fourteen paths now pass.
+`test/language/global-code/script-decl-lex-var-declared-via-eval.js`
+remains unsupported for ordinary eval, the ADR 0016 dynamic-source
+boundary. Its existing owner `node:test262-host-script-bindings` retains
+active remediation of the non-source declaration contract. No new exclusion
+or completed replacement evidence is claimed. The ledger, observation
+batches and graph baseline derive from this accepted manifest.
+
+The result manifest is remote commit
+`787d1a682f49d12af12931ddff23e37c34d682ef`, tree
+`6703d46daa08fc0391007030f7666f11305dd7a4`, directly on U. Applying its
+binary diff reproduced that tree before derived-data or prose edits.
+Raw evidence remains under
+*/data/m5c-tco-host-compose-20261027/remote-20261027T105544Z-904e10b15d52/*.
+Earlier source-qualified observations and pending-at-the-time statements
+remain historical. This Full supplies no candidate/Main gate, macOS
+execution, graph landing or publication; Root owns those later gates.
