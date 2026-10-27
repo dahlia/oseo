@@ -106696,22 +106696,22 @@ tests:
     dependencies: [dynamic-source, functions, var-bindings]
   - path: test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-arrow-import-catch-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
@@ -106723,6 +106723,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-eval-rqstd-abrupt-urierror.js
@@ -106733,6 +106734,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-eval-script-code-target.js
@@ -106754,6 +106756,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-instn-iee-err-ambiguous-import.js
@@ -106764,6 +106767,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-instn-iee-err-circular.js
@@ -106774,6 +106778,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-await-specifier-tostring-abrupt-rejects.js
@@ -106795,6 +106800,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-eval-rqstd-abrupt-urierror.js
@@ -106805,6 +106811,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-eval-script-code-target.js
@@ -106826,6 +106833,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-instn-iee-err-ambiguous-import.js
@@ -106836,6 +106844,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-instn-iee-err-circular.js
@@ -106846,6 +106855,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-arrow-function-return-await-specifier-tostring-abrupt-rejects.js
@@ -106862,11 +106872,23 @@ tests:
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-await-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-await-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-await-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -106880,15 +106902,33 @@ tests:
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-await-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-await-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-await-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-await-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -106902,30 +106942,42 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions, dynamic-source, functions]
+    dependencies: [async-functions, dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions, dynamic-source, functions]
+    dependencies: [async-functions, dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions, dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions, dynamic-source, functions]
+    dependencies: [async-functions, dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions, dynamic-source, functions]
+    dependencies: [async-functions, dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions, dynamic-source, functions]
+    dependencies: [async-functions, dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-return-await-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-return-await-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-return-await-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -106939,15 +106991,33 @@ tests:
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-return-await-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-return-await-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-function-return-await-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -106977,6 +107047,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-await-eval-rqstd-abrupt-urierror.js
@@ -106987,6 +107058,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-await-eval-script-code-target.js
@@ -107008,6 +107080,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-await-instn-iee-err-ambiguous-import.js
@@ -107018,6 +107091,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-await-instn-iee-err-circular.js
@@ -107028,6 +107102,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-await-specifier-tostring-abrupt-rejects.js
@@ -107050,6 +107125,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-eval-rqstd-abrupt-urierror.js
@@ -107060,6 +107136,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-eval-script-code-target.js
@@ -107081,6 +107158,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-instn-iee-err-ambiguous-import.js
@@ -107091,6 +107169,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-instn-iee-err-circular.js
@@ -107101,6 +107180,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-async-gen-return-await-specifier-tostring-abrupt-rejects.js
@@ -107117,169 +107197,169 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-import-catch-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-import-catch-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-import-catch-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-import-catch-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-import-catch-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/catch/nested-block-labeled-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-labeled-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-labeled-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-labeled-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-labeled-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-labeled-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-block-labeled-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/catch/nested-do-while-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-do-while-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-do-while-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-do-while-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-do-while-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-do-while-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-do-while-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/catch/nested-else-import-catch-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-else-import-catch-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-else-import-catch-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-else-import-catch-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-else-import-catch-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-else-import-catch-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-else-import-catch-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/catch/nested-function-import-catch-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-function-import-catch-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-function-import-catch-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-function-import-catch-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-function-import-catch-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-function-import-catch-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-function-import-catch-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/catch/nested-if-import-catch-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-if-import-catch-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-if-import-catch-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-if-import-catch-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-if-import-catch-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-if-import-catch-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-if-import-catch-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/catch/nested-while-import-catch-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-while-import-catch-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-while-import-catch-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-while-import-catch-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-while-import-catch-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-while-import-catch-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/catch/nested-while-import-catch-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/catch/top-level-import-catch-eval-rqstd-abrupt-typeerror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/top-level-import-catch-eval-rqstd-abrupt-urierror.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/top-level-import-catch-eval-script-code-target.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/top-level-import-catch-file-does-not-exist.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/top-level-import-catch-instn-iee-err-ambiguous-import.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/top-level-import-catch-instn-iee-err-circular.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/catch/top-level-import-catch-specifier-tostring-abrupt-rejects.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
@@ -107291,6 +107371,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/escape-sequence-import.js
@@ -107338,6 +107419,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -107351,6 +107433,7 @@ tests:
         generators,
         iterator-protocol,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -107363,6 +107446,7 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
+        module-linking,
       ]
   - path: test/language/expressions/dynamic-import/import-attributes/2nd-param-await-expr.js
     expectedClassification: unsupported-profile-feature
@@ -107433,7 +107517,13 @@ tests:
   - path: test/language/expressions/dynamic-import/import-errored-module.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/import-fulfilled-member-of-errored-cycle.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -107441,6 +107531,7 @@ tests:
         async-functions,
         dynamic-source,
         functions,
+        module-linking,
         promise-settlement,
         top-level-await,
         var-bindings,
@@ -107464,6 +107555,7 @@ tests:
         async-functions,
         dynamic-source,
         functions,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -107475,6 +107567,8 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
+        object-properties,
         promise-settlement,
         symbols,
         var-bindings,
@@ -107488,7 +107582,9 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
+        module-linking,
         object-literals,
+        object-properties,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107502,6 +107598,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
       ]
@@ -107513,6 +107610,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
       ]
@@ -107524,6 +107622,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107537,6 +107636,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107550,6 +107650,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/namespace/await-ns-get-own-property-str-found-init.js
@@ -107560,6 +107661,8 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
+        object-properties,
         promise-settlement,
         var-bindings,
       ]
@@ -107571,6 +107674,8 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
+        object-properties,
         promise-settlement,
         var-bindings,
       ]
@@ -107582,6 +107687,8 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
+        object-properties,
         promise-settlement,
         symbols,
         var-bindings,
@@ -107594,6 +107701,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/namespace/await-ns-get-str-not-found.js
@@ -107604,6 +107712,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -107615,6 +107724,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         symbols,
       ]
@@ -107626,6 +107736,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         symbols,
       ]
@@ -107637,6 +107748,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
       ]
@@ -107648,6 +107760,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         var-bindings,
@@ -107660,6 +107773,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107672,6 +107786,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107685,6 +107800,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         symbols,
       ]
@@ -107696,6 +107812,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107709,6 +107826,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
       ]
@@ -107720,6 +107838,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
       ]
@@ -107731,6 +107850,8 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
+        object-properties,
         promise-settlement,
         var-bindings,
       ]
@@ -107742,6 +107863,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/namespace/await-ns-set-no-strict.js
@@ -107752,6 +107874,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107765,6 +107888,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/namespace/await-ns-set-prototype-of.js
@@ -107775,6 +107899,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         object-literals,
         promise-settlement,
         var-bindings,
@@ -107787,6 +107912,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107799,6 +107925,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107811,6 +107938,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         reflect-namespace,
         symbols,
@@ -107818,10 +107946,18 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/namespace/default-property-not-set-own.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-Symbol-toStringTag.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, symbols, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-define-own-property.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -107830,101 +107966,185 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
+        module-linking,
         object-literals,
+        object-properties,
         reflect-namespace,
         symbols,
         var-bindings,
       ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-exported-init-no-strict.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace]
+    dependencies: [dynamic-source, functions, module-linking, reflect-namespace]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-exported-init-strict.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace]
+    dependencies: [dynamic-source, functions, module-linking, reflect-namespace]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-exported-no-strict.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, reflect-namespace, symbols, var-bindings]
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-delete-non-exported-strict.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, reflect-namespace, symbols, var-bindings]
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-extensible.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-own-property-str-found-init.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-own-property-str-not-found.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-own-property-sym.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, symbols, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-str-found.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-str-not-found.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-sym-found.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, symbols]
+    dependencies: [dynamic-source, functions, module-linking, symbols]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-sym-not-found.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, symbols]
+    dependencies: [dynamic-source, functions, module-linking, symbols]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-has-property-str-found-init.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace]
+    dependencies: [dynamic-source, functions, module-linking, reflect-namespace]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-has-property-str-not-found.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        reflect-namespace,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-has-property-sym-found.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace, symbols]
+    dependencies:
+      [dynamic-source, functions, module-linking, reflect-namespace, symbols]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-has-property-sym-not-found.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, reflect-namespace, symbols, var-bindings]
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-no-iterator.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, symbols]
+    dependencies: [dynamic-source, functions, module-linking, symbols]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-own-property-keys-sort.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, reflect-namespace, symbols, var-bindings]
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-prevent-extensions-object.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace]
+    dependencies: [dynamic-source, functions, module-linking, reflect-namespace]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-prevent-extensions-reflect.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace]
+    dependencies: [dynamic-source, functions, module-linking, reflect-namespace]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-prop-descs.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-prototype.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-set-no-strict.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, reflect-namespace, symbols, var-bindings]
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-set-prototype-of-null.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-set-prototype-of.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, object-literals, var-bindings]
+    dependencies:
+      [dynamic-source, functions, module-linking, object-literals, var-bindings]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-set-same-values-no-strict.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace, symbols]
+    dependencies:
+      [dynamic-source, functions, module-linking, reflect-namespace, symbols]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-set-same-values-strict.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, reflect-namespace, symbols]
+    dependencies:
+      [dynamic-source, functions, module-linking, reflect-namespace, symbols]
   - path: test/language/expressions/dynamic-import/namespace/promise-then-ns-set-strict.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, reflect-namespace, symbols, var-bindings]
+      [
+        dynamic-source,
+        functions,
+        module-linking,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/reuse-namespace-object-from-import.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -107938,11 +108158,23 @@ tests:
   - path: test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [destructuring-bindings, dynamic-source, functions, promise-settlement]
+      [
+        destructuring-bindings,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/reuse-namespace-object.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [destructuring-bindings, dynamic-source, functions, promise-settlement]
+      [
+        destructuring-bindings,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-1-update-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source]
@@ -108807,18 +109039,32 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/usage-from-eval.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, lexical-bindings, promise-settlement]
+      [
+        dynamic-source,
+        functions,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        lexical-bindings,
+        module-linking,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -108830,10 +109076,17 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/nested-arrow-import-then-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-arrow-import-then-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        lexical-bindings,
+        module-linking,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/usage/nested-arrow-import-then-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -108851,6 +109104,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/usage/nested-async-arrow-function-await-eval-script-code-host-resolves-module-code.js
@@ -108861,6 +109115,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -108903,6 +109158,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/usage/nested-async-arrow-function-return-await-eval-script-code-host-resolves-module-code.js
@@ -108913,6 +109169,7 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -108950,7 +109207,13 @@ tests:
   - path: test/language/expressions/dynamic-import/usage/nested-async-function-await-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/usage/nested-async-function-await-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -108958,6 +109221,7 @@ tests:
         async-functions,
         dynamic-source,
         functions,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -108982,17 +109246,24 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/usage/nested-async-function-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions, dynamic-source, functions]
+    dependencies: [async-functions, dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-async-function-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [async-functions, dynamic-source, functions, var-bindings]
+    dependencies:
+      [async-functions, dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/nested-async-function-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/usage/nested-async-function-return-await-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        module-linking,
+        promise-settlement,
+      ]
   - path: test/language/expressions/dynamic-import/usage/nested-async-function-return-await-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -109000,6 +109271,7 @@ tests:
         async-functions,
         dynamic-source,
         functions,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -109044,6 +109316,7 @@ tests:
         functions,
         generators,
         lexical-bindings,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/usage/nested-async-gen-await-eval-script-code-host-resolves-module-code.js
@@ -109055,6 +109328,7 @@ tests:
         functions,
         generators,
         lexical-bindings,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -109101,6 +109375,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/usage/nested-async-gen-return-await-eval-script-code-host-resolves-module-code.js
@@ -109112,6 +109387,7 @@ tests:
         dynamic-source,
         functions,
         generators,
+        module-linking,
         promise-settlement,
         var-bindings,
       ]
@@ -109152,10 +109428,10 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/usage/nested-block-import-then-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-block-import-then-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/nested-block-import-then-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -109167,10 +109443,10 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/nested-do-while-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-do-while-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/nested-do-while-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -109182,10 +109458,10 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/nested-else-import-then-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-else-import-then-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/nested-else-import-then-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -109197,10 +109473,10 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/nested-function-import-then-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-function-import-then-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/nested-function-import-then-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -109212,10 +109488,10 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/nested-if-braceless-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-if-braceless-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/nested-if-braceless-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -109227,10 +109503,10 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/nested-if-import-then-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-if-import-then-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/nested-if-import-then-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -109242,10 +109518,17 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/nested-while-import-then-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings]
+    dependencies: [dynamic-source, functions, lexical-bindings, module-linking]
   - path: test/language/expressions/dynamic-import/usage/nested-while-import-then-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, lexical-bindings, var-bindings]
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        lexical-bindings,
+        module-linking,
+        var-bindings,
+      ]
   - path: test/language/expressions/dynamic-import/usage/nested-while-import-then-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -109257,10 +109540,10 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/syntax-nested-block-labeled-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/syntax-nested-block-labeled-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/syntax-nested-block-labeled-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -109272,10 +109555,10 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, object-literals]
   - path: test/language/expressions/dynamic-import/usage/top-level-import-then-eval-gtbndng-indirect-update-dflt.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions]
+    dependencies: [dynamic-source, functions, module-linking]
   - path: test/language/expressions/dynamic-import/usage/top-level-import-then-eval-script-code-host-resolves-module-code.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies: [dynamic-source, functions, module-linking, var-bindings]
   - path: test/language/expressions/dynamic-import/usage/top-level-import-then-is-call-expression-square-brackets.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions]
@@ -133546,7 +133829,8 @@ tests:
     dependencies: [regular-expressions]
   - path: test/language/literals/regexp/lastIndex.js
     expectedClassification: pass
-    dependencies: [object-literals, regular-expressions, var-bindings]
+    dependencies:
+      [object-literals, object-properties, regular-expressions, var-bindings]
   - path: test/language/literals/regexp/mongolian-vowel-separator-eval.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, regular-expressions]
@@ -134047,13 +134331,13 @@ tests:
     dependencies: [module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
     expectedClassification: pass
-    dependencies: [lexical-grammar, module-linking]
+    dependencies: [module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from.js
     expectedClassification: pass
-    dependencies: [lexical-grammar, module-linking]
+    dependencies: [module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js
     expectedClassification: pass
-    dependencies: [lexical-grammar, module-linking]
+    dependencies: [module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -134553,7 +134837,7 @@ tests:
     dependencies: [module-linking, symbols]
   - path: test/language/module-code/namespace/Symbol.toStringTag.js
     expectedClassification: pass
-    dependencies: [module-linking, symbols, var-bindings]
+    dependencies: [module-linking, object-properties, symbols, var-bindings]
   - path: test/language/module-code/namespace/internals/define-own-property.js
     expectedClassification: pass
     dependencies:
@@ -134563,6 +134847,7 @@ tests:
         lexical-bindings,
         module-linking,
         object-literals,
+        object-properties,
         reflect-namespace,
         symbols,
         var-bindings,
@@ -134580,13 +134865,13 @@ tests:
       [functions, module-linking, reflect-namespace, symbols, var-bindings]
   - path: test/language/module-code/namespace/internals/get-own-property-str-found-init.js
     expectedClassification: pass
-    dependencies: [module-linking, var-bindings]
+    dependencies: [module-linking, object-properties, var-bindings]
   - path: test/language/module-code/namespace/internals/get-own-property-str-not-found.js
     expectedClassification: pass
-    dependencies: [module-linking, var-bindings]
+    dependencies: [module-linking, object-properties, var-bindings]
   - path: test/language/module-code/namespace/internals/get-own-property-sym.js
     expectedClassification: pass
-    dependencies: [module-linking, symbols, var-bindings]
+    dependencies: [module-linking, object-properties, symbols, var-bindings]
   - path: test/language/module-code/namespace/internals/get-prototype-of.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -134657,11 +134942,19 @@ tests:
       [functions, module-linking, reflect-namespace, symbols, var-bindings]
   - path: test/language/module-code/namespace/internals/super-access-to-tdz-binding.js
     expectedClassification: pass
-    dependencies: [classes, functions, lexical-bindings, module-linking]
+    dependencies:
+      [classes, functions, lexical-bindings, module-linking, object-properties]
   - path: test/language/module-code/namespace/internals/super-set-to-tdz-binding-with-accessor.js
     expectedClassification: pass
     dependencies:
-      [classes, functions, lexical-bindings, module-linking, var-bindings]
+      [
+        classes,
+        functions,
+        lexical-bindings,
+        module-linking,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/module-code/parse-err-decl-pos-export-arrow-function.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -135120,7 +135413,9 @@ tests:
         dynamic-source,
         functions,
         lexical-bindings,
+        module-linking,
         promise-settlement,
+        top-level-await,
       ]
   - path: test/language/module-code/top-level-await/dynamic-import-rejection.js
     expectedClassification: unsupported-profile-feature
@@ -135215,7 +135510,7 @@ tests:
     dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/new-await-script-code.js
     expectedClassification: pass
-    dependencies: [classes, promise-settlement, top-level-await]
+    dependencies: [classes, top-level-await]
   - path: test/language/module-code/top-level-await/new-await.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
