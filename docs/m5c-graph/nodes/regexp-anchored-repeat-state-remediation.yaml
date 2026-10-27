@@ -24,4 +24,4 @@ dependencies:
   - regexp-property-escape-harness
   - unsupported-ownership-audit
 landed: false
-status: blocked
+status: ready
