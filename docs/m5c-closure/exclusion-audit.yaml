@@ -8722,3 +8722,442 @@ paths:
     section: "sec-unicode-format-control-characters"
     subject: "Mongolian Vowel Separator can appear in string literals (eval code)."
     assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-array-literal-with-item.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e08bc1d6e19141382938fdfa4f4dcc31be7a45bc2fc6a6908205bc886af74a65"
+    observationDigest: "4478aa553c1019b43c4acaa4cf9ee91c7bd331afefff12d0ef530fa46c675e5d"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal with items (Eval production of StatementList
+      starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-array-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "42e5a6d69ed667a9b4288814c4548b61c959e9cc3cdf5718cf58278d434c31f4"
+    observationDigest: "ad3f072b09bb90c3ebb20765c2c26f66fb3a7089b1777e00428319c585022d7f"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal (Eval production of StatementList starting with a
+      BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-arrow-function-assignment-exp\
+      r.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "23c4a766dfc8b48c05658a7a7f4f87ffdcb6acee22e78acdaf297e2ceff4a68b"
+    observationDigest: "10d270ce28763d4073d9159d3f1b29ac260dadd1e3a1019249764675193d8149"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with an AssignmentExpression (Eval production of
+      StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-arrow-function-functionbody.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dc3a9e8d8160605bc7fe6edd983f186f49d1fa8de566adfd7f606a9273cff5c4"
+    observationDigest: "19057eeaaf7f86bb02510cbe33aa3c654f9154d09416be56e13b410bcc82e747"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with a Function Body (Eval production of
+      StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-block-with-labels.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ab06ec168a8f8d9dd6ee9903ba823a1cc99fc661ce880716ebeef8d2b69e0390"
+    observationDigest: "cd15f5b65efbb0d9ba6d0a5c8e887e15e2919c1107b4cff636e4d0f8810e1dd3"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block with a label (Eval production of StatementList starting with
+      a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-block.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c5547c1952fe626e543f1e1e855c013e0d7d3b723a737eadbc8567cb82e52142"
+    observationDigest: "891a4ec1cc4a0753d2693516377c8b1b63fdc6e168af0e3122baccbaabefd4e3"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block (Eval production of StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-expr-arrow-function-boolean-l\
+      iteral.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fbbcb22e764a28d6a873c71aa4cac0268ec26ab2d43433f126a548670e3ecb57"
+    observationDigest: "f35082e84e737d7a0304ae15e0ae2c6dd027f649d1c0f0ffa349c5029d792faf"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Expression with an Arrow Function and Boolean literal (Eval
+      production of StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-let-declaration.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c3a9710c6583d4c41ccbebb289ac8c302fde4dac4cdc25687297f1d64167a627"
+    observationDigest: "e0b264184961d063ee0dbcf52a2c502545254a09998327d15b0435a9e6b0d463"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "LexicalDeclaration using Let (Eval production of StatementList
+      starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-regexp-literal-flags.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7ac7d3fe28a043de1197dd558dd0151471fe0ccd622d62e8b583499ef6880b57"
+    observationDigest: "eac5671e557884580fef7c1096f99df930b32b086db1855335290d2bd6712905"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal with Flags (Eval production of
+      StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-regexp-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "aded25ecd4f0a2e82e8d5ff852d90e9a7320be83fa875b99adc89b8e306d1183"
+    observationDigest: "161f1b96bc5941a93075a57dea6849e1dab84c440151521d5e1d1db39e3564ad"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal (Eval production of StatementList
+      starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-array-literal-w\
+      ith-item.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "099b8653827981f663fe42f3bd323c013925d5f590c72b92aee1313c8102e6c0"
+    observationDigest: "13c2fccf53debf4d00e50a25cc5c135219b98042a3756da866f64f09ebc50365"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal with items (Evaluate produciton of StatementList
+      starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-array-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "85156ef1f983ca04882f70fc6ca6cce835aa76dd9c911ef610a666b8edb74246"
+    observationDigest: "7d0482d730806fe60c9bc72bf8ad516c4a82b788157f71146006b4486415d390"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal (Evaluate produciton of StatementList starting with
+      a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-arrow-function-\
+      assignment-expr.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1befab779e060146dadd149a5ba93db24e6acaf9e27321c2d31ad72b523b6d92"
+    observationDigest: "bfbf934408672a61454c739c5ffa825fb02d9dab48eda39db42d66968f624859"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with an AssignmentExpression (Evaluate produciton
+      of StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-arrow-function-\
+      functionbody.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1e69551384675d70adbb28ec4f799fe242c2388faec1e81f48a513978c4db8a0"
+    observationDigest: "b9cc5b4fc8334be0c02a1e9c21d8614bef05a1ecc7d870e76a6aafdc48d88c0b"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with a Function Body (Evaluate produciton of
+      StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-block-with-labe\
+      ls.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "451ec14fb0f3e497080097be81d551393ca2ed07182954b4096dc0bd1faddc98"
+    observationDigest: "98694a882eda929a692676bc6b487b3c2bcdc566f3b6aa90da51fb7be7ed6fa9"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block with a label (Evaluate produciton of StatementList starting
+      with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-block.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "52b7227ad4a26a383998b44b9cf89433fc991c3157d1bf8a3f9ea096e6a6269f"
+    observationDigest: "a4c92683673fa92ebf22faed14465d62a97c932c598c52ab413cf4c81bb8241b"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block (Evaluate produciton of StatementList starting with a
+      BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-expr-arrow-func\
+      tion-boolean-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "32de5ab73ae0fb0f24ff567f1b8cceefd59b94b1e2fe67472a411c3ae5ef502f"
+    observationDigest: "05b826213ce51acea5fa23b27b7d7d3ca545f9f70ead84d1c600c725456bc3a9"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Expression with an Arrow Function and Boolean literal (Evaluate
+      produciton of StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-let-declaration.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b3dae5b1845eb7828f80c01372ce4f3d09820fc220420740d04be9d14fae2c50"
+    observationDigest: "7862ede0aaa759ff4af30258e4b7c945d2aa8b866754385b3fac12c465e7774e"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "LexicalDeclaration using Let (Evaluate produciton of StatementList
+      starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-regexp-literal-\
+      flags.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9da87e2f7a8e8b72867b80494712cbb929c1901e41d8b4d67a09641daed08f49"
+    observationDigest: "98ab319d7890282bbf1f0dea9242dd6a29dcb4adc827b27769935f0dd1ffa637"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal with Flags (Evaluate produciton of
+      StatementList starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-block-with-statment-regexp-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e94f774e21dee120760e9e52b4298529648150e213ec2bf4ae2f050ba99e003f"
+    observationDigest: "ffe49957720e4b020bfdacfc376a98ca4b31620a06295f23aed22e096380f2fc"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal (Evaluate produciton of StatementList
+      starting with a BlockStatement)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-array-literal-with-item.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d72ca3f66b2b4bc766c45eb3f998192aa345b3f70819c49d652a8a802ecbb3c5"
+    observationDigest: "e281513f902a72e8e551a8d4c6f024d6a8bafe4a7b22f2be09b9198ac614556f"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal with items (Valid syntax of StatementList starting
+      with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-array-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "de489036ab69596a35dae3ab835371862b362512fe80fca40dea43b446b44446"
+    observationDigest: "2486b04cd8da8c5597a768c2e68fcda89db95dc48543ab120aeeb3a8f8cb5b93"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal (Valid syntax of StatementList starting with a Class
+      Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-arrow-function-assignment-exp\
+      r.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2db3f72fb64d8e564a3089aa4e39bd5bd941ecb222bc78e39eb0237b7be8f275"
+    observationDigest: "b9ce6e1e4c3527148794202f9fbd67a896117b6c6f46aa5d0d25bdbdcffce554"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with an AssignmentExpression (Valid syntax of
+      StatementList starting with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-arrow-function-functionbody.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3163a5197c2e0e7e7483aa5ee9be1caf8c785d51b990c09c42330280634daf49"
+    observationDigest: "a3c4dac52ca6eee357a33a9f05afe52bdb329ee5221ec28f2cd292910f1654f1"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with a Function Body (Valid syntax of StatementList
+      starting with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-block-with-labels.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6529774f6fac737b5d4c25f156a10eb6c0ca64864589be9838568a2b498f0d27"
+    observationDigest: "ff16bdc1671ac805fee0d6be56057ccb4b2a50dabb9829251b4b042c45c2be7e"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block with a label (Valid syntax of StatementList starting with a
+      Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-block.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f133499b2d8e1ba0dae90dd4e480cbe7cfcac4c39b6dabaf5bae48d6c86ea3bc"
+    observationDigest: "2a6a34aa438bb26015c823b893fc0c6041a419e5b12138009d0a4b2fc64fed0d"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block (Valid syntax of StatementList starting with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-expr-arrow-function-boolean-l\
+      iteral.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "43524f0fff9a3bba384ff21b176b954f5847385ccd39f598c56ceb6b8302bfd1"
+    observationDigest: "b95f15f745627558e246f57065d9dc0bfc5da265f45f831d62d97a863cce1d5d"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Expression with an Arrow Function and Boolean literal (Valid
+      syntax of StatementList starting with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-let-declaration.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "814dc2708e111d7ccb2b61e0603eb902a029a495a8dbce44f197be7243b902c1"
+    observationDigest: "02ca2a4aa88a9b830c55434100a9f2a032cf36783542d84409171ddbeeee0501"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "LexicalDeclaration using Let (Valid syntax of StatementList
+      starting with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-regexp-literal-flags.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "41d7f524f22669576f7fe0e64d8b6c9693ebcb1b119c95adc9e8762a89dc10b5"
+    observationDigest: "c2d583d9005a8a8f036580862965ab3a03e1b8834d50f0704e1e7890422d8368"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal with Flags (Valid syntax of
+      StatementList starting with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-class-regexp-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d9ace48a17999979a783e4ee1584f7db536c49016576b5df319f753afec71830"
+    observationDigest: "6d6787e914953a37632e8b96184bcab6968816cae4fdb9b9955cf6913fbc696c"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal (Valid syntax of StatementList starting
+      with a Class Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-array-literal-with-item.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8b119c37882555f3eaf7a5fcde1307fe161fabcbf080ad2e5697a0d27dd05f60"
+    observationDigest: "f4720277622e14b04bed4249cbe6d3e659940cc1c2edc8e6a89e4dda9191adf4"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal with items (Eval production of StatementList
+      starting with a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-array-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "61de6372c2c33e0a3b371633f5133ede396411d9c7e449016d29246d7d957d68"
+    observationDigest: "84dd5ce381245656390c8ed9653845408f3b1acae5cd30c66295e466dadadfe1"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Array Literal (Eval production of StatementList starting with a
+      Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-arrow-function-assignment-expr.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "61bcef0a355562f89b31dbc92efd8a5eb9ad27837e7be2216fa771c8a5f3413a"
+    observationDigest: "9829dd3842465a18ae819057d3745624bb66685c2f6ea7ccd8f7ab300fbe36bc"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with an AssignmentExpression (Eval production of
+      StatementList starting with a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-arrow-function-functionbody.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2d5e84d9aba9581829ac9fb2884a9b33238483421f7fb3a9e302287bde8c03ea"
+    observationDigest: "46ad3d3d65b84d377c2f5386e5fc625cfd5b695c4d9e02d3f0ad78790d58da82"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Arrow Function with a Function Body (Eval production of
+      StatementList starting with a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-block-with-labels.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5cc4f4a3c011d84d6556ef14d019796f392806453d4d7075afc09fbfb2f3fac1"
+    observationDigest: "cc76dfdcdff4912d1d70b6aed7c8890050a2f48cc28faa9578db687ba80c1783"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block with a label (Eval production of StatementList starting with
+      a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-block.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "709231b54f38ed0f667d6c1fb42613f6ef1b660b0757a7a4427adaf9991571de"
+    observationDigest: "2a009e12c44ae2c207d9d5d3935d29e96f728f2b13f4fab0ea39f638753b068c"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Block (Eval production of StatementList starting with a Function
+      Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-expr-arrow-function-boolean-lite\
+      ral.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fdbbca38460c6fbd6e1d9abeac4de3403d7044d08a2e8bfabb1dcd3230e00999"
+    observationDigest: "cffb94194a6c390af1d57c581e780818c7b8bb5d0ce931608a8d66bd424ec14f"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Expression with an Arrow Function and Boolean literal (Eval
+      production of StatementList starting with a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-let-declaration.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2a37bbc62f77a4dd84f7a7ab8bb4d339b5bfbae23db3feb3b53a8e35731aa15c"
+    observationDigest: "d56ab9c7482cd9db1922c77745e02a023241081d3858490607ae4314a9196424"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "LexicalDeclaration using Let (Eval production of StatementList
+      starting with a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-regexp-literal-flags.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7c8a3228ca7be15592b397da95bd377fb81d49eaeabf4ef0c88f981cd11a7b4d"
+    observationDigest: "f46225005bed3cad5ab1599b5ff71dd1bc1ad8913c8920ccef2863b3cea7b471"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal with Flags (Eval production of
+      StatementList starting with a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/statementList/eval-fn-regexp-literal.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "77a3d4296ae15d99f1a779e623e504fbb181dde57e37a4587e97eb4e5035fb91"
+    observationDigest: "349bb8762277769444f662ccd0d877df90de14f0633b84f7fb5259f6445599fd"
+    missingDynamicTag: false
+    section: "prod-StatementList"
+    subject: "Regular Expression Literal (Eval production of StatementList
+      starting with a Function Declaration)"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/module-code/top-level-await/fulfillment-order.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "45c63f22d4028a425852a11e2592a48b82e51d0a959490ef9c99da34b48b6686"
+    observationDigest: "82082911859c7ac9b0bf9b236b6f78fd4d7166829f8558cb8e6a191fb0d0c662"
+    missingDynamicTag: false
+    section: "sec-async-module-execution-fulfilled"
+    subject: "When an async module fulfills, the promises relative to itself and
+      its ancestors are resolved in leaf-to-root order"
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/module-code/top-level-await/module-graphs-does-not-han\
+      g.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5a715a19933abd179c881584fd6682f03ae6f1f941d00582823bc0af5f977d92"
+    observationDigest: "2d8500389d269bee329b77402c529498b3ed181610f77a7e53d69396df932508"
+    missingDynamicTag: false
+    section: "Module evaluation (original frontmatter has no esid)"
+    subject: "Module graphs with Top-Level Await shouldn't hang."
+    assessment: "observation-train-dynamic-source"
+  - path: "test/language/module-code/top-level-await/rejection-order.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a9d6eec9f4cae9d833c95f230c86a89ae1c3d2393b190d40e14909ad2d91b5a3"
+    observationDigest: "424e67eb4c0c934a96dec0ee8819ff2c1852a984a5dc160fc8a6038b2eab4c67"
+    missingDynamicTag: false
+    section: "sec-async-module-execution-rejected"
+    subject: "When an async module rejects, the promises relative to itself and
+      its ancestors are resolved in leaf-to-root order"
+    assessment: "observation-train-dynamic-source"

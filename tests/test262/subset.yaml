@@ -131362,6 +131362,30 @@ tests:
   - path: test/language/literals/string/unicode-escape-no-hex-err-single.js
     expectedClassification: expected-negative
     dependencies: [lexical-grammar]
+  - path: test/language/module-code/ambiguous-export-bindings/error-export-from-named-as.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/error-export-from-named.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/error-import-named-as.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/error-import-named.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace.js
+    expectedClassification: pass
+    dependencies: [module-linking]
   - path: test/language/module-code/comment-multi-line-html-close.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -131449,6 +131473,9 @@ tests:
   - path: test/language/module-code/early-undef-continue.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/eval-export-cls-semi.js
+    expectedClassification: pass
+    dependencies: [classes, module-linking, var-bindings]
   - path: test/language/module-code/eval-export-dflt-cls-anon-semi.js
     expectedClassification: pass
     dependencies: [classes, module-linking]
@@ -131464,12 +131491,78 @@ tests:
   - path: test/language/module-code/eval-export-dflt-cls-named.js
     expectedClassification: pass
     dependencies: [classes, module-linking, object-properties]
+  - path: test/language/module-code/eval-export-dflt-expr-cls-anon.js
+    expectedClassification: pass
+    dependencies: [classes, functions, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-cls-name-meth.js
+    expectedClassification: pass
+    dependencies: [classes, functions, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-cls-named.js
+    expectedClassification: pass
+    dependencies: [classes, functions, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-err-eval.js
+    expectedClassification: expected-negative
+    dependencies: [functions, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-err-get-value.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-fn-anon.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-fn-named.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-gen-anon.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-gen-named.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking]
+  - path: test/language/module-code/eval-export-dflt-expr-in.js
+    expectedClassification: pass
+    dependencies: [module-linking, object-literals, var-bindings]
+  - path: test/language/module-code/eval-export-dflt-fun-anon-semi.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
+  - path: test/language/module-code/eval-export-dflt-fun-named-semi.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
+  - path: test/language/module-code/eval-export-dflt-gen-anon-semi.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking, var-bindings]
+  - path: test/language/module-code/eval-export-dflt-gen-named-semi.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking, var-bindings]
+  - path: test/language/module-code/eval-export-fun-semi.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
+  - path: test/language/module-code/eval-export-gen-semi.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking, var-bindings]
+  - path: test/language/module-code/eval-gtbndng-indirect-trlng-comma.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/eval-gtbndng-indirect-update-dflt.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/eval-gtbndng-local-bndng-cls.js
+    expectedClassification: pass
+    dependencies: [classes, functions, module-linking]
   - path: test/language/module-code/eval-gtbndng-local-bndng-const.js
     expectedClassification: pass
     dependencies: [lexical-bindings, module-linking]
   - path: test/language/module-code/eval-gtbndng-local-bndng-let.js
     expectedClassification: pass
     dependencies: [lexical-bindings, module-linking]
+  - path: test/language/module-code/eval-gtbndng-local-bndng-var.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/eval-rqstd-abrupt.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
+  - path: test/language/module-code/eval-self-abrupt.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking]
   - path: test/language/module-code/eval-this.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -131482,6 +131575,9 @@ tests:
   - path: test/language/module-code/export-default-asyncgenerator-declaration-binding-exists.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/export-default-asyncgenerator-declaration-binding.js
+    expectedClassification: pass
+    dependencies: [async-functions, functions, generators, module-linking]
   - path: test/language/module-code/export-default-function-declaration-binding-exists.js
     expectedClassification: expected-negative
     dependencies: [functions, module-linking]
@@ -131491,6 +131587,9 @@ tests:
   - path: test/language/module-code/export-default-generator-declaration-binding-exists.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/export-default-generator-declaration-binding.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking]
   - path: test/language/module-code/export-expname-binding-string.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -131572,15 +131671,24 @@ tests:
   - path: test/language/module-code/import-attributes/import-attribute-value-string-single.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-bndng-cls.js
+    expectedClassification: pass
+    dependencies: [classes, functions, module-linking]
   - path: test/language/module-code/instn-iee-bndng-const.js
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-bndng-fun.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-bndng-gen.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking]
   - path: test/language/module-code/instn-iee-bndng-let.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-bndng-var.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
   - path: test/language/module-code/instn-iee-err-circular-as.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -131599,12 +131707,24 @@ tests:
   - path: test/language/module-code/instn-iee-err-not-found.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-iee-iee-cycle.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
   - path: test/language/module-code/instn-iee-star-cycle.js
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-iee-trlng-comma.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-local-bndng-for-dup.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/instn-local-bndng-var-dup.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/instn-named-bndng-cls.js
+    expectedClassification: pass
+    dependencies: [classes, functions, module-linking]
   - path: test/language/module-code/instn-named-bndng-const.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -131620,12 +131740,33 @@ tests:
   - path: test/language/module-code/instn-named-bndng-dflt-fun-named.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-dflt-gen-anon.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking]
+  - path: test/language/module-code/instn-named-bndng-dflt-gen-named.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking]
+  - path: test/language/module-code/instn-named-bndng-dflt-named.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
+  - path: test/language/module-code/instn-named-bndng-dflt-star.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
   - path: test/language/module-code/instn-named-bndng-fun.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-gen.js
+    expectedClassification: pass
+    dependencies: [functions, generators, module-linking]
   - path: test/language/module-code/instn-named-bndng-let.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-bndng-trlng-comma.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
+  - path: test/language/module-code/instn-named-bndng-var.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
   - path: test/language/module-code/instn-named-err-dflt-thru-star-as.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -131641,6 +131782,12 @@ tests:
   - path: test/language/module-code/instn-named-err-not-found.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-named-id-name.js
+    expectedClassification: pass
+    dependencies: [dynamic-source, module-linking, var-bindings]
+  - path: test/language/module-code/instn-named-iee-cycle.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
   - path: test/language/module-code/instn-named-star-cycle.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -131668,12 +131815,21 @@ tests:
   - path: test/language/module-code/instn-star-as-props-dflt-skip.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-binding.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, var-bindings]
   - path: test/language/module-code/instn-star-equality.js
     expectedClassification: pass
     dependencies: [module-linking]
   - path: test/language/module-code/instn-star-err-not-found.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-star-id-name.js
+    expectedClassification: pass
+    dependencies: [dynamic-source, module-linking, var-bindings]
+  - path: test/language/module-code/instn-star-iee-cycle.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
   - path: test/language/module-code/instn-star-iee-multi-cycle-same-name.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -131698,6 +131854,17 @@ tests:
   - path: test/language/module-code/instn-star-star-cycle.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/instn-uniq-env-rec.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        generators,
+        lexical-bindings,
+        module-linking,
+        var-bindings,
+      ]
   - path: test/language/module-code/invalid-private-names-call-expression-bad-reference.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -131710,6 +131877,120 @@ tests:
   - path: test/language/module-code/invalid-private-names-member-expression-this.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/namespace/Symbol.iterator.js
+    expectedClassification: pass
+    dependencies: [module-linking, symbols]
+  - path: test/language/module-code/namespace/Symbol.toStringTag.js
+    expectedClassification: pass
+    dependencies: [module-linking, symbols, var-bindings]
+  - path: test/language/module-code/namespace/internals/define-own-property.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        object-literals,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/module-code/namespace/internals/delete-exported-init.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, reflect-namespace, var-bindings]
+  - path: test/language/module-code/namespace/internals/delete-exported-uninit.js
+    expectedClassification: pass
+    dependencies:
+      [functions, lexical-bindings, module-linking, reflect-namespace]
+  - path: test/language/module-code/namespace/internals/delete-non-exported.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, reflect-namespace, symbols, var-bindings]
+  - path: test/language/module-code/namespace/internals/get-own-property-str-found-init.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/namespace/internals/get-own-property-str-not-found.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/namespace/internals/get-own-property-sym.js
+    expectedClassification: pass
+    dependencies: [module-linking, symbols, var-bindings]
+  - path: test/language/module-code/namespace/internals/get-prototype-of.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/namespace/internals/get-str-found-init.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/namespace/internals/get-str-found-uninit.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-bindings, module-linking]
+  - path: test/language/module-code/namespace/internals/get-str-initialize.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, module-linking]
+  - path: test/language/module-code/namespace/internals/get-str-not-found.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/namespace/internals/get-str-update.js
+    expectedClassification: pass
+    dependencies: [module-linking, var-bindings]
+  - path: test/language/module-code/namespace/internals/get-sym-found.js
+    expectedClassification: pass
+    dependencies: [module-linking, symbols]
+  - path: test/language/module-code/namespace/internals/get-sym-not-found.js
+    expectedClassification: pass
+    dependencies: [module-linking, symbols]
+  - path: test/language/module-code/namespace/internals/has-property-str-found-init.js
+    expectedClassification: pass
+    dependencies: [module-linking, reflect-namespace, var-bindings]
+  - path: test/language/module-code/namespace/internals/has-property-str-found-uninit.js
+    expectedClassification: pass
+    dependencies: [lexical-bindings, module-linking, reflect-namespace]
+  - path: test/language/module-code/namespace/internals/has-property-str-not-found.js
+    expectedClassification: pass
+    dependencies: [module-linking, reflect-namespace, var-bindings]
+  - path: test/language/module-code/namespace/internals/has-property-sym-found.js
+    expectedClassification: pass
+    dependencies: [module-linking, reflect-namespace, symbols]
+  - path: test/language/module-code/namespace/internals/has-property-sym-not-found.js
+    expectedClassification: pass
+    dependencies: [module-linking, reflect-namespace, symbols, var-bindings]
+  - path: test/language/module-code/namespace/internals/is-extensible.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/namespace/internals/own-property-keys-binding-types.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        reflect-namespace,
+        symbols,
+        var-bindings,
+      ]
+  - path: test/language/module-code/namespace/internals/own-property-keys-sort.js
+    expectedClassification: pass
+    dependencies: [module-linking, reflect-namespace, symbols, var-bindings]
+  - path: test/language/module-code/namespace/internals/prevent-extensions.js
+    expectedClassification: pass
+    dependencies: [module-linking, reflect-namespace]
+  - path: test/language/module-code/namespace/internals/set-prototype-of-null.js
+    expectedClassification: pass
+    dependencies: [module-linking]
+  - path: test/language/module-code/namespace/internals/set-prototype-of.js
+    expectedClassification: pass
+    dependencies: [functions, module-linking, object-literals, var-bindings]
+  - path: test/language/module-code/namespace/internals/set.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, reflect-namespace, symbols, var-bindings]
+  - path: test/language/module-code/namespace/internals/super-access-to-tdz-binding.js
+    expectedClassification: pass
+    dependencies: [classes, functions, lexical-bindings, module-linking]
+  - path: test/language/module-code/namespace/internals/super-set-to-tdz-binding-with-accessor.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, lexical-bindings, module-linking, var-bindings]
   - path: test/language/module-code/parse-err-decl-pos-export-arrow-function.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
@@ -132049,21 +132330,177 @@ tests:
   - path: test/language/module-code/privatename-not-valid-earlyerr-module-8.js
     expectedClassification: expected-negative
     dependencies: [module-linking]
+  - path: test/language/module-code/privatename-valid-no-earlyerr.js
+    expectedClassification: pass
+    dependencies: [classes, functions, module-linking, var-bindings]
   - path: test/language/module-code/top-level-await/async-module-does-not-block-sibling-modules.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/await-awaits-thenable-not-callable.js
+    expectedClassification: pass
+    dependencies:
+      [
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/await-awaits-thenables-that-throw.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/await-awaits-thenables.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
   - path: test/language/module-code/top-level-await/await-expr-func-expression.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/await-expr-new-expr-reject.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/await-expr-reject-throws.js
+    expectedClassification: pass
+    dependencies:
+      [
+        module-linking,
+        object-literals,
+        promise-settlement,
+        symbols,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/await-expr-resolution.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        symbols,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/await-void-expr.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
   - path: test/language/module-code/top-level-await/dfs-invariant.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/early-errors-await-not-simple-assignment-target.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/fulfillment-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/if-await-expr.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/module-async-import-async-resolution-ticks.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/module-graphs-does-not-hang.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [dynamic-source, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/module-import-rejection-body.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/module-import-rejection-tick.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/module-import-rejection.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/module-import-resolution.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/module-import-unwrapped.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/module-self-import-async-resolution-ticks.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/module-sync-import-async-resolution-ticks.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/new-await-parens.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/new-await-script-code.js
+    expectedClassification: pass
+    dependencies: [classes, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/new-await.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
@@ -132073,15 +132510,746 @@ tests:
   - path: test/language/module-code/top-level-await/pending-async-dep-from-cycle.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/rejection-order.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        dynamic-source,
+        functions,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/block-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/catch-parameter.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-body.js
+    expectedClassification: expected-negative
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-params.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-body.js
+    expectedClassification: expected-negative
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-params.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/early-no-escaped-await.js
+    expectedClassification: expected-negative
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-nested.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-null.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        module-linking,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-this.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-nested.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-null.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        classes,
+        functions,
+        module-linking,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-this.js
+    expectedClassification: pass
+    dependencies:
+      [classes, functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-nested.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-null.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-this.js
+    expectedClassification: pass
+    dependencies:
+      [lexical-bindings, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-array-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-func-expression.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-identifier.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-number.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-string.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-nested.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-new-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-null.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-obj-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-regexp.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-template-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-this.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        destructuring-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-nested.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-await-expr-this.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-nested.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        lexical-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-await-expr-this.js
+    expectedClassification: pass
+    dependencies:
+      [
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
   - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-array-literal.js
     expectedClassification: pass
     dependencies: [control-flow, property-enumeration, top-level-await]
@@ -132118,9 +133286,627 @@ tests:
   - path: test/language/module-code/top-level-await/syntax/for-in-await-expr-this.js
     expectedClassification: pass
     dependencies: [control-flow, property-enumeration, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-nested.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-null.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        regular-expressions,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/for-of-await-expr-this.js
+    expectedClassification: pass
+    dependencies:
+      [
+        iterator-protocol,
+        lexical-bindings,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-block-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/if-expr-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/top-level-await-expr-this.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/try-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/void-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-array-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-func-expression.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-identifier.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, top-level-await, var-bindings]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-literal-number.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-literal-string.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-nested.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-new-expr.js
+    expectedClassification: pass
+    dependencies:
+      [functions, module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-null.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-obj-literal.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+      ]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-regexp.js
+    expectedClassification: pass
+    dependencies:
+      [module-linking, promise-settlement, regular-expressions, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-template-literal.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/syntax/while-await-expr-this.js
+    expectedClassification: pass
+    dependencies: [module-linking, promise-settlement, top-level-await]
+  - path: test/language/module-code/top-level-await/top-level-ticks-2.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/top-level-ticks.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/void-await-expr.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        object-literals,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/module-code/top-level-await/while-dynamic-evaluation.js
+    expectedClassification: pass
+    dependencies:
+      [
+        functions,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+        var-bindings,
+      ]
+  - path: test/language/punctuators/S7.7_A1.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals]
+  - path: test/language/punctuators/S7.7_A2_T1.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T10.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T2.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T3.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T4.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T5.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T6.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T7.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T8.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/punctuators/S7.7_A2_T9.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/await-module.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar, module-linking, var-bindings]
+  - path: test/language/reserved-words/await-script.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/reserved-words/ident-name-global-property-accessor.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-global-property-memberexpr-str.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-global-property-memberexpr.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-global-property-prop-name.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-keyword-accessor.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-keyword-memberexpr-str.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-keyword-memberexpr.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-keyword-prop-name.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-reserved-word-literal-accessor.js
+    expectedClassification: pass
+    dependencies: [functions, lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-reserved-word-literal-memberexpr-str.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-reserved-word-literal-memberexpr.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-name-reserved-word-literal-prop-name.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, object-literals, var-bindings]
+  - path: test/language/reserved-words/ident-reference-false-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/ident-reference-false.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar, object-literals]
+  - path: test/language/reserved-words/ident-reference-null-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/ident-reference-null.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar, object-literals]
+  - path: test/language/reserved-words/ident-reference-true-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/ident-reference-true.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar, object-literals]
+  - path: test/language/reserved-words/label-ident-false-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/label-ident-false.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/label-ident-null-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/label-ident-null.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/label-ident-true-escaped.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/label-ident-true.js
+    expectedClassification: expected-negative
+    dependencies: [lexical-grammar]
+  - path: test/language/reserved-words/unreserved-words.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
   - path: test/language/rest-parameters/array-pattern.js
     expectedClassification: pass
     dependencies: [destructuring-bindings, functions, rest-parameters]
@@ -132143,18 +133929,261 @@ tests:
   - path: test/language/rest-parameters/rest-index.js
     expectedClassification: pass
     dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/rest-parameters-apply.js
+    expectedClassification: pass
+    dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/rest-parameters-call.js
+    expectedClassification: pass
+    dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/rest-parameters-produce-an-array.js
+    expectedClassification: pass
+    dependencies: [functions, rest-parameters]
+  - path: test/language/rest-parameters/with-new-target.js
+    expectedClassification: pass
+    dependencies: [classes, functions, rest-parameters, var-bindings]
+  - path: test/language/source-text/6.1.js
+    expectedClassification: pass
+    dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/statementList/block-array-literal-with-item.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-array-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-arrow-function-assignment-expr.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/block-arrow-function-functionbody.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/block-block-with-labels.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-block.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-expr-arrow-function-boolean-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
   - path: test/language/statementList/block-let-declaration.js
     expectedClassification: pass
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statementList/block-regexp-literal-flags.js
+    expectedClassification: pass
+    dependencies: [control-flow, regular-expressions]
+  - path: test/language/statementList/block-regexp-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, regular-expressions]
+  - path: test/language/statementList/block-with-statment-array-literal-with-item.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-with-statment-array-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-with-statment-arrow-function-assignment-expr.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/block-with-statment-arrow-function-functionbody.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/block-with-statment-block-with-labels.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-with-statment-block.js
+    expectedClassification: pass
+    dependencies: [control-flow]
+  - path: test/language/statementList/block-with-statment-expr-arrow-function-boolean-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
   - path: test/language/statementList/block-with-statment-let-declaration.js
     expectedClassification: pass
     dependencies: [control-flow, lexical-bindings]
+  - path: test/language/statementList/block-with-statment-regexp-literal-flags.js
+    expectedClassification: pass
+    dependencies: [control-flow, regular-expressions]
+  - path: test/language/statementList/block-with-statment-regexp-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, regular-expressions]
+  - path: test/language/statementList/class-array-literal-with-item.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow]
+  - path: test/language/statementList/class-array-literal.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow]
+  - path: test/language/statementList/class-arrow-function-assignment-expr.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow, functions]
+  - path: test/language/statementList/class-arrow-function-functionbody.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow, functions]
+  - path: test/language/statementList/class-block-with-labels.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow]
+  - path: test/language/statementList/class-block.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow]
+  - path: test/language/statementList/class-expr-arrow-function-boolean-literal.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow, functions]
   - path: test/language/statementList/class-let-declaration.js
     expectedClassification: pass
     dependencies: [classes, lexical-bindings]
+  - path: test/language/statementList/class-regexp-literal-flags.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow, regular-expressions]
+  - path: test/language/statementList/class-regexp-literal.js
+    expectedClassification: pass
+    dependencies: [classes, control-flow, regular-expressions]
+  - path: test/language/statementList/eval-block-array-literal-with-item.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-array-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-arrow-function-assignment-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-arrow-function-functionbody.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-block-with-labels.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-block.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-expr-arrow-function-boolean-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-let-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-regexp-literal-flags.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-regexp-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-array-literal-with-item.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-array-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-arrow-function-assignment-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-arrow-function-functionbody.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-block-with-labels.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-block.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-expr-arrow-function-boolean-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-let-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-regexp-literal-flags.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-block-with-statment-regexp-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-array-literal-with-item.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-array-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-arrow-function-assignment-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-arrow-function-functionbody.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-block-with-labels.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-block.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-expr-arrow-function-boolean-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-let-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-regexp-literal-flags.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-class-regexp-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-array-literal-with-item.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-array-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-arrow-function-assignment-expr.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-arrow-function-functionbody.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-block-with-labels.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-block.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-expr-arrow-function-boolean-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-let-declaration.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-regexp-literal-flags.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/eval-fn-regexp-literal.js
+    expectedClassification: unsupported-profile-feature
+    dependencies: [control-flow, dynamic-source, var-bindings]
+  - path: test/language/statementList/fn-array-literal-with-item.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/fn-array-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/fn-arrow-function-assignment-expr.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/fn-arrow-function-functionbody.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/fn-block-with-labels.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/fn-block.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
+  - path: test/language/statementList/fn-expr-arrow-function-boolean-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions]
   - path: test/language/statementList/fn-let-declaration.js
     expectedClassification: pass
     dependencies: [functions, lexical-bindings]
+  - path: test/language/statementList/fn-regexp-literal-flags.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, regular-expressions]
+  - path: test/language/statementList/fn-regexp-literal.js
+    expectedClassification: pass
+    dependencies: [control-flow, functions, regular-expressions]
   - path: test/language/statements/async-function/array-destructuring-param-strict-body.js
     expectedClassification: expected-negative
     dependencies: [async-functions, destructuring-bindings]
