@@ -1,0 +1,11 @@
+version: 1
+id: test262-module-harness-globals
+title: Expose harness globals to imported test modules
+delivers: >-
+  Makes test262 harness bindings, which come from a global script, visible to
+  modules imported by a module test, so the 1 observed path whose imported
+  module calls assert can be observed.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready
