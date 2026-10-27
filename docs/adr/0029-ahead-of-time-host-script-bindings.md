@@ -135,15 +135,31 @@ source-bound failed results do not validate later corrections. The whole
 host suites subsequently passed twelve registrations per framework on
 `a93871cc`; ordinary properties passed both domains per framework on
 `ab8d5d5c`, whose extended Node run passed 120 cases per domain. A later
-compiler repair addresses runtime-owned call targets across Scripts and
-requires fresh native validation and affected review. Shared-harness Full
-evidence remains pending.
+compiler repair addresses runtime-owned call targets across Scripts. The
+composed-source native validation below is complete; affected review and
+shared-harness Full evidence remain pending.
 
 The actual `ab8d5d5c` extended run supplies a 510-second Linux scheduling
 weight in *docs/evidence/u6/README.md*. macOS is unmeasured and retains the
 296-second fallback. This is source-qualified historical evidence, not a
-measurement of the later runtime-owned-call repair. Existing seeds,
+measurement of the later runtime-owned-call repair. The composed-source
+`20d6119b` run below supplies the later 607-second Linux weight. Existing seeds,
 case counts, limits, classifications, owners and subset paths are preserved.
+
+Composed source `20d6119bac41c5a6c819a268476dec017a2475d6` (tree
+`fbb16dadcaee5047ac692200d28efbc5ca56bd71`, ABI `m5-140`) completed the
+handwritten runtime-C fixture, both new eight-case Node/Deno suites, both
+original twelve-registration Host suites, ordinary twelve-case generated
+domains under both frameworks, and the existing extended 120-case domains.
+The whole Host suites preserve all fourteen subjects, including the separate
+ordinary-eval unsupported boundary. Policies, false hints, guard misses,
+forced collection, original domains, seeds, budgets and deadlines remain.
+Root accepted all eight natural successful commands with original raw output,
+three exact source snapshots and two actual empty drains for each. The
+extended leaf sum is 606.907057926 seconds: Linux weight 607, macOS still
+unmeasured at 296. See *docs/evidence/u6/README.md* for source-bound provenance.
+These observations do not establish Full/classification, affected internal
+or outer reviews, admission, candidate/Main gates or later-source execution.
 
 The literal source set cannot admit runtime-created source. Agents retain
 ADR 0026's separate precompiled source tables and contexts; this change does

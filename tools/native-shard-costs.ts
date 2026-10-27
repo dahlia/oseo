@@ -73,8 +73,9 @@
  * These are unmeasured scheduling estimates, not matching-host costs.
  *
  * Host Script bindings use a complete local Linux extended two-case sum
- * at `ab8d5d5c`. macOS preserves its prior unknown-file assignment of
- * 296 seconds as an explicitly unmeasured placeholder. See U6 provenance.
+ * at `20d6119b`; the earlier `ab8d5d5c` result stays source-qualified.
+ * macOS preserves its prior unknown-file assignment of 296 seconds as
+ * an explicitly unmeasured placeholder. See U6 provenance.
  * All other Main entries and partition rules remain unchanged. See U6.
  */
 export const nativeShardCosts = {
@@ -144,9 +145,9 @@ export const nativeShardCosts = {
     "tests/property/m5-globalthis-binding.property.test.ts": 2647,
     "tests/property/m5-harness-native-function-matcher.property.test.ts": 590,
     "tests/property/m5-harness-promise-helper.property.test.ts": 578,
-    // Local Linux extended case sum: 509.305691758 s, rounded up.
+    // Local Linux extended case sum: 606.907057926 s, rounded up.
     // October 27, 2026; not CI or file wall time. See U6 provenance.
-    "tests/property/m5-host-script-bindings.property.test.ts": 510,
+    "tests/property/m5-host-script-bindings.property.test.ts": 607,
     "tests/property/m5-import-attributes.property.test.ts": 354,
     "tests/property/m5-intrinsic-graph-root.property.test.ts": 334,
     "tests/property/m5-iterator-helpers-eager.property.test.ts": 285,

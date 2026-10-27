@@ -1193,7 +1193,93 @@ scheduling baseline; it is not a fresh measurement or native pass for that
 repair. macOS remains unmeasured at the 296-second fallback. A new
 measurement requires the separately serialized author-heavy slot.
 
-The subsequent Host/GC source composition on `beea6880` uses ABI `m5-140`
-and likewise has no fresh property-cost measurement. The eight-case Node
-and Deno runtime-owned-call passes belong to Host source `918a6d93`; they
-are fixed correctness observations, not property scheduling measurements.
+The subsequent Host/GC preparation on `beea6880` uses ABI `m5-140`. At
+preparation it had no fresh property-cost measurement. The eight-case Node
+and Deno runtime-owned-call passes on Host source `918a6d93` remain fixed
+correctness observations, not property scheduling measurements. The later
+composed-source measurement follows below.
+
+
+Composed Host/GC local Linux extended cost
+------------------------------------------
+
+On October 27, 2026, source
+`20d6119bac41c5a6c819a268476dec017a2475d6`, tree
+`fbb16dadcaee5047ac692200d28efbc5ca56bd71`, ABI `m5-140`, completed once:
+
+~~~~ sh
+mise run test:property:extended:native:shard --shard 1/1 \
+  tests/property/m5-host-script-bindings.property.test.ts
+~~~~
+
+The physical input SHA-256 was:
+
+~~~~ text
+30ee9e7bca3cdae7b96e081dbc6d0105df4bd7fee46546366c0be58be554b404
+~~~~
+
+The stock task retained scale 10, large size, shared seed 1592590339,
+namespace seed inputs `0x60008d00` and `0x60008d01`, and 120 cases in each
+of the original declaration-state and malformed-Script domains. Both
+specialization policies, false hints, guard misses, forced collection,
+independent oracles, shrinking and original budgets remain. Each
+240,000-millisecond base deadline scales normally to 2,400,000. The actual
+wrapper selected this single file with one worker; both registrations passed,
+with no failures, skips, cancellations or TODOs.
+
+Measured leaf durations were 375,794.693417 and 231,112.364509 milliseconds.
+Their sum is 606,907.057926 milliseconds, or 606.907057926 seconds; rounding
+seconds up gives the 607-second Linux weight. Gate wall was 608.559741115
+seconds and is not the weight. The older ab8d 510-second observation above
+retains its exact source identity. This replaces only the owning Linux
+entry. All other weights and scheduling algorithms stay exact; both tables
+still have 136 entries and derive upper-median fallbacks of 415 Linux/296
+macOS seconds. macOS is unmeasured and retains its 296-second placeholder.
+No host ratio, conservative bound, speed comparison or CI time is inferred.
+
+The same fixed source also passed the handwritten runtime-C tail-call
+fixture, new eight-case Node and Deno runtime-owned-call suites, original
+twelve-registration Host suites under each framework, and ordinary generated
+domains under each. All fourteen original subjects stay intact: thirteen
+expected passes and the separate ordinary-eval ADR 0016 unsupported case.
+These eight exact focused commands are Linux source-qualified correctness
+observations; they establish no Full classification, admission or Main gate.
+
+The durable packet remains under
+*/data/m5c-host-script-bindings-20261027/*, task `task_2d22aad7a394`, dispatch
+`ctx_60b42a8e012e`. The *native-composed-extended01/run/* directory holds the
+five original raw files, three identical complete source snapshots, original
+process identities and two actual empty drains; Root acceptance is
+*ROOT-ACCEPTED.json*. Its parent *MEASURED-COST.json* records the exact
+command/task inputs, source/physical identities and case-sum derivation.
+The *integration-beea/FOCUSED-FIRST3-SUMMARY.json* and
+*FOCUSED-LAST5-SUMMARY.json* record the full focused vector. Original raw
+SHA-256 values, in gate stdout/stderr and command stdout/stderr/JSON order:
+
+~~~~ text
+gate.stdout.raw
+d44b9812b83ca4d188d398c32ab81b6b5ac9040032ce0822b28ca21f7d07f6bc
+gate.stderr.raw
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+commands/whole.stdout
+288fda0ad7597f0c95efc0db2d36fd325f7f0ea475f67812e5ec86b283adea9c
+commands/whole.stderr
+7c0ace3e3238bd03664e0f321b1fa97c3bd204aae470a947c819c11f860d8b6c
+commands/whole.json
+d44b9812b83ca4d188d398c32ab81b6b5ac9040032ce0822b28ca21f7d07f6bc
+~~~~
+
+The gate exited naturally at 04:12:45.466304 UTC, root PID 1182015 with
+start tick 48837315; 1,387 PID/start identities were sampled, not an
+exhaustive execution count. The actual empty drains were
+04:12:46.536409 and 04:13:01.592510 UTC, 15.056101484050 seconds apart.
+Kernel ownership and controls passed with no foreign actor. Source snapshots
+include exact tracked modes/bytes, dist/maps and dependency/tool identities.
+The task's normal package build regenerated identical dist contents.
+
+Later metadata commits do not become new executions. The cost module is
+an actual extended-wrapper import and changes in this update; the observed
+one-file/one-worker selection and unchanged case budgets remain explicit.
+Compiled product and native fixture inputs stay exact `20d6119b`, while the
+entire wrapper import closure is not claimed byte-identical. Matching-host
+candidate CI and macOS measurements remain separate requirements.

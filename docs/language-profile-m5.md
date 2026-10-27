@@ -9703,8 +9703,8 @@ private call targets and rejected unbound value/typeof/delete forms. This
 adds no public intrinsic global and changes no timer behavior. The bounded
 regressions are *tests/host-script-runtime-owned-source.test.ts* and
 *tests/host-script-runtime-owned.test.ts*, using
-*tests/native/fixtures/host-script-runtime-owned.ts*. Fresh native validation
-of this repair and Full observations remain pending.
+*tests/native/fixtures/host-script-runtime-owned.ts*. Source-qualified native
+validation is recorded below; Full observations remain pending.
 
 The earlier whole host suites passed twelve registrations per framework on
 `a93871cc`; ordinary properties passed two domains per framework on
@@ -9731,8 +9731,43 @@ The new runtime-owned-call suites passed eight registrations per framework
 on `918a6d93`, with both policies, false hints, guard misses and forced GC.
 Those measurements remain bound to that source. Earlier a938, ab8d, f5 and
 U68 evidence also retains its actual identity; none validates this composed
-source. The historical Linux scheduling weight remains 510 seconds and
-macOS remains unmeasured at 296. Fresh composed native execution, affected
-internal reviews and Full remain pending. Reg's existing observations and
-matcher owners, both TCO unsupported expectations and all fourteen Host
+source. The historical ab8d Linux weight is 510 seconds; the later
+20d measurement below supplies 607. macOS remains unmeasured at 296.
+Affected internal reviews and Full remain pending. Reg's existing observations
+and matcher owners, both TCO unsupported expectations and all fourteen Host
 unsupported expectations are preserved; no promotion is predicted here.
+
+
+Composed Host focused evidence
+------------------------------
+
+Source `20d6119bac41c5a6c819a268476dec017a2475d6`, tree
+`fbb16dadcaee5047ac692200d28efbc5ca56bd71`, completed eight exact focused
+commands on Linux with ABI `m5-140`. The handwritten runtime tail-call C
+fixture passed its one registration. The new runtime-owned-call suites
+passed eight registrations under Node and eight under Deno; the unchanged
+whole Host suites passed twelve under each. Those whole suites traverse
+all fourteen original subjects: thirteen expected passes and the separate
+ordinary-eval ADR 0016 unsupported boundary, while preserving the
+checked-in manifest records.
+The unchanged ordinary properties passed both domains under each framework,
+with twelve cases per domain. The existing extended task passed both domains
+at 120 cases each, scale 10, large size and shared seed 1592590339.
+Original policies, false hints, guard misses, forced collection, oracles,
+seeds, budgets and normal scaled deadlines remain intact.
+
+The extended leaf durations sum to 606.907057926 seconds, giving a measured
+Linux scheduling weight of 607 after rounding up; macOS remains unmeasured
+at 296. These are one-run scheduling data, not a comparative performance or
+CI claim. *evidence/u6/README.md* records the exact task, raw provenance
+and limits. All commands exited naturally with no failures, skips or
+cancellations. Raw output, three exact source snapshots and two actual empty
+drains were retained for each, and Root accepted the measurements.
+
+This execution belongs to `20d6119b`, not to later evidence commits. The
+compiled product inputs are preserved by the cost/document update; its cost
+module differs within the extended wrapper's import closure, whose observed
+selection was one file and one worker. Affected internal and outer reviews,
+Full/classification, admission and exact candidate/Main gates remain pending.
+Reg's existing records, both TCO unsupported expectations and all fourteen
+Host unsupported expectations are preserved, with no predicted promotions.
