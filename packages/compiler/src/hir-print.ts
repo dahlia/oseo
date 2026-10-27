@@ -460,7 +460,12 @@ function printHirBindingPattern(pattern: HirBindingPattern): string {
     );
   }
   if (pattern.kind === "binding-identifier") {
-    return `%b${pattern.bindingId} ${pattern.name}${hintText(pattern.hints)}`;
+    return (
+      `%b${pattern.bindingId} ${pattern.name}${hintText(pattern.hints)}` +
+      (pattern.withGlobalFallback == null
+        ? ""
+        : withGlobalFallbackText(pattern.withGlobalFallback))
+    );
   }
   if (pattern.kind === "object-binding-pattern") {
     const properties = pattern.properties.map(
@@ -607,7 +612,10 @@ function appendHirStatement(
           : statement.target.kind === "assignment-pattern"
             ? printHirBindingPattern(statement.target.pattern)
             : statement.target.kind === "binding"
-              ? `%b${statement.target.bindingId} ${statement.target.name}`
+              ? `%b${statement.target.bindingId} ${statement.target.name}` +
+                (statement.target.withGlobalFallback == null
+                  ? ""
+                  : withGlobalFallbackText(statement.target.withGlobalFallback))
               : statement.target.kind === "private"
                 ? `${printHirExpression(statement.target.object)}.` +
                   printHirPrivateName(statement.target.privateName)
@@ -629,7 +637,10 @@ function appendHirStatement(
           : statement.target.kind === "assignment-pattern"
             ? printHirBindingPattern(statement.target.pattern)
             : statement.target.kind === "binding"
-              ? `%b${statement.target.bindingId} ${statement.target.name}`
+              ? `%b${statement.target.bindingId} ${statement.target.name}` +
+                (statement.target.withGlobalFallback == null
+                  ? ""
+                  : withGlobalFallbackText(statement.target.withGlobalFallback))
               : statement.target.kind === "private"
                 ? `${printHirExpression(statement.target.object)}.` +
                   printHirPrivateName(statement.target.privateName)

@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { cBackend } from "../packages/backend-c/src/index.ts";
-import { compileSource } from "../packages/compiler/src/index.ts";
+import { compileSource, printHir } from "../packages/compiler/src/index.ts";
 import { createNodeHost } from "../packages/host/src/index.ts";
 import { babelFrontend } from "../packages/parser-babel/src/index.ts";
 import { assertMatchingObservations } from "../packages/testkit/src/index.ts";
@@ -26,6 +26,57 @@ test("fixed host Scripts agree with Node and Deno", async () => {
       },
       references[1]!,
     ]);
+  }
+});
+
+test("with fallback write forms agree with Node and Deno", async () => {
+  for (const fixture of fixtures.withFallbackWriteCases) {
+    const expected = { stdout: fixture.expected, stderr: "", exitStatus: 0 };
+    assertMatchingObservations([
+      expected,
+      ...(await hostScriptReferences(host, fixture.source)),
+    ]);
+  }
+});
+
+test("with fallback write forms compile under both targets", () => {
+  // Only the Host target routes a declared global's write leaf to the
+  // global object's property; the ordinary target keeps the script cell
+  // that its global property already names.
+  const fallback = /fallback %b\d+\(\*intrinsic global object\*\)\["v"\]/u;
+  for (const fixture of fixtures.withFallbackWriteCases) {
+    for (const test262Host of [false, true]) {
+      for (const specialization of ["disabled", "enabled"] as const) {
+        const compiled = compileSource(
+          babelFrontend,
+          { source: fixture.source, sourceId: `${fixture.name}.js` },
+          { specialization, test262Host },
+        );
+        const label = `${fixture.name} host=${test262Host}`;
+        assert.deepEqual(compiled.diagnostics, [], label);
+        assert.ok(compiled.mir != null, label);
+        const hir = printHir(compiled.hir!);
+        if (!test262Host) assert.doesNotMatch(hir, fallback, label);
+        else if (!fixture.name.startsWith("var for-in")) {
+          assert.match(hir, fallback, label);
+        }
+      }
+    }
+  }
+});
+
+test("undeclared with fallback pattern writes stay rejected", () => {
+  for (const test262Host of [false, true]) {
+    const compiled = compileSource(
+      babelFrontend,
+      { source: "with ({}) { [u] = [3]; }", sourceId: "undeclared.js" },
+      { test262Host },
+    );
+    assert.equal(compiled.mir, undefined);
+    assert.deepEqual(
+      compiled.diagnostics.map((diagnostic) => diagnostic.code),
+      ["OSEO1001"],
+    );
   }
 });
 

@@ -153,4 +153,97 @@ console.log(typeof held, Object === $262.global.Object);
       "4 true true 3 5\n4 true true\ntrue\ntail host\nundefined\n" +
       "undefined true\n",
   },
+  // The with-hit `for (var x in/of ...)` head is a known outside-scope
+  // defect on both targets, owned by the separate remediation node
+  // `with-var-loop-head-resolution`; this fixture does not cover it.
+  {
+    name: "with fallback writes reach declared global properties",
+    source: `
+var v = 1, w = 0, k, f, r, s, o = { hit: 0 };
+function g() { return 'g'; }
+with ({}) {
+  [v] = [3];
+  ({ a: w } = { a: 4 });
+  for (k in { key: 1 }) {}
+  for (f of [5]) {}
+  [...r] = [6, 7];
+  ({ ...s } = { t: 8 });
+  [g = 9] = [];
+}
+console.log(v, w, k, f, r.length, s.t, g, globalThis.v, globalThis.k);
+var hit = 'outer';
+with (o) { [hit] = [10]; for (hit in { h: 1 }) {} }
+console.log(o.hit, hit);
+with ({}) {
+  for ([v, k] of [[13, 'm']]) {} for ({ length: w } in { ab: 1 }) {}
+}
+console.log(v, k, w, $262.evalScript('v + k + w;'));
+$262.evalScript('var later = 0; with ({}) { (function () {' +
+  ' "use strict"; [later] = [11]; for (later of [12]) {} })(); }');
+console.log(later, globalThis.later);
+with ({}) { var dv = 1; for (var dk in { q: 1 }) {} var [dp] = [2]; }
+console.log(dv, dk, dp, globalThis.dp);
+var hv = 'g';
+var held = { hv: 0 };
+with (held) { var hv = 5; var { hp: hv } = { hp: 6 }; }
+console.log(hv, held.hv);
+`,
+    expected:
+      "3 4 key 5 2 8 9 3 key\nh outer\n13 m 2 13m2\n12 12\n1 q 2 2\ng 6\n",
+  },
 ];
+
+/**
+ * One assignment-target form per Script that reaches an all-miss `with`
+ * fallback for a declared global name. Each prints the name and the
+ * global object's property, so a write that stopped at a hidden cell
+ * instead of the property would print two different values.
+ */
+export const withFallbackWriteCases: readonly {
+  readonly name: string;
+  readonly source: string;
+  readonly expected: string;
+}[] = [
+  ["simple", "var v = 1; with ({}) { v = 3; }", "3 3"],
+  ["compound", "var v = 1; with ({}) { v += 2; }", "3 3"],
+  ["logical", "var v = 0; with ({}) { v ||= 3; }", "3 3"],
+  ["update", "var v = 2; with ({}) { v++; }", "3 3"],
+  ["array", "var v = 1; with ({}) { [v] = [3]; }", "3 3"],
+  ["array default", "var v = 1; with ({}) { [v = 3] = []; }", "3 3"],
+  ["array rest", "var v; with ({}) { [, ...v] = [0, 3]; } v = v[0];", "3 3"],
+  ["object shorthand", "var v = 1; with ({}) { ({ v } = { v: 3 }); }", "3 3"],
+  ["object key", "var v = 1; with ({}) { ({ a: v } = { a: 3 }); }", "3 3"],
+  [
+    "object rest",
+    "var v; with ({}) { ({ ...v } = { b: 3 }); } v = v.b;",
+    "3 3",
+  ],
+  ["nested", "var v = 1; with ({}) { [{ a: [v] }] = [{ a: [3] }]; }", "3 3"],
+  ["for-in head", "var v; with ({}) { for (v in { 3: 0 }) {} }", "3 3"],
+  ["for-of head", "var v; with ({}) { for (v of [3]) {} }", "3 3"],
+  ["for-of pattern", "var v; with ({}) { for ([v] of [[3]]) {} }", "3 3"],
+  [
+    "for-in pattern",
+    "var v; with ({}) { for ({ length: v } in { abc: 0 }) {} }",
+    "3 3",
+  ],
+  [
+    "for-await head",
+    "var v; with ({}) { (async function () {" +
+      " for await (v of [3]) {} console.log(v, globalThis.v); })(); }",
+    "undefined undefined\n3 3",
+  ],
+  ["var initializer", "with ({}) { var v = 3; }", "3 3"],
+  ["var for-in head", "with ({}) { for (var v in { 3: 0 }) {} }", "3 3"],
+  ["var pattern", "with ({}) { var [v] = [3]; }", "3 3"],
+  ["function name", "function v() {} with ({}) { [v] = [3]; }", "3 3"],
+  [
+    "strict inner function",
+    "var v; with ({}) { (function () { 'use strict'; [v] = [3]; })(); }",
+    "3 3",
+  ],
+].map(([name, source, expected]) => ({
+  name: name!,
+  source: `${source} console.log(v, globalThis.v);`,
+  expected: `${expected}\n`,
+}));

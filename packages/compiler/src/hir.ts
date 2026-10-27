@@ -28,6 +28,12 @@ export interface HirBindingIdentifier extends LocatedSyntax {
    * lexical fallback when the target occurs inside `with`.
    */
   readonly withObjectBindingIds?: readonly number[];
+  /**
+   * The realm global-object property an all-miss write leaf reaches
+   * instead of the lexical cell, as for a host Script's `var` or
+   * function name whose binding is that property.
+   */
+  readonly withGlobalFallback?: HirWithGlobalObjectFallback;
   /** Strict SetMutableBinding for a selected with object on a write leaf. */
   readonly globalReference?: HirGlobalReference;
 }
@@ -256,6 +262,8 @@ export type HirForOfTarget =
       readonly name: string;
       readonly range: SourceRange;
       readonly withObjectBindingIds?: readonly number[];
+      /** The global-object property an all-miss write reaches instead. */
+      readonly withGlobalFallback?: HirWithGlobalObjectFallback;
       /** Strict SetMutableBinding for a selected with object. */
       readonly globalReference?: HirGlobalReference;
     }

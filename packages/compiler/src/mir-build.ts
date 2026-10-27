@@ -6171,10 +6171,11 @@ function lowerForHeadTarget(
         range: target.range,
       },
       builder,
+      target.withGlobalFallback,
     );
     lowerWithBindingWrite(
       selected,
-      target,
+      target.withGlobalFallback ?? target,
       value,
       target.range,
       builder,
@@ -6859,10 +6860,11 @@ function lowerBindingTarget(
               range: pattern.range,
             },
             builder,
+            pattern.withGlobalFallback,
           );
     lowerWithBindingWrite(
       selected,
-      pattern,
+      pattern.withGlobalFallback ?? pattern,
       value,
       pattern.range,
       builder,
@@ -7034,6 +7036,7 @@ function lowerKeyedAssignmentReference(
         range: pattern.range,
       },
       builder,
+      pattern.withGlobalFallback,
     ),
   };
 }

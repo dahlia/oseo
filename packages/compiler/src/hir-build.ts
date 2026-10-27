@@ -31,6 +31,7 @@ import type {
   HirForOfTarget,
   HirFunction,
   HirGlobalObjectBinding,
+  HirWithGlobalObjectFallback,
   HirObjectBindingProperty,
   HirObjectProperty,
   HirOptionalChainLink,
@@ -201,7 +202,9 @@ function rejectStrictWithFallbackWrite(
  * admitted, but an all-miss PutValue reaches the global object, where a
  * non-strict write creates or updates a real property; the compiler
  * cannot let that path create a separate hidden cell instead, because a
- * later reference to the name reads the global object.
+ * later reference to the name reads the global object. A host Script's
+ * declared name never reaches this rejection: its write leaf carries
+ * the global-object fallback from `hostScriptWithGlobalFallback`.
  */
 function rejectGlobalObjectWithFallbackWrite(
   name: string,
@@ -221,6 +224,34 @@ function rejectGlobalObjectWithFallbackWrite(
     ),
   );
   return true;
+}
+
+/**
+ * The global-object fallback of a host Script's `var` or function name
+ * behind an all-miss `with` chain. Such a binding is the realm global
+ * object's property, so `resolveName` reports it unbound. A pattern or
+ * loop-head write leaf keeps the declared binding's identity, but its
+ * PutValue reaches that property through the persistent Global
+ * Environment Record, as a simple or compound `with` assignment does.
+ */
+function hostScriptWithGlobalFallback(
+  name: string,
+  range: SourceRange,
+  state: ResolveState,
+): { binding: Binding; fallback: HirWithGlobalObjectFallback } | undefined {
+  if (state.hostScriptBindings !== true) return undefined;
+  const binding = state.scriptScope?.get(name);
+  if (binding == null || !state.globalObjectBindingIds.has(binding.id)) {
+    return undefined;
+  }
+  return {
+    binding,
+    fallback: {
+      name,
+      object: intrinsicGlobalObjectRead(range, state, name),
+      objectBindingId: intrinsicGlobalObjectBinding(state).id,
+    },
+  };
 }
 
 /** Whether the mutable global object property owns this intrinsic value. */
@@ -277,20 +308,6 @@ function isPropertyOwnedIntrinsicName(name: string): boolean {
   );
 }
 
-/**
- * Whether an unshadowed reference to `name` resolves through the realm's
- * global object rather than through a compiled binding.
- *
- * A property-owned intrinsic always does: its value lives in the global
- * object property the realm installed. Every other name that ECMA-262
- * does not require a conforming realm to bind does too, because a
- * program can create such a property at run time through `globalThis`,
- * so no closed-world analysis can decide the reference statically. The
- * two exclusions keep names this profile has not admitted as values
- * reportable: a runtime-owned intrinsic is a call target with no global
- * property behind it, and a standard global this realm does not install
- * yet would answer an absent property where ECMA-262 requires a value.
- */
 /*
  * The agent program hole an unresolved identifier read occupies: its name
  * is a hole's placeholder and its bytes are exactly where the compiler
@@ -312,6 +329,22 @@ function agentHoleAt(
   return hole;
 }
 
+/**
+ * Whether an unshadowed reference to `name` resolves through the realm's
+ * global object rather than through a compiled binding.
+ *
+ * A property-owned intrinsic always does: its value lives in the global
+ * object property the realm installed. Every other name that ECMA-262
+ * does not require a conforming realm to bind does too, because a
+ * program can create such a property at run time through `globalThis`,
+ * so no closed-world analysis can decide the reference statically. The
+ * two exclusions keep names this profile has not admitted as values
+ * reportable: a runtime-owned intrinsic is a call target with no global
+ * property behind it, and a standard global this realm does not install
+ * yet would answer an absent property where ECMA-262 requires a value.
+ * Under host Script bindings a Script's own `var` and function names do
+ * too, since their binding is the global object's property.
+ */
 function isGlobalObjectResolvedName(
   name: string,
   state?: ResolveState,
@@ -3425,7 +3458,14 @@ function resolveBindingPattern(
     ) {
       return intrinsicGlobalPatternTarget(pattern.name, pattern, state);
     }
+    const hostGlobal =
+      mode === "write" &&
+      resolution.binding == null &&
+      resolution.objectBindingIds.length > 0
+        ? hostScriptWithGlobalFallback(pattern.name, pattern.range, state)
+        : undefined;
     if (
+      hostGlobal == null &&
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
       rejectGlobalObjectWithFallbackWrite(pattern.name, pattern, state)
@@ -3433,6 +3473,7 @@ function resolveBindingPattern(
       return undefined;
     }
     if (
+      hostGlobal == null &&
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
       state.strict
@@ -3442,6 +3483,7 @@ function resolveBindingPattern(
     }
     const binding =
       resolution.binding ??
+      hostGlobal?.binding ??
       (resolution.objectBindingIds.length === 0
         ? undefined
         : withFallbackBinding(pattern.name, state, true));
@@ -3475,8 +3517,13 @@ function resolveBindingPattern(
         if (resolution.objectBindingIds.length === 0) return undefined;
         return {
           withObjectBindingIds: resolution.objectBindingIds,
+          ...includePropertiesWhen(() =>
+            hostGlobal == null
+              ? undefined
+              : { withGlobalFallback: hostGlobal.fallback },
+          ),
           ...includePropertiesWhen(() => {
-            if (!state.strict) return undefined;
+            if (!state.strict && hostGlobal == null) return undefined;
             return {
               globalReference: intrinsicGlobalReference(pattern.name, state),
             };
@@ -3712,7 +3759,12 @@ function resolveForInTarget(
     ) {
       return intrinsicGlobalLoopTarget(target.name, target.range, state);
     }
+    const hostGlobal =
+      resolution.binding == null && resolution.objectBindingIds.length > 0
+        ? hostScriptWithGlobalFallback(target.name, target.range, state)
+        : undefined;
     if (
+      hostGlobal == null &&
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
       rejectGlobalObjectWithFallbackWrite(target.name, target, state)
@@ -3720,6 +3772,7 @@ function resolveForInTarget(
       return undefined;
     }
     if (
+      hostGlobal == null &&
       resolution.binding == null &&
       resolution.objectBindingIds.length > 0 &&
       state.strict
@@ -3729,6 +3782,7 @@ function resolveForInTarget(
     }
     const binding =
       resolution.binding ??
+      hostGlobal?.binding ??
       (resolution.objectBindingIds.length === 0
         ? undefined
         : withFallbackBinding(target.name, state, true));
@@ -3762,8 +3816,13 @@ function resolveForInTarget(
         if (resolution.objectBindingIds.length === 0) return undefined;
         return {
           withObjectBindingIds: resolution.objectBindingIds,
+          ...includePropertiesWhen(() =>
+            hostGlobal == null
+              ? undefined
+              : { withGlobalFallback: hostGlobal.fallback },
+          ),
           ...includePropertiesWhen(() => {
-            if (!state.strict) return undefined;
+            if (!state.strict && hostGlobal == null) return undefined;
             return {
               globalReference: intrinsicGlobalReference(target.name, state),
             };
@@ -4354,6 +4413,14 @@ function resolveStatement(
       }
     } else if (statement.target.kind === "binding") {
       const resolution = resolveName(scopes, state, statement.target.name);
+      const hostGlobal =
+        resolution.binding == null && resolution.objectBindingIds.length > 0
+          ? hostScriptWithGlobalFallback(
+              statement.target.name,
+              statement.target.range,
+              state,
+            )
+          : undefined;
       if (
         isGlobalObjectResolvedName(statement.target.name, state) &&
         resolution.binding == null &&
@@ -4365,6 +4432,7 @@ function resolveStatement(
           state,
         );
       } else if (
+        hostGlobal == null &&
         resolution.binding == null &&
         resolution.objectBindingIds.length > 0 &&
         rejectGlobalObjectWithFallbackWrite(
@@ -4375,6 +4443,7 @@ function resolveStatement(
       ) {
         return undefined;
       } else if (
+        hostGlobal == null &&
         resolution.binding == null &&
         resolution.objectBindingIds.length > 0 &&
         state.strict
@@ -4388,6 +4457,7 @@ function resolveStatement(
       } else {
         const binding =
           resolution.binding ??
+          hostGlobal?.binding ??
           (resolution.objectBindingIds.length === 0
             ? undefined
             : withFallbackBinding(statement.target.name, state, true));
@@ -4418,8 +4488,13 @@ function resolveStatement(
               if (resolution.objectBindingIds.length === 0) return undefined;
               return {
                 withObjectBindingIds: resolution.objectBindingIds,
+                ...includePropertiesWhen(() =>
+                  hostGlobal == null
+                    ? undefined
+                    : { withGlobalFallback: hostGlobal.fallback },
+                ),
                 ...includePropertiesWhen(() => {
-                  if (!state.strict) return undefined;
+                  if (!state.strict && hostGlobal == null) return undefined;
                   return {
                     globalReference: intrinsicGlobalReference(
                       binding.name,
