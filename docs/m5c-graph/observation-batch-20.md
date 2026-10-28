@@ -18,7 +18,7 @@ from the saved phase/type-correct runner classification.
 | Raw observations, first segment        | /data/m5c-b19-b20-b30-20261027/observation-6aab/raw/observations.json                                 |
 | Raw observations, continuation         | /data/m5c-b19-b20-b30-20261027/observation-6aab/continuation/raw/observations.json                    |
 | Raw observations, remaining 904        | /data/m5c-b19-b20-b30-20261027/observation-6aab/remaining-904/raw/observations.json                   |
-| Exact source hashes and tag derivation | /data/m5c-b19-b20-b30-20261027/task\_c268e41dfa6d/ctx\_e6fde0372f06/round6/reviewed-tag-evidence.json |
+| Exact source hashes and tag derivation | /data/m5c-b19-b20-b30-20261027/task\_c268e41dfa6d/ctx\_e6fde0372f06/round7/reviewed-tag-evidence.json |
 
 The 66 unknown-eval and 393 ImportExpression rejections across this train
 belong to `dynamic-source-coverage-remediation`. The 12 await-in-top-level
@@ -50,47 +50,56 @@ Full dependency audit
 ---------------------
 
 The full train audit recomputes all 1,409 admitted rows with the B13 r14
-AST tagger; its control run matches all 757 landed B13 rows. Every raw
-difference has a source-bound decision, including metadata and includes.
-Only this train is retagged; existing Main rows, owners, and result
-classifications remain unchanged.
+AST tagger; its control run matches all 757 landed B13 rows. Each raw
+difference and manual supplement has pinned-source evidence. Existing
+Main rows, owners, classifications, and source hashes remain unchanged.
 
-A dependency tag records the test subject and semantics its evaluation
-necessarily reaches. Failure-only assertion throws, harness plumbing,
-uncalled bodies, and grammar contrast supply no runtime coverage. The
-audit rejects 101 failure-only abrupt-completion additions. Tested
-throws, specific error assertions, and try/catch/finally retain their
-abrupt-completion tags. Malformed ImportCall spreads acquire no iterator;
-a missing Symbol.iterator property alone observes no iterator consumer.
+A tag records the asserted source subject and operations necessarily
+performed. Failure-only assertion throws, diagnostic arguments, harness
+plumbing, and uncalled bodies supply no runtime coverage. Syntax-family
+tags can describe explicitly tested grammar, including operator early
+errors. Expected runtime/resolution errors and observed rejection retain
+abrupt-completion and their asserted named error-family tags.
 
-The source review also checks evaluated class bindings, observed import
-promise chains and error names, reached specifier/namespace coercions,
-object-valued await reads, and class-heritage prototype reads. Generic
-syntax/runtime tags come from the primary test and its includes. Fixture
-modules contribute asserted contracts or prerequisites, including module
-linking, top-level await, and dynamic source. Incidental fixture binding
-initialization, loops, and branches are plumbing and add no tags. The
-final sweep adds module-linking to 80 namespace/evaluation subjects
-separately from the AST proposals. The
-synchronous Script class named await carries no top-level-await tag.
+Generic syntax/runtime tags derive from the primary test and includes.
+Fixture modules contribute asserted contracts or prerequisites, including
+module linking, top-level await, and dynamic source. Incidental fixture
+initialization, loops, and branches are plumbing. The source audit also
+checks evaluated class bindings, observed Promise chains, reached object
+coercions, object-valued await reads, and heritage prototype reads.
 
-This batch changes 331 owned rows. Added tag counts:
+All counts below describe the **full dispatch**, comparing `3a0e7449`
+with the current subset. They come from the
+[full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round7/all-dispatch-tag-changes.json).
+It changes 969 rows across the train and 347 owned rows here. The latest
+[correction-round delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round7/tag-changes.json)
+describes the separate comparison from `387bef0e` to this correction. Its
+per-round counts must not be compared with the full dispatch totals. Both
+artifacts agree with the current source-tag evidence and subset.
 
- -  abrupt-completion: 42
+Added tag counts for the full dispatch:
+
+ -  abrupt-completion: 48
+ -  async-iteration: 12
+ -  classes: 10
  -  control-flow: 104
- -  error-intrinsics: 21
- -  expression-operators: 109
- -  functions: 56
- -  lexical-bindings: 50
- -  lexical-grammar: 2
- -  object-properties: 213
+ -  error-intrinsics: 29
+ -  expression-operators: 108
+ -  functions: 75
+ -  lexical-bindings: 54
+ -  lexical-grammar: 3
+ -  object-own-keys: 2
+ -  object-properties: 220
+ -  regular-expressions: 8
  -  set-intrinsic: 1
  -  symbols: 27
 
-Removed tag counts:
+Removed tag counts for the full dispatch:
 
+ -  dynamic-source: 2
+ -  lexical-grammar: 3
+ -  promise-settlement: 1
  -  top-level-await: 1
 
-The complete per-row decisions and full tag-change lists accompany the
-current tag-evidence artifact; its directory also records the control
-match, source hashes, manual supplements, and Root policy decisions.
+The evidence directory records all source hashes, per-candidate reach
+decisions, metadata/uncalled-body/operator sweeps, and Root decisions.

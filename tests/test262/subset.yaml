@@ -106782,7 +106782,7 @@ tests:
       ]
   - path: test/language/expressions/dynamic-import/assignment-expression/yield-star.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, generators, iterator-protocol]
+    dependencies: [dynamic-source, functions, generators]
   - path: test/language/expressions/dynamic-import/await-import-evaluation.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -109497,28 +109497,28 @@ tests:
     dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-10-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-11-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-12-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-13-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-14-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-15-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-16-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-17-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-2-update-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, expression-operators]
@@ -109530,19 +109530,19 @@ tests:
     dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-5-lhs-equals-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-6-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-7-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-8-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-9-lhs-assignment-operator-assignment-expression.js
     expectedClassification: expected-negative
-    dependencies: [dynamic-source]
+    dependencies: [dynamic-source, expression-operators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -110016,8 +110016,7 @@ tests:
     dependencies: [dynamic-source, functions, lexical-bindings, var-bindings]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-empty-str-is-valid-assign-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-import-attributes-trailing-comma-first.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, dynamic-source]
@@ -110026,22 +110025,13 @@ tests:
     dependencies: [module-linking, dynamic-source]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-nested-imports.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-script-code-valid.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        promise-settlement,
-        var-bindings,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, var-bindings]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-empty-str-is-valid-assign-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-import-attributes-trailing-comma-first.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, dynamic-source]
@@ -110050,22 +110040,13 @@ tests:
     dependencies: [module-linking, dynamic-source]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-nested-imports.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-script-code-valid.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        promise-settlement,
-        var-bindings,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, var-bindings]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-empty-str-is-valid-assign-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-import-attributes-trailing-comma-first.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, dynamic-source]
@@ -110074,18 +110055,10 @@ tests:
     dependencies: [module-linking, dynamic-source]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-nested-imports.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-script-code-valid.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        promise-settlement,
-        var-bindings,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, var-bindings]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-empty-str-is-valid-assign-expr.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions, dynamic-source, functions]
@@ -110100,8 +110073,7 @@ tests:
     dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-return-await-empty-str-is-valid-assign-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-return-await-import-attributes-trailing-comma-first.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, dynamic-source]
@@ -110110,31 +110082,16 @@ tests:
     dependencies: [module-linking, dynamic-source]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-return-await-nested-imports.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-return-await-script-code-valid.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        promise-settlement,
-        var-bindings,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, var-bindings]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-function-script-code-valid.js
     expectedClassification: unsupported-profile-feature
     dependencies: [async-functions, dynamic-source, functions, var-bindings]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-empty-str-is-valid-assign-expr.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        generators,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, generators]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-import-attributes-trailing-comma-first.js
     expectedClassification: unsupported-profile-feature
     dependencies: [module-linking, dynamic-source]
@@ -110143,25 +110100,11 @@ tests:
     dependencies: [module-linking, dynamic-source]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-nested-imports.js
     expectedClassification: unsupported-profile-feature
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        generators,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, generators]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-script-code-valid.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        generators,
-        promise-settlement,
-        var-bindings,
-      ]
+      [async-functions, dynamic-source, functions, generators, var-bindings]
   - path: test/language/expressions/dynamic-import/syntax/valid/nested-block-empty-str-is-valid-assign-expr.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source]
@@ -136165,10 +136108,16 @@ tests:
   - path: test/language/literals/regexp/mongolian-vowel-separator-eval.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [dynamic-source, functions, object-properties, regular-expressions]
+      [
+        dynamic-source,
+        functions,
+        lexical-grammar,
+        object-properties,
+        regular-expressions,
+      ]
   - path: test/language/literals/regexp/mongolian-vowel-separator.js
     expectedClassification: pass
-    dependencies: [object-properties, regular-expressions]
+    dependencies: [lexical-grammar, object-properties, regular-expressions]
   - path: test/language/literals/regexp/named-groups/forward-reference.js
     expectedClassification: pass
     dependencies: [functions, object-properties, regular-expressions]
@@ -136811,16 +136760,16 @@ tests:
     dependencies: [lexical-grammar]
   - path: test/language/module-code/ambiguous-export-bindings/error-export-from-named-as.js
     expectedClassification: expected-negative
-    dependencies: [module-linking]
+    dependencies: [abrupt-completion, error-intrinsics, module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/error-export-from-named.js
     expectedClassification: expected-negative
-    dependencies: [module-linking]
+    dependencies: [abrupt-completion, error-intrinsics, module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/error-import-named-as.js
     expectedClassification: expected-negative
-    dependencies: [module-linking]
+    dependencies: [abrupt-completion, error-intrinsics, module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/error-import-named.js
     expectedClassification: expected-negative
-    dependencies: [module-linking]
+    dependencies: [abrupt-completion, error-intrinsics, module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
     expectedClassification: pass
     dependencies: [module-linking]
@@ -136961,7 +136910,7 @@ tests:
     dependencies: [abrupt-completion, functions, module-linking]
   - path: test/language/module-code/eval-export-dflt-expr-err-get-value.js
     expectedClassification: expected-negative
-    dependencies: [module-linking]
+    dependencies: [abrupt-completion, error-intrinsics, module-linking]
   - path: test/language/module-code/eval-export-dflt-expr-fn-anon.js
     expectedClassification: pass
     dependencies: [functions, module-linking, object-properties]
@@ -138180,6 +138129,7 @@ tests:
       [
         abrupt-completion,
         dynamic-source,
+        error-intrinsics,
         module-linking,
         promise-settlement,
         top-level-await,
@@ -138226,7 +138176,6 @@ tests:
     dependencies:
       [
         control-flow,
-        expression-operators,
         functions,
         lexical-grammar,
         module-linking,
@@ -138366,15 +138315,33 @@ tests:
   - path: test/language/module-code/top-level-await/module-import-rejection-body.js
     expectedClassification: expected-negative
     dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+      [
+        abrupt-completion,
+        error-intrinsics,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+      ]
   - path: test/language/module-code/top-level-await/module-import-rejection-tick.js
     expectedClassification: expected-negative
     dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+      [
+        abrupt-completion,
+        error-intrinsics,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+      ]
   - path: test/language/module-code/top-level-await/module-import-rejection.js
     expectedClassification: expected-negative
     dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+      [
+        abrupt-completion,
+        error-intrinsics,
+        module-linking,
+        promise-settlement,
+        top-level-await,
+      ]
   - path: test/language/module-code/top-level-await/module-import-resolution.js
     expectedClassification: pass
     dependencies: [module-linking, top-level-await]
@@ -138437,6 +138404,7 @@ tests:
         expression-operators,
         functions,
         lexical-bindings,
+        lexical-grammar,
         object-properties,
         symbols,
       ]
@@ -138453,6 +138421,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [
+        abrupt-completion,
         dynamic-source,
         functions,
         lexical-bindings,

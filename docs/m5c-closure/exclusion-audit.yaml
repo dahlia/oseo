@@ -8287,8 +8287,8 @@ paths:
       085c029adac683a822a60d6ec730"
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
-    subject: "Module namespace objects lack a Symbol.toStringTag (value from
-      await resolving)"
+    subject: "Module namespace objects lack a Symbol.iterator property (value
+      from await resolving)"
     assessment: "observation-train-dynamic-source"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-own-prop\
       erty-keys-sort.js"
@@ -8691,8 +8691,8 @@ paths:
       7e3fcab0716614cc2d4248597bab"
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
-    subject: "Module namespace objects lack a Symbol.toStringTag (value from
-      promise then)"
+    subject: "Module namespace objects lack a Symbol.iterator property (value
+      from promise then)"
     assessment: "observation-train-dynamic-source"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-o\
       wn-property-keys-sort.js"
@@ -13233,8 +13233,8 @@ paths:
       391ac7afb03afaaf1117bd774fe8"
     missingDynamicTag: false
     section: "prod-RegularExpressionNonTerminator"
-    subject: "The first character of a regular expression may not be a <LS>,
-      (\\u2028), evaluated"
+    subject: "The first character of a regexp literal cannot be PS (U+2029),
+      tested through evaluated source"
     assessment: "observation-train-dynamic-source"
   - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13386,8 +13386,8 @@ paths:
       6f0572c6c69d8e618f5608467c35"
     missingDynamicTag: false
     section: "prod-RegularExpressionBackslashSequence"
-    subject: "A regular expression may not contain a <LF> as a SourceCharacter,
-      evaluated"
+    subject: "A regexp literal cannot contain backslash followed by CR (U+000D),
+      tested through evaluated source"
     assessment: "observation-train-dynamic-source"
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
