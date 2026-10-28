@@ -9182,7 +9182,7 @@ observation in *tests/native.ts* compiles the program in
 *tests/native/fixtures/with-get-binding-value.ts* under both specialization
 policies with collection forced at every safepoint, and requires a positive
 collection count and the exact ECMA-262 output. With specialization disabled
-it also requires zero guard hits and misses. Its 27 rows cover, in sloppy and
+it also requires zero guard hits and misses. Its 35 rows cover, in sloppy and
 strict code:
 
  -  a binding deleted by a `Symbol.unscopables` getter, behind a global or a
@@ -9193,6 +9193,11 @@ strict code:
  -  the Proxy trace that the pinned test262 cases assert, a Proxy whose
     second `has` answers `false` or throws, and a Proxy miss followed by the
     next object.
+ -  an optional call `f?.()` after deletion, which short-circuits non-strict
+    code before its arguments, and a traced Proxy's optional call, whose
+    `this` is the Proxy, beside a second `has` that answers `false` or
+    throws. Node `with-optional-call-receiver-non-tail` added these eight
+    rows.
 
 The existing *m5-global-object-record.property.test.ts* family adds slot
 `0x60003d02` with 12 ordinary cases and a 180-second interrupt limit. It
