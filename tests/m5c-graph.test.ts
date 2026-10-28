@@ -383,9 +383,9 @@ test("the checked-in M5c work graph is valid", () => {
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 65);
   assert.equal(summary.parked, 0);
-  assert.equal(summary.nodes, 107);
-  assert.equal(summary.ready, 102);
-  assert.equal(summary.blocked, 5);
+  assert.equal(summary.nodes, 112);
+  assert.equal(summary.ready, 105);
+  assert.equal(summary.blocked, 7);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -656,4 +656,39 @@ test("computed member key order owns its Reference contract", () => {
     if (!owner.landed) assert.equal(batch.status, "blocked", batchId);
   }
   assert.ok(readNode("m5-exit-audit").dependencies.includes(ownerId));
+});
+
+test("observation train retains bounded remediation dependencies", () => {
+  validateCurrentM5cWorkGraph();
+  const exit = readImportAttributesNode("m5-exit-audit");
+  for (const id of [
+    "array-generated-property-cost-remediation",
+    "dynamic-import-early-error-precedence",
+    "module-namespace-uninitialized-bindings",
+    "test262-module-harness-globals",
+    "with-var-loop-head-resolution",
+  ]) {
+    const node = readImportAttributesNode(id);
+    assert.equal(node.landed, false);
+    assert.equal(node.status, "ready");
+    assert.deepEqual(node.dependencies, ["unsupported-ownership-audit"]);
+    assert.ok(exit.dependencies.includes(id), id);
+  }
+  for (const [id, prerequisites] of [
+    [
+      "observation-batch-20",
+      [
+        "module-namespace-uninitialized-bindings",
+        "test262-module-harness-globals",
+      ],
+    ],
+    ["observation-batch-30", ["dynamic-import-early-error-precedence"]],
+  ] as const) {
+    const batch = readImportAttributesNode(id);
+    assert.equal(batch.landed, false);
+    assert.equal(batch.status, "blocked");
+    for (const prerequisite of prerequisites) {
+      assert.ok(batch.dependencies.includes(prerequisite), prerequisite);
+    }
+  }
 });
