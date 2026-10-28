@@ -888,7 +888,6 @@ results:
       - async-functions
       - dynamic-source
       - functions
-      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-function-return-await-script-code-valid.js

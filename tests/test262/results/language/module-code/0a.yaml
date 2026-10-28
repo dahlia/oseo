@@ -17,7 +17,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - functions
       - lexical-grammar
       - module-linking

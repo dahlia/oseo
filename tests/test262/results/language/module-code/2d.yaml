@@ -20,6 +20,7 @@ results:
     dependencies:
       - abrupt-completion
       - dynamic-source
+      - error-intrinsics
       - module-linking
       - promise-settlement
       - top-level-await

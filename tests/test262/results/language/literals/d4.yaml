@@ -80,6 +80,7 @@ results:
     dependencies:
       - dynamic-source
       - functions
+      - lexical-grammar
       - object-properties
       - regular-expressions
     observation:

@@ -1164,6 +1164,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
     observation:
       errorType: SyntaxError
       failedPhase: parse

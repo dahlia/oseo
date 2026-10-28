@@ -927,6 +927,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -949,6 +950,7 @@ results:
     classification: expected-negative
     dependencies:
       - dynamic-source
+      - expression-operators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -972,7 +974,6 @@ results:
       - async-functions
       - dynamic-source
       - functions
-      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-function-await-script-code-valid.js

@@ -887,7 +887,6 @@ results:
       - dynamic-source
       - functions
       - generators
-      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-empty-str-is-valid-assign-expr.js
         non-strict disabled failed (1): stdout=""

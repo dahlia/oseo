@@ -21129,12 +21129,12 @@ summary:
   unsupportedProfileFeatures: 1114
   dependencies:
     - dependency: abrupt-completion
-      expectedNegatives: 13
+      expectedNegatives: 18
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 1654
       semanticFailures: 0
-      unsupportedProfileFeatures: 210
+      unsupportedProfileFeatures: 211
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -21227,17 +21227,17 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 894
     - dependency: error-intrinsics
-      expectedNegatives: 7
+      expectedNegatives: 15
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 1273
       semanticFailures: 0
-      unsupportedProfileFeatures: 170
+      unsupportedProfileFeatures: 171
     - dependency: expression-operators
-      expectedNegatives: 482
+      expectedNegatives: 495
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 4884
+      passes: 4883
       semanticFailures: 0
       unsupportedProfileFeatures: 276
     - dependency: functions
@@ -21260,7 +21260,7 @@ summary:
       infrastructureFailures: 0
       passes: 3771
       semanticFailures: 0
-      unsupportedProfileFeatures: 29
+      unsupportedProfileFeatures: 28
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -21286,9 +21286,9 @@ summary:
       expectedNegatives: 230
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 283
+      passes: 285
       semanticFailures: 0
-      unsupportedProfileFeatures: 33
+      unsupportedProfileFeatures: 34
     - dependency: module-linking
       expectedNegatives: 213
       harnessFailures: 0
@@ -21323,7 +21323,7 @@ summary:
       infrastructureFailures: 0
       passes: 2132
       semanticFailures: 0
-      unsupportedProfileFeatures: 379
+      unsupportedProfileFeatures: 364
     - dependency: property-enumeration
       expectedNegatives: 67
       harnessFailures: 0

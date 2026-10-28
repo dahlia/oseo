@@ -18,6 +18,7 @@ results:
     classification: expected-negative
     dependencies:
       - abrupt-completion
+      - error-intrinsics
       - module-linking
       - promise-settlement
       - top-level-await

@@ -1226,7 +1226,6 @@ results:
       - async-functions
       - dynamic-source
       - functions
-      - promise-settlement
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-nested-imports.js
         non-strict disabled failed (1): stdout=""

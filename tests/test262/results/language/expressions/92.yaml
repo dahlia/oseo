@@ -918,7 +918,6 @@ results:
       - dynamic-source
       - functions
       - generators
-      - promise-settlement
       - var-bindings
     observation:
       detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-script-code-valid.js
