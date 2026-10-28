@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test, { describe } from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
+import { fileURLToPath } from "node:url";
 
 import type { ProcessRequest } from "@oseo/compiler";
 import { createNodeHost } from "../src/index.ts";
@@ -277,7 +278,10 @@ describe(
     test("an idle helper does not keep its parent alive", async () => {
       const child = spawn(
         process.execPath,
-        [new URL("fixtures/spawn-owner.ts", import.meta.url).pathname, "idle"],
+        [
+          fileURLToPath(new URL("fixtures/spawn-owner.ts", import.meta.url)),
+          "idle",
+        ],
         { stdio: ["ignore", "pipe", "pipe"], timeout: 5_000 },
       );
       const [code, signal] = await once(child, "close");
@@ -296,7 +300,7 @@ describe(
         const child = spawn(
           process.execPath,
           [
-            new URL("fixtures/spawn-owner.ts", import.meta.url).pathname,
+            fileURLToPath(new URL("fixtures/spawn-owner.ts", import.meta.url)),
             "descendants",
             path,
           ],

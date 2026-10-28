@@ -8,8 +8,9 @@ delivers: "Profiles the native matcher for Unicode property escape classes
   any other family, mostly in property escape tests; for example
   test/built-ins/RegExp/property-escapes/generated/ID_Start.js takes
   11.6 s of execution and 31.5 s of compile and link over 4 variants with
-  14 MB of C per variant. Records before and after per-variant native
-  time, C bytes and compile time. Owns no test262 path; decision
+  14 MB of C in total, about 3.5 MB per variant. Records before and after
+  per-variant native time, C bytes and compile time. Owns no test262
+  path; decision
   ~/.local/state/oseo-m5c/decisions/product-performance-nodes-20261028.md\
   ; work note docs/m5c-graph/regexp-property-escape-match-cost.md."
 dependencies:

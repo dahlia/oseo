@@ -12,7 +12,7 @@ instrumentation commit `7adf8d40`, manifest unchanged) attributed
 and link. The timings include instrumentation overhead and a cold Zig
 cache, so treat them as relative.
 
-| Path under *test/built-ins/RegExp/property-escapes/generated/* | Native execution, 4 variants | Compile and link, 4 variants | C bytes per variant |
+| Path under *test/built-ins/RegExp/property-escapes/generated/* | Native execution, 4 variants | Compile and link, 4 variants | C bytes, 4 variants |
 | -------------------------------------------------------------- | ---------------------------- | ---------------------------- | ------------------- |
 | *ID\_Start.js*                                                 | 11.608 s                     | 31.527 s                     | 13,992,528          |
 | *General\_Category\_-\_Other.js*                               | 12.936 s                     | 35.409 s                     | 16,098,848          |
@@ -21,7 +21,9 @@ cache, so treat them as relative.
 | *ID\_Continue.js*                                              | 11.611 s                     | 37.213 s                     | 16,395,770          |
 | *strings/RGI\_Emoji.js*                                        | 0.344 s                      | 40.610 s                     | 22,123,274          |
 
-These are retained measurements, not new executions in this worktree.
+The phase report sums every column over the four variants, so *ID\_Start.js*
+emits about 3.5 MB of C per variant. These are retained measurements, not
+new executions in this worktree.
 
 | Evidence                          | Pointer                                                                 |
 | --------------------------------- | ----------------------------------------------------------------------- |

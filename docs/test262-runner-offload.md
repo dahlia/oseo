@@ -10,7 +10,8 @@ measured execution pool limit remains eight.
 The spawn helper owns command pipes and sends one complete observation per
 request over advanced Node IPC. It does not import compiler implementations.
 The host keeps its existing UTF-8 decoding and signal-status mapping. Each
-request captures the parent's environment, absolute cwd, and umask. The helper
+request captures the parent's environment and absolute cwd; commands inherit
+the umask the helper started with. The helper
 inherits the runner's process group so existing external timeout supervisors
 can terminate commands and descendants together. Individual helper loss is a
 new infrastructure failure; it rejects pending requests without replay. Group
@@ -51,12 +52,12 @@ vary. Stop on a semantic, harness, or infrastructure failure.
 
 The expected effect is lower main-thread fork cost and fewer gaps in child
 admission while C is emitted. The p06 measurement attributes 1,252 seconds of
-system CPU to spawning and about 805 CPU seconds to C emission. These are
-overlapping work totals, not additive wall-time savings. One cold-cache Full
-UPDATE pair on the remote host, recorded in the [node work note], took 75.2
-minutes without the offload and 52.4 minutes with it at pool eight, and
-neither run changed the checked-in manifest. Raising the pool is separate
-follow-up work. A higher default still requires remote evidence, a memory
-headroom check, and an identical canonical manifest.
+system CPU to spawning and about 795 CPU seconds, or 805 seconds of wall time,
+to C emission. These are overlapping work totals, not additive wall-time
+savings. One cold-cache Full UPDATE pair on the remote host, recorded in the
+[node work note], took 75.2 minutes without the offload and 52.4 minutes with
+it at pool eight, and neither run changed the checked-in manifest. Raising the
+pool is separate follow-up work. A higher default still requires remote
+evidence, a memory headroom check, and an identical canonical manifest.
 
 [node work note]: ./m5c-graph/test262-runner-main-thread-offload.md

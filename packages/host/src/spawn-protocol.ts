@@ -1,10 +1,13 @@
 import type { ProcessObservation, ProcessRequest } from "@oseo/compiler";
 
-/** A request owns its environment snapshot, even when the parent changes it. */
+/**
+ * A request owns its environment snapshot, even when the parent changes it.
+ * It carries no umask: commands inherit the umask the helper started with,
+ * because reading it in Node briefly sets the process-wide umask to zero.
+ */
 export interface SpawnRequest {
   readonly id: number;
   readonly request: ProcessRequest;
-  readonly umask: number;
 }
 
 /** Preserve the observable fields of Node's spawn and argument errors. */

@@ -10,15 +10,16 @@ instrumentation commit `7adf8d40`, manifest unchanged) found the three
 slowest paths of the whole run in one place. The timings include
 instrumentation overhead and a cold Zig cache, so treat them as relative.
 
-| Path under *test/built-ins/TypedArray/prototype/copyWithin/* | Native execution, 4 variants | Compile and link | C bytes per variant |
+| Path under *test/built-ins/TypedArray/prototype/copyWithin/* | Native execution, 4 variants | Compile and link | C bytes, 4 variants |
 | ------------------------------------------------------------ | ---------------------------- | ---------------- | ------------------- |
 | *coerced-values-end-detached.js*                             | 128.887 s                    | 0.402 s          | 3,680,829           |
 | *coerced-values-end-detached-prototype.js*                   | 128.410 s                    | 0.464 s          | 3,698,972           |
 | *coerced-values-start-detached.js*                           | 129.134 s                    | 0.363 s          | 3,680,885           |
 
-Each variant spends about 32 seconds in native execution, while emitting,
-compiling and linking it takes well under a second. These are retained
-measurements, not new executions in this worktree.
+The phase report sums every column over the four variants. Each variant
+spends about 32 seconds in native execution and emits about 0.92 MB of C,
+while emitting, compiling and linking it takes well under a second. These are
+retained measurements, not new executions in this worktree.
 
 | Evidence                                  | Pointer                                                                 |
 | ----------------------------------------- | ----------------------------------------------------------------------- |

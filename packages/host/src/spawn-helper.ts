@@ -20,9 +20,8 @@ function respond(response: SpawnResponse): void {
 }
 
 process.on("disconnect", disconnect);
-process.on("message", ({ id, request, umask }: SpawnRequest) => {
+process.on("message", ({ id, request }: SpawnRequest) => {
   try {
-    process.umask(umask);
     // Keep the caller's process group: existing fixture timeout/interrupt
     // supervisors must still kill the helper, command, and descendants.
     const child = spawn(request.command, [...request.args], {

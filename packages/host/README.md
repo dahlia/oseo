@@ -56,8 +56,10 @@ compiler's address space. The product CLI keeps direct spawning by default.
 `await host.close()` drains accepted requests and closes the helper. Idle
 helpers do not keep the parent alive, and process exit disconnects their IPC.
 
-Delegated requests capture the caller's current environment, absolute working
-directory, and umask. Output is decoded once after each pipe closes, just as in
+Delegated requests capture the caller's current environment and absolute working
+directory. Commands inherit the umask the helper started with; reading the
+umask in Node briefly sets it to zero for the whole process, which would race
+with other threads. Output is decoded once after each pipe closes, just as in
 the direct host. Signal termination retains the host's existing status mapping
 (`null` becomes `1`). Spawn errors retain Node's error codes and command
 metadata. Transport failure rejects outstanding and future requests; commands

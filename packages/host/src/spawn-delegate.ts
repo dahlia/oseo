@@ -176,7 +176,6 @@ export function createSpawnDelegate(
           service.send(
             {
               id,
-              umask: process.umask(),
               request: {
                 ...request,
                 cwd: resolvePath(request.cwd),

@@ -91,7 +91,7 @@ test("captures cwd and environment before sending", async () => {
     { EXPLICIT: "old" },
   );
   assert.equal(helper.requests[0]?.request.cwd, resolve("."));
-  assert.equal(helper.requests[0]?.umask, process.umask());
+  assert.equal(Object.hasOwn(helper.requests[0] ?? {}, "umask"), false);
   helper.emit("message", {
     id: 0,
     observation: { exitStatus: 0, stdout: "", stderr: "" },

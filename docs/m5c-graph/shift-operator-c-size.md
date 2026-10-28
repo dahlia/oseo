@@ -10,7 +10,7 @@ instrumentation commit `7adf8d40`, manifest unchanged) measured these
 paths. The timings include instrumentation overhead and a cold Zig cache,
 so treat them as relative.
 
-| Path under *test/language/expressions/*   | C bytes per variant | Compile and link, 4 variants |
+| Path under *test/language/expressions/*   | C bytes, 4 variants | Compile and link, 4 variants |
 | ----------------------------------------- | ------------------- | ---------------------------- |
 | *right-shift/S11.7.2\_A4\_T1.js*          | 101,471,532         | 50.245 s                     |
 | *right-shift/S11.7.2\_A4\_T2.js*          | 101,459,080         | 48.921 s                     |
@@ -21,7 +21,11 @@ so treat them as relative.
 | *unsigned-right-shift/S11.7.3\_A4\_T3.js* | 106,489,144         | 48.887 s                     |
 | *unsigned-right-shift/S11.7.3\_A4\_T4.js* | 106,475,884         | 47.772 s                     |
 
-Each variant emits about 100 MB of C and takes about 12 seconds to compile.
+Each path's four variants together emit about 100 MB of C, so each variant
+emits about 25 MB and takes about 12 seconds to compile and link. The
+phase report sums both columns over the four variants; the raw records for
+*right-shift/S11.7.2\_A4\_T1.js* show 25,363,858 to 25,371,908 bytes per
+variant.
 The left-shift siblings probably share the shape. An earlier tail study
 found the cause: in one variant of
 *unsigned-right-shift/S11.7.3\_A4\_T3.js*, 24.03 MB of its 26.49 MB of
