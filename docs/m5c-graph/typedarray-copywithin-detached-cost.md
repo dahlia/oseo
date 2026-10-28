@@ -68,6 +68,16 @@ site starts the hint through `oseo_internal_init_dense_index`. The hint is
 exact about the vector, so every lookup answer is unchanged; the Array
 length check and the slot check in front of it are unchanged.
 
+The hint's three fields are the last members of `OseoOrdinaryObject`.
+They first sat right after `array_length`, inside the flag prefix that
+*tests/fixtures/primitive-receiver-inherited-set/allocation.c* pins to its
+original layout, so candidate CI 40651934600 failed that fixture's
+`_Static_assert` on every lane: `number_value` sat 40 bytes after
+`array_length` instead of 16. The prefix has only three bytes of padding,
+too few for the fields, so they moved to the end, which keeps every member
+before them at its pre-hint offset. On x86-64 Linux the object grows from
+248 to 264 bytes; it was 272 with the fields inside the prefix.
+
 *packages/runtime-c/tests/fixtures/dense-index.c* is the contract test,
 run on the Zig lane (*packages/runtime-c/tests/dense-index.test.ts*) and
 the host-cc ASan and UBSan lane (*tests/runtime-dense-index.test.ts*),
@@ -129,3 +139,27 @@ Raw rows: */data/m5c-typedarray-copywithin-before-20261028/measure-before.log*
 and *measure-after.log* (the Array-only intermediate is
 *measure-after-arrayonly.log*), from the script
 */data/m5c-typedarray-copywithin-before-20261028/measure.mjs*.
+
+The same script, rerun on 2026-10-28 after the hint's fields moved to the
+end of the object, on the bundle branch with the commits that follow this
+one, gives the numbers below. Every run exited 0. They are lower than the
+after column above and the C bytes differ, because the later commits in the
+bundle also change the runtime and the generated code; they are not a
+measurement of the field move alone, which changes no lookup.
+
+| Path, variant                             | C bytes   | Execution | Compile and link |
+| ----------------------------------------- | --------- | --------- | ---------------- |
+| *end-detached.js*, sloppy, specialized    | 1,830,543 | 1.434 s   | 1.510 s          |
+| *end-detached.js*, sloppy, generic        | 1,420,793 | 1.152 s   | 1.240 s          |
+| *end-detached.js*, strict, specialized    | 1,890,424 | 1.405 s   | 1.609 s          |
+| *end-detached.js*, strict, generic        | 1,495,937 | 1.393 s   | 1.338 s          |
+| *end-detached-prototype.js*, sloppy, spec | 1,835,235 | 1.405 s   | 1.449 s          |
+| *end-detached-prototype.js*, sloppy, gen  | 1,424,926 | 1.163 s   | 1.426 s          |
+| *end-detached-prototype.js*, strict, spec | 1,895,390 | 1.406 s   | 1.397 s          |
+| *end-detached-prototype.js*, strict, gen  | 1,500,340 | 1.384 s   | 1.379 s          |
+| *start-detached.js*, sloppy, specialized  | 1,830,555 | 1.419 s   | 1.404 s          |
+| *start-detached.js*, sloppy, generic      | 1,420,805 | 1.167 s   | 1.255 s          |
+| *start-detached.js*, strict, specialized  | 1,890,436 | 1.415 s   | 1.414 s          |
+| *start-detached.js*, strict, generic      | 1,495,949 | 1.372 s   | 1.365 s          |
+
+Raw rows of that rerun: */data/m5c-perf-fix1/measure/results.json*.

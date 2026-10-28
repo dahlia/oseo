@@ -1504,19 +1504,6 @@ typedef struct {
     size_t private_element_count;
     size_t shape_id;
     uint32_t array_length;
-    /*
-     * An index lookup hint. While `dense_index_known` holds, slots
-     * [dense_index_base, dense_index_base + dense_index_count) store the
-     * array index keys 0 through dense_index_count - 1 in order and no
-     * other slot stores an array index, so an index lookup finds its
-     * slot or misses without a scan. A change the property-vector
-     * helpers cannot follow clears the flag for good, which restores the
-     * plain linear search. Every allocation starts it through
-     * oseo_internal_init_dense_index.
-     */
-    size_t dense_index_base;
-    uint32_t dense_index_count;
-    bool dense_index_known;
     bool dictionary;
     bool length_writable;
     /* [[Extensible]], false for frozen arrays and module namespaces. */
@@ -1613,6 +1600,21 @@ typedef struct {
     bool mapped_arguments;
     /* Non-NULL exactly on a generator object, which owns the record. */
     OseoGenerator *generator;
+    /*
+     * An index lookup hint. While `dense_index_known` holds, slots
+     * [dense_index_base, dense_index_base + dense_index_count) store the
+     * array index keys 0 through dense_index_count - 1 in order and no
+     * other slot stores an array index, so an index lookup finds its
+     * slot or misses without a scan. A change the property-vector
+     * helpers cannot follow clears the flag for good, which restores the
+     * plain linear search. Every allocation starts it through
+     * oseo_internal_init_dense_index. It follows every other member so
+     * that the flag prefix from array_length through number_value keeps
+     * its original layout.
+     */
+    size_t dense_index_base;
+    uint32_t dense_index_count;
+    bool dense_index_known;
 } OseoOrdinaryObject;
 
 /* A Proxy exotic retains its construction-time target and handler. */
