@@ -1,0 +1,17 @@
+version: 1
+id: test262-runner-main-thread-offload
+title: Offload test262 runner process spawning and C emission
+delivers: "Shortens the Full UPDATE observation pool by adding an opt-in
+  packages/host spawn helper, a small long-lived process that spawns
+  children so the large runner process no longer forks, and moving split
+  C emission in tools/test262.ts to a worker thread. The product CLI
+  default, the observation pool of 8, every output, and the manifest stay
+  unchanged; a Full UPDATE at the node writes no manifest change. Measured
+  on t1 with a cold Zig cache: 75.2 min at main 2df04b46 to 52.4 min.
+  Owns no test262 path; decision
+  ~/.local/state/oseo-m5c/decisions/test262-runner-main-thread-offload.md\
+  ."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

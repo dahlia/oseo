@@ -20,8 +20,8 @@ baseline:
   unreviewedPaths: 11190
   unsupportedProfileFeatures: 643
 summary:
-  nodes: 103
-  ready: 98
+  nodes: 107
+  ready: 102
   blocked: 5
   parked: 0
   landed: 61
@@ -57,6 +57,1026 @@ serializationPoints:
       digest together; never merge a digest from another observation
       set."
 collisions:
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-callable-family
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-callable-family
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-callable-family
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-callable-family
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-accounting
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-accounting
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-accounting
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-importcall-accounting
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-lexical-completion-family
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-lexical-completion-family
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-lexical-completion-family
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-lexical-completion-family
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-module-semantics
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-module-semantics
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-module-semantics
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-module-semantics
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-private-binding-family
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-private-binding-family
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-private-binding-family
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-private-binding-family
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-realm-string-family
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-realm-string-family
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-realm-string-family
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-realm-string-family
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-unknown-eval
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-unknown-eval
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-unknown-eval
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-unknown-eval
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-06
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-19
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-anchored-repeat-state-remediation
+      - regexp-property-escape-match-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-anchored-repeat-state-remediation
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-anchored-repeat-state-remediation
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-anchored-repeat-state-remediation
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - regexp-split-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - temporal-helpers-harness
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - typed-array-proto-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - unhandled-rejection-observation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - with-optional-call-receiver
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - with-optional-call-receiver-non-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-property-escape-match-cost
+      - with-optional-call-receiver-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-split-coverage-remediation
+      - shift-operator-c-size
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-split-coverage-remediation
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-split-coverage-remediation
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - temporal-helpers-harness
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - typed-array-proto-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - unhandled-rejection-observation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - with-optional-call-receiver
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - with-optional-call-receiver-non-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - shift-operator-c-size
+      - with-optional-call-receiver-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - temporal-helpers-harness
+      - test262-runner-main-thread-offload
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - temporal-helpers-harness
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-runner-main-thread-offload
+      - typed-array-proto-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-runner-main-thread-offload
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-runner-main-thread-offload
+      - unhandled-rejection-observation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-runner-main-thread-offload
+      - with-optional-call-receiver
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-runner-main-thread-offload
+      - with-optional-call-receiver-non-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-runner-main-thread-offload
+      - with-optional-call-receiver-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typed-array-proto-coverage-remediation
+      - typedarray-copywithin-detached-cost
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typedarray-copywithin-detached-cost
+      - unhandled-rejection-observation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typedarray-copywithin-detached-cost
+      - with-optional-call-receiver
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typedarray-copywithin-detached-cost
+      - with-optional-call-receiver-non-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - typedarray-copywithin-detached-cost
+      - with-optional-call-receiver-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - class-private-accessor-lookup-coverage-remediation
