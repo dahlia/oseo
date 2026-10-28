@@ -33,17 +33,20 @@ scope:
     non-strict code and throws ReferenceError in strict code, before a call
     evaluates its arguments; an ordinary call keeps the selected object as
     its receiver, and an abrupt HasProperty propagates before Get."
-  - "Known remaining defect: an optional call f?.() whose callee resolves
-    through a selected Object Environment Record passes undefined instead of
-    the selected object as its receiver. Native runs on 13ab5051 observed it
-    under both specialization policies. That commit precedes the
-    GetBindingValue correction above, which was not executed for this
-    program; static analysis shows the correction leaves the optional-chain
-    lowering unchanged. Active remediation node
+  - "An optional call f?.() outside tail position whose callee resolves
+    through a selected Object Environment Record receives WithBaseObject as
+    this, as the ordinary call does: the selected object, or undefined for
+    a lexical or global fallback, after GetBindingValue's own HasProperty
+    and Get. Node with-optional-call-receiver-non-tail admits it, recorded
+    in docs/m5c-graph/with-optional-call-receiver-non-tail.md."
+  - "Known remaining gap: strict tail-position optional calls through a
+    selected Object Environment Record, such as return f?.() in a strict
+    function nested in a with body. Active node
+    with-optional-call-receiver-tail owns their evidence, and the umbrella
     with-optional-call-receiver, recorded in
-    docs/m5c-graph/with-optional-call-receiver.md, owns it and blocks
-    m5-exit-audit. This record claims no optional-call receiver behavior
-    through with until that node lands."
+    docs/m5c-graph/with-optional-call-receiver.md, blocks m5-exit-audit
+    until it lands. This record claims no tail-position optional-call
+    receiver behavior through with."
 owners:
   - PLAN-M5.md
 evidence:
@@ -68,11 +71,13 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/array-prototype-index-search.ts
+      - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/with-get-binding-value.ts
       - tests/property/m5-array-prototype-index-search.property.test.ts
       - tests/property/m5-global-object-record.property.test.ts
       - tests/property/m5-globalthis-binding.property.test.ts
       - tests/property/m5-object-binding.property.test.ts
+      - tests/property/m5-optional-chaining.property.test.ts
   generated:
     status: covered
     references:
@@ -81,6 +86,7 @@ evidence:
       - tests/property/m5-global-object-record.property.test.ts
       - tests/property/m5-globalthis-binding.property.test.ts
       - tests/property/m5-object-binding.property.test.ts
+      - tests/property/m5-optional-chaining.property.test.ts
   guard-fallback:
     status: covered
     references:

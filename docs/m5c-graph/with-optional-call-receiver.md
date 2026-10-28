@@ -105,6 +105,12 @@ and line 3685 otherwise. The ordinary call path asks `lowerWithRead` to retain
 the receiver and passes the selected object, or `undefined` for a lexical or
 global fallback. On `13ab5051` the same lines are 3564, 3572, 3659, and 3677.
 
+`with-optional-call-receiver-non-tail` changes this lowering to read such a
+base through `lowerWithRead` with the receiver retained when the first link
+is a call.
+[*with-optional-call-receiver-non-tail.md*](./with-optional-call-receiver-non-tail.md)
+records the repair and its evidence outside tail position.
+
 
 Repair and evidence contract
 ----------------------------

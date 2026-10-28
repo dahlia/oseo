@@ -1206,6 +1206,109 @@ test("consults object environments before the typeof fallback", () => {
   }
 });
 
+/** One optional-chain call link and the receivers that can reach it. */
+interface OptionalCallLink {
+  /**
+   * The receiver each jump into the link's callee and receiver join
+   * passes, or the receiver itself when no join defines it.
+   */
+  readonly incoming: readonly number[];
+  readonly receiver: number;
+  readonly tail: boolean;
+}
+
+/** The optional-chain call links of one compiled program. */
+interface OptionalCallReceivers {
+  readonly calls: readonly OptionalCallLink[];
+  /** Operands of every `in` test, including GetBindingValue's own. */
+  readonly inOperands: ReadonlySet<number>;
+  readonly undefinedValues: ReadonlySet<number>;
+}
+
+/** Collects the receivers that reach each optional call link of `source`. */
+function optionalCallReceivers(source: string): OptionalCallReceivers {
+  const result = compileSource(babelFrontend, {
+    source,
+    sourceId: "with-optional-call.js",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  const calls: OptionalCallLink[] = [];
+  const inOperands = new Set<number>();
+  const undefinedValues = new Set<number>();
+  for (const body of [result.mir.script, ...result.mir.functions]) {
+    const operations = body.blocks.flatMap((block) => block.operations);
+    for (const operation of operations) {
+      if (operation.kind === "binary" && operation.operator === "in") {
+        for (const operand of operation.arguments) inOperands.add(operand);
+      }
+      if (
+        operation.kind === "constant" &&
+        operation.constant?.kind === "undefined"
+      ) {
+        undefinedValues.add(operation.id);
+      }
+    }
+    for (const operation of operations) {
+      if (operation.detail !== "optional chain function value") continue;
+      const [callee, receiver] = operation.arguments;
+      assert.ok(callee != null && receiver != null);
+      const join = body.blocks.find(
+        (block) =>
+          block.parameters?.[0] === callee && block.parameters[1] === receiver,
+      );
+      const incoming =
+        join == null
+          ? [receiver]
+          : body.blocks.flatMap((block) =>
+              block.terminator.kind === "jump" &&
+              block.terminator.target === join.id
+                ? [block.terminator.values?.[1] ?? -1]
+                : [],
+            );
+      calls.push({ incoming, receiver, tail: operation.tail === true });
+    }
+  }
+  return { calls, inOperands, undefinedValues };
+}
+
+test("passes the with base object to a non-tail optional call", () => {
+  // WithBaseObject is the selected object, which GetBindingValue's own
+  // HasProperty tests, or `undefined` once every object environment
+  // misses. Both reach the call link through the join that also carries
+  // the callee, including from a strict function nested in the body.
+  for (const source of [
+    "var o = {}; with (o) { f?.(1); }",
+    "var o = {}; with (o) { (f)?.(1)?.(2); }",
+    "var o = {};\n" +
+      "with (o) {\n" +
+      '  (function () { "use strict"; var r = f?.(1); return r; })();\n' +
+      "}",
+    "var o = {}; with (o) { (function () { return f?.(1); })(); }",
+  ]) {
+    const { calls, inOperands, undefinedValues } =
+      optionalCallReceivers(source);
+    const [first, ...rest] = calls;
+    assert.ok(first != null, source);
+    assert.equal(first.tail, false, source);
+    assert.equal(first.incoming.length, 2, source);
+    const [selected, fallback] = first.incoming;
+    assert.ok(selected != null && fallback != null, source);
+    assert.ok(inOperands.has(selected), source);
+    assert.ok(!undefinedValues.has(selected), source);
+    assert.ok(undefinedValues.has(fallback), source);
+    // A later call link calls the previous result with no receiver.
+    for (const call of rest) {
+      assert.deepEqual(call.incoming, [call.receiver], source);
+      assert.ok(undefinedValues.has(call.receiver), source);
+    }
+  }
+  // A comma callee is a value, not a Reference, so it keeps `undefined`.
+  const comma = optionalCallReceivers("var o = {}; with (o) { (0, f)?.(1); }");
+  assert.equal(comma.calls.length, 1);
+  assert.ok(comma.undefinedValues.has(comma.calls[0]?.receiver ?? -1));
+});
+
 test("reads typeof of an assigned with name from the global object", () => {
   // A sloppy all-miss assignment writes the realm global object's
   // property, and every typeof of the same name reads that property, so
