@@ -945,7 +945,6 @@ results:
       - dynamic-source
       - functions
       - generators
-      - promise-settlement
     observation:
       errorType: SyntaxError
       failedPhase: parse

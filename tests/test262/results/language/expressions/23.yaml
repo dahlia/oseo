@@ -915,7 +915,6 @@ results:
       - async-functions
       - dynamic-source
       - functions
-      - promise-settlement
     observation:
       errorType: SyntaxError
       failedPhase: parse

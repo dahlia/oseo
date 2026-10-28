@@ -1211,7 +1211,6 @@ results:
       - dynamic-source
       - expression-operators
       - functions
-      - promise-settlement
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -1240,7 +1239,6 @@ results:
       - expression-operators
       - functions
       - generators
-      - promise-settlement
     observation:
       errorType: SyntaxError
       failedPhase: parse

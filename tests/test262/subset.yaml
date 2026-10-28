@@ -109579,103 +109579,55 @@ tests:
       [dynamic-source, expression-operators, functions, lexical-bindings]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-new-call-expression.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-rest-param.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-not-extensible-args.js
     expectedClassification: expected-negative
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        object-literals,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-typeof-import.js
     expectedClassification: expected-negative
     dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        expression-operators,
-        functions,
-        promise-settlement,
-      ]
+      [async-functions, dynamic-source, expression-operators, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-new-call-expression.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-rest-param.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-not-extensible-args.js
     expectedClassification: expected-negative
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        object-literals,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-typeof-import.js
     expectedClassification: expected-negative
     dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        expression-operators,
-        functions,
-        promise-settlement,
-      ]
+      [async-functions, dynamic-source, expression-operators, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-new-call-expression.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-rest-param.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-not-extensible-args.js
     expectedClassification: expected-negative
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        object-literals,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-typeof-import.js
     expectedClassification: expected-negative
     dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        expression-operators,
-        functions,
-        promise-settlement,
-      ]
+      [async-functions, dynamic-source, expression-operators, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -109687,81 +109639,37 @@ tests:
     dependencies: [async-functions, dynamic-source, functions, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-new-call-expression.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-rest-param.js
     expectedClassification: expected-negative
-    dependencies:
-      [async-functions, dynamic-source, functions, promise-settlement]
+    dependencies: [async-functions, dynamic-source, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-not-extensible-args.js
     expectedClassification: expected-negative
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        object-literals,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-typeof-import.js
     expectedClassification: expected-negative
     dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        expression-operators,
-        functions,
-        promise-settlement,
-      ]
+      [async-functions, dynamic-source, expression-operators, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-typeof-import.js
     expectedClassification: expected-negative
     dependencies:
       [async-functions, dynamic-source, expression-operators, functions]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        generators,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, generators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-new-call-expression.js
     expectedClassification: expected-negative
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        generators,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, generators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-rest-param.js
     expectedClassification: expected-negative
-    dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        generators,
-        promise-settlement,
-      ]
+    dependencies: [async-functions, dynamic-source, functions, generators]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-not-extensible-args.js
     expectedClassification: expected-negative
     dependencies:
-      [
-        async-functions,
-        dynamic-source,
-        functions,
-        generators,
-        object-literals,
-        promise-settlement,
-      ]
+      [async-functions, dynamic-source, functions, generators, object-literals]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-typeof-import.js
     expectedClassification: expected-negative
     dependencies:
@@ -109771,7 +109679,6 @@ tests:
         expression-operators,
         functions,
         generators,
-        promise-settlement,
       ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-assignment-expr-not-optional.js
     expectedClassification: expected-negative
@@ -138514,22 +138421,19 @@ tests:
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-body.js
     expectedClassification: expected-negative
-    dependencies:
-      [functions, module-linking, promise-settlement, top-level-await]
+    dependencies: [functions, module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-params.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-body.js
     expectedClassification: expected-negative
-    dependencies:
-      [functions, module-linking, promise-settlement, top-level-await]
+    dependencies: [functions, module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-params.js
     expectedClassification: expected-negative
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-no-escaped-await.js
     expectedClassification: expected-negative
-    dependencies:
-      [lexical-grammar, module-linking, promise-settlement, top-level-await]
+    dependencies: [lexical-grammar, module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-array-literal.js
     expectedClassification: pass
     dependencies:

@@ -892,7 +892,6 @@ results:
       - dynamic-source
       - expression-operators
       - functions
-      - promise-settlement
     observation:
       errorType: SyntaxError
       failedPhase: parse

@@ -879,7 +879,6 @@ results:
       - dynamic-source
       - functions
       - object-literals
-      - promise-settlement
     observation:
       errorType: SyntaxError
       failedPhase: parse

@@ -654,7 +654,6 @@ results:
       - functions
       - generators
       - object-literals
-      - promise-settlement
     observation:
       errorType: SyntaxError
       failedPhase: parse
