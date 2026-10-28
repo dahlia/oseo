@@ -2,9 +2,16 @@
 import assert from "node:assert/strict";
 import { fork, spawn } from "node:child_process";
 import { once } from "node:events";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  realpath,
+  rm,
+  symlink,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import test, { describe } from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
@@ -79,6 +86,31 @@ describe(
         await delegated.close();
       }
     });
+
+    test(
+      "a relative cwd resolves .. after symlinks, like direct spawning",
+      { skip: process.platform === "win32" },
+      async () => {
+        const root = await mkdtemp(join(tmpdir(), "oseo-spawn-cwd-"));
+        const direct = createNodeHost();
+        const delegated = createNodeHost({ delegateSpawns: true });
+        try {
+          await mkdir(join(root, "real", "nested"), { recursive: true });
+          await symlink(join(root, "real", "nested"), join(root, "link"));
+          const request = {
+            ...nodeRequest("process.stdout.write(process.cwd())"),
+            // join() would normalize `link/..` away, so append it by hand.
+            cwd: `${relative(process.cwd(), join(root, "link"))}${sep}..`,
+          };
+          const expected = await direct.run(request);
+          assert.equal(expected.stdout, await realpath(join(root, "real")));
+          assert.deepEqual(await delegated.run(request), expected);
+        } finally {
+          await delegated.close();
+          await rm(root, { recursive: true, force: true });
+        }
+      },
+    );
 
     test("routes complete large concurrent responses", async () => {
       const host = createNodeHost({ delegateSpawns: true });

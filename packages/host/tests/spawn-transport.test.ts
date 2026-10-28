@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop -- Each failure owns one isolated service. */
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
-import { resolve } from "node:path";
+import { sep } from "node:path";
 import test from "node:test";
 
 import type { ProcessRequest } from "@oseo/compiler";
@@ -90,7 +90,7 @@ test("captures cwd and environment before sending", async () => {
     { ...helper.requests[0]?.request.environment?.variables },
     { EXPLICIT: "old" },
   );
-  assert.equal(helper.requests[0]?.request.cwd, resolve("."));
+  assert.equal(helper.requests[0]?.request.cwd, `${process.cwd()}${sep}.`);
   assert.equal(Object.hasOwn(helper.requests[0] ?? {}, "umask"), false);
   helper.emit("message", {
     id: 0,

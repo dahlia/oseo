@@ -1,7 +1,7 @@
 import { fork } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import type { EventEmitter } from "node:events";
-import { resolve as resolvePath } from "node:path";
+import { isAbsolute, sep } from "node:path";
 import type { ProcessObservation, ProcessRequest } from "@oseo/compiler";
 import { isSpawnResponse, restoreSpawnError } from "./spawn-protocol.ts";
 import type { SpawnRequest } from "./spawn-protocol.ts";
@@ -41,6 +41,17 @@ function snapshotEnvironment(
     if (value != null) snapshot[name] = value;
   }
   return snapshot;
+}
+
+/**
+ * Anchor a relative cwd to the caller's directory without normalizing it.
+ * The operating system must resolve `..` after symlinks, exactly as a
+ * direct spawn from the caller would; `path.resolve` would collapse
+ * `link/..` lexically and select a different directory.
+ */
+function anchorCwd(cwd: string): string {
+  if (cwd === "") return process.cwd();
+  return isAbsolute(cwd) ? cwd : `${process.cwd()}${sep}${cwd}`;
 }
 
 /** Host-local spawn service; closing drains requests and releases its IPC. */
@@ -178,7 +189,7 @@ export function createSpawnDelegate(
               id,
               request: {
                 ...request,
-                cwd: resolvePath(request.cwd),
+                cwd: anchorCwd(request.cwd),
                 environment: {
                   variables: snapshotEnvironment(
                     request.environment?.variables ?? process.env,
