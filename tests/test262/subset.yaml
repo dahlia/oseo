@@ -106729,6 +106729,7 @@ tests:
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
       ]
   - path: test/language/expressions/dynamic-import/assignment-expression/unary-expr.js
     expectedClassification: unsupported-profile-feature
@@ -108636,7 +108637,6 @@ tests:
         control-flow,
         dynamic-source,
         error-intrinsics,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -109089,7 +109089,6 @@ tests:
         control-flow,
         dynamic-source,
         error-intrinsics,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -136369,7 +136368,7 @@ tests:
   - path: test/language/literals/regexp/u-null-character-escape.js
     expectedClassification: pass
     dependencies:
-      [functions, object-properties, regular-expressions, var-bindings]
+      [functions, object-properties, regular-expressions, symbols, var-bindings]
   - path: test/language/literals/regexp/u-surrogate-pairs-atom-char-class.js
     expectedClassification: pass
     dependencies: [functions, object-properties, regular-expressions]
@@ -138433,13 +138432,7 @@ tests:
   - path: test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        dynamic-source,
-        module-linking,
-        promise-settlement,
-        top-level-await,
-      ]
+      [dynamic-source, module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/block-await-expr-array-literal.js
     expectedClassification: pass
     dependencies:
@@ -139910,18 +139903,11 @@ tests:
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-array-literal.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        module-linking,
-        object-properties,
-        promise-settlement,
-        top-level-await,
-      ]
+      [module-linking, object-properties, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-func-expression.js
     expectedClassification: pass
     dependencies:
       [
-        abrupt-completion,
         functions,
         module-linking,
         object-properties,
@@ -139931,30 +139917,20 @@ tests:
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-identifier.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        module-linking,
-        promise-settlement,
-        top-level-await,
-        var-bindings,
-      ]
+      [module-linking, promise-settlement, top-level-await, var-bindings]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-literal-number.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-literal-string.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-nested.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-new-expr.js
     expectedClassification: pass
     dependencies:
       [
-        abrupt-completion,
         functions,
         module-linking,
         object-properties,
@@ -139963,13 +139939,11 @@ tests:
       ]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-null.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-obj-literal.js
     expectedClassification: pass
     dependencies:
       [
-        abrupt-completion,
         functions,
         module-linking,
         object-literals,
@@ -139981,7 +139955,6 @@ tests:
     expectedClassification: pass
     dependencies:
       [
-        abrupt-completion,
         module-linking,
         object-properties,
         promise-settlement,
@@ -139990,12 +139963,10 @@ tests:
       ]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-template-literal.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/try-await-expr-this.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, module-linking, promise-settlement, top-level-await]
+    dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/typeof-await-expr-array-literal.js
     expectedClassification: pass
     dependencies:

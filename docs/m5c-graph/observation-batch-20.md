@@ -18,7 +18,7 @@ from the saved phase/type-correct runner classification.
 | Raw observations, first segment        | /data/m5c-b19-b20-b30-20261027/observation-6aab/raw/observations.json                                 |
 | Raw observations, continuation         | /data/m5c-b19-b20-b30-20261027/observation-6aab/continuation/raw/observations.json                    |
 | Raw observations, remaining 904        | /data/m5c-b19-b20-b30-20261027/observation-6aab/remaining-904/raw/observations.json                   |
-| Exact source hashes and tag derivation | /data/m5c-b19-b20-b30-20261027/task\_c268e41dfa6d/ctx\_e6fde0372f06/round7/reviewed-tag-evidence.json |
+| Exact source hashes and tag derivation | /data/m5c-b19-b20-b30-20261027/task\_c268e41dfa6d/ctx\_e6fde0372f06/round8/reviewed-tag-evidence.json |
 
 The 66 unknown-eval and 393 ImportExpression rejections across this train
 belong to `dynamic-source-coverage-remediation`. The 12 await-in-top-level
@@ -58,7 +58,8 @@ A tag records the asserted source subject and operations necessarily
 performed. Failure-only assertion throws, diagnostic arguments, harness
 plumbing, and uncalled bodies supply no runtime coverage. Syntax-family
 tags can describe explicitly tested grammar, including operator early
-errors. Expected runtime/resolution errors and observed rejection retain
+errors. Normally completing try syntax alone proves no abrupt operation.
+Expected runtime/resolution errors and observed rejection retain
 abrupt-completion and their asserted named error-family tags.
 
 Generic syntax/runtime tags derive from the primary test and includes.
@@ -70,16 +71,16 @@ coercions, object-valued await reads, and heritage prototype reads.
 
 All counts below describe the **full dispatch**, comparing `3a0e7449`
 with the current subset. They come from the
-[full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round7/all-dispatch-tag-changes.json).
-It changes 969 rows across the train and 347 owned rows here. The latest
-[correction-round delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round7/tag-changes.json)
-describes the separate comparison from `387bef0e` to this correction. Its
+[full dispatch delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round8/all-dispatch-tag-changes.json).
+It changes 961 rows across the train and 340 owned rows here. The latest
+[correction-round delta](/data/m5c-b19-b20-b30-20261027/task_c268e41dfa6d/ctx_e6fde0372f06/round8/tag-changes.json)
+describes the separate comparison from `a5d1d3f6` to this correction. Its
 per-round counts must not be compared with the full dispatch totals. Both
 artifacts agree with the current source-tag evidence and subset.
 
-Added tag counts for the full dispatch:
+Added tag counts for owned rows in this full-dispatch slice:
 
- -  abrupt-completion: 48
+ -  abrupt-completion: 36
  -  async-iteration: 12
  -  classes: 10
  -  control-flow: 104
@@ -94,7 +95,7 @@ Added tag counts for the full dispatch:
  -  set-intrinsic: 1
  -  symbols: 27
 
-Removed tag counts for the full dispatch:
+Removed tag counts for owned rows in this full-dispatch slice:
 
  -  dynamic-source: 2
  -  lexical-grammar: 3
