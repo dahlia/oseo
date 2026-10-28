@@ -2134,7 +2134,17 @@ Because the subset still declares `TemporalHelpers`, the runner's
 object-literal definitions. A case that may read an omitted member, through
 a static read of that member or any non-static use of the object, stays an
 explicit unsupported result instead of failing in the harness. No other
-reviewed include is affected. A focused precheck observes the three paths
-as pass; the manifest records them as unsupported until the full UPDATE.
-The [IH-B work note](./docs/m5c-graph/temporal-helpers-harness.md) records
-the decision, its tests and the raw packet.
+reviewed include is affected. A focused precheck observed the three paths
+as pass before the full UPDATE.
+
+Root accepted the full UPDATE on U `6c0d46bd`: all 29,901 reviewed paths
+were observed, yielding 26,459 passes, 2,802 expected negatives and 640
+unsupported paths. It records exactly three promotions, the three
+*Iterator/from/* paths from `unsupported-profile-feature` to pass, and no
+demotions or failure classifications. The ledger now assigns them to
+`observation`, so `temporal-helpers-harness` owns no path. Carried
+onto Main `915ec6df` without a new observation, the same records give
+26,957 passes, 3,242 expected negatives and 1,111 unsupported paths
+across 31,310 reviewed cases. The
+[IH-B work note](./docs/m5c-graph/temporal-helpers-harness.md) records
+the decision, its tests and the raw packets.

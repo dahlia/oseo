@@ -20,7 +20,7 @@ in this worktree.
 | `c814b5c5` with pool 16, never-merge `dff06dd0` | 16   | 2,222.208 s (37.0 min), −51% | `written=0`, 29,901 tests, `retries=0` |
 
 All three report 26,456 passes, 2,802 expected negatives and 643
-unsupported, the same totals as the checked-in manifest. In the pool 16
+unsupported, the totals then checked in. In the pool 16
 run, cgroup memory, page cache included, reached its 52 GiB cap without an
 OOM or retry. That run is diagnostic only: this node keeps pool eight, and
 raising it is a separate follow-up that needs a D13 evidence text change,

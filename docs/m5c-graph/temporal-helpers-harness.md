@@ -112,9 +112,9 @@ process was awaited once through `m5c-wait`. The run in *precheck1/* and
 *precheck1-gate/* observed all three paths as pass: 12 split native
 variants, zero retries, no errors, and unchanged tracked inputs. The
 packet keeps *inputs.json*, per-path attempts with raw stdout and stderr,
-and *summary.json*. This is not the D3 regeneration, which still records
-the three paths as unsupported in the checked-in manifest until Root's
-UPDATE.
+and *summary.json*. This focused run was not the D3 regeneration; at the
+time the checked-in manifest still recorded the three paths as
+unsupported. The accepted full observation below supersedes it.
 
 Capacity-wrapped `mise run check` exited zero naturally (*check1/*). The
 focused validation in *focused1/* ran 12 runner-adjacent test files: the
@@ -130,3 +130,33 @@ cross-compile aarch64-linux-musl.” That lane has no cross-compiler, and no
 host-cc task runs this file. No native fixture,
 property file, seed, case budget or deadline changes, because the runtime,
 compiler and backend are untouched.
+
+
+Accepted full observation
+-------------------------
+
+Root accepted exactly one normal
+`mise run test262:update -- --accept-promotions` on clean U
+`6c0d46bd`, which carries this node's two commits and the
+`with-optional-call-receiver-non-tail` commits on base `5eaf2c12`. It ran
+from 2026-10-28T18:04:59Z to 19:18:14Z with natural exit zero, 4,394.9
+seconds of wall time, pool eight and zero retries. All 29,901 reviewed
+paths were observed: 26,459 passes, 2,802 expected negatives and 640
+unsupported paths, with no semantic, harness or infrastructure failures.
+It records exactly three promotions, the three *Iterator/from/* paths in
+the selection rule from `unsupported-profile-feature` to pass, and no
+demotions. Raw argv, capacity, timing and exit status are in
+*/data/m5c-ihb-woc1-20261029/full-6c0d46bd/full.json*; *full.stdout* and
+*full.stderr* in that directory preserve the unfiltered output.
+
+These records were carried onto Main `915ec6df`, which reviews 31,310
+paths after observation batch 19 landed. The three partition records and
+subset expectations apply unchanged; `mise run test262:reindex` and the
+repository ledger and batch tasks recompute the derived files, giving
+26,957 passes, 3,242 expected negatives and 1,111 unsupported paths. This
+carry-forward observed nothing, so it is not a full UPDATE on Main.
+
+The three paths now belong to `observation` in the regenerated closure
+ledger, so `node:temporal-helpers-harness` owns no path. No other
+classification moves. The landed flag and the dependency and
+publication gates remain Root's.

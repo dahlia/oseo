@@ -16,8 +16,9 @@ scope:
     manifest UPDATE on U a678c85e confirms 389 promotions and four
     unsupported paths. IH-B admits a reviewed temporalHelpers.js subset for
     three of them; its focused precheck, recorded in
-    docs/m5c-graph/temporal-helpers-harness.md, observes them as pass,
-    and the manifest records them as unsupported until its full UPDATE."
+    docs/m5c-graph/temporal-helpers-harness.md, observed them as pass,
+    and the accepted full manifest UPDATE on U 6c0d46bd promotes exactly
+    those three paths to pass with no demotions."
 owners:
   - PLAN-M5.md
 evidence:
