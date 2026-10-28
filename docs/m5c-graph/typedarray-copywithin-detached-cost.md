@@ -95,9 +95,10 @@ carry UBSan instrumentation but no ASan; the host-cc ASan coverage above
 belongs to the fixture, not to the timings. “Execution” is `Date.now()` around
 the whole program inside the native run; “compile and link” is the CLI wall
 time minus it; “C bytes” is the `--emit-c` output. The phase report's
-per-variant C bytes, about 3.7 MB above, are not the `--emit-c` count, so
-compare only within one method. Before is commit G `e2ff16d4` exported to a
-separate directory; after is this change. Every run exited 0.
+C-byte totals above, about 3.7 MB over four variants (about 0.92 MB per
+variant), are not the `--emit-c` count, so compare only within one method.
+Before is commit G `e2ff16d4` exported to a separate directory; after is this
+change. Every run exited 0.
 
 | Path, variant                             | C bytes   | Execution before | Execution after | Compile and link before → after |
 | ----------------------------------------- | --------- | ---------------- | --------------- | ------------------------------- |
