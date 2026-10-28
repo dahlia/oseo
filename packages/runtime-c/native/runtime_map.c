@@ -118,6 +118,7 @@ static OseoResult map_allocate(
     map->ordinary.properties = NULL;
     map->ordinary.property_capacity = 0u;
     map->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&map->ordinary);
     map->ordinary.private_elements = NULL;
     map->ordinary.private_element_capacity = 0u;
     map->ordinary.private_element_count = 0u;
@@ -737,6 +738,7 @@ static OseoResult map_create_iterator(
     iterator->ordinary.properties = NULL;
     iterator->ordinary.property_capacity = 0u;
     iterator->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&iterator->ordinary);
     iterator->ordinary.private_elements = NULL;
     iterator->ordinary.private_element_capacity = 0u;
     iterator->ordinary.private_element_count = 0u;

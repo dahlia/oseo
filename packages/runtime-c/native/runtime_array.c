@@ -555,6 +555,7 @@ static OseoResult array_create_with_prototype(
     array->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     array->array_length = (uint32_t)length;
+    oseo_internal_init_dense_index(array);
     array->dictionary = false;
     array->length_writable = true;
     array->extensible = true;
@@ -2458,6 +2459,7 @@ OseoResult oseo_array_append(
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     array->property_count += 1u;
+    oseo_internal_note_property_inserted(array, array->property_count - 1u);
     array->array_length = index + 1u;
     array->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;

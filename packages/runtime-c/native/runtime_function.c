@@ -1398,6 +1398,7 @@ OseoResult oseo_function_create(
     function->ordinary.properties = NULL;
     function->ordinary.property_capacity = 0u;
     function->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&function->ordinary);
     function->ordinary.private_elements = NULL;
     function->ordinary.private_element_capacity = 0u;
     function->ordinary.private_element_count = 0u;

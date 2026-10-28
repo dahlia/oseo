@@ -1324,6 +1324,7 @@ static OseoResult date_allocate(
     date->ordinary.properties = NULL;
     date->ordinary.property_capacity = 0u;
     date->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&date->ordinary);
     date->ordinary.private_elements = NULL;
     date->ordinary.private_element_capacity = 0u;
     date->ordinary.private_element_count = 0u;

@@ -386,6 +386,7 @@ static OseoResult promise_allocate(
     promise->ordinary.properties = NULL;
     promise->ordinary.property_capacity = 0u;
     promise->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&promise->ordinary);
     promise->ordinary.private_elements = NULL;
     promise->ordinary.private_element_capacity = 0u;
     promise->ordinary.private_element_count = 0u;

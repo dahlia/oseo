@@ -108,6 +108,7 @@ static void array_buffer_initialize(
     buffer->ordinary.properties = NULL;
     buffer->ordinary.property_capacity = 0u;
     buffer->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&buffer->ordinary);
     buffer->ordinary.private_elements = NULL;
     buffer->ordinary.private_element_capacity = 0u;
     buffer->ordinary.private_element_count = 0u;
