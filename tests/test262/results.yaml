@@ -21132,9 +21132,9 @@ summary:
       expectedNegatives: 18
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1654
+      passes: 1642
       semanticFailures: 0
-      unsupportedProfileFeatures: 211
+      unsupportedProfileFeatures: 210
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -21239,7 +21239,7 @@ summary:
       infrastructureFailures: 0
       passes: 4883
       semanticFailures: 0
-      unsupportedProfileFeatures: 276
+      unsupportedProfileFeatures: 274
     - dependency: functions
       expectedNegatives: 814
       harnessFailures: 0
@@ -21377,9 +21377,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2065
+      passes: 2066
       semanticFailures: 0
-      unsupportedProfileFeatures: 139
+      unsupportedProfileFeatures: 140
     - dependency: top-level-await
       expectedNegatives: 11
       harnessFailures: 0

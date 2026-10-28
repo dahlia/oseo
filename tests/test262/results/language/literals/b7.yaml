@@ -17,6 +17,7 @@ results:
       - functions
       - object-properties
       - regular-expressions
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:

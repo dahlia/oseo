@@ -822,7 +822,6 @@ results:
       - control-flow
       - dynamic-source
       - error-intrinsics
-      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings
