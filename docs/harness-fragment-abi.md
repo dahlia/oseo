@@ -300,6 +300,15 @@ the separate binding-access charge changes whole-Script entry C.
 Replaying backend commit `fb5d1cb0` reproduces all 44 prior hashes;
 printed HIR/MIR and non-source metadata remain unchanged.
 
+M5c node `shift-operator-c-size` moves 26 records: a completion dispatch
+now names only the blocks a `completion-set` of its function saves as
+targets, instead of every block. The pre-change backend of commit
+`e2ff16d4` reproduces all 44 prior hashes. With outlining and unit
+splitting disabled in copies of both backends, the emitted C differs only
+by removed `case` lines inside completion dispatch switches; printed
+HIR/MIR are unchanged. Outlining then splits the shorter bodies at other
+points, so helper boundaries and unit numbers also move.
+
 
 Stage 2 interfaces and ownership
 --------------------------------

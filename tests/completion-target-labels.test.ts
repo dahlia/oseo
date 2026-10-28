@@ -7,7 +7,8 @@ import { babelFrontend } from "../packages/parser-babel/src/index.ts";
 
 /*
  * A completion target is entered only through a `resume-completion`
- * switch, which names every block emitted for the same body. When every
+ * switch, which names every completion target emitted for the same body.
+ * When every
  * `finally` of a body leaves abruptly, no such switch exists, so the
  * backend must not emit those targets either: their labels would have no
  * `goto`, which `-Werror` rejects as an unused label. These programs
@@ -213,4 +214,82 @@ console.log([...g()].join(), [...g(0)].join(), log.join());
   assert.match(text, new RegExp(`^\\s*bb${target}:;$`, "mu"));
   assert.match(text, /oseo_number\(2\.0\)/u);
   assert.doesNotMatch(text, /^\s*bb0:;$/mu);
+});
+
+/** One completion dispatch switch, capturing its case lines. */
+const dispatchPattern = /switch \(completion\[\d+u\]\.target\) \{\n([^}]*)\}/gu;
+
+/** Saved nonzero completion targets of a body, in ascending order. */
+function savedTargets(text: string): readonly number[] {
+  return [
+    ...new Set(
+      [...text.matchAll(/completion\[\d+u\]\.target = (\d+)u;/gu)]
+        .map((match) => Number(match[1]))
+        .filter((target) => target !== 0),
+    ),
+  ].toSorted((left, right) => left - right);
+}
+
+test("a dispatch names exactly the saved completion targets", () => {
+  const source = emit(`"use strict";
+let log = [];
+function f(n) {
+  log.push("a");
+  a: { try { if (n === 1) break a; } finally { log.push("b"); } }
+  log.push("c");
+  for (let i = 0; i < 2; i++) {
+    try { if (n === i) continue; log.push(i); } finally { log.push("d"); }
+  }
+  b: { try { if (n) break b; return 3; } finally { log.push("e"); } }
+  return 2;
+}
+console.log(f(0), f(1), log.join());
+`);
+  // The body is outlined into helpers, so read every dispatch of the unit;
+  // only `f` saves completion targets.
+  const saved = savedTargets(source);
+  assert.ok(saved.length >= 4, saved.join());
+  const dispatches = [...source.matchAll(dispatchPattern)];
+  assert.equal(dispatches.length, 3);
+  for (const [, cases] of dispatches) {
+    const named = [...cases!.matchAll(/^\s*case (\d+)u: /gmu)].map((match) =>
+      Number(match[1]),
+    );
+    assert.deepEqual(named, saved);
+  }
+});
+
+/** `count` guarded throws in the shape of test262's shift checks. */
+function guardedThrows(count: number): string {
+  return Array.from(
+    { length: count },
+    (_, index) =>
+      `if (${index} >>> 0 !== ${index}) ` +
+      `{ throw new Error("#${index}: " + (${index} >>> 0)); }`,
+  ).join("\n");
+}
+
+test("dispatch without a saved target names no blocks", () => {
+  // The shape of test262's S11.7.*_A4 shift checks: hundreds of guarded
+  // throws, each with its own completion dispatch but no saved jump
+  // destination. Naming every block of the body in every dispatch made
+  // the C quadratic in the statement count.
+  const sizes = [32, 64].map((count) => {
+    const compiled = compileSource(
+      babelFrontend,
+      { source: guardedThrows(count), sourceId: "shift-shape.js" },
+      { specialization: "enabled" },
+    );
+    assert.deepEqual(compiled.diagnostics, []);
+    assert.ok(compiled.mir != null);
+    const emitted = cBackend.emit(compiled.mir).source;
+    const dispatches = [...emitted.matchAll(dispatchPattern)];
+    assert.ok(dispatches.length >= count, `${dispatches.length}`);
+    for (const [, cases] of dispatches) {
+      assert.match(cases!, /^\s*default: abort\(\);\s*$/u);
+    }
+    return emitted.length;
+  });
+  // Doubling the statements at most doubles the C, plus a fixed part.
+  assert.ok(sizes[1]! < 2.1 * sizes[0]!, sizes.join());
 });
