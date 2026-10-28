@@ -13,7 +13,7 @@
 // Every other TemporalHelpers member is omitted. Most construct, compare,
 // or assert on Temporal or Intl values, and admitting this file must not
 // admit either. The reviewed runner compares this object's members with
-// the upstream object's, so a case that reads an omitted member, or reads
+// the upstream object's, so a case that reads an omitted member, or names
 // TemporalHelpers in any way other than a static member access, stays an
 // explicit harness-definition observation instead of executing. Upstream's
 // SKIP_SYMBOL serves only the omitted substituteMethod and SUBSTITUTE_SKIP

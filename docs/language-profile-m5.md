@@ -9941,5 +9941,5 @@ generic `observeMethod`, `propertyBagObserver`, and `toPrimitiveObserver`
 helpers. A case that may read an omitted `TemporalHelpers` member stays an
 explicit `harness-definition` capability. Its focused precheck observes the
 three *Iterator/from/* paths as pass;
-[its work note](./docs/m5c-graph/temporal-helpers-harness.md) records the
+[its work note](./m5c-graph/temporal-helpers-harness.md) records the
 decision and evidence.

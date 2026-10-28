@@ -45,7 +45,8 @@ under *tests/test262/harness/*, so no byte-identical copy can be checked in.
 Of its 46 `TemporalHelpers` members, almost all construct, compare, or
 assert on Temporal or Intl values. Compiled with the base harness and one
 case, the unchanged file emits about 3.4 MB of C per variant against about
-137 KB without it.
+137 KB without it; */data/m5c-temporal-helpers-harness/c-size/* keeps both
+inputs and their measured sizes.
 
 *tests/test262/harness/temporalHelpers.js* keeps `observeMethod`,
 `propertyBagObserver`, the `toPrimitiveObserver` that
@@ -54,7 +55,8 @@ upstream `formatPropertyName` function and `ASCII_IDENTIFIER` pattern they
 log through. Each kept operation is unchanged apart from formatter spacing.
 Upstream's `SKIP_SYMBOL` serves only omitted members and is not
 reproduced. The copy reads no global outside `Number`, `Proxy`, `Reflect`,
-`String` and `Symbol`, so it admits no Temporal or Intl behavior;
+`String`, `Symbol` and `undefined`, plus each function's implicit
+`arguments`, so it admits no Temporal or Intl behavior;
 `supportedFeatures` is unchanged and `Temporal` remains unsupported.
 
 The existing `harness-definition` check compares only top-level `defines`
@@ -69,7 +71,11 @@ with capability `harness-definition`. A static read such as
 kept member executes as usual. Any other unresolved reference to the name,
 including a computed key, an alias, destructuring, or passing the object to
 a function, may reach an omitted member and is withheld. Scopes, `typeof`
-operands and `with` bodies follow the existing reference walk. An object
+operands and `with` bodies follow the existing reference walk. The check
+is syntactic and sees only the name itself: a read through another object
+that holds the global, such as `globalThis.TemporalHelpers`, or through
+source compiled at run time is not withheld. No reviewed path reads either
+way, and run-time source stays outside the admitted profile. An object
 whose literal has a spread or a non-literal computed key infers no
 omission. A sweep over every reviewed include found exactly one affected
 object, `TemporalHelpers`, with 43 omitted members, so no other reviewed
@@ -111,9 +117,16 @@ the three paths as unsupported in the checked-in manifest until Root's
 UPDATE.
 
 Capacity-wrapped `mise run check` exited zero naturally (*check1/*). The
-focused validation in *focused1/* ran the 12 test files that import the
-reviewed runner or its source module: 170/170 registrations under Node on
-the Zig lane and 170/170 under Deno. The six of them that build natively
-then passed 45/45 under Node on the host-cc lane. No native fixture,
+focused validation in *focused1/* ran 12 runner-adjacent test files: the
+11 that import *tools/test262.ts* or *tools/test262-source.ts* outside
+*tests/native-io/*, plus *tests/native-toolchains.test.ts*, which scans
+*tools/test262.ts*. They passed 170/170 registrations under Node on the
+Zig lane and 170/170 under Deno. The six that build natively then passed
+45/45 under Node on the host-cc lane. *focused2/* ran the remaining
+importer, *tests/native-io/clock-wakeup.test.ts*: 7/7 under Node on the
+Zig lane and 7/7 under Deno. Under the host-cc lane, 6/7 passed; the
+AArch64 Linux cross-link registration failed with “Host C lane cannot
+cross-compile aarch64-linux-musl.” That lane has no cross-compiler, and no
+host-cc task runs this file. No native fixture,
 property file, seed, case budget or deadline changes, because the runtime,
 compiler and backend are untouched.
