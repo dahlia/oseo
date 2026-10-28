@@ -21,12 +21,12 @@ spends about 32 seconds in native execution and emits about 0.92 MB of C,
 while emitting, compiling and linking it takes well under a second. These are
 retained measurements, not new executions in this worktree.
 
-| Evidence                                  | Pointer                                                                 |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| User decision                             | ~/.local/state/oseo-m5c/decisions/product-performance-nodes-20261028.md |
-| Phase report, “Top 30 slowest item paths” | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt              |
-| Raw `OSEO_PHASE` records                  | /data/m5c-phase-diag-20261028/remote-20261027T212428Z-2c437718e422/     |
-| Report parser                             | ~/.local/state/oseo-m5c/throughput-research/p06/phase\_report.py        |
+| Evidence                                  | Pointer                                                                      |
+| ----------------------------------------- | ---------------------------------------------------------------------------- |
+| User decision                             | ~/.local/state/oseo-m5c/decisions/done/product-performance-nodes-20261028.md |
+| Phase report, “Top 30 slowest item paths” | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt                   |
+| Raw `OSEO_PHASE` records                  | /data/m5c-phase-diag-20261028/remote-20261027T212428Z-2c437718e422/          |
+| Report parser                             | ~/.local/state/oseo-m5c/throughput-research/p06/phase\_report.py             |
 
 The bounded remedy is to find the runtime cause, for example a loop over a
 large length after detachment, and fix it without changing semantics.

@@ -27,12 +27,12 @@ raising it is a separate follow-up that needs a D13 evidence text change,
 a memory headroom check, and a check of the CI macOS lanes that share one
 machine.
 
-| Evidence                               | Pointer                                                                 |
-| -------------------------------------- | ----------------------------------------------------------------------- |
-| User decision                          | ~/.local/state/oseo-m5c/decisions/test262-runner-main-thread-offload.md |
-| Pool 8 baseline and candidate runs     | /data/m5c-offload-compare-20261028/                                     |
-| Pool 16 diagnostic run                 | /data/m5c-offload-pool16-20261028/                                      |
-| Phase timing that motivated the change | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt              |
+| Evidence                               | Pointer                                                                      |
+| -------------------------------------- | ---------------------------------------------------------------------------- |
+| User decision                          | ~/.local/state/oseo-m5c/decisions/done/test262-runner-main-thread-offload.md |
+| Pool 8 baseline and candidate runs     | /data/m5c-offload-compare-20261028/                                          |
+| Pool 16 diagnostic run                 | /data/m5c-offload-pool16-20261028/                                           |
+| Phase timing that motivated the change | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt                   |
 
 Because the change touches *packages/* and *tools/*, its UPDATE is Full,
 run at this node's own source.

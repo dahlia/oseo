@@ -32,12 +32,12 @@ found the cause: in one variant of
 body C (90.71%) was the same completion branch table emitted 528 times.
 These are retained measurements, not new executions in this worktree.
 
-| Evidence                                  | Pointer                                                                 |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| User decision                             | ~/.local/state/oseo-m5c/decisions/product-performance-nodes-20261028.md |
-| Phase report, “Top 30 slowest item paths” | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt              |
-| Raw `OSEO_PHASE` records                  | /data/m5c-phase-diag-20261028/remote-20261027T212428Z-2c437718e422/     |
-| Duplicated completion table study (P07)   | ~/.local/state/oseo-m5c/throughput-research/r10-test262-tail.md         |
+| Evidence                                  | Pointer                                                                      |
+| ----------------------------------------- | ---------------------------------------------------------------------------- |
+| User decision                             | ~/.local/state/oseo-m5c/decisions/done/product-performance-nodes-20261028.md |
+| Phase report, “Top 30 slowest item paths” | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt                   |
+| Raw `OSEO_PHASE` records                  | /data/m5c-phase-diag-20261028/remote-20261027T212428Z-2c437718e422/          |
+| Duplicated completion table study (P07)   | ~/.local/state/oseo-m5c/throughput-research/r10-test262-tail.md              |
 
 The bounded remedy is to share identical completion-target tables or
 otherwise stop the duplication in the C backend. Keep both specialization

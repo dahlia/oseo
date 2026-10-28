@@ -25,11 +25,11 @@ The phase report sums every column over the four variants, so *ID\_Start.js*
 emits about 3.5 MB of C per variant. These are retained measurements, not
 new executions in this worktree.
 
-| Evidence                          | Pointer                                                                 |
-| --------------------------------- | ----------------------------------------------------------------------- |
-| User decision                     | ~/.local/state/oseo-m5c/decisions/product-performance-nodes-20261028.md |
-| Phase report, “Per-family totals” | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt              |
-| Raw `OSEO_PHASE` records          | /data/m5c-phase-diag-20261028/remote-20261027T212428Z-2c437718e422/     |
+| Evidence                          | Pointer                                                                      |
+| --------------------------------- | ---------------------------------------------------------------------------- |
+| User decision                     | ~/.local/state/oseo-m5c/decisions/done/product-performance-nodes-20261028.md |
+| Phase report, “Per-family totals” | ~/.local/state/oseo-m5c/throughput-research/p06/report.txt                   |
+| Raw `OSEO_PHASE` records          | /data/m5c-phase-diag-20261028/remote-20261027T212428Z-2c437718e422/          |
 
 The bounded remedy is to profile the native matcher for property escape
 classes, for example class membership by linear range scans, and the size

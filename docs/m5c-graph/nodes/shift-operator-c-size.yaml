@@ -12,7 +12,7 @@ delivers: "Shares identical completion-target branch tables, or otherwise
   policies, GC behavior and generic fallback behavior, and records
   before and after C bytes, compile time and per-variant native time.
   Owns no test262 path; decision
-  ~/.local/state/oseo-m5c/decisions/product-performance-nodes-20261028.md\
+  ~/.local/state/oseo-m5c/decisions/done/product-performance-nodes-20261028.md\
   ; work note docs/m5c-graph/shift-operator-c-size.md."
 dependencies:
   - unsupported-ownership-audit
