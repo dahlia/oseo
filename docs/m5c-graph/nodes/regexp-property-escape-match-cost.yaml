@@ -16,5 +16,5 @@ delivers: "Profiles the native matcher for Unicode property escape classes
 dependencies:
   - regexp-property-escape-harness
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

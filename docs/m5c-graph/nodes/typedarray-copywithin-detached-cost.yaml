@@ -15,5 +15,5 @@ delivers: "Finds and removes the runtime cause of the native execution
   ; work note docs/m5c-graph/typedarray-copywithin-detached-cost.md."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

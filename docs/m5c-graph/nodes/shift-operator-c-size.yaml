@@ -16,5 +16,5 @@ delivers: "Shares identical completion-target branch tables, or otherwise
   ; work note docs/m5c-graph/shift-operator-c-size.md."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
