@@ -3,8 +3,8 @@ B19/B20/B30 dynamic-source coverage remediation
 
 Root authorized exactly 459 additions on 2026-10-27: 66 observed
 `OSEO1001` unknown-eval binding paths and 393 observed ImportExpression
-rejections. Preserve the existing 305 owned paths and dependencies. The
-combined remediation scope is 764 paths. ADR 0016 and ADR 0019 remain
+rejections. Preserve the existing 306 owned paths and dependencies. The
+combined remediation scope is 765 paths. ADR 0016 and ADR 0019 remain
 unchanged; none of these additions is an exclusion or a semantic pass.
 
 | Batch                | Unknown binding eval | ImportExpression outside M1 | Total |

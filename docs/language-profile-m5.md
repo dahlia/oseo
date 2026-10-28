@@ -237,8 +237,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 31,310 reviewed cases: 26,565 passes, 3,242
-expected negatives, and 1,503 unsupported profile features. It records no
+The current manifest contains 31,310 reviewed cases: 26,954 passes, 3,242
+expected negatives, and 1,114 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
