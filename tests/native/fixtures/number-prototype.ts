@@ -52,6 +52,36 @@ console.log(
   (1e21).toString(),
 );
 
+const integerKeys = [];
+integerKeys[4294967294] = "last index";
+const keyed = { [2 ** 53 - 1]: "safe", [-42]: "negative" };
+console.log(
+  "integer text",
+  String(1),
+  String(-1),
+  String(9),
+  String(10),
+  String(-10),
+  String(4294967295),
+  String(4294967296),
+  String(2 ** 52),
+  String(2 ** 52 + 0.5),
+  String(2 ** 53 - 1),
+  String(-(2 ** 53 - 1)),
+  String(2 ** 53),
+  String(2 ** 53 + 2),
+  String(-(2 ** 53)),
+  String(1e20),
+  String(123456789012345680000),
+  String(-0.5),
+  \`\${7 * 11}\`,
+  integerKeys[4294967294],
+  integerKeys.length,
+  keyed["9007199254740991"],
+  keyed["-42"],
+  Object.keys(keyed).join(),
+);
+
 console.log(
   "valueOf",
   new Number(42).valueOf(),

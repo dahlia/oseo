@@ -1,0 +1,20 @@
+version: 1
+id: shift-operator-c-size
+title: Stop duplicated completion tables in shift operator C
+delivers: "Shares identical completion-target branch tables, or otherwise
+  stops their duplication in the C backend, so the shift operator tests
+  stop emitting about 25 MB of C per variant. Baseline from the phase
+  report: test/language/expressions/right-shift/S11.7.2_A4_T1.js and its
+  S11.7.2_A4_T* and unsigned-right-shift S11.7.3_A4_T* siblings emit
+  99.9-106.5 MB of C over their four variants, about 25-26.6 MB and 12 s
+  of compiling per variant; an earlier study found 24.03 MB of duplicates
+  in one variant's 26.49 MB of body C. Keeps both specialization
+  policies, GC behavior and generic fallback behavior, and records
+  before and after C bytes, compile time and per-variant native time.
+  Owns no test262 path; decision
+  ~/.local/state/oseo-m5c/decisions/done/product-performance-nodes-20261028.md\
+  ; work note docs/m5c-graph/shift-operator-c-size.md."
+dependencies:
+  - unsupported-ownership-audit
+landed: true
+status: ready

@@ -1600,6 +1600,21 @@ typedef struct {
     bool mapped_arguments;
     /* Non-NULL exactly on a generator object, which owns the record. */
     OseoGenerator *generator;
+    /*
+     * An index lookup hint. While `dense_index_known` holds, slots
+     * [dense_index_base, dense_index_base + dense_index_count) store the
+     * array index keys 0 through dense_index_count - 1 in order and no
+     * other slot stores an array index, so an index lookup finds its
+     * slot or misses without a scan. A change the property-vector
+     * helpers cannot follow clears the flag for good, which restores the
+     * plain linear search. Every allocation starts it through
+     * oseo_internal_init_dense_index. It follows every other member so
+     * that the flag prefix from array_length through number_value keeps
+     * its original layout.
+     */
+    size_t dense_index_base;
+    uint32_t dense_index_count;
+    bool dense_index_known;
 } OseoOrdinaryObject;
 
 /* A Proxy exotic retains its construction-time target and handler. */
@@ -2293,6 +2308,13 @@ typedef struct {
     size_t index;
     OseoMapIterationKind kind;
 } OseoMapIterator;
+
+/* The dense index hint of an empty property vector, which always holds. */
+static inline void oseo_internal_init_dense_index(OseoOrdinaryObject *object) {
+    object->dense_index_base = 0u;
+    object->dense_index_count = 0u;
+    object->dense_index_known = true;
+}
 
 static inline OseoValue tagged(uint64_t tag, uint64_t payload) {
     return OSEO_CANONICAL_NAN | (tag << OSEO_TAG_SHIFT) |
@@ -3947,6 +3969,16 @@ size_t oseo_internal_own_property_index(
     OseoValue key
 );
 bool oseo_internal_remove_property(OseoOrdinaryObject *object, size_t index);
+/*
+ * Keeps the dense index hint after a key was stored in `slot`, by
+ * appending or by inserting before later slots. Every site that stores
+ * a key in the property vector calls it once the key and the
+ * incremented count are in place; removal keeps the hint itself.
+ */
+void oseo_internal_note_property_inserted(
+    OseoOrdinaryObject *object,
+    size_t slot
+);
 /*
  * Reserves room for one more own property. The call is a safepoint and
  * moves the property vector, so a caller reacquires both the object and

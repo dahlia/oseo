@@ -1347,6 +1347,7 @@ static OseoResult iterator_helper_create(
     helper->ordinary.properties = NULL;
     helper->ordinary.property_capacity = 0u;
     helper->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&helper->ordinary);
     helper->ordinary.private_elements = NULL;
     helper->ordinary.private_element_capacity = 0u;
     helper->ordinary.private_element_count = 0u;

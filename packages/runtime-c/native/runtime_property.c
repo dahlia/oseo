@@ -609,6 +609,7 @@ OseoResult oseo_object_set(
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     object->property_count += 1u;
+    oseo_internal_note_property_inserted(object, object->property_count - 1u);
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = receiver_index + 1u;

@@ -18,6 +18,7 @@ static void initialize_ordinary(
     object->properties = NULL;
     object->property_capacity = 0u;
     object->property_count = 0u;
+    oseo_internal_init_dense_index(object);
     object->private_elements = NULL;
     object->private_element_capacity = 0u;
     object->private_element_count = 0u;

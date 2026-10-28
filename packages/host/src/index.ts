@@ -1013,9 +1013,30 @@ export const fileModuleResolver: ModuleResolver = {
   },
 };
 
+/** Optional execution services for long-running Node.js compiler hosts. */
+export interface NodeHostOptions {
+  /** Spawn through a small reusable process instead of the compiler heap. */
+  readonly delegateSpawns?: boolean;
+}
+
+/** A Node host can explicitly drain and close its optional spawn service. */
+export interface NodeHost extends CompilerHost {
+  /** Stop accepting delegated work, drain pending requests, and close IPC. */
+  close(): Promise<void>;
+}
+
 /** Create the Node.js implementation of compiler host operations. */
-export function createNodeHost(): CompilerHost {
+export function createNodeHost(options: NodeHostOptions = {}): NodeHost {
+  const delegate =
+    options.delegateSpawns === true
+      ? import("./spawn-delegate.ts").then(({ createSpawnDelegate }) =>
+          createSpawnDelegate(),
+        )
+      : undefined;
   return {
+    async close() {
+      await (await delegate)?.close();
+    },
     cache: createNodeCache(),
     captureEnvironment(policy) {
       return Promise.resolve({
@@ -1080,6 +1101,7 @@ export function createNodeHost(): CompilerHost {
       await rm(path, { force: true, recursive: true });
     },
     async run(request: ProcessRequest): Promise<ProcessObservation> {
+      if (delegate != null) return await (await delegate).run(request);
       const { spawn } = await import("node:child_process");
       return await new Promise((resolve, reject) => {
         const environment = request.environment;

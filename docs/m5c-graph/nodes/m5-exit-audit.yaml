@@ -85,17 +85,21 @@ dependencies:
   - regexp-anchored-repeat-state-remediation
   - regexp-pattern-extensions
   - regexp-property-escape-harness
+  - regexp-property-escape-match-cost
   - regexp-split-coverage-remediation
   - remediation-work-graph
   - resizable-array-buffer-harness
   - runtime-dynamic-source-classification
   - script-module-declaration-early-error
+  - shift-operator-c-size
   - temporal-helpers-harness
   - test262-host-script-bindings
+  - test262-runner-main-thread-offload
   - typed-array-construction-order
   - typed-array-feature-admission
   - typed-array-proto-coverage-remediation
   - typed-array-tolocalestring-arguments
+  - typedarray-copywithin-detached-cost
   - unhandled-rejection-observation
   - well-known-intrinsics-harness
   - with-optional-call-receiver

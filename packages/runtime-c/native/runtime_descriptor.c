@@ -550,6 +550,8 @@ static OseoResult define_data_property(
     property->omitted_accessors = 0u;
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
+    oseo_internal_note_property_inserted(
+        object, (size_t)(property - object->properties));
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;
@@ -583,6 +585,7 @@ OseoResult oseo_internal_append_own_property(
     property->getter = oseo_undefined();
     property->setter = oseo_undefined();
     object->property_count += 1u;
+    oseo_internal_note_property_inserted(object, object->property_count - 1u);
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     return normal(object_value);
@@ -861,6 +864,8 @@ static OseoResult define_accessor_property(
     property->value = oseo_undefined();
     property->getter = new_getter;
     property->setter = new_setter;
+    oseo_internal_note_property_inserted(
+        object, (size_t)(property - object->properties));
     object->shape_id = context->next_shape_id;
     context->next_shape_id += 1u;
     if (extends_array) object->array_length = defined_index + 1u;

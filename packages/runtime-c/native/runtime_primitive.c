@@ -556,6 +556,39 @@ size_t oseo_internal_number_text(double value, char *output, size_t capacity) {
         );
     }
     if (value == 0.0) return (size_t)snprintf(output, capacity, "0");
+    /*
+     * Every integer below 2^53 in magnitude is a double whose neighbors lie
+     * at most one apart, so no decimal with fewer significant digits reads
+     * back as it: Number::toString's digits are the integer's own, in plain
+     * notation because it is below 10^21. Array indices and loop counters
+     * take this path instead of the round-trip search below, whose
+     * snprintf and strtod calls dominate index-heavy code.
+     */
+    double magnitude = fabs(value);
+    if (magnitude < 9007199254740992.0 && magnitude == floor(magnitude)) {
+        uint64_t integer = (uint64_t)magnitude;
+        char reversed[20];
+        size_t count = 0u;
+        do {
+            reversed[count] = (char)('0' + (int)(integer % 10u));
+            count += 1u;
+            integer /= 10u;
+        } while (integer != 0u);
+        size_t length = count + (value < 0.0 ? 1u : 0u);
+        if (capacity == 0u) return length;
+        size_t stored = 0u;
+        if (value < 0.0 && stored + 1u < capacity) {
+            output[stored] = '-';
+            stored += 1u;
+        }
+        while (count > 0u && stored + 1u < capacity) {
+            count -= 1u;
+            output[stored] = reversed[count];
+            stored += 1u;
+        }
+        output[stored] = '\0';
+        return length;
+    }
     char candidate[64];
     shortest_round_trip_candidate(value, candidate);
     return format_shortest_decimal(candidate, output, capacity);

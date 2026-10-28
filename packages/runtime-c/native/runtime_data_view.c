@@ -332,6 +332,7 @@ static OseoResult data_view_allocate(
     view->ordinary.properties = NULL;
     view->ordinary.property_capacity = 0u;
     view->ordinary.property_count = 0u;
+    oseo_internal_init_dense_index(&view->ordinary);
     view->ordinary.private_elements = NULL;
     view->ordinary.private_element_capacity = 0u;
     view->ordinary.private_element_count = 0u;

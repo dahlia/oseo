@@ -55,6 +55,13 @@ size_t oseo_internal_own_property_index(
             return array_index;
         }
     }
+    /* The dense run holds every own index, each at its base offset, so
+     * an index past the run is absent without a scan. */
+    if (object->dense_index_known &&
+        oseo_internal_array_index(key, &array_index)) {
+        if (array_index >= object->dense_index_count) return SIZE_MAX;
+        return object->dense_index_base + array_index;
+    }
     for (size_t index = 0u; index < object->property_count; index += 1u) {
         if (oseo_internal_property_key_equal(
             object->properties[index].key, key)) {
@@ -75,7 +82,49 @@ bool oseo_internal_remove_property(OseoOrdinaryObject *object, size_t index) {
         object->properties[next - 1u] = object->properties[next];
     }
     object->property_count -= 1u;
+    /* A removal before the run shifts it down whole, and removing its
+     * last index shortens it; any other index would split it. */
+    if (object->dense_index_known && object->dense_index_count > 0u) {
+        size_t end = object->dense_index_base + object->dense_index_count;
+        if (index < object->dense_index_base) {
+            object->dense_index_base -= 1u;
+        } else if (index + 1u == end) {
+            object->dense_index_count -= 1u;
+            if (object->dense_index_count == 0u) object->dense_index_base = 0u;
+        } else if (index < end) {
+            object->dense_index_known = false;
+        }
+    }
     return true;
+}
+
+void oseo_internal_note_property_inserted(
+    OseoOrdinaryObject *object,
+    size_t slot
+) {
+    if (!object->dense_index_known) return;
+    size_t end = object->dense_index_base + object->dense_index_count;
+    uint32_t array_index;
+    if (oseo_internal_array_index(object->properties[slot].key, &array_index)) {
+        /* Index 0 starts the run wherever it lands, since no other index
+         * is stored yet; the next index right after the run extends it. */
+        if (object->dense_index_count == 0u && array_index == 0u) {
+            object->dense_index_base = slot;
+            object->dense_index_count = 1u;
+        } else if (object->dense_index_count > 0u && slot == end &&
+                   array_index == object->dense_index_count) {
+            object->dense_index_count += 1u;
+        } else {
+            object->dense_index_known = false;
+        }
+    } else if (object->dense_index_count > 0u) {
+        /* A named key before the run shifts it up whole. */
+        if (slot <= object->dense_index_base) {
+            object->dense_index_base += 1u;
+        } else if (slot < end) {
+            object->dense_index_known = false;
+        }
+    }
 }
 
 static OseoResult object_create(
@@ -97,6 +146,7 @@ static OseoResult object_create(
     object->properties = NULL;
     object->property_capacity = 0u;
     object->property_count = 0u;
+    oseo_internal_init_dense_index(object);
     object->private_elements = NULL;
     object->private_element_capacity = 0u;
     object->private_element_count = 0u;

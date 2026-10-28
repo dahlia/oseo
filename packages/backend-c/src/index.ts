@@ -120,6 +120,13 @@ interface EmitState {
   /** Global bindings initialized from function declaration objects. */
   readonly globalFunctionBindingIds: ReadonlySet<number>;
   readonly blockParameters: ReadonlyMap<number, readonly number[]>;
+  /**
+   * Blocks some `completion-set` of the function saves as its jump
+   * destination. A completion record's target is zero-initialized and only
+   * ever holds such a block, or block 0, so these are the only cases a
+   * `resume-completion` dispatch can take.
+   */
+  readonly completionTargets: ReadonlySet<number>;
   readonly scalarKinds: Map<number, "boolean" | "smi">;
   readonly strict: boolean;
   readonly observeSpecialization: boolean;
@@ -3449,7 +3456,7 @@ function emitTerminator(state: EmitState, terminator: MirTerminator): void {
     line(state, renderC(emittedC.common.closeBlock));
     line(state, renderC(emittedC.terminator.switchCompletionUTargetOpen, slot));
     for (const target of state.blockParameters.keys()) {
-      if (target === 0) continue;
+      if (target === 0 || !state.completionTargets.has(target)) continue;
       line(
         state,
         renderC(emittedC.common.caseUGotoBbStatement, target, target),
@@ -3697,7 +3704,8 @@ function scriptFrameCost(functionValue: MirFunction): number {
  * without crossing `excluded`.
  *
  * A completion target is entered only through a `resume-completion`
- * terminator, whose switch names every block emitted for the same body.
+ * terminator, whose switch names every completion target emitted for the
+ * same body.
  * Targets are therefore deferred until such a terminator is reachable;
  * targets found before or after it join the fixed point together. When
  * every `finally` in the body leaves abruptly, no dispatch exists, and
@@ -3769,6 +3777,21 @@ function reachableBlocksFrom(
     }
   }
   return functionValue.blocks.filter((block) => reachable.has(block.id));
+}
+
+/** Every block a `completion-set` of `functionValue` names as its target. */
+function savedCompletionTargets(
+  functionValue: MirFunction,
+): ReadonlySet<number> {
+  const targets = new Set<number>();
+  for (const block of functionValue.blocks) {
+    for (const operation of block.operations) {
+      if (operation.completionTarget != null) {
+        targets.add(operation.completionTarget.blockId);
+      }
+    }
+  }
+  return targets;
 }
 
 function reachableBlocks(functionValue: MirFunction): readonly MirBlock[] {
@@ -4499,6 +4522,7 @@ function emitFunction(
       blocks.map((block) => [block.id, block.parameters ?? []]),
     ),
     completionSlotStart: baseRootCount + argumentSlots,
+    completionTargets: savedCompletionTargets(functionValue),
     ...includePropertiesWhen(() => {
       if (functionValue.derivedThisBindingId == null) return undefined;
       return { derivedThisBindingId: functionValue.derivedThisBindingId };

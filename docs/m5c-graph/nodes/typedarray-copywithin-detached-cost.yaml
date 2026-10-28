@@ -1,0 +1,19 @@
+version: 1
+id: typedarray-copywithin-detached-cost
+title: Remove the native cost of detached TypedArray copyWithin
+delivers: "Finds and removes the runtime cause of the native execution
+  cost of TypedArray.prototype.copyWithin after its coerced start or end
+  detaches the buffer, without changing semantics. Baseline from the
+  phase report: test/built-ins/TypedArray/prototype/copyWithin/\
+  coerced-values-end-detached.js, coerced-values-end-detached-prototype.js
+  and coerced-values-start-detached.js take about 32 s of native execution
+  per variant (about 128 s per path) against 0.4 s of compile and link
+  for all four variants, the three slowest Full UPDATE paths. Records
+  before and after per-variant native time, C bytes and compile time.
+  Owns no test262 path; decision
+  ~/.local/state/oseo-m5c/decisions/done/product-performance-nodes-20261028.md\
+  ; work note docs/m5c-graph/typedarray-copywithin-detached-cost.md."
+dependencies:
+  - unsupported-ownership-audit
+landed: true
+status: ready

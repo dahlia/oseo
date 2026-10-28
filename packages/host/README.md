@@ -48,3 +48,25 @@ in that workflow receives the same immutable snapshot. Unlisted ambient
 compiler settings cannot leak across the toolchain boundary. A Deno host
 without `--allow-env` reports snapshot capture as unavailable; the caller
 disables cache reuse and process requests retain ordinary child inheritance.
+
+Node hosts may opt into `createNodeHost({ delegateSpawns: true })`. One lazy,
+reusable Node process then spawns commands and collects their output. The
+helper imports no compiler implementation, so repeated forks do not copy the
+compiler's address space. The product CLI keeps direct spawning by default.
+`await host.close()` drains accepted requests and closes the helper. Idle
+helpers do not keep the parent alive, and process exit disconnects their IPC.
+
+Delegated requests capture the caller's current environment and absolute working
+directory. Commands inherit the umask the helper started with; reading the
+umask in Node briefly sets it to zero for the whole process, which would race
+with other threads. Output is decoded once after each pipe closes, just as in
+the direct host. Signal termination retains the host's existing status mapping
+(`null` becomes `1`). Spawn errors retain Node's error codes and command
+metadata. Transport failure rejects outstanding and future requests; commands
+are never replayed after an uncertain failure.
+
+The helper and its commands retain the caller's process group. Existing fixture
+supervisors must continue to signal that group for timeout and descendant
+cleanup. The host API adds no timeout or cancellation protocol. Disconnect
+cleanup kills direct commands; arbitrary helper loss alone does not guarantee
+termination of descendants that outlive their direct parent.
