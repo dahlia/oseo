@@ -167,6 +167,63 @@ export function parseHarnessDefinitions(
   return stringArray(metadata.defines, `${name} defines`);
 }
 
+/**
+ * The member keys of each global object one harness Script initializes
+ * with an object literal at its top level, as `var Helpers = { ... }`
+ * does. Only literal keys are listed. An object whose literal has a spread
+ * or a key computed from anything other than a string literal has members
+ * the parsed syntax cannot name, so it is left out and no omission is
+ * inferred for it. Members added later by assignment are not listed.
+ */
+export function parseHarnessObjectMembers(
+  source: string,
+): ReadonlyMap<string, readonly string[]> {
+  const objects = new Map<string, readonly string[]>();
+  const program = agentSyntaxNode(parseBabel(source, { sourceType: "script" }));
+  const body = agentSyntaxNode(program?.program)?.body;
+  for (const statement of Array.isArray(body) ? body : []) {
+    const node = agentSyntaxNode(statement);
+    if (node?.type !== "VariableDeclaration") continue;
+    const declarations = node.declarations;
+    for (const declaration of Array.isArray(declarations) ? declarations : []) {
+      const declarator = agentSyntaxNode(declaration);
+      const id = agentSyntaxNode(declarator?.id);
+      const init = agentSyntaxNode(declarator?.init);
+      if (id?.type !== "Identifier" || !isString(id.name)) continue;
+      if (init?.type !== "ObjectExpression") continue;
+      const keys = objectLiteralKeys(init);
+      if (keys != null) objects.set(id.name, keys);
+    }
+  }
+  return objects;
+}
+
+function objectLiteralKeys(
+  node: AgentSyntaxNode,
+): readonly string[] | undefined {
+  const keys: string[] = [];
+  const properties = node.properties;
+  for (const value of Array.isArray(properties) ? properties : []) {
+    const property = agentSyntaxNode(value);
+    if (
+      property?.type !== "ObjectProperty" &&
+      property?.type !== "ObjectMethod"
+    ) {
+      return undefined;
+    }
+    const key = agentSyntaxNode(property.key);
+    if (property.computed !== true && key?.type === "Identifier") {
+      if (!isString(key.name)) return undefined;
+      keys.push(key.name);
+    } else if (key?.type === "StringLiteral" && isString(key.value)) {
+      keys.push(key.value);
+    } else {
+      return undefined;
+    }
+  }
+  return keys;
+}
+
 function classification(value: StructuredDataInput): Test262Classification {
   // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
@@ -263,21 +320,39 @@ export function hostMemberRead(
   node: AgentSyntaxNode,
   members: ReadonlySet<string> = test262HostMembers,
 ): boolean {
+  const read = staticMemberRead(node);
+  return read?.object === "$262" && members.has(read.key);
+}
+
+/** A member read whose object is a plain identifier and whose key is fixed. */
+interface StaticMemberRead {
+  readonly key: string;
+  readonly object: string;
+}
+
+/**
+ * The identifier and key of a member read such as `name.key` or
+ * `name["key"]`, or `undefined` when the object is not an identifier or the
+ * key is computed from anything other than a string literal.
+ */
+function staticMemberRead(node: AgentSyntaxNode): StaticMemberRead | undefined {
   if (
     node.type !== "MemberExpression" &&
     node.type !== "OptionalMemberExpression"
   ) {
-    return false;
+    return undefined;
   }
   const object = agentSyntaxNode(node.object);
   const property = agentSyntaxNode(node.property);
-  if (object?.type !== "Identifier" || object.name !== "$262") return false;
+  if (object?.type !== "Identifier" || !isString(object.name)) return undefined;
   if (node.computed === true) {
-    return (
-      property?.type === "StringLiteral" && members.has(String(property.value))
-    );
+    return property?.type === "StringLiteral" && isString(property.value)
+      ? { key: property.value, object: object.name }
+      : undefined;
   }
-  return property?.type === "Identifier" && members.has(String(property.name));
+  return property?.type === "Identifier" && isString(property.name)
+    ? { key: property.name, object: object.name }
+    : undefined;
 }
 
 export function collectBoundNames(
@@ -366,6 +441,44 @@ export function unresolvedReferenceNames(
   mode: Test262Case["mode"],
   hostMembers: ReadonlySet<string> = test262HostMembers,
 ): ReadonlySet<string> {
+  return unresolvedNames(source, mode, (node) =>
+    hostMemberRead(node, hostMembers),
+  );
+}
+
+/**
+ * The names in `omitted` that the parsed case may read an omitted member
+ * of, where each entry maps a global harness object to the upstream members
+ * its reviewed copy leaves out. A static read such as `name.key` or
+ * `name["key"]` of a kept member reads nothing omitted. Any other
+ * unresolved reference to the name, including a computed key, an alias, a
+ * destructuring pattern, or passing the object to a function, may reach an
+ * omitted member, so it counts. Scopes, `typeof` operands, and `with`
+ * bodies follow {@link unresolvedReferenceNames}.
+ */
+export function omittedMemberReaders(
+  source: string,
+  mode: Test262Case["mode"],
+  omitted: ReadonlyMap<string, ReadonlySet<string>>,
+): ReadonlySet<string> {
+  const readers = unresolvedNames(source, mode, (node) => {
+    const read = staticMemberRead(node);
+    const members = read == null ? undefined : omitted.get(read.object);
+    return read != null && members != null && !members.has(read.key);
+  });
+  return new Set([...omitted.keys()].filter((name) => readers.has(name)));
+}
+
+/**
+ * The walk behind {@link unresolvedReferenceNames}. A member read for which
+ * `providedRead` holds does not reference its object identifier, because
+ * whatever provides that member provides the read.
+ */
+function unresolvedNames(
+  source: string,
+  mode: Test262Case["mode"],
+  providedRead: (node: AgentSyntaxNode) => boolean,
+): ReadonlySet<string> {
   let program: unknown;
   try {
     program = parseBabel(source, {
@@ -408,7 +521,7 @@ export function unresolvedReferenceNames(
       if (syntaxMetadataKeys.has(key)) continue;
       const declared = scoped?.(key) ?? [];
       pending.push({
-        mode: referenceMode(node, key, entry.mode, hostMembers),
+        mode: referenceMode(node, key, entry.mode, providedRead),
         scopes:
           declared.length === 0 ? entry.scopes : [...entry.scopes, ...declared],
         value,
@@ -615,7 +728,7 @@ function referenceMode(
   node: AgentSyntaxNode,
   key: string,
   mode: ReferenceMode,
-  hostMembers: ReadonlySet<string>,
+  providedRead: (node: AgentSyntaxNode) => boolean,
 ): ReferenceMode {
   const nonComputedKey = node.computed === true ? "reference" : "skip";
   if (mode === "binding") {
@@ -664,9 +777,7 @@ function referenceMode(
     case "OptionalMemberExpression":
       if (key === "property") return nonComputedKey;
       // An installed host member is the native test262 host's capability.
-      return key === "object" && hostMemberRead(node, hostMembers)
-        ? "skip"
-        : "reference";
+      return key === "object" && providedRead(node) ? "skip" : "reference";
     case "ObjectProperty":
     case "ClassProperty":
     case "ClassAccessorProperty":

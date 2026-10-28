@@ -14,7 +14,10 @@ scope:
     four remaining unsupported paths are recorded in
     docs/m5c-graph/iterator-helpers-tag-activation.md; the accepted full
     manifest UPDATE on U a678c85e confirms 389 promotions and four
-    unsupported paths."
+    unsupported paths. IH-B admits a reviewed temporalHelpers.js subset for
+    three of them; its focused precheck, recorded in
+    docs/m5c-graph/temporal-helpers-harness.md, observes them as pass,
+    and the manifest records them as unsupported until its full UPDATE."
 owners:
   - PLAN-M5.md
 evidence:

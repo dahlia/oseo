@@ -91,7 +91,9 @@ import {
   collectBoundNames,
   hostMemberRead,
   includePropertiesWhen,
+  omittedMemberReaders,
   parseHarnessDefinitions,
+  parseHarnessObjectMembers,
   parseReviewedSubset,
   parseTest262Case,
   unresolvedReferenceNames,
@@ -103,6 +105,7 @@ import type {
 
 export {
   parseHarnessDefinitions,
+  parseHarnessObjectMembers,
   parseReviewedSubset,
   parseTest262Case,
   unresolvedReferenceNames,
@@ -206,6 +209,10 @@ const testTypedArrayHarnessPath = join(
 const testAtomicsHarnessPath = join(
   repositoryRoot,
   "tests/test262/harness/testAtomics.js",
+);
+const temporalHelpersHarnessPath = join(
+  repositoryRoot,
+  "tests/test262/harness/temporalHelpers.js",
 );
 const wellKnownIntrinsicObjectsHarnessPath = join(
   repositoryRoot,
@@ -318,6 +325,17 @@ export interface Test262Harnesses {
    * inferred for it.
    */
   readonly upstreamDefinitions?: ReadonlyMap<string, readonly string[]>;
+  /**
+   * The literal member keys of each global object an upstream include
+   * initializes with an object literal, keyed by include name and then by
+   * object name. A reviewed include may keep only some members of such an
+   * object, so a defined name alone does not show that every upstream
+   * member is present. An absent map or entry infers no member omission.
+   */
+  readonly upstreamMembers?: ReadonlyMap<
+    string,
+    ReadonlyMap<string, readonly string[]>
+  >;
 }
 
 /** Marker the reviewed `$DONE` harness prints on asynchronous completion. */
@@ -738,8 +756,67 @@ function unsupportedStructuralCapability(
         detail: `the reviewed harness ${include} omits ${omitted.join(", ")}.`,
       };
     }
+    const readers = omittedMemberReaders(
+      source,
+      parsed.case.mode,
+      omittedHarnessMembers(include, parsed, harnesses),
+    );
+    if (readers.size > 0) {
+      const names = [...readers].toSorted().join(", ");
+      return {
+        capability: "harness-definition",
+        detail:
+          `the reviewed harness ${include} omits members of ${names} ` +
+          "that the case may read.",
+      };
+    }
   }
   return undefined;
+}
+
+/**
+ * The upstream members of each object one include defines that the
+ * reviewed harness declaring that object leaves out. An object is compared
+ * only when a reviewed harness the case loads initializes it with an object
+ * literal whose keys the syntax names; otherwise no omission is inferred.
+ */
+function omittedHarnessMembers(
+  include: string,
+  parsed: ParsedTest262Case,
+  harnesses: Test262Harnesses,
+): ReadonlyMap<string, ReadonlySet<string>> {
+  const omitted = new Map<string, ReadonlySet<string>>();
+  const upstream = harnesses.upstreamMembers?.get(include);
+  if (upstream == null) return omitted;
+  const reviewed = new Map<string, readonly string[]>();
+  for (const loaded of parsed.case.includes) {
+    const text = harnesses.includes.get(loaded);
+    if (text == null) continue;
+    for (const [name, keys] of harnessObjectMembers(text)) {
+      reviewed.set(name, keys);
+    }
+  }
+  for (const [name, keys] of upstream) {
+    const kept = new Set(reviewed.get(name) ?? keys);
+    const missing = keys.filter((key) => !kept.has(key));
+    if (missing.length > 0) omitted.set(name, new Set(missing));
+  }
+  return omitted;
+}
+
+const harnessObjectMemberCache = new Map<
+  string,
+  ReadonlyMap<string, readonly string[]>
+>();
+
+function harnessObjectMembers(
+  source: string,
+): ReadonlyMap<string, readonly string[]> {
+  const cached = harnessObjectMemberCache.get(source);
+  if (cached != null) return cached;
+  const members = parseHarnessObjectMembers(source);
+  harnessObjectMemberCache.set(source, members);
+  return members;
 }
 
 /**
@@ -1858,14 +1935,20 @@ async function suiteRoot(revision: string): Promise<string> {
 async function readHarnesses(root: string): Promise<Test262Harnesses> {
   const harnesses = await readReviewedHarnesses();
   const upstreamDefinitions = new Map<string, readonly string[]>();
+  const upstreamMembers = new Map<
+    string,
+    ReadonlyMap<string, readonly string[]>
+  >();
   for (const include of harnesses.includes.keys()) {
     const upstreamPath = join(root, "harness", include);
+    const upstream = await readFile(upstreamPath, "utf8");
     upstreamDefinitions.set(
       include,
-      parseHarnessDefinitions(await readFile(upstreamPath, "utf8"), include),
+      parseHarnessDefinitions(upstream, include),
     );
+    upstreamMembers.set(include, parseHarnessObjectMembers(upstream));
   }
-  return { ...harnesses, upstreamDefinitions };
+  return { ...harnesses, upstreamDefinitions, upstreamMembers };
 }
 
 async function readReviewedHarnesses(): Promise<Test262Harnesses> {
@@ -1916,6 +1999,10 @@ async function readReviewedHarnesses(): Promise<Test262Harnesses> {
       ],
       ["tcoHelper.js", await readFile(tcoHelperHarnessPath, "utf8")],
       ["testAtomics.js", await readFile(testAtomicsHarnessPath, "utf8")],
+      [
+        "temporalHelpers.js",
+        await readFile(temporalHelpersHarnessPath, "utf8"),
+      ],
       ["testTypedArray.js", await readFile(testTypedArrayHarnessPath, "utf8")],
       [
         "wellKnownIntrinsicObjects.js",

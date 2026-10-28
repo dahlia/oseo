@@ -19,8 +19,8 @@ scope:
     inputs and observations are recorded in
     docs/m5c-graph/iterator-helpers-tag-activation.md. The accepted full
     UPDATE on U a678c85e records these method paths as pass.
-    temporalHelpers.js remains unadmitted and belongs to IH-B;
-    it is not required by these method paths."
+    IH-B admits a reviewed temporalHelpers.js subset for three
+    Iterator.from paths; these method paths do not require it."
   - "One observation is native-only rather than differential. Re-entering a
     suspended helper from the underlying iterator return method reaches the
     running-generator TypeError ECMA-262 specifies, and the two reference

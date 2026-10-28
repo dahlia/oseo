@@ -14,6 +14,7 @@ import {
   createReviewedManifest,
   executeTest262Case,
   parseHarnessDefinitions,
+  parseHarnessObjectMembers,
   parseTest262Arguments,
   parseReviewedSubset,
   parseTest262Case,
@@ -21,6 +22,7 @@ import {
   ReviewedTest262RunError,
   rewriteReviewedPromotions,
   selectManifestShard,
+  unresolvedReferenceNames,
   validateReviewedResults,
 } from "../tools/test262.ts";
 import {
@@ -2116,6 +2118,201 @@ includes: [resizableArrayBufferUtils.js]
   for (const request of requests) assert.ok(request.includes(reviewed));
 });
 
+async function temporalHelpersHarnesses(): Promise<{
+  readonly reviewed: string;
+  readonly upstream: string;
+}> {
+  return {
+    reviewed: await readFile(
+      new URL("test262/harness/temporalHelpers.js", import.meta.url),
+      "utf8",
+    ),
+    upstream: await readFile(
+      new URL(
+        "harness/temporalHelpers.js",
+        import.meta.resolve("test262/package.json"),
+      ),
+      "utf8",
+    ),
+  };
+}
+
+/** Run a harness, then a probe Script in the same fresh realm. */
+function probeTemporalHelpersHarness(harness: string, probe: string): string {
+  const context = createContext({});
+  runInContext(harness, context);
+  const observed: unknown = runInContext(probe, context);
+  assert.ok(isString(observed));
+  return observed;
+}
+
+test("temporal helpers harness keeps the upstream observers", async () => {
+  const { reviewed, upstream } = await temporalHelpersHarnesses();
+  // Every key branch of formatPropertyName, primitive and object values,
+  // skipToPrimitive, each trap, and observeMethod's receiver and arguments.
+  const probe = `(() => {
+    const calls = [];
+    const local = Symbol("local");
+    const registered = Symbol.for("registered");
+    const nested = {};
+    function method() {}
+    const bag = TemporalHelpers.propertyBagObserver(calls, {
+      plain: 1, "two words": "x", 3: 2, "it's": 7, [local]: 4,
+      [registered]: 5, [Symbol.iterator]: 6, nested, method,
+      missing: undefined, skipped: "kept", nil: null,
+    }, "bag", ["skipped"]);
+    const reads = [
+      +bag.plain, \`\${bag["two words"]}\`, +bag[3], +bag["it's"],
+      +bag[local], +bag[registered], +bag[Symbol.iterator],
+      bag.nested === nested, bag.method === method, bag.missing,
+      bag.skipped, (() => {
+        try { return String(bag.nil); }
+        catch (error) { return error.constructor.name; }
+      })(), "plain" in bag, local in bag,
+      Object.keys(bag),
+    ];
+    const unnamed = TemporalHelpers.propertyBagObserver(calls, { a: 1 });
+    reads.push(String(unnamed.a));
+    reads.push(String(TemporalHelpers.toPrimitiveObserver(calls, undefined,
+      "empty")));
+    const target = {
+      value: 2,
+      add(left, right) { return [this === target, left + right + this.value]; },
+    };
+    TemporalHelpers.observeMethod(calls, target, "add", "target");
+    TemporalHelpers.observeMethod(calls, target, "add");
+    reads.push(target.add(3, 4));
+    return JSON.stringify({ calls, reads });
+  })()`;
+  const observed = probeTemporalHelpersHarness(reviewed, probe);
+  assert.equal(observed, probeTemporalHelpersHarness(upstream, probe));
+  assert.match(observed, /get bag\[Symbol\.for\('registered'\)\]/u);
+  assert.match(observed, /call target\.add/u);
+  // The reviewed object keeps exactly the three generic observers, and the
+  // copy reads no global outside the standard ones they need.
+  assert.deepEqual(parseHarnessObjectMembers(reviewed).get("TemporalHelpers"), [
+    "observeMethod",
+    "propertyBagObserver",
+    "toPrimitiveObserver",
+  ]);
+  const upstreamMembers =
+    parseHarnessObjectMembers(upstream).get("TemporalHelpers") ?? [];
+  assert.ok(upstreamMembers.includes("observeProperty"));
+  assert.ok(upstreamMembers.includes("assertDuration"));
+  assert.deepEqual(
+    [...unresolvedReferenceNames(reviewed, "script")].toSorted(),
+    [
+      "Number",
+      "Proxy",
+      "Reflect",
+      "String",
+      "Symbol",
+      "arguments",
+      "undefined",
+    ],
+  );
+  assert.ok(unresolvedReferenceNames(upstream, "script").has("Temporal"));
+});
+
+test("parses only literal keys of harness object literals", () => {
+  const members = parseHarnessObjectMembers(`
+var Listed = { a: 1, "b c": 2, ["d"]: 3, e() {}, get f() { return 1; } };
+const Spread = { ...Listed, g: 1 };
+let Computed = { [Symbol.iterator]: 1 };
+var Numbered = { 1: 1 };
+var Plain = 1, Second = { h: 1 };
+function Declared() {}
+{ var Nested = { i: 1 }; }
+`);
+  assert.deepEqual(
+    [...members],
+    [
+      ["Listed", ["a", "b c", "d", "e", "f"]],
+      ["Second", ["h"]],
+    ],
+  );
+});
+
+test("withholds a case that reads an omitted harness member", async () => {
+  const { reviewed, upstream } = await temporalHelpersHarnesses();
+  const admitted = {
+    ...harnesses,
+    includes: new Map([["temporalHelpers.js", reviewed]]),
+    upstreamDefinitions: new Map([
+      [
+        "temporalHelpers.js",
+        parseHarnessDefinitions(upstream, "temporalHelpers.js"),
+      ],
+    ]),
+    upstreamMembers: new Map([
+      ["temporalHelpers.js", parseHarnessObjectMembers(upstream)],
+    ]),
+  };
+  const executions: string[] = [];
+  const run = async (body: string): Promise<Test262Result> => {
+    const flags = body.includes("with") ? "flags: [noStrict]\n" : "";
+    const source =
+      `/*---\n${flags}includes: [temporalHelpers.js]\n---*/\n` + body;
+    const parsed = parseTest262Case(source, "test/temporal.js", revision);
+    return await executeTest262Case(
+      source,
+      parsed,
+      new Set<string>(),
+      admitted,
+      {
+        async execute(request) {
+          executions.push(request.source);
+          return await Promise.resolve(successfulResult());
+        },
+      },
+      ["iterator-protocol"],
+    );
+  };
+  const withheld = await Promise.all(
+    [
+      "TemporalHelpers.observeProperty([], {}, 'x');\n",
+      "TemporalHelpers['assertDuration'];\n",
+      "TemporalHelpers?.ISO;\n",
+      "const key = 'ISO';\nTemporalHelpers[key];\n",
+      "const helpers = TemporalHelpers;\n",
+      "const { observeProperty } = TemporalHelpers;\n",
+      "Object.keys(TemporalHelpers);\n",
+      "with ({}) {}\nTemporalHelpers.ISO;\n",
+    ].map(run),
+  );
+  assert.equal(executions.length, 0);
+  for (const result of withheld) {
+    assert.equal(result.classification, "unsupported-profile-feature");
+    assert.equal(
+      result.observation.unsupportedCapability,
+      "harness-definition",
+    );
+    assert.equal(
+      result.observation.detail,
+      "Not executed: the reviewed harness temporalHelpers.js omits " +
+        "members of TemporalHelpers that the case may read.",
+    );
+    assert.deepEqual(result.dependencies, ["iterator-protocol"]);
+  }
+  // Kept members, a name only in text or a typeof operand, a local
+  // binding of the name, and a with body whose object may provide it.
+  const executed = await Promise.all(
+    [
+      "const calls = [];\n" +
+        "const bag = TemporalHelpers.propertyBagObserver(calls, {}, 'o');\n" +
+        "TemporalHelpers.observeMethod(calls, {}, 'm', 'o');\n" +
+        "TemporalHelpers['toPrimitiveObserver'](calls, 1, 'p');\n",
+      "// TemporalHelpers.ISO\nconst text = 'TemporalHelpers.ISO';\n",
+      "typeof TemporalHelpers;\n",
+      "function local(TemporalHelpers) { TemporalHelpers.ISO; }\n",
+      "with ({ TemporalHelpers: {} }) { TemporalHelpers.ISO; }\n",
+    ].map(run),
+  );
+  for (const result of executed) assert.equal(result.classification, "pass");
+  assert.ok(executions.length > 0);
+  for (const request of executions) assert.ok(request.includes(reviewed));
+});
+
 test("builds a case that reads $262.agent with the test262 host", async () => {
   const agentHarnesses = {
     ...harnesses,
@@ -2499,7 +2696,7 @@ assert(true);
     );
   };
   const withheld = await Promise.all(
-    ["temporalHelpers.js", "unknownHelper.js"].map((include) => run(include)),
+    ["testIntl.js", "unknownHelper.js"].map((include) => run(include)),
   );
   for (const result of withheld) {
     assert.equal(result.classification, "unsupported-profile-feature");

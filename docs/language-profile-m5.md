@@ -9935,3 +9935,11 @@ records the source-bound observations and accepted full UPDATE on U
 `a678c85e`. That Full confirms 389 promotions and four unsupported paths;
 the ledger assigns three to `temporal-helpers-harness` and one to
 `dynamic-source-coverage-remediation`. No exclusion or landing is claimed.
+
+M5c IH-B admits a reviewed *temporalHelpers.js* subset that keeps only the
+generic `observeMethod`, `propertyBagObserver`, and `toPrimitiveObserver`
+helpers. A case that may read an omitted `TemporalHelpers` member stays an
+explicit `harness-definition` capability. Its focused precheck observes the
+three *Iterator/from/* paths as pass;
+[its work note](./docs/m5c-graph/temporal-helpers-harness.md) records the
+decision and evidence.

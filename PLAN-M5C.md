@@ -2117,3 +2117,24 @@ paths across all 29,901 reviewed cases. The ledger assigns the three
 *Iterator/proto-from-ctor-realm.js* to
 `dynamic-source-coverage-remediation`. All promoted paths belong to their
 observations. The graph remains unlanded pending the later gates.
+
+
+Temporal helpers harness
+------------------------
+
+IH-B admits a reviewed subset of *temporalHelpers.js* for the three
+*Iterator/from/* paths that include it. The copy keeps `observeMethod`,
+`propertyBagObserver`, `toPrimitiveObserver`, and the upstream
+`formatPropertyName` and `ASCII_IDENTIFIER` they log through; the other 43
+`TemporalHelpers` members, which mostly need Temporal or Intl, are omitted.
+`supportedFeatures` is unchanged.
+
+Because the subset still declares `TemporalHelpers`, the runner's
+`harness-definition` check also compares literal member keys of upstream
+object-literal definitions. A case that may read an omitted member, through
+a static read of that member or any non-static use of the object, stays an
+explicit unsupported result instead of failing in the harness. No other
+reviewed include is affected. A focused precheck observes the three paths
+as pass; the manifest records them as unsupported until the full UPDATE.
+The [IH-B work note](./docs/m5c-graph/temporal-helpers-harness.md) records
+the decision, its tests and the raw packet.
