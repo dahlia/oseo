@@ -109466,6 +109466,7 @@ tests:
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
       ]
   - path: test/language/expressions/dynamic-import/reuse-namespace-object-from-script.js
     expectedClassification: unsupported-profile-feature
@@ -109478,6 +109479,7 @@ tests:
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
       ]
   - path: test/language/expressions/dynamic-import/reuse-namespace-object.js
     expectedClassification: unsupported-profile-feature
@@ -109490,6 +109492,7 @@ tests:
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
       ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-1-update-expression.js
     expectedClassification: expected-negative
@@ -138235,10 +138238,12 @@ tests:
         dynamic-source,
         expression-operators,
         functions,
+        iterator-protocol,
         lexical-bindings,
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
         top-level-await,
       ]
   - path: test/language/module-code/top-level-await/dynamic-import-rejection.js
@@ -138276,10 +138281,12 @@ tests:
       [
         dynamic-source,
         functions,
+        iterator-protocol,
         lexical-bindings,
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
         top-level-await,
       ]
   - path: test/language/module-code/top-level-await/if-await-expr.js
@@ -138423,10 +138430,12 @@ tests:
         abrupt-completion,
         dynamic-source,
         functions,
+        iterator-protocol,
         lexical-bindings,
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
         top-level-await,
       ]
   - path: test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js
@@ -140323,10 +140332,12 @@ tests:
         dynamic-source,
         expression-operators,
         functions,
+        iterator-protocol,
         lexical-bindings,
         module-linking,
         object-properties,
         promise-settlement,
+        symbols,
         top-level-await,
       ]
   - path: test/language/module-code/top-level-await/void-await-expr.js
