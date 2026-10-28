@@ -1,4 +1,5 @@
 import { createTest262FragmentExecutor } from "./test262-fragments.ts";
+import { createTest262FragmentEmitter } from "./test262-emission.ts";
 import type { Test262FragmentInput } from "./test262-fragments.ts";
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
@@ -217,7 +218,9 @@ const tcoHelperHarnessPath = join(
 );
 
 const canonicalTarget = canonicalTest262Target;
-const runnerHost = createNodeHost();
+const runnerHost = createNodeHost({
+  delegateSpawns: process.env.OSEO_TEST262_SPAWN_DELEGATION !== "disabled",
+});
 const executionTarget = targetForExecutionHost(
   runnerHost.executionHost ?? {
     architecture: "unknown",
@@ -1947,6 +1950,9 @@ async function loadNativeExecution(): Promise<NativeExecution> {
   const fragmentExecutor = createTest262FragmentExecutor(
     runnerHost,
     nativeToolchain,
+    process.env.OSEO_TEST262_EMISSION_WORKER === "disabled"
+      ? undefined
+      : createTest262FragmentEmitter(),
   );
   const executor: Test262Executor = {
     ...includePropertiesWhen(() => {
@@ -1973,12 +1979,15 @@ async function loadNativeExecution(): Promise<NativeExecution> {
         entry,
       ];
       return await fragmentExecutor.execute(request, () =>
-        runNativeCli({
-          args,
-          source: request.source,
-          sourceId: request.sourceId,
-          version: "0.1.0",
-        }),
+        runNativeCli(
+          {
+            args,
+            source: request.source,
+            sourceId: request.sourceId,
+            version: "0.1.0",
+          },
+          runnerHost,
+        ),
       );
     },
   };

@@ -30,6 +30,7 @@ import type {
   SourceInput,
 } from "../packages/compiler/src/index.ts";
 import type { Test262ExecutionRequest } from "./test262.ts";
+import type { Test262FragmentEmitter } from "./test262-emission.ts";
 
 /** Original source components; the assembled source remains authoritative. */
 export interface Test262FragmentInput {
@@ -172,10 +173,14 @@ export interface Test262FragmentExecutor {
   ): Promise<CliResult>;
 }
 
-/** Coalesce workers within a run without sharing case-dependent state. */
+/**
+ * Coalesce workers within a run without sharing case-dependent state.
+ * An optional emission service remains owned and closed by the caller.
+ */
 export function createTest262FragmentExecutor(
   originalHost: CompilerHost,
   toolchain: NativeToolchain,
+  emitter?: Test262FragmentEmitter,
 ): Test262FragmentExecutor {
   const host = withHarnessIntegrity(originalHost);
   const bundles = new Map<string, HarnessFragmentResult>();
@@ -293,11 +298,15 @@ export function createTest262FragmentExecutor(
       const boundary = fragmentBoundaryReason(input, request.source);
       if (boundary != null) return await fallback(boundary);
       const prefix = input.sources.map((s) => s.source).join("\n") + "\n";
-      const emitted = emitScriptFragments(prepared.harness, body.body, {
+      const mapping = {
         sourceId: request.sourceId,
         harnessLineOffset: 0,
         bodyLineOffset: prefix.match(/\r\n|[\n\r\u2028\u2029]/gu)?.length ?? 0,
-      });
+      };
+      const emitted =
+        emitter == null
+          ? emitScriptFragments(prepared.harness, body.body, mapping)
+          : await emitter.emit(prepared.harness, body.body, mapping);
       const prior = emittedHarnesses.get(key);
       if (prior != null && prior !== emitted.harness.source) {
         throw new Error("Harness C changed across bodies.");
