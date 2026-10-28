@@ -59,10 +59,12 @@ results:
       - abrupt-completion
       - dynamic-source
       - functions
+      - iterator-protocol
       - lexical-bindings
       - module-linking
       - object-properties
       - promise-settlement
+      - symbols
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/rejection-order.js:1\

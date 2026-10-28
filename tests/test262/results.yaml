@@ -21260,7 +21260,7 @@ summary:
       infrastructureFailures: 0
       passes: 3771
       semanticFailures: 0
-      unsupportedProfileFeatures: 28
+      unsupportedProfileFeatures: 32
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -21379,7 +21379,7 @@ summary:
       infrastructureFailures: 0
       passes: 2066
       semanticFailures: 0
-      unsupportedProfileFeatures: 140
+      unsupportedProfileFeatures: 147
     - dependency: top-level-await
       expectedNegatives: 11
       harnessFailures: 0

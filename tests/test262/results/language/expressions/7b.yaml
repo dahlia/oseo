@@ -1020,6 +1020,7 @@ results:
       - module-linking
       - object-properties
       - promise-settlement
+      - symbols
     observation:
       detail: "test/language/expressions/dynamic-import/reuse-namespace-objec\
         t-from-import.js:135:5: error[OSEO1001]: ImportExpression is
