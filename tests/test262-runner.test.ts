@@ -22,6 +22,7 @@ import {
   ReviewedTest262RunError,
   rewriteReviewedPromotions,
   selectManifestShard,
+  test262ModuleHarnessScript,
   unresolvedReferenceNames,
   validateReviewedResults,
 } from "../tools/test262.ts";
@@ -3287,6 +3288,14 @@ test("executes module cases with explicit module intent", async () => {
           !request.source.startsWith('"use strict";'),
       ),
     );
+    // The harness is a Script of its own, so the module body is the
+    // unmodified upstream source and imported modules see its globals.
+    assert.ok(
+      requests.every(
+        (request) =>
+          request.source === source && request.script === `${harnesses.base}\n`,
+      ),
+    );
     assert.deepEqual(result.execution?.variants, [
       { specialization: "disabled", strictness: "strict" },
       { specialization: "enabled", strictness: "strict" },
@@ -3305,6 +3314,105 @@ test("executes module cases with explicit module intent", async () => {
       result.execution?.moduleGraph?.every(
         (node) => isString(node.sourceHash) && node.sourceHash !== "",
       ),
+    );
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
+test("runs a module case's harness as one Script before its graph", () => {
+  const testCase: Test262Case = {
+    async: true,
+    features: [],
+    flags: ["module", "async"],
+    includes: ["propertyHelper.js"],
+    mode: "module",
+    path: "test/module-harness.js",
+    strictness: ["strict"],
+    suiteRevision: revision,
+  };
+  assert.equal(
+    test262ModuleHarnessScript(testCase, harnesses, false),
+    "function assert() {}\n" +
+      "function $DONE() {}\n" +
+      "function verifyProperty() {}\n",
+  );
+  assert.equal(
+    test262ModuleHarnessScript(testCase, harnesses, true),
+    undefined,
+  );
+  assert.throws(
+    () =>
+      test262ModuleHarnessScript(
+        { ...testCase, includes: ["missing.js"] },
+        harnesses,
+        false,
+      ),
+    /requires unsupported missing\.js/u,
+  );
+});
+
+test("classifies a module harness rejection under its virtual id", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-prelude-"));
+  try {
+    const source = "/*---\nflags: [module]\n---*/\nexport {};\n";
+    const parsed = parseTest262Case(source, "test/module-case.js", revision);
+    const result = await executeTest262Case(
+      source,
+      parsed,
+      new Set<string>(),
+      { ...harnesses, base: "with ({}) { console = 1; }" },
+      {
+        execute(): Promise<CliResult> {
+          return Promise.reject(new Error("unexpected execution"));
+        },
+      },
+      ["module-linking"],
+      {
+        rootPath: directory,
+        sourcePath: join(directory, "module-case.js"),
+      },
+    );
+    // A harness diagnostic is a harness failure, reported at the harness
+    // rather than aborting the reviewed run.
+    assert.equal(result.classification, "harness-failure");
+    assert.match(
+      result.observation.detail ?? "",
+      /^oseo:test262-harness\.js:1:1: .*may initialize console/u,
+    );
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
+});
+
+test("never matches a harness parse failure as a module negative", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "oseo-test262-prelude-"));
+  try {
+    const source =
+      "/*---\nflags: [module]\nnegative:\n  phase: resolution\n" +
+      "  type: SyntaxError\n---*/\nexport {};\n";
+    const parsed = parseTest262Case(source, "test/module-case.js", revision);
+    const result = await executeTest262Case(
+      source,
+      parsed,
+      new Set<string>(),
+      { ...harnesses, base: "var 1;" },
+      {
+        execute(): Promise<CliResult> {
+          return Promise.reject(new Error("unexpected execution"));
+        },
+      },
+      ["module-linking"],
+      {
+        rootPath: directory,
+        sourcePath: join(directory, "module-case.js"),
+      },
+    );
+    assert.equal(result.classification, "harness-failure");
+    assert.equal(result.observation.failedPhase, undefined);
+    assert.match(
+      result.observation.detail ?? "",
+      /^oseo:test262-harness\.js:1:5: error\[OSEO0001\]/u,
     );
   } finally {
     await rm(directory, { force: true, recursive: true });

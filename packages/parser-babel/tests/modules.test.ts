@@ -623,3 +623,97 @@ test("lowers promise construction and statics over the intrinsic", () => {
     ),
   );
 });
+
+/** Compile one-module graph `source` after the Script `prelude`. */
+function compileWithPrelude(source: string, prelude?: string) {
+  const sourceId = "file:///app/prelude-entry.js";
+  const parsed = babelModuleFrontend.parseModule({ source, sourceId });
+  assert.deepEqual(parsed.diagnostics, []);
+  assert.ok(parsed.module != null);
+  const script =
+    prelude == null
+      ? undefined
+      : babelFrontend.parse({ source: prelude, sourceId: "prelude.js" });
+  assert.deepEqual(script?.diagnostics ?? [], []);
+  return compileModuleGraph(
+    {
+      entryId: sourceId,
+      kind: "module-graph",
+      modules: [
+        {
+          canonicalId: sourceId,
+          dependencies: [],
+          resolutions: [],
+          sourceHash: "prelude-entry",
+          syntax: parsed.module,
+        },
+      ],
+    },
+    { specialization: "disabled" },
+    script?.program,
+  );
+}
+
+test("resolves a prelude Script's globals around every module", () => {
+  const prelude =
+    "var count = 0;\nfunction check() { count += 1; }\n" +
+    "let lexical = 1;\nvar shadowed = 2;";
+  const compiled = compileWithPrelude(
+    "check(lexical);\nconst shadowed = 3;\nfunction count() {}\n" +
+      "export { shadowed };",
+    prelude,
+  );
+  assert.deepEqual(compiled.diagnostics, []);
+  assert.ok(compiled.hir != null && compiled.mir != null);
+  // The prelude keeps its own sloppy statement list ahead of the graph.
+  assert.equal(compiled.hir.strict, false);
+  assert.deepEqual(
+    compiled.hir.globalObjectBindings?.map((binding) => binding.name),
+    ["check", "count", "shadowed"],
+  );
+  assert.deepEqual(
+    compiled.hir.globalLexicalNames?.map((entry) => entry.name),
+    ["lexical"],
+  );
+  const scriptIds = new Map(
+    (compiled.hir.globalObjectBindings ?? []).map((binding) => [
+      binding.name,
+      binding.id,
+    ]),
+  );
+  const text = printMir(compiled.mir);
+  // A module's own declarations shadow the global names they repeat.
+  const moduleShadow = compiled.mir.globalBindings.find(
+    (binding) =>
+      binding.name === "shadowed" && binding.id !== scriptIds.get("shadowed"),
+  );
+  assert.ok(moduleShadow != null);
+  assert.match(text, /read check @1:1-1:6/u);
+  assert.match(text, /read lexical @1:7-1:14/u);
+  // Prelude ranges keep the Script's identity for runtime locations.
+  const check = compiled.hir.functions.find(
+    (candidate) => candidate.name === "check",
+  );
+  assert.equal(check?.range.sourceId, "prelude.js");
+  assert.equal(compiled.hir.body[0]?.range.sourceId, "prelude.js");
+  const strict = compileWithPrelude("check();", '"use strict";\nvar check;');
+  assert.deepEqual(strict.diagnostics, []);
+  assert.equal(strict.hir?.strict, true);
+  const without = compileWithPrelude("export const value = 1;");
+  assert.equal(without.hir?.strict, true);
+  assert.equal(without.hir?.globalObjectBindings, undefined);
+});
+
+test("rejects a prelude with statement that may initialize a global", () => {
+  const compiled = compileWithPrelude(
+    "export {};",
+    "with ({}) { console = 1; }",
+  );
+  assert.equal(compiled.diagnostics.length, 1);
+  assert.equal(compiled.diagnostics[0]?.sourceId, "prelude.js");
+  assert.match(
+    compiled.diagnostics[0]?.message ?? "",
+    /may initialize console is unsupported before a module graph/u,
+  );
+  assert.equal(compiled.mir, undefined);
+});

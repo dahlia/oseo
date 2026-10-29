@@ -580,3 +580,7 @@ families:
     owner: tests/property/m5-module-namespace-uninitialized.property.test.ts
     start: 0x60009000
     end: 0x600090ff
+  - family: m5-module-prelude-script
+    owner: tests/property/m5-module-prelude-script.property.test.ts
+    start: 0x60009100
+    end: 0x600091ff

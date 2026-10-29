@@ -39,6 +39,16 @@ scope:
     throws TypeError. A const declarator in a classic for head is an
     evalScript alias position. A var head inside a with statement belongs
     to with-var-loop-head-resolution."
+  - "A Script the realm evaluates before a module graph, as the test262
+    harness runs before a module case and the CLI --script option
+    provides, is the global environment of every module in that graph.
+    Each module, including an imported one, resolves the Script's var,
+    function, and lexical declarations by name, while its own declarations
+    and imports hide them. Writes to the Script's var and function names
+    reach the global object's property, and the Script keeps its own
+    strictness. A top-level with statement in that Script whose all-miss
+    write could initialize a hidden fallback is rejected with a diagnostic
+    located at the Script."
 owners:
   - PLAN-M5.md
   - docs/adr/0029-ahead-of-time-host-script-bindings.md
@@ -52,6 +62,9 @@ evidence:
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native/fixtures/global-object-record.ts
       - tests/property/m5-global-object-record.property.test.ts
+      - tests/property/m5-module-prelude-script.property.test.ts
+      - tests/native/scenarios/shard-2.ts
+      - tests/fixtures/module-prelude-script/reference.mjs
   fixed:
     status: covered
     references:
@@ -64,6 +77,8 @@ evidence:
       - tests/native/fixtures/with-get-binding-value.ts
       - tests/native.ts
       - tests/fixtures/runtime-heap.c
+      - tests/native/scenarios/shard-2.ts
+      - tests/fixtures/module-prelude-script/entry.mjs
   forced-collection:
     status: covered
     references:
@@ -71,6 +86,8 @@ evidence:
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native.ts
       - tests/property/m5-global-object-record.property.test.ts
+      - tests/property/m5-module-prelude-script.property.test.ts
+      - tests/native/scenarios/shard-2.ts
   generated:
     status: covered
     references:
@@ -78,6 +95,7 @@ evidence:
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/property-seeds.yaml
       - tests/property/m5-global-object-record.property.test.ts
+      - tests/property/m5-module-prelude-script.property.test.ts
   guard-fallback:
     status: covered
     references:
@@ -86,6 +104,7 @@ evidence:
       - tests/native.ts
       - tests/native/fixtures/global-object-record.ts
       - tests/property/m5-global-object-record.property.test.ts
+      - tests/property/m5-module-prelude-script.property.test.ts
   specialization:
     status: covered
     references:
@@ -93,6 +112,7 @@ evidence:
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native.ts
       - tests/property/m5-global-object-record.property.test.ts
+      - tests/property/m5-module-prelude-script.property.test.ts
   standards:
     status: covered
     references:
@@ -115,3 +135,6 @@ evidence:
       - packages/parser-babel/tests/statements.test.ts
       - packages/runtime-c/native/runtime_binding.c
       - tests/fixtures/runtime-heap.c
+      - packages/parser-babel/tests/modules.test.ts
+      - packages/cli/tests/index.test.ts
+      - tests/test262-runner.test.ts

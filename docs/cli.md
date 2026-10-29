@@ -38,9 +38,10 @@ Command syntax
 --------------
 
 ~~~~ text
-oseo [--module] [--no-specialization] [--target TARGET]
+oseo [--module] [--script SCRIPT] [--no-specialization] [--target TARGET]
   [--no-runtime-archive-reuse] SOURCE
-oseo [--dump-mir | --emit-c] [--module] [--no-specialization] SOURCE
+oseo [--dump-mir | --emit-c] [--module] [--script SCRIPT]
+  [--no-specialization] SOURCE
 oseo --help
 oseo --version
 ~~~~
@@ -54,6 +55,7 @@ Options may appear before or after the source path.
 | `--dump-mir`                 | Print Oseo's textual MIR without compiling C |
 | `--emit-c`                   | Print the generated C11 translation unit     |
 | `--module`                   | Compile the source as an ECMAScript module   |
+| `--script SCRIPT`            | Evaluate a Script before the module entry    |
 | `--no-specialization`        | Compile only the generic native path         |
 | `--no-runtime-archive-reuse` | Rebuild the C runtime archive for this run   |
 | `--target TARGET`            | Select an explicit native execution target   |
@@ -204,6 +206,13 @@ cannot distinguish every such source from a script.
 Relative `./` and `../` imports resolve against the entry's canonical
 `file:` URL. Bare specifiers, *package.json* resolution, and dynamic import
 remain unsupported.
+
+`--script SCRIPT` evaluates one Script in the same realm before the module
+graph links, as a test harness runs before a module test. Its `var`,
+function, and lexical declarations form the global environment of every
+module in the graph, including imported ones; a module's own declarations
+and imports hide them. The option applies only to a module entry, and a
+script entry is rejected with a diagnostic.
 
 
 Source-language limits
