@@ -1,5 +1,10 @@
 import { createTest262FragmentExecutor } from "./test262-fragments.ts";
 import { createTest262FragmentEmitter } from "./test262-emission.ts";
+import {
+  harnessTrapOutcome,
+  harnessTrapSource,
+  harnessTrapToken,
+} from "./test262-harness-trap.ts";
 import type { Test262FragmentInput } from "./test262-fragments.ts";
 /* eslint-disable no-await-in-loop -- Each bounded worker sequences its case. */
 
@@ -91,7 +96,6 @@ import {
   collectBoundNames,
   hostMemberRead,
   includePropertiesWhen,
-  omittedMemberReaders,
   parseHarnessDefinitions,
   parseHarnessObjectMembers,
   parseReviewedSubset,
@@ -415,7 +419,8 @@ export function rewriteReviewedPromotions(
  * Module sources are inherently strict, so only Script inputs receive the
  * strict-mode directive; asynchronous cases receive the reviewed `$DONE`
  * harness immediately after the base assertions, mirroring upstream
- * doneprintHandle insertion.
+ * doneprintHandle insertion. A case whose includes keep fewer members than
+ * upstream also receives the omitted-member trap, which needs `trapToken`.
  */
 export function assembleTest262Source(
   source: string,
@@ -423,23 +428,88 @@ export function assembleTest262Source(
   testCase: Test262Case,
   harnesses: Test262Harnesses,
   raw: boolean,
+  trapToken?: string,
 ): string {
   if (raw) return source;
   const parts: string[] = [];
   if (strictnessMode === "strict" && testCase.mode === "script") {
     parts.push('"use strict";');
   }
-  parts.push(harnesses.base);
-  if (testCase.async) parts.push(harnesses.done);
+  for (const harness of test262HarnessSources(testCase, harnesses, trapToken)) {
+    parts.push(harness.source);
+  }
+  parts.push(source);
+  return `${parts.join("\n")}\n`;
+}
+
+/** One harness Script the runner places before a case body. */
+interface Test262HarnessSource {
+  readonly source: string;
+  readonly sourceId: string;
+}
+
+/** Source identifier of the runner-generated omitted-member trap. */
+const harnessTrapSourceId = "harness-trap.js";
+
+/**
+ * The harness sources a case runs before its body, in order: the base
+ * assertions, the reviewed `$DONE` harness for an asynchronous case, each
+ * include, and then the omitted-member trap when an include the case
+ * loads keeps fewer members than upstream. The trap needs `trapToken`,
+ * because its output is recognized only by that token.
+ */
+function test262HarnessSources(
+  testCase: Test262Case,
+  harnesses: Test262Harnesses,
+  trapToken: string | undefined,
+): readonly Test262HarnessSource[] {
+  const sources: Test262HarnessSource[] = [
+    { source: harnesses.base, sourceId: "base.js" },
+  ];
+  if (testCase.async) {
+    sources.push({ source: harnesses.done, sourceId: "doneprintHandle.js" });
+  }
   for (const include of testCase.includes) {
     const harness = harnesses.includes.get(include);
     if (harness == null) {
       throw new Error(`${testCase.path} requires unsupported ${include}.`);
     }
-    parts.push(harness);
+    sources.push({ source: harness, sourceId: include });
   }
-  parts.push(source);
-  return `${parts.join("\n")}\n`;
+  const trapped = harnessTrapObjects(testCase, harnesses);
+  if (trapped.size > 0) {
+    if (trapToken == null) {
+      throw new Error(
+        `${testCase.path} needs a token for the omitted-member trap.`,
+      );
+    }
+    sources.push({
+      source: harnessTrapSource(trapped, trapToken),
+      sourceId: harnessTrapSourceId,
+    });
+  }
+  return sources;
+}
+
+/**
+ * Every global harness object a case loads with omitted upstream members,
+ * mapped to those members. Each such object runs behind the trap.
+ */
+function harnessTrapObjects(
+  testCase: Test262Case,
+  harnesses: Test262Harnesses,
+): ReadonlyMap<string, ReadonlySet<string>> {
+  const trapped = new Map<string, ReadonlySet<string>>();
+  for (const include of testCase.includes) {
+    for (const [name, members] of omittedHarnessMembers(
+      include,
+      testCase,
+      harnesses,
+    )) {
+      trapped.set(name, new Set([...(trapped.get(name) ?? []), ...members]));
+    }
+  }
+  return trapped;
 }
 
 function parseInputSource(
@@ -756,18 +826,21 @@ function unsupportedStructuralCapability(
         detail: `the reviewed harness ${include} omits ${omitted.join(", ")}.`,
       };
     }
-    const readers = omittedMemberReaders(
-      source,
-      parsed.case.mode,
-      omittedHarnessMembers(include, parsed, harnesses),
-    );
-    if (readers.size > 0) {
-      const names = [...readers].toSorted().join(", ");
+    const trapped = omittedHarnessMembers(include, parsed.case, harnesses);
+    // The omitted-member trap relies on a Script whose own statements run
+    // after the harness and on the static output intrinsic; a Module's
+    // imports run first, and the test262 host makes console a global.
+    if (
+      trapped.size > 0 &&
+      (parsed.case.mode === "module" || needsTest262Host(source, parsed))
+    ) {
+      const names = [...trapped.keys()].toSorted().join(", ");
       return {
         capability: "harness-definition",
         detail:
-          `the reviewed harness ${include} omits members of ${names} ` +
-          "that the case may read.",
+          `the reviewed harness ${include} omits members of ${names}, ` +
+          "and its omitted-member trap needs a Script without the test262 " +
+          "host.",
       };
     }
   }
@@ -782,14 +855,14 @@ function unsupportedStructuralCapability(
  */
 function omittedHarnessMembers(
   include: string,
-  parsed: ParsedTest262Case,
+  testCase: Test262Case,
   harnesses: Test262Harnesses,
 ): ReadonlyMap<string, ReadonlySet<string>> {
   const omitted = new Map<string, ReadonlySet<string>>();
   const upstream = harnesses.upstreamMembers?.get(include);
   if (upstream == null) return omitted;
   const reviewed = new Map<string, readonly string[]>();
-  for (const loaded of parsed.case.includes) {
+  for (const loaded of testCase.includes) {
     const text = harnesses.includes.get(loaded);
     if (text == null) continue;
     for (const [name, keys] of harnessObjectMembers(text)) {
@@ -1230,6 +1303,7 @@ function planTest262Variants(
   parsed: ParsedTest262Case,
   testCase: Test262Case,
   harnesses: Test262Harnesses,
+  trapToken: string,
 ): readonly PlannedTest262Strictness[] {
   const planned: PlannedTest262Strictness[] = [];
   for (const strictnessMode of testCase.strictness) {
@@ -1241,6 +1315,7 @@ function planTest262Variants(
           testCase,
           harnesses,
           parsed.flags.includes("raw"),
+          trapToken,
         ),
         kind: "assembled",
         strictness: strictnessMode,
@@ -1443,24 +1518,28 @@ async function executedResult(
     readonly variant: Test262Variant;
   }
   const observations: VariantObservation[] = [];
-  const planned = planTest262Variants(source, parsed, testCase, harnesses);
+  // One token serves every variant, so the trap prints identical output
+  // wherever it fires and the variants stay comparable.
+  const trapToken = harnessTrapToken();
+  const planned = planTest262Variants(
+    source,
+    parsed,
+    testCase,
+    harnesses,
+    trapToken,
+  );
   const admitted = plannedTest262Variants(planned);
   const unassembled = planned.find((plan) => plan.kind === "unassembled");
+  const trapped = harnessTrapObjects(testCase, harnesses).size > 0;
   const request = (input: string, variant: Test262Variant) => ({
     mode: testCase.mode,
     source: input,
     fragment: {
       body: source,
-      sources: [
-        { sourceId: "base.js", source: harnesses.base },
-        ...(testCase.async
-          ? [{ sourceId: "doneprintHandle.js", source: harnesses.done }]
-          : []),
-        ...testCase.includes.map((name) => ({
-          sourceId: name,
-          source: harnesses.includes.get(name)!,
-        })),
-      ],
+      // A raw case runs no harness and never uses the split build.
+      sources: parsed.flags.includes("raw")
+        ? []
+        : test262HarnessSources(testCase, harnesses, trapToken),
       strict: variant.strictness === "strict",
       raw: parsed.flags.includes("raw"),
     },
@@ -1528,6 +1607,41 @@ async function executedResult(
     const observation = entry.settled.observation;
     if (!test262CompileStage(observation)) variants.push(entry.variant);
     observations.push({ observation, variant: entry.variant });
+  }
+  // A case that observed an omitted harness member, or ran without its
+  // trap armed, has no meaningful outcome under the reviewed harness. The
+  // trap leaves its marker on every path, so this decides the result
+  // before a pass, a negative match, or any other classification.
+  if (trapped && !parsed.flags.includes("raw")) {
+    for (const entry of observations) {
+      const observation = entry.observation;
+      const outcome = harnessTrapOutcome(
+        observation.stdout,
+        trapToken,
+        !test262CompileStage(observation) &&
+          !infrastructureFailure(observation) &&
+          (observation.exitStatus === 0 || observation.executed === true),
+      );
+      if (outcome == null) continue;
+      const variant =
+        `${testCase.path} ${entry.variant.strictness} ` +
+        `${entry.variant.specialization}`;
+      return classifyTest262(
+        testCase,
+        {
+          detail:
+            outcome.kind === "trapped"
+              ? `${variant} observed ${outcome.member}, which the reviewed ` +
+                "harness omits."
+              : `${variant} ran without the reviewed harness's ` +
+                "omitted-member trap armed.",
+          failureKind: "harness",
+          passed: false,
+        },
+        supportedFeatures,
+        evidence(),
+      );
+    }
   }
   // A rejected execution can never be masked by another variant's
   // outcome, so it settles the result before any classification that a

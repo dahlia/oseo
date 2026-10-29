@@ -320,39 +320,21 @@ export function hostMemberRead(
   node: AgentSyntaxNode,
   members: ReadonlySet<string> = test262HostMembers,
 ): boolean {
-  const read = staticMemberRead(node);
-  return read?.object === "$262" && members.has(read.key);
-}
-
-/** A member read whose object is a plain identifier and whose key is fixed. */
-interface StaticMemberRead {
-  readonly key: string;
-  readonly object: string;
-}
-
-/**
- * The identifier and key of a member read such as `name.key` or
- * `name["key"]`, or `undefined` when the object is not an identifier or the
- * key is computed from anything other than a string literal.
- */
-function staticMemberRead(node: AgentSyntaxNode): StaticMemberRead | undefined {
   if (
     node.type !== "MemberExpression" &&
     node.type !== "OptionalMemberExpression"
   ) {
-    return undefined;
+    return false;
   }
   const object = agentSyntaxNode(node.object);
   const property = agentSyntaxNode(node.property);
-  if (object?.type !== "Identifier" || !isString(object.name)) return undefined;
+  if (object?.type !== "Identifier" || object.name !== "$262") return false;
   if (node.computed === true) {
-    return property?.type === "StringLiteral" && isString(property.value)
-      ? { key: property.value, object: object.name }
-      : undefined;
+    return (
+      property?.type === "StringLiteral" && members.has(String(property.value))
+    );
   }
-  return property?.type === "Identifier" && isString(property.name)
-    ? { key: property.name, object: object.name }
-    : undefined;
+  return property?.type === "Identifier" && members.has(String(property.name));
 }
 
 export function collectBoundNames(
@@ -441,44 +423,6 @@ export function unresolvedReferenceNames(
   mode: Test262Case["mode"],
   hostMembers: ReadonlySet<string> = test262HostMembers,
 ): ReadonlySet<string> {
-  return unresolvedNames(source, mode, (node) =>
-    hostMemberRead(node, hostMembers),
-  );
-}
-
-/**
- * The names in `omitted` that the parsed case may read an omitted member
- * of, where each entry maps a global harness object to the upstream members
- * its reviewed copy leaves out. A static read such as `name.key` or
- * `name["key"]` of a kept member reads nothing omitted. Any other
- * unresolved reference to the name, including a computed key, an alias, a
- * destructuring pattern, or passing the object to a function, may reach an
- * omitted member, so it counts. Scopes, `typeof` operands, and `with`
- * bodies follow {@link unresolvedReferenceNames}.
- */
-export function omittedMemberReaders(
-  source: string,
-  mode: Test262Case["mode"],
-  omitted: ReadonlyMap<string, ReadonlySet<string>>,
-): ReadonlySet<string> {
-  const readers = unresolvedNames(source, mode, (node) => {
-    const read = staticMemberRead(node);
-    const members = read == null ? undefined : omitted.get(read.object);
-    return read != null && members != null && !members.has(read.key);
-  });
-  return new Set([...omitted.keys()].filter((name) => readers.has(name)));
-}
-
-/**
- * The walk behind {@link unresolvedReferenceNames}. A member read for which
- * `providedRead` holds does not reference its object identifier, because
- * whatever provides that member provides the read.
- */
-function unresolvedNames(
-  source: string,
-  mode: Test262Case["mode"],
-  providedRead: (node: AgentSyntaxNode) => boolean,
-): ReadonlySet<string> {
   let program: unknown;
   try {
     program = parseBabel(source, {
@@ -521,7 +465,7 @@ function unresolvedNames(
       if (syntaxMetadataKeys.has(key)) continue;
       const declared = scoped?.(key) ?? [];
       pending.push({
-        mode: referenceMode(node, key, entry.mode, providedRead),
+        mode: referenceMode(node, key, entry.mode, hostMembers),
         scopes:
           declared.length === 0 ? entry.scopes : [...entry.scopes, ...declared],
         value,
@@ -728,7 +672,7 @@ function referenceMode(
   node: AgentSyntaxNode,
   key: string,
   mode: ReferenceMode,
-  providedRead: (node: AgentSyntaxNode) => boolean,
+  hostMembers: ReadonlySet<string>,
 ): ReferenceMode {
   const nonComputedKey = node.computed === true ? "reference" : "skip";
   if (mode === "binding") {
@@ -777,7 +721,9 @@ function referenceMode(
     case "OptionalMemberExpression":
       if (key === "property") return nonComputedKey;
       // An installed host member is the native test262 host's capability.
-      return key === "object" && providedRead(node) ? "skip" : "reference";
+      return key === "object" && hostMemberRead(node, hostMembers)
+        ? "skip"
+        : "reference";
     case "ObjectProperty":
     case "ClassProperty":
     case "ClassAccessorProperty":

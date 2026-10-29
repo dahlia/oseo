@@ -2131,9 +2131,12 @@ IH-B admits a reviewed subset of *temporalHelpers.js* for the three
 
 Because the subset still declares `TemporalHelpers`, the runner's
 `harness-definition` check also compares literal member keys of upstream
-object-literal definitions. A case that may read an omitted member, through
-a static read of that member or any non-static use of the object, stays an
-explicit unsupported result instead of failing in the harness. No other
+object-literal definitions. The 2026-10-29 maintainer decision replaced
+the first, static prediction of omitted-member reads with a runtime trap:
+the object runs behind a proxy that prints a per-case secret marker before
+throwing on any observation of an omitted member, and the runner
+classifies any marker, or a started program whose trap never armed, as a
+harness failure ahead of every other outcome. No other
 reviewed include is affected. A focused precheck observed the three paths
 as pass before the full UPDATE.
 
@@ -2145,6 +2148,7 @@ demotions or failure classifications. The ledger now assigns them to
 `observation`, so `temporal-helpers-harness` owns no path. Carried
 onto Main `915ec6df` without a new observation, the same records give
 26,957 passes, 3,242 expected negatives and 1,111 unsupported paths
-across 31,310 reviewed cases. The
+across 31,310 reviewed cases. The trap redesign changes *tools/*, so
+these records stand only until Root's next full UPDATE. The
 [IH-B work note](./docs/m5c-graph/temporal-helpers-harness.md) records
 the decision, its tests and the raw packets.

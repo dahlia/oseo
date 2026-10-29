@@ -64,33 +64,23 @@ names, and the subset still declares `TemporalHelpers`. The runner now also
 compares literal member keys. *tools/test262-source.ts* parses each
 top-level object literal initializer of a harness Script, and
 *tools/test262.ts* records the upstream keys of every reviewed include
-next to its `defines`. When a reviewed copy keeps fewer keys, a case that
-may read an omitted member is withheld as `unsupported-profile-feature`
-with capability `harness-definition`. A static read such as
-`TemporalHelpers.observeMethod` or `TemporalHelpers["observeMethod"]` of a
-kept member executes as usual. Any other unresolved reference to the name,
-including a computed key, an alias, destructuring, or passing the object to
-a function, may reach an omitted member and is withheld. Scopes, `typeof`
-operands and `with` bodies follow the existing reference walk. The check
-is syntactic and sees only the name itself: a read through another object
-that holds the global, such as `globalThis.TemporalHelpers`, or through
-source compiled at run time is not withheld. No reviewed path reads either
-way, and run-time source stays outside the admitted profile. An object
-whose literal has a spread or a non-literal computed key infers no
-omission. A sweep over every reviewed include found exactly one affected
-object, `TemporalHelpers`, with 43 omitted members, so no other reviewed
-classification can change. Within the pinned suite, the only other
-*temporalHelpers.js* includes outside the Temporal and Intl directories are
-nine unreviewed *Array/fromAsync/* paths. Seven of them call the omitted
-`observeProperty` and would be withheld if a later node reviewed them.
+next to its `defines`. When a reviewed copy keeps fewer keys, the object
+runs behind the omitted-member trap described under “Runtime trap” below.
+A sweep over every reviewed include found exactly one affected object,
+`TemporalHelpers`, with 43 omitted members, and exactly the three paths in
+the selection rule load it. Within the pinned suite, the only other
+*temporalHelpers.js* includes outside the Temporal and Intl directories
+are nine unreviewed *Array/fromAsync/* paths. Seven of them call the
+omitted `observeProperty` and would be harness failures if a later node
+reviewed them.
 
 *tests/test262-runner.test.ts* runs the reviewed and upstream files in
 fresh realms and compares one probe's complete call log and results over
 every `formatPropertyName` key branch, primitive, object, function and
 undefined property values, `skipToPrimitive`, all four traps and
 `observeMethod` with and without an object name. It also pins the kept
-member list and the reviewed copy's unresolved globals. Further tests cover
-the literal-key parser and the withheld and executed member reads above.
+member list and the reviewed copy's unresolved globals. A further test
+covers the literal-key parser; the trap's tests are listed below.
 The missing-include regression now uses *testIntl.js* as its unadmitted
 example.
 
@@ -160,3 +150,105 @@ The three paths now belong to `observation` in the regenerated closure
 ledger, so `node:temporal-helpers-harness` owns no path. No other
 classification moves. The landed flag and the dependency and
 publication gates remain Root's.
+
+
+Runtime trap
+------------
+
+The first design withheld a case when a syntactic walk predicted that it
+might read an omitted member. Outer review pass 1 found two bypasses: an
+object environment that lacks the name falls through to the global
+binding inside `with`, and a Script `var TemporalHelpers` shares the
+harness binding instead of shadowing it. The guard-fix rounds then found
+nested Script `var`, inherited `valueOf` returning the object, replaced
+kept members, and computed class keys seeing the outer `this`. The
+maintainer decision of 2026-10-29 replaced the static guard with a runtime
+trap, because adding cases could not make the prediction sound. The four
+guard-fix commits are not carried; this U removes `omittedMemberReaders`
+and restores the shared reference walk.
+
+*tools/test262-harness-trap.ts* generates an installer Script that the
+runner places after the includes of every case whose includes keep fewer
+members than upstream. It replaces each such global object with a proxy
+over the reviewed object. Reading, writing, describing, defining,
+deleting, or testing an omitted key, and listing the object's own keys,
+prints `Test262:HarnessTrap:<token>:<member>` and then throws. Listing
+traps because the upstream key list includes every omitted member. Kept
+and unknown keys forward to the reviewed object with the same receiver, so
+kept members behave as upstream, and a write to a kept member changes only
+that member. Every access path reaches the proxy's internal methods, so
+the global object, `with`, `eval`, `Function`, `Reflect`, getters,
+prototype chains, and enumeration need no case of their own. After arming,
+the installer prints `Test262:HarnessArmed:<token>`.
+
+The runner reads each executed variant's standard output before any other
+classification. A trap line with the case's token makes the case a
+`harness-failure`, and so does a started program that printed no armed
+line. Neither can then become a pass or an expected negative. A test
+cannot suppress or forge either line, for these reasons:
+
+ -  The token is 128 random bits drawn for each case and shared by its
+    variants. It appears only in the installer's own closure, which no
+    case code can reach: the proxy hides its handler, and no reachable
+    function's source text contains it. A forged line with any other
+    token is ordinary program output.
+ -  The admitted profile compiles `console.log(...)` as a direct call to
+    the runtime's output intrinsic unless a declaration binds `console`;
+    `console` is not a run-time value a case can replace. A Script-level
+    `console` binding makes the arming call throw before it prints, so
+    that case is unarmed.
+ -  The installer runs before any statement of the case. Only hoisted
+    declarations exist by then, and they rebind names without running
+    code, so every intrinsic property the installer reads is unmodified.
+    It captures `Proxy`, `TypeError`, and six `Reflect` methods and
+    requires each one's `Function.prototype.toString` text to read as
+    native code, which no user function's source can. A rebound or
+    uninitialized intrinsic leaves the case unarmed. Later replacements
+    reach nothing, because the traps call only captured functions, and
+    the handler and omitted-key table have null prototypes.
+ -  The trap prints before it throws, so catching the throw, finishing in
+    a later job, or completing normally cannot remove the line. Standard
+    output is flushed whenever the program returns, which every pass and
+    every expected negative requires. A process that dies without
+    flushing loses its armed line and so remains a harness failure.
+
+A Module case runs its imports before the harness, and a case built with
+the test262 host reads `console` from the global object. The runner
+withholds a case that loads a trapped object in either form as
+`unsupported-profile-feature` with capability `harness-definition`; no
+reviewed path is one. A host failure, an owned compile-stage rejection, or
+an infrastructure diagnostic does not count as an unarmed start, so those
+keep their existing classification.
+
+*tests/test262-harness-trap.test.ts* runs each previously found bypass,
+together with the global object, getter, prototype, enumeration,
+`Reflect`, `eval`, and `Function` paths, in a fresh realm through
+`executeTest262Case`, both as an ordinary case and as a runtime negative
+expecting `TypeError`; each is a harness failure. It also covers caught
+traps, kept members including `with` over the object, forged marker
+lines, hoisted rebinding of each captured intrinsic and of `console`, the
+Module and test262-host withholding, and scripted variant outputs: a
+pass, a matching negative, a marker without its line break, a killed
+process with and without its buffered output, a trap only in a later
+variant, and a trap beside an infrastructure diagnostic.
+*tests/test262-harness-trap-native.test.ts* builds nine cases natively
+through the split-harness executor: kept members pass, a forged marker
+passes, and the `with` and Script `var` bypasses, a caught trap, a
+replaced kept member, `Object.keys`, a trap caught in a later job, and a
+hoisted `Proxy` are harness failures.
+
+The trap U starts at Main `915ec6df8eaf237e807b263c06a4139a8418a940` with
+this node's two source commits and the carried records above. A sweep
+(*/data/m5c-ihb-redesign-20261029/sweep/*) compared every one of the 27
+reviewed includes with upstream and parsed all 31,310 reviewed subset
+paths: only *temporalHelpers.js* omits members, and only the three Script
+paths in the selection rule load it, so no other reviewed classification
+can change. The focused driver from the first U, with its selection fixed
+to those three paths, ran under *run-gate.py* in *precheck1/* and
+*precheck1-gate/*: 12 split native variants, each armed and none trapped,
+all three paths pass, zero retries, and unchanged tracked inputs.
+*focused2/* ran the earlier 12 runner-adjacent files plus the two trap
+files: 187/187 under Node on the Zig lane, 187/187 under Deno, and the
+seven native-building files 54/54 under Node on the host-cc lane.
+*focused1/* found two raw-case regressions and a Deno-only type error,
+fixed before *focused2/*. Root owns the full UPDATE on this U.
