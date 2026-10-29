@@ -531,6 +531,23 @@ observed prerequisites already cover that work. Future observations can still
 justify a bounded node, whose terminal result must reach `m5-exit-audit`. The
 graph validator rejects any node outside that path.
 
+Each node record names its `id`, `title`, `delivers`, `dependencies`,
+`landed`, `status`, and schema `version`. A parked node also gives a `reason`.
+The optional `after` field is a sorted, unique array of node IDs, empty when
+omitted. It means selection and publication wait until every named node has
+landed. Both `dependencies` and `after` must name existing nodes, cannot name
+the node itself, and together must be acyclic. A landed node must have landed
+targets for both fields. An unparked node cannot wait on a parked target.
+
+For an unparked node, `status` is `ready` only when all direct `dependencies`
+and `after` targets have landed; otherwise it is `blocked`. The graph summary
+counts these validated statuses. Ordering does not add transitive dependency
+ancestry: the collision-group rule and the required dependency path to
+`m5-exit-audit` follow only `dependencies`. Keep publication collisions even
+when `after` orders the publishers. For example, DS-2 waits on batches 20 and
+30, and DS-3 waits on batches 19, 20, and 30, without making their umbrella a
+dependent of those batches.
+
 Observation batches are deterministic and small enough for one reviewer to
 inspect their applicability and classifications. A batch records its path
 selector, exact path count, shared prerequisites, and expected manifest

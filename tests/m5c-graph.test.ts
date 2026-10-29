@@ -306,6 +306,173 @@ test("M5c graph rejects a landed node with an unlanded dependency", () => {
   );
 });
 
+test("M5c graph validates after targets and landed ordering", () => {
+  for (const [after, overrides, message] of [
+    [["missing-node"], {}, /after unknown node missing-node/u],
+    [["closure-ledger"], {}, /after itself/u],
+    [["Invalid_ID"], {}, /kebab-case node ID/u],
+    [["bootstrap-graph", "bootstrap-graph"], {}, /must not repeat/u],
+    [["m5-exit-audit", "bootstrap-graph"], {}, /must be sorted/u],
+    [null, {}, /must be an array/u],
+    [["m5-exit-audit"], { landed: true }, /landed but after target/u],
+  ] as const) {
+    assert.throws(
+      () =>
+        validateM5cWorkGraph(
+          graphSource(),
+          [
+            bootstrap,
+            exitAudit,
+            nodeSource("closure-ledger", {
+              after,
+              ...overrides,
+            }),
+          ],
+          baseline,
+        ),
+      message,
+    );
+  }
+});
+
+test("M5c graph rejects after-only and mixed dependency cycles", () => {
+  for (const dependencies of [[], ["bootstrap-graph"]]) {
+    assert.throws(
+      () =>
+        validateM5cWorkGraph(
+          graphSource(),
+          [
+            nodeSource("bootstrap-graph", { after: ["closure-ledger"] }),
+            nodeSource("closure-ledger", {
+              after: dependencies.length === 0 ? ["bootstrap-graph"] : [],
+              dependencies,
+            }),
+            exitAudit,
+          ],
+          baseline,
+        ),
+      /dependency cycle.*including after/u,
+    );
+  }
+});
+
+test("M5c graph waits for after targets without collision ancestry", () => {
+  for (const landed of [false, true]) {
+    const status = landed ? "ready" : "blocked";
+    assert.deepEqual(
+      validateM5cWorkGraph(
+        graphSource({
+          summary: {
+            blocked: landed ? 1 : 2,
+            landed: landed ? 1 : 0,
+            nodes: 3,
+            parked: 0,
+            ready: landed ? 2 : 1,
+          },
+          collisions: [
+            {
+              nodes: ["bootstrap-graph", "closure-ledger"],
+              note: "Publication still needs serialization.",
+              path: "tests/test262/results.yaml",
+            },
+          ],
+        }),
+        [
+          nodeSource("bootstrap-graph", { landed }),
+          nodeSource("closure-ledger", { after: ["bootstrap-graph"], status }),
+          nodeSource("m5-exit-audit", {
+            dependencies: ["bootstrap-graph", "closure-ledger"],
+            status: "blocked",
+          }),
+        ],
+        baseline,
+      ),
+      {
+        blocked: landed ? 1 : 2,
+        landed: landed ? 1 : 0,
+        nodes: 3,
+        parked: 0,
+        ready: landed ? 2 : 1,
+      },
+    );
+  }
+});
+
+test("M5c graph rejects ready status while after is unlanded", () => {
+  assert.throws(
+    () =>
+      validateM5cWorkGraph(
+        graphSource(),
+        [
+          nodeSource("bootstrap-graph"),
+          exitAudit,
+          nodeSource("closure-ledger", { after: ["bootstrap-graph"] }),
+        ],
+        baseline,
+      ),
+    /and after targets make it blocked/u,
+  );
+});
+
+test("M5c graph rejects an unparked node ordered after a parked node", () => {
+  assert.throws(
+    () =>
+      validateM5cWorkGraph(
+        graphSource(),
+        [
+          nodeSource("bootstrap-graph", {
+            status: "parked",
+            reason: "Pending.",
+          }),
+          exitAudit,
+          nodeSource("closure-ledger", { after: ["bootstrap-graph"] }),
+        ],
+        baseline,
+      ),
+    /after parked node bootstrap-graph/u,
+  );
+});
+
+test("M5c graph keeps after out of collision and exit ancestry", () => {
+  const nodes = [
+    bootstrap,
+    nodeSource("closure-ledger", { after: ["bootstrap-graph"], landed: true }),
+    nodeSource("m5-exit-audit", { dependencies: ["closure-ledger"] }),
+  ];
+  assert.throws(
+    () => validateM5cWorkGraph(graphSource(), nodes, baseline),
+    /bootstrap-graph is not on the m5-exit-audit path/u,
+  );
+  assert.deepEqual(
+    validateM5cWorkGraph(
+      graphSource({
+        summary: { blocked: 1, landed: 2, nodes: 4, parked: 0, ready: 3 },
+        collisions: [
+          {
+            nodes: ["bootstrap-graph", "publication-owner"],
+            note: "Shared publication.",
+            path: "tests/test262/results.yaml",
+          },
+        ],
+      }),
+      [
+        bootstrap,
+        nodeSource("closure-ledger", {
+          after: ["bootstrap-graph"],
+          landed: true,
+        }),
+        nodeSource("publication-owner", { dependencies: ["closure-ledger"] }),
+        nodeSource("m5-exit-audit", {
+          dependencies: ["bootstrap-graph", "publication-owner"],
+          status: "blocked",
+        }),
+      ],
+      baseline,
+    ),
+    { blocked: 1, landed: 2, nodes: 4, parked: 0, ready: 3 },
+  );
+});
+
 const manifestSummary: Test262Summary = {
   dependencies: [],
   expectedNegatives: 1,
@@ -384,8 +551,8 @@ test("the checked-in M5c work graph is valid", () => {
   assert.ok(summary.landed >= 72);
   assert.equal(summary.parked, 0);
   assert.equal(summary.nodes, 112);
-  assert.equal(summary.ready, 109);
-  assert.equal(summary.blocked, 3);
+  assert.equal(summary.ready, 107);
+  assert.equal(summary.blocked, 5);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -442,6 +609,7 @@ test("import attribute accounting retains its bounded graph contract", () => {
 });
 
 interface PublicationNode {
+  readonly after?: readonly string[];
   readonly id: string;
   readonly dependencies: readonly string[];
   readonly landed: boolean;
@@ -697,5 +865,21 @@ test("observation train retains bounded remediation dependencies", () => {
     for (const prerequisite of prerequisites) {
       assert.ok(batch.dependencies.includes(prerequisite), prerequisite);
     }
+  }
+});
+
+test("dynamic-source selection waits for its observation batches", () => {
+  validateCurrentM5cWorkGraph();
+  for (const [id, batches] of [
+    ["dynamic-source-module-semantics", [20, 30]],
+    ["dynamic-source-unknown-eval", [19, 20, 30]],
+  ] as const) {
+    const node = readImportAttributesNode(id);
+    assert.deepEqual(
+      node.after,
+      batches.map((batch) => `observation-batch-${batch}`),
+    );
+    assert.equal(node.status, "blocked");
+    assert.equal(node.landed, false);
   }
 });

@@ -73,6 +73,7 @@ export interface M5cBaseline {
 }
 
 interface M5cWorkGraphNode {
+  readonly after: readonly string[];
   readonly dependencies: readonly string[];
   readonly id: string;
   readonly landed: boolean;
@@ -302,6 +303,7 @@ function parseNode(source: M5cWorkGraphSource): M5cWorkGraphNode {
   requireExactKeys(
     value,
     new Set([
+      ...("after" in value ? ["after"] : []),
       "delivers",
       "dependencies",
       "id",
@@ -331,6 +333,16 @@ function parseNode(source: M5cWorkGraphSource): M5cWorkGraphNode {
       throw new Error(`${context} depends on itself.`);
     }
   }
+  const after =
+    "after" in value
+      ? sortedUniqueStrings(value.after, `${context} after`, true)
+      : [];
+  for (const [index, target] of after.entries()) {
+    nodeId(target, `${context} after entry ${index}`);
+    if (target === id) {
+      throw new Error(`${context} orders itself after itself.`);
+    }
+  }
   const status = stringValue(value.status, `${context} status`);
   if (status !== "blocked" && status !== "parked" && status !== "ready") {
     throw new Error(`${context} has unknown status ${status}.`);
@@ -344,11 +356,12 @@ function parseNode(source: M5cWorkGraphSource): M5cWorkGraphNode {
   }
   stringValue(value.delivers, `${context} delivers`);
   stringValue(value.title, `${context} title`);
-  return { dependencies, id, landed, status };
+  return { after, dependencies, id, landed, status };
 }
 
 function transitiveDependencies(
   nodes: ReadonlyMap<string, M5cWorkGraphNode>,
+  includeAfter = false,
 ): ReadonlyMap<string, ReadonlySet<string>> {
   const resolved = new Map<string, ReadonlySet<string>>();
   const visiting = new Set<string>();
@@ -357,11 +370,19 @@ function transitiveDependencies(
     if (cached != null) return cached;
     if (visiting.has(id)) {
       const cycle = [...trail.slice(trail.indexOf(id)), id].join(" -> ");
-      throw new Error(`M5c work graph has a dependency cycle: ${cycle}.`);
+      throw new Error(
+        "M5c work graph has a dependency cycle" +
+          `${includeAfter ? " (including after)" : ""}: ${cycle}.`,
+      );
     }
     visiting.add(id);
     const reachable = new Set<string>();
-    for (const dependency of nodes.get(id)?.dependencies ?? []) {
+    const node = nodes.get(id);
+    const prerequisites = [
+      ...(node?.dependencies ?? []),
+      ...(includeAfter ? (node?.after ?? []) : []),
+    ];
+    for (const dependency of prerequisites) {
       reachable.add(dependency);
       for (const nested of visit(dependency, [...trail, id])) {
         reachable.add(nested);
@@ -578,6 +599,22 @@ export function validateM5cWorkGraph(
   }
   for (const node of nodes.values()) {
     const context = `M5c work graph node ${node.id}`;
+    for (const after of node.after) {
+      const target = nodes.get(after);
+      if (target == null) {
+        throw new Error(
+          `${context} orders itself after unknown node ${after}.`,
+        );
+      }
+      if (target.status === "parked" && node.status !== "parked") {
+        throw new Error(`${context} orders itself after parked node ${after}.`);
+      }
+      if (node.landed && !target.landed) {
+        throw new Error(
+          `${context} is landed but after target ${after} is not.`,
+        );
+      }
+    }
     for (const dependency of node.dependencies) {
       const target = nodes.get(dependency);
       if (target == null) {
@@ -596,10 +633,12 @@ export function validateM5cWorkGraph(
       }
     }
   }
+  // Ordering affects scheduling and cycles, but not ownership or collisions.
+  transitiveDependencies(nodes, true);
   const reachable = transitiveDependencies(nodes);
   for (const node of nodes.values()) {
     if (node.status === "parked") continue;
-    const expected = node.dependencies.every(
+    const expected = [...node.dependencies, ...node.after].every(
       (dependency) => nodes.get(dependency)?.landed === true,
     )
       ? "ready"
@@ -607,7 +646,8 @@ export function validateM5cWorkGraph(
     if (node.status !== expected) {
       throw new Error(
         `M5c work graph node ${node.id} records status ${node.status} but ` +
-          `dependencies make it ${expected}.`,
+          `dependencies${node.after.length > 0 ? " and after targets" : ""} ` +
+          `make it ${expected}.`,
       );
     }
   }

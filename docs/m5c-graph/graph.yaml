@@ -21,8 +21,8 @@ baseline:
   unsupportedProfileFeatures: 1111
 summary:
   nodes: 112
-  ready: 109
-  blocked: 3
+  ready: 107
+  blocked: 5
   parked: 0
   landed: 72
 serializationPoints:
