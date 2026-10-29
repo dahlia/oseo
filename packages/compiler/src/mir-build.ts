@@ -3714,11 +3714,23 @@ function lowerOptionalChain(
 ): number {
   const shortBlock = createMirBlock(builder);
   let pendingSuper = superOperand(expression.base);
-  let value =
-    pendingSuper == null
-      ? lowerExpression(expression.base, builder)
-      : lowerSuperReceiver(pendingSuper, builder);
+  let value: number;
   let receiver: number | undefined;
+  if (pendingSuper != null) {
+    value = lowerSuperReceiver(pendingSuper, builder);
+  } else if (
+    expression.base.kind === "with-get" &&
+    expression.links[0]?.kind === "call"
+  ) {
+    // The chain keeps the base's Reference, so a first call link takes
+    // WithBaseObject as `this`, as the ordinary call `f()` does: the
+    // selected object, or `undefined` for a lexical or global fallback.
+    const reference = lowerWithRead(expression.base, builder, true);
+    value = reference.value;
+    receiver = reference.receiver;
+  } else {
+    value = lowerExpression(expression.base, builder);
+  }
   let shortConsumed = false;
   for (const [index, link] of expression.links.entries()) {
     if (pendingSuper != null && link.kind !== "member") {

@@ -8131,7 +8131,7 @@ observation in *tests/native.ts* compiles the program in
 *tests/native/fixtures/with-get-binding-value.ts* under both specialization
 policies with collection forced at every safepoint, and requires a positive
 collection count and the exact ECMA-262 output. With specialization disabled
-it also requires zero guard hits and misses. Its 27 rows cover, in sloppy and
+it also requires zero guard hits and misses. Its 35 rows cover, in sloppy and
 strict code:
 
  -  a binding deleted by a `Symbol.unscopables` getter, behind a global or a
@@ -8142,6 +8142,11 @@ strict code:
  -  the Proxy trace that the pinned test262 cases assert, a Proxy whose
     second `has` answers `false` or throws, and a Proxy miss followed by the
     next object.
+ -  an optional call `f?.()` after deletion, which short-circuits non-strict
+    code before its arguments, and a traced Proxy's optional call, whose
+    `this` is the Proxy, beside a second `has` that answers `false` or
+    throws. Node `with-optional-call-receiver-non-tail` added these eight
+    rows.
 
 The existing *m5-global-object-record.property.test.ts* family adds slot
 `0x60003d02` with 12 ordinary cases and a 180-second interrupt limit. It
@@ -8165,18 +8170,24 @@ change. It admits no test262 path: the four pinned GetBindingValue cases
 under *test/language/statements/with/* remain unreviewed with
 `observation-batch-28`.
 
-This correction does not cover optional calls. An optional call such as
-`with (o) { f?.() }` lowers its identifier callee as a value and passes
-`undefined` instead of the selected object as `this`. Native runs on
-`13ab5051` observed `false` for a strict `this === o` check under both
-specialization policies, where ECMA-262 and the ordinary call give `true`.
-That commit precedes this correction, which was not executed for that
-program; static analysis shows the correction leaves the optional-chain
-lowering unchanged. This is a known remaining defect, not an exclusion. Active
-remediation node `with-optional-call-receiver` owns it, and `m5-exit-audit`
-depends on that node. The
+Optional calls follow the same order. An optional call such as
+`with (o) { f?.() }` keeps its identifier callee's Reference, so outside tail
+position its first call link receives WithBaseObject as `this`: the selected
+object after GetBindingValue's own HasProperty and Get, or `undefined` for a
+lexical or global fallback. Before M5c node
+`with-optional-call-receiver-non-tail` the lowering read the callee as a value
+and passed `undefined`. A binding gone before Get short-circuits a non-strict
+chain and throws `ReferenceError` in strict code, both before the arguments.
+The
+[*with-optional-call-receiver-non-tail.md*](./docs/m5c-graph/with-optional-call-receiver-non-tail.md)
+record lists the native, generated, and structural evidence.
+
+Strict tail-position optional calls through `with`, such as `return f?.()` in
+a strict function nested in a `with` body, remain a known gap, not an
+exclusion. Active node `with-optional-call-receiver-tail` owns their evidence,
+and `m5-exit-audit` depends on the umbrella `with-optional-call-receiver`. The
 [*with-optional-call-receiver.md*](./docs/m5c-graph/with-optional-call-receiver.md)
-record holds the evidence and the repair contract.
+record holds the defect and the repair contract.
 
 [identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
 [call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js

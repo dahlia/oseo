@@ -19,4 +19,4 @@ dependencies:
   - proper-tail-calls
   - with-optional-call-receiver-non-tail
 landed: false
-status: blocked
+status: ready

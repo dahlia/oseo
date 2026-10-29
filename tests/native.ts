@@ -1089,9 +1089,9 @@ for (const specialization of ["disabled", "enabled"] as const) {
 
 /*
  * GetBindingValue repeats HasProperty on the Object Environment Record
- * HasBinding selected, so an identifier read, `typeof`, or call whose
- * binding disappears in between reads `undefined` or throws in strict
- * code. V8 and JSC both skip that test, differently, so this native-only
+ * HasBinding selected, so an identifier read, `typeof`, call, or optional
+ * call whose binding disappears in between reads `undefined` or throws in
+ * strict code. V8 and JSC both skip that test, differently, so this native-only
  * observation compares the compiled program with the ECMA-262 2025 text.
  * Both policies force collection at every safepoint.
  */
@@ -1453,6 +1453,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "with-strict-heritage-write" ||
+    fixture.name === "with-optional-call-receiver" ||
     fixture.name === "object-prototype" ||
     fixture.name === "catchable-type-errors" ||
     fixture.name === "aggregate-error-and-options" ||
@@ -1758,6 +1759,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "eval-intrinsic-value" ||
             fixture.name === "globalthis-binding" ||
             fixture.name === "with-strict-heritage-write" ||
+            fixture.name === "with-optional-call-receiver" ||
             fixture.name === "object-prototype" ||
             fixture.name === "function-prototype" ||
             fixture.name === "iterator-helpers-eager" ||

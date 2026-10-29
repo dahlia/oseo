@@ -310,3 +310,278 @@ test(
     );
   },
 );
+
+type WithSelection = "blocked" | "inherited" | "miss" | "own";
+type WithCalleeKind = "function" | "null" | "number" | "undefined";
+type WithVanish = "delete" | "none" | "throw";
+
+/**
+ * One optional call `f?.(argument())` outside tail position whose callee
+ * resolves through a traced `with` Proxy. `selection` fixes what the
+ * Proxy's target holds: an own or inherited `f`, an own `f` that
+ * `@@unscopables` blocks, or none. A miss or a block reaches an optional
+ * outer `with` object, then a lexical or global `f`. `vanish` answers
+ * GetBindingValue's second `has` on a selected Proxy as present, missing,
+ * or abrupt. A strict caller is a strict function nested in the body.
+ */
+interface WithOptionalCallCase {
+  readonly argument: number;
+  readonly callee: WithCalleeKind;
+  readonly fallback: "global" | "lexical";
+  readonly outer: boolean;
+  readonly selection: WithSelection;
+  readonly strict: boolean;
+  readonly vanish: WithVanish;
+}
+
+const withCallArbitrary: fc.Arbitrary<WithOptionalCallCase> = fc.record({
+  argument: fc.integer({ max: 20, min: -20 }),
+  callee: fc.constantFrom<WithCalleeKind>(
+    "function",
+    "null",
+    "number",
+    "undefined",
+  ),
+  fallback: fc.constantFrom("global" as const, "lexical" as const),
+  outer: fc.boolean(),
+  selection: fc.constantFrom<WithSelection>(
+    "blocked",
+    "inherited",
+    "miss",
+    "own",
+  ),
+  strict: fc.boolean(),
+  vanish: fc.constantFrom<WithVanish>("delete", "none", "throw"),
+});
+
+function calleeSource(kind: WithCalleeKind): string {
+  if (kind === "function") return "callee";
+  if (kind === "number") return "1";
+  return kind;
+}
+
+function innerTargetSource(testCase: WithOptionalCallCase): string {
+  const f = calleeSource(testCase.callee);
+  if (testCase.selection === "own") return `{ f: ${f} }`;
+  if (testCase.selection === "inherited") return `Object.create({ f: ${f} })`;
+  if (testCase.selection === "blocked") {
+    return `{ f: ${f}, [Symbol.unscopables]: { f: true } }`;
+  }
+  return "{}";
+}
+
+function printWithCallCase(testCase: WithOptionalCallCase): string {
+  const call = testCase.strict
+    ? '(function () {\n      "use strict";\n' +
+      "      var r = f?.(argument());\n      return r;\n    })()"
+    : "f?.(argument())";
+  const body = `with (inner) {\n    result = ${call};\n  }`;
+  const wrapped = testCase.outer ? `with (outer) {\n  ${body}\n  }` : body;
+  const lexical = testCase.fallback === "lexical";
+  const binding = `var f = ${calleeSource(testCase.callee)};`;
+  return `
+var log = [];
+var answers = ["first", ${JSON.stringify(testCase.vanish)}];
+function callee(value) {
+  "use strict";
+  log.push("call");
+  return [this, value];
+}
+function argument() {
+  log.push("argument");
+  return ${testCase.argument};
+}
+var outer = { f: ${calleeSource(testCase.callee)} };
+var inner = new Proxy(${innerTargetSource(testCase)}, {
+  has(target, key) {
+    if (key !== "f") return false;
+    var answer = answers.shift();
+    log.push("has:" + answer);
+    if (answer === "throw") throw new RangeError("has");
+    if (answer === "delete") return false;
+    return Reflect.has(target, key);
+  },
+  get(target, key, receiver) {
+    if (key === "f" || key === Symbol.unscopables) {
+      log.push("get:" + String(key));
+    }
+    return Reflect.get(target, key, receiver);
+  },
+});
+function name(value) {
+  if (value === inner) return "inner";
+  if (value === outer) return "outer";
+  if (value === undefined) return "undefined";
+  return "other";
+}
+${lexical ? "" : binding}
+function run() {
+  ${lexical ? binding : ""}
+  var result;
+  try {
+  ${wrapped}
+  } catch (error) {
+    return error.constructor.name;
+  }
+  return result === undefined
+    ? "undefined"
+    : name(result[0]) + " " + result[1];
+}
+var shown = run();
+console.log(log.join(" "));
+console.log("result", shown);
+`;
+}
+
+/**
+ * ECMA-262 2025 ResolveBinding, GetBindingValue, and the optional call's
+ * EvaluateCall for the generated case, written independently of the
+ * compiler. An Object Environment Record's HasBinding asks `has`, then
+ * reads `@@unscopables`; GetBindingValue asks `has` again before Get. The
+ * call's `this` is WithBaseObject: the selected object, or `undefined`
+ * for a declarative or global binding.
+ */
+function expectedWithCall(testCase: WithOptionalCallCase): string {
+  const log: string[] = ["has:first"];
+  const finish = (result: string): string =>
+    `${log.join(" ")}\nresult ${result}\n`;
+  let receiver = "undefined";
+  let value: WithCalleeKind = testCase.callee;
+  const present = testCase.selection !== "miss";
+  if (present) log.push("get:Symbol(Symbol.unscopables)");
+  if (present && testCase.selection !== "blocked") {
+    log.push(`has:${testCase.vanish}`);
+    if (testCase.vanish === "throw") return finish("RangeError");
+    if (testCase.vanish === "delete") {
+      if (testCase.strict) return finish("ReferenceError");
+      value = "undefined";
+    } else {
+      log.push("get:f");
+    }
+    receiver = "inner";
+  } else if (testCase.outer) {
+    receiver = "outer";
+  }
+  if (value === "null" || value === "undefined") return finish("undefined");
+  log.push("argument");
+  if (value === "number") return finish("TypeError");
+  log.push("call");
+  return finish(`${receiver} ${testCase.argument}`);
+}
+
+test("with optional call model keeps WithBaseObject as this", () => {
+  const base = {
+    argument: 2,
+    callee: "function",
+    fallback: "lexical",
+    outer: true,
+    strict: false,
+    vanish: "none",
+  } as const;
+  assert.equal(
+    expectedWithCall({ ...base, selection: "inherited" }),
+    "has:first get:Symbol(Symbol.unscopables) has:none get:f argument " +
+      "call\nresult inner 2\n",
+  );
+  assert.equal(
+    expectedWithCall({ ...base, selection: "blocked" }),
+    "has:first get:Symbol(Symbol.unscopables) argument call\n" +
+      "result outer 2\n",
+  );
+  assert.equal(
+    expectedWithCall({ ...base, outer: false, selection: "miss" }),
+    "has:first argument call\nresult undefined 2\n",
+  );
+  assert.equal(
+    expectedWithCall({ ...base, selection: "own", vanish: "delete" }),
+    "has:first get:Symbol(Symbol.unscopables) has:delete\n" +
+      "result undefined\n",
+  );
+  assert.equal(
+    expectedWithCall({
+      ...base,
+      selection: "own",
+      strict: true,
+      vanish: "delete",
+    }),
+    "has:first get:Symbol(Symbol.unscopables) has:delete\n" +
+      "result ReferenceError\n",
+  );
+});
+
+test(
+  "generated with optional calls match the M5 property model",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "optional calls through with keep WithBaseObject as their receiver",
+      fc.asyncProperty(withCallArbitrary, async (testCase) => {
+        const source = printWithCallCase(testCase);
+        const expectedObservation = {
+          exitStatus: 0,
+          stderr: "",
+          stdout: expectedWithCall(testCase),
+        };
+        // V8 skips GetBindingValue's second `has`, so the reference
+        // engines cannot observe this trace; native runs meet the model.
+        for (const specialization of ["disabled", "enabled"] as const) {
+          const compiled = compileSource(
+            babelFrontend,
+            { source, sourceId: "generated-m5-with-optional-call.js" },
+            { observeSpecialization: true, specialization },
+          );
+          assert.deepEqual(compiled.diagnostics, []);
+          assert.ok(compiled.mir != null);
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            await withNativeFixture(
+              {
+                backend: cBackend,
+                host,
+                input: compiled.mir,
+                operation: "execute",
+                runtime: cRuntimeProvider,
+                target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                toolchain: nativeToolchain,
+              },
+              (native) => {
+                assertMatchingObservations([expectedObservation, native]);
+                assert.ok(native.counters?.collections != null);
+                assert.ok(native.counters.collections > 0);
+                if (specialization === "disabled") {
+                  assert.equal(native.counters.guardHits, 0);
+                  assert.equal(native.counters.guardMisses, 0);
+                }
+              },
+            );
+          } finally {
+            delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+          }
+        }
+      }),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "one non-tail optional call f?.(argument()), sloppy or from a " +
+          "strict nested function, whose callee resolves through a traced " +
+          "with Proxy holding an own, inherited, unscopables-blocked, or " +
+          "no f, an optional outer with object, and a lexical or global " +
+          "fallback, with a function, null, undefined, or non-callable " +
+          "callee and a present, missing, or abrupt second has",
+        numRuns: 10,
+        profile: "M5 optional chaining",
+        seed: 0x6000_2401,
+        sizeLimit: "one optional call, two with objects, and one integer",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

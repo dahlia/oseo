@@ -6,7 +6,10 @@
  * `undefined` in non-strict code and throws ReferenceError in strict code,
  * including under `typeof` and before a call evaluates its arguments. A
  * call still receives the selected object as `this`, and an abrupt second
- * `has` propagates. The expected text follows that algorithm and the pinned
+ * `has` propagates. An optional call `f?.()` takes the same steps: a
+ * binding gone before Get short-circuits the non-strict chain before its
+ * arguments, and a present one is called with the selected Proxy as
+ * `this`. The expected text follows that algorithm and the pinned
  * test262 get-binding-value cases under *test/language/statements/with/*.
  * Node.js and Deno (V8) skip the second HasProperty, and Bun (JSC) differs
  * from both, so *tests/native.ts* compares the compiled program with this
@@ -60,6 +63,28 @@ function flicker(log, answers) {
       return Reflect.get(t, k, r);
     },
   });
+}
+function tracedCall(log, answers) {
+  var environment = new Proxy({
+    f: function () {
+      "use strict";
+      log.push("call");
+      return this === environment;
+    },
+  }, {
+    has(t, k) {
+      if (k !== "f") return false;
+      var a = answers.shift();
+      log.push("has:" + String(k) + "=" + a);
+      if (a === "throw") throw new RangeError("has");
+      return a;
+    },
+    get(t, k, r) {
+      log.push("get:" + String(k));
+      return Reflect.get(t, k, r);
+    },
+  });
+  return environment;
 }
 function run(strict) {
   var s = strict ? "strict" : "sloppy";
@@ -197,6 +222,46 @@ function run(strict) {
     }
   }
   lines.push("P4 " + s + " proxy-miss-next " + r + " [" + log + "]");
+  log = [];
+  with (disappearing("f")) {
+    r = strict
+      ? (function () {
+          "use strict";
+          return show(function () { return f?.(args()); });
+        })()
+      : show(function () { return f?.(args()); });
+  }
+  lines.push("O1 " + s + " optional-call-disappear " + r + " [" + log + "]");
+  log = [];
+  with (tracedCall(log, [true, true])) {
+    r = strict
+      ? (function () {
+          "use strict";
+          return show(function () { return f?.(args()); });
+        })()
+      : show(function () { return f?.(args()); });
+  }
+  lines.push("O2 " + s + " optional-call-proxy " + r + " [" + log + "]");
+  log = [];
+  with (tracedCall(log, [true, false])) {
+    r = strict
+      ? (function () {
+          "use strict";
+          return show(function () { return f?.(args()); });
+        })()
+      : show(function () { return f?.(args()); });
+  }
+  lines.push("O3 " + s + " optional-call-flicker " + r + " [" + log + "]");
+  log = [];
+  with (tracedCall(log, [true, "throw"])) {
+    r = strict
+      ? (function () {
+          "use strict";
+          return show(function () { return f?.(args()); });
+        })()
+      : show(function () { return f?.(args()); });
+  }
+  lines.push("O4 " + s + " optional-call-has-throws " + r + " [" + log + "]");
 }
 run(false);
 run(true);
@@ -230,6 +295,13 @@ export const withGetBindingValueExpected: string =
     `P3 sloppy proxy-has-throws RangeError [has:x=true,${unscopablesGet},` +
       "has:x=throw]",
     "P4 sloppy proxy-miss-next 2 [has:x=false]",
+    "O1 sloppy optional-call-disappear undefined []",
+    `O2 sloppy optional-call-proxy true [has:f=true,${unscopablesGet},` +
+      "has:f=true,get:f,args,call]",
+    `O3 sloppy optional-call-flicker undefined [has:f=true,${unscopablesGet},` +
+      "has:f=false]",
+    `O4 sloppy optional-call-has-throws RangeError [has:f=true,` +
+      `${unscopablesGet},has:f=throw]`,
     "R0 strict coordinator-eval-probe ReferenceError",
     "R1 strict root-eval-probe ReferenceError",
     "R2 strict disappear-lexical-fallback ReferenceError",
@@ -245,5 +317,12 @@ export const withGetBindingValueExpected: string =
     `P3 strict proxy-has-throws RangeError [has:x=true,${unscopablesGet},` +
       "has:x=throw]",
     "P4 strict proxy-miss-next 2 [has:x=false]",
+    "O1 strict optional-call-disappear ReferenceError []",
+    `O2 strict optional-call-proxy true [has:f=true,${unscopablesGet},` +
+      "has:f=true,get:f,args,call]",
+    "O3 strict optional-call-flicker ReferenceError [has:f=true," +
+      `${unscopablesGet},has:f=false]`,
+    `O4 strict optional-call-has-throws RangeError [has:f=true,` +
+      `${unscopablesGet},has:f=throw]`,
     "G1 sloppy collection kept",
   ].join("\n") + "\n";

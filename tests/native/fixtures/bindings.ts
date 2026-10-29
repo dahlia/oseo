@@ -273,6 +273,129 @@ console.log("after", "x" in deleting, open.x, frozen.x,
       .join("\n"),
   },
   {
+    // An optional call keeps its identifier callee's Reference, so a
+    // callee resolved through `with` receives WithBaseObject as `this`
+    // outside tail position, exactly as the ordinary call does. The
+    // arguments allocate, so forced collection runs while the selected
+    // receiver is live only in the call link.
+    name: "with-optional-call-receiver",
+    nonStrictScript: true,
+    source: `
+var log = [];
+function who(a, b) {
+  "use strict";
+  log.push("call");
+  return [this, a, b];
+}
+function churn(label) {
+  log.push(label);
+  var kept = [];
+  for (var i = 0; i < 8; i++) kept.push({ i: i });
+  return kept.length;
+}
+function name(receiver) {
+  if (receiver === undefined) return "undefined";
+  if (receiver === globalThis) return "global";
+  return receiver.tag === undefined ? "object" : receiver.tag;
+}
+function show(label, run) {
+  log = [];
+  var shown;
+  try {
+    var result = run();
+    shown = result === undefined
+      ? "undefined"
+      : name(result[0]) + " " + result[1] + " " + result[2];
+  } catch (error) {
+    shown = error.constructor.name;
+  }
+  console.log(label, shown, "[" + log.join(",") + "]");
+}
+var own = { tag: "own", f: who };
+var child = Object.create(own);
+child.tag = "child";
+var blocked = { tag: "blocked", f: who };
+blocked[Symbol.unscopables] = { f: true };
+var outer = { tag: "outer", f: who };
+var inner = { tag: "inner" };
+var shadow = { tag: "shadow", f: who };
+var named = { tag: "named", eval: who };
+var nullish = { tag: "nullish", f: null, g: undefined };
+var plain = { tag: "plain", f: 1 };
+var got = {
+  tag: "got",
+  get f() {
+    log.push("get");
+    return who;
+  },
+};
+var f = who;
+
+with (own) {
+  show("selected", function () { return f?.(churn("a1"), churn("a2")); });
+  show("parenthesized", function () { return (f)?.(1, 2); });
+  show("ordinary", function () { return f(1, 2); });
+  show("strict-nested", function () {
+    "use strict";
+    var result = f?.(churn("s1"), 2);
+    return result;
+  });
+  show("sloppy-return", function () { return f?.(3, 4); });
+  show("comma-callee", function () { return (0, f)?.(5, 6); });
+  show("chained", function () { return [f?.(7, 8)?.[0]]; });
+}
+with (child) {
+  show("inherited", function () { return f?.(churn("i1"), 2); });
+}
+with (blocked) {
+  show("unscopables-global", function () { return f?.(1, 2); });
+}
+(function () {
+  var f = who;
+  with (blocked) {
+    show("unscopables-lexical", function () { return f?.(1, 2); });
+  }
+  with ({}) {
+    show("all-miss-lexical", function () { return f?.(churn("m1"), 2); });
+  }
+})();
+with ({}) {
+  show("all-miss-global", function () { return f?.(1, 2); });
+}
+with (outer) {
+  with (inner) {
+    show("nested-outer", function () { return f?.(churn("n1"), 2); });
+  }
+  with (shadow) {
+    show("nested-inner", function () { return f?.(1, 2); });
+  }
+}
+with (named) {
+  show("eval-named", function () { return eval?.(1, 2); });
+}
+with (nullish) {
+  show("null-short", function () { return f?.(churn("x1"), 2); });
+  show("undefined-short", function () {
+    "use strict";
+    var result = g?.(churn("x2"), 2);
+    return result;
+  });
+}
+with (plain) {
+  show("non-callable", function () { return f?.(churn("p1"), 2); });
+}
+with (got) {
+  show("argument-order", function () {
+    return f?.(churn("a1"), churn("a2"));
+  });
+}
+with (own) {
+  show("member-call", function () { return own.f?.(1, 2); });
+  show("optional-member", function () { return own?.f(1, 2); });
+}
+`,
+  },
+  {
     name: "labeled-statements",
     source: `
 outer: for (let i = 0; i < 3; i = i + 1) {

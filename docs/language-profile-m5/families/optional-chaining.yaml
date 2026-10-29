@@ -3,17 +3,21 @@ id: optional-chaining
 title: "Optional chaining"
 scope:
   - "Optional property, computed, and call chains."
-  - "Known remaining defect: an optional call whose callee is an identifier
+  - "An optional call outside tail position whose callee is an identifier
     resolved through a selected with Object Environment Record, such as
-    f?.() inside with, passes undefined instead of the selected object as
-    its receiver. Native runs on 13ab5051 observed it under both
-    specialization policies. That commit precedes the eval-intrinsic-value
-    GetBindingValue correction, which was not executed for this program;
-    static analysis shows the correction leaves the optional-chain lowering
-    unchanged.
-    Active remediation node with-optional-call-receiver, recorded in
-    docs/m5c-graph/with-optional-call-receiver.md, owns it and blocks
-    m5-exit-audit. Member-call receivers are unaffected."
+    f?.() inside with, keeps the callee's Reference and receives
+    WithBaseObject as this: the selected object, or undefined for a
+    lexical or global fallback. Node with-optional-call-receiver-non-tail
+    admits it, recorded in
+    docs/m5c-graph/with-optional-call-receiver-non-tail.md. Member-call
+    receivers are unchanged."
+  - "Known remaining gap: strict tail-position optional calls through with,
+    such as return f?.() in a strict function nested in a with body. Active
+    node with-optional-call-receiver-tail owns their evidence, and the
+    umbrella with-optional-call-receiver, recorded in
+    docs/m5c-graph/with-optional-call-receiver.md, blocks m5-exit-audit
+    until it lands. This record claims no tail-position receiver behavior
+    through with."
 owners:
   - PLAN-M5.md
 evidence:
@@ -21,13 +25,19 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/expressions.ts
+      - tests/native/fixtures/bindings.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/expressions.ts
+      - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/with-get-binding-value.ts
   forced-collection:
     status: covered
     references:
+      - tests/native.ts
+      - tests/native/fixtures/bindings.ts
+      - tests/native/fixtures/with-get-binding-value.ts
       - tests/property/m5-optional-chaining.property.test.ts
   generated:
     status: covered
@@ -43,6 +53,7 @@ evidence:
     references:
       - tests/native.ts
       - tests/native/fixtures/expressions.ts
+      - tests/native/fixtures/bindings.ts
   standards:
     status: covered
     references:
@@ -52,3 +63,4 @@ evidence:
     status: covered
     references:
       - packages/compiler/tests/mir.test.ts
+      - packages/parser-babel/tests/statements.test.ts

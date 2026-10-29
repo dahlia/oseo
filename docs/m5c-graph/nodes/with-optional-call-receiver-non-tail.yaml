@@ -20,5 +20,5 @@ delivers: "WOC-1 of the with-optional-call-receiver split approved by the
   admission or an exclusion."
 dependencies:
   - eval-intrinsic-value
-landed: false
+landed: true
 status: ready
