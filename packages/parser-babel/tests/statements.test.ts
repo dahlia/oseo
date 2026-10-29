@@ -1959,3 +1959,66 @@ test("tests a selected with binding again before its read", () => {
     }
   }
 });
+
+test("strict optional with calls return their tail call directly", () => {
+  for (const specialization of ["disabled", "enabled"] as const) {
+    for (const invocation of ["f?.(1)", "(f)?.(1)", "f(1)"]) {
+      const source = `var o = {}; with (o) {
+        (function () { "use strict"; return ${invocation}; })();
+      }`;
+      const compiled = compileSource(
+        babelFrontend,
+        { source, sourceId: "with-tail.js" },
+        { specialization },
+      );
+      assert.deepEqual(compiled.diagnostics, []);
+      assert.ok(compiled.mir != null);
+      const bodies = compiled.mir.functions;
+      const tails = bodies.flatMap((body) =>
+        body.blocks.flatMap((block) =>
+          block.operations
+            .filter((op) => op.kind === "call" && op.tail === true)
+            .map((call) => ({ body, block, call })),
+        ),
+      );
+      assert.equal(tails.length, 1);
+      const { body, block, call } = tails[0]!;
+      assert.equal(block.terminator.kind, "return");
+      assert.ok(block.terminator.kind === "return");
+      assert.equal(block.terminator.value, call.id);
+      const [callee, receiver] = call.arguments;
+      const join = body.blocks.find(
+        (candidate) =>
+          candidate.parameters?.[0] === callee &&
+          candidate.parameters?.[1] === receiver,
+      );
+      assert.ok(join != null);
+      const incoming = body.blocks.flatMap((candidate) =>
+        candidate.terminator.kind === "jump" &&
+        candidate.terminator.target === join.id
+          ? [candidate.terminator.values?.[1]]
+          : [],
+      );
+      assert.equal(incoming.length, 2);
+      const operations = body.blocks.flatMap(
+        (candidate) => candidate.operations,
+      );
+      assert.ok(
+        operations.some(
+          (op) =>
+            op.kind === "binary" &&
+            op.operator === "in" &&
+            op.arguments[1] === incoming[0],
+        ),
+      );
+      assert.ok(
+        operations.some(
+          (op) =>
+            op.id === incoming[1] &&
+            op.kind === "constant" &&
+            op.constant?.kind === "undefined",
+        ),
+      );
+    }
+  }
+});

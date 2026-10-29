@@ -8182,12 +8182,18 @@ The
 [*with-optional-call-receiver-non-tail.md*](./docs/m5c-graph/with-optional-call-receiver-non-tail.md)
 record lists the native, generated, and structural evidence.
 
-Strict tail-position optional calls through `with`, such as `return f?.()` in
-a strict function nested in a `with` body, remain a known gap, not an
-exclusion. Active node `with-optional-call-receiver-tail` owns their evidence,
-and `m5-exit-audit` depends on the umbrella `with-optional-call-receiver`. The
-[*with-optional-call-receiver.md*](./docs/m5c-graph/with-optional-call-receiver.md)
-record holds the defect and the repair contract.
+Strict tail-position optional calls through `with`, such as `return f?.()`
+in a strict function nested in a `with` body, retain that same receiver.
+WOC-1's lowering already supplies the receiver to the tail call. WOC-2 adds
+fixed native evidence, an independent generated oracle at seed `0x60002402`,
+and MIR assertions that the call is a tail call returned directly. The
+fixed fixture compares optional calls with ordinary strict tail calls for
+normal, nullish, non-callable and abrupt completions. Both specialization
+policies force collection while the trampoline retains the selected
+receiver, getter-produced callee and freshly allocated arguments. The
+[*WOC-2 work note*](./docs/m5c-graph/with-optional-call-receiver-tail.md)
+records validation and the remaining Root-owned publication gates. No
+manifest classification, exclusion or graph landed state changes.
 
 [identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
 [call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js
