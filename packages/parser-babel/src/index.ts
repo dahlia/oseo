@@ -11,6 +11,7 @@ import {
   type ParserError,
 } from "./babel.ts";
 import { program } from "./convert.ts";
+import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
 import { convertModule } from "./modules.ts";
 import { scriptModuleDeclarations } from "./script-goal.ts";
@@ -60,6 +61,18 @@ export function createBabelFrontend(
             diagnostics: moduleDeclarations.map((declaration) =>
               diagnosticAt(input, locations, declaration.start ?? 0),
             ),
+            parsed: false,
+            sourceId: input.sourceId,
+          };
+        }
+        const importCallErrors = newImportCallDiagnostics(
+          input,
+          locations,
+          file,
+        );
+        if (importCallErrors.length > 0) {
+          return {
+            diagnostics: importCallErrors,
             parsed: false,
             sourceId: input.sourceId,
           };

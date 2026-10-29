@@ -25,7 +25,10 @@ Current source contracts
 
 *packages/parser-babel/src/convert.ts* has no admitted ImportExpression
 conversion. Its unsupported-node path in *locations.ts* emits source-located
-`OSEO1001`, with `ImportExpression is outside the M1 profile.`
+`OSEO1001`, with `ImportExpression is outside the M1 profile.` Before
+conversion, *import-call-early-errors.ts* reports an ImportCall that begins
+a `new` operand, such as `new import('').prop`, as the early error
+`OSEO0001`; Babel accepts that grammar error.
 *packages/compiler/src/syntax.ts* defines owned module sources, resolvers,
 loaders, dependencies, and graph results, but no dynamic-import operation.
 

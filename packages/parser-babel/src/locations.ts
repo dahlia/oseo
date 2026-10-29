@@ -159,13 +159,29 @@ export function earlyError(
   value: BabelNode,
   description: string,
 ): undefined {
-  context.diagnostics.push({
-    ...location(context, value),
+  context.diagnostics.push(
+    earlyErrorDiagnostic(context.input, context.locations, value, description),
+  );
+  return undefined;
+}
+
+/**
+ * The diagnostic of {@link earlyError}, for a scan that runs before a
+ * conversion context exists.
+ */
+export function earlyErrorDiagnostic(
+  input: SourceInput,
+  index: SourceIndex,
+  value: BabelNode,
+  description: string,
+): Diagnostic {
+  return {
+    byteRange: bytes(index, value),
     code: "OSEO0001",
     message: description,
-    sourceId: context.input.sourceId,
-  });
-  return undefined;
+    range: sourceRange(index, value),
+    sourceId: input.sourceId,
+  };
 }
 
 export function unsupported(

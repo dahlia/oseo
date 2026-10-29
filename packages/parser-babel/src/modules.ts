@@ -31,6 +31,7 @@ import {
   statement,
   varScopedFunctionNames,
 } from "./convert.ts";
+import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
 import {
   createSourceIndex,
   diagnosticAt,
@@ -482,6 +483,14 @@ export function convertModule(
       diagnostics: parserErrors.map((error) =>
         diagnosticAt(input, locations, errorOffset(error)),
       ),
+      parsed: false,
+      sourceId: input.sourceId,
+    };
+  }
+  const importCallErrors = newImportCallDiagnostics(input, locations, file);
+  if (importCallErrors.length > 0) {
+    return {
+      diagnostics: importCallErrors,
       parsed: false,
       sourceId: input.sourceId,
     };
