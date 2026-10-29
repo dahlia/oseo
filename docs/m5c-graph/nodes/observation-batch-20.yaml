@@ -11,4 +11,4 @@ dependencies:
   - observation-batch-plan
   - test262-module-harness-globals
 landed: false
-status: blocked
+status: ready
