@@ -1807,3 +1807,61 @@ fed73b867fc80e4e913f92d21797a1d9a49240d907b1f4fac7e85472a00452de
 These are Linux source-qualified correctness observations on `16bb5e91`,
 made before its internal review. They establish no review verdict, Full
 classification, admission or Main gate.
+
+
+Module namespace and prelude Script candidate CI cost
+-----------------------------------------------------
+
+*tests/property/m5-module-namespace-uninitialized.property.test.ts* and
+*tests/property/m5-module-prelude-script.property.test.ts* landed after the
+three Linux source runs above, so neither table had an entry. Candidate
+[40869736577] at `ad1a1eba` scheduled both at each host's upper-median
+fallback and passed every native file shard. Its unit tests then failed
+because the Linux jobs no longer covered the property inventory with
+measured weights.
+
+Both files were measured from that run's own file-shard logs. The extraction
+uses the same rule as *linux-shards.py*: it starts at the `native-shard`
+marker, maps each complete reported title to exactly one selected source,
+requires every test to pass, and sums every case duration of a file. The
+weight is that sum divided by 1,000 and rounded up.
+
+| File                    | Host  | Job          | Cases | Case sum, ms  | Weight |
+| ----------------------- | ----- | ------------ | ----- | ------------- | ------ |
+| Namespace uninitialized | Linux | 123433597564 | 1     | 127167.963317 | 128    |
+| Prelude Script          | Linux | 123433597780 | 2     | 485361.516405 | 486    |
+| Namespace uninitialized | macOS | 123433598882 | 1     | 152327.246416 | 153    |
+| Prelude Script          | macOS | 123433598882 | 2     | 360655.745708 | 361    |
+
+The Linux jobs are file shards 2/7 and 3/7, and the macOS job is file shard
+10/12. The Prelude Script sums include its pure model registration, 1.558146
+milliseconds on Linux and 0.377833 on macOS.
+
+Only one run observed these files. Each weight is a single observation, not
+the three-run median the other Linux entries use, and estimates no run-to-run
+variation. The TSV therefore records them like the other later files: the
+weight in the old column and `-` for the three source-run samples.
+*linux-shards.py* and the unit test list both files as retained. A later
+three-run refresh should replace these values.
+
+Both tables gain two entries: Linux has 143 and macOS 140. Their
+upper-median fallbacks stay at 443 and 296 seconds. No other weight,
+exclusion, width, or shard total changed. The regenerated
+[*linux-shard-model.txt*](./linux-shard-model.txt) still reproduces every
+source log's selected file order. Its refreshed seven-shard maximum is
+2,991 modeled seconds, or 49.85 minutes, against a 2,948.71-second mean.
+
+The three logs, their job list, the extraction script, and their SHA-256
+sums are under
+*/home/dahlia/.local/state/oseo-m5c/aws-gate-work/module-logs-40869736577/*:
+
+~~~~ text
+123433597564.log
+f9a9e33ffe38c9c96e3888e79d7d8e6df470d8cd2bb530203fcf4d7b2f028975
+123433597780.log
+36ad9bc755979c030009c8883a7c02424e6c6b0a458d485a154cf0e3b539e89a
+123433598882.log
+bf13fabdf0540688093e274df059dbcdf26be32c99907de167622750e545dfd8
+~~~~
+
+[40869736577]: https://github.com/dahlia/oseo/actions/runs/40869736577
