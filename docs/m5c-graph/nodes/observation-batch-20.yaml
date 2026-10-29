@@ -11,5 +11,5 @@ dependencies:
   - module-namespace-uninitialized-bindings
   - observation-batch-plan
   - test262-module-harness-globals
-landed: false
+landed: true
 status: ready

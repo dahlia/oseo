@@ -548,11 +548,11 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 72);
+  assert.ok(summary.landed >= 74);
   assert.equal(summary.parked, 0);
   assert.equal(summary.nodes, 117);
-  assert.equal(summary.ready, 112);
-  assert.equal(summary.blocked, 5);
+  assert.equal(summary.ready, 114);
+  assert.equal(summary.blocked, 3);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -860,7 +860,8 @@ test("observation train retains bounded remediation dependencies", () => {
     ["observation-batch-30", ["dynamic-import-early-error-precedence"]],
   ] as const) {
     const batch = readImportAttributesNode(id);
-    assert.equal(batch.landed, false);
+    // Landed with the B20/B30 residual rows after their remediations.
+    assert.equal(batch.landed, true);
     assert.equal(batch.status, "ready");
     for (const prerequisite of prerequisites) {
       assert.ok(batch.dependencies.includes(prerequisite), prerequisite);
@@ -870,6 +871,8 @@ test("observation train retains bounded remediation dependencies", () => {
 
 test("dynamic-source selection waits for its observation batches", () => {
   validateCurrentM5cWorkGraph();
+  // Every batch named in after has landed, so the ordering edge no longer
+  // holds either node back.
   for (const [id, batches] of [
     ["dynamic-source-module-semantics", [20, 30]],
     ["dynamic-source-unknown-eval", [19, 20, 30]],
@@ -879,7 +882,7 @@ test("dynamic-source selection waits for its observation batches", () => {
       node.after,
       batches.map((batch) => `observation-batch-${batch}`),
     );
-    assert.equal(node.status, "blocked");
+    assert.equal(node.status, "ready");
     assert.equal(node.landed, false);
   }
 });

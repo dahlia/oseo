@@ -12,5 +12,5 @@ dependencies:
   - dynamic-import
   - dynamic-import-early-error-precedence
   - observation-batch-plan
-landed: false
+landed: true
 status: ready
