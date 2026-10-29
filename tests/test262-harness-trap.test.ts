@@ -367,6 +367,39 @@ test("an assembly that needs the trap requires its token", async () => {
   );
 });
 
+/**
+ * Kept-member operations whose descriptors inherit fields a case added to
+ * Object.prototype. Upstream completes each one, so the trapped harness
+ * must too, and a runtime negative must not match a throw it introduced.
+ */
+const inheritedDescriptorBodies: readonly string[] = [
+  "Object.prototype.get = function () {};\n" +
+    "TemporalHelpers.observeMethod = 1;",
+  "Object.prototype.get = function () {};\n" +
+    "Object.getOwnPropertyDescriptor(TemporalHelpers, 'observeMethod');",
+  "Object.prototype.set = function () {};\n" +
+    "TemporalHelpers.observeMethod = 1;",
+  "Object.prototype.get = function () {};\n" +
+    "Object.prototype.hasOwnProperty.call(TemporalHelpers, 'observeMethod');",
+  "Object.defineProperty(TemporalHelpers, 'added', { get() {} });\n" +
+    "Object.prototype.value = 1;\n" +
+    "Object.getOwnPropertyDescriptor(TemporalHelpers, 'added');\n" +
+    "TemporalHelpers.added;",
+];
+
+test("inherited descriptor fields leave kept members as upstream", async () => {
+  const executor = realmExecutor([]);
+  for (const body of inheritedDescriptorBodies) {
+    const context = createContext({ console: { log() {} } });
+    runInContext(upstream, context);
+    runInContext(body, context);
+    const result = await runCase(body, executor);
+    assert.equal(result.classification, "pass", result.observation.detail);
+    const negative = await runCase(body, executor, { negative: true });
+    assert.equal(negative.classification, "semantic-failure", body);
+  }
+});
+
 test("a rebound trap intrinsic leaves the case unarmed", async () => {
   const executor = realmExecutor([]);
   for (const body of [

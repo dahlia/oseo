@@ -31,7 +31,10 @@ export function harnessTrapToken(): string {
  * arming. It captures every function it later calls, so nothing a case
  * replaces afterwards reaches the traps. The handler and the omitted-key
  * table have no prototype, so inherited properties can neither add a trap
- * nor hide a key.
+ * nor hide a key. Descriptors pass between the proxy and the reviewed
+ * object as prototype-free copies of their own fields, because the proxy
+ * converts each one again where an ordinary object would not, and an
+ * inherited field such as `get` must not reach that conversion.
  *
  * The admitted profile compiles `console.log` as a direct call to the
  * runtime's output intrinsic unless a declaration binds `console`, and a
@@ -91,6 +94,19 @@ export function harnessTrapSource(
     "    throw new TypeErrorConstructor(\n" +
     '      "The reviewed harness omits " + member + ".");\n' +
     "  }\n" +
+    '  var fields = ["value", "writable", "get", "set", "enumerable",\n' +
+    '    "configurable"];\n' +
+    "  function own(descriptor) {\n" +
+    "    if (descriptor === undefined) return undefined;\n" +
+    "    var copy = create(null);\n" +
+    "    for (var index = 0; index < fields.length; index += 1) {\n" +
+    "      var field = fields[index];\n" +
+    "      if (describe(descriptor, field) !== undefined) {\n" +
+    "        copy[field] = descriptor[field];\n" +
+    "      }\n" +
+    "    }\n" +
+    "    return copy;\n" +
+    "  }\n" +
     "  function install(target, name, keys) {\n" +
     "    var omitted = create(null);\n" +
     "    for (var index = 0; index < keys.length; index += 1) {\n" +
@@ -114,11 +130,11 @@ export function harnessTrapSource(
     "    };\n" +
     "    handler.getOwnPropertyDescriptor = function (object, key) {\n" +
     "      check(key);\n" +
-    "      return describe(object, key);\n" +
+    "      return own(describe(object, key));\n" +
     "    };\n" +
     "    handler.defineProperty = function (object, key, descriptor) {\n" +
     "      check(key);\n" +
-    "      return define(object, key, descriptor);\n" +
+    "      return define(object, key, own(descriptor));\n" +
     "    };\n" +
     "    handler.deleteProperty = function (object, key) {\n" +
     "      check(key);\n" +

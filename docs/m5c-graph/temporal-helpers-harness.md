@@ -176,10 +176,14 @@ prints `Test262:HarnessTrap:<token>:<member>` and then throws. Listing
 traps because the upstream key list includes every omitted member. Kept
 and unknown keys forward to the reviewed object with the same receiver, so
 kept members behave as upstream, and a write to a kept member changes only
-that member. Every access path reaches the proxy's internal methods, so
-the global object, `with`, `eval`, `Function`, `Reflect`, getters,
-prototype chains, and enumeration need no case of their own. After arming,
-the installer prints `Test262:HarnessArmed:<token>`.
+that member. Descriptors cross the proxy as prototype-free copies of their
+own fields: the proxy converts each descriptor once more than an ordinary
+object would, and a field a case added to `Object.prototype`, such as
+`get`, must not reach that conversion and throw where upstream completes. Every
+access path reaches the proxy's internal methods, so the global object, `with`,
+`eval`, `Function`, `Reflect`, getters, prototype chains, and enumeration need
+no case of their own. After arming, the installer prints
+`Test262:HarnessArmed:<token>`.
 
 The runner reads each executed variant's standard output before any other
 classification. A trap line with the case's token makes the case a
@@ -236,16 +240,18 @@ together with the global object, getter, prototype, enumeration,
 `executeTest262Case`, both as an ordinary case and as a runtime negative
 expecting `TypeError`; each is a harness failure. It also covers caught
 traps, kept members including `with` over the object, forged marker
-lines, hoisted rebinding of each captured intrinsic and of `console`, the
+lines, kept-member writes and descriptors under inherited descriptor
+fields, hoisted rebinding of each captured intrinsic and of `console`, the
 Module and test262-host withholding, and scripted variant outputs: a
 pass, a matching negative, a marker without its line break, a killed
 process with all, none, or only the armed line of its output, a trap only in a
 later variant, and a trap beside an infrastructure diagnostic.
-*tests/test262-harness-trap-native.test.ts* builds nine cases natively through
-the split-harness executor: kept members pass, a forged marker passes, and the
-`with` and Script `var` bypasses, a caught trap, a replaced kept member,
-`Object.keys`, a trap caught in a later job, and a hoisted `Proxy` are harness
-failures.
+*tests/test262-harness-trap-native.test.ts* builds ten cases natively through
+the split-harness executor: kept members pass, a forged marker passes, a
+kept-member write under an inherited `get` completes and so fails its runtime
+negative, and the `with` and Script `var` bypasses, a caught trap, a replaced
+kept member, `Object.keys`, a trap caught in a later job, and a hoisted `Proxy`
+are harness failures.
 
 The trap U starts at Main `915ec6df8eaf237e807b263c06a4139a8418a940` with
 this node's two source commits and the carried records above. A sweep

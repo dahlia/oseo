@@ -96,6 +96,13 @@ const cases = {
     "pass",
   ],
   "rebound Proxy": ["", "function Proxy() {}\n", "harness-failure"],
+  // An inherited descriptor field must not make a kept-member write throw.
+  "inherited descriptor field": [
+    `flags: [noStrict]\n${negative}`,
+    "Object.prototype.get = function () {};\n" +
+      "TemporalHelpers.observeMethod = 1;\n",
+    "semantic-failure",
+  ],
 } satisfies Readonly<Record<string, readonly [string, string, string]>>;
 
 for (const [name, [metadata, body, expected]] of Object.entries(cases)) {
