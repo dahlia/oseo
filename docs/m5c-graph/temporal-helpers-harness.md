@@ -209,12 +209,18 @@ cannot suppress or forge either line, for these reasons:
  -  The trap prints before it throws, so catching the throw, finishing in
     a later job, or completing normally cannot remove the line. Standard
     output is flushed whenever the program returns, which every pass and
-    every expected negative requires. A process killed by a signal
-    flushes nothing more; it is a harness failure when the armed line was
-    lost too, and otherwise, when an earlier full buffer carried the
-    armed line out but not a later trap line, a semantic failure. It
-    never has the clean exit a pass needs or the runtime's final thrown
-    identity line an expected negative needs.
+    every expected negative requires. Only a signal from outside can
+    stop the program without that flush; no case can send one, and the
+    runner sends none. Such a process exits nonzero, so it is never a
+    pass. It is a harness failure when its armed line was lost too, and
+    otherwise, when an earlier full buffer carried the armed line out but
+    not a later trap line, normally a semantic failure. The one residual
+    is a kill that lands after the runtime has written its final thrown
+    identity line to unbuffered standard error but before the exit flush:
+    that line could then match a runtime negative although the trap line
+    was lost. Closing that window would need the runtime to flush
+    standard output before the identity line, which this node does not
+    change.
 
 A Module case runs its imports before the harness, and a case built with
 the test262 host reads `console` from the global object. The runner

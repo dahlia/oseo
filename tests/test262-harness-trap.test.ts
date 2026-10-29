@@ -533,6 +533,22 @@ test("reads the trap marker on every outcome", async () => {
       "semantic-failure",
     ],
     [
+      // The documented residual: an outside kill after the runtime wrote
+      // its final identity line but before the exit flush lost the trap
+      // line. No case code can cause it; this pins what the runner sees.
+      "an outside kill between the identity line and the exit flush",
+      { negative: true },
+      [
+        (token) => ({
+          executed: true,
+          exitStatus: 1,
+          stderr: "TypeError\nOSEO_THROWN TypeError\n",
+          stdout: `${armed(token)}${"x".repeat(16_384)}`,
+        }),
+      ],
+      "expected-negative",
+    ],
+    [
       "a matching runtime negative without the armed line",
       { negative: true },
       [

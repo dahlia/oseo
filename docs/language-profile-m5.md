@@ -9939,8 +9939,9 @@ the ledger assigns three to `temporal-helpers-harness` and one to
 M5c IH-B admits a reviewed *temporalHelpers.js* subset that keeps only the
 generic `observeMethod`, `propertyBagObserver`, and `toPrimitiveObserver`
 helpers. Any observation of an omitted `TemporalHelpers` member trips a
-runtime trap whose marker makes the case a harness failure; it can never
-yield a pass or an expected negative. Its focused precheck observes the
-three *Iterator/from/* paths as pass;
-[its work note](./m5c-graph/temporal-helpers-harness.md) records the
-decision and evidence.
+runtime trap whose marker makes the case a harness failure. No case code
+can turn the trap into a pass or an expected negative; the work note
+records the one window an external signal could still open. Its focused
+precheck observes the three *Iterator/from/* paths as pass;
+[its work note](./m5c-graph/temporal-helpers-harness.md) records the decision
+and evidence.
