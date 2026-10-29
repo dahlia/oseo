@@ -24,9 +24,14 @@ scope:
     still write the lexical fallback."
   - "Keyed object pattern identifier leaves, in var declarations and
     destructuring assignments, resolve before GetV and the default
-    initializer and write the selection made then. Array element, array
-    rest, and object rest preparation order remains outside this unit and
-    is tracked as a separate source-based concern."
+    initializer and write the selection made then. Array identifier leaves
+    resolve before iterator stepping, defaults, and rest collection.
+    Object rest preparation order remains outside this unit."
+  - "Simple var heads in for-in/of resolve through the active with chain
+    per iteration. Classic for var initializers select the reference before
+    the initializer. All-miss host Script heads use the persistent Global
+    Environment Record, including later lexical shadows of global properties.
+    Lexical heads keep their own declarative environments."
   - "Identifier value reads, typeof, and call callees through a selected
     Object Environment Record perform GetBindingValue's own HasProperty
     before Get. A binding gone since HasBinding reads undefined in
@@ -62,6 +67,8 @@ evidence:
     status: covered
     references:
       - tests/with-optional-call-receiver-tail.test.ts
+      - tests/with-var-loop-head.test.ts
+      - tests/native/fixtures/with-var-loop-head-resolution.ts
       - tests/native.ts
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/array-prototype-index-search.ts
@@ -72,6 +79,8 @@ evidence:
     status: covered
     references:
       - tests/with-optional-call-receiver-tail.test.ts
+      - tests/with-var-loop-head.test.ts
+      - tests/native/fixtures/with-var-loop-head-resolution.ts
       - tests/native.ts
       - tests/native/fixtures/array-prototype-index-search.ts
       - tests/native/fixtures/bindings.ts
@@ -84,6 +93,7 @@ evidence:
   generated:
     status: covered
     references:
+      - tests/property/m5-with-var-loop-head.property.test.ts
       - tests/property-seeds.yaml
       - tests/property/m5-array-prototype-index-search.property.test.ts
       - tests/property/m5-global-object-record.property.test.ts
@@ -101,6 +111,8 @@ evidence:
     status: covered
     references:
       - tests/with-optional-call-receiver-tail.test.ts
+      - tests/with-var-loop-head.test.ts
+      - tests/native/fixtures/with-var-loop-head-resolution.ts
       - tests/native.ts
       - tests/native/fixtures/bindings.ts
       - tests/native/fixtures/array-prototype-index-search.ts
@@ -117,6 +129,7 @@ evidence:
   structural:
     status: covered
     references:
+      - tests/with-var-loop-head-source.test.ts
       - packages/parser-babel/tests/statements.test.ts
       - packages/parser-babel/tests/bindings.test.ts
       - packages/compiler/src/mir-build.ts

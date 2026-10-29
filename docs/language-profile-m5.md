@@ -9841,10 +9841,10 @@ references, and by a combined native fixture in
 *tests/native/fixtures/host-script-bindings.ts*. Undeclared names keep the
 existing rejection on both targets, and ordinary output is unchanged.
 
-A with-hit simple `for (var x in/of ...)` head writes the hoisted cell
-instead of the `with` object on both targets. That defect predates this node
-and is owned by the separate `with-var-loop-head-resolution` node; the new
-fixture does not cover it. Raw evidence is under
+At that checkpoint, a with-hit simple `for (var x in/of ...)` head wrote
+its hoisted cell instead of the `with` object on both targets. The separate
+`with-var-loop-head-resolution` repair below addresses this defect; the
+Host binding fixture above does not cover it. Original raw evidence is under
 */data/m5c-host-script-bindings-20261027/claude-native/diag-with02/*.
 
 `ce8ae0c84a632e414729872b5de928bac5ed4d2e` (tree
@@ -9887,11 +9887,10 @@ table. Deno's vm rejects the shadowing declaration through its legacy
 var-name check, as the generated model already qualifies, so its loops
 write the unshadowed properties.
 
-A simple `var` loop head inside a `with` statement still writes the hoisted
-cell, whether the `with` object supplies the name or not, so a later
-lexical declaration does not capture it there. That is the same
-pre-existing defect as the with-hit head above, owned by
-`with-var-loop-head-resolution` and not covered by this node.
+At that checkpoint, a simple `var` loop head inside a `with` statement
+still wrote its hoisted cell, whether the object supplied the name or not.
+A later lexical declaration consequently did not capture it there. The
+separate `with-var-loop-head-resolution` repair below addresses this gap.
 
 `16bb5e917afbe90ab050805af151a5eacfb98dac` (tree
 `cf9a53e9dae174604962a790d2374a294081b641`) completed the same nine focused
@@ -9972,3 +9971,34 @@ records the one window an external signal could still open. Its focused
 precheck observes the three *Iterator/from/* paths as pass;
 [its work note](./m5c-graph/temporal-helpers-harness.md) records the decision
 and evidence.
+
+
+With var loop-head resolution
+-----------------------------
+
+Simple `var` heads in `for-in` and `for-of`, including `for await`, now
+resolve the identifier through the active `with` chain on each iteration.
+A classic `for` var initializer selects its reference before evaluating the
+initializer. Lexical heads retain their own declaration environments.
+Nested environments, inherited properties, `Symbol.unscopables`, accessors,
+and abrupt lookup use the existing generic reference and PutValue paths.
+An all-miss host Script reference reaches the persistent Global Environment
+Record, including a later lexical shadow of a configurable global property.
+
+Array-pattern identifier leaves select their reference before the iterator
+step, default initializer, or rest collection, as ECMA-262 2025 section
+8.6.3 requires. The same preparation helper retains the existing keyed
+object leaf order without changing object rest preparation.
+A later addition or deletion cannot change the selected environment.
+Lookup failures close acquired iterators through the existing cleanup path.
+Fixed traces use the specification where V8's var binding order differs.
+
+*tests/with-var-loop-head-source.test.ts*,
+*tests/with-var-loop-head.test.ts*, and
+*tests/native/fixtures/with-var-loop-head-resolution.ts* cover both targets.
+*tests/property/m5-with-var-loop-head.property.test.ts* adds independent
+models for nested hit, miss, blocking and deletion sequences, and array
+reference order with mutations. Seeds `0x60009200` and `0x60009201` use
+8 ordinary cases each, both specialization policies and forced collection.
+These sources add no test262 path or classification. D3, full observation,
+review and publication remain separate gates owned by Root.

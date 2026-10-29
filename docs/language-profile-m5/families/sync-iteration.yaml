@@ -3,6 +3,7 @@ id: sync-iteration
 title: "Synchronous iteration"
 scope:
   - "Iterator acquisition, stepping, closing, and for-of."
+  - "Var for-of identifier heads resolve the active with chain per iteration."
 owners:
   - PLAN-M5.md
 evidence:
@@ -17,6 +18,7 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native/fixtures/objects.ts
       - tests/native/fixtures/object-own-keys.ts
       - tests/native/fixtures/generators.ts
@@ -24,6 +26,7 @@ evidence:
   forced-collection:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/property/m5-for-of.property.test.ts
       - tests/property/m5-object-own-keys.property.test.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
@@ -31,6 +34,7 @@ evidence:
   generated:
     status: covered
     references:
+      - tests/property/m5-with-var-loop-head.property.test.ts
       - tests/property/m5-for-of.property.test.ts
       - tests/property/m5-object-own-keys.property.test.ts
       - tests/property/m5-destructuring-assignment.property.test.ts
@@ -44,6 +48,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/native/fixtures/generators.ts

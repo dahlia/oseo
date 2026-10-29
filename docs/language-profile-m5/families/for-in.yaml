@@ -16,6 +16,7 @@ scope:
     pending. The required Array CI failure blocked that historical bundle,
     not standalone Set preparation on Main cf0902db.
     Existing domains, seeds, budgets and assessments remain unchanged."
+  - "Var identifier heads resolve the active with chain per iteration."
 owners:
   - PLAN-M5.md
 evidence:
@@ -30,6 +31,7 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native/fixtures/objects.ts
       - tests/annexb-for-in.test.ts
       - tests/fixtures/annexb-for-in/allocation.c
@@ -37,6 +39,7 @@ evidence:
   forced-collection:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/property/m5-for-in.property.test.ts
       - tests/annexb-for-in.test.ts
       - tests/fixtures/annexb-for-in/allocation.c
@@ -44,6 +47,7 @@ evidence:
   generated:
     status: covered
     references:
+      - tests/property/m5-with-var-loop-head.property.test.ts
       - tests/property/m5-for-in.property.test.ts
       - tests/helpers/annexb-for-in.ts
       - tests/property/m5-annexb-proto-boundary.property.test.ts
@@ -55,6 +59,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native.ts
       - tests/native/fixtures/objects.ts
       - tests/annexb-for-in.test.ts

@@ -1,6 +1,8 @@
 import type { Fixture } from "../fixture.ts";
+import { withVarLoopHeadFixtures } from "./with-var-loop-head-resolution.ts";
 
 export const bindingFixtures: readonly Fixture[] = [
+  ...withVarLoopHeadFixtures,
   {
     name: "with-optional-call-receiver-tail",
     nonStrictScript: true,
