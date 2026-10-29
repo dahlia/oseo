@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-switch-dft\
-        l.js:89:22: error[OSEO0001]: Source could not be parsed."
+        l.js:14:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -48,9 +48,8 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-array-literal.js:139:12: error[OSEO1001]: Await inside
-        a module top-level binding or assignment pattern is
-        unsupported."
+        ait-expr-array-literal.js:64:12: error[OSEO1001]: Await inside a
+        module top-level binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -647,6 +647,28 @@ console.log(
   nonCallableError,
 );
 
+// A forwarded descriptor reports the property's value, not the binding
+// cell behind a global var binding or a mapped arguments index.
+var proxyGlobalBinding = 7;
+function mappedArgumentsProxy(first) {
+  const forwarded = new Proxy(arguments, {});
+  first = 8;
+  return Object.getOwnPropertyDescriptor(forwarded, "0").value;
+}
+console.log(
+  "cell-backed targets",
+  mappedArgumentsProxy(5),
+  Object.getOwnPropertyDescriptor(
+    new Proxy(this, {}),
+    "proxyGlobalBinding",
+  ).value,
+  Object.getOwnPropertyDescriptors(
+    new Proxy((function(value) { return arguments; })(3), {}),
+  )[0].value,
+  Object.values(new Proxy((function(value) { return arguments; })(4), {}))
+    .join(","),
+);
+
 /** @param {number} value */
 function hinted(value) { return value + 1; }
 console.log(

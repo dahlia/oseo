@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-top-function-async.js:95:1\
+      detail: "test/language/module-code/early-dup-top-function-async.js:20:1\
         6: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -45,7 +45,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/module-graphs-does-n\
-        ot-hang.js:114:7: error[OSEO1001]: ImportExpression is outside
+        ot-hang.js:11:7: error[OSEO1001]: ImportExpression is outside
         the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

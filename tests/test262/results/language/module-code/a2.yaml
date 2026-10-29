@@ -29,7 +29,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/dynamic-import-rejec\
-        tion.js:151:1: error[OSEO1001]: ImportExpression is outside the
+        tion.js:48:1: error[OSEO1001]: ImportExpression is outside the
         M1 profile."
       passed: false
       unsupportedCapability: profile-syntax
@@ -60,7 +60,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-identifier.js
-          sourceHash: fnv1a64:416a4fb64fe5d574
+          sourceHash: fnv1a64:46e54b9c2be3d787
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

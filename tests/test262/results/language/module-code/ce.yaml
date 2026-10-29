@@ -24,7 +24,7 @@ results:
             - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_import-and-export_FIXTURE.js
             - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
           id: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
-          sourceHash: fnv1a64:124b768f5daacfad
+          sourceHash: fnv1a64:712f8a220314cd00
         - dependencies:
             - test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_FIXTURE.js
           id: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding_export-from_FIXTURE.js

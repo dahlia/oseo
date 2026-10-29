@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/import/import-attributes/json-value-boolean_FIXTURE.json
           id: test/language/import/import-attributes/json-value-boolean.js
-          sourceHash: fnv1a64:467d0481386287fa
+          sourceHash: fnv1a64:ee8bf6abc38266f3
         - dependencies: []
           id: test/language/import/import-attributes/json-value-boolean_FIXTURE.json
           sourceHash: fnv1a64:8c178da7271cb65d

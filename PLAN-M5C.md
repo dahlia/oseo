@@ -367,7 +367,10 @@ use. Already-reviewed paths are re-observed by a full manifest update.
 Observation
 batches 30, 31, and 32 review them using the existing parse-time diagnostic
 `error[OSEO1001]: ImportExpression is outside the M1 profile.` The audit
-accepts exactly this message, not another `OSEO1001` rejection.
+accepts exactly this message, not another `OSEO1001` rejection. A parse
+negative whose ImportCall begins a `new` operand reports the early error
+`OSEO0001` instead, so the `dynamic-import-early-error-precedence` node
+makes its 21 owned paths expected negatives rather than exclusions.
 
 If a feature-tagged source has no `import()` call, or observation reports a
 different rejection, retain its actual classification and identify the owner

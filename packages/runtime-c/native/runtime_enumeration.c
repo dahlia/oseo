@@ -309,7 +309,12 @@ static OseoResult enumeration_own_key(
             &setter,
             NULL
         )) return normal(oseo_undefined());
-    else *found = true;
+    else {
+        OseoResult ready = oseo_internal_namespace_export_ready(
+            context, level, value);
+        if (ready.status != OSEO_STATUS_NORMAL) return ready;
+        *found = true;
+    }
     *enumerable = attributes.enumerable;
     return normal(oseo_undefined());
 }

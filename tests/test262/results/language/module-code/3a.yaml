@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/import-attribute-k\
-        ey-string-single.js:108:55: error[OSEO2001]: Unsupported static
+        ey-string-single.js:33:55: error[OSEO2001]: Unsupported static
         import attribute."
       errorType: SyntaxError
       failedPhase: resolution
@@ -45,7 +45,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-labeled.js\
-        :89:10: error[OSEO0001]: Source could not be parsed."
+        :14:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

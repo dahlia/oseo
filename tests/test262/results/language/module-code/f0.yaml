@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-expr\
-        -meth.js:89:21: error[OSEO0001]: Source could not be parsed."
+        -meth.js:14:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -56,7 +56,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-import-unwrapped_FIXTURE.js
           id: test/language/module-code/top-level-await/module-import-unwrapped.js
-          sourceHash: fnv1a64:3159d968dd595c63
+          sourceHash: fnv1a64:05ca540c8460a8f4
         - dependencies: []
           id: test/language/module-code/top-level-await/module-import-unwrapped_FIXTURE.js
           sourceHash: fnv1a64:a221ecf540eabc12
@@ -94,7 +94,7 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-literal-number.js:139:12: error[OSEO1001]: Await inside
+        ait-expr-literal-number.js:64:12: error[OSEO1001]: Await inside
         a module top-level binding or assignment pattern is
         unsupported."
       passed: false
@@ -132,7 +132,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-null.js
-          sourceHash: fnv1a64:54cf24881781f8e9
+          sourceHash: fnv1a64:2637fc38bbc71d66
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

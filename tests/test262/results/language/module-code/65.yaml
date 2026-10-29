@@ -26,7 +26,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/export-default-asyncgenerator-declaration-binding.js
-          sourceHash: fnv1a64:18d6a2d5d9d545a6
+          sourceHash: fnv1a64:98f30a7ec8803e89
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -56,7 +56,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-expname-unpaired-surrogate.js\
-        :96:17: error[OSEO0001]: Source could not be parsed."
+        :21:17: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -86,7 +86,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-nested.js
-          sourceHash: fnv1a64:921a493b16462f05
+          sourceHash: fnv1a64:de7a5c2389bbc2e0
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

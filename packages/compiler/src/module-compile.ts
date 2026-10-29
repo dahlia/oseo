@@ -1249,10 +1249,86 @@ function lowerModuleEvaluationBody(
   return body;
 }
 
-/** Link and lower a closed module graph to shared-cell scheduled MIR. */
+/**
+ * The resolved Script a host evaluates in the realm before the graph, as
+ * the test262 harness is. Its bindings seed every module's outer scope
+ * the way the global Environment Record would answer them.
+ */
+interface ModulePrelude {
+  readonly hir: HirProgram;
+  readonly bindings: ReadonlyMap<string, Binding>;
+  readonly globalObjectBindingIds: readonly number[];
+}
+
+/** A resolved prelude, or the diagnostics that rejected it. */
+interface ModulePreludeResolution {
+  readonly diagnostics: readonly Diagnostic[];
+  readonly nextBindingId: number;
+  readonly nextFunctionId: number;
+  readonly prelude?: ModulePrelude;
+}
+
+/**
+ * Resolve the prelude Script after the graph's cells, so its IDs never
+ * collide with a module binding. A top-level `with` assignment that may
+ * write a hidden fallback cell is rejected, because a module reading the
+ * same name could not observe that cell.
+ */
+function resolveModulePrelude(
+  prelude: SyntaxProgram,
+  nextBindingId: number,
+): ModulePreludeResolution {
+  const resolved = buildSeededHir(prelude, {
+    fragmentMetadata: true,
+    nextBindingId,
+  });
+  const failed = {
+    diagnostics: resolved.diagnostics,
+    nextBindingId: resolved.nextBindingId,
+    nextFunctionId: resolved.nextFunctionId,
+  };
+  if (resolved.program == null || resolved.scriptBindings == null) {
+    return failed;
+  }
+  const initializing = resolved.initializingWithNames ?? [];
+  if (initializing.length > 0) {
+    return {
+      ...failed,
+      diagnostics: [
+        sourceDiagnostic(
+          prelude.sourceId,
+          prelude,
+          "A prelude Script whose with statement may initialize " +
+            `${initializing.toSorted().join(", ")} is unsupported before ` +
+            "a module graph.",
+        ),
+      ],
+    };
+  }
+  return {
+    ...failed,
+    prelude: {
+      bindings: resolved.scriptBindings,
+      globalObjectBindingIds: (resolved.program.globalObjectBindings ?? []).map(
+        (binding) => binding.id,
+      ),
+      // Every range names the Script, as each module's ranges name the
+      // module, so a runtime location never falls back to the entry's.
+      hir: retainModuleSource(resolved.program, prelude.sourceId),
+    },
+  };
+}
+
+/**
+ * Link and lower a closed module graph to shared-cell scheduled MIR.
+ * A `prelude` Script runs to completion in the same realm before any
+ * module links or evaluates; modules resolve its global declarations as
+ * names of their outer global environment.
+ */
 export function compileModuleGraph(
   graph: ModuleGraph,
   options: CompilerOptions = {},
+  prelude?: SyntaxProgram,
 ): ModuleCompilationResult {
   const linked = linkModuleGraph(graph);
   if (linked.graph == null) return { diagnostics: linked.diagnostics };
@@ -1273,6 +1349,16 @@ export function compileModuleGraph(
   const varInitializers: HirStatement[] = [];
   let nextBindingId = linked.graph.cells.length;
   let nextFunctionId = 0;
+  let resolvedPrelude: ModulePrelude | undefined;
+  if (prelude != null) {
+    const result = resolveModulePrelude(prelude, nextBindingId);
+    if (result.prelude == null) {
+      return { diagnostics: result.diagnostics, graph: linked.graph };
+    }
+    resolvedPrelude = result.prelude;
+    nextBindingId = result.nextBindingId;
+    nextFunctionId = result.nextFunctionId;
+  }
   const namespaceBindings = new Map<string, number>();
   const namespaceInitializers: HirStatement[] = [];
 
@@ -1370,6 +1456,8 @@ export function compileModuleGraph(
         pendingDeclaration: true,
       });
     }
+    // The prelude's global names enclose the module environment, so a
+    // module's own declarations and imports shadow them.
     const result = buildSeededHir(
       {
         body: moduleProgramBody(node.syntax),
@@ -1378,7 +1466,17 @@ export function compileModuleGraph(
         sourceId: moduleId,
         strict: true,
       },
-      { bindings, moduleBody: true, nextBindingId, nextFunctionId },
+      {
+        bindings,
+        globalObjectBindingIds: resolvedPrelude?.globalObjectBindingIds ?? [],
+        moduleBody: true,
+        nextBindingId,
+        nextFunctionId,
+        ...includePropertiesWhen(() => {
+          if (resolvedPrelude == null) return undefined;
+          return { outerBindings: resolvedPrelude.bindings };
+        }),
+      },
     );
     nextBindingId = result.nextBindingId;
     nextFunctionId = result.nextFunctionId;
@@ -1680,8 +1778,11 @@ export function compileModuleGraph(
     throw new Error("The entry module promise is unavailable.");
   }
   const entryRange = retainModuleSource(entry.syntax.range, graph.entryId);
+  const preludeHir = resolvedPrelude?.hir;
   const hir: HirProgram = {
     body: [
+      // The prelude Script completes before any module environment exists.
+      ...(preludeHir?.body ?? []),
       ...intrinsicInitializers,
       // Each module's import.meta object exists before any function
       // initializer, so a hoisted function that a cyclic dependency calls
@@ -1703,12 +1804,21 @@ export function compileModuleGraph(
         range: entryRange,
       },
     ],
-    functions,
-    globalBindings,
+    functions: [...(preludeHir?.functions ?? []), ...functions],
+    globalBindings: [...(preludeHir?.globalBindings ?? []), ...globalBindings],
+    ...includePropertiesWhen(() => {
+      if (preludeHir == null) return undefined;
+      return {
+        globalLexicalNames: preludeHir.globalLexicalNames ?? [],
+        globalObjectBindings: preludeHir.globalObjectBindings ?? [],
+      };
+    }),
     kind: "hir-program",
     range: entryRange,
     sourceId: graph.entryId,
-    strict: true,
+    // Every module body is its own strict evaluator function, so the
+    // top-level statement list keeps the prelude Script's strictness.
+    strict: preludeHir == null || preludeHir.strict === true,
   };
   return {
     diagnostics: [],

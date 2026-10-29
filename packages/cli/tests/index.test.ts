@@ -453,6 +453,99 @@ test("forces the module goal symbol with --module", async () => {
   assert.match(strictModule.stderr, /error\[OSEO0001\]/u);
 });
 
+test("evaluates a --script Script before the module graph", async () => {
+  const reads: string[] = [];
+  const host: CompilerHost = {
+    canonicalizeFile() {
+      return Promise.resolve("file:///work/entry.js");
+    },
+    makeTemporaryDirectory() {
+      return Promise.reject(new Error("unexpected temporary directory"));
+    },
+    readTextFile(path) {
+      reads.push(String(path));
+      return path === "/work/prelude.js"
+        ? Promise.resolve("function check() {}\nlet lexical = 1;")
+        : Promise.reject(new Error("unexpected read"));
+    },
+    remove() {
+      return Promise.reject(new Error("unexpected remove"));
+    },
+    run() {
+      return Promise.reject(new Error("unexpected process"));
+    },
+    writeTextFile() {
+      return Promise.reject(new Error("unexpected write"));
+    },
+  };
+  const fromFile = await runNativeCli(
+    {
+      args: ["--dump-mir", "--module", "--script", "/work/prelude.js", "e.js"],
+      source: "check(lexical);",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(fromFile.exitStatus, 0, fromFile.stderr);
+  assert.deepEqual(reads, ["/work/prelude.js"]);
+  assert.match(fromFile.stdout, /global-object %b\d+ check @1:1-1:20/u);
+  assert.match(fromFile.stdout, /global-lexical lexical @2:5-2:16/u);
+  // The module reads both names as the Script's bindings.
+  assert.match(fromFile.stdout, /read check @1:1-1:6/u);
+  assert.match(fromFile.stdout, /read lexical @1:7-1:14/u);
+  // Without the Script, the module's own read is an unresolved global.
+  const withoutScript = await runNativeCli(
+    {
+      args: ["--dump-mir", "--module", "e.js"],
+      source: "check(lexical);",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(withoutScript.exitStatus, 0, withoutScript.stderr);
+  assert.doesNotMatch(withoutScript.stdout, /global-object/u);
+  const inMemory = await runNativeCli(
+    {
+      args: ["--dump-mir", "--module", "--script", "harness.js", "e.js"],
+      scriptSource: "var 1;",
+      source: "export {};",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(inMemory.exitStatus, 1);
+  assert.match(inMemory.stderr, /^harness\.js:1:5: error\[OSEO0001\]/u);
+  assert.deepEqual(reads, ["/work/prelude.js"]);
+  const unreadable = await runNativeCli(
+    {
+      args: ["--dump-mir", "--module", "--script", "/work/absent.js", "e.js"],
+      source: "export {};",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(unreadable.exitStatus, 1);
+  assert.match(unreadable.stderr, /The Script file could not be read/u);
+  const scriptEntry = await runNativeCli(
+    {
+      args: ["--dump-mir", "--script", "/work/prelude.js", "e.js"],
+      source: "check();",
+      version: "0.0.0",
+    },
+    host,
+  );
+  assert.equal(scriptEntry.exitStatus, 1);
+  assert.match(scriptEntry.stderr, /applies only to a module entry/u);
+  const synchronous = runCli({
+    args: ["--script", "prelude.js", "entry.js"],
+    source: "check();",
+    sourceId: "entry.js",
+    version: "0.0.0",
+  });
+  assert.equal(synchronous.exitStatus, 1);
+  assert.match(synchronous.stderr, /applies only to a module entry/u);
+});
+
 test("keeps --module outside the synchronous CLI surface", () => {
   const result = runCli({
     args: ["--module", "entry.js"],

@@ -33,6 +33,7 @@ import {
 import type {
   Diagnostic,
   SpecializationMode,
+  SyntaxProgram,
 } from "../packages/compiler/src/index.ts";
 import {
   parsedObject as record,
@@ -56,6 +57,7 @@ import type {
   Test262ExecutionMode,
   Test262FailurePhase,
   Test262ModuleGraphNode,
+  Test262Observation,
   Test262Result,
   Test262Strictness,
   Test262Variant,
@@ -297,6 +299,11 @@ export class ReviewedTest262RunError extends Error {
 export interface Test262ExecutionRequest {
   readonly fragment?: Test262FragmentInput;
   readonly mode: Test262ExecutionMode;
+  /**
+   * The harness Script a module case evaluates in its realm before the
+   * graph, whose `source` is then the unmodified case body.
+   */
+  readonly script?: string;
   readonly source: string;
   readonly sourceId: string;
   /** Absolute upstream path; module imports resolve against it. */
@@ -440,6 +447,27 @@ export function assembleTest262Source(
   }
   parts.push(source);
   return `${parts.join("\n")}\n`;
+}
+
+/** Source identifier of the harness Script a module case runs first. */
+export const test262ModuleHarnessSourceId = "oseo:test262-harness.js";
+
+/**
+ * The harness Script a module case evaluates before its graph, or
+ * `undefined` for a raw case. INTERPRETING.md runs the harness as a
+ * global Script, so every module the case imports, not only the entry,
+ * reads its declarations through the global environment. A Module never
+ * receives the omitted-member trap, which needs a Script body that runs
+ * after the harness.
+ */
+export function test262ModuleHarnessScript(
+  testCase: Test262Case,
+  harnesses: Test262Harnesses,
+  raw: boolean,
+): string | undefined {
+  if (raw) return undefined;
+  const sources = test262HarnessSources(testCase, harnesses, undefined);
+  return `${sources.map((harness) => harness.source).join("\n")}\n`;
 }
 
 /** One harness Script the runner places before a case body. */
@@ -1045,12 +1073,14 @@ function relativeModuleId(
 
 /**
  * Discover, link, and lower one module case without native execution. The
- * entry source is supplied in memory so harness assembly never modifies the
- * upstream checkout; sibling fixtures load from disk. Recorded identities
- * are relative to the suite root so the manifest stays host-independent.
+ * entry source is supplied in memory and sibling fixtures load from disk;
+ * the harness `script` is compiled as the Script the realm evaluates
+ * first, as native execution does. Recorded identities are relative to the
+ * suite root so the manifest stays host-independent.
  */
 async function buildEntryGraph(
   source: string,
+  script: string | undefined,
   sourcePath: string,
   entryDisplayId: string,
   rootPath: string,
@@ -1063,15 +1093,19 @@ async function buildEntryGraph(
   const fileLoader = createFileModuleLoader(moduleHost);
   // Recorded diagnostics use the same suite-root-relative identities as the
   // module-graph evidence so the manifest never leaks a host path.
-  const displayDiagnostic = (diagnostic: Diagnostic): Diagnostic => ({
-    ...diagnostic,
-    sourceId: relativeModuleId(
-      diagnostic.sourceId,
-      entryId,
-      entryDisplayId,
-      rootUrl,
-    ),
-  });
+  // The harness Script's identity is already virtual and host-independent.
+  const displayDiagnostic = (diagnostic: Diagnostic): Diagnostic =>
+    diagnostic.sourceId === test262ModuleHarnessSourceId
+      ? diagnostic
+      : {
+          ...diagnostic,
+          sourceId: relativeModuleId(
+            diagnostic.sourceId,
+            entryId,
+            entryDisplayId,
+            rootUrl,
+          ),
+        };
   const result = await buildModuleGraph(
     defaultComponents.moduleFrontend,
     {
@@ -1110,9 +1144,27 @@ async function buildEntryGraph(
     id: relativeModuleId(module.canonicalId, entryId, entryDisplayId, rootUrl),
     sourceHash: module.sourceHash,
   }));
-  const compiled = compileModuleGraph(result.graph, {
-    specialization: "disabled",
-  });
+  let prelude: SyntaxProgram | undefined;
+  if (script != null) {
+    const parsed = defaultComponents.frontend.parse({
+      source: script,
+      sourceId: test262ModuleHarnessSourceId,
+    });
+    if (parsed.program == null || parsed.diagnostics.length > 0) {
+      return {
+        compileDiagnostics: parsed.diagnostics,
+        entryDisplayId,
+        graphDiagnostics: [],
+        nodes,
+      };
+    }
+    prelude = parsed.program;
+  }
+  const compiled = compileModuleGraph(
+    result.graph,
+    { specialization: "disabled" },
+    prelude,
+  );
   return {
     compileDiagnostics: compiled.diagnostics.map(displayDiagnostic),
     entryDisplayId,
@@ -1169,6 +1221,22 @@ function unsupportedModuleCapability(
   return undefined;
 }
 
+/**
+ * A diagnostic in the harness Script is a harness failure, never evidence
+ * of the case's own parse, resolution, or profile outcome, so it cannot
+ * satisfy an expected negative or report an unsupported capability.
+ */
+function moduleHarnessFailure(
+  diagnostic: Diagnostic,
+): Test262Observation | undefined {
+  if (diagnostic.sourceId !== test262ModuleHarnessSourceId) return undefined;
+  return {
+    detail: diagnosticDetail(diagnostic),
+    failureKind: "harness",
+    passed: false,
+  };
+}
+
 async function moduleNegativeResult(
   source: string,
   parsed: ParsedTest262Case,
@@ -1179,11 +1247,9 @@ async function moduleNegativeResult(
   rootPath: string,
 ): Promise<Test262Result> {
   const testCase = parsed.case;
-  let assembled: string;
+  let script: string | undefined;
   try {
-    assembled = assembleTest262Source(
-      source,
-      "strict",
+    script = test262ModuleHarnessScript(
       testCase,
       harnesses,
       parsed.flags.includes("raw"),
@@ -1201,12 +1267,23 @@ async function moduleNegativeResult(
     );
   }
   const graph = await buildEntryGraph(
-    assembled,
+    source,
+    script,
     sourcePath,
     testCase.path,
     rootPath,
   );
   const diagnostic = graph.graphDiagnostics[0] ?? graph.compileDiagnostics[0];
+  const harnessFailure =
+    diagnostic == null ? undefined : moduleHarnessFailure(diagnostic);
+  if (harnessFailure != null) {
+    return classifyTest262(
+      testCase,
+      harnessFailure,
+      supportedFeatures,
+      evidence,
+    );
+  }
   if (diagnostic == null) {
     return classifyTest262(
       testCase,
@@ -1309,14 +1386,19 @@ function planTest262Variants(
   for (const strictnessMode of testCase.strictness) {
     try {
       planned.push({
-        input: assembleTest262Source(
-          source,
-          strictnessMode,
-          testCase,
-          harnesses,
-          parsed.flags.includes("raw"),
-          trapToken,
-        ),
+        // A Module's harness is a separate Script, so its body is the
+        // unmodified upstream source.
+        input:
+          testCase.mode === "module"
+            ? source
+            : assembleTest262Source(
+                source,
+                strictnessMode,
+                testCase,
+                harnesses,
+                parsed.flags.includes("raw"),
+                trapToken,
+              ),
         kind: "assembled",
         strictness: strictnessMode,
       });
@@ -1423,6 +1505,7 @@ async function executedResult(
   const expectRuntimeNegative = testCase.expectedFailurePhase === "runtime";
   const variants: Test262Variant[] = [];
   let moduleGraph: readonly Test262ModuleGraphNode[] | undefined;
+  let moduleScript: string | undefined;
   const execution = (): Test262Execution => ({
     harnessIncludes: parsed.flags.includes("raw")
       ? []
@@ -1457,11 +1540,8 @@ async function executedResult(
         { dependencies },
       );
     }
-    let assembled: string;
     try {
-      assembled = assembleTest262Source(
-        source,
-        "strict",
+      moduleScript = test262ModuleHarnessScript(
         testCase,
         harnesses,
         parsed.flags.includes("raw"),
@@ -1479,13 +1559,21 @@ async function executedResult(
       );
     }
     const graph = await buildEntryGraph(
-      assembled,
+      source,
+      moduleScript,
       sourcePath,
       testCase.path,
       rootPath,
     );
     moduleGraph = graph.nodes;
     const diagnostic = graph.graphDiagnostics[0] ?? graph.compileDiagnostics[0];
+    const harnessFailure =
+      diagnostic == null ? undefined : moduleHarnessFailure(diagnostic);
+    if (harnessFailure != null) {
+      return classifyTest262(testCase, harnessFailure, supportedFeatures, {
+        dependencies,
+      });
+    }
     if (diagnostic != null) {
       const unsupportedCapability = unsupportedModuleCapability(diagnostic);
       const failedPhase = moduleFailurePhase(diagnostic, graph.entryDisplayId);
@@ -1533,6 +1621,10 @@ async function executedResult(
   const trapped = harnessTrapObjects(testCase, harnesses).size > 0;
   const request = (input: string, variant: Test262Variant) => ({
     mode: testCase.mode,
+    ...includePropertiesWhen(() => {
+      if (moduleScript == null) return undefined;
+      return { script: moduleScript };
+    }),
     source: input,
     fragment: {
       body: source,
@@ -2169,6 +2261,9 @@ async function loadNativeExecution(): Promise<NativeExecution> {
           : request.sourceId;
       const args = [
         ...(request.mode === "module" ? ["--module"] : []),
+        ...(request.script == null
+          ? []
+          : ["--script", test262ModuleHarnessSourceId]),
         ...(request.test262Host === true ? ["--test262-host"] : []),
         ...(request.specialization === "disabled"
           ? ["--no-specialization"]
@@ -2183,6 +2278,10 @@ async function loadNativeExecution(): Promise<NativeExecution> {
         runNativeCli(
           {
             args,
+            ...includePropertiesWhen(() => {
+              if (request.script == null) return undefined;
+              return { scriptSource: request.script };
+            }),
             source: request.source,
             sourceId: request.sourceId,
             version: "0.1.0",

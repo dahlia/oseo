@@ -28,7 +28,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-new-expr.js
-          sourceHash: fnv1a64:52a6a3ba61e5646e
+          sourceHash: fnv1a64:93c882d6c261c99d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

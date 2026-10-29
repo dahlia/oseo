@@ -25,7 +25,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-expr-cls-name-meth.js
           id: test/language/module-code/eval-export-dflt-expr-cls-name-meth.js
-          sourceHash: fnv1a64:8af2bc010774e601
+          sourceHash: fnv1a64:dbe13885f01a1d04
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -54,7 +54,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-try-finall\
-        y.js:90:3: error[OSEO0001]: Source could not be parsed."
+        y.js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

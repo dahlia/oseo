@@ -27,7 +27,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-expr-await-expr-identifier.js
-          sourceHash: fnv1a64:2574832f185cd346
+          sourceHash: fnv1a64:756e52d9a7f4ca59
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

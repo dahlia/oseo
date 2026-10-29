@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/module-code/ambiguous-export-bindings/omitted-from-namespace_FIXTURE.js
           id: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace.js
-          sourceHash: fnv1a64:ac5528595b45ab32
+          sourceHash: fnv1a64:bb44e75917156345
         - dependencies:
             - test/language/module-code/ambiguous-export-bindings/omitted-from-namespace-1_FIXTURE.js
             - test/language/module-code/ambiguous-export-bindings/omitted-from-namespace-2_FIXTURE.js

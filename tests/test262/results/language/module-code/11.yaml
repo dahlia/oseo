@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/is-extensible.js
           id: test/language/module-code/namespace/internals/is-extensible.js
-          sourceHash: fnv1a64:a8007fa9fe43f3bf
+          sourceHash: fnv1a64:4e9ed8e634c60534
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -59,7 +59,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-obj-literal.js
-          sourceHash: fnv1a64:a96384b63e56b195
+          sourceHash: fnv1a64:05f827d82e6f97ce
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

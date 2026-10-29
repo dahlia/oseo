@@ -30,7 +30,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/has-property-sym-not-found.js
           id: test/language/module-code/namespace/internals/has-property-sym-not-found.js
-          sourceHash: fnv1a64:5d0c73690782af89
+          sourceHash: fnv1a64:9e9f7f712bc7e3e8
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -58,7 +58,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-var.js:90:16:
+      detail: "test/language/module-code/parse-err-export-dflt-var.js:15:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

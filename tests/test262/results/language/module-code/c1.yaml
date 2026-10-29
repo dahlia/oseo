@@ -30,7 +30,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-literal-number.js
-          sourceHash: fnv1a64:4f17abcfb5007fca
+          sourceHash: fnv1a64:4c8e1cb9f19a0765
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -71,7 +71,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-obj-literal.js
-          sourceHash: fnv1a64:e1c084ade922f193
+          sourceHash: fnv1a64:eb170ddeba777fc8
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -112,7 +112,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-of-await-expr-literal-string.js
-          sourceHash: fnv1a64:4ee381d52646793b
+          sourceHash: fnv1a64:eddd4115da972a42
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -148,7 +148,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/typeof-await-expr-literal-number.js
-          sourceHash: fnv1a64:f440ec4f11437ab3
+          sourceHash: fnv1a64:1c7dcb47c075d402
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

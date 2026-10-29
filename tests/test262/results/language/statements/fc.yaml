@@ -299,7 +299,7 @@ results:
       - control-flow
       - module-linking
     observation:
-      detail: "test/language/statements/labeled/value-await-module.js:95:6:
+      detail: "test/language/statements/labeled/value-await-module.js:20:6:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

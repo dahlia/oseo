@@ -4803,6 +4803,13 @@ interface HirSeed extends HirHostOptions {
   readonly globalObjectBindingIds?: readonly number[];
   readonly bindings?: ReadonlyMap<string, Binding>;
   /**
+   * Bindings of an environment enclosing the program's own top-level
+   * scope, such as the global declarations a module reads from a Script
+   * the realm evaluated first. The program's declarations shadow them
+   * rather than redeclaring them.
+   */
+  readonly outerBindings?: ReadonlyMap<string, Binding>;
+  /**
    * True when `program` is one module's body rather than a Script or
    * FunctionBody. A module's top-level function declarations are
    * LexicallyDeclaredNames, unlike a Script's or a FunctionBody's, which
@@ -4872,7 +4879,7 @@ export function buildSeededHir(
   }
   const body = resolveStatementList(
     program.body,
-    [],
+    seed.outerBindings == null ? [] : [new Map(seed.outerBindings)],
     state,
     false,
     scriptScope,

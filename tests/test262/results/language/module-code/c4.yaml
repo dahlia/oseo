@@ -24,7 +24,7 @@ results:
             - test/language/module-code/export-expname-from-string-binding.js
             - test/language/module-code/export-expname_FIXTURE.js
           id: test/language/module-code/export-expname-from-string-binding.js
-          sourceHash: fnv1a64:444c0b9282333334
+          sourceHash: fnv1a64:856f427fb776f179
         - dependencies: []
           id: test/language/module-code/export-expname_FIXTURE.js
           sourceHash: fnv1a64:711e14c825b19f18
@@ -59,7 +59,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/instn-local-bndng-var-dup.js
-          sourceHash: fnv1a64:2d0100bbd2780667
+          sourceHash: fnv1a64:e0653a42fe6e4dc8
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -95,7 +95,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-nested.js
-          sourceHash: fnv1a64:756dd52ffd0381c4
+          sourceHash: fnv1a64:e4d9f55a16d28f5f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

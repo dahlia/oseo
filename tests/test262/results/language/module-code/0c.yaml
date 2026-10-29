@@ -22,7 +22,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-dflt-cls-named-semi.js
-          sourceHash: fnv1a64:101d13df61ec01fa
+          sourceHash: fnv1a64:543979b7b6669667
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -51,7 +51,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-expr\
-        -meth-static.js:89:28: error[OSEO0001]: Source could not be
+        -meth-static.js:14:28: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -84,7 +84,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-template-literal.js
-          sourceHash: fnv1a64:2e3b612ef2f03763
+          sourceHash: fnv1a64:cee85e25a93ff7de
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

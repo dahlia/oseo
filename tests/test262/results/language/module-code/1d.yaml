@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found.js:104:10:
+      detail: "test/language/module-code/instn-iee-err-not-found.js:29:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -46,7 +46,7 @@ results:
             - test/language/module-code/instn-star-props-dflt-skip-star-named_FIXTURE.js
             - test/language/module-code/instn-star-props-dflt-skip-star-prod_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-skip.js
-          sourceHash: fnv1a64:d81581e32b2710c0
+          sourceHash: fnv1a64:0e1d0cb0654002e1
         - dependencies:
             - test/language/module-code/instn-star-props-dflt-skip-named_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-skip-star-named_FIXTURE.js

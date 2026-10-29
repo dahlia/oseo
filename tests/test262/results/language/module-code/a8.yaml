@@ -22,7 +22,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-local-bndng-const.js
-          sourceHash: fnv1a64:eddaba3bd8957e8b
+          sourceHash: fnv1a64:bb689e17fc4193d2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -60,7 +60,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-func-expression.js
-          sourceHash: fnv1a64:e98d25ed260fc5d0
+          sourceHash: fnv1a64:1e309139179cbe8b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

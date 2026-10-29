@@ -23,7 +23,7 @@ results:
             - test/language/module-code/instn-star-equality.js
             - test/language/module-code/instn-star-equality-other_FIXTURE.js
           id: test/language/module-code/instn-star-equality.js
-          sourceHash: fnv1a64:1cb780bf37e28a10
+          sourceHash: fnv1a64:eb4b6adf28a70655
         - dependencies:
             - test/language/module-code/instn-star-equality.js
           id: test/language/module-code/instn-star-equality-other_FIXTURE.js
@@ -64,7 +64,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-func-expression.js
-          sourceHash: fnv1a64:37bc3f271f0a24e9
+          sourceHash: fnv1a64:7829f99024ad645e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -24,7 +24,7 @@ results:
             - test/language/module-code/export-expname-from-string-string.js
             - test/language/module-code/export-expname_FIXTURE.js
           id: test/language/module-code/export-expname-from-string-string.js
-          sourceHash: fnv1a64:8dbb890b759bc12b
+          sourceHash: fnv1a64:094f1524529f8242
         - dependencies: []
           id: test/language/module-code/export-expname_FIXTURE.js
           sourceHash: fnv1a64:711e14c825b19f18

@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-asyncgenerator-declar\
-        ation-binding-exists.js:98:33: error[OSEO0001]: Source could not
+        ation-binding-exists.js:23:33: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -50,7 +50,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-null.js
-          sourceHash: fnv1a64:19e14777f0393598
+          sourceHash: fnv1a64:cd636e117db9df03
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -88,7 +88,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-obj-literal.js
-          sourceHash: fnv1a64:ac9157183a1e0079
+          sourceHash: fnv1a64:9153402ac6465fc4
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

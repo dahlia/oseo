@@ -33,7 +33,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/delete-non-exported.js
           id: test/language/module-code/namespace/internals/delete-non-exported.js
-          sourceHash: fnv1a64:04abe79bf4ccbcca
+          sourceHash: fnv1a64:2f8f2d55cfea35b3
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -74,7 +74,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-of-await-expr-nested.js
-          sourceHash: fnv1a64:b6bca970d74c95be
+          sourceHash: fnv1a64:5e2bf7ae635f347b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

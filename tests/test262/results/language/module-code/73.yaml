@@ -27,7 +27,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-binding.js
           id: test/language/module-code/instn-star-binding.js
-          sourceHash: fnv1a64:b35c353ae21d20ed
+          sourceHash: fnv1a64:604f2913e7375f42
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

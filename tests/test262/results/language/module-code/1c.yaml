@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-return.js:107:1:
+      detail: "test/language/module-code/parse-err-return.js:32:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -49,7 +49,7 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-new-expr.js:136:12: error[OSEO1001]: Await inside a
+        ait-expr-new-expr.js:61:12: error[OSEO1001]: Await inside a
         module top-level binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax

@@ -29,7 +29,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-iee-bndng-gen_FIXTURE.js
           id: test/language/module-code/instn-iee-bndng-gen.js
-          sourceHash: fnv1a64:18b3f472130ad22e
+          sourceHash: fnv1a64:f301ee79cefee3e9
         - dependencies:
             - test/language/module-code/instn-iee-bndng-gen.js
           id: test/language/module-code/instn-iee-bndng-gen_FIXTURE.js
@@ -74,7 +74,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-identifier.js
-          sourceHash: fnv1a64:c959009a26c37661
+          sourceHash: fnv1a64:ba9ae42ddf0b33ca
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -112,7 +112,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-expr-await-expr-regexp.js
-          sourceHash: fnv1a64:f40138bcf2adc45c
+          sourceHash: fnv1a64:b5631ccd5171caeb
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -153,7 +153,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/top-level-ticks-2.js
-          sourceHash: fnv1a64:f6c98e1082583d8d
+          sourceHash: fnv1a64:eaf323f5a41a861b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

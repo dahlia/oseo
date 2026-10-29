@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-as-eval.js:110:15:
+      detail: "test/language/module-code/early-import-as-eval.js:35:15:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -51,7 +51,7 @@ results:
             - test/language/module-code/eval-rqstd-abrupt-err-type_FIXTURE.js
             - test/language/module-code/eval-rqstd-abrupt-err-uri_FIXTURE.js
           id: test/language/module-code/eval-rqstd-abrupt.js
-          sourceHash: fnv1a64:dedf150390097cfb
+          sourceHash: fnv1a64:14c1ed1ffeee303c
         - dependencies: []
           id: test/language/module-code/eval-rqstd-abrupt-err-type_FIXTURE.js
           sourceHash: fnv1a64:f1e4c767df9f4047

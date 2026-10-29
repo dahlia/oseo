@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-decl\
-        -method-gen.js:90:23: error[OSEO0001]: Source could not be
+        -method-gen.js:15:23: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -46,7 +46,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-4.js:97:10: error[OSEO0001]: Source could not be parsed."
+        e-4.js:22:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -76,7 +76,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-expr-await-expr-literal-string.js
-          sourceHash: fnv1a64:2491f22a85ec02c6
+          sourceHash: fnv1a64:1c094b756d54c99d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -115,7 +115,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/typeof-await-expr-obj-literal.js
-          sourceHash: fnv1a64:07a1ee37bc14d50b
+          sourceHash: fnv1a64:5888e47f7eed463c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

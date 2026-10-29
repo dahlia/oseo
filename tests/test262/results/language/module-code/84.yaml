@@ -23,7 +23,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-local-bndng-var.js
-          sourceHash: fnv1a64:a446a51a1c9e40a8
+          sourceHash: fnv1a64:5893cff51b453b19
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

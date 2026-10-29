@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/early-dup-attribut\
-        e-key-export.js:97:3: error[OSEO0001]: Source could not be
+        e-key-export.js:22:3: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -51,7 +51,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-gen-named.js
           id: test/language/module-code/instn-named-bndng-dflt-gen-named.js
-          sourceHash: fnv1a64:65614d3783330eca
+          sourceHash: fnv1a64:c721544da1ce747b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -86,7 +86,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-str-initialize.js
           id: test/language/module-code/namespace/internals/get-str-initialize.js
-          sourceHash: fnv1a64:046fb68fc4e41a28
+          sourceHash: fnv1a64:d28f2f73e127f039
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -122,7 +122,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-sym-not-found.js
           id: test/language/module-code/namespace/internals/get-sym-not-found.js
-          sourceHash: fnv1a64:57eb236b5c3743b1
+          sourceHash: fnv1a64:246e7f1be58e0164
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -157,7 +157,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-nested.js
-          sourceHash: fnv1a64:d2dbc61252ab3e2a
+          sourceHash: fnv1a64:76cfcaeb495f5bab
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

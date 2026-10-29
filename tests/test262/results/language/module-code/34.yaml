@@ -31,7 +31,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           id: test/language/module-code/top-level-await/module-sync-import-async-resolution-ticks.js
-          sourceHash: fnv1a64:1295288297623930
+          sourceHash: fnv1a64:81e03124917a332d
         - dependencies: []
           id: test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           sourceHash: fnv1a64:911c90c83a970ad1
@@ -66,7 +66,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/await-expr-dy\
-        n-import.js:112:9: error[OSEO1001]: ImportExpression is outside
+        n-import.js:37:9: error[OSEO1001]: ImportExpression is outside
         the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax
@@ -92,7 +92,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/early-does-no\
-        t-propagate-to-fn-expr-body.js:104:3: error[OSEO0001]: Source
+        t-propagate-to-fn-expr-body.js:29:3: error[OSEO0001]: Source
         could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

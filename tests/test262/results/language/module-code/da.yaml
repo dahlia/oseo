@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-fun-named.js
           id: test/language/module-code/instn-named-bndng-dflt-fun-named.js
-          sourceHash: fnv1a64:cd73c188d2deca74
+          sourceHash: fnv1a64:146b7967232c0ecf
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -51,7 +51,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-var\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -73,8 +73,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-decl-pos-export-if-if.js:8\
-        9:12: error[OSEO0001]: Source could not be parsed."
+      detail: "test/language/module-code/parse-err-decl-pos-export-if-if.js:1\
+        4:12: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

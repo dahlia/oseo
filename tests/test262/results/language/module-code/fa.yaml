@@ -19,7 +19,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/export-expname-string-binding.js:96:\
+      detail: "test/language/module-code/export-expname-string-binding.js:21:\
         10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

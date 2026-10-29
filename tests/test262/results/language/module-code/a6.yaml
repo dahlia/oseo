@@ -25,7 +25,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/export-default-generator-declaration-binding.js
-          sourceHash: fnv1a64:b4844e4a15f70ec0
+          sourceHash: fnv1a64:4bcdb94231162a1b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -63,7 +63,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/has-property-str-not-found.js
           id: test/language/module-code/namespace/internals/has-property-str-not-found.js
-          sourceHash: fnv1a64:59868b73290bc796
+          sourceHash: fnv1a64:7058f6a3b6f33c17
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -101,7 +101,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-nested.js
-          sourceHash: fnv1a64:b893317570d1b90c
+          sourceHash: fnv1a64:f8f990acced7b4e1
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -136,7 +136,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-nested.js
-          sourceHash: fnv1a64:96f5860eb5b8627d
+          sourceHash: fnv1a64:79a68f4aa8dfe8a8
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

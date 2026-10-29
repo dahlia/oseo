@@ -27,7 +27,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-gen-semi.js
-          sourceHash: fnv1a64:c91e375114068090
+          sourceHash: fnv1a64:1f495022e1159ae5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -60,7 +60,7 @@ results:
             - test/language/module-code/instn-star-props-circular-a_FIXTURE.js
             - test/language/module-code/instn-star-props-circular-b_FIXTURE.js
           id: test/language/module-code/instn-star-props-circular.js
-          sourceHash: fnv1a64:587a566f35acfe7a
+          sourceHash: fnv1a64:aa43ffea4b3a34d7
         - dependencies:
             - test/language/module-code/instn-star-props-circular-b_FIXTURE.js
           id: test/language/module-code/instn-star-props-circular-a_FIXTURE.js
@@ -99,7 +99,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/early-errors-await-n\
-        ot-simple-assignment-target.js:92:1: error[OSEO0001]: Source
+        ot-simple-assignment-target.js:17:1: error[OSEO0001]: Source
         could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -129,8 +129,8 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-nested.js:135:12: error[OSEO1001]: Await inside a
-        module top-level binding or assignment pattern is unsupported."
+        ait-expr-nested.js:60:12: error[OSEO1001]: Await inside a module
+        top-level binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -159,7 +159,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-literal-number.js
-          sourceHash: fnv1a64:602cc3060c837f10
+          sourceHash: fnv1a64:dafdbf373322fd83
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -21,7 +21,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-this.js
-          sourceHash: fnv1a64:80f0bb59c762bbbe
+          sourceHash: fnv1a64:75b17133b09f2db9
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -50,7 +50,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-hoist-lex-gen.js:102:11:
+      detail: "test/language/module-code/parse-err-hoist-lex-gen.js:27:11:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -73,7 +73,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-syntax-2.js:96:1:
+      detail: "test/language/module-code/parse-err-syntax-2.js:21:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -109,7 +109,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-of-await-expr-this.js
-          sourceHash: fnv1a64:e9997351c6363ee2
+          sourceHash: fnv1a64:bdfa9516121f443b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -145,7 +145,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-template-literal.js
-          sourceHash: fnv1a64:c8eb4583e84e81ab
+          sourceHash: fnv1a64:c94a0f9c32b04774
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

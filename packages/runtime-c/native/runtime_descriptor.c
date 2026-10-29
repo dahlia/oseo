@@ -254,6 +254,21 @@ bool oseo_internal_own_property_descriptor(
     );
 }
 
+OseoResult oseo_internal_namespace_export_ready(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue stored
+) {
+    if (!is_object(object_value) ||
+        !ordinary_object(object_value)->module_namespace ||
+        !is_cell(stored)) {
+        return normal(oseo_undefined());
+    }
+    OseoResult read = oseo_cell_get(context, stored);
+    if (read.status != OSEO_STATUS_NORMAL) return read;
+    return normal(oseo_undefined());
+}
+
 static OseoResult define_data_property(
     OseoContext *context,
     OseoValue object_value,

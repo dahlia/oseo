@@ -20,7 +20,7 @@ results:
       - module-linking
       - top-level-await
     observation:
-      detail: "test/language/module-code/top-level-await/no-operand.js:92:6:
+      detail: "test/language/module-code/top-level-await/no-operand.js:17:6:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -52,7 +52,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-array-literal.js
-          sourceHash: fnv1a64:1b01ed55d15623a5
+          sourceHash: fnv1a64:1db8f991fa002044
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

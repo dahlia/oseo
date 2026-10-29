@@ -29,7 +29,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/fulfillment-order.js\
-        :154:31: error[OSEO1001]: ImportExpression is outside the M1
+        :43:31: error[OSEO1001]: ImportExpression is outside the M1
         profile."
       passed: false
       unsupportedCapability: profile-syntax
@@ -58,7 +58,7 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-this.js:139:12: error[OSEO1001]: Await inside a module
+        ait-expr-this.js:64:12: error[OSEO1001]: Await inside a module
         top-level binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax

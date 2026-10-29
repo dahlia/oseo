@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-labeled.js\
-        :89:10: error[OSEO0001]: Source could not be parsed."
+        :14:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -49,7 +49,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/block-await-expr-identifier.js
-          sourceHash: fnv1a64:1c87dc038ac51e07
+          sourceHash: fnv1a64:79ccd4fb02577aae
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

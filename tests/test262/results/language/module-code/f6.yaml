@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/invalid-private-names-call-expressio\
-        n-this.js:115:16: error[OSEO0001]: Source could not be parsed."
+        n-this.js:40:16: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -54,7 +54,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/new-await-parens.js
-          sourceHash: fnv1a64:9580f0460ab89256
+          sourceHash: fnv1a64:ec8c202693d775c1
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

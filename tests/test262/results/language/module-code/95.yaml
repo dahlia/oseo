@@ -22,7 +22,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-dflt-cls-anon-semi.js
-          sourceHash: fnv1a64:42b9125d92fa7187
+          sourceHash: fnv1a64:a755ace520c29c84
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -58,7 +58,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-gen-anon.js
           id: test/language/module-code/instn-named-bndng-dflt-gen-anon.js
-          sourceHash: fnv1a64:916a8a1204258dd0
+          sourceHash: fnv1a64:be741158bd25f549
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -87,7 +87,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-try-finall\
-        y.js:90:3: error[OSEO0001]: Source could not be parsed."
+        y.js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -116,7 +116,7 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-literal-string.js:139:12: error[OSEO1001]: Await inside
+        ait-expr-literal-string.js:64:12: error[OSEO1001]: Await inside
         a module top-level binding or assignment pattern is
         unsupported."
       passed: false
@@ -149,7 +149,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-regexp.js
-          sourceHash: fnv1a64:86e2567b0dde6894
+          sourceHash: fnv1a64:f550fbbca75a34f5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

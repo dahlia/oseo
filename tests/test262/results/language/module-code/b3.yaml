@@ -23,7 +23,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/instn-local-bndng-for-dup.js
-          sourceHash: fnv1a64:ca3e1c2479ecb883
+          sourceHash: fnv1a64:968b5932c0619600
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -55,7 +55,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-let.js
           id: test/language/module-code/instn-named-bndng-let.js
-          sourceHash: fnv1a64:96d613e0b503ce2f
+          sourceHash: fnv1a64:ba6ac38fb248d5c2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -83,8 +83,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-decl-pos-import-while.js:8\
-        9:15: error[OSEO0001]: Source could not be parsed."
+      detail: "test/language/module-code/parse-err-decl-pos-import-while.js:1\
+        4:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -122,7 +122,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-new-expr.js
-          sourceHash: fnv1a64:aee6e7abbfc1b454
+          sourceHash: fnv1a64:6882254b86d06329
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

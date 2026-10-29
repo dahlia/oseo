@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/import/import-attributes/json-value-object_FIXTURE.json
           id: test/language/import/import-attributes/json-extensibility-object.js
-          sourceHash: fnv1a64:7098f175cc002478
+          sourceHash: fnv1a64:34e630e89484450d
         - dependencies: []
           id: test/language/import/import-attributes/json-value-object_FIXTURE.json
           sourceHash: fnv1a64:71eac782051f179f

@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-export-unresolvable.js:92:10:
+      detail: "test/language/module-code/early-export-unresolvable.js:17:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -57,7 +57,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-regexp.js
-          sourceHash: fnv1a64:aa8e3d29e6660bc4
+          sourceHash: fnv1a64:802f30a0f09bcd43
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

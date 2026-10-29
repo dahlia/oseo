@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-iee-cycle-2_FIXTURE.js
           id: test/language/module-code/instn-star-iee-cycle.js
-          sourceHash: fnv1a64:5021c8ba7eb93845
+          sourceHash: fnv1a64:f69e7f72b983ea44
         - dependencies:
             - test/language/module-code/instn-star-iee-cycle.js
           id: test/language/module-code/instn-star-iee-cycle-2_FIXTURE.js
@@ -63,7 +63,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/block-await-expr-this.js
-          sourceHash: fnv1a64:40dac810f405674c
+          sourceHash: fnv1a64:128a6809dcb83b29
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

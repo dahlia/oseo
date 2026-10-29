@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-var\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -41,7 +41,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-let.js:90:16:
+      detail: "test/language/module-code/parse-err-export-dflt-let.js:15:16:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -74,7 +74,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-func-expression.js
-          sourceHash: fnv1a64:37e8ebe2610178c5
+          sourceHash: fnv1a64:8945299aadb89050
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

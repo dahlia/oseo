@@ -18,8 +18,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-semi-named-export.js:102:1\
-        0: error[OSEO0001]: Source could not be parsed."
+      detail: "test/language/module-code/parse-err-semi-named-export.js:27:10:
+        error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -54,7 +54,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-identifier.js
-          sourceHash: fnv1a64:b1c468fc9c9c69a7
+          sourceHash: fnv1a64:2cc3f89eb4468d26
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

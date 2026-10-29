@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-eval.js:110:10:
+      detail: "test/language/module-code/early-import-eval.js:35:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -46,7 +46,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-id-name.js
           id: test/language/module-code/instn-named-id-name.js
-          sourceHash: fnv1a64:cfa5462fab0dadcf
+          sourceHash: fnv1a64:7fd1da9ed8b17448
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -75,7 +75,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-block-stmt\
-        .js:89:3: error[OSEO0001]: Source could not be parsed."
+        .js:14:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -104,7 +104,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-this.js
-          sourceHash: fnv1a64:9dc3dd56d2fd1c1b
+          sourceHash: fnv1a64:acb46d18b9a7e7e4
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/early-dup-attribut\
-        e-key-import-withbinding.js:98:3: error[OSEO0001]: Source could
+        e-key-import-withbinding.js:23:3: error[OSEO0001]: Source could
         not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -46,7 +46,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-6.js:96:9: error[OSEO0001]: Source could not be parsed."
+        e-6.js:21:9: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -79,7 +79,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-obj-literal.js
-          sourceHash: fnv1a64:08aadd974555f830
+          sourceHash: fnv1a64:05e590792d608085
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -120,7 +120,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/void-await-expr.js
-          sourceHash: fnv1a64:bb5e1ced713fe16d
+          sourceHash: fnv1a64:67ffcd4291cee3f6
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

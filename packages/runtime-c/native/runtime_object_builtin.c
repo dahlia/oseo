@@ -63,7 +63,9 @@ static OseoResult own_property_query(
         setter,
         omitted_accessors
     );
-    return normal(oseo_undefined());
+    if (!*found) return normal(oseo_undefined());
+    return oseo_internal_namespace_export_ready(
+        context, object_value, *value);
 }
 
 static OseoValue builtin_argument(
@@ -917,7 +919,14 @@ static OseoResult object_test_integrity_level(
          (frozen && object->virtual_string_iterator_writable))) {
         return normal(oseo_boolean(false));
     }
+    /* A module namespace lists its exports in [[OwnPropertyKeys]] order,
+     * so this walk reads each export's binding exactly where
+     * TestIntegrityLevel's [[GetOwnProperty]] would. */
     for (size_t index = 0u; index < object->property_count; index += 1u) {
+        OseoResult ready = oseo_internal_namespace_export_ready(
+            context, value, ordinary_object(value)->properties[index].value);
+        if (ready.status != OSEO_STATUS_NORMAL) return ready;
+        object = ordinary_object(value);
         OseoPropertyAttributes attributes =
             object->properties[index].attributes;
         if (attributes.configurable ||

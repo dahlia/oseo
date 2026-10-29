@@ -25,7 +25,7 @@ results:
             - test/language/module-code/ambiguous-export-bindings/namespace-export-star-as-from-2_FIXTURE.js
             - test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from.js
           id: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from.js
-          sourceHash: fnv1a64:5437dd55d8123b5d
+          sourceHash: fnv1a64:c4eba1b28f7edfaa
         - dependencies:
             - test/language/module-code/ambiguous-export-bindings/namespace-empty-module_FIXTURE.js
           id: test/language/module-code/ambiguous-export-bindings/namespace-export-star-as-from-1_FIXTURE.js
@@ -66,7 +66,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/early-dup-attribut\
-        e-key-import-nobinding.js:98:3: error[OSEO0001]: Source could
+        e-key-import-nobinding.js:23:3: error[OSEO0001]: Source could
         not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -97,7 +97,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-identifier.js
-          sourceHash: fnv1a64:9c84ee8bf636fa9b
+          sourceHash: fnv1a64:dcd919de646ca708
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-expname-from-unpaired-surroga\
-        te.js:96:10: error[OSEO0001]: Source could not be parsed."
+        te.js:21:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -54,7 +54,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-nested.js
-          sourceHash: fnv1a64:76c63b0b54d956d6
+          sourceHash: fnv1a64:cbf6cfd7bb5dfffd
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

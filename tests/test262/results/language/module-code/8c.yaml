@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-expr.js
           id: test/language/module-code/instn-named-bndng-dflt-expr.js
-          sourceHash: fnv1a64:3073084c1498148e
+          sourceHash: fnv1a64:13049b947f78620f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -59,7 +59,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-array-literal.js
-          sourceHash: fnv1a64:af17f97ee9d8f780
+          sourceHash: fnv1a64:602057591bdfaa45
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

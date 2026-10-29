@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/ambiguous-export-bindings/error-expo\
-        rt-from-named.js:116:10: error[OSEO2001]: Export 'x' is
+        rt-from-named.js:41:10: error[OSEO2001]: Export 'x' is
         ambiguous."
       errorType: SyntaxError
       failedPhase: resolution
@@ -44,7 +44,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/comment-single-line-html-open.js:91:\
+      detail: "test/language/module-code/comment-single-line-html-open.js:16:\
         2: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -67,7 +67,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-iee-err-not-found-as.js:104:10:
+      detail: "test/language/module-code/instn-iee-err-not-found-as.js:29:10:
         error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
@@ -99,7 +99,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/block-await-expr-regexp.js
-          sourceHash: fnv1a64:871563adf10b2d87
+          sourceHash: fnv1a64:acc9fa1a980e8926
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -141,7 +141,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-of-await-expr-regexp.js
-          sourceHash: fnv1a64:2981612d170b4544
+          sourceHash: fnv1a64:9dff059c560a5431
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -30,7 +30,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-array-literal.js
-          sourceHash: fnv1a64:e2b7d95c47b033d3
+          sourceHash: fnv1a64:e10992a6a3ae179c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

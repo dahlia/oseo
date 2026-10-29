@@ -26,7 +26,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-nested.js
-          sourceHash: fnv1a64:80991f2c837c45b1
+          sourceHash: fnv1a64:f4f1f6643ed5f4fa
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

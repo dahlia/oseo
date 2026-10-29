@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/import/import-attributes/json-value-null_FIXTURE.json
           id: test/language/import/import-attributes/json-value-null.js
-          sourceHash: fnv1a64:8316c12aa016cafa
+          sourceHash: fnv1a64:a996022986fc780b
         - dependencies: []
           id: test/language/import/import-attributes/json-value-null_FIXTURE.json
           sourceHash: fnv1a64:2ab8369a31422c6a

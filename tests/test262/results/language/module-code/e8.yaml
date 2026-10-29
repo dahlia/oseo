@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-own-property-str-found-init.js
           id: test/language/module-code/namespace/internals/get-own-property-str-found-init.js
-          sourceHash: fnv1a64:9bd557e2d770c2e2
+          sourceHash: fnv1a64:b40a17b862242873
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -66,7 +66,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-expr-new-expr-reject.js
-          sourceHash: fnv1a64:2dbcdf70ed5b6167
+          sourceHash: fnv1a64:34e6f2a57e63b286
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -102,7 +102,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-template-literal.js
-          sourceHash: fnv1a64:4ee26c2158dafb42
+          sourceHash: fnv1a64:d3f177aff0334f3d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -142,7 +142,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-literal-number.js
-          sourceHash: fnv1a64:3fbe9d73bd063f18
+          sourceHash: fnv1a64:4627f32a9e0590cd
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -178,7 +178,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-identifier.js
-          sourceHash: fnv1a64:4e4dc8db265dbb4a
+          sourceHash: fnv1a64:fa8a4658ad0e3ec1
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

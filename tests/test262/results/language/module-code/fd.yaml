@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-iee-bndng-fun_FIXTURE.js
           id: test/language/module-code/instn-iee-bndng-fun.js
-          sourceHash: fnv1a64:abdc5794c2fa6767
+          sourceHash: fnv1a64:20ad224fc299d2a2
         - dependencies:
             - test/language/module-code/instn-iee-bndng-fun.js
           id: test/language/module-code/instn-iee-bndng-fun_FIXTURE.js
@@ -58,7 +58,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-fun.js
           id: test/language/module-code/instn-named-bndng-fun.js
-          sourceHash: fnv1a64:a4572fdc946d0554
+          sourceHash: fnv1a64:7a9e86f23d5cd789
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -88,7 +88,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/catch-paramet\
-        er.js:117:1: error[OSEO1001]: Await inside a module top-level
+        er.js:42:1: error[OSEO1001]: Await inside a module top-level
         binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax

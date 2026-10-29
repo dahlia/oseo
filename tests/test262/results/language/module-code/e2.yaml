@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-expr-cls-named.js
           id: test/language/module-code/eval-export-dflt-expr-cls-named.js
-          sourceHash: fnv1a64:fdcd9b63e0cf8877
+          sourceHash: fnv1a64:3176be32694f2752
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -59,7 +59,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-once.js
           id: test/language/module-code/instn-once.js
-          sourceHash: fnv1a64:e1ab6a6be9e87bac
+          sourceHash: fnv1a64:30d46fcaf4af2181
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -98,7 +98,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/has-property-str-found-uninit.js
           id: test/language/module-code/namespace/internals/has-property-str-found-uninit.js
-          sourceHash: fnv1a64:a494a8415378d900
+          sourceHash: fnv1a64:c4dfa697c04fb611
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -171,7 +171,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-this.js
-          sourceHash: fnv1a64:2e68e9fdaf40d708
+          sourceHash: fnv1a64:cc2d11081df9ffe5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

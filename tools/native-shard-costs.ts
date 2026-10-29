@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 443 seconds across 141 entries.
+ * 443 seconds across 143 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -105,6 +105,11 @@
  * macOS preserves its prior unknown-file assignment of 296 seconds as
  * an explicitly unmeasured placeholder. See U6 provenance.
  * All other Main entries and partition rules remain unchanged. See U6.
+ *
+ * Module namespace uninitialized and module prelude Script postdate the
+ * three Linux runs. Both hosts use one-run case sums from candidate CI
+ * 40869736577 at `ad1a1eba`: Linux jobs 123433597564 and 123433597780,
+ * macOS job 123433598882. One run estimates no variation. See U6.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -188,6 +193,8 @@ export const nativeShardCosts = {
     "tests/property/m5-map-intrinsic.property.test.ts": 493,
     "tests/property/m5-math-namespace.property.test.ts": 1053,
     "tests/property/m5-module-continuation.property.test.ts": 194,
+    "tests/property/m5-module-namespace-uninitialized.property.test.ts": 128,
+    "tests/property/m5-module-prelude-script.property.test.ts": 486,
     "tests/property/m5-number-intrinsic.property.test.ts": 966,
     "tests/property/m5-number-prototype.property.test.ts": 1292,
     "tests/property/m5-object-binding.property.test.ts": 544,
@@ -340,6 +347,8 @@ export const nativeShardCosts = {
     "tests/property/m5-map-intrinsic.property.test.ts": 198,
     "tests/property/m5-math-namespace.property.test.ts": 321,
     "tests/property/m5-module-continuation.property.test.ts": 317,
+    "tests/property/m5-module-namespace-uninitialized.property.test.ts": 153,
+    "tests/property/m5-module-prelude-script.property.test.ts": 361,
     "tests/property/m5-number-intrinsic.property.test.ts": 301,
     "tests/property/m5-number-prototype.property.test.ts": 242,
     // Provisional estimate: ceil(235 * 122/131) from this file's host

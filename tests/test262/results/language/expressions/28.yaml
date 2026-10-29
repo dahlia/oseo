@@ -739,7 +739,7 @@ results:
       - promise-settlement
     observation:
       detail: "test/language/expressions/dynamic-import/catch/nested-async-ar\
-        row-function-return-await-eval-script-code-target.js:137:29:
+        row-function-return-await-eval-script-code-target.js:34:29:
         error[OSEO1001]: ImportExpression is outside the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

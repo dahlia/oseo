@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-export-global.js:94:10:
+      detail: "test/language/module-code/early-export-global.js:19:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -77,7 +77,7 @@ results:
             - test/language/module-code/top-level-await/async-module-tla_FIXTURE.js
             - test/language/module-code/top-level-await/async-module-sync_FIXTURE.js
           id: test/language/module-code/top-level-await/async-module-does-not-block-sibling-modules.js
-          sourceHash: fnv1a64:2b109a056302ead9
+          sourceHash: fnv1a64:273f9b91f38439e6
         - dependencies: []
           id: test/language/module-code/top-level-await/async-module-tla_FIXTURE.js
           sourceHash: fnv1a64:2b1386b7819c2b3b
@@ -118,7 +118,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/block-await-expr-null.js
-          sourceHash: fnv1a64:70f338fb8a0b07b8
+          sourceHash: fnv1a64:ccbd49565960c387
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -32,7 +32,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-expr-resolution.js
-          sourceHash: fnv1a64:56b3289602751a8f
+          sourceHash: fnv1a64:ddd60f1e569eb0e0
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

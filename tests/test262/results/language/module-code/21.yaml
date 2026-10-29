@@ -28,7 +28,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-star.js
           id: test/language/module-code/instn-named-bndng-dflt-star.js
-          sourceHash: fnv1a64:f76382a93ef8b2dc
+          sourceHash: fnv1a64:e1facf1270d0bd69
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -67,8 +67,8 @@ results:
       - symbols
       - top-level-await
     observation:
-      detail: "test/language/module-code/top-level-await/rejection-order.js:1\
-        37:31: error[OSEO1001]: ImportExpression is outside the M1
+      detail: "test/language/module-code/top-level-await/rejection-order.js:2\
+        6:31: error[OSEO1001]: ImportExpression is outside the M1
         profile."
       passed: false
       unsupportedCapability: profile-syntax
@@ -97,7 +97,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-literal-string.js
-          sourceHash: fnv1a64:04f23f560d01648b
+          sourceHash: fnv1a64:13ddccaa042cc3a6
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

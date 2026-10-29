@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/import/import-attributes/json-via-namespace_FIXTURE.json
           id: test/language/import/import-attributes/json-via-namespace.js
-          sourceHash: fnv1a64:9cf2ba44d57d7306
+          sourceHash: fnv1a64:61d9dc47c279a567
         - dependencies: []
           id: test/language/import/import-attributes/json-via-namespace_FIXTURE.json
           sourceHash: fnv1a64:06187e0b2b08f101

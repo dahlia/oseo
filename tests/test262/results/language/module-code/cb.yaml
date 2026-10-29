@@ -26,7 +26,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/block-await-expr-array-literal.js
-          sourceHash: fnv1a64:9dd36cbfce775841
+          sourceHash: fnv1a64:af9ced880bf660e4
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -58,8 +58,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/early-no-esca\
-        ped-await.js:100:1: error[OSEO0001]: Source could not be
-        parsed."
+        ped-await.js:25:1: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

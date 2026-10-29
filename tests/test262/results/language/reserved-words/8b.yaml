@@ -20,7 +20,7 @@ results:
       - module-linking
       - var-bindings
     observation:
-      detail: "test/language/reserved-words/await-module.js:90:5:
+      detail: "test/language/reserved-words/await-module.js:15:5:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

@@ -17,6 +17,7 @@ import type {
   RuntimeInput,
   RuntimeInputProvider,
   SourceFrontend,
+  SyntaxProgram,
   TargetDescription,
   TargetName,
 } from "@oseo/compiler";
@@ -132,6 +133,12 @@ const moduleParser = withDefault(
   false,
 );
 
+const scriptParser = optional(
+  option("--script", stringValue({ metavar: "SCRIPT" }), {
+    description: message`Evaluate a Script in the realm before the module.`,
+  }),
+);
+
 const targetParser = optional(
   option(
     "--target",
@@ -150,6 +157,7 @@ const cliParser = object({
   module: moduleParser,
   mode: modeParser,
   runtimeArchiveReuse: runtimeArchiveReuseParser,
+  script: scriptParser,
   sourceId: argument(stringValue({ metavar: "SOURCE" }), {
     description: message`Source file to compile.`,
   }),
@@ -186,6 +194,11 @@ export interface DefaultComponents {
 /** A host-independent invocation of the Oseo command-line contract. */
 export interface CliRequest {
   readonly args: readonly string[];
+  /**
+   * In-memory text of the `--script` file, which is then not read from
+   * the host. It is ignored without that option.
+   */
+  readonly scriptSource?: string;
   readonly source?: string;
   readonly sourceId?: string;
   readonly version: string;
@@ -372,11 +385,20 @@ function compileCliSource(
   );
 }
 
+const scriptModuleOnly = "The --script option applies only to a module entry.";
+
+/** A `--script` Script with the text the CLI read or was given. */
+interface CliPreludeScript {
+  readonly source: string;
+  readonly sourceId: string;
+}
+
 async function compileCliModuleGraph(
   host: CompilerHost,
   sourcePath: string,
   source: string,
   specialization: CliInvocation["specialization"],
+  script?: CliPreludeScript,
 ): Promise<{ readonly diagnostic: Diagnostic } | { readonly mir: MirProgram }> {
   let entryId: string;
   try {
@@ -419,7 +441,26 @@ async function compileCliModuleGraph(
       diagnostic: hostDiagnostic(entryId, "The module graph is unavailable."),
     };
   }
-  const compiled = compileModuleGraph(result.graph, { specialization });
+  let prelude: SyntaxProgram | undefined;
+  if (script != null) {
+    const parsed = defaultComponents.frontend.parse(script);
+    const parseDiagnostic = parsed.diagnostics[0];
+    if (parseDiagnostic != null) return { diagnostic: parseDiagnostic };
+    if (parsed.program == null) {
+      return {
+        diagnostic: hostDiagnostic(
+          script.sourceId,
+          "The frontend did not produce the Script.",
+        ),
+      };
+    }
+    prelude = parsed.program;
+  }
+  const compiled = compileModuleGraph(
+    result.graph,
+    { specialization },
+    prelude,
+  );
   const diagnostic = compiled.diagnostics[0];
   if (diagnostic != null) return { diagnostic };
   if (compiled.mir == null) {
@@ -507,6 +548,14 @@ export function runCli(request: CliRequest): CliResult {
       hostDiagnostic(
         request.sourceId ?? parsed.value.sourceId,
         "Module compilation requires the asynchronous CLI host workflow.",
+      ),
+    );
+  }
+  if (parsed.value.script != null) {
+    return diagnosticResult(
+      hostDiagnostic(
+        request.sourceId ?? parsed.value.sourceId,
+        scriptModuleOnly,
       ),
     );
   }
@@ -1515,12 +1564,32 @@ export async function runNativeCli(
       ),
     );
   }
+  if (!moduleGoal && parsed.value.script != null) {
+    return diagnosticResult(hostDiagnostic(sourceId, scriptModuleOnly));
+  }
+  let script: CliPreludeScript | undefined;
+  if (parsed.value.script != null) {
+    const scriptId = parsed.value.script;
+    try {
+      script = {
+        source:
+          request.scriptSource ??
+          (await host.readTextFile(sourceReadLocation(scriptId))),
+        sourceId: scriptId,
+      };
+    } catch {
+      return diagnosticResult(
+        hostDiagnostic(scriptId, "The Script file could not be read."),
+      );
+    }
+  }
   if (moduleGoal) {
     const compiled = await compileCliModuleGraph(
       host,
       parsed.value.sourceId,
       source,
       parsed.value.specialization,
+      script,
     );
     if ("diagnostic" in compiled) {
       return diagnosticResult(compiled.diagnostic);

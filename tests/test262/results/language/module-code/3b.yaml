@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-hoist-lex-fun.js:100:10:
+      detail: "test/language/module-code/parse-err-hoist-lex-fun.js:25:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -51,7 +51,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-regexp.js
-          sourceHash: fnv1a64:836b8cc05df1230c
+          sourceHash: fnv1a64:53a648b175756cdf
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

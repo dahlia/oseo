@@ -194,6 +194,91 @@ export async function runNativeScenario2(
     }
   }
 
+  // A Script the realm evaluates before the graph, as test262 runs its
+  // harness, is the global environment of every module: an imported
+  // module reads its functions and lexical bindings, writes reach the
+  // global object, a module declaration shadows a global name, and the
+  // Script keeps its own sloppy top level. The references run the same
+  // Script through node:vm before importing the entry.
+  const preludeDirectory = `${root}/tests/fixtures/module-prelude-script`;
+  const preludeReferences = [
+    await host.run({
+      args: [`${preludeDirectory}/reference.mjs`],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: [
+        "run",
+        "--quiet",
+        "--allow-read",
+        `${preludeDirectory}/reference.mjs`,
+      ],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of preludeReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativePrelude = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            "--script",
+            `${preludeDirectory}/prelude.js`,
+            `${preludeDirectory}/entry.mjs`,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(nativePrelude.exitStatus, 0, nativePrelude.stderr);
+      assert.equal(nativePrelude.stderr, "");
+      for (const reference of preludeReferences) {
+        assert.equal(
+          nativePrelude.stdout,
+          reference.stdout,
+          `module prelude ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
+  // A throw in the prelude Script, at its top level or inside one of its
+  // functions that a module calls, reports the Script's own location.
+  for (const [prelude, entry, location] of [
+    ["throwing-prelude.js", "entry.mjs", "2:1"],
+    ["failing-prelude.js", "calls-prelude.mjs", "3:3"],
+  ] as const) {
+    for (const specialization of ["disabled", "enabled"] as const) {
+      const thrown = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            "--script",
+            `${preludeDirectory}/${prelude}`,
+            `${preludeDirectory}/${entry}`,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(thrown.exitStatus, 1, `${prelude} ${specialization}`);
+      assert.equal(thrown.stdout, "");
+      assert.equal(
+        thrown.stderr,
+        `${preludeDirectory}/${prelude}:${location}: error[OSEO2001]: ` +
+          "Error: prelude failure\nOSEO_THROWN Error\n",
+      );
+    }
+  }
+
   // Each module has one import.meta object with a null [[Prototype]],
   // created before any of its code can run, so a hoisted function that a
   // cyclic dependency calls before its module evaluates already reads it.
@@ -516,6 +601,62 @@ export async function runNativeScenario2(
           nativeExportForms.stdout,
           reference.stdout,
           `module export forms ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
+  // Namespace [[GetOwnProperty]] over uninitialized exports: each
+  // descriptor, ownership, enumeration, integrity, copy, and forwarding
+  // proxy operation throws a ReferenceError before the bindings are
+  // initialized and succeeds after, while [[HasProperty]],
+  // [[OwnPropertyKeys]], and [[Delete]] read no binding. A cycle's
+  // dependency observes the same namespace before its evaluation.
+  const uninitializedNamespaceEntry = [
+    root,
+    "tests/fixtures/module-namespace-uninitialized/entry.mjs",
+  ].join("/");
+  const uninitializedNamespaceReferences = [
+    await host.run({
+      args: [uninitializedNamespaceEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", uninitializedNamespaceEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of uninitializedNamespaceReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeUninitializedNamespace = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            uninitializedNamespaceEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(
+        nativeUninitializedNamespace.exitStatus,
+        0,
+        nativeUninitializedNamespace.stderr,
+      );
+      assert.equal(nativeUninitializedNamespace.stderr, "");
+      for (const reference of uninitializedNamespaceReferences) {
+        assert.equal(
+          nativeUninitializedNamespace.stdout,
+          reference.stdout,
+          `uninitialized namespace ${specialization}`,
         );
       }
     } finally {

@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-expname-from-as-unpaired-surr\
-        ogate.js:96:17: error[OSEO0001]: Source could not be parsed."
+        ogate.js:21:17: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -44,7 +44,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-expr\
-        -meth-gen-static.js:90:29: error[OSEO0001]: Source could not be
+        -meth-gen-static.js:15:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -68,7 +68,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-con\
-        st.js:90:3: error[OSEO0001]: Source could not be parsed."
+        st.js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -91,7 +91,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-con\
-        st.js:90:3: error[OSEO0001]: Source could not be parsed."
+        st.js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -114,7 +114,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-set\
-        ter.js:89:15: error[OSEO0001]: Source could not be parsed."
+        ter.js:14:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -143,7 +143,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-this.js
-          sourceHash: fnv1a64:078c0acb5b1d8ff6
+          sourceHash: fnv1a64:ce5dade40a52627f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

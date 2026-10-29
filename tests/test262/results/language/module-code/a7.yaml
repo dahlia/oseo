@@ -29,7 +29,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-import-rejection-body_FIXTURE.js
           id: test/language/module-code/top-level-await/module-import-rejection-body.js
-          sourceHash: fnv1a64:1c115db88ad03176
+          sourceHash: fnv1a64:41b74a3631621819
         - dependencies: []
           id: test/language/module-code/top-level-await/module-import-rejection-body_FIXTURE.js
           sourceHash: fnv1a64:cae7df201970cdb8
@@ -70,7 +70,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-array-literal.js
-          sourceHash: fnv1a64:178d190ba2d2e99e
+          sourceHash: fnv1a64:d6d7b4f7bbe9c2fd
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

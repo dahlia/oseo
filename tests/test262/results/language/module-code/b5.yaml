@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-expr-gen-named.js
           id: test/language/module-code/eval-export-dflt-expr-gen-named.js
-          sourceHash: fnv1a64:96ec490162154199
+          sourceHash: fnv1a64:4d8aff04aec1b8de
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -55,7 +55,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-object-get\
-        ter.js:89:14: error[OSEO0001]: Source could not be parsed."
+        ter.js:14:14: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

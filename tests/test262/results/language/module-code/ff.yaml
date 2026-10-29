@@ -23,7 +23,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-iee-iee-cycle-2_FIXTURE.js
           id: test/language/module-code/instn-iee-iee-cycle.js
-          sourceHash: fnv1a64:276f1e6d45739e2f
+          sourceHash: fnv1a64:345e6adba51f4a30
         - dependencies:
             - test/language/module-code/instn-iee-iee-cycle.js
           id: test/language/module-code/instn-iee-iee-cycle-2_FIXTURE.js
@@ -61,7 +61,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-str-not-found.js
           id: test/language/module-code/namespace/internals/get-str-not-found.js
-          sourceHash: fnv1a64:23eabd123b6c7890
+          sourceHash: fnv1a64:fff9ad88907d0e7f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -99,7 +99,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/typeof-await-expr-new-expr.js
-          sourceHash: fnv1a64:2313aa1286e130f4
+          sourceHash: fnv1a64:6939302724e500cb
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -38,7 +38,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/define-own-property.js
           id: test/language/module-code/namespace/internals/define-own-property.js
-          sourceHash: fnv1a64:5fa100715881118c
+          sourceHash: fnv1a64:1a0381478e15251f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -77,7 +77,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/has-property-sym-found.js
           id: test/language/module-code/namespace/internals/has-property-sym-found.js
-          sourceHash: fnv1a64:fe2d149316238b97
+          sourceHash: fnv1a64:c0163247a2042972
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -112,7 +112,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/set-prototype-of-null.js
           id: test/language/module-code/namespace/internals/set-prototype-of-null.js
-          sourceHash: fnv1a64:c538c9ee45608a0b
+          sourceHash: fnv1a64:3f70e024d0267336
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -141,7 +141,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-semi-named-export-from.js:\
-        102:56: error[OSEO0001]: Source could not be parsed."
+        27:56: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

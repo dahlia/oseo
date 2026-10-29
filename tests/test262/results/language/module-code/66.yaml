@@ -26,8 +26,8 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-regexp.js:139:12: error[OSEO1001]: Await inside a
-        module top-level binding or assignment pattern is unsupported."
+        ait-expr-regexp.js:64:12: error[OSEO1001]: Await inside a module
+        top-level binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -57,7 +57,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-identifier.js
-          sourceHash: fnv1a64:ed64ebd9a0aa0e83
+          sourceHash: fnv1a64:60ad8e43558ea2c6
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

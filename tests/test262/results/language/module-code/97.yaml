@@ -25,7 +25,7 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-null.js:139:12: error[OSEO1001]: Await inside a module
+        ait-expr-null.js:64:12: error[OSEO1001]: Await inside a module
         top-level binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax
@@ -57,7 +57,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-identifier.js
-          sourceHash: fnv1a64:0e37802ba80607ef
+          sourceHash: fnv1a64:caf0b0428332f958
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -100,7 +100,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-of-await-expr-obj-literal.js
-          sourceHash: fnv1a64:b496de9dc3fd5fcd
+          sourceHash: fnv1a64:e5233a338420df22
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

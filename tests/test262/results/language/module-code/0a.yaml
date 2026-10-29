@@ -33,7 +33,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-expr-regexp.js
-          sourceHash: fnv1a64:ff4ff6d6fdbc6228
+          sourceHash: fnv1a64:f794411d992e84c7
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -70,7 +70,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-regexp.js
-          sourceHash: fnv1a64:f38e71f45f4f0568
+          sourceHash: fnv1a64:d5e69420cf1dc437
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

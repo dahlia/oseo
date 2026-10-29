@@ -31,7 +31,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/delete-exported-uninit.js
           id: test/language/module-code/namespace/internals/delete-exported-uninit.js
-          sourceHash: fnv1a64:688a20e3a4d96f80
+          sourceHash: fnv1a64:9c5c4988b760aaa5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -60,7 +60,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-if-else.js\
-        :89:20: error[OSEO0001]: Source could not be parsed."
+        :14:20: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -83,7 +83,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-switch-dft\
-        l.js:89:22: error[OSEO0001]: Source could not be parsed."
+        l.js:14:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

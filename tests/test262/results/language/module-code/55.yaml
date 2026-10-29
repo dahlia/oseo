@@ -21,8 +21,8 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/import-attribute-v\
-        alue-string-double.js:108:55: error[OSEO2001]: Unsupported
-        static import attribute."
+        alue-string-double.js:33:55: error[OSEO2001]: Unsupported static
+        import attribute."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false
@@ -55,7 +55,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-gen.js
           id: test/language/module-code/instn-named-bndng-gen.js
-          sourceHash: fnv1a64:eafb7464739bd66d
+          sourceHash: fnv1a64:34fc735e9e789de2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -93,7 +93,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-new-expr.js
-          sourceHash: fnv1a64:72271d514a858a6b
+          sourceHash: fnv1a64:88fb980bec82c944
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -130,7 +130,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/typeof-await-expr-array-literal.js
-          sourceHash: fnv1a64:6b80e2aae021f710
+          sourceHash: fnv1a64:1e56d7b181dedf31
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -28,7 +28,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-func-expression.js
-          sourceHash: fnv1a64:9f2481b65347c41a
+          sourceHash: fnv1a64:8514aa88965c9f9f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -64,7 +64,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-literal-number.js
-          sourceHash: fnv1a64:0dfce45cc1274632
+          sourceHash: fnv1a64:7886afaa158cb26f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -100,7 +100,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-null.js
-          sourceHash: fnv1a64:e76a30d5a5554d74
+          sourceHash: fnv1a64:10b776322faeffc5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

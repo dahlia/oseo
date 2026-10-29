@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/early-dup-top-function-generator.js:\
-        95:11: error[OSEO0001]: Source could not be parsed."
+        20:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-try-catch.\
-        js:90:3: error[OSEO0001]: Source could not be parsed."
+        js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -74,7 +74,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-literal-string.js
-          sourceHash: fnv1a64:322acf35cecae97d
+          sourceHash: fnv1a64:5edf8088e3d5c9a8
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -110,7 +110,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-array-literal.js
-          sourceHash: fnv1a64:c227eaaff8671285
+          sourceHash: fnv1a64:7100f00e9ffca4fa
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -146,7 +146,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-literal-string.js
-          sourceHash: fnv1a64:23e262136bcdefbb
+          sourceHash: fnv1a64:bd50270132ff075c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-expr-fn-named.js
           id: test/language/module-code/eval-export-dflt-expr-fn-named.js
-          sourceHash: fnv1a64:5e4c1b6a08a7a375
+          sourceHash: fnv1a64:721465aaa3dd8bc2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -55,7 +55,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-2.js:96:10: error[OSEO0001]: Source could not be parsed."
+        e-2.js:21:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -89,7 +89,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-nested.js
-          sourceHash: fnv1a64:c340f3f6621b999c
+          sourceHash: fnv1a64:eac392a36caf1b7d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

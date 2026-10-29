@@ -8503,6 +8503,22 @@ ordinary object lists array-index keys first. The reviewed test262
 features `arbitrary-module-namespace-names` and
 `export-star-as-namespace-from-module` are admitted.
 
+M5c node `module-namespace-uninitialized-bindings` completes a namespace's
+`[[GetOwnProperty]]` for uninitialized exports. It reads each export through
+`[[Get]]`, so while the binding is uninitialized every operation that asks
+for the export's own descriptor throws a `ReferenceError`:
+`hasOwnProperty`, `Object.hasOwn`, `propertyIsEnumerable`, descriptor
+queries, `Object.keys`, `values`, and `entries`, `for-in` over the
+namespace or an inheriting object, copies, `JSON.stringify`,
+`Object.isSealed` and `isFrozen`, property-list definitions, forwarding
+Proxy operations and their invariant checks, and a namespace `[[Set]]`
+receiver. `[[HasProperty]]`, `[[OwnPropertyKeys]]`, and `[[Delete]]` read
+no binding. A Proxy target descriptor query also reports the value of a
+cell-backed global binding or mapped arguments index instead of its
+binding cell. The generated domain in
+*tests/property/m5-module-namespace-uninitialized.property.test.ts*
+reserves seed block `0x60009000`.
+
 
 Known gaps inside the claim
 ---------------------------

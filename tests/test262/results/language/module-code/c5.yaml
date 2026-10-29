@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-const.js
           id: test/language/module-code/instn-named-bndng-const.js
-          sourceHash: fnv1a64:e4b48e62502a1333
+          sourceHash: fnv1a64:fa8bbc79ec085e7e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -74,7 +74,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-in-let\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -113,7 +113,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-obj-literal.js
-          sourceHash: fnv1a64:800934c7120fecff
+          sourceHash: fnv1a64:4e23969676b860e6
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

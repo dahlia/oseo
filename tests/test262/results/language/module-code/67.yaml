@@ -28,7 +28,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-regexp.js
-          sourceHash: fnv1a64:c5849c2e58774c6f
+          sourceHash: fnv1a64:be749aa591532ad0
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

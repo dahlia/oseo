@@ -28,7 +28,7 @@ results:
         - dependencies:
             - test/built-ins/Proxy/preventExtensions/trap-is-undefined-target-is-proxy.js
           id: test/built-ins/Proxy/preventExtensions/trap-is-undefined-target-is-proxy.js
-          sourceHash: fnv1a64:ffafede25303973f
+          sourceHash: fnv1a64:01a06aeb222699c2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

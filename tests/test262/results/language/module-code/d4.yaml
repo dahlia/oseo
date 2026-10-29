@@ -33,7 +33,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-literal-string.js
-          sourceHash: fnv1a64:8ffb2bc766836085
+          sourceHash: fnv1a64:906e9101daedaf06
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -70,7 +70,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-identifier.js
-          sourceHash: fnv1a64:4cd3f551a67f9fb6
+          sourceHash: fnv1a64:4413589eb393a003
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

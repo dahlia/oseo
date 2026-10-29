@@ -381,11 +381,11 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 69);
+  assert.ok(summary.landed >= 72);
   assert.equal(summary.parked, 0);
   assert.equal(summary.nodes, 112);
-  assert.equal(summary.ready, 107);
-  assert.equal(summary.blocked, 5);
+  assert.equal(summary.ready, 109);
+  assert.equal(summary.blocked, 3);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -660,6 +660,13 @@ test("computed member key order owns its Reference contract", () => {
 
 test("observation train retains bounded remediation dependencies", () => {
   validateCurrentM5cWorkGraph();
+  // Landed by the 2026-10-29 remediation publication; their batches are
+  // now ready for the admission of the paths these nodes owned.
+  const landedRemediations = new Set([
+    "dynamic-import-early-error-precedence",
+    "module-namespace-uninitialized-bindings",
+    "test262-module-harness-globals",
+  ]);
   const exit = readImportAttributesNode("m5-exit-audit");
   for (const id of [
     "array-generated-property-cost-remediation",
@@ -669,7 +676,7 @@ test("observation train retains bounded remediation dependencies", () => {
     "with-var-loop-head-resolution",
   ]) {
     const node = readImportAttributesNode(id);
-    assert.equal(node.landed, false);
+    assert.equal(node.landed, landedRemediations.has(id), id);
     assert.equal(node.status, "ready");
     assert.deepEqual(node.dependencies, ["unsupported-ownership-audit"]);
     assert.ok(exit.dependencies.includes(id), id);
@@ -686,7 +693,7 @@ test("observation train retains bounded remediation dependencies", () => {
   ] as const) {
     const batch = readImportAttributesNode(id);
     assert.equal(batch.landed, false);
-    assert.equal(batch.status, "blocked");
+    assert.equal(batch.status, "ready");
     for (const prerequisite of prerequisites) {
       assert.ok(batch.dependencies.includes(prerequisite), prerequisite);
     }

@@ -22,9 +22,12 @@ EXCLUDED = {
     'tests/property/m5-array-constructor.property.test.ts',
 }
 # Added to main after these runs, so the logs never observed them; their
-# table weights are retained unchanged.
+# table weights are retained unchanged. The two module files carry one-run
+# case sums from candidate CI 40869736577; see the U6 README.
 RETAINED = {
     'tests/property/m5-host-script-bindings.property.test.ts',
+    'tests/property/m5-module-namespace-uninitialized.property.test.ts',
+    'tests/property/m5-module-prelude-script.property.test.ts',
     'tests/property/m5-proper-tail-calls.property.test.ts',
 }
 # Logged files later split by test registration. Each logged title is

@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/import/import-attributes/json-named-bindings.js:\
-        95:9: error[OSEO2001]: Module has no export 'name'."
+        20:9: error[OSEO2001]: Module has no export 'name'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false

@@ -25,7 +25,7 @@ results:
             - test/language/module-code/ambiguous-export-bindings/namespace-import-star-as-and-export-2_FIXTURE.js
             - test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js
           id: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js
-          sourceHash: fnv1a64:81b24b1f5d2e03fd
+          sourceHash: fnv1a64:07d742f008e97b82
         - dependencies:
             - test/language/module-code/ambiguous-export-bindings/namespace-empty-module_FIXTURE.js
           id: test/language/module-code/ambiguous-export-bindings/namespace-import-star-as-and-export-1_FIXTURE.js
@@ -65,7 +65,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-block-stmt\
-        -list.js:89:11: error[OSEO0001]: Source could not be parsed."
+        -list.js:14:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -100,7 +100,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-of-await-expr-literal-number.js
-          sourceHash: fnv1a64:a4f41686dc4fef65
+          sourceHash: fnv1a64:03c560609df9a044
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

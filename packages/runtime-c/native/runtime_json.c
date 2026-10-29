@@ -498,6 +498,10 @@ static OseoResult json_own_enumerable(
                 NULL
             ))
         ));
+    if (result.status == OSEO_STATUS_NORMAL && found) {
+        result = oseo_internal_namespace_export_ready(
+            context, object, ignored);
+    }
     *enumerable = result.status == OSEO_STATUS_NORMAL &&
         found && attributes.enumerable;
     return result;
