@@ -5,7 +5,9 @@ delivers: "Observes the 535 unreviewed paths that
   docs/m5c-closure/observation-batches.yaml selects for observation-batch-30
   (213 review units, after dynamic-import): admits them to the reviewed subset
   with dependency tags, regenerates the manifest and the ledger, and assigns
-  every unsupported result an owner."
+  every unsupported result an owner. The follow-up on ad1a1eba prepares all
+  535 paths; 21 formerly unreviewed paths are expected negatives. Root owns
+  landing."
 dependencies:
   - dynamic-import
   - dynamic-import-early-error-precedence

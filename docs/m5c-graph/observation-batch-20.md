@@ -1,5 +1,8 @@
-Observation batch 20: reviewed admission
-========================================
+Observation batch 20: completed admission
+=========================================
+
+The initial admission below is historical. Its residual paths are closed
+by the follow-up at the end of this note.
 
 From the 430 saved observations on clean source `6aab0fc8`, admit
 424 paths: 332 pass, 37 expected-negative and
@@ -113,3 +116,43 @@ contracts. Explicit grammar families remain; none executes promise
 settlement. The
 [scan record](/data/m5c-b19-b20-b30-20261027/task_b6fabe177327/ctx_3b873992f3d6/scan-result.json)
 records every row and the retained family rationale.
+
+
+Remediation follow-up on ad1a1eba
+---------------------------------
+
+The six previously unreviewed paths above were observed directly with
+`executeTest262Case` on candidate `ad1a1eba`: six passes, zero failures.
+B20 now has all 430 paths admitted: 338 passes, 37 expected negatives and
+55 unsupported profile features. The five namespace cases assert the
+ReferenceError from uninitialized exports; the remaining case exercises
+harness globals in an imported test module.
+
+Before U, every new row was audited against the approved observation-tag
+rules of 2026-10-29. Parse-only negatives carry syntax families, with no
+promise-settlement, abrupt-completion or module-linking runtime claim.
+Diagnostic messages, harness calls, failure-only throws and uncalled
+bodies contribute no runtime tags. Reached implicit protocols were
+checked: namespace own-key enumeration is tagged; no new row consumes an
+iterator or performs Symbol-keyed dispatch.
+
+Generic syntax tags come from the primary test and reviewed includes.
+Fixture modules contribute only asserted contracts or prerequisites;
+incidental fixture syntax remains plumbing. One new row has fixture-derived
+module-linking evidence from its namespace re-export graph.
+
+The input inventory found zero ledger rows owned by the three landed
+remediation nodes. All 6 residual paths were owned by this observation
+batch. Their fresh passes close under `observation` ownership after
+manifest and ledger regeneration. Existing unsupported owners and every
+previous subset row are preserved.
+
+Per-path sources, hashes, tag rationales and raw executor records are in
+*/data/m5c-b20-b30-finish-20261029/*: *intake.json*, *tags.json*,
+*observations.json* and *raw/*. The source tree is pinned in the observation
+record. Root authorized serial observation outside the heavy lock for this
+27-path critical-chain follow-up (message `msg_0d0a186b6be2`), with one
+case at a time and a dedicated Zig cache and temporary directory.
+This preparation keeps the node unlanded; scoped UPDATE, strict
+agreement and internal review are recorded separately by the worker.
+Root owns publication, candidate CI and the outer gate.

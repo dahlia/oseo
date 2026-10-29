@@ -5,7 +5,8 @@ delivers: "Observes the 430 unreviewed paths that
   docs/m5c-closure/observation-batches.yaml selects for observation-batch-20
   (209 review units): admits them to the reviewed subset with dependency tags,
   regenerates the manifest and the ledger, and assigns every unsupported
-  result an owner."
+  result an owner. The follow-up on ad1a1eba prepares all 430 paths;
+  six formerly unreviewed paths pass. Root owns landing."
 dependencies:
   - module-namespace-uninitialized-bindings
   - observation-batch-plan

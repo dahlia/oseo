@@ -109551,6 +109551,10 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions, lexical-bindings]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [dynamic-source, functions, lexical-bindings, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -109564,6 +109568,10 @@ tests:
     expectedClassification: expected-negative
     dependencies:
       [dynamic-source, expression-operators, functions, lexical-bindings]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [dynamic-source, functions, lexical-bindings, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions, lexical-bindings]
@@ -109580,6 +109588,10 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -109596,6 +109608,10 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -109615,6 +109631,10 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -109628,6 +109648,10 @@ tests:
     expectedClassification: expected-negative
     dependencies:
       [async-functions, dynamic-source, expression-operators, functions]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -109640,6 +109664,10 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [async-functions, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions]
@@ -109660,6 +109688,16 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions, generators]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        async-functions,
+        dynamic-source,
+        functions,
+        generators,
+        object-properties,
+      ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [async-functions, dynamic-source, functions, generators]
@@ -109686,6 +109724,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, functions]
@@ -109698,6 +109739,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-typeof-import.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, expression-operators]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-block-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions]
@@ -109713,6 +109757,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, functions]
@@ -109731,6 +109778,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, functions]
@@ -109743,6 +109793,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-typeof-import.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, expression-operators]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-else-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-else-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, functions]
@@ -109758,6 +109811,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions]
@@ -109770,6 +109826,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions]
@@ -109791,6 +109850,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, functions]
@@ -109803,6 +109865,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-typeof-import.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, expression-operators]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [control-flow, dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, functions]
@@ -109818,6 +109883,16 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-while-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, lexical-bindings]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-while-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [
+        control-flow,
+        dynamic-source,
+        functions,
+        lexical-bindings,
+        object-properties,
+      ]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-while-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [control-flow, dynamic-source, functions, lexical-bindings]
@@ -109838,6 +109913,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions]
@@ -109850,6 +109928,10 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-typeof-import.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, expression-operators]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies:
+      [dynamic-source, functions, object-literals, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/nested-with-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions, object-literals]
@@ -109865,6 +109947,9 @@ tests:
   - path: test/language/expressions/dynamic-import/syntax/invalid/top-level-assignment-expr-not-optional.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source]
+  - path: test/language/expressions/dynamic-import/syntax/invalid/top-level-no-new-call-expression-prop-access.js
+    expectedClassification: expected-negative
+    dependencies: [dynamic-source, functions, object-properties]
   - path: test/language/expressions/dynamic-import/syntax/invalid/top-level-no-new-call-expression.js
     expectedClassification: expected-negative
     dependencies: [dynamic-source, functions]
@@ -136682,6 +136767,9 @@ tests:
   - path: test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js
     expectedClassification: pass
     dependencies: [module-linking]
+  - path: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from-and-import-star-as-and-export.js
+    expectedClassification: pass
+    dependencies: [expression-operators, module-linking]
   - path: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from.js
     expectedClassification: pass
     dependencies: [expression-operators, module-linking]
@@ -137424,6 +137512,20 @@ tests:
         symbols,
         var-bindings,
       ]
+  - path: test/language/module-code/namespace/internals/enumerate-binding-uninit.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        functions,
+        module-linking,
+        object-own-keys,
+        object-properties,
+        property-enumeration,
+        var-bindings,
+      ]
   - path: test/language/module-code/namespace/internals/get-own-property-str-found-init.js
     expectedClassification: pass
     dependencies:
@@ -137433,6 +137535,17 @@ tests:
         module-linking,
         object-properties,
         var-bindings,
+      ]
+  - path: test/language/module-code/namespace/internals/get-own-property-str-found-uninit.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        lexical-bindings,
+        module-linking,
+        object-properties,
       ]
   - path: test/language/module-code/namespace/internals/get-own-property-str-not-found.js
     expectedClassification: pass
@@ -137555,6 +137668,37 @@ tests:
   - path: test/language/module-code/namespace/internals/is-extensible.js
     expectedClassification: pass
     dependencies: [functions, module-linking, object-properties]
+  - path: test/language/module-code/namespace/internals/object-hasOwnProperty-binding-uninit.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        module-linking,
+        object-properties,
+      ]
+  - path: test/language/module-code/namespace/internals/object-keys-binding-uninit.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        module-linking,
+        object-own-keys,
+        object-properties,
+      ]
+  - path: test/language/module-code/namespace/internals/object-propertyIsEnumerable-binding-uninit.js
+    expectedClassification: pass
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        functions,
+        module-linking,
+        object-properties,
+      ]
   - path: test/language/module-code/namespace/internals/own-property-keys-binding-types.js
     expectedClassification: pass
     dependencies:

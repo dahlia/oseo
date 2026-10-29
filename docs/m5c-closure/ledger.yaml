@@ -5,15 +5,15 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 30199
-openPaths: 10892
+closedPaths: 30226
+openPaths: 10865
 states:
-  expected-negative: 3242
+  expected-negative: 3263
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 26957
+  pass: 26963
   semantic-failure: 0
-  unreviewed: 9781
+  unreviewed: 9754
   unsupported-profile-feature: 1111
 owners:
   adr:0016-dynamic-source-boundary:
@@ -210,11 +210,6 @@ owners:
       selects for observation-batch-18. The batch observes them; no
       classification is assumed before it does.
     paths: 336
-  node:observation-batch-20:
-    note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
-      selects for observation-batch-20. The batch observes them; no
-      classification is assumed before it does.
-    paths: 6
   node:observation-batch-21:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-21. The batch observes them; no
@@ -260,11 +255,6 @@ owners:
       selects for observation-batch-29. The batch observes them; no
       classification is assumed before it does.
     paths: 89
-  node:observation-batch-30:
-    note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
-      selects for observation-batch-30. The batch observes them; no
-      classification is assumed before it does.
-    paths: 21
   node:observation-batch-32:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-32. The batch observes them; no
@@ -301,7 +291,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 30199
+    paths: 30226
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -26671,89 +26661,89 @@ paths:
   test/language/expressions/dynamic-import/syntax/invalid/invalid-assignmenttargettype-syntax-error-9-lhs-assignment-operator-assignment-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expr-not-optional.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-typeof-import.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-await-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-arrow-function-return-await-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-assignment-expr-not-optional.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-await-typeof-import.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-return-await-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-function-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-async-gen-await-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-assignment-expr-not-optional.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-labeled-typeof-import.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-block-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-block-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-block-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-do-while-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-assignment-expr-not-optional.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-braceless-typeof-import.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-else-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-else-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-else-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-function-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-function-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-return-not-extensible-args.js: [expected-negative, observation]
@@ -26761,36 +26751,36 @@ paths:
   test/language/expressions/dynamic-import/syntax/invalid/nested-function-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-assignment-expr-not-optional.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-typeof-import.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-if-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-if-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-if-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-while-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-while-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-while-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-while-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-while-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-while-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-while-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-assignment-expr-not-optional.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-expression-typeof-import.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/nested-with-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/nested-with-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-not-extensible-args.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/nested-with-typeof-import.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/top-level-assignment-expr-not-optional.js: [expected-negative, observation]
-  test/language/expressions/dynamic-import/syntax/invalid/top-level-no-new-call-expression-prop-access.js: [unreviewed, node:observation-batch-30]
+  test/language/expressions/dynamic-import/syntax/invalid/top-level-no-new-call-expression-prop-access.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/top-level-no-new-call-expression.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/top-level-no-rest-param.js: [expected-negative, observation]
   test/language/expressions/dynamic-import/syntax/invalid/top-level-not-extensible-args.js: [expected-negative, observation]
@@ -31357,7 +31347,7 @@ paths:
   test/language/module-code/ambiguous-export-bindings/error-import-named-as.js: [expected-negative, observation]
   test/language/module-code/ambiguous-export-bindings/error-import-named.js: [expected-negative, observation]
   test/language/module-code/ambiguous-export-bindings/import-and-export-propagates-binding.js: [pass, observation]
-  test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from-and-import-star-as-and-export.js: [unreviewed, node:observation-batch-20]
+  test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from-and-import-star-as-and-export.js: [pass, observation]
   test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from.js: [pass, observation]
   test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js: [pass, observation]
   test/language/module-code/ambiguous-export-bindings/omitted-from-namespace.js: [pass, observation]
@@ -31549,11 +31539,11 @@ paths:
   test/language/module-code/namespace/internals/delete-exported-init.js: [pass, observation]
   test/language/module-code/namespace/internals/delete-exported-uninit.js: [pass, observation]
   test/language/module-code/namespace/internals/delete-non-exported.js: [pass, observation]
-  test/language/module-code/namespace/internals/enumerate-binding-uninit.js: [unreviewed, node:observation-batch-20]
+  test/language/module-code/namespace/internals/enumerate-binding-uninit.js: [pass, observation]
   test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js: [unreviewed, node:observation-batch-32]
   test/language/module-code/namespace/internals/get-nested-namespace-props-nrml.js: [unreviewed, node:observation-batch-32]
   test/language/module-code/namespace/internals/get-own-property-str-found-init.js: [pass, observation]
-  test/language/module-code/namespace/internals/get-own-property-str-found-uninit.js: [unreviewed, node:observation-batch-20]
+  test/language/module-code/namespace/internals/get-own-property-str-found-uninit.js: [pass, observation]
   test/language/module-code/namespace/internals/get-own-property-str-not-found.js: [pass, observation]
   test/language/module-code/namespace/internals/get-own-property-sym.js: [pass, observation]
   test/language/module-code/namespace/internals/get-prototype-of.js: [pass, observation]
@@ -31570,9 +31560,9 @@ paths:
   test/language/module-code/namespace/internals/has-property-sym-found.js: [pass, observation]
   test/language/module-code/namespace/internals/has-property-sym-not-found.js: [pass, observation]
   test/language/module-code/namespace/internals/is-extensible.js: [pass, observation]
-  test/language/module-code/namespace/internals/object-hasOwnProperty-binding-uninit.js: [unreviewed, node:observation-batch-20]
-  test/language/module-code/namespace/internals/object-keys-binding-uninit.js: [unreviewed, node:observation-batch-20]
-  test/language/module-code/namespace/internals/object-propertyIsEnumerable-binding-uninit.js: [unreviewed, node:observation-batch-20]
+  test/language/module-code/namespace/internals/object-hasOwnProperty-binding-uninit.js: [pass, observation]
+  test/language/module-code/namespace/internals/object-keys-binding-uninit.js: [pass, observation]
+  test/language/module-code/namespace/internals/object-propertyIsEnumerable-binding-uninit.js: [pass, observation]
   test/language/module-code/namespace/internals/own-property-keys-binding-types.js: [pass, observation]
   test/language/module-code/namespace/internals/own-property-keys-sort.js: [pass, observation]
   test/language/module-code/namespace/internals/prevent-extensions.js: [pass, observation]
