@@ -22,5 +22,5 @@ delivers: "DS-1 of the dynamic-source-coverage-remediation split approved
   import implementation; ADR 0016 and ADR 0019 remain unchanged."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready
