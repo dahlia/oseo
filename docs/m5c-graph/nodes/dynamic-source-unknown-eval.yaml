@@ -15,6 +15,10 @@ delivers: "DS-3 of the dynamic-source-coverage-remediation split approved
   replacement evidence for every non-source subject; otherwise it stays in
   remediation. Never counts a pass, emulates eval, or widens ADR 0016; ADR
   0016 and ADR 0019 remain unchanged."
+after:
+  - observation-batch-19
+  - observation-batch-20
+  - observation-batch-30
 dependencies:
   - authorized-exclusion-audit
 landed: false

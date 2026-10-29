@@ -16,10 +16,9 @@ Selection rule
 This node selects from the 393 OSEO1001 ImportExpression rejections that
 `observation-batch-20` and `observation-batch-30` add to the umbrella;
 *dynamic-source-importcall-accounting.md* records their path-set digest. The
-umbrella owns them once both batches land. This node does not depend on the
-batches; it selects nothing before they land, and its landing must follow
-theirs.
-The candidates are:
+umbrella owns them once both batches land. The node records both batches in
+`after`; selection and publication wait for their landing without adding
+dependency ancestry. The candidates are:
 
  -  the 61 paths under *test/language/expressions/dynamic-import/namespace/*;
  -  the 11 module code paths: 10 under

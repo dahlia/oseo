@@ -67,12 +67,17 @@ dependencies:
   - observation-batch-18
   - observation-batch-19
   - observation-batch-20
-  - observation-batch-21
-  - observation-batch-22
+  - observation-batch-21a
+  - observation-batch-21b
+  - observation-batch-21c
+  - observation-batch-21d
+  - observation-batch-22a
+  - observation-batch-22b
   - observation-batch-23
   - observation-batch-24
   - observation-batch-25
-  - observation-batch-26
+  - observation-batch-26a
+  - observation-batch-26b
   - observation-batch-27
   - observation-batch-28
   - observation-batch-29

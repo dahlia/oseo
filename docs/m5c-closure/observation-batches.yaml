@@ -1,10 +1,11 @@
 # Derived M5c observation batch plan. Regenerate counts with
 # `mise run m5c:observation-batches:update`; PLAN-M5C.md defines the
 # selectors, prerequisite keys, review units, and the cost model.
-# Selectors change only through `mise run m5c:observation-batches:plan`.
+# Selectors change only through `mise run m5c:observation-batches:plan`
+# or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 9781
+unreviewedPaths: 9754
 basis:
   supportedFeatures:
     - AggregateError
@@ -164,19 +165,19 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 105594
+  currentExecutedVariants: 105606
   currentSeconds: 5802
   finalExecutedVariants: 138226
   finalSeconds: 7594
   plan:
-    batches: 18
-    largestPaths: 2408
+    batches: 21
+    largestPaths: 794
     largestReviewUnits: 500
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 34.42
-    fullUpdateScheduleHours: 67.85
+    scheduleHours: 39.82
+    fullUpdateScheduleHours: 78.64
   alternatives:
     - batches: 26
       largestPaths: 1920
@@ -192,7 +193,7 @@ regeneration:
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 25.36
+      scheduleHours: 25.37
       fullUpdateScheduleHours: 49.73
     - batches: 8
       largestPaths: 3900
@@ -282,7 +283,7 @@ batches:
     regeneration:
       executableVariants: 1044
       scopedUpdateSeconds: 57
-      fullCorpusSeconds: 5859
+      fullCorpusSeconds: 5860
   - id: observation-batch-03
     selector:
       prerequisiteSets:
@@ -341,7 +342,7 @@ batches:
     regeneration:
       executableVariants: 1244
       scopedUpdateSeconds: 68
-      fullCorpusSeconds: 5927
+      fullCorpusSeconds: 5928
   - id: observation-batch-06
     selector:
       prerequisiteSets:
@@ -385,7 +386,7 @@ batches:
     regeneration:
       executableVariants: 850
       scopedUpdateSeconds: 47
-      fullCorpusSeconds: 5974
+      fullCorpusSeconds: 5975
   - id: observation-batch-08
     selector:
       prerequisiteSets:
@@ -431,7 +432,7 @@ batches:
     regeneration:
       executableVariants: 1308
       scopedUpdateSeconds: 72
-      fullCorpusSeconds: 6046
+      fullCorpusSeconds: 6047
   - id: observation-batch-14
     selector:
       prerequisiteSets:
@@ -484,7 +485,7 @@ batches:
     regeneration:
       executableVariants: 1350
       scopedUpdateSeconds: 74
-      fullCorpusSeconds: 6120
+      fullCorpusSeconds: 6121
   - id: observation-batch-18
     selector:
       prerequisiteSets:
@@ -525,35 +526,7 @@ batches:
       executableVariants: 704
       scopedUpdateSeconds: 39
       fullCorpusSeconds: 6159
-  - id: observation-batch-20
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/module-code/
-    dependsOn:
-      - observation-batch-plan
-    paths: 6
-    reviewUnits: 6
-    generatedPaths: 0
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      module: 6
-    includes: {}
-    features:
-      let: 1
-    negatives: {}
-    partitions:
-      groups:
-        - language/module-code
-      files: 6
-      newFiles: 0
-    regeneration:
-      executableVariants: 12
-      scopedUpdateSeconds: 1
-      fullCorpusSeconds: 6159
-  - id: observation-batch-21
+  - id: observation-batch-21a
     selector:
       prerequisiteSets:
         - ""
@@ -567,63 +540,235 @@ batches:
         - test/language/statements/class/cpn-class-decl-
         - test/language/statements/class/cptn-
         - test/language/statements/class/definition/
-        - test/language/statements/class/dstr/
     dependsOn:
       - observation-batch-plan
-    paths: 2408
-    reviewUnits: 396
-    generatedPaths: 2331
+    paths: 488
+    reviewUnits: 267
+    generatedPaths: 411
     prerequisites: {}
     dynamicSource:
       Function: 1
       eval: 4
     flags:
-      async: 708
-      generated: 2331
+      async: 220
+      generated: 411
       module: 6
       noStrict: 33
       onlyStrict: 4
     includes:
-      compareArray.js: 28
-      propertyHelper.js: 74
+      compareArray.js: 4
+      propertyHelper.js: 2
     features:
       Symbol: 2
       Symbol.asyncIterator: 88
-      Symbol.iterator: 262
+      Symbol.iterator: 106
       Symbol.unscopables: 2
       arrow-function: 30
       async-functions: 85
-      async-iteration: 848
-      class: 824
+      async-iteration: 208
+      class: 20
       class-fields-private: 4
       class-fields-public: 62
-      class-methods-private: 402
       class-static-fields-public: 62
-      class-static-methods-private: 402
       computed-property-names: 124
-      default-parameters: 676
-      destructuring-binding: 1280
+      default-parameters: 36
       exponentiation: 8
-      generators: 853
+      generators: 13
       globalThis: 2
       let: 2
       logical-assignment-operators: 12
-      object-rest: 72
       object-spread: 4
       rest-parameters: 12
       top-level-await: 4
     negatives:
-      parse: 239
+      parse: 95
     partitions:
       groups:
         - language/statements
-      files: 256
+      files: 223
       newFiles: 0
     regeneration:
-      executableVariants: 8602
-      scopedUpdateSeconds: 473
+      executableVariants: 1498
+      scopedUpdateSeconds: 82
+      fullCorpusSeconds: 6242
+  - id: observation-batch-21b
+    selector:
+      prerequisiteSets:
+        - ""
+      prefixes:
+        - test/language/statements/class/dstr/async-
+    dependsOn:
+      - observation-batch-plan
+    paths: 640
+    reviewUnits: 105
+    generatedPaths: 640
+    prerequisites: {}
+    dynamicSource: {}
+    flags:
+      async: 488
+      generated: 640
+    includes:
+      compareArray.js: 8
+      propertyHelper.js: 24
+    features:
+      Symbol.iterator: 52
+      async-iteration: 640
+      class: 268
+      class-methods-private: 134
+      class-static-methods-private: 134
+      generators: 100
+      object-rest: 24
+    negatives:
+      parse: 48
+    partitions:
+      groups:
+        - language/statements
+      files: 236
+      newFiles: 0
+    regeneration:
+      executableVariants: 2368
+      scopedUpdateSeconds: 130
+      fullCorpusSeconds: 6372
+  - id: observation-batch-21c
+    selector:
+      prerequisiteSets:
+        - ""
+      prefixes:
+        - test/language/statements/class/dstr/gen-
+        - test/language/statements/class/dstr/private-gen-
+    dependsOn:
+      - observation-batch-plan
+    paths: 640
+    reviewUnits: 105
+    generatedPaths: 640
+    prerequisites: {}
+    dynamicSource: {}
+    flags:
+      generated: 640
+    includes:
+      compareArray.js: 8
+      propertyHelper.js: 24
+    features:
+      Symbol.iterator: 52
+      class: 268
+      class-methods-private: 134
+      class-static-methods-private: 134
+      default-parameters: 320
+      destructuring-binding: 640
+      generators: 640
+      object-rest: 24
+    negatives:
+      parse: 48
+    partitions:
+      groups:
+        - language/statements
+      files: 236
+      newFiles: 0
+    regeneration:
+      executableVariants: 2368
+      scopedUpdateSeconds: 130
+      fullCorpusSeconds: 6502
+  - id: observation-batch-21d
+    selector:
+      prerequisiteSets:
+        - ""
+      prefixes:
+        - test/language/statements/class/dstr/meth-
+        - test/language/statements/class/dstr/private-meth-
+    dependsOn:
+      - observation-batch-plan
+    paths: 640
+    reviewUnits: 105
+    generatedPaths: 640
+    prerequisites: {}
+    dynamicSource: {}
+    flags:
+      generated: 640
+    includes:
+      compareArray.js: 8
+      propertyHelper.js: 24
+    features:
+      Symbol.iterator: 52
+      class: 268
+      class-methods-private: 134
+      class-static-methods-private: 134
+      default-parameters: 320
+      destructuring-binding: 640
+      generators: 100
+      object-rest: 24
+    negatives:
+      parse: 48
+    partitions:
+      groups:
+        - language/statements
+      files: 240
+      newFiles: 0
+    regeneration:
+      executableVariants: 2368
+      scopedUpdateSeconds: 130
       fullCorpusSeconds: 6632
-  - id: observation-batch-22
+  - id: observation-batch-22a
+    selector:
+      prerequisiteSets:
+        - ""
+      prefixes:
+        - test/language/statements/class/elements/after-
+        - test/language/statements/class/elements/arrow-
+        - test/language/statements/class/elements/async-
+        - test/language/statements/class/elements/class-
+        - test/language/statements/class/elements/derived-
+        - test/language/statements/class/elements/direct-
+        - test/language/statements/class/elements/fields-
+        - test/language/statements/class/elements/gen-
+        - test/language/statements/class/elements/get-
+        - test/language/statements/class/elements/indirect-
+        - test/language/statements/class/elements/multiple-
+        - test/language/statements/class/elements/nested-
+    dependsOn:
+      - observation-batch-plan
+    paths: 579
+    reviewUnits: 212
+    generatedPaths: 574
+    prerequisites: {}
+    dynamicSource:
+      eval: 65
+    flags:
+      async: 243
+      generated: 574
+      noStrict: 3
+      onlyStrict: 8
+    includes:
+      compareArray.js: 5
+      propertyHelper.js: 306
+    features:
+      Proxy: 1
+      Symbol: 8
+      Symbol.asyncIterator: 88
+      Symbol.iterator: 106
+      async-functions: 61
+      async-iteration: 198
+      class: 375
+      class-fields-private: 131
+      class-fields-public: 370
+      class-methods-private: 166
+      class-static-fields-private: 57
+      class-static-methods-private: 183
+      computed-property-names: 16
+      generators: 103
+      new.target: 10
+      object-spread: 8
+    negatives:
+      parse: 57
+    partitions:
+      groups:
+        - language/statements
+      files: 235
+      newFiles: 0
+    regeneration:
+      executableVariants: 2082
+      scopedUpdateSeconds: 114
+      fullCorpusSeconds: 6746
+  - id: observation-batch-22b
     selector:
       prerequisiteSets:
         - ""
@@ -641,52 +786,50 @@ batches:
         - test/language/statements/class/restricted-
     dependsOn:
       - observation-batch-plan
-    paths: 1219
-    reviewUnits: 494
-    generatedPaths: 1149
+    paths: 640
+    reviewUnits: 341
+    generatedPaths: 575
     prerequisites: {}
     dynamicSource:
-      eval: 100
+      eval: 35
     flags:
-      async: 351
-      generated: 1149
-      noStrict: 24
-      onlyStrict: 12
+      async: 108
+      generated: 575
+      noStrict: 21
+      onlyStrict: 4
     includes:
-      compareArray.js: 10
-      propertyHelper.js: 595
+      compareArray.js: 5
+      propertyHelper.js: 289
     features:
       BigInt: 2
-      Proxy: 4
-      Symbol: 17
-      Symbol.asyncIterator: 88
-      Symbol.iterator: 106
+      Proxy: 3
+      Symbol: 9
       arrow-function: 1
-      async-functions: 109
-      async-iteration: 265
-      class: 942
-      class-fields-private: 295
-      class-fields-public: 734
-      class-methods-private: 291
-      class-static-fields-private: 114
+      async-functions: 48
+      async-iteration: 67
+      class: 567
+      class-fields-private: 164
+      class-fields-public: 364
+      class-methods-private: 125
+      class-static-fields-private: 57
       class-static-fields-public: 7
-      class-static-methods-private: 327
-      computed-property-names: 35
+      class-static-methods-private: 144
+      computed-property-names: 19
       default-parameters: 24
-      generators: 261
-      new.target: 12
-      object-spread: 12
+      generators: 158
+      new.target: 2
+      object-spread: 4
       rest-parameters: 6
     negatives:
-      parse: 149
+      parse: 92
     partitions:
       groups:
         - language/statements
-      files: 256
+      files: 237
       newFiles: 0
     regeneration:
-      executableVariants: 4232
-      scopedUpdateSeconds: 233
+      executableVariants: 2150
+      scopedUpdateSeconds: 118
       fullCorpusSeconds: 6864
   - id: observation-batch-23
     selector:
@@ -886,7 +1029,7 @@ batches:
       executableVariants: 2210
       scopedUpdateSeconds: 121
       fullCorpusSeconds: 7212
-  - id: observation-batch-26
+  - id: observation-batch-26a
     selector:
       prerequisiteSets:
         - ""
@@ -900,50 +1043,86 @@ batches:
         - test/language/statements/for-of/yield-
         - test/language/statements/for-of/yield.
         - test/language/statements/for/
+    dependsOn:
+      - observation-batch-plan
+    paths: 384
+    reviewUnits: 209
+    generatedPaths: 278
+    prerequisites: {}
+    dynamicSource:
+      eval: 9
+    flags:
+      generated: 278
+      noStrict: 7
+    includes:
+      compareArray.js: 3
+      propertyHelper.js: 7
+    features:
+      Symbol.iterator: 27
+      TypedArray: 6
+      async-functions: 1
+      async-iteration: 1
+      destructuring-binding: 278
+      generators: 57
+      let: 1
+      object-rest: 7
+    negatives:
+      parse: 49
+    partitions:
+      groups:
+        - language/statements
+      files: 192
+      newFiles: 0
+    regeneration:
+      executableVariants: 1328
+      scopedUpdateSeconds: 73
+      fullCorpusSeconds: 7284
+  - id: observation-batch-26b
+    selector:
+      prerequisiteSets:
+        - ""
+      prefixes:
         - test/language/statements/function/
         - test/language/statements/generators/
     dependsOn:
       - observation-batch-plan
-    paths: 1029
-    reviewUnits: 495
-    generatedPaths: 689
+    paths: 645
+    reviewUnits: 378
+    generatedPaths: 411
     prerequisites: {}
     dynamicSource:
       Function: 22
-      eval: 50
+      eval: 41
     flags:
-      generated: 689
-      noStrict: 104
+      generated: 411
+      noStrict: 97
       onlyStrict: 23
     includes:
-      compareArray.js: 7
-      propertyHelper.js: 23
+      compareArray.js: 4
+      propertyHelper.js: 16
     features:
       Symbol: 1
-      Symbol.iterator: 63
+      Symbol.iterator: 36
       Symbol.unscopables: 4
-      TypedArray: 6
-      async-functions: 1
-      async-iteration: 1
       class-fields-private: 4
       default-parameters: 206
-      destructuring-binding: 646
-      generators: 308
+      destructuring-binding: 368
+      generators: 251
       globalThis: 4
-      let: 3
-      object-rest: 19
+      let: 2
+      object-rest: 12
       object-spread: 1
       rest-parameters: 3
     negatives:
-      parse: 114
+      parse: 65
     partitions:
       groups:
         - language/statements
-      files: 253
+      files: 237
       newFiles: 0
     regeneration:
-      executableVariants: 3444
-      scopedUpdateSeconds: 189
+      executableVariants: 2116
+      scopedUpdateSeconds: 116
       fullCorpusSeconds: 7401
   - id: observation-batch-27
     selector:
@@ -1100,39 +1279,6 @@ batches:
     regeneration:
       executableVariants: 340
       scopedUpdateSeconds: 19
-      fullCorpusSeconds: 7565
-  - id: observation-batch-30
-    selector:
-      prerequisiteSets:
-        - dynamic-import
-      prefixes:
-        - test/language/
-    dependsOn:
-      - observation-batch-plan
-      - dynamic-import
-    paths: 21
-    reviewUnits: 22
-    generatedPaths: 21
-    prerequisites:
-      feature:dynamic-import: 21
-    dynamicSource: {}
-    flags:
-      generated: 21
-      noStrict: 2
-    includes: {}
-    features:
-      async-iteration: 1
-      dynamic-import: 21
-    negatives:
-      parse: 21
-    partitions:
-      groups:
-        - language/expressions
-      files: 21
-      newFiles: 0
-    regeneration:
-      executableVariants: 0
-      scopedUpdateSeconds: 0
       fullCorpusSeconds: 7565
   - id: observation-batch-32
     selector:

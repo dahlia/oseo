@@ -531,6 +531,23 @@ observed prerequisites already cover that work. Future observations can still
 justify a bounded node, whose terminal result must reach `m5-exit-audit`. The
 graph validator rejects any node outside that path.
 
+Each node record names its `id`, `title`, `delivers`, `dependencies`,
+`landed`, `status`, and schema `version`. A parked node also gives a `reason`.
+The optional `after` field is a sorted, unique array of node IDs, empty when
+omitted. It means selection and publication wait until every named node has
+landed. Both `dependencies` and `after` must name existing nodes, cannot name
+the node itself, and together must be acyclic. A landed node must have landed
+targets for both fields. An unparked node cannot wait on a parked target.
+
+For an unparked node, `status` is `ready` only when all direct `dependencies`
+and `after` targets have landed; otherwise it is `blocked`. The graph summary
+counts these validated statuses. Ordering does not add transitive dependency
+ancestry: the collision-group rule and the required dependency path to
+`m5-exit-audit` follow only `dependencies`. Keep publication collisions even
+when `after` orders the publishers. For example, DS-2 waits on batches 20 and
+30, and DS-3 waits on batches 19, 20, and 30, without making their umbrella a
+dependent of those batches.
+
 Observation batches are deterministic and small enough for one reviewer to
 inspect their applicability and classifications. A batch records its path
 selector, exact path count, shared prerequisites, and expected manifest
@@ -564,6 +581,35 @@ The check rejects a path that no batch selects, a prefix that two batches share
 for one prerequisite set, a prefix or listed set that selects nothing, a batch
 that selects a reviewed path, a batch without a graph node, a batch node
 missing a required dependency, and a ledger owner that differs from the batch.
+
+Three batches were later split so that each part reviews and lands on its
+own: `observation-batch-21` (2,408 paths) into `observation-batch-21a` through
+`observation-batch-21d`, `observation-batch-22` (1,219) into
+`observation-batch-22a` and `observation-batch-22b`, and `observation-batch-26`
+(1,029) into `observation-batch-26a` and `observation-batch-26b`. Each part is
+its own graph node with the dependencies of the batch it came from, and the
+batch ID pattern accepts the one-letter suffix. The cuts follow directories
+and, inside the flat *class/dstr/* and *class/elements/* directories, the file
+name prefixes of the generator templates, so every handwritten test and every
+template stays in one part. All paths are under *test/language/statements/*:
+
+| Batch                   | Paths | Units | Selects                                                               |
+| ----------------------- | ----: | ----: | --------------------------------------------------------------------- |
+| `observation-batch-21a` |   488 |   267 | *async-*, *block/*, *break/*, *class/* `arguments/` to `definition/`  |
+| `observation-batch-21b` |   640 |   105 | *class/dstr/async-*: async generator methods                          |
+| `observation-batch-21c` |   640 |   105 | *class/dstr/gen-*, *private-gen-*: generator methods                  |
+| `observation-batch-21d` |   640 |   105 | *class/dstr/meth-*, *private-meth-*: methods                          |
+| `observation-batch-22a` |   579 |   212 | *class/elements/* `after-` to `nested-`, not `init-`, `intercalated-` |
+| `observation-batch-22b` |   640 |   341 | the rest of *class/elements/* and 10 other *class/* prefixes          |
+| `observation-batch-26a` |   384 |   209 | *for-of/* `uint*` and `yield` names, *for/*                           |
+| `observation-batch-26b` |   645 |   378 | *function/*, *generators/*                                            |
+
+A generated file combines one case file with one template, so a case read for
+templates in two parts counts as a review unit in both, as cases already did
+across batches before the split. The split adds five complete corpus gates to
+the remaining landings: the scoped schedule grows from 34.4 to 43.6 hours.
+Running `mise run m5c:observation-batches:plan` would renumber every batch and
+undo the split; `mise run m5c:observation-batches:update` keeps it.
 
 Each path's facts come from its upstream source at the pinned revision and
 from checked-in review state, never from its directory name:

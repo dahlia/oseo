@@ -17,6 +17,9 @@ delivers: "DS-2 of the dynamic-source-coverage-remediation split approved
   showing that only source evaluation remains; otherwise it stays in
   remediation. Never counts a pass, emulates dynamic import, or widens ADR
   0016; ADR 0016 and ADR 0019 remain unchanged."
+after:
+  - observation-batch-20
+  - observation-batch-30
 dependencies:
   - authorized-exclusion-audit
 landed: false

@@ -199,7 +199,11 @@ export interface M5cObservationFacts {
  * longest prefix the path starts with among the batches listing it.
  */
 export interface M5cObservationSelector {
-  /** Graph node ID of the batch, `observation-batch-NN`. */
+  /**
+   * Graph node ID of the batch, `observation-batch-NN`, or
+   * `observation-batch-NNx` for a batch split from `observation-batch-NN`
+   * after planning.
+   */
   readonly id: string;
   readonly prefixes: readonly string[];
   /** Listed prerequisite sets; `[""]` selects paths without one. */
@@ -539,7 +543,7 @@ export function planM5cObservationSelectors(
   return selectors;
 }
 
-const batchIdPattern = /^observation-batch-\d{2,}$/u;
+const batchIdPattern = /^observation-batch-\d{2,}[a-z]?$/u;
 
 /**
  * Assign every path to exactly one selector, rejecting a path that no
@@ -838,7 +842,8 @@ const fileHeader = [
   "# Derived M5c observation batch plan. Regenerate counts with",
   "# `mise run m5c:observation-batches:update`; PLAN-M5C.md defines the",
   "# selectors, prerequisite keys, review units, and the cost model.",
-  "# Selectors change only through `mise run m5c:observation-batches:plan`.",
+  "# Selectors change only through `mise run m5c:observation-batches:plan`",
+  "# or a split of one batch that PLAN-M5C.md records.",
 ];
 
 /** Serialize a plan in its canonical layout. */

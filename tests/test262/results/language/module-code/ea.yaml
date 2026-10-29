@@ -3,6 +3,62 @@ key: ea
 results:
   - case:
       async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from-and-import-star-as-and-export.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/namespace-export-star-as-from-1_FIXTURE.js
+            - test/language/module-code/ambiguous-export-bindings/namespace-import-star-as-and-export-1_FIXTURE.js
+            - test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js
+          id: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-export-star-as-from-and-import-star-as-and-export.js
+          sourceHash: fnv1a64:a9bf6454d12d5455
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/namespace-empty-module_FIXTURE.js
+          id: test/language/module-code/ambiguous-export-bindings/namespace-export-star-as-from-1_FIXTURE.js
+          sourceHash: fnv1a64:a8d753c174bea59e
+        - dependencies: []
+          id: test/language/module-code/ambiguous-export-bindings/namespace-empty-module_FIXTURE.js
+          sourceHash: fnv1a64:2849ca28ced03b1f
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/namespace-empty-module_FIXTURE.js
+          id: test/language/module-code/ambiguous-export-bindings/namespace-import-star-as-and-export-1_FIXTURE.js
+          sourceHash: fnv1a64:8d93035098a515c0
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/namespace-import-star-as-and-export-1_FIXTURE.js
+            - test/language/module-code/ambiguous-export-bindings/namespace-import-star-as-and-export-2_FIXTURE.js
+            - test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js
+          id: test/language/module-code/ambiguous-export-bindings/namespace-unambiguous-if-import-star-as-and-export.js
+          sourceHash: fnv1a64:07d742f008e97b82
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/namespace-empty-module_FIXTURE.js
+          id: test/language/module-code/ambiguous-export-bindings/namespace-import-star-as-and-export-2_FIXTURE.js
+          sourceHash: fnv1a64:8d93035098a515c0
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:

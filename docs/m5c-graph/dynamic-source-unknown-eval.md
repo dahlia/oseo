@@ -17,10 +17,10 @@ umbrella with the observed rejection `error[OSEO1001]: Unknown binding 'eval'`.
 The Host Full path
 *test/language/global-code/script-decl-lex-var-declared-via-eval.js* reports
 the same diagnostic but belongs to `dynamic-source-lexical-completion-family`.
-The umbrella owns these paths once those batches land. This node does not
-depend on the batches, because the umbrella shares manifest collision groups
-with them; it selects nothing before they land, and its landing must follow
-theirs. The sorted path set, with one final newline, has SHA256
+The umbrella owns these paths once those batches land. The node records all
+three batches in `after`; selection and publication wait for their landing
+without adding dependency ancestry to the umbrella's manifest collision groups.
+The sorted path set, with one final newline, has SHA256
 `f8cdae47b9f8cf413abce9a9546194caa38c727841c0b42ca361f5a471f86830`.
 
 

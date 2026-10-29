@@ -9,22 +9,22 @@ usage: "Take a node whose status is ready and whose landed field is
   m5-exit-audit path. Update baseline whenever the checked-in reviewed
   manifest changes; check:m5c-graph rejects stale counts."
 baseline:
-  expectedNegatives: 3242
+  expectedNegatives: 3263
   harnessFailures: 0
   infrastructureFailures: 0
   inventoryPaths: 41091
-  passes: 26957
-  reviewedPaths: 31310
+  passes: 26963
+  reviewedPaths: 31337
   semanticFailures: 0
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-  unreviewedPaths: 9781
+  unreviewedPaths: 9754
   unsupportedProfileFeatures: 1111
 summary:
-  nodes: 112
-  ready: 109
+  nodes: 117
+  ready: 114
   blocked: 3
   parked: 0
-  landed: 72
+  landed: 74
 serializationPoints:
   - path: docs/m5c-graph/graph.yaml
     note: "Every landing updates node state and the evidence baseline. Merge
@@ -563,49 +563,65 @@ collisions:
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - regexp-property-escape-match-cost
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - shift-operator-c-size
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - test262-runner-main-thread-offload
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - typedarray-copywithin-detached-cost
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - regexp-property-escape-match-cost
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - shift-operator-c-size
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - test262-runner-main-thread-offload
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - typedarray-copywithin-detached-cost
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
@@ -683,25 +699,29 @@ collisions:
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - regexp-property-escape-match-cost
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - shift-operator-c-size
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - test262-runner-main-thread-offload
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - typedarray-copywithin-detached-cost
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
@@ -1212,13 +1232,17 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - compound-assignment-property-cost
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - compound-assignment-property-cost
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -1242,7 +1266,8 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - compound-assignment-property-cost
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -1351,12 +1376,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1394,12 +1424,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1713,12 +1748,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1749,12 +1789,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1783,12 +1828,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1816,12 +1866,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1851,12 +1906,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1883,12 +1943,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1915,12 +1980,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -1955,12 +2025,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2000,12 +2075,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2041,12 +2121,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2073,12 +2158,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2113,12 +2203,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2155,12 +2250,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2194,12 +2294,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2225,12 +2330,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2256,12 +2366,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2290,12 +2405,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2326,12 +2446,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2358,12 +2483,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2417,12 +2547,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2461,12 +2596,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2506,12 +2646,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2549,12 +2694,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2594,12 +2744,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -2637,12 +2792,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -3045,14 +3205,18 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
     note: The bounded dynamic attribute owner and this independent publisher
       both refresh canonical observations; serialize manifest
       publication.
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
     note: The bounded dynamic attribute owner and this independent publisher
       both refresh canonical observations; serialize manifest
       publication.
@@ -3080,7 +3244,8 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - import-attributes-dynamic-coverage-remediation
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
     note: The bounded dynamic attribute owner and this independent publisher
       both refresh canonical observations; serialize manifest
       publication.
@@ -3496,14 +3661,18 @@ collisions:
       concurrently."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - typed-array-tolocalestring-arguments
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
       concurrently."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - typed-array-tolocalestring-arguments
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
@@ -3531,7 +3700,8 @@ collisions:
       concurrently."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - typed-array-tolocalestring-arguments
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
@@ -3804,14 +3974,18 @@ collisions:
       concurrently."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - with-optional-call-receiver
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
       concurrently."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - with-optional-call-receiver
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
@@ -3839,7 +4013,8 @@ collisions:
       concurrently."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - with-optional-call-receiver
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
@@ -4057,14 +4232,18 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - computed-member-reference-key-order
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
       concurrently."
   - path: tests/test262/results.yaml
     nodes:
       - computed-member-reference-key-order
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
       concurrently."
@@ -4092,7 +4271,8 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - computed-member-reference-key-order
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
     note: "These independent publishers regenerate the reviewed manifest.
       Serialize their publication; analysis and implementation may run
       concurrently."
@@ -4318,13 +4498,17 @@ collisions:
       the manifest; serialize final publication under D2."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - primitive-receiver-inherited-set
     note: "Independent primitive Set remediation and this publisher update
       the manifest; serialize final publication under D2."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - primitive-receiver-inherited-set
     note: "Independent primitive Set remediation and this publisher update
       the manifest; serialize final publication under D2."
@@ -4348,7 +4532,8 @@ collisions:
       the manifest; serialize final publication under D2."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - primitive-receiver-inherited-set
     note: "Independent primitive Set remediation and this publisher update
       the manifest; serialize final publication under D2."
@@ -4576,13 +4761,17 @@ collisions:
       this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - script-module-declaration-early-error
     note: "Script-goal repair shares canonical observation partitions with
       this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - script-module-declaration-early-error
     note: "Script-goal repair shares canonical observation partitions with
       this independent publisher; serialize their publication."
@@ -4606,7 +4795,8 @@ collisions:
       this independent publisher; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - script-module-declaration-early-error
     note: "Script-goal repair shares canonical observation partitions with
       this independent publisher; serialize their publication."
@@ -4724,12 +4914,17 @@ collisions:
       - observation-batch-18
       - observation-batch-19
       - observation-batch-20
-      - observation-batch-21
-      - observation-batch-22
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
+      - observation-batch-22a
+      - observation-batch-22b
       - observation-batch-23
       - observation-batch-24
       - observation-batch-25
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - observation-batch-27
       - observation-batch-28
       - observation-batch-29
@@ -4867,13 +5062,17 @@ collisions:
       manifest; serialize publication with this independent node."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - ordinary-array-indexed-lookup-performance
     note: "Array lookup performance observations share the canonical
       manifest; serialize publication with this independent node."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - ordinary-array-indexed-lookup-performance
     note: "Array lookup performance observations share the canonical
       manifest; serialize publication with this independent node."
@@ -4897,7 +5096,8 @@ collisions:
       manifest; serialize publication with this independent node."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - ordinary-array-indexed-lookup-performance
     note: "Array lookup performance observations share the canonical
       manifest; serialize publication with this independent node."
@@ -5082,13 +5282,17 @@ collisions:
       stays separate; final publication is serialized.
     path: tests/test262/results.yaml
   - nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - regexp-anchored-repeat-state-remediation
     note: Independent manifest publishers share the results index. Preparation
       stays separate; final publication is serialized.
     path: tests/test262/results.yaml
   - nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - regexp-anchored-repeat-state-remediation
     note: Independent manifest publishers share the results index. Preparation
       stays separate; final publication is serialized.
@@ -5112,7 +5316,8 @@ collisions:
       stays separate; final publication is serialized.
     path: tests/test262/results.yaml
   - nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - regexp-anchored-repeat-state-remediation
     note: Independent manifest publishers share the results index. Preparation
       stays separate; final publication is serialized.
@@ -5330,13 +5535,17 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - array-generated-property-cost-remediation
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - array-generated-property-cost-remediation
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -5360,7 +5569,8 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - array-generated-property-cost-remediation
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -5612,13 +5822,17 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-import-early-error-precedence
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-import-early-error-precedence
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -5642,7 +5856,8 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - dynamic-import-early-error-precedence
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -5972,13 +6187,17 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - module-namespace-uninitialized-bindings
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
       - module-namespace-uninitialized-bindings
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -6002,7 +6221,8 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - module-namespace-uninitialized-bindings
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
@@ -6217,25 +6437,33 @@ collisions:
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - test262-module-harness-globals
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-21
+      - observation-batch-21a
+      - observation-batch-21b
+      - observation-batch-21c
+      - observation-batch-21d
       - with-var-loop-head-resolution
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - test262-module-harness-globals
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-22
+      - observation-batch-22a
+      - observation-batch-22b
       - with-var-loop-head-resolution
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
@@ -6277,13 +6505,15 @@ collisions:
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - test262-module-harness-globals
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
-      - observation-batch-26
+      - observation-batch-26a
+      - observation-batch-26b
       - with-var-loop-head-resolution
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."

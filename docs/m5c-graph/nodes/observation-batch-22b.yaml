@@ -1,9 +1,9 @@
 version: 1
-id: observation-batch-22
+id: observation-batch-22b
 title: Observe language/statements/class/elements/ and 10 more
-delivers: "Observes the 1219 unreviewed paths that
-  docs/m5c-closure/observation-batches.yaml selects for observation-batch-22
-  (494 review units): admits them to the reviewed subset with dependency tags,
+delivers: "Observes the 640 unreviewed paths that
+  docs/m5c-closure/observation-batches.yaml selects for observation-batch-22b
+  (341 review units): admits them to the reviewed subset with dependency tags,
   regenerates the manifest and the ledger, and assigns every unsupported
   result an owner."
 dependencies:
