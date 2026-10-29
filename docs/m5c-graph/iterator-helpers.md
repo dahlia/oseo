@@ -14,7 +14,9 @@ IH-B, and *Iterator/proto-from-ctor-realm.js* to
 `dynamic-source-coverage-remediation`. The latter remains active
 non-source coverage debt after its Function source-constructor rejection.
 This result accounting leaves zero umbrella-owned paths; the dependency
-gates and explicit landing decision remain pending.
+gates and explicit landing decision remain pending. IH-B's accepted full
+UPDATE on U `6c0d46bd` later promotes its three paths to pass, so they
+now belong to `observation`.
 
 IH-A came first to activate the feature tag, with the bounded String
 primitive repair and missing-include classification recorded in its work

@@ -2117,3 +2117,38 @@ paths across all 29,901 reviewed cases. The ledger assigns the three
 *Iterator/proto-from-ctor-realm.js* to
 `dynamic-source-coverage-remediation`. All promoted paths belong to their
 observations. The graph remains unlanded pending the later gates.
+
+
+Temporal helpers harness
+------------------------
+
+IH-B admits a reviewed subset of *temporalHelpers.js* for the three
+*Iterator/from/* paths that include it. The copy keeps `observeMethod`,
+`propertyBagObserver`, `toPrimitiveObserver`, and the upstream
+`formatPropertyName` and `ASCII_IDENTIFIER` they log through; the other 43
+`TemporalHelpers` members, which mostly need Temporal or Intl, are omitted.
+`supportedFeatures` is unchanged.
+
+Because the subset still declares `TemporalHelpers`, the runner's
+`harness-definition` check also compares literal member keys of upstream
+object-literal definitions. The 2026-10-29 maintainer decision replaced
+the first, static prediction of omitted-member reads with a runtime trap:
+the object runs behind a proxy that prints a per-case secret marker before
+throwing on any observation of an omitted member, and the runner
+classifies any marker, or a started program whose trap never armed, as a
+harness failure ahead of every other outcome. No other
+reviewed include is affected. A focused precheck observed the three paths
+as pass before the full UPDATE.
+
+Root accepted the full UPDATE on U `6c0d46bd`: all 29,901 reviewed paths
+were observed, yielding 26,459 passes, 2,802 expected negatives and 640
+unsupported paths. It records exactly three promotions, the three
+*Iterator/from/* paths from `unsupported-profile-feature` to pass, and no
+demotions or failure classifications. The ledger now assigns them to
+`observation`, so `temporal-helpers-harness` owns no path. Carried
+onto Main `915ec6df` without a new observation, the same records give
+26,957 passes, 3,242 expected negatives and 1,111 unsupported paths
+across 31,310 reviewed cases. The trap redesign changes *tools/*, so
+these records stand only until Root's next full UPDATE. The
+[IH-B work note](./docs/m5c-graph/temporal-helpers-harness.md) records
+the decision, its tests and the raw packets.

@@ -21,8 +21,8 @@ scope:
     docs/m5c-graph/iterator-helpers-tag-activation.md. The accepted full
     UPDATE on U a678c85e records these method paths as pass. String
     iteration and the bounded Iterator.from primitive repair remove the
-    historical String blockers; temporalHelpers.js
-    remains unadmitted and its three paths belong to IH-B."
+    historical String blockers. IH-B admits a reviewed temporalHelpers.js
+    subset for its three Iterator.from paths."
 owners:
   - PLAN-M5.md
 evidence:

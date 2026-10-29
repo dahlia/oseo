@@ -16591,7 +16591,7 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/get-return-method-when-call-return.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/is-function.js
     expectedClassification: pass
@@ -16624,13 +16624,13 @@ tests:
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/return-method-calls-base-return-method.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/return-method-returns-iterator-result.js
     expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/return-method-throws-for-invalid-this.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [iterator-protocol]
   - path: test/built-ins/Iterator/from/supports-iterable.js
     expectedClassification: pass

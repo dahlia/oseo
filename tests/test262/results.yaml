@@ -21124,9 +21124,9 @@ summary:
   expectedNegatives: 3242
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 26954
+  passes: 26957
   semanticFailures: 0
-  unsupportedProfileFeatures: 1114
+  unsupportedProfileFeatures: 1111
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 18
@@ -21258,9 +21258,9 @@ summary:
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3771
+      passes: 3774
       semanticFailures: 0
-      unsupportedProfileFeatures: 32
+      unsupportedProfileFeatures: 29
     - dependency: json-parse
       expectedNegatives: 0
       harnessFailures: 0
@@ -21595,9 +21595,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 390
+      passes: 393
       semanticFailures: 0
-      unsupportedProfileFeatures: 4
+      unsupportedProfileFeatures: 1
     - group: built-ins/JSON
       expectedNegatives: 0
       harnessFailures: 0

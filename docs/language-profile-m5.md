@@ -237,8 +237,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 31,310 reviewed cases: 26,954 passes, 3,242
-expected negatives, and 1,114 unsupported profile features. It records no
+The current manifest contains 31,310 reviewed cases: 26,957 passes, 3,242
+expected negatives, and 1,111 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -9935,3 +9935,13 @@ records the source-bound observations and accepted full UPDATE on U
 `a678c85e`. That Full confirms 389 promotions and four unsupported paths;
 the ledger assigns three to `temporal-helpers-harness` and one to
 `dynamic-source-coverage-remediation`. No exclusion or landing is claimed.
+
+M5c IH-B admits a reviewed *temporalHelpers.js* subset that keeps only the
+generic `observeMethod`, `propertyBagObserver`, and `toPrimitiveObserver`
+helpers. Any observation of an omitted `TemporalHelpers` member trips a
+runtime trap whose marker makes the case a harness failure. No case code
+can turn the trap into a pass or an expected negative; the work note
+records the one window an external signal could still open. Its focused
+precheck observes the three *Iterator/from/* paths as pass;
+[its work note](./m5c-graph/temporal-helpers-harness.md) records the decision
+and evidence.

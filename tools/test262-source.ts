@@ -167,6 +167,63 @@ export function parseHarnessDefinitions(
   return stringArray(metadata.defines, `${name} defines`);
 }
 
+/**
+ * The member keys of each global object one harness Script initializes
+ * with an object literal at its top level, as `var Helpers = { ... }`
+ * does. Only literal keys are listed. An object whose literal has a spread
+ * or a key computed from anything other than a string literal has members
+ * the parsed syntax cannot name, so it is left out and no omission is
+ * inferred for it. Members added later by assignment are not listed.
+ */
+export function parseHarnessObjectMembers(
+  source: string,
+): ReadonlyMap<string, readonly string[]> {
+  const objects = new Map<string, readonly string[]>();
+  const program = agentSyntaxNode(parseBabel(source, { sourceType: "script" }));
+  const body = agentSyntaxNode(program?.program)?.body;
+  for (const statement of Array.isArray(body) ? body : []) {
+    const node = agentSyntaxNode(statement);
+    if (node?.type !== "VariableDeclaration") continue;
+    const declarations = node.declarations;
+    for (const declaration of Array.isArray(declarations) ? declarations : []) {
+      const declarator = agentSyntaxNode(declaration);
+      const id = agentSyntaxNode(declarator?.id);
+      const init = agentSyntaxNode(declarator?.init);
+      if (id?.type !== "Identifier" || !isString(id.name)) continue;
+      if (init?.type !== "ObjectExpression") continue;
+      const keys = objectLiteralKeys(init);
+      if (keys != null) objects.set(id.name, keys);
+    }
+  }
+  return objects;
+}
+
+function objectLiteralKeys(
+  node: AgentSyntaxNode,
+): readonly string[] | undefined {
+  const keys: string[] = [];
+  const properties = node.properties;
+  for (const value of Array.isArray(properties) ? properties : []) {
+    const property = agentSyntaxNode(value);
+    if (
+      property?.type !== "ObjectProperty" &&
+      property?.type !== "ObjectMethod"
+    ) {
+      return undefined;
+    }
+    const key = agentSyntaxNode(property.key);
+    if (property.computed !== true && key?.type === "Identifier") {
+      if (!isString(key.name)) return undefined;
+      keys.push(key.name);
+    } else if (key?.type === "StringLiteral" && isString(key.value)) {
+      keys.push(key.value);
+    } else {
+      return undefined;
+    }
+  }
+  return keys;
+}
+
 function classification(value: StructuredDataInput): Test262Classification {
   // SAFETY: The membership check below validates this candidate before return.
   const candidate = value as Test262Classification;
