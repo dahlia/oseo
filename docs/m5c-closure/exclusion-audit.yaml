@@ -289,6 +289,83 @@ assessments:
       accounting decision of 2026-10-22 accepts it, and an
       accepted ADR 0016 amendment that admits any form of
       dynamic import reopens it.
+  import-call-syntax:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The subject is the ImportCall production itself
+      (prod-ImportCall or
+      sec-import-call-runtime-semantics-evaluation). The
+      source places an ImportCall in a statement, function,
+      arrow, async, generator, block, loop, with, or Script
+      context; nests it as another ImportCall's argument; or
+      uses it as a CallExpression followed by Arguments, a
+      TemplateLiteral, a computed member access, or a
+      parenthesized NewExpression operand; or passes an
+      AssignmentExpression form whose call result no
+      assertion observes, such as yield * inside a generator
+      that is never called or unary operands whose returned
+      promises are discarded. Its assertions are a
+      successful parse, the promise that the call
+      returns, or the TypeError from calling or constructing
+      that promise; one export read only identifies the
+      module that fulfilled it. ADR 0016 keeps import()
+      rejected at parse time, and each path observes that
+      exact ImportExpression OSEO1001 rejection. The
+      maintainer decision of 2026-10-28, item 2, extends the
+      2026-10-22 accounting decision (option A) to these
+      paths after the per-path review in
+      docs/m5c-graph/dynamic-source-importcall-accounting.md.
+      No path counts as a pass. An accepted ADR 0016
+      amendment that admits any form of dynamic import
+      reopens it for reassessment.
+  import-call-specifier:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The subject is how EvaluateImportCall evaluates
+      its specifier (sec-import-call-runtime-semantics-evaluation
+      or prod-ImportCall). The source passes an
+      AssignmentExpression form, an object or other value
+      whose ToString names the target, or a specifier whose
+      GetValue or ToString completes abruptly. Its
+      assertions are the synchronous abrupt completion, the
+      rejection of the returned promise, or the module that
+      the promise fulfills with; namespace export reads only
+      identify which module the specifier named. ADR 0016
+      keeps import() rejected at parse time, and each path
+      observes that exact ImportExpression OSEO1001
+      rejection. The maintainer decision of 2026-10-28, item
+      2, extends the 2026-10-22 accounting decision (option
+      A) to these paths after the per-path review in
+      docs/m5c-graph/dynamic-source-importcall-accounting.md.
+      No path counts as a pass. An accepted ADR 0016
+      amendment that admits any form of dynamic import
+      reopens it for reassessment.
+  import-call-promise:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: The subject is the promise that ImportCall returns
+      and ContinueDynamicImport settles
+      (sec-import-call-runtime-semantics-evaluation or
+      sec-finishdynamicimport). The source asserts that
+      each call returns a new %Promise%, that it fulfills
+      with the target namespace only after the target's
+      evaluation settles, or that it rejects when the host
+      load fails or the target's only statement throws.
+      Namespace export reads only identify the fulfilled
+      module, and for await or async generator plumbing only
+      consumes the settled promises. No assertion observes
+      module evaluation order, top-level await, namespace
+      object identity or binding updates, or JSON module
+      identity. ADR 0016 keeps import() rejected at parse
+      time, and each path observes that exact
+      ImportExpression OSEO1001 rejection. The maintainer
+      decision of 2026-10-28, item 2, extends the 2026-10-22
+      accounting decision (option A) to these paths after
+      the per-path review in
+      docs/m5c-graph/dynamic-source-importcall-accounting.md.
+      No path counts as a pass. An accepted ADR 0016
+      amendment that admits any form of dynamic import
+      reopens it for reassessment.
   annex-b-legacy-lookup:
     disposition: remediation
     normativeDependency: not-demonstrated
@@ -424,8 +501,11 @@ assessments:
   observation-train-dynamic-source:
     disposition: remediation
     normativeDependency: not-demonstrated
-    reason: Root retains all 459 B19/B20/B30 unknown-eval and ImportExpression
-      rejections as active coverage remediation. Original source, subjects and
+    reason: Root retains the 459 B19/B20/B30 unknown-eval and ImportExpression
+      rejections as active coverage remediation, except the 218 ImportCall
+      subjects that dynamic-source-importcall-accounting reassessed under the
+      import-call-syntax, import-call-specifier, and import-call-promise
+      assessments; 241 remain here. Original source, subjects and
       assertions remain visible; the observation does not establish equivalent
       replacement evidence or authorize a whole-path exclusion. ADR 0016 and
       ADR 0019 are unchanged, including their reopening triggers.
@@ -5697,7 +5777,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall returns a new instance of Promise"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/assign-expr-get-value-abrup\
       t-throws.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5710,7 +5790,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Return Abrupt from the GetValue evaluation on the given
       AssignmentExpression"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/addit\
       ive-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5723,7 +5803,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Additiv\
       e Expression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/array\
       -literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5735,7 +5815,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Array Literal)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/arrow\
       -function.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5747,7 +5827,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (ArrowFunction)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/await\
       -expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5759,7 +5839,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (AwaitExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/await\
       -identifier.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5772,7 +5852,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression
       (IdentifierReference: await)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/call-\
       expr-arguments.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5785,7 +5865,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (CallExpression
       Arguments)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/call-\
       expr-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5798,7 +5878,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (CallExpression [
       Expression ])"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/call-\
       expr-identifier.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5811,7 +5891,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (CallExpression .
       IdentifierName)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/cover\
       -call-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5824,7 +5904,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression
       (CoverCallExpressionAndAsyncArrowHeadn)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/cover\
       -parenthesized-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5837,7 +5917,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression
       (CoverParenthesizedExpressionAndArrowParameterList)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/ident\
       ifier.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5849,7 +5929,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Identifier)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/lhs-a\
       ssign-operator-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5862,7 +5942,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (LHS Expr
       AssignmentOperator AssignmentExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/lhs-e\
       q-assign-expr-nostrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5875,7 +5955,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (LHS Expr =
       AssignmentExpression) Using a frozen object property"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/lhs-e\
       q-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5888,7 +5968,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (LHS Expr =
       AssignmentExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/logic\
       al-and-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5901,7 +5981,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Logical\
       ANDExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/logic\
       al-or-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5914,7 +5994,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Logical\
       ORExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/membe\
       r-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5927,7 +6007,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Object properties
       from MemberExpressions)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/new-t\
       arget.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5939,7 +6019,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (NewTarget)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/objec\
       t-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5951,7 +6031,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Object Literal)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/tagge\
       d-function-call.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5964,7 +6044,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (MemberExpression
       TemplateLiteral)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/terna\
       ry.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5976,7 +6056,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Ternary)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-express\
       ion/this.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -5988,7 +6068,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (this)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/unary\
       -expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6001,7 +6081,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (UnaryEx\
       pressions)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/assignment-expression/yield\
       -assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6014,7 +6094,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (yield [no
       LineTerminator here] AssignmentExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/yield\
       -expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6026,7 +6106,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (YieldExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/yield\
       -identifier.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6039,7 +6119,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression
       (IdentifierReference: yield)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/assignment-expression/yield\
       -star.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6052,7 +6132,7 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (yield [no
       LineTerminator here] AssignmentExpression)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/await-import-evaluation.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -6063,7 +6143,7 @@ paths:
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Dynamic Import should await for evaluation"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6076,7 +6156,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6089,7 +6169,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6115,7 +6195,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-arrow-import-c\
       atch-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6154,7 +6234,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nes\
       ted arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6167,7 +6247,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6180,7 +6260,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6207,7 +6287,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-await-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6246,7 +6326,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested in
       async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6259,7 +6339,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6272,7 +6352,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6299,7 +6379,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-arrow-fu\
       nction-return-await-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6338,7 +6418,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested in
       async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6351,7 +6431,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6364,7 +6444,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6391,7 +6471,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -await-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6430,7 +6510,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested in
       async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6443,7 +6523,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6456,7 +6536,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6482,7 +6562,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6521,7 +6601,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6534,7 +6614,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6561,7 +6641,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -return-await-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6600,7 +6680,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested in
       async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-function\
       -specifier-tostring-abrupt-rejects.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6613,7 +6693,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested in
       async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6626,7 +6706,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6639,7 +6719,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6666,7 +6746,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-awai\
       t-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6705,7 +6785,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested in
       async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6718,7 +6798,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6731,7 +6811,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6758,7 +6838,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-retu\
       rn-await-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6797,7 +6877,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested in
       async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6810,7 +6890,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6823,7 +6903,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6849,7 +6929,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-import-c\
       atch-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6888,7 +6968,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nes\
       ted block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6901,7 +6981,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6914,7 +6994,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6940,7 +7020,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-block-labeled-\
       instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6979,7 +7059,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested block
       syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-eval-\
       rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -6992,7 +7072,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-eval-\
       rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7005,7 +7085,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-eval-\
       script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7031,7 +7111,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-do-while-instn\
       -iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7070,7 +7150,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested do
       while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7083,7 +7163,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7096,7 +7176,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7122,7 +7202,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-else-import-ca\
       tch-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7160,7 +7240,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7173,7 +7253,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7186,7 +7266,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7212,7 +7292,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-function-impor\
       t-catch-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7251,7 +7331,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nes\
       ted function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7264,7 +7344,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7277,7 +7357,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7303,7 +7383,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-if-import-catc\
       h-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7341,7 +7421,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7354,7 +7434,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7367,7 +7447,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7393,7 +7473,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record
       (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/nested-while-import-c\
       atch-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7432,7 +7512,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (nes\
       ted while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-eval-rqstd-abrupt-typeerror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7445,7 +7525,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-eval-rqstd-abrupt-urierror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7458,7 +7538,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt completion during module evaluation precludes further
       evaluation (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-eval-script-code-target.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7484,7 +7564,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Non existent file can't resolve to a Script or Module Record (top
       level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/catch/top-level-import-catc\
       h-instn-iee-err-ambiguous-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7522,7 +7602,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Abrupt from ToString(specifier) rejects the promise (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/custom-primitive.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -7694,7 +7774,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Resolve multiple imports through a for await loop in an async
       generator yielding imports"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/for-await-resolution-and-er\
       ror-agen.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7707,7 +7787,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Resolve multiple imports through a for await loop in an \
       async generator"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/for-await-resolution-and-er\
       ror.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7719,7 +7799,7 @@ paths:
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Resolve multiple imports through a for await loop"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/import-attr\
       ibutes/2nd-param-await-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8039,7 +8119,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic Import should resolve another import call"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-Symbol-t\
       oStringTag.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8883,7 +8963,7 @@ paths:
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "ImportCall is a CallExpression and can be used before arguments"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/callexpression\
       -templateliteral.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8896,7 +8976,7 @@ paths:
     section: "prod-ImportCall"
     subject: "ImportCall is a CallExpression and can be used before a template
       literal"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-a\
       ssignment-expression-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8908,7 +8988,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-arrow-assignment-expression-import-attribute\
       s-trailing-comma-first.js"
@@ -8949,7 +9029,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-a\
       ssignment-expression-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8961,7 +9041,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-e\
       mpty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8973,7 +9053,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-arrow-import-attributes-trailing-comma-first\
       .js"
@@ -9014,7 +9094,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-arrow-s\
       cript-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9026,7 +9106,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-a\
       rrow-function-await-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9038,7 +9118,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested in async arrow function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-arrow-function-await-import-attributes\
       -trailing-comma-first.js"
@@ -9079,7 +9159,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested in async arrow function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-a\
       rrow-function-await-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9092,7 +9172,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested in async arr\
       ow function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-a\
       rrow-function-return-await-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9104,7 +9184,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-arrow-function-return-await-import-att\
       ributes-trailing-comma-first.js"
@@ -9145,7 +9225,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-a\
       rrow-function-return-await-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9158,7 +9238,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested in async arrow
       function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
       unction-await-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9170,7 +9250,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-await-import-attributes-trail\
       ing-comma-first.js"
@@ -9211,7 +9291,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
       unction-await-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9223,7 +9303,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
       unction-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9235,7 +9315,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-import-attributes-trailing-co\
       mma-first.js"
@@ -9276,7 +9356,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
       unction-return-await-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9288,7 +9368,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-function-return-await-import-attribute\
       s-trailing-comma-first.js"
@@ -9329,7 +9409,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
       unction-return-await-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9341,7 +9421,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-f\
       unction-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9353,7 +9433,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested arrow syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-g\
       en-await-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9365,7 +9445,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-async-gen-await-import-attributes-trailing-c\
       omma-first.js"
@@ -9406,7 +9486,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-async-g\
       en-await-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9419,7 +9499,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested in async generator,
       awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-block-e\
       mpty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9431,7 +9511,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-block-import-attributes-trailing-comma-first\
       .js"
@@ -9471,7 +9551,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-block-labeled-import-attributes-trailing-com\
       ma-first.js"
@@ -9512,7 +9592,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-block-l\
       abeled-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9524,7 +9604,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-block-n\
       ested-imports.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9537,7 +9617,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-block-s\
       cript-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9549,7 +9629,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-do-whil\
       e-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9561,7 +9641,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-do-while-import-attributes-trailing-comma-fi\
       rst.js"
@@ -9602,7 +9682,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-do-whil\
       e-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9614,7 +9694,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-else-br\
       aceless-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9626,7 +9706,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested else syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-else-braceless-import-attributes-trailing-co\
       mma-first.js"
@@ -9667,7 +9747,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested else syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-else-br\
       aceless-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9679,7 +9759,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested else syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-else-em\
       pty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9691,7 +9771,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested else syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-else-import-attributes-trailing-comma-first.\
       js"
@@ -9732,7 +9812,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested else syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-else-sc\
       ript-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9744,7 +9824,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested else syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-functio\
       n-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9756,7 +9836,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested function syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-function-import-attributes-trailing-comma-fi\
       rst.js"
@@ -9797,7 +9877,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested function syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-functio\
       n-return-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9809,7 +9889,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested function syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-function-return-import-attributes-trailing-c\
       omma-first.js"
@@ -9850,7 +9930,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested function syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-functio\
       n-return-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9862,7 +9942,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested function syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-functio\
       n-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9874,7 +9954,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested function syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-if-brac\
       eless-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9886,7 +9966,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-if-braceless-import-attributes-trailing-comm\
       a-first.js"
@@ -9927,7 +10007,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-if-brac\
       eless-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9939,7 +10019,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-if-empt\
       y-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9951,7 +10031,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-if-import-attributes-trailing-comma-first.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9991,7 +10071,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-if-scri\
       pt-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10003,7 +10083,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-while-e\
       mpty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10015,7 +10095,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-while-import-attributes-trailing-comma-first\
       .js"
@@ -10056,7 +10136,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-while-s\
       cript-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10068,7 +10148,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-with-em\
       pty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10080,7 +10160,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested with syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-with-ex\
       pression-empty-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10093,7 +10173,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (nested with syntax in the expressio\
       n position)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-with-expression-import-attributes-trailing-c\
       omma-first.js"
@@ -10136,7 +10216,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested with syntax in the expression position)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-with-ex\
       pression-script-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10149,7 +10229,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested with syntax in the
       expression position)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/nested-with-import-attributes-trailing-comma-first.\
       js"
@@ -10190,7 +10270,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (nested with syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/nested-with-sc\
       ript-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10202,7 +10282,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (nested with syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/new-covered-ex\
       pression-is-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10216,7 +10296,7 @@ paths:
     subject: "ImportCall is a CallExpression and Expression, so it can be
       wrapped for new expressions, while the same production is not possible
       without the parentheses wrapping."
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/top-level-empt\
       y-str-is-valid-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10228,7 +10308,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Calling import('') (top level syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/vali\
       d/top-level-import-attributes-trailing-comma-first.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10268,7 +10348,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression can be nested in other import calls
       (top level syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/syntax/valid/top-level-scri\
       pt-code-valid.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10280,7 +10360,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "import() can be used in script code (top level syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/update-to-dynamic-import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -10341,7 +10421,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assignme\
       nt-expression-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10353,7 +10433,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assignme\
       nt-expression-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10365,7 +10445,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-import-t\
       hen-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10404,7 +10484,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-import-t\
       hen-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10416,7 +10496,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-import-t\
       hen-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10428,7 +10508,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-await-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10468,7 +10548,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested in async arrow function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-await-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10481,7 +10561,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested in async arrow
       function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-await-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10494,7 +10574,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested in async arrow funct\
       ion, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-return-await-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10534,7 +10614,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested in async arrow function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-return-await-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10547,7 +10627,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested in async arrow
       function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-return-await-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10560,7 +10640,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested in async arrow funct\
       ion, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -await-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10600,7 +10680,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -await-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10613,7 +10693,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested in async
       function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -await-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10625,7 +10705,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested in async function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10665,7 +10745,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -return-await-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10705,7 +10785,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested in async function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -return-await-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10718,7 +10798,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested in async
       function, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -return-await-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10731,7 +10811,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested in async function, r\
       eturns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10744,7 +10824,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested in a\
       sync function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10756,7 +10836,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested in async function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-awai\
       t-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10796,7 +10876,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-awai\
       t-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10809,7 +10889,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested in async
       generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-awai\
       t-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10821,7 +10901,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested in async generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-retu\
       rn-await-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10861,7 +10941,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested in async generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-retu\
       rn-await-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10874,7 +10954,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested in async
       generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-retu\
       rn-await-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10887,7 +10967,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested in async generator, returns
       awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-block-import-t\
       hen-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10926,7 +11006,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-block-import-t\
       hen-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10938,7 +11018,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-block-import-t\
       hen-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10950,7 +11030,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-do-while-eval-\
       gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10989,7 +11069,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-do-while-retur\
       ns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11002,7 +11082,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested do w\
       hile syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-do-while-speci\
       fier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11014,7 +11094,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-else-import-th\
       en-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11053,7 +11133,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-else-import-th\
       en-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11065,7 +11145,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-else-import-th\
       en-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11077,7 +11157,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-function-impor\
       t-then-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11116,7 +11196,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-function-impor\
       t-then-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11128,7 +11208,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-function-impor\
       t-then-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11140,7 +11220,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-braceless-e\
       val-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11179,7 +11259,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-braceless-r\
       eturns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11191,7 +11271,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-braceless-s\
       pecifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11203,7 +11283,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-import-then\
       -eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11242,7 +11322,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-import-then\
       -returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11254,7 +11334,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-import-then\
       -specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11266,7 +11346,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/nested-while-import-t\
       hen-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11305,7 +11385,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/nested-while-import-t\
       hen-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11317,7 +11397,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/nested-while-import-t\
       hen-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11329,7 +11409,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/syntax-nested-block-l\
       abeled-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11368,7 +11448,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/syntax-nested-block-l\
       abeled-returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11380,7 +11460,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/syntax-nested-block-l\
       abeled-specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11392,7 +11472,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: "test/language/expressions/dynamic-import/usage/top-level-import-then\
       -eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11431,7 +11511,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall is a CallExpression, it can be followed by square
       brackets (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-syntax"
   - path: "test/language/expressions/dynamic-import/usage/top-level-import-then\
       -returns-thenable.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11443,7 +11523,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Dynamic import() returns a thenable object. (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-promise"
   - path: "test/language/expressions/dynamic-import/usage/top-level-import-then\
       -specifier-tostring.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11455,7 +11535,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ToString value of specifier (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "import-call-specifier"
   - path: test/language/expressions/equals/S11.9.1_A1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
