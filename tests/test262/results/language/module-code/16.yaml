@@ -28,7 +28,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/has-property-str-found-init.js
           id: test/language/module-code/namespace/internals/has-property-str-found-init.js
-          sourceHash: fnv1a64:7bdf3c8ba949ea3b
+          sourceHash: fnv1a64:ceeacb6afafe6e2a
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -58,7 +58,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-expr\
-        -meth-gen.js:90:22: error[OSEO0001]: Source could not be
+        -meth-gen.js:15:22: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -82,7 +82,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-get\
-        ter.js:89:14: error[OSEO0001]: Source could not be parsed."
+        ter.js:14:14: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -107,7 +107,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/syntax/early-does-no\
-        t-propagate-to-fn-declaration-params.js:113:17: error[OSEO0001]:
+        t-propagate-to-fn-declaration-params.js:38:17: error[OSEO0001]:
         Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -140,7 +140,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-regexp.js
-          sourceHash: fnv1a64:dcc480f6f234450b
+          sourceHash: fnv1a64:1e6bb6650fdda336
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

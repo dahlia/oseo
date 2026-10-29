@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-undef-break.js:92:3:
+      detail: "test/language/module-code/early-undef-break.js:17:3:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -52,7 +52,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-array-literal.js
-          sourceHash: fnv1a64:055599d5059bde81
+          sourceHash: fnv1a64:c76e4380eb1a3eec
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

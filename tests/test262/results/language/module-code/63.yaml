@@ -28,7 +28,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-str-found-uninit.js
           id: test/language/module-code/namespace/internals/get-str-found-uninit.js
-          sourceHash: fnv1a64:d99ba79cb37c3ff9
+          sourceHash: fnv1a64:b01e3dc71c5a52ee
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -57,7 +57,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-decl\
-        -meth.js:89:22: error[OSEO0001]: Source could not be parsed."
+        -meth.js:14:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -91,7 +91,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-func-expression.js
-          sourceHash: fnv1a64:36b77160b951ec62
+          sourceHash: fnv1a64:7c5b9e0a0c62381b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

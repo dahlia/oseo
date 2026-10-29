@@ -21,8 +21,8 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/invalid-private-names-member-express\
-        ion-bad-reference.js:115:11: error[OSEO0001]: Source could not
-        be parsed."
+        ion-bad-reference.js:40:11: error[OSEO0001]: Source could not be
+        parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -55,7 +55,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/super-set-to-tdz-binding-with-accessor.js
           id: test/language/module-code/namespace/internals/super-set-to-tdz-binding-with-accessor.js
-          sourceHash: fnv1a64:7ee4521300d38c29
+          sourceHash: fnv1a64:fd66f69b5472597e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

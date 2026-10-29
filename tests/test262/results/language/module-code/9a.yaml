@@ -24,7 +24,7 @@ results:
             - test/language/module-code/export-expname-from-binding-string.js
             - test/language/module-code/export-expname_FIXTURE.js
           id: test/language/module-code/export-expname-from-binding-string.js
-          sourceHash: fnv1a64:3ae2eeac649c7dcb
+          sourceHash: fnv1a64:fb2331b9b7735036
         - dependencies: []
           id: test/language/module-code/export-expname_FIXTURE.js
           sourceHash: fnv1a64:711e14c825b19f18
@@ -62,7 +62,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/dynamic-import-resol\
-        ution.js:151:1: error[OSEO1001]: ImportExpression is outside the
+        ution.js:48:1: error[OSEO1001]: ImportExpression is outside the
         M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

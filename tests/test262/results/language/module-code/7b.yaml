@@ -23,7 +23,7 @@ results:
             - test/language/module-code/instn-iee-star-cycle-2_FIXTURE.js
             - test/language/module-code/instn-iee-star-cycle.js
           id: test/language/module-code/instn-iee-star-cycle.js
-          sourceHash: fnv1a64:1a42464055535830
+          sourceHash: fnv1a64:b24330aa518e9015
         - dependencies:
             - test/language/module-code/instn-iee-star-cycle-indirect-x_FIXTURE.js
           id: test/language/module-code/instn-iee-star-cycle-2_FIXTURE.js

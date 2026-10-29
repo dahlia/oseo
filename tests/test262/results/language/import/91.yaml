@@ -20,7 +20,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/import/import-attributes/json-invalid.js:98:19:
+      detail: "test/language/import/import-attributes/json-invalid.js:23:19:
         error[OSEO2001]: Invalid JSON module source."
       errorType: SyntaxError
       failedPhase: resolution

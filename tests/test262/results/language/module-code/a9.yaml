@@ -25,7 +25,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/block-await-expr-literal-number.js
-          sourceHash: fnv1a64:77e066a64c6393d6
+          sourceHash: fnv1a64:e11dc242d87f794f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

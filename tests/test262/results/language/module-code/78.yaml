@@ -21,8 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/ambiguous-export-bindings/error-impo\
-        rt-named-as.js:121:10: error[OSEO2001]: Import 'x' is
-        ambiguous."
+        rt-named-as.js:46:10: error[OSEO2001]: Import 'x' is ambiguous."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false
@@ -49,7 +48,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-gtbndng-indirect-update-dflt_FIXTURE.js
           id: test/language/module-code/eval-gtbndng-indirect-update-dflt.js
-          sourceHash: fnv1a64:9105c8c48b5a2646
+          sourceHash: fnv1a64:a944205c6ed6b195
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-indirect-update-dflt_FIXTURE.js
           sourceHash: fnv1a64:f019bb6ed98cbb83
@@ -86,7 +85,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-str-found-init.js
           id: test/language/module-code/namespace/internals/get-str-found-init.js
-          sourceHash: fnv1a64:de22c655910e5bcc
+          sourceHash: fnv1a64:6615c76b703e6f9b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -123,7 +122,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-identifier.js
-          sourceHash: fnv1a64:fb0e2f6ca84d63b5
+          sourceHash: fnv1a64:5856f7608c6864d2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

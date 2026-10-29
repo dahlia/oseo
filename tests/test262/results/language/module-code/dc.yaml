@@ -23,7 +23,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-iee-cycle-2_FIXTURE.js
           id: test/language/module-code/instn-named-iee-cycle.js
-          sourceHash: fnv1a64:49ad18c56eae67ec
+          sourceHash: fnv1a64:13a96fc0f391ae15
         - dependencies:
             - test/language/module-code/instn-named-iee-cycle.js
           id: test/language/module-code/instn-named-iee-cycle-2_FIXTURE.js
@@ -63,7 +63,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           id: test/language/module-code/top-level-await/module-import-resolution.js
-          sourceHash: fnv1a64:6fc3864e750b2657
+          sourceHash: fnv1a64:f97a163617241670
         - dependencies: []
           id: test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           sourceHash: fnv1a64:911c90c83a970ad1

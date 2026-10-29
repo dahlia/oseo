@@ -29,7 +29,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/set-prototype-of.js
           id: test/language/module-code/namespace/internals/set-prototype-of.js
-          sourceHash: fnv1a64:46795be9e195eab0
+          sourceHash: fnv1a64:a96c7adafa37e0d9
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

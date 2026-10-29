@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-function-e\
-        xpr.js:89:15: error[OSEO0001]: Source could not be parsed."
+        xpr.js:14:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -43,7 +43,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-object-gen\
-        -method.js:90:11: error[OSEO0001]: Source could not be parsed."
+        -method.js:15:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -66,7 +66,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-lhs.js\
-        :90:3: error[OSEO0001]: Source could not be parsed."
+        :15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -103,7 +103,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-expr-reject-throws.js
-          sourceHash: fnv1a64:b9d08d9d6962efe5
+          sourceHash: fnv1a64:3a8b8dd9f4540014
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

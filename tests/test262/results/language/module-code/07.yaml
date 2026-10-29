@@ -18,8 +18,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-decl-pos-export-while.js:8\
-        9:15: error[OSEO0001]: Source could not be parsed."
+      detail: "test/language/module-code/parse-err-decl-pos-export-while.js:1\
+        4:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -49,8 +49,8 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-func-expression.js:145:12: error[OSEO1001]: Await
-        inside a module top-level binding or assignment pattern is
+        ait-expr-func-expression.js:70:12: error[OSEO1001]: Await inside
+        a module top-level binding or assignment pattern is
         unsupported."
       passed: false
       unsupportedCapability: profile-syntax

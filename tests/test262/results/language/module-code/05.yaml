@@ -27,7 +27,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-dflt-gen-named-semi.js
-          sourceHash: fnv1a64:e2b48378352a74d7
+          sourceHash: fnv1a64:6d4fe534a5397b64
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -56,7 +56,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-default-generator-declaration\
-        -binding-exists.js:98:27: error[OSEO0001]: Source could not be
+        -binding-exists.js:23:27: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -82,7 +82,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/import-attribute-t\
-        rlng-comma.js:108:55: error[OSEO2001]: Unsupported static import
+        rlng-comma.js:33:55: error[OSEO2001]: Unsupported static import
         attribute."
       errorType: SyntaxError
       failedPhase: resolution
@@ -112,7 +112,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-id-name.js
           id: test/language/module-code/instn-star-id-name.js
-          sourceHash: fnv1a64:c9d8b5b6fd54ee8f
+          sourceHash: fnv1a64:2dbfaf82567de008
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -153,7 +153,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/own-property-keys-sort.js
           id: test/language/module-code/namespace/internals/own-property-keys-sort.js
-          sourceHash: fnv1a64:c77850e8399d2311
+          sourceHash: fnv1a64:f89d2478cff22b22
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -182,7 +182,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-lhs\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -216,7 +216,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-new-expr.js
-          sourceHash: fnv1a64:92753fc5de83497d
+          sourceHash: fnv1a64:33d4b8c6feaff634
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -257,7 +257,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-obj-literal.js
-          sourceHash: fnv1a64:ba93245aaffba8f6
+          sourceHash: fnv1a64:8060f691b824f1c7
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -292,7 +292,7 @@ results:
       - var-bindings
     observation:
       detail: "test/language/module-code/top-level-await/syntax/export-var-aw\
-        ait-expr-identifier.js:140:12: error[OSEO1001]: Await inside a
+        ait-expr-identifier.js:65:12: error[OSEO1001]: Await inside a
         module top-level binding or assignment pattern is unsupported."
       passed: false
       unsupportedCapability: profile-syntax
@@ -322,7 +322,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/typeof-await-expr-literal-string.js
-          sourceHash: fnv1a64:f3600c304a7b208e
+          sourceHash: fnv1a64:db4eabc67b3ab6bf
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-sym-found.js
           id: test/language/module-code/namespace/internals/get-sym-found.js
-          sourceHash: fnv1a64:3c52877d7f19aea3
+          sourceHash: fnv1a64:e6df07c583412570
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

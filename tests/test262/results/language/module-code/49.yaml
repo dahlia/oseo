@@ -23,7 +23,7 @@ results:
         - dependencies:
             - test/language/module-code/export-expname_FIXTURE.js
           id: test/language/module-code/export-expname-binding-string.js
-          sourceHash: fnv1a64:a53bd5b07c50a3d0
+          sourceHash: fnv1a64:8c68be7afde0e087
         - dependencies: []
           id: test/language/module-code/export-expname_FIXTURE.js
           sourceHash: fnv1a64:711e14c825b19f18
@@ -61,7 +61,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-str-update.js
           id: test/language/module-code/namespace/internals/get-str-update.js
-          sourceHash: fnv1a64:d2f9bf8e23184bcf
+          sourceHash: fnv1a64:2307c4865463c4a4
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -102,7 +102,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-regexp.js
-          sourceHash: fnv1a64:9dbff8bf5e56528f
+          sourceHash: fnv1a64:5826f86bc14760e8
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

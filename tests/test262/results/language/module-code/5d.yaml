@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/import-attribute-m\
-        any.js:108:55: error[OSEO2001]: Unsupported static import
+        any.js:33:55: error[OSEO2001]: Unsupported static import
         attribute."
       errorType: SyntaxError
       failedPhase: resolution
@@ -45,7 +45,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-switch-cas\
-        e.js:89:21: error[OSEO0001]: Source could not be parsed."
+        e.js:14:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -78,7 +78,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-awaits-thenable-not-callable.js
-          sourceHash: fnv1a64:762588012f4e68d7
+          sourceHash: fnv1a64:9958fefce6d4e414
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -119,7 +119,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dft-class-decl-await-expr-obj-literal.js
-          sourceHash: fnv1a64:82b47f0024c8f394
+          sourceHash: fnv1a64:ca4be4cf33fde763
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -154,7 +154,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-null.js
-          sourceHash: fnv1a64:0ad7ea8c8d97503a
+          sourceHash: fnv1a64:f146e19138a32d9f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -190,7 +190,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-nested.js
-          sourceHash: fnv1a64:593966c3822a865c
+          sourceHash: fnv1a64:4673cfee57f3d455
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

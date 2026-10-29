@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-dflt-id.js:94:10:
+      detail: "test/language/module-code/early-dup-export-dflt-id.js:19:10:
         error[OSEO0001]: Duplicate export 'default'."
       errorType: SyntaxError
       failedPhase: parse
@@ -51,7 +51,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-iee-bndng-var_FIXTURE.js
           id: test/language/module-code/instn-iee-bndng-var.js
-          sourceHash: fnv1a64:f2f3858456606f60
+          sourceHash: fnv1a64:8e21302165a89091
         - dependencies:
             - test/language/module-code/instn-iee-bndng-var.js
           id: test/language/module-code/instn-iee-bndng-var_FIXTURE.js
@@ -93,7 +93,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-void-expr.js
-          sourceHash: fnv1a64:e360ace138fe062e
+          sourceHash: fnv1a64:014a0ad3d062714b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

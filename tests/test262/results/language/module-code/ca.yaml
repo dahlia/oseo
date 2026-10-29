@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-yield.js:107:1:
+      detail: "test/language/module-code/parse-err-yield.js:32:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -52,7 +52,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-obj-literal.js
-          sourceHash: fnv1a64:b7b5ad2105e82d5e
+          sourceHash: fnv1a64:ae6d01862ed0bbc1
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -31,7 +31,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           id: test/language/module-code/top-level-await/module-async-import-async-resolution-ticks.js
-          sourceHash: fnv1a64:79a2a7a57131ced5
+          sourceHash: fnv1a64:feb9793b8c5b02d2
         - dependencies: []
           id: test/language/module-code/top-level-await/module-import-resolution_FIXTURE.js
           sourceHash: fnv1a64:911c90c83a970ad1

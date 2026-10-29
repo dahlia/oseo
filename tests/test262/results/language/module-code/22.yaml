@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-lhs\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-switch-cas\
-        e-dflt.js:89:21: error[OSEO0001]: Source could not be parsed."
+        e-dflt.js:14:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -77,7 +77,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/top-level-ticks.js
-          sourceHash: fnv1a64:e891a93815b18b29
+          sourceHash: fnv1a64:5b7ac8679d18cc27
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

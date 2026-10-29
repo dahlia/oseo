@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/comment-multi-line-html-close.js:92:\
+      detail: "test/language/module-code/comment-multi-line-html-close.js:17:\
         5: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -48,7 +48,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-template-literal.js
-          sourceHash: fnv1a64:771862ae498ee3ea
+          sourceHash: fnv1a64:83e85d16c365078d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

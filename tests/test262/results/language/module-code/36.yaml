@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-of-let\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -43,7 +43,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-7.js:96:5: error[OSEO0001]: Source could not be parsed."
+        e-7.js:21:5: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -72,7 +72,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-literal-number.js
-          sourceHash: fnv1a64:0018c82aba03a635
+          sourceHash: fnv1a64:22765838228eec60
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

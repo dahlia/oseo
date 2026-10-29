@@ -797,7 +797,7 @@ results:
       - promise-settlement
     observation:
       detail: "test/language/expressions/dynamic-import/catch/nested-async-fu\
-        nction-await-eval-script-code-target.js:138:9: error[OSEO1001]:
+        nction-await-eval-script-code-target.js:35:9: error[OSEO1001]:
         ImportExpression is outside the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

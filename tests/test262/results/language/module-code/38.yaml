@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-star-cycle-2_FIXTURE.js
           id: test/language/module-code/instn-star-star-cycle.js
-          sourceHash: fnv1a64:6a352d7070e5a976
+          sourceHash: fnv1a64:28d38f31b781eefd
         - dependencies:
             - test/language/module-code/instn-star-star-cycle-indirect-x_FIXTURE.js
           id: test/language/module-code/instn-star-star-cycle-2_FIXTURE.js
@@ -68,7 +68,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-new-expr.js
-          sourceHash: fnv1a64:38b86dbc1cfca4d9
+          sourceHash: fnv1a64:a5e409a77dddaa46
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

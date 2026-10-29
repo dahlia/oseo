@@ -20,7 +20,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-lex.js:93:7:
+      detail: "test/language/module-code/early-dup-lex.js:18:7:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -50,7 +50,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-dflt-fun-anon-semi.js
-          sourceHash: fnv1a64:b3cf2e14a8e67932
+          sourceHash: fnv1a64:9f14f70aacd0ea47
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

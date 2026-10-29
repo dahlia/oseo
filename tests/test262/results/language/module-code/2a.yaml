@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-syntax-1.js:96:1:
+      detail: "test/language/module-code/parse-err-syntax-1.js:21:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -52,7 +52,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-expr-new-expr.js
-          sourceHash: fnv1a64:0abed24d87d4076d
+          sourceHash: fnv1a64:f6b43d8de78b867e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

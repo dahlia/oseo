@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-as-arguments.js:110:15:
+      detail: "test/language/module-code/early-import-as-arguments.js:35:15:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -52,7 +52,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-own-property-sym.js
           id: test/language/module-code/namespace/internals/get-own-property-sym.js
-          sourceHash: fnv1a64:14103d5a951208e5
+          sourceHash: fnv1a64:33a2fa02004571d0
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -90,7 +90,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-func-expression.js
-          sourceHash: fnv1a64:cf7458bc572f7e89
+          sourceHash: fnv1a64:7cff839cd4091ffa
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

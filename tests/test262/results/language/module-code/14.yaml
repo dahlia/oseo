@@ -24,7 +24,7 @@ results:
             - test/language/module-code/export-expname-from-string.js
             - test/language/module-code/export-expname_FIXTURE.js
           id: test/language/module-code/export-expname-from-string.js
-          sourceHash: fnv1a64:a302b20152ded49c
+          sourceHash: fnv1a64:c3cf4fc0ff17439f
         - dependencies: []
           id: test/language/module-code/export-expname_FIXTURE.js
           sourceHash: fnv1a64:711e14c825b19f18
@@ -60,7 +60,7 @@ results:
         - dependencies:
             - test/language/module-code/export-expname_FIXTURE.js
           id: test/language/module-code/export-expname-import-string-binding.js
-          sourceHash: fnv1a64:81dac99a0cb1ada5
+          sourceHash: fnv1a64:95deb1571c53b4a0
         - dependencies: []
           id: test/language/module-code/export-expname_FIXTURE.js
           sourceHash: fnv1a64:711e14c825b19f18
@@ -107,7 +107,7 @@ results:
             - test/language/module-code/namespace/internals/own-property-keys-binding-types.js
             - test/language/module-code/namespace/internals/own-property-keys-binding-types_FIXTURE.js
           id: test/language/module-code/namespace/internals/own-property-keys-binding-types.js
-          sourceHash: fnv1a64:6ba2acf122ff9052
+          sourceHash: fnv1a64:f1d283ac369327f7
         - dependencies:
             - test/language/module-code/namespace/internals/own-property-keys-binding-types.js
           id: test/language/module-code/namespace/internals/own-property-keys-binding-types_FIXTURE.js

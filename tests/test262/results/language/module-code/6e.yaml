@@ -19,7 +19,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-decl.js:93:18:
+      detail: "test/language/module-code/early-dup-export-decl.js:18:18:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -52,7 +52,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-obj-literal.js
-          sourceHash: fnv1a64:9dcb40406d12a29e
+          sourceHash: fnv1a64:fb542ff5933a978f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

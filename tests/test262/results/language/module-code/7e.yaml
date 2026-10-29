@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-const.\
-        js:90:3: error[OSEO0001]: Source could not be parsed."
+        js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -48,7 +48,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/block-await-expr-nested.js
-          sourceHash: fnv1a64:2525526300772424
+          sourceHash: fnv1a64:ca097e6996ff26a7
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -84,7 +84,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-null.js
-          sourceHash: fnv1a64:dbe2bfea23d20896
+          sourceHash: fnv1a64:96023bf07e8379b3
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -119,7 +119,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-nested.js
-          sourceHash: fnv1a64:354f76720d45d1f8
+          sourceHash: fnv1a64:5712b5ad11300fe5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

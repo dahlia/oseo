@@ -27,7 +27,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-array-literal.js
-          sourceHash: fnv1a64:b41baa9887388a1a
+          sourceHash: fnv1a64:c3a7229ec07fb8cf
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -64,7 +64,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-array-literal.js
-          sourceHash: fnv1a64:cac4c6488399df07
+          sourceHash: fnv1a64:d5409d1df49507e4
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

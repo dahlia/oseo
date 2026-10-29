@@ -26,8 +26,8 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/await-dynamic-import\
-        -rejection.js:126:7: error[OSEO1001]: ImportExpression is
-        outside the M1 profile."
+        -rejection.js:51:7: error[OSEO1001]: ImportExpression is outside
+        the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

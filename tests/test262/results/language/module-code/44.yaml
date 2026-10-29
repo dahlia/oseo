@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-import-arguments.js:110:10:
+      detail: "test/language/module-code/early-import-arguments.js:35:10:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-met\
-        hod.js:89:10: error[OSEO0001]: Source could not be parsed."
+        hod.js:14:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -72,7 +72,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/typeof-await-expr-this.js
-          sourceHash: fnv1a64:a07e38208d40b3a3
+          sourceHash: fnv1a64:99d54e8c227df36a
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

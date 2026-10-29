@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-gtbndng-indirect-trlng-comma_FIXTURE.js
           id: test/language/module-code/eval-gtbndng-indirect-trlng-comma.js
-          sourceHash: fnv1a64:c578f5412f391be3
+          sourceHash: fnv1a64:95c901975a8e9fb0
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-indirect-trlng-comma_FIXTURE.js
           sourceHash: fnv1a64:f45593db9ac345d5
@@ -54,7 +54,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-switch-cas\
-        e.js:89:21: error[OSEO0001]: Source could not be parsed."
+        e.js:14:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -76,7 +76,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-export-dflt-expr.js:101:20:
+      detail: "test/language/module-code/parse-err-export-dflt-expr.js:26:20:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -108,7 +108,7 @@ results:
             - test/language/module-code/top-level-await/dfs-invariant-direct-2_FIXTURE.js
             - test/language/module-code/top-level-await/dfs-invariant-indirect_FIXTURE.js
           id: test/language/module-code/top-level-await/dfs-invariant.js
-          sourceHash: fnv1a64:5a7cbd6e6649b121
+          sourceHash: fnv1a64:0050be41382276a6
         - dependencies:
             - test/language/module-code/top-level-await/dfs-invariant-async_FIXTURE.js
           id: test/language/module-code/top-level-await/dfs-invariant-direct-1_FIXTURE.js
@@ -160,7 +160,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-new-expr.js
-          sourceHash: fnv1a64:bb983d6b23eb4c17
+          sourceHash: fnv1a64:2254a3e67d561686
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

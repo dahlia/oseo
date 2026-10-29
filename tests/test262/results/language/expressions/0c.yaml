@@ -487,7 +487,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/expressions/class/elements/class-name-static-initializer-default-export.js
-          sourceHash: fnv1a64:43e56fa4773bb1ca
+          sourceHash: fnv1a64:96aabf1f4b89cd1d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

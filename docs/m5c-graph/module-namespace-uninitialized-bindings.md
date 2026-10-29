@@ -96,3 +96,20 @@ Evidence
 
 The repair adds no specialization, guard, ABI entry point, intrinsic, or
 heap kind.
+
+
+Complete manifest update
+------------------------
+
+Root ran one `mise run test262:update -- --accept-promotions` on clean
+bundle source `bc4b4696`, which carries this node and the two sibling
+remediation commits on main `68b026bb`. The remote job
+`20261029T102935Z-f808232b5d68` ran from 10:29:42Z to 11:19:36Z on
+2026-10-29 and exited 0 without retries. It observed 31,310 reviewed paths:
+26,957 pass, 3,242 expected-negative, and 1,111 unsupported, the totals on
+main. It promoted and demoted nothing and changed no classification. Its
+283 rewritten partitions and the 39 re-verified exclusion audit digests
+come from the module harness change; the
+[*test262-module-harness-globals.md*](./test262-module-harness-globals.md)
+note records them. The owned paths are not in the reviewed subset, so they
+stay unreviewed; their observation batch admits them.

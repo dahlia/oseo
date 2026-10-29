@@ -27,7 +27,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-var.js
           id: test/language/module-code/instn-named-bndng-var.js
-          sourceHash: fnv1a64:93b861847271c4f8
+          sourceHash: fnv1a64:ea0ea7dc1b472e93
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -55,7 +55,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-semi-dflt-expr.js:102:20:
+      detail: "test/language/module-code/parse-err-semi-dflt-expr.js:27:20:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

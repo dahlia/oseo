@@ -24,7 +24,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-self-abrupt.js
-          sourceHash: fnv1a64:fa27957c99caf021
+          sourceHash: fnv1a64:4aec790b2cd5d1f0
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

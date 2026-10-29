@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-super.js:90:1: error[OSEO0001]:
+      detail: "test/language/module-code/early-super.js:15:1: error[OSEO0001]:
         Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -42,7 +42,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-class-expr\
-        -meth.js:89:21: error[OSEO0001]: Source could not be parsed."
+        -meth.js:14:21: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -65,7 +65,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -meth-static.js:89:29: error[OSEO0001]: Source could not be
+        -meth-static.js:14:29: error[OSEO0001]: Source could not be
         parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -90,7 +90,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-object-gen\
-        -method.js:90:11: error[OSEO0001]: Source could not be parsed."
+        -method.js:15:11: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -116,7 +116,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-3.js:95:12: error[OSEO0001]: Source could not be parsed."
+        e-3.js:20:12: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -150,7 +150,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-null.js
-          sourceHash: fnv1a64:94f38375191a011c
+          sourceHash: fnv1a64:4a02650bd369315d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

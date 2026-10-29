@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -meth.js:89:22: error[OSEO0001]: Source could not be parsed."
+        -meth.js:14:22: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -44,7 +44,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/privatename-not-valid-earlyerr-modul\
-        e-1.js:96:10: error[OSEO0001]: Source could not be parsed."
+        e-1.js:21:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -76,7 +76,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/privatename-valid-no-earlyerr.js
-          sourceHash: fnv1a64:9ae12fea2eb2a05b
+          sourceHash: fnv1a64:891edcbcc6550e2e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -27,7 +27,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-dflt-gen-anon-semi.js
-          sourceHash: fnv1a64:56951bb40060acf8
+          sourceHash: fnv1a64:ed97849acb1d190f
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -59,7 +59,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-bndng-dflt-fun-anon.js
           id: test/language/module-code/instn-named-bndng-dflt-fun-anon.js
-          sourceHash: fnv1a64:ffaa8345c20d2ef8
+          sourceHash: fnv1a64:6cb8d3ba9503c799
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -88,7 +88,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-lhs.js\
-        :90:3: error[OSEO0001]: Source could not be parsed."
+        :15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -111,7 +111,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-for-const.\
-        js:90:3: error[OSEO0001]: Source could not be parsed."
+        js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

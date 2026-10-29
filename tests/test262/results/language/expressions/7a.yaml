@@ -279,7 +279,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/expressions/class/cpn-class-expr-accessors-computed-property-name-from-await-expression.js
-          sourceHash: fnv1a64:02023731c210df54
+          sourceHash: fnv1a64:0f14847b974a3d0d
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

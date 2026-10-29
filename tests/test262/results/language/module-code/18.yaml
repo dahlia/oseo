@@ -26,7 +26,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-cls-semi.js
-          sourceHash: fnv1a64:27ea982b81c18ebd
+          sourceHash: fnv1a64:233494cb4fc25e82
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -61,7 +61,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-export-dflt-expr-err-eval.js
-          sourceHash: fnv1a64:8b36795b18f609c3
+          sourceHash: fnv1a64:5e12dea8d1cc0338
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -96,7 +96,7 @@ results:
             - test/language/module-code/instn-iee-trlng-comma_FIXTURE.js
             - test/language/module-code/instn-iee-trlng-comma.js
           id: test/language/module-code/instn-iee-trlng-comma.js
-          sourceHash: fnv1a64:7a229eb163f49470
+          sourceHash: fnv1a64:d142eecf2fb2223f
         - dependencies: []
           id: test/language/module-code/instn-iee-trlng-comma_FIXTURE.js
           sourceHash: fnv1a64:65cdb4c3debe13e6
@@ -137,7 +137,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-null.js
-          sourceHash: fnv1a64:38684247cbc52d23
+          sourceHash: fnv1a64:c8d9d4454b168aa2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -172,7 +172,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/try-await-expr-null.js
-          sourceHash: fnv1a64:e80bccaeb2410027
+          sourceHash: fnv1a64:79a29a055de0565e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

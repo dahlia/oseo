@@ -74,3 +74,20 @@ The runner retained only `non-strict produced OSEO1001.` for these parse
 negatives. It records no compiler message or location; the ImportExpression
 precedence diagnosis was the Root routing decision, not a deeper raw trace.
 Without the scan, the invalid-operand parser tests above fail.
+
+
+Complete manifest update
+------------------------
+
+Root ran one `mise run test262:update -- --accept-promotions` on clean
+bundle source `bc4b4696`, which carries this node and the two sibling
+remediation commits on main `68b026bb`. The remote job
+`20261029T102935Z-f808232b5d68` ran from 10:29:42Z to 11:19:36Z on
+2026-10-29 and exited 0 without retries. It observed 31,310 reviewed paths:
+26,957 pass, 3,242 expected-negative, and 1,111 unsupported, the totals on
+main. It promoted and demoted nothing and changed no classification. Its
+283 rewritten partitions and the 39 re-verified exclusion audit digests
+come from the module harness change; the
+[*test262-module-harness-globals.md*](./test262-module-harness-globals.md)
+note records them. The owned paths are not in the reviewed subset, so they
+stay unreviewed; their observation batch admits them.

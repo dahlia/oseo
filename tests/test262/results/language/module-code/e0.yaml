@@ -32,7 +32,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-awaits-thenables-that-throw.js
-          sourceHash: fnv1a64:ae70a1deee17ecc2
+          sourceHash: fnv1a64:ab01a8285ba205a1
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -68,7 +68,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-literal-string.js
-          sourceHash: fnv1a64:4aa7236616cdc284
+          sourceHash: fnv1a64:36d6b562a21c2c63
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -103,7 +103,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-func-expression.js
-          sourceHash: fnv1a64:81ebb6d3f7003ebd
+          sourceHash: fnv1a64:29e6b498cfdbb054
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

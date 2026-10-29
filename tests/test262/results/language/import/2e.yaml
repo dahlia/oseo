@@ -22,9 +22,8 @@ results:
       - module-linking
       - dynamic-source
     observation:
-      detail: "test/language/import/import-attributes/json-idempotency.js:120\
-        :1: error[OSEO1001]: ImportExpression is outside the M1
-        profile."
+      detail: "test/language/import/import-attributes/json-idempotency.js:17:\
+        1: error[OSEO1001]: ImportExpression is outside the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

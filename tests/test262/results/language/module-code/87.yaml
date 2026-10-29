@@ -26,7 +26,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/eval-gtbndng-local-bndng-cls.js
-          sourceHash: fnv1a64:e3465a0dda56eab6
+          sourceHash: fnv1a64:b48e5c2c1308dadb
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -64,7 +64,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-expr-literal-number.js
-          sourceHash: fnv1a64:4c3380872146f117
+          sourceHash: fnv1a64:c41d1256dfde33e2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

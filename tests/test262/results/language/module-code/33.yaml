@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/ambiguous-export-bindings/error-impo\
-        rt-named.js:121:10: error[OSEO2001]: Import 'x' is ambiguous."
+        rt-named.js:46:10: error[OSEO2001]: Import 'x' is ambiguous."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false
@@ -44,7 +44,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-semi-export-star.js:102:48:
+      detail: "test/language/module-code/parse-err-semi-export-star.js:27:48:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -82,7 +82,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-identifier.js
-          sourceHash: fnv1a64:ee5ce46974ee90bb
+          sourceHash: fnv1a64:f4f90a77a9e526f6
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -31,7 +31,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-of-await-expr-template-literal.js
-          sourceHash: fnv1a64:244e2488aa9811ef
+          sourceHash: fnv1a64:7bae4a33e08661b2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

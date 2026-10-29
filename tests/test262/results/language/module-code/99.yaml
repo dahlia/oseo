@@ -30,7 +30,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/await-awaits-thenables.js
-          sourceHash: fnv1a64:b9a3e44f3b03b64a
+          sourceHash: fnv1a64:a8bde24d7639dd35
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -18,8 +18,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/instn-named-err-not-found-as.js:109:\
-        10: error[OSEO2001]: Module has no export 'x'."
+      detail: "test/language/module-code/instn-named-err-not-found-as.js:34:1\
+        0: error[OSEO2001]: Module has no export 'x'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false
@@ -49,7 +49,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-own-property-str-not-found.js
           id: test/language/module-code/namespace/internals/get-own-property-str-not-found.js
-          sourceHash: fnv1a64:efd1942c7d137ba4
+          sourceHash: fnv1a64:bd83812465625b27
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -86,7 +86,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-expr-await-expr-array-literal.js
-          sourceHash: fnv1a64:d06d3b4be64b8d34
+          sourceHash: fnv1a64:f5cb636055b29f83
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

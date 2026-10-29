@@ -24,7 +24,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-cls-named.js
           id: test/language/module-code/eval-export-dflt-cls-named.js
-          sourceHash: fnv1a64:016ee04462a94759
+          sourceHash: fnv1a64:3ee2b86fe7b1edfe
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -53,7 +53,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-function-e\
-        xpr.js:89:15: error[OSEO0001]: Source could not be parsed."
+        xpr.js:14:15: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -86,7 +86,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-obj-literal.js
-          sourceHash: fnv1a64:c08542fa94a9234d
+          sourceHash: fnv1a64:0ec77b1e946d85b2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

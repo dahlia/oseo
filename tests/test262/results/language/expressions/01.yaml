@@ -1072,7 +1072,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/expressions/object/cpn-obj-lit-computed-property-name-from-await-expression.js
-          sourceHash: fnv1a64:066e6af02b97b832
+          sourceHash: fnv1a64:a7a73d3bf54f9fd5
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

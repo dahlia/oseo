@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/import-attribute-k\
-        ey-identifiername.js:108:55: error[OSEO2001]: Unsupported static
+        ey-identifiername.js:33:55: error[OSEO2001]: Unsupported static
         import attribute."
       errorType: SyntaxError
       failedPhase: resolution
@@ -44,7 +44,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-named-err-dflt-thru-star-dflt.\
-        js:109:8: error[OSEO2001]: Module has no export 'default'."
+        js:34:8: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false
@@ -75,7 +75,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-func-expression.js
-          sourceHash: fnv1a64:286e867e81c92d62
+          sourceHash: fnv1a64:4cf7a688e9e69ef1
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

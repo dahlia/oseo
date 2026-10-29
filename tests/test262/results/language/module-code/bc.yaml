@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-iee-multi-cycle-same-name-a_FIXTURE.js
           id: test/language/module-code/instn-star-iee-multi-cycle-same-name.js
-          sourceHash: fnv1a64:ba5d69905508c07b
+          sourceHash: fnv1a64:722fcfa95c4ad18a
         - dependencies:
             - test/language/module-code/instn-star-iee-multi-cycle-same-name-b_FIXTURE.js
             - test/language/module-code/instn-star-iee-multi-cycle-same-name-c_FIXTURE.js
@@ -82,7 +82,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-nested.js
-          sourceHash: fnv1a64:80dae0ac9dc3fff6
+          sourceHash: fnv1a64:d5f3acf60f00b929
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

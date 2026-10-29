@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/import-attribute-n\
-        ewlines.js:119:1: error[OSEO2001]: Unsupported static import
+        ewlines.js:44:1: error[OSEO2001]: Unsupported static import
         attribute."
       errorType: SyntaxError
       failedPhase: resolution

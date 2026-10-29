@@ -21,7 +21,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/import-attributes/import-attribute-k\
-        ey-string-double.js:108:55: error[OSEO2001]: Unsupported static
+        ey-string-double.js:33:55: error[OSEO2001]: Unsupported static
         import attribute."
       errorType: SyntaxError
       failedPhase: resolution
@@ -46,7 +46,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-class-decl\
-        -method-gen-static.js:90:30: error[OSEO0001]: Source could not
+        -method-gen-static.js:15:30: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -84,7 +84,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-await-await-expr-this.js
-          sourceHash: fnv1a64:13197b7cc16c4878
+          sourceHash: fnv1a64:add3e818150c9de7
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -120,7 +120,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-template-literal.js
-          sourceHash: fnv1a64:d64c20dce1abe64b
+          sourceHash: fnv1a64:d2f4d126666627f2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

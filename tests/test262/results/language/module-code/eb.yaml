@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-of-con\
-        st.js:90:3: error[OSEO0001]: Source could not be parsed."
+        st.js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -49,7 +49,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-nested.js
-          sourceHash: fnv1a64:626924629cf4f9f3
+          sourceHash: fnv1a64:62356ae0d2992c46
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

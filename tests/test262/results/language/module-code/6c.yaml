@@ -24,7 +24,7 @@ results:
             - test/language/module-code/instn-star-props-dflt-skip-star-as-named_FIXTURE.js
             - test/language/module-code/instn-star-props-dflt-skip-star-as-prod_FIXTURE.js
           id: test/language/module-code/instn-star-as-props-dflt-skip.js
-          sourceHash: fnv1a64:1851436013d5fb60
+          sourceHash: fnv1a64:ccd74a99f1f37a57
         - dependencies:
             - test/language/module-code/instn-star-props-dflt-skip-star-as-named-end_FIXTURE.js
           id: test/language/module-code/instn-star-props-dflt-skip-star-as-named_FIXTURE.js

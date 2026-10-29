@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/instn-named-err-dflt-thru-star-as.js\
-        :109:10: error[OSEO2001]: Module has no export 'default'."
+        :34:10: error[OSEO2001]: Module has no export 'default'."
       errorType: SyntaxError
       failedPhase: resolution
       passed: false
@@ -48,7 +48,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-literal-string.js
-          sourceHash: fnv1a64:456a34fbb1d1f4a5
+          sourceHash: fnv1a64:8f5d082c6660c27e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

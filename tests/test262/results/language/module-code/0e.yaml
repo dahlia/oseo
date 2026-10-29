@@ -19,7 +19,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-if-else.js\
-        :89:20: error[OSEO0001]: Source could not be parsed."
+        :14:20: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -43,7 +43,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-semi-name-space-export.js:\
-        103:67: error[OSEO0001]: Source could not be parsed."
+        28:67: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -77,7 +77,7 @@ results:
             - test/language/module-code/top-level-await/pending-async-dep-from-cycle_cycle-root_FIXTURE.js
             - test/language/module-code/top-level-await/pending-async-dep-from-cycle_import-cycle-leaf_FIXTURE.js
           id: test/language/module-code/top-level-await/pending-async-dep-from-cycle.js
-          sourceHash: fnv1a64:7343769c6e39092a
+          sourceHash: fnv1a64:63690ba87194f4ae
         - dependencies: []
           id: test/language/module-code/top-level-await/pending-async-dep-from-cycle_setup_FIXTURE.js
           sourceHash: fnv1a64:6e9a47f86392c2cf
@@ -132,7 +132,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-class-decl-await-expr-func-expression.js
-          sourceHash: fnv1a64:9bb5825ff676794c
+          sourceHash: fnv1a64:f60efa2f6a5620bf
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -170,7 +170,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/void-await-expr-new-expr.js
-          sourceHash: fnv1a64:267cc573c64b535d
+          sourceHash: fnv1a64:d39abdd878a6f88c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

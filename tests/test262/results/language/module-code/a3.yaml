@@ -33,7 +33,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-self-import-async-resolution-ticks.js
           id: test/language/module-code/top-level-await/module-self-import-async-resolution-ticks.js
-          sourceHash: fnv1a64:911f5ada015bae50
+          sourceHash: fnv1a64:211cdf459342232b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

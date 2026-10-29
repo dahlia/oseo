@@ -26,7 +26,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-literal-string.js
-          sourceHash: fnv1a64:6eff713d3cad7327
+          sourceHash: fnv1a64:499a58ee328fda0e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -62,7 +62,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/typeof-await-expr-nested.js
-          sourceHash: fnv1a64:cc909dd2a8fa7b9b
+          sourceHash: fnv1a64:ba09d09fe7819d58
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -81,3 +81,38 @@ touches *packages/* and *tools/*, so the scoped manifest update cannot
 admit it; it needs `mise run test262:update`. A module case that declares
 a harness name at top level no longer collides with the harness; the
 update, not this note, decides each such case's classification.
+
+
+Complete manifest update
+------------------------
+
+Root ran one `mise run test262:update -- --accept-promotions` on clean
+bundle source `bc4b4696`, which carries this node and the two sibling
+remediation commits on main `68b026bb`. The remote job
+`20261029T102935Z-f808232b5d68` ran from 10:29:42Z to 11:19:36Z on
+2026-10-29 and exited 0 without retries. It observed 31,310 reviewed paths:
+26,957 pass, 3,242 expected-negative, and 1,111 unsupported, the totals on
+main. It promoted and demoted nothing. It rewrote 283 partitions and
+*target-parity.yaml*.
+
+All 609 changed records are module cases, and no classification changed.
+In 360 of them only the entry module's `sourceHash` changed. In the other
+249, only the line or column of a recorded diagnostic changed, because the
+entry no longer carries the harness lines. The owned path is not in the
+reviewed subset, so it stays unreviewed; its observation batch admits it.
+
+Thirty-nine rows of *docs/m5c-closure/exclusion-audit.yaml* pinned one of
+those shifted observations. All are ADR 0016 exclusions: 38 under the
+`observation-train-dynamic-source` assessment and one under
+`json-module-dynamic-site-identity`. Each old and new observation was
+compared before its digest changed. Each keeps the exact
+`error[OSEO1001]: ImportExpression is outside the M1 profile.` diagnostic,
+its column, the `profile-syntax` capability, and the
+`unsupported-profile-feature` classification. Only the line moved, by 75,
+103, or 111 lines, and the new line holds the `import()` call in the
+upstream source. The ImportCall subject and the boundary rejection still
+hold, so only their `observationDigest` values were recomputed with
+`exclusionObservationDigest`. No subject, assessment, owner, disposition,
+or dependency-tag flag changed, and the audit still reports 520 exclusions,
+553 remediation rows, and 155 missing dynamic tags. The closure ledger
+regenerates unchanged, and both graph checks pass.

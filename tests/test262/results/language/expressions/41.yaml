@@ -1223,7 +1223,7 @@ results:
       - promise-settlement
     observation:
       detail: "test/language/expressions/dynamic-import/eval-export-dflt-cls-\
-        named.js:135:1: error[OSEO1001]: ImportExpression is outside the
+        named.js:32:1: error[OSEO1001]: ImportExpression is outside the
         M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

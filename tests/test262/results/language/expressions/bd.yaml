@@ -104,7 +104,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/expressions/assignmenttargettype/direct-importca\
-        ll.js:95:1: error[OSEO0001]: Source could not be parsed."
+        ll.js:20:1: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

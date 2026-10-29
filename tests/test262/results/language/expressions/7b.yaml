@@ -1023,7 +1023,7 @@ results:
       - symbols
     observation:
       detail: "test/language/expressions/dynamic-import/reuse-namespace-objec\
-        t-from-import.js:135:5: error[OSEO1001]: ImportExpression is
+        t-from-import.js:32:5: error[OSEO1001]: ImportExpression is
         outside the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

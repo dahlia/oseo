@@ -26,7 +26,7 @@ results:
             - test/language/module-code/import-attributes/import-attribute-2_FIXTURE.js
             - test/language/module-code/import-attributes/import-attribute-3_FIXTURE.js
           id: test/language/module-code/import-attributes/import-attribute-empty.js
-          sourceHash: fnv1a64:6e6872a969b1da51
+          sourceHash: fnv1a64:791e11301e84947a
         - dependencies: []
           id: test/language/module-code/import-attributes/import-attribute-1_FIXTURE.js
           sourceHash: fnv1a64:31f77150dd994f24
@@ -64,7 +64,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-let\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -94,7 +94,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-literal-number.js
-          sourceHash: fnv1a64:d1dfc1da669746dd
+          sourceHash: fnv1a64:b269828d317f76c2
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -129,7 +129,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/for-in-await-expr-null.js
-          sourceHash: fnv1a64:9e7340636d8193e7
+          sourceHash: fnv1a64:6e5b1fcebf37877a
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

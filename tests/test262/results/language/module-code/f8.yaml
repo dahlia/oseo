@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-export-dflt-expr-gen-anon.js
           id: test/language/module-code/eval-export-dflt-expr-gen-anon.js
-          sourceHash: fnv1a64:a6de05dc531fa37f
+          sourceHash: fnv1a64:58ae8148efd35efa
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -56,7 +56,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-expname-from-star-unpaired-su\
-        rrogate.js:96:8: error[OSEO0001]: Source could not be parsed."
+        rrogate.js:21:8: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -92,7 +92,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-uniq-env-rec-other_FIXTURE.js
           id: test/language/module-code/instn-uniq-env-rec.js
-          sourceHash: fnv1a64:7e9fbe4270384c41
+          sourceHash: fnv1a64:6c48b78b309c3622
         - dependencies: []
           id: test/language/module-code/instn-uniq-env-rec-other_FIXTURE.js
           sourceHash: fnv1a64:3d48fd871f84e989
@@ -130,7 +130,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/top-level-await-expr-literal-number.js
-          sourceHash: fnv1a64:879f60509c584302
+          sourceHash: fnv1a64:2dc6d469b73f0ba9
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

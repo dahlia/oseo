@@ -22,7 +22,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-named-star-cycle-2_FIXTURE.js
           id: test/language/module-code/instn-named-star-cycle.js
-          sourceHash: fnv1a64:870b3bc0b2577708
+          sourceHash: fnv1a64:f92e730aabf9125d
         - dependencies:
             - test/language/module-code/instn-named-star-cycle-indirect-x_FIXTURE.js
           id: test/language/module-code/instn-named-star-cycle-2_FIXTURE.js

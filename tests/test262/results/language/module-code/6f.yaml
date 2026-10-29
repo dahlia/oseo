@@ -26,7 +26,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/Symbol.iterator.js
           id: test/language/module-code/namespace/Symbol.iterator.js
-          sourceHash: fnv1a64:7204a287c843cea3
+          sourceHash: fnv1a64:58e1605ac251893c
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

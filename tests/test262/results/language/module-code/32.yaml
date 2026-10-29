@@ -24,7 +24,7 @@ results:
             - test/language/module-code/export-expname-from-star.js
             - test/language/module-code/export-expname_FIXTURE.js
           id: test/language/module-code/export-expname-from-star.js
-          sourceHash: fnv1a64:18eb5d05df3ffef3
+          sourceHash: fnv1a64:4e3280252eb93048
         - dependencies: []
           id: test/language/module-code/export-expname_FIXTURE.js
           sourceHash: fnv1a64:711e14c825b19f18
@@ -56,7 +56,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-for-in-var\
-        .js:90:3: error[OSEO0001]: Source could not be parsed."
+        .js:15:3: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

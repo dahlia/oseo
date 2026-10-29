@@ -29,7 +29,7 @@ results:
         - dependencies:
             - test/language/module-code/top-level-await/module-import-rejection-tick_FIXTURE.js
           id: test/language/module-code/top-level-await/module-import-rejection-tick.js
-          sourceHash: fnv1a64:4a667648c9b3ccd4
+          sourceHash: fnv1a64:dbacb689c4cd0b7d
         - dependencies: []
           id: test/language/module-code/top-level-await/module-import-rejection-tick_FIXTURE.js
           sourceHash: fnv1a64:d19ee743ac7ead82
@@ -70,7 +70,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-literal-number.js
-          sourceHash: fnv1a64:f11cb8e80b09e505
+          sourceHash: fnv1a64:69405a2f6557cbc0
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

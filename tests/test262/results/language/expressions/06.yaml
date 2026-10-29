@@ -1025,7 +1025,7 @@ results:
       - promise-settlement
     observation:
       detail: "test/language/expressions/dynamic-import/catch/nested-else-imp\
-        ort-catch-eval-script-code-target.js:140:3: error[OSEO1001]:
+        ort-catch-eval-script-code-target.js:37:3: error[OSEO1001]:
         ImportExpression is outside the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

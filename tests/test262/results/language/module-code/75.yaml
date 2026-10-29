@@ -19,7 +19,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-dup-export-star-as-dflt.js:94:\
+      detail: "test/language/module-code/early-dup-export-star-as-dflt.js:19:\
         1: error[OSEO0001]: Duplicate export 'default'."
       errorType: SyntaxError
       failedPhase: parse
@@ -43,7 +43,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-export-do-while.j\
-        s:89:4: error[OSEO0001]: Source could not be parsed."
+        s:14:4: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -65,8 +65,8 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/parse-err-invoke-anon-fun-decl.js:10\
-        1:30: error[OSEO0001]: Source could not be parsed."
+      detail: "test/language/module-code/parse-err-invoke-anon-fun-decl.js:26\
+        :30: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -96,7 +96,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/while-await-expr-this.js
-          sourceHash: fnv1a64:8c4b491f73e3c783
+          sourceHash: fnv1a64:c855fda61f3e5cca
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

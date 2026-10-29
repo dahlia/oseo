@@ -23,7 +23,7 @@ results:
         - dependencies:
             - test/language/module-code/instn-star-props-nrml-1_FIXTURE.js
           id: test/language/module-code/instn-star-props-nrml.js
-          sourceHash: fnv1a64:890230bedcc7290b
+          sourceHash: fnv1a64:7c7d8d9963d435bc
         - dependencies:
             - test/language/module-code/instn-star-props-nrml-indirect_FIXTURE.js
             - test/language/module-code/instn-star-props-nrml-star_FIXTURE.js
@@ -72,7 +72,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-dflt-assign-expr-await-expr-identifier.js
-          sourceHash: fnv1a64:b83758cfcd30758c
+          sourceHash: fnv1a64:dba47e0a754a19e3
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
@@ -108,7 +108,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-literal-number.js
-          sourceHash: fnv1a64:1ddf0fa717b34a1a
+          sourceHash: fnv1a64:8a7b182890b6ca43
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

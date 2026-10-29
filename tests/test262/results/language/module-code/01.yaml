@@ -20,7 +20,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/export-expname-import-unpaired-surro\
-        gate.js:96:10: error[OSEO0001]: Source could not be parsed."
+        gate.js:21:10: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -52,7 +52,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/top-level-await/syntax/if-block-await-expr-func-expression.js
-          sourceHash: fnv1a64:5751f6faf7ee9c5a
+          sourceHash: fnv1a64:f3751628cccf2b7b
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

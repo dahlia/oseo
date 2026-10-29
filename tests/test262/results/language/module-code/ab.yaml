@@ -19,7 +19,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/module-code/early-new-target.js:91:1:
+      detail: "test/language/module-code/early-new-target.js:16:1:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
@@ -43,7 +43,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/module-code/parse-err-decl-pos-import-do-while.j\
-        s:89:4: error[OSEO0001]: Source could not be parsed."
+        s:14:4: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false
@@ -78,7 +78,7 @@ results:
       - top-level-await
     observation:
       detail: "test/language/module-code/top-level-await/unobservable-global-\
-        async-evaluation-count-reset.js:180:12: error[OSEO1001]:
+        async-evaluation-count-reset.js:69:12: error[OSEO1001]:
         ImportExpression is outside the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax
