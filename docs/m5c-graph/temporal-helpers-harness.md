@@ -209,8 +209,12 @@ cannot suppress or forge either line, for these reasons:
  -  The trap prints before it throws, so catching the throw, finishing in
     a later job, or completing normally cannot remove the line. Standard
     output is flushed whenever the program returns, which every pass and
-    every expected negative requires. A process that dies without
-    flushing loses its armed line and so remains a harness failure.
+    every expected negative requires. A process killed by a signal
+    flushes nothing more; it is a harness failure when the armed line was
+    lost too, and otherwise, when an earlier full buffer carried the
+    armed line out but not a later trap line, a semantic failure. It
+    never has the clean exit a pass needs or the runtime's final thrown
+    identity line an expected negative needs.
 
 A Module case runs its imports before the harness, and a case built with
 the test262 host reads `console` from the global object. The runner
@@ -229,13 +233,13 @@ traps, kept members including `with` over the object, forged marker
 lines, hoisted rebinding of each captured intrinsic and of `console`, the
 Module and test262-host withholding, and scripted variant outputs: a
 pass, a matching negative, a marker without its line break, a killed
-process with and without its buffered output, a trap only in a later
-variant, and a trap beside an infrastructure diagnostic.
-*tests/test262-harness-trap-native.test.ts* builds nine cases natively
-through the split-harness executor: kept members pass, a forged marker
-passes, and the `with` and Script `var` bypasses, a caught trap, a
-replaced kept member, `Object.keys`, a trap caught in a later job, and a
-hoisted `Proxy` are harness failures.
+process with all, none, or only the armed line of its output, a trap only in a
+later variant, and a trap beside an infrastructure diagnostic.
+*tests/test262-harness-trap-native.test.ts* builds nine cases natively through
+the split-harness executor: kept members pass, a forged marker passes, and the
+`with` and Script `var` bypasses, a caught trap, a replaced kept member,
+`Object.keys`, a trap caught in a later job, and a hoisted `Proxy` are harness
+failures.
 
 The trap U starts at Main `915ec6df8eaf237e807b263c06a4139a8418a940` with
 this node's two source commits and the carried records above. A sweep

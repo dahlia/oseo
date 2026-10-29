@@ -505,6 +505,34 @@ test("reads the trap marker on every outcome", async () => {
       "harness-failure",
     ],
     [
+      // A full buffer flushed the armed line before a later trap line
+      // was lost; the kill still rules out a pass and a negative match.
+      "a killed process that kept only its armed line",
+      {},
+      [
+        (token) => ({
+          executed: true,
+          exitStatus: 1,
+          stderr: "",
+          stdout: `${armed(token)}${"x".repeat(16_384)}`,
+        }),
+      ],
+      "semantic-failure",
+    ],
+    [
+      "a killed runtime negative that kept only its armed line",
+      { negative: true },
+      [
+        (token) => ({
+          executed: true,
+          exitStatus: 1,
+          stderr: "",
+          stdout: armed(token),
+        }),
+      ],
+      "semantic-failure",
+    ],
+    [
       "a matching runtime negative without the armed line",
       { negative: true },
       [
