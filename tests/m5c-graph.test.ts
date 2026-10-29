@@ -550,8 +550,8 @@ test("the checked-in M5c work graph is valid", () => {
   // Landing marks change this count without changing the graph's shape.
   assert.ok(summary.landed >= 72);
   assert.equal(summary.parked, 0);
-  assert.equal(summary.nodes, 112);
-  assert.equal(summary.ready, 107);
+  assert.equal(summary.nodes, 117);
+  assert.equal(summary.ready, 112);
   assert.equal(summary.blocked, 5);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",

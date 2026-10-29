@@ -333,6 +333,45 @@ test("assignment rejects missed, duplicated, and invented selections", () => {
   );
 });
 
+test("a batch split after planning keeps one selector per sub-batch", () => {
+  const entries = [
+    plain("test/language/a/one.js"),
+    plain("test/language/a/two.js"),
+    plain("test/language/b/three.js"),
+  ];
+  // Two sub-batches of one batch: the longer prefix takes a/two.js.
+  const whole = {
+    id: "observation-batch-21a",
+    prefixes: ["test/language/"],
+    prerequisiteSets: [""],
+  };
+  const split = [
+    whole,
+    {
+      id: "observation-batch-21b",
+      prefixes: ["test/language/a/two."],
+      prerequisiteSets: [""],
+    },
+  ];
+  assert.deepEqual(
+    assignM5cObservationBatches(split, entries).map((selected) =>
+      selected.map((entry) => entry.path),
+    ),
+    [
+      ["test/language/a/one.js", "test/language/b/three.js"],
+      ["test/language/a/two.js"],
+    ],
+  );
+  assert.throws(
+    () =>
+      assignM5cObservationBatches(
+        [{ ...whole, id: "observation-batch-21ab" }],
+        entries,
+      ),
+    /unique observation-batch-NN ID/u,
+  );
+});
+
 test("pruning drops landed batches without moving other paths", () => {
   const entries = [
     plain("test/language/a/one.js"),
