@@ -4,8 +4,13 @@ B19/B20/B30 dynamic-source coverage remediation
 Root authorized exactly 459 additions on 2026-10-27: 66 observed
 `OSEO1001` unknown-eval binding paths and 393 observed ImportExpression
 rejections. Preserve the existing 306 owned paths and dependencies. The
-combined remediation scope is 765 paths. ADR 0016 and ADR 0019 remain
-unchanged; none of these additions is an exclusion or a semantic pass.
+original combined remediation scope was 765 paths. DS-1 subsequently
+accounted for 218 ImportCall paths under ADR 0016, leaving 547. DS-3
+accounts for 11 unknown-eval paths with reviewed static replacement
+evidence under item 1 of the 2026-10-28 decision, leaving 536; its other
+55 remain remediation. The per-path reasons are in
+[the DS-3 assessment](./dynamic-source-unknown-eval-assessment.md).
+ADR 0016 and ADR 0019 remain unchanged; no path becomes a semantic pass.
 
 | Batch                | Unknown binding eval | ImportExpression outside M1 | Total |
 | -------------------- | -------------------- | --------------------------- | ----- |
@@ -19,10 +24,10 @@ from clean source `6aab0fc8`, tree
 `d6723be80209aca0fcf0606c5c3e5959f152ad0c`. The table below retains
 every original path and exact diagnostic. No path was re-observed here.
 
-Root retains these paths as active remediation, including ImportCall
-subjects: the dependency tag alone authorizes no exclusion. The audit
-assessments preserve each original subject and normative section; they do
-not claim replacement evidence or normative dependence on dynamic source.
+The table below preserves the original observation-train evidence. Later
+DS-1 and DS-3 audit assessments account for the paths described above; all
+other paths remain active remediation. A dependency tag alone authorizes
+no exclusion. Every original subject and normative section is preserved.
 
 | Original path                                                                                                                           | Exact observed diagnostic                                                                                                                                                                                                                                                                                                                                                                               | Raw result                                                                               |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |

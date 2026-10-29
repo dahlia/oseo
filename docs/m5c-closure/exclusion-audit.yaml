@@ -505,10 +505,116 @@ assessments:
       rejections as active coverage remediation, except the 218 ImportCall
       subjects that dynamic-source-importcall-accounting reassessed under the
       import-call-syntax, import-call-specifier, and import-call-promise
-      assessments; 241 remain here. Original source, subjects and
+      assessments; DS-3 separately assesses its 66 unknown-eval paths,
+      closing 11 under item 1 and retaining 55; 175 remain under this
+      shared assessment. Original source, subjects and
       assertions remain visible; the observation does not establish equivalent
       replacement evidence or authorize a whole-path exclusion. ADR 0016 and
       ADR 0019 are unchanged, including their reopening triggers.
+  ds3-u180e-regexp:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies:
+      test/language/literals/regexp/mongolian-vowel-separator.js at the pinned
+      suite revision passes in all four linux-x86_64-gnu
+      strictness/specialization variants, with observation passed: true. The
+      static literal already yields U+180E through .source; only eval source
+      evaluation remains. Source SHA256
+      609f92de6627ab9b791c1f8dfc8bad547df3dd35df65729e478bfd287c1692bd. Reopen
+      on an ADR 0016 amendment admitting eval, or changed source, observation,
+      or replacement evidence; ADR 0019's non-source reopening trigger remains
+      in force."
+    replacementEvidence:
+      tests/test262/results/language/literals/3a.yaml:
+        "c2766008fb0d55e540d687b1615aad825a11b55d3b3d68e4\
+        0aa6554d033ec8db"
+  ds3-u180e-string:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies:
+      test/language/literals/string/mongolian-vowel-separator.js at the pinned
+      suite revision passes in all four linux-x86_64-gnu
+      strictness/specialization variants, with observation passed: true. The
+      static literal already yields the exact U+180E string; only eval source
+      evaluation remains. Source SHA256
+      c7630cac41019a84da640710fea431e9cb7f59613c3871b812dae88ced5b015a. Reopen
+      on an ADR 0016 amendment admitting eval, or changed source, observation,
+      or replacement evidence; ADR 0019's non-source reopening trigger remains
+      in force."
+    replacementEvidence:
+      tests/test262/results/language/literals/66.yaml:
+        "235e52d53a1c28941de11b28c98046c13df9ad96a37aadec\
+        6a3890e9bdc74451"
+  ds3-statementlist-syntax:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies to the nine
+      no-assertion eval-block-with-statment probes listed in
+      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. Each exact
+      StatementList body passes without eval in its paired static path in that
+      table, in all four linux-x86_64-gnu strictness/specialization variants,
+      with observation passed: true. These originals never inspect result or
+      call their arrow function; expected = 3000 is unused. Successful parsing
+      and normal evaluation are covered by the paired static observation,
+      leaving only eval source evaluation. The tenth labelled-block probe
+      asserts result = 3000 and stays remediation. Reopen on an ADR 0016
+      amendment admitting eval, or changed source, observation, or replacement
+      evidence; ADR 0019 reopening remains in force."
+    replacementEvidence:
+      tests/test262/results/language/statementList/50.yaml:
+        "bebc9bba7beb670993444c0a8d4e575442c40c2e232d6218\
+        660e4d8a0f317a1a"
+      tests/test262/results/language/statementList/7b.yaml:
+        "b2a40b1fb02a9c782bd0ec5798678c71a02c3a5511ee1d55\
+        394ab5d3c90c6aa3"
+      tests/test262/results/language/statementList/9a.yaml:
+        "795ed863566f28800f928cc74bc8ca56e05804503c992431\
+        e9ba5de5c3035a68"
+      tests/test262/results/language/statementList/dc.yaml:
+        "e96c47e0fa8098e7ab6a23eab42a5ba8465ea192d7ca8bef\
+        420ef7b7b30d1b92"
+      tests/test262/results/language/statementList/8a.yaml:
+        "099b840f265898d6cc338012f50ca36e0cf4ab4f8772ae4a\
+        9315d11d4106d88b"
+      tests/test262/results/language/statementList/18.yaml:
+        "1ef9eccc6b75693a26a0a91270640cf2b60af4528c65257b\
+        75722319871f493c"
+      tests/test262/results/language/statementList/e4.yaml:
+        "55e454e38405d67e549164e10955fadd69ec9bea307733e0\
+        6adab56a1def417d"
+      tests/test262/results/language/statementList/b5.yaml:
+        "b2921a9e3f4e3d9677e759bed96d266cca7265098e6d5bec\
+        02f49ce076581d5c"
+      tests/test262/results/language/statementList/2d.yaml:
+        "32af7e61f39e38bdb4ffe2aaf740f0d68e3ffce5fcbf0857\
+        a48830cbc08e5fcd"
+  ds3-statementlist-completion:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The 31 assertion-bearing StatementList eval probes retain the
+      completion-value subjects listed separately in
+      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. Their passing
+      static counterparts establish parsing and normal completion but never
+      observe the StatementList value, returned object, or returned function;
+      substituting a return statement would not prove Completion Record
+      equivalence. No complete replacement is established.
+  ds3-literal-coverage:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The 23 literal probes retain the separately assessed strict octal
+      error, RegExp syntax errors, selected BMP character/source domains,
+      UnicodeIDContinue fallback, and lone surrogate group-name subjects in
+      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. No reviewed
+      complete replacement is established for these contracts; the unknown
+      eval binding diagnostic is not such evidence.
+  ds3-import-from-eval:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: usage-from-eval.js checks ImportCall from eval code, intrinsic
+      Promise identity and prototype, and four imported values. No reviewed
+      replacement covers every non-source assertion. Static import alone
+      cannot prove the ImportCall promise contract; retain the original as
+      unsupported remediation.
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -10382,7 +10488,7 @@ paths:
     missingDynamicTag: false
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "ImportCall can be used from eval code"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-import-from-eval
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assignme\
       nt-expression-eval-gtbndng-indirect-update-dflt.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13244,7 +13350,7 @@ paths:
     section: "Original es5id: 7.8.3-3gs"
     subject: "Strict Mode - octal extension is forbidden in strict mode (after a
       hex number is assigned to a variable from an eval)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/7.8.5-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13256,7 +13362,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a L\
       ineTerminator."
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13267,7 +13373,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A1.1_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13279,7 +13385,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LF>
       (\\u000A), evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13291,7 +13397,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <CR>,
       (\\u000D), evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13303,7 +13409,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LS>,
       (\\u2028), evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.3_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13315,7 +13421,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regexp literal cannot be PS (U+2029),
       tested through evaluated source"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.4_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13326,7 +13432,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A1.4_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13338,7 +13444,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a <\
       LF>, evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13350,7 +13456,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A RegularExpressionBackslashSequence may not contain a <\
       CR>, evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13362,7 +13468,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <LS>,
       (\\u2028), evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A1.5_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13374,7 +13480,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "The first character of a regular expression may not be a <PS>,
       (\\u2029), evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.1_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13385,7 +13491,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A2.1_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13397,7 +13503,7 @@ paths:
     section: "sec-literals-regular-expression-literals"
     subject: "A regular expression may not contain a <LF> as a SourceCharacter,
       evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13409,7 +13515,7 @@ paths:
     section: "sec-literals-regular-expression-literals"
     subject: "A regular expression may not contain a <CR> as a SourceCharacter,
       evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13421,7 +13527,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "A regular expression may not contain a <LS> as a SourceCharacter,
       evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.3_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13433,7 +13539,7 @@ paths:
     section: "prod-RegularExpressionNonTerminator"
     subject: "A regular expression may not contain a <PS> as a SourceCharacter,
       evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.4_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13444,7 +13550,7 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 7.8.5_A2.4_T2"
     subject: "Complex test with eval, using syntax pattern"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13456,7 +13562,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <LF> as a SourceCharacter,
       evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T4.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13468,7 +13574,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regexp literal cannot contain backslash followed by CR (U+000D),
       tested through evaluated source"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T5.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13480,7 +13586,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <LS> as a SourceCharacter,
       evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/S7.8.5_A2.5_T6.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13492,7 +13598,7 @@ paths:
     section: "prod-RegularExpressionBackslashSequence"
     subject: "A regular expression may not contain a <PS> as a SourceCharacter,
       evaluated"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/regexp/mongolian-vowel-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13504,7 +13610,7 @@ paths:
     section: "sec-unicode-format-control-characters"
     subject: "Mongolian Vowel Separator can appear in regular expression
       literals (eval code)."
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-u180e-regexp
   - path: "test/language/literals/regexp/named-groups/invalid-lone-surrogate-gr\
       oupname.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13516,7 +13622,7 @@ paths:
     missingDynamicTag: false
     section: "prod-GroupSpecifier"
     subject: "Lone surrogates in RegExp group names"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-literal-coverage
   - path: "test/language/literals/string/mongolian-vowel-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13528,7 +13634,7 @@ paths:
     section: "sec-unicode-format-control-characters"
     subject: "Mongolian Vowel Separator can appear in string literals \
       (eval code)."
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-u180e-string
   - path: "test/language/module-code/top-level-await/await-dynamic-import-rejec\
       tion.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13674,7 +13780,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal with items (Eval production of StatementList
       starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-array-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13686,7 +13792,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal (Eval production of StatementList starting with a
       BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-arrow-function-assignment-exp\
       r.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13699,7 +13805,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with an AssignmentExpression (Eval production of
       StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-arrow-function-funct\
       ionbody.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13712,7 +13818,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with a Function Body (Eval production of
       StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-block-with-labels.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13724,7 +13830,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block with a label (Eval production of StatementList starting with
       a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13736,7 +13842,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Eval production of StatementList starting with a \
       BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-expr-arrow-function-boolean-l\
       iteral.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13749,7 +13855,7 @@ paths:
     section: "prod-StatementList"
     subject: "Expression with an Arrow Function and Boolean literal (Eval
       production of StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-let-declaration.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13761,7 +13867,7 @@ paths:
     section: "prod-StatementList"
     subject: "LexicalDeclaration using Let (Eval production of StatementList
       starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-regexp-literal-flags.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13773,7 +13879,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal with Flags (Eval production of
       StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-regexp-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13785,7 +13891,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal (Eval production of StatementList
       starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-with-statment-array-literal-w\
       ith-item.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13798,7 +13904,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal with items (Evaluate produciton of StatementList
       starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-array-\
       literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13811,7 +13917,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal (Evaluate produciton of StatementList starting with
       a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-arrow-function-\
       assignment-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13824,7 +13930,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with an AssignmentExpression (Evaluate produciton
       of StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-arrow-function-\
       functionbody.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13837,7 +13943,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with a Function Body (Evaluate produciton of
       StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-block-with-labe\
       ls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13850,7 +13956,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block with a label (Evaluate produciton of StatementList starting
       with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13862,7 +13968,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Evaluate produciton of StatementList starting with a
       BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-block-with-statment-expr-arrow-func\
       tion-boolean-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13875,7 +13981,7 @@ paths:
     section: "prod-StatementList"
     subject: "Expression with an Arrow Function and Boolean literal (Evaluate
       produciton of StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-let-de\
       claration.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13888,7 +13994,7 @@ paths:
     section: "prod-StatementList"
     subject: "LexicalDeclaration using Let (Evaluate produciton of StatementList
       starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-regexp-literal-\
       flags.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13901,7 +14007,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal with Flags (Evaluate produciton of
       StatementList starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-block-with-statment-regexp\
       -literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13914,7 +14020,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal (Evaluate produciton of StatementList
       starting with a BlockStatement)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-syntax
   - path: "test/language/statementList/eval-class-array-literal-with-item.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13926,7 +14032,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal with items (Valid syntax of StatementList starting
       with a Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-array-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13938,7 +14044,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal (Valid syntax of StatementList starting with a Class
       Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-arrow-function-assignment-exp\
       r.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13951,7 +14057,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with an AssignmentExpression (Valid syntax of
       StatementList starting with a Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-arrow-function-funct\
       ionbody.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13964,7 +14070,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with a Function Body (Valid syntax of StatementList
       starting with a Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-block-with-labels.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13976,7 +14082,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block with a label (Valid syntax of StatementList starting with a
       Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -13988,7 +14094,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Valid syntax of StatementList starting with a Cla\
       ss Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-expr-arrow-function-boolean-l\
       iteral.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14001,7 +14107,7 @@ paths:
     section: "prod-StatementList"
     subject: "Expression with an Arrow Function and Boolean literal (Valid
       syntax of StatementList starting with a Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-let-declaration.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14013,7 +14119,7 @@ paths:
     section: "prod-StatementList"
     subject: "LexicalDeclaration using Let (Valid syntax of StatementList
       starting with a Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-regexp-literal-flags.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14025,7 +14131,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal with Flags (Valid syntax of
       StatementList starting with a Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-class-regexp-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14037,7 +14143,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal (Valid syntax of StatementList starting
       with a Class Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-array-literal-with-item.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14049,7 +14155,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal with items (Eval production of StatementList
       starting with a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-array-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14061,7 +14167,7 @@ paths:
     section: "prod-StatementList"
     subject: "Array Literal (Eval production of StatementList starting with a
       Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-arrow-function-assignme\
       nt-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14074,7 +14180,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with an AssignmentExpression (Eval production of
       StatementList starting with a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-arrow-function-functionbody.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14086,7 +14192,7 @@ paths:
     section: "prod-StatementList"
     subject: "Arrow Function with a Function Body (Eval production of
       StatementList starting with a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-block-with-labels.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14098,7 +14204,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block with a label (Eval production of StatementList starting with
       a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-block.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14110,7 +14216,7 @@ paths:
     section: "prod-StatementList"
     subject: "Block (Eval production of StatementList starting with a Function
       Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-expr-arrow-function-boolean-lite\
       ral.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14123,7 +14229,7 @@ paths:
     section: "prod-StatementList"
     subject: "Expression with an Arrow Function and Boolean literal (Eval
       production of StatementList starting with a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-let-declaration.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14135,7 +14241,7 @@ paths:
     section: "prod-StatementList"
     subject: "LexicalDeclaration using Let (Eval production of StatementList
       starting with a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-regexp-literal-flags.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14147,7 +14253,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal with Flags (Eval production of
       StatementList starting with a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statementList/eval-fn-regexp-literal.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -14159,7 +14265,7 @@ paths:
     section: "prod-StatementList"
     subject: "Regular Expression Literal (Eval production of StatementList
       starting with a Function Declaration)"
-    assessment: "observation-train-dynamic-source"
+    assessment: ds3-statementlist-completion
   - path: "test/language/statements/async-generator/eval-var-sc\
       ope-syntax-err.js"
     proposedOwner: adr:0016-dynamic-source-boundary

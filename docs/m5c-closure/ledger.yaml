@@ -73,8 +73,12 @@ owners:
       specifier evaluation, or the promise ContinueDynamicImport
       settles. Each observes the exact ImportExpression OSEO1001
       rejection, none counts as a pass, and an accepted ADR 0016
-      amendment admitting any dynamic import form reopens them."
-    paths: 497
+      amendment admitting any dynamic import form reopens them. DS-3
+      adds 11 unknown-eval paths under maintainer decision 2026-10-28
+      item 1: nine syntax-only StatementList probes and two U+180E
+      literal probes, each with a passing static replacement and
+      fresh-digest exclusion assessment."
+    paths: 508
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -169,8 +173,11 @@ owners:
       ImportCall-subject paths to ADR 0016 (547). The other 103 reviewed
       dynamic-import candidates keep module linking, module goal,
       namespace, binding update, export default, or evaluation subjects
-      and stay here."
-    paths: 547
+      and stay here. DS-3 accounts for 11 unknown-eval paths under ADR
+      0016 using reviewed static replacements (536); its other 55 paths
+      remain remediation. See
+      docs/m5c-graph/dynamic-source-unknown-eval-assessment.md."
+    paths: 536
   node:module-top-level-await-patterns:
     note: "Observed OSEO1001: Await inside a module top-level binding or
       assignment pattern is unsupported. The dynamic-import observe-only
@@ -31201,7 +31208,7 @@ paths:
   test/language/literals/regexp/invalid-range-lookbehind.js: [expected-negative, observation]
   test/language/literals/regexp/invalid-range-negative-lookbehind.js: [expected-negative, observation]
   test/language/literals/regexp/lastIndex.js: [pass, observation]
-  test/language/literals/regexp/mongolian-vowel-separator-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, lexical-grammar, object-properties, regular-expressions]]
+  test/language/literals/regexp/mongolian-vowel-separator-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-grammar, object-properties, regular-expressions]]
   test/language/literals/regexp/mongolian-vowel-separator.js: [pass, observation]
   test/language/literals/regexp/named-groups/forward-reference.js: [pass, observation]
   test/language/literals/regexp/named-groups/invalid-dangling-groupname-2-u.js: [expected-negative, observation]
@@ -31359,7 +31366,7 @@ paths:
   test/language/literals/string/line-continuation-single.js: [pass, observation]
   test/language/literals/string/line-separator-eval.js: [unreviewed, node:observation-batch-32]
   test/language/literals/string/line-separator.js: [unreviewed, node:observation-batch-32]
-  test/language/literals/string/mongolian-vowel-separator-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, lexical-grammar]]
+  test/language/literals/string/mongolian-vowel-separator-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, lexical-grammar]]
   test/language/literals/string/mongolian-vowel-separator.js: [pass, observation]
   test/language/literals/string/paragraph-separator-eval.js: [unreviewed, node:observation-batch-32]
   test/language/literals/string/paragraph-separator.js: [unreviewed, node:observation-batch-32]
@@ -32052,16 +32059,16 @@ paths:
   test/language/statementList/eval-block-let-declaration.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, lexical-bindings, var-bindings]]
   test/language/statementList/eval-block-regexp-literal-flags.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, object-properties, regular-expressions, var-bindings]]
   test/language/statementList/eval-block-regexp-literal.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, object-properties, regular-expressions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-array-literal-with-item.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-array-literal.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-arrow-function-assignment-expr.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-arrow-function-functionbody.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-block-with-labels.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-array-literal-with-item.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-array-literal.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-arrow-function-assignment-expr.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-arrow-function-functionbody.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-block-with-labels.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, var-bindings]]
   test/language/statementList/eval-block-with-statment-block.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-expr-arrow-function-boolean-literal.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-let-declaration.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, lexical-bindings, var-bindings]]
-  test/language/statementList/eval-block-with-statment-regexp-literal-flags.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, regular-expressions, var-bindings]]
-  test/language/statementList/eval-block-with-statment-regexp-literal.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, regular-expressions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-expr-arrow-function-boolean-literal.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, expression-operators, functions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-let-declaration.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, lexical-bindings, var-bindings]]
+  test/language/statementList/eval-block-with-statment-regexp-literal-flags.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, regular-expressions, var-bindings]]
+  test/language/statementList/eval-block-with-statment-regexp-literal.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, regular-expressions, var-bindings]]
   test/language/statementList/eval-class-array-literal-with-item.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, control-flow, dynamic-source, functions, lexical-bindings, object-properties, var-bindings]]
   test/language/statementList/eval-class-array-literal.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, control-flow, dynamic-source, functions, lexical-bindings, object-properties, var-bindings]]
   test/language/statementList/eval-class-arrow-function-assignment-expr.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, control-flow, dynamic-source, functions, lexical-bindings, var-bindings]]

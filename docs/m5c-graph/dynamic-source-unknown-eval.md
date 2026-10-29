@@ -20,7 +20,8 @@ the same diagnostic but belongs to `dynamic-source-lexical-completion-family`.
 The umbrella owns these paths once those batches land. The node records all
 three batches in `after`; selection and publication wait for their landing
 without adding dependency ancestry to the umbrella's manifest collision groups.
-The sorted path set, with one final newline, has SHA256
+The path set sorted with `LC_ALL=en_US.UTF-8 sort`, with one final newline,
+has SHA256
 `f8cdae47b9f8cf413abce9a9546194caa38c727841c0b42ca361f5a471f86830`.
 
 
@@ -111,3 +112,28 @@ Owned paths
 | *test/language/statementList/eval-fn-let-declaration.js*                                      |
 | *test/language/statementList/eval-fn-regexp-literal-flags.js*                                 |
 | *test/language/statementList/eval-fn-regexp-literal.js*                                       |
+
+
+Assessment result
+-----------------
+
+The [per-path assessment](./dynamic-source-unknown-eval-assessment.md)
+records all 66 source reads, normative subjects, replacement evidence, and
+individual reasons. 11 paths close under ADR 0016 using existing reviewed
+passing static paths: nine StatementList probes with no result assertions,
+and the U+180E RegExp and string literal probes. The other 55 stay with the
+umbrella: 31 StatementList completion-value probes, 23 literal grammar or
+source-preservation probes, and one ImportCall-from-eval probe. No replacement
+test is added, and none of these unsupported results becomes a pass.
+
+The 11 exclusions use fresh-digest audit records under item 1 of the
+2026-10-28 maintainer decision. The original source and observation digests
+were recomputed for all 66 paths and match the landed records. The new
+assessments bind the checked-in replacement observation partitions; the
+per-path table also records each replacement's pinned source digest.
+
+At base 74bb8e47 the umbrella owns 547 paths; these 11 owner changes leave
+536. All 41,091 inventory paths, subset entries, dependency tags, results,
+and summary counts are preserved. No UPDATE is needed because the subset
+and results are unchanged. Root owns full UPDATE scheduling, outer review,
+publication, and landed state; this record sets none of them.
