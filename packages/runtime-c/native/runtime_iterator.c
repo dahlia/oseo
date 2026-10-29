@@ -979,15 +979,22 @@ static OseoResult iterator_setter(
             &setter,
             NULL
         );
-        result = own
-            ? oseo_object_set(context, slots[0], slots[2], slots[1], true)
-            : oseo_object_define(
-                context,
-                slots[0],
-                slots[2],
-                slots[1],
-                (OseoPropertyAttributes){true, true, true, false}
-            );
+        if (own) {
+            result = oseo_internal_namespace_export_ready(
+                context, slots[0], ignored);
+        }
+        if (result.status == OSEO_STATUS_NORMAL) {
+            result = own
+                ? oseo_object_set(
+                    context, slots[0], slots[2], slots[1], true)
+                : oseo_object_define(
+                    context,
+                    slots[0],
+                    slots[2],
+                    slots[1],
+                    (OseoPropertyAttributes){true, true, true, false}
+                );
+        }
     }
     if (result.status == OSEO_STATUS_NORMAL) {
         result = normal(oseo_undefined());

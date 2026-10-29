@@ -523,6 +523,62 @@ export async function runNativeScenario2(
     }
   }
 
+  // Namespace [[GetOwnProperty]] over uninitialized exports: each
+  // descriptor, ownership, enumeration, integrity, copy, and forwarding
+  // proxy operation throws a ReferenceError before the bindings are
+  // initialized and succeeds after, while [[HasProperty]],
+  // [[OwnPropertyKeys]], and [[Delete]] read no binding. A cycle's
+  // dependency observes the same namespace before its evaluation.
+  const uninitializedNamespaceEntry = [
+    root,
+    "tests/fixtures/module-namespace-uninitialized/entry.mjs",
+  ].join("/");
+  const uninitializedNamespaceReferences = [
+    await host.run({
+      args: [uninitializedNamespaceEntry],
+      command: process.execPath,
+      cwd: root,
+    }),
+    await host.run({
+      args: ["run", "--quiet", uninitializedNamespaceEntry],
+      command: "deno",
+      cwd: root,
+    }),
+  ];
+  for (const reference of uninitializedNamespaceReferences) {
+    assert.equal(reference.exitStatus, 0, reference.stderr);
+  }
+  for (const specialization of ["disabled", "enabled"] as const) {
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const nativeUninitializedNamespace = await runNativeCli(
+        {
+          args: [
+            ...(specialization === "disabled" ? ["--no-specialization"] : []),
+            uninitializedNamespaceEntry,
+          ],
+          version: "0.1.0",
+        },
+        host,
+      );
+      assert.equal(
+        nativeUninitializedNamespace.exitStatus,
+        0,
+        nativeUninitializedNamespace.stderr,
+      );
+      assert.equal(nativeUninitializedNamespace.stderr, "");
+      for (const reference of uninitializedNamespaceReferences) {
+        assert.equal(
+          nativeUninitializedNamespace.stdout,
+          reference.stdout,
+          `uninitialized namespace ${specialization}`,
+        );
+      }
+    } finally {
+      delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+    }
+  }
+
   // The key-order entry explains why it bypasses the reference hosts: V8
   // lists a namespace's array-index export names first, where ECMA-262
   // keeps the code-unit order of [[Exports]]. Bun 1.4.3 (JavaScriptCore)

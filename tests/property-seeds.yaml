@@ -576,3 +576,7 @@ families:
     owner: tests/property/m5-computed-member-fixed.property.test.ts
     start: 0x60008f00
     end: 0x60008fff
+  - family: m5-module-namespace-uninitialized
+    owner: tests/property/m5-module-namespace-uninitialized.property.test.ts
+    start: 0x60009000
+    end: 0x600090ff

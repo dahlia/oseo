@@ -3948,6 +3948,23 @@ bool oseo_internal_own_property_descriptor(
     uint8_t *omitted_accessors
 );
 /*
+ * The binding read a module namespace's [[GetOwnProperty]] (10.4.6.5)
+ * performs for an export. `stored` is the value an own-descriptor query
+ * returned for object_value. When it is a namespace export's binding
+ * cell, the cell is read through [[Get]] and an uninitialized binding
+ * throws a ReferenceError; every other object, key, and namespace
+ * metadata property completes normally without a read. Each consumer
+ * that reports a descriptor's presence or attributes without
+ * dereferencing the cell calls this immediately after its query, so
+ * hasOwnProperty, enumeration, and integrity tests observe the same
+ * abrupt completion Object.getOwnPropertyDescriptor does.
+ */
+OseoResult oseo_internal_namespace_export_ready(
+    OseoContext *context,
+    OseoValue object_value,
+    OseoValue stored
+);
+/*
  * True when a String primitive or wrapper reaches %String.prototype%'s
  * untouched virtual bootstrap iterator without a nearer own replacement.
  * Materializing the String iterator installs an own property and makes this

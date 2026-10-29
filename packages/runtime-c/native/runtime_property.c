@@ -309,8 +309,11 @@ OseoResult oseo_object_has_own(
         &setter,
         NULL
     );
-    if (exists) return normal(oseo_boolean(true));
-    return normal(oseo_boolean(false));
+    if (!exists) return normal(oseo_boolean(false));
+    OseoResult ready = oseo_internal_namespace_export_ready(
+        context, object_value, value);
+    if (ready.status != OSEO_STATUS_NORMAL) return ready;
+    return normal(oseo_boolean(true));
 }
 
 OseoResult oseo_object_set(
@@ -752,6 +755,10 @@ OseoResult oseo_internal_set_with_receiver(
                 NULL
             ))
         ));
+    if (receiver_result.status == OSEO_STATUS_NORMAL && receiver_found) {
+        receiver_result = oseo_internal_namespace_export_ready(
+            context, receiver, receiver_value);
+    }
     if (receiver_result.status != OSEO_STATUS_NORMAL) return receiver_result;
     if (receiver_found) {
         if (receiver_attributes.accessor) {

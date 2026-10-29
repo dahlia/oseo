@@ -190,6 +190,16 @@ static OseoResult target_own_property(
     *found = oseo_internal_own_property_descriptor(
         context, target, key, value, attributes, getter, setter,
         omitted_accessors);
+    /* A trap result, invariant check, or forwarded descriptor sees the
+     * property's value, never the binding cell that a namespace export,
+     * global binding, or mapped arguments index stores. Reading the
+     * cell is the [[Get]] a namespace's [[GetOwnProperty]] performs, so
+     * an uninitialized export throws its ReferenceError here. */
+    if (*found && oseo_internal_cell_backed_property(target, *value)) {
+        OseoResult read = oseo_cell_get(context, *value);
+        if (read.status != OSEO_STATUS_NORMAL) return read;
+        *value = read.value;
+    }
     return normal(oseo_undefined());
 }
 

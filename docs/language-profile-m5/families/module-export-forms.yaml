@@ -23,6 +23,17 @@ scope:
     copies use that order; ordinary objects keep array-index keys first in
     ascending numeric order. ECMA-262 leaves for-in order over a namespace
     unspecified, and Oseo chooses the same order."
+  - "A module namespace's [[GetOwnProperty]] reads each export through
+    [[Get]], so while an export's binding is uninitialized every
+    operation that asks for its own descriptor throws a ReferenceError:
+    hasOwnProperty, Object.hasOwn, propertyIsEnumerable, descriptor
+    queries, Object.keys, values, and entries, for-in over the namespace
+    or an object inheriting from it, Object.assign and spread copies,
+    JSON.stringify, Object.isSealed and isFrozen, defineProperty,
+    defineProperties and Object.create property lists, forwarding Proxy
+    operations and their invariant checks, and the Iterator.prototype
+    constructor setter. [[HasProperty]], [[OwnPropertyKeys]], and
+    [[Delete]] read no binding and keep their results."
   - "ECMAScript import and export declarations are ModuleItems, never
     Script statements, including nested positions. Script placement errors
     report source-located OSEO0001 before unsupported conversion. The
@@ -38,6 +49,7 @@ evidence:
     references:
       - tests/native/scenarios/shard-2.ts
       - tests/fixtures/module-export-forms/entry.mjs
+      - tests/fixtures/module-namespace-uninitialized/entry.mjs
   fixed:
     status: covered
     references:
@@ -48,6 +60,8 @@ evidence:
       - tests/fixtures/module-export-forms/values.mjs
       - tests/fixtures/module-export-forms/key-order.mjs
       - tests/fixtures/module-export-forms/numeric-names.mjs
+      - tests/fixtures/module-namespace-uninitialized/entry.mjs
+      - tests/fixtures/module-namespace-uninitialized/later.mjs
       - packages/parser-babel/tests/module-export-forms.test.ts
       - packages/parser-babel/tests/script-module-declarations.test.ts
   forced-collection:
