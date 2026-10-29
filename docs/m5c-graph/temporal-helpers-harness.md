@@ -254,17 +254,22 @@ kept member, `Object.keys`, a trap caught in a later job, and a hoisted `Proxy`
 are harness failures.
 
 The trap U starts at Main `915ec6df8eaf237e807b263c06a4139a8418a940` with
-this node's two source commits and the carried records above. A sweep
-(*/data/m5c-ihb-redesign-20261029/sweep/*) compared every one of the 27
-reviewed includes with upstream and parsed all 31,310 reviewed subset
-paths: only *temporalHelpers.js* omits members, and only the three Script
+this node's two source commits and the carried records above; the
+evidence below was taken at clean HEAD `78ccca36`. A sweep
+(*/data/m5c-ihb-redesign-20261029/sweep2/*) parsed the 26 reviewed
+harness files that have an upstream counterpart, the 25 registered
+includes and *doneprintHandle.js*, against upstream; *base.js* combines
+upstream files and has none. It also parsed all 31,310 reviewed subset
+paths. Only *temporalHelpers.js* omits members, and only the three Script
 paths in the selection rule load it, so no other reviewed classification
 can change. The focused driver from the first U, with its selection fixed
-to those three paths, ran under *run-gate.py* in *precheck1/* and
-*precheck1-gate/*: 12 split native variants, each armed and none trapped,
-all three paths pass, zero retries, and unchanged tracked inputs.
-*focused2/* ran the earlier 12 runner-adjacent files plus the two trap
-files: 187/187 under Node on the Zig lane, 187/187 under Deno, and the
-seven native-building files 54/54 under Node on the host-cc lane.
-*focused1/* found two raw-case regressions and a Deno-only type error,
-fixed before *focused2/*. Root owns the full UPDATE on this U.
+to those three paths, ran under *run-gate.py* in *precheck2/* and
+*precheck2-gate/*, whose *inputs.json* hashes every tracked file
+including *tools/test262-harness-trap.ts*: 12 split native variants, each
+armed and none trapped, all three paths pass, zero retries, and unchanged
+tracked inputs. *focused3/* ran the earlier 12 runner-adjacent files plus
+the two trap files: 189/189 under Node on the Zig lane, 189/189 under
+Deno, and the seven native-building files 55/55 under Node on the host-cc
+lane. Earlier packets in the same directory (*sweep/*, *precheck1/*,
+*focused1/*, *focused2/*) ran before the trap commits on an uncommitted
+tree and are superseded. Root owns the full UPDATE on this U.
