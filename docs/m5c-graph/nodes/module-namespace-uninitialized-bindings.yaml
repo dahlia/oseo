@@ -1,0 +1,15 @@
+version: 1
+id: module-namespace-uninitialized-bindings
+title: Reject uninitialized namespace binding operations
+delivers: >-
+  Makes module namespace exotic object operations over uninitialized bindings
+  throw ReferenceError as ECMA-262 requires, so the 5 observed namespace
+  internals paths can be observed. The five observed runtime failures report
+  OSEO2001 Test262Error while the namespace operations should throw
+  ReferenceError. The work note
+  docs/m5c-graph/module-namespace-uninitialized-bindings.md names each
+  original path and its raw result.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

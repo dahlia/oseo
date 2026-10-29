@@ -1,0 +1,32 @@
+group: language/statementList
+key: "85"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statementList/eval-block-with-statment-regexp-literal.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - functions
+      - regular-expressions
+      - var-bindings
+    observation:
+      detail: "test/language/statementList/eval-block-with-statment-regexp-li\
+        teral.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statementList/eval-block-with-statment-r\
+        egexp-literal.js:118:14: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

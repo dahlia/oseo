@@ -48,4 +48,39 @@ results:
       failedPhase: parse
       passed: false
     unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - top-level-await
+        - dynamic-import
+        - promise-with-resolvers
+      flags:
+        - module
+        - async
+      includes:
+        - compareArray.js
+      mode: module
+      path: test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - module-linking
+      - object-properties
+      - promise-settlement
+      - symbols
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/unobservable-global-\
+        async-evaluation-count-reset.js:180:12: error[OSEO1001]:
+        ImportExpression is outside the M1 profile."
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

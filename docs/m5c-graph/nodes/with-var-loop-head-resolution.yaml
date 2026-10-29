@@ -1,0 +1,12 @@
+version: 1
+id: with-var-loop-head-resolution
+title: Resolve var loop heads through with environments
+delivers: >-
+  Resolves var loop heads and array-pattern identifier leaves inside with
+  statements through the with object environment in the order ECMA-262
+  specifies, on the ordinary and host targets. The work note retains the exact
+  repro and raw pointer.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

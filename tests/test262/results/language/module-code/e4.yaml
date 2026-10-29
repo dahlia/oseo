@@ -24,4 +24,50 @@ results:
       failedPhase: parse
       passed: false
     unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: TypeError
+      expectedFailurePhase: runtime
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/eval-rqstd-abrupt.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - functions
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/eval-rqstd-abrupt-err-type_FIXTURE.js
+            - test/language/module-code/eval-rqstd-abrupt-err-uri_FIXTURE.js
+          id: test/language/module-code/eval-rqstd-abrupt.js
+          sourceHash: fnv1a64:dedf150390097cfb
+        - dependencies: []
+          id: test/language/module-code/eval-rqstd-abrupt-err-type_FIXTURE.js
+          sourceHash: fnv1a64:f1e4c767df9f4047
+        - dependencies: []
+          id: test/language/module-code/eval-rqstd-abrupt-err-uri_FIXTURE.js
+          sourceHash: fnv1a64:871860d72da6134f
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      errorType: TypeError
+      failedPhase: runtime
+      passed: false
+    unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -3,6 +3,78 @@ key: "21"
 results:
   - case:
       async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/instn-named-bndng-dflt-star.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - module-linking
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/instn-named-bndng-dflt-star.js
+          id: test/language/module-code/instn-named-bndng-dflt-star.js
+          sourceHash: fnv1a64:f76382a93ef8b2dc
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - top-level-await
+        - promise-with-resolvers
+      flags:
+        - module
+        - async
+      includes:
+        - compareArray.js
+      mode: module
+      path: test/language/module-code/top-level-await/rejection-order.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - module-linking
+      - object-properties
+      - promise-settlement
+      - symbols
+      - top-level-await
+    observation:
+      detail: "test/language/module-code/top-level-await/rejection-order.js:1\
+        37:31: error[OSEO1001]: ImportExpression is outside the M1
+        profile."
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - top-level-await
       flags:

@@ -901,6 +901,62 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - dynamic-import
+        - async-iteration
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-nested-imports.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - generators
+    observation:
+      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-nested-imports.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-gen-await-nested-imports.js:101:9:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/valid/nested-else-braceless-nested-imports.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - functions
+      - object-properties
+      - symbols
+    observation:
+      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-else-braceless-nested-imports.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-else-braceless-nested-imports.js:102:8:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:

@@ -1112,6 +1112,116 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: true
+      features:
+        - dynamic-import
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/namespace/await-ns-get-str-not-found.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - lexical-bindings
+      - module-linking
+      - object-properties
+      - promise-settlement
+      - var-bindings
+    observation:
+      detail: 'test/language/expressions/dynamic-import/namespace/await-ns-get-str-not-found.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/namespace/await-ns-get-str-not-found.js:185:22:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-script-code-valid.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - var-bindings
+    observation:
+      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-script-code-valid.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-await-script-code-valid.js:105:9:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-nested-imports.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+    observation:
+      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-nested-imports.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-async-arrow-function-return-await-nested-imports.js:100:20:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/valid/nested-function-nested-imports.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+    observation:
+      detail: 'test/language/expressions/dynamic-import/syntax/valid/nested-function-nested-imports.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/syntax/valid/nested-function-nested-imports.js:101:3:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: false
       features:
         - generators

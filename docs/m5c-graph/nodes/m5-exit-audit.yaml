@@ -7,6 +7,7 @@ delivers: Verifies that the manifest covers all 41,091 applicable paths, that
   required gates pass without claiming unqualified ECMA-262 conformance.
 dependencies:
   - annexb-proto-dependency-classification
+  - array-generated-property-cost-remediation
   - array-sort-stability
   - array-tolocalestring-arguments
   - authorized-exclusion-audit
@@ -18,6 +19,7 @@ dependencies:
   - cross-realm-host
   - destructuring-binding-target-order
   - dynamic-import
+  - dynamic-import-early-error-precedence
   - dynamic-import-staged-plan
   - dynamic-source-callable-family
   - dynamic-source-coverage-remediation
@@ -42,6 +44,7 @@ dependencies:
   - iterator-next-callability
   - minor-feature-tag-admission
   - module-export-forms
+  - module-namespace-uninitialized-bindings
   - module-top-level-await-patterns
   - non-blocking-agent
   - observation-batch-01
@@ -94,6 +97,7 @@ dependencies:
   - shift-operator-c-size
   - temporal-helpers-harness
   - test262-host-script-bindings
+  - test262-module-harness-globals
   - test262-runner-main-thread-offload
   - typed-array-construction-order
   - typed-array-feature-admission
@@ -106,6 +110,7 @@ dependencies:
   - with-optional-call-receiver-non-tail
   - with-optional-call-receiver-tail
   - with-strict-assignment-fallback
+  - with-var-loop-head-resolution
   - yield-star-throw-callability
 landed: false
 status: blocked

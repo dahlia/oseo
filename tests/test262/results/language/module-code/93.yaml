@@ -1,0 +1,49 @@
+group: language/module-code
+key: "93"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/omitted-from-namespace_FIXTURE.js
+          id: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace.js
+          sourceHash: fnv1a64:ac5528595b45ab32
+        - dependencies:
+            - test/language/module-code/ambiguous-export-bindings/omitted-from-namespace-1_FIXTURE.js
+            - test/language/module-code/ambiguous-export-bindings/omitted-from-namespace-2_FIXTURE.js
+          id: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace_FIXTURE.js
+          sourceHash: fnv1a64:073bb4b3c877351a
+        - dependencies: []
+          id: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace-1_FIXTURE.js
+          sourceHash: fnv1a64:73d8292cbba437f8
+        - dependencies: []
+          id: test/language/module-code/ambiguous-export-bindings/omitted-from-namespace-2_FIXTURE.js
+          sourceHash: fnv1a64:a13c083fe8361b82
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

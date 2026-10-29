@@ -976,6 +976,37 @@ results:
       async: true
       features:
         - dynamic-import
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/catch/top-level-import-catch-file-does-not-exist.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - expression-operators
+      - functions
+      - module-linking
+      - object-properties
+      - promise-settlement
+    observation:
+      detail: 'test/language/expressions/dynamic-import/catch/top-level-import-catch-file-does-not-exist.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/catch/top-level-import-catch-file-does-not-exist.js:132:1:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - dynamic-import
         - import-attributes
       flags:
         - async
@@ -994,6 +1025,88 @@ results:
       detail: 'test/language/expressions/dynamic-import/import-attributes/2nd-param-yield-expr.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/expressions/dynamic-import/import-attributes/2nd-param-yield-expr.js:121:13:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/invalid/nested-arrow-assignment-expression-typeof-import.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+      - lexical-bindings
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/invalid/nested-if-braceless-typeof-import.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - dynamic-import
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/usage/nested-async-arrow-function-await-returns-thenable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - lexical-bindings
+      - module-linking
+      - object-properties
+      - promise-settlement
+    observation:
+      detail: 'test/language/expressions/dynamic-import/usage/nested-async-arrow-function-await-returns-thenable.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/usage/nested-async-arrow-function-await-returns-thenable.js:129:9:
         error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax

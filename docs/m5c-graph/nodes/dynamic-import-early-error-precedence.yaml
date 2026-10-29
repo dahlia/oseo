@@ -1,0 +1,15 @@
+version: 1
+id: dynamic-import-early-error-precedence
+title: Report dynamic import early errors first
+delivers: >-
+  Reports the early SyntaxError of the 21 observed dynamic-import
+  parse-negative paths before Oseo's ImportExpression unsupported diagnostic,
+  so their expected negative is observed. All 21 observed parse-negative
+  failures retain the exact detail: non-strict produced OSEO1001. No more
+  specific compiler diagnostic was retained. The work note
+  docs/m5c-graph/dynamic-import-early-error-precedence.md names each original
+  path and its raw result.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

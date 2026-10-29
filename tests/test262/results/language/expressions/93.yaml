@@ -780,6 +780,61 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - dynamic-import
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/syntax/invalid/nested-function-typeof-import.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - dynamic-import
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/usage/nested-async-function-return-await-returns-thenable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - module-linking
+      - object-properties
+      - promise-settlement
+    observation:
+      detail: 'test/language/expressions/dynamic-import/usage/nested-async-function-return-await-returns-thenable.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/usage/nested-async-function-return-await-returns-thenable.js:129:16:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       features:
         - destructuring-binding
         - default-parameters
