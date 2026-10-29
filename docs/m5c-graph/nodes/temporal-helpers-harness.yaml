@@ -13,5 +13,5 @@ delivers: "IH-B of the iterator-helpers split approved by the maintainer
   owner; do not predict passes."
 dependencies:
   - iterator-helpers-tag-activation
-landed: false
+landed: true
 status: ready
