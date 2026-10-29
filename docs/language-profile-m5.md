@@ -727,11 +727,13 @@ current evidence assessment. Those live only in the indexed records above.
     8.5l promoted its `for-in` iteration-statement case and the M5b
     `string-intrinsic` node promoted its `String` one. Optional calls through
     `super` properties are admitted by M5a Unit 8.2 as recorded below. An
-    optional call outside tail position whose callee is an identifier
-    resolved through a `with` object environment passes the selected object
-    as `this`, as recorded under identifier reads through `with` below; M5c
-    node `with-optional-call-receiver-tail` still owns strict tail-position
-    optional calls through `with`, and the umbrella
+    optional call whose callee is an identifier resolved through a `with`
+    object environment passes the selected object as `this`, as recorded
+    under identifier reads through `with` below. WOC-2 supplies fixed,
+    generated and MIR evidence for strict tail-position optional calls:
+    both specialization policies retain the receiver, callee and heap
+    arguments through the trampoline with forced collection. Publication
+    and graph landing remain separate; the umbrella
     `with-optional-call-receiver` blocks the M5 exit until it lands. The
     remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
@@ -9249,12 +9251,21 @@ The
 [*with-optional-call-receiver-non-tail.md*](./m5c-graph/with-optional-call-receiver-non-tail.md)
 record lists the native, generated, and structural evidence.
 
-Strict tail-position optional calls through `with`, such as `return f?.()` in
-a strict function nested in a `with` body, remain a known gap, not an
-exclusion. Active node `with-optional-call-receiver-tail` owns their evidence,
-and `m5-exit-audit` depends on the umbrella `with-optional-call-receiver`. The
-[*with-optional-call-receiver.md*](./m5c-graph/with-optional-call-receiver.md)
-record holds the defect and the repair contract.
+Strict tail-position optional calls through `with`, such as `return f?.()`
+in a strict function nested in a `with` body, retain that same receiver.
+WOC-1's lowering already supplies the receiver to the tail call. WOC-2 adds
+fixed native evidence, an independent generated oracle at seed `0x60002402`,
+and MIR assertions that the call is a tail call returned directly. The
+fixed fixture pairs optional and ordinary strict tail calls for normal,
+nullish, non-callable and abrupt completions, including argument order.
+Both specialization policies force collection while the trampoline retains
+the selected receiver, getter-produced callee and freshly allocated
+arguments. The
+[*WOC-2 work note*](./m5c-graph/with-optional-call-receiver-tail.md)
+records the focused Linux execution and its limits. No manifest
+classification or exclusion changes. Publication and graph landing remain
+Root-owned gates; `m5-exit-audit` still depends on the umbrella
+`with-optional-call-receiver` until it lands.
 
 [identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
 [call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js

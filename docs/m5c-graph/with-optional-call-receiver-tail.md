@@ -101,3 +101,14 @@ Script) are retained in `zig02`; the successful packets use the corrected
 setup. The final structural packet includes the stricter assertion that the
 selected receiver is the object operand of HasProperty. Concurrent
 reference reads do not change native program source or expected output.
+
+
+Internal review correction
+--------------------------
+
+Both stages of internal pass 1 identified `WOC2-PROFILE-STALE`: the central
+*docs/language-profile-m5.md* still described tail calls through `with` as
+a gap after the PLAN and family updates. The correction updates both the
+optional-chaining summary and the identifier-read account with the same
+contract, evidence and publication limits. It changes no test program,
+oracle, seed, budget, compiler/runtime or manifest input.
