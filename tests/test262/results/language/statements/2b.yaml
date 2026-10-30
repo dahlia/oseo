@@ -23,7 +23,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -53,7 +52,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-own-keys
       - object-properties

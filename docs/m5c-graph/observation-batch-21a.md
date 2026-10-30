@@ -60,3 +60,26 @@ node:unhandled-rejection-observation. It asserts immediate body execution
 and constructs a Promise without an executor, triggering the existing
 unhandled-rejection-policy capability. No new remediation node or
 exclusion boundary is introduced; ADR 0013, 0016, and 0019 are unchanged.
+
+
+Internal review corrections
+---------------------------
+
+The first internal round prompted another audit of all 1,768 train rows.
+ADR 0013 reserves generators for synchronous generators: 199 async-only
+rows in this batch lose that tag, while 19 synchronous witnesses retain it.
+Reserved-word negatives retain their class and async-method grammar;
+incidental void expressions supply no expression-operators coverage.
+
+The audit adds asserted rejection completions, implicit Symbol lookup for
+generator-object property keys, and restricted-production line terminators.
+It removes unreachable descriptor literals, an inherited failure-trap
+setter, and a constructor guard that only gates repeated test probes.
+The guard is executed by both positive and negative constructor calls;
+its removal is based on test-body gating, not an unreachable-branch claim.
+Iterator helpers that change asserted protocol results retain control-flow.
+
+The complete pattern audit is *known-pattern-full-row-audit.json* beside
+the focused evidence. It also covers batch 21b's async-only wrappers and
+confirms all 640 batch 21c rows have synchronous-generator witnesses.
+Classifications, owners, source observations, and landed flags are unchanged.

@@ -152,7 +152,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -201,7 +200,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -252,7 +250,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -299,7 +296,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement
@@ -346,7 +342,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - symbols
@@ -389,7 +384,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - object-properties
       - var-bindings
     execution:
@@ -432,7 +426,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -465,7 +458,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties

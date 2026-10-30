@@ -206,7 +206,6 @@ results:
       - classes
       - default-parameters
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse

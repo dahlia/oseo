@@ -84,7 +84,6 @@ results:
       - default-parameters
       - expression-operators
       - functions
-      - generators
       - object-properties
       - promise-settlement
       - var-bindings
@@ -131,7 +130,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -250,7 +248,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement

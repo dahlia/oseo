@@ -57,7 +57,6 @@ results:
       - classes
       - expression-operators
       - functions
-      - generators
       - object-properties
       - promise-settlement
       - var-bindings
@@ -101,7 +100,6 @@ results:
       - classes
       - control-flow
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -180,7 +178,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties

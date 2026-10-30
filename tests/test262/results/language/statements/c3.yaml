@@ -120,7 +120,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings

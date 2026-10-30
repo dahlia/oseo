@@ -25,7 +25,6 @@ results:
       - control-flow
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -109,7 +108,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings
@@ -200,7 +198,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse

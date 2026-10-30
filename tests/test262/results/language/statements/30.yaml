@@ -62,7 +62,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -107,6 +106,7 @@ results:
       - generators
       - lexical-bindings
       - object-properties
+      - symbols
     execution:
       harnessIncludes:
         - base.js
@@ -145,7 +145,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement
@@ -192,7 +191,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement

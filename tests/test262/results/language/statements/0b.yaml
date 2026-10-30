@@ -101,7 +101,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - lexical-bindings
       - object-properties

@@ -24,7 +24,6 @@ results:
       - expression-operators
       - functions
       - lexical-bindings
-      - object-literals
       - object-properties
       - promise-settlement
       - symbols
@@ -65,7 +64,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement

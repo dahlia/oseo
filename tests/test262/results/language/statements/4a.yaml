@@ -80,7 +80,6 @@ results:
       - async-iteration
       - classes
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -109,7 +108,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - object-properties
       - var-bindings
     execution:

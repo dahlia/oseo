@@ -128,7 +128,6 @@ results:
       - async-iteration
       - classes
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -157,7 +156,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse

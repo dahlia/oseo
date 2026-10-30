@@ -22,7 +22,6 @@ results:
       - expression-operators
       - functions
       - lexical-bindings
-      - object-literals
       - object-properties
       - promise-settlement
       - symbols

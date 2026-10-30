@@ -89,7 +89,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -118,7 +117,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - object-properties
       - var-bindings
     execution:
@@ -159,7 +157,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings
@@ -204,7 +201,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse

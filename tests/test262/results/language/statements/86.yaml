@@ -125,7 +125,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -172,6 +171,7 @@ results:
       - generators
       - lexical-bindings
       - object-properties
+      - symbols
     execution:
       harnessIncludes:
         - base.js

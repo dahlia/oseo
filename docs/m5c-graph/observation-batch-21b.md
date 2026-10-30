@@ -40,3 +40,18 @@ validate the derived records. No property test file is added.
 
 All original paths pass or are phase/type-correct expected negatives. No
 unsupported owner or new remediation node is needed for this batch.
+
+
+Internal review corrections
+---------------------------
+
+The first internal round prompted a synchronous-generator witness audit
+across all 1,768 train rows. ADR 0013 reserves generators for synchronous
+generators: 540 async-only wrappers in this batch lose that tag. The other
+100 rows retain it because their asserted case has a synchronous-generator
+witness. Async iteration and async-function prerequisites remain recorded.
+
+The complete audit is *sync-generator-full-row-audit.json* beside the
+focused evidence; *known-pattern-full-row-audit.json* covers the other
+review patterns across every train row. Classifications, owners, source
+observations, and landed flags are unchanged.

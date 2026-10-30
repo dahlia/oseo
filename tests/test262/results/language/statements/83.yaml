@@ -89,7 +89,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - lexical-bindings
       - object-properties
       - promise-settlement
@@ -135,7 +134,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties

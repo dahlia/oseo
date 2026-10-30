@@ -84,7 +84,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -133,7 +132,6 @@ results:
       - control-flow
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -220,7 +218,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -268,7 +265,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - object-properties
       - var-bindings
     execution:
@@ -308,7 +304,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings

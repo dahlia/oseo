@@ -86,7 +86,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-own-keys
       - object-properties
@@ -136,7 +135,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement

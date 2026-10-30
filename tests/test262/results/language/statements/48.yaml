@@ -95,7 +95,6 @@ results:
       - async-iteration
       - expression-operators
       - functions
-      - generators
       - object-properties
       - promise-settlement
       - var-bindings
@@ -257,7 +256,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings
@@ -301,7 +299,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse

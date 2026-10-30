@@ -168,7 +168,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement

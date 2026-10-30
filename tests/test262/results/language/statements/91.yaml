@@ -63,7 +63,6 @@ results:
       - control-flow
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -231,7 +230,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement
@@ -276,7 +274,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings

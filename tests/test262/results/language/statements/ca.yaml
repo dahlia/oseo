@@ -60,7 +60,6 @@ results:
       - classes
       - default-parameters
       - functions
-      - generators
       - rest-parameters
     observation:
       errorType: SyntaxError
@@ -93,7 +92,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -208,7 +206,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - symbols
@@ -252,7 +249,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement
@@ -351,7 +347,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement

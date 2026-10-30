@@ -18,7 +18,11 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: expected-negative
     dependencies:
+      - async-functions
       - async-iteration
+      - classes
+      - control-flow
+      - functions
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -84,7 +88,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -112,7 +115,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement
@@ -162,7 +164,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -212,7 +213,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties

@@ -43,7 +43,6 @@ results:
       - async-iteration
       - classes
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -97,7 +96,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - symbols

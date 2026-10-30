@@ -121,7 +121,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings
@@ -165,7 +164,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement

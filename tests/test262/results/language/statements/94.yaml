@@ -109,6 +109,7 @@ results:
     dependencies:
       - control-flow
       - expression-operators
+      - lexical-grammar
       - var-bindings
     execution:
       harnessIncludes:
@@ -260,7 +261,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement

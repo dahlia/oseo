@@ -62,7 +62,6 @@ results:
       - classes
       - expression-operators
       - functions
-      - generators
       - object-properties
       - promise-settlement
       - var-bindings
@@ -178,7 +177,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
       - object-literals
       - object-properties
       - var-bindings

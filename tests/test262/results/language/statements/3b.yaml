@@ -47,7 +47,6 @@ results:
       - classes
       - control-flow
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -76,7 +75,6 @@ results:
       - default-parameters
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement
@@ -121,7 +119,6 @@ results:
       - destructuring-bindings
       - error-intrinsics
       - functions
-      - generators
       - object-properties
       - var-bindings
     execution:

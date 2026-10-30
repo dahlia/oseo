@@ -67,7 +67,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - object-properties
       - var-bindings
     execution:
@@ -111,7 +110,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -199,7 +197,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse

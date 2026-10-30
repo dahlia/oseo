@@ -23,7 +23,6 @@ results:
       - async-iteration
       - classes
       - functions
-      - generators
       - rest-parameters
     observation:
       errorType: SyntaxError
@@ -56,7 +55,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -106,7 +104,6 @@ results:
       - control-flow
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties

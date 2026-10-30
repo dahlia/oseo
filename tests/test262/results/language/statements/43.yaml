@@ -171,7 +171,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - symbols
@@ -215,7 +214,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement

@@ -82,7 +82,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-own-keys
       - object-properties
@@ -129,7 +128,6 @@ results:
       - default-parameters
       - destructuring-bindings
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - symbols
@@ -174,7 +172,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - promise-settlement
@@ -224,7 +221,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement

@@ -204,7 +204,6 @@ results:
       - classes
       - destructuring-bindings
       - functions
-      - generators
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -235,7 +234,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-properties
       - promise-settlement
@@ -282,7 +280,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties

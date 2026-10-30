@@ -37,6 +37,7 @@ results:
     dependencies:
       - control-flow
       - expression-operators
+      - lexical-grammar
       - var-bindings
     execution:
       harnessIncludes:
@@ -78,7 +79,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -125,7 +125,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -175,7 +174,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-literals
       - object-properties
@@ -226,7 +224,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - object-literals
       - object-own-keys
       - object-properties
