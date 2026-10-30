@@ -918,7 +918,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/expressions/import.meta/syntax/invalid-assignmen\
-        t-target-update-expr.js:107:1: error[OSEO0001]: Source could not
+        t-target-update-expr.js:32:1: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse

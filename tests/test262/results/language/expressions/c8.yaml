@@ -1095,7 +1095,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/expressions/import.meta/not-accessible-from-dire\
-        ct-eval.js:90:5: error[OSEO1001]: Unknown binding 'eval'."
+        ct-eval.js:15:5: error[OSEO1001]: Unknown binding 'eval'."
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

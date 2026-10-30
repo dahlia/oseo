@@ -1242,7 +1242,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/expressions/import.meta/syntax/goal-module-nested-function.js
-          sourceHash: fnv1a64:aa2f16e93f6781d9
+          sourceHash: fnv1a64:a3678639b1331292
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

@@ -26,7 +26,7 @@ results:
             - test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-named_FIXTURE.js
             - test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-prod_FIXTURE.js
           id: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js
-          sourceHash: fnv1a64:5e48d780cca63fbf
+          sourceHash: fnv1a64:100c6d3cc5fad740
         - dependencies:
             - test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-named-end_FIXTURE.js
           id: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-named_FIXTURE.js

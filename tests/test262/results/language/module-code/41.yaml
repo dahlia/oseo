@@ -30,7 +30,7 @@ results:
         - dependencies:
             - test/language/module-code/export-expname-binding-index_FIXTURE.js
           id: test/language/module-code/export-expname-binding-index.js
-          sourceHash: fnv1a64:63324b7cf28e40c5
+          sourceHash: fnv1a64:f94f0b3ff96ef6f6
         - dependencies: []
           id: test/language/module-code/export-expname-binding-index_FIXTURE.js
           sourceHash: fnv1a64:e94a531c98fe8ecd

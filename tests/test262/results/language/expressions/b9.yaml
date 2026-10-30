@@ -998,7 +998,7 @@ results:
       - lexical-grammar
     observation:
       detail: "test/language/expressions/import.meta/syntax/escape-sequence-i\
-        mport.js:109:1: error[OSEO0001]: Source could not be parsed."
+        mport.js:34:1: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

@@ -84,7 +84,7 @@ results:
         - dependencies:
             - test/language/module-code/eval-self-once.js
           id: test/language/module-code/eval-self-once.js
-          sourceHash: fnv1a64:5679c39ed1ef49e7
+          sourceHash: fnv1a64:b740e447358e8d88
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

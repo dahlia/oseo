@@ -642,8 +642,8 @@ assessments:
         "6b49ffb07dc3969b7e66016cfd97fc00\
         a94f3e60208c1bb1c2a4105c2dbbdd32"
       tests/test262/results/language/module-code/19.yaml:
-        "e4f9a936469430944c43b6d47ec5876c\
-        4b83592bae3a9d5987e5205caa06a88c"
+        "381e6f0d04f09098fcde8077500f7e68\
+        9982ee3261129c784287e9958e20652d"
       tests/test262/results/language/module-code/24.yaml:
         "977d455b32ce0ce11cf00af713d072d0\
         8557db6bcd5d846f6650700724cfe7df"
@@ -678,8 +678,8 @@ assessments:
         "154274049c6b2019711ce1f05bb953a5\
         074c2f1134c26ecf5fe79437740ce512"
       tests/test262/results/language/module-code/92.yaml:
-        "12e95a6f3ac7f2d4abfc2d3b1096522e\
-        86831ebc7f8a4ca733862c622e392015"
+        "d4ead11c5c468fdebf9ab348f154864f\
+        f62d8ff6c9835bcdefdbfd04b881592c"
       tests/test262/results/language/module-code/9e.yaml:
         "09526f7e3296f20c9b45f732866e3971\
         e17ae4c0d07a37dd313408f4dca4edaa"
@@ -708,17 +708,17 @@ assessments:
         "68937ef4685526ed2467cb623dedcc4a\
         3b4bc122ee6da25ed094f4550d412e1b"
       tests/test262/results/language/module-code/f1.yaml:
-        "a9e209b065937e3c6a7e39600a43742f\
-        ea56c0e2c4aab8f62ecb37f2026ba9b2"
+        "898563d7a490bd7c29c58a53a9fa046f\
+        596265b28722192b6dad7b2fd7d5dbbd"
       tests/test262/results/language/module-code/f8.yaml:
-        "2a7194dfaf4a6f019eef351bda8ca6b4\
-        6b28075d3dc6739062004e57ad727504"
+        "ad566ab67d6870fafb59723bd785dc4b\
+        9e83aa4f8d64f23a4d7292c301f4d4f9"
       tests/test262/results/language/module-code/f9.yaml:
         "2b0fe566bd78f1dc71d00a54c3bf7f99\
         027e0f5116bb344d467e8923d4a901c8"
       tests/test262/results/language/module-code/fe.yaml:
-        "2184b7ed321397b9528e8d71a0f92b1b\
-        587f9f1c8d9a3322cbb24b12b521045d"
+        "e516220e6c81bcec7cad9e644346fd6a\
+        860c4aa558aa5973c6ab0aa245c5b9ac"
       tests/test262/results/language/module-code/ff.yaml:
         "5213678b9be7a75cc5fd5d5da721b9e6\
         ffa058daa59c0f4dce7f5827d4df7e33"
@@ -12023,8 +12023,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "25a06877484a087cc87a61dd39d71e76791210ede96642b0\
       2b99dab6da9283b3"
-    observationDigest: "e64e2772f4e95572e95af0e024990e55b0622b2acba\
-      8c5f91b7a39cffa447de4"
+    observationDigest: "e9ad86ad36e2d37c2a60aee98bacd7346dd72eb8d50\
+      fda44fd96df08c6fda269"
     missingDynamicTag: false
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression
@@ -13880,8 +13880,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "c2499ec1969ed861b17f2a58bcb5f60db281d82da6580ca1\
       84f412f7fb65697b"
-    observationDigest: "dead4fcfaaa9bd69de4900121141631c8b72f58a16b\
-      065306197bba7ec362490"
+    observationDigest: "0a9efa8ca18fa7bba4b5a08ec6c4f780e662f2ec459\
+      d5eb249806ed938f714cd"
     missingDynamicTag: false
     section: "sec-moduleevaluation"
     subject: "Module is evaluated exactly once"
@@ -14368,8 +14368,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "ffb5a3791ebc0acfff888ce97285af83a2ebaa64f1e01316\
       5b8e8abb9fcf5892"
-    observationDigest: "a8aca704a4924c19e14da27e2521fae82aac851249b\
-      159ef2bdf238c5266964b"
+    observationDigest: "83ca3205b4e89e4d94ac73bd3ad61fe76608b77bcb5\
+      f5e47ce8336a91c43c9d3"
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Inirect Default exports are included in an imported
@@ -14815,8 +14815,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "ec7b9753525bd1fe142c61e78999730aa0e548f90d4b68f2\
       30afa926b0d6a071"
-    observationDigest: "c82cc6a2a82e73d9163cd4bbaa31200e12e18e7b779\
-      9b059af3448023542fcf4"
+    observationDigest: "f3d8e44da95966aa2f16322baf7844eeae949eed8d3\
+      2999cdb0574c767d5e4d0"
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "Inirect Default exports are included in an imported
@@ -18350,8 +18350,8 @@ paths:
     priorCohort: "incidental-scaffolding"
     sourceDigest: "211f92e37e1c87e80e68a289b00efa9f4e8369e5bd8ecb6d\
       f799d744009b0a43"
-    observationDigest: "bae793c9aee996076e1006754d02ad20af2bc603a48\
-      11d8107c1f433da9897e9"
+    observationDigest: "583a81c7c0739347e4d125dffc006149a8b4a2f408e\
+      ea0ed3b8e4a5a210eafc9"
     missingDynamicTag: false
     section: "sec-left-hand-side-expressions-static-semantics-early\
       -errors"

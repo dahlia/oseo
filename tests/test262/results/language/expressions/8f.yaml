@@ -1090,7 +1090,7 @@ results:
         - dependencies:
             - test/language/expressions/import.meta/distinct-for-each-module_FIXTURE.js
           id: test/language/expressions/import.meta/distinct-for-each-module.js
-          sourceHash: fnv1a64:03ddb674f60b32fe
+          sourceHash: fnv1a64:3d8e81b9f3762797
         - dependencies: []
           id: test/language/expressions/import.meta/distinct-for-each-module_FIXTURE.js
           sourceHash: fnv1a64:62dd9645f273595e

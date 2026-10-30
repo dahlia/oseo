@@ -130,7 +130,7 @@ results:
         - dependencies:
             - test/language/module-code/namespace/internals/get-nested-namespace-props-nrml-1_FIXTURE.js
           id: test/language/module-code/namespace/internals/get-nested-namespace-props-nrml.js
-          sourceHash: fnv1a64:06c771d686b14fc4
+          sourceHash: fnv1a64:8a554d201d48bd9b
         - dependencies:
             - test/language/module-code/namespace/internals/get-nested-namespace-props-nrml-2_FIXTURE.js
           id: test/language/module-code/namespace/internals/get-nested-namespace-props-nrml-1_FIXTURE.js

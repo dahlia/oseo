@@ -1415,7 +1415,7 @@ results:
       - lexical-grammar
     observation:
       detail: "test/language/expressions/import.meta/syntax/escape-sequence-m\
-        eta.js:109:8: error[OSEO0001]: Source could not be parsed."
+        eta.js:34:8: error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
       passed: false

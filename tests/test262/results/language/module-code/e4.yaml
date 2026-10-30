@@ -98,7 +98,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/instn-local-bndng-gen.js
-          sourceHash: fnv1a64:2aa6b89de2afeab3
+          sourceHash: fnv1a64:a2c36f3e9d728230
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

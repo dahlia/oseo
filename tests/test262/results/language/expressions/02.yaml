@@ -1359,7 +1359,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/expressions/import.meta/same-object-returned.js
-          sourceHash: fnv1a64:17a3e942bac30931
+          sourceHash: fnv1a64:af7c51be8372827e
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

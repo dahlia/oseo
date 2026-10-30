@@ -845,7 +845,7 @@ results:
       - var-bindings
     observation:
       detail: "test/language/expressions/dynamic-import/namespace/promise-the\
-        n-ns-get-nested-namespace-dflt-indirect.js:199:1:
+        n-ns-get-nested-namespace-dflt-indirect.js:96:1:
         error[OSEO1001]: ImportExpression is outside the M1 profile."
       passed: false
       unsupportedCapability: profile-syntax

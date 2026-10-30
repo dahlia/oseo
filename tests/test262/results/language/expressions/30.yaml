@@ -1076,7 +1076,7 @@ results:
       - module-linking
     observation:
       detail: "test/language/expressions/import.meta/syntax/invalid-assignmen\
-        t-target-for-of-loop.js:105:6: error[OSEO0001]: Source could not
+        t-target-for-of-loop.js:30:6: error[OSEO0001]: Source could not
         be parsed."
       errorType: SyntaxError
       failedPhase: parse

@@ -29,7 +29,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/module-code/instn-local-bndng-export-gen.js
-          sourceHash: fnv1a64:d59968f7c5789d32
+          sourceHash: fnv1a64:00c7314882829f37
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

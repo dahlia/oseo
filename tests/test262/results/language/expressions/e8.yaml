@@ -1700,7 +1700,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/expressions/import.meta/import-meta-is-an-ordinary-object.js
-          sourceHash: fnv1a64:bd3429ef60a9cda5
+          sourceHash: fnv1a64:250a359303438bb8
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:

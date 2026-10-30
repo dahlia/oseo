@@ -25,7 +25,7 @@ results:
             - test/language/module-code/export-star-as-dflt_FIXTURE.js
             - test/language/module-code/export-star-as-dflt.js
           id: test/language/module-code/export-star-as-dflt.js
-          sourceHash: fnv1a64:fe7b11402e01f988
+          sourceHash: fnv1a64:bd07228480667ba1
         - dependencies: []
           id: test/language/module-code/export-star-as-dflt_FIXTURE.js
           sourceHash: fnv1a64:bf7a12809f78338c

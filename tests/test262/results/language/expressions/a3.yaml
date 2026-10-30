@@ -1647,7 +1647,7 @@ results:
       moduleGraph:
         - dependencies: []
           id: test/language/expressions/import.meta/syntax/goal-module.js
-          sourceHash: fnv1a64:e893ba1f9b8d3ab7
+          sourceHash: fnv1a64:a3438214a1dd1374
       scheduler: deterministic-logical-clock
       target: linux-x86_64-gnu
       variants:
