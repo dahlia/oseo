@@ -1,13 +1,18 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The current umbrella owns 1,001 paths: DS1 accounts for 218, DS-3 for 11,
-DS2 for 76, DS4 for 40 and DS-5 for 2 of the paths it has held; later
+The current umbrella owns 959 paths: DS1 accounts for 218, DS-3 for 11,
+DS2 for 76, DS4 for 40, DS-5 for 2 and DS-6 for 42 of the paths it has
+held; later
 observation trains added the rest, and five promoted to pass when direct
 eval stopped parsing absent or non-String arguments. DS-5's
 [*per-path assessment*](./dynamic-source-lexical-completion-assessment.yaml)
 closes two U+180E lexical probes through paired static passes and keeps
-71 in remediation. DS4's
+71 in remediation. DS-6's
+[*per-path assessment*](./dynamic-source-private-binding-assessment.yaml)
+closes 42 of its 66 private identity, binding, call-order and
+this-binding paths through 20 reviewed static replacement paths and keeps
+24 in remediation. DS4's
 [*per-path assessment*](./dynamic-source-callable-family-assessment.md)
 reviews all 86 reserved callable-family paths, closes 40 through existing
 passing static replacements under decision item 1, and keeps 46 in
@@ -46,7 +51,7 @@ from clean source `6aab0fc8`, tree
 every original path and exact diagnostic. No path was re-observed here.
 
 The table below preserves the original observation-train evidence. Later
-DS-1 through DS-5 audit assessments account for the paths described above; all
+DS-1 through DS-6 audit assessments account for the paths described above; all
 other paths remain active remediation. A dependency tag alone authorizes
 no exclusion. Every original subject and normative section is preserved.
 

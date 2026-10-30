@@ -881,6 +881,86 @@ assessments:
       accepted ADR 0016 amendment admitting eval, or changed
       original/replacement source or observations; ADR 0019 non-source reopening
       remains in force.
+  ds6-static-private-binding:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-private-binding-assessment.yaml:
+        "8f9675ea41b4a54f8eb02cd48daa18d7\
+        bb2d57f054d3e49329fd5d0b89df4461"
+      tests/test262/results/language/expressions/11.yaml:
+        "f6339dea2e410c9b1ccc72280d1473dc\
+        a7dfad36f0314ee54e77c00119c15ca1"
+      tests/test262/results/language/expressions/66.yaml:
+        "03c18f614ac7e6303c6b13ce46c4b5bd\
+        57b6c059fa7b91ae6a51d0d8c80537eb"
+      tests/test262/results/language/expressions/84.yaml:
+        "bc9838bb3b7cc7e0fa971818b4a2f764\
+        06bb2cdfed7c7225249a81a1c136b5d2"
+      tests/test262/results/language/expressions/26.yaml:
+        "0111f2de0f4d98d672e1e42968790ff1\
+        72978fab86fc9727fd8a965b7909cf80"
+      tests/test262/results/language/expressions/1d.yaml:
+        "d34ab11dcead983a3e753c85146d456b\
+        b637338e7e6cb5acc80c87736722d07e"
+      tests/test262/results/language/expressions/2c.yaml:
+        "58b93c3e6377e81f026350a9e65e733a\
+        e541aebaf30e454ae6243cdf45b08db1"
+      tests/test262/results/language/expressions/3a.yaml:
+        "73885edb2c48f2a280d0a1ecf778d82f\
+        6b84d1e3a68620ca4aeb7df5cc0426f5"
+      tests/test262/results/language/expressions/d4.yaml:
+        "890fd5381ec41c730d17a9dc250e8e55\
+        38728477a7d0d2eb6cebe6cb27a8633b"
+      tests/test262/results/language/expressions/4c.yaml:
+        "123def8f3c6ef6c07fe56ab78c2610ac\
+        85d04865cb312f11fef4494818252587"
+      tests/test262/results/language/expressions/08.yaml:
+        "3ed40ed274bca1ae97dc8fc0980a4542\
+        53a6995a6a06ceff6e6470e3d21f5d86"
+      tests/test262/results/language/expressions/49.yaml:
+        "ed5f2313b3f0892025a3c4cc7c13e46b\
+        760205b397655e8c6dd3f34040a2e2b6"
+      tests/test262/results/language/expressions/83.yaml:
+        "9be86c520998126ca682a75b191007b1\
+        26a04007b07e21a53dc37b647e69263b"
+      tests/test262/results/language/expressions/fb.yaml:
+        "43939432170cbb892ee7e9e642df8d15\
+        fbf6dcb2e6088db7c383dd935c6ca64a"
+      tests/test262/results/language/expressions/ba.yaml:
+        "b1e9a6150b0231146a839b78f1c09616\
+        0a3413c9d952265edc9346eea1e93b6b"
+      tests/test262/results/language/expressions/c8.yaml:
+        "9232c1d5e2cfd95fc215c0d9d0845fe6\
+        c652a338787252f43982f276ea23802c"
+      tests/test262/results/language/expressions/86.yaml:
+        "501e9943e7f056df1b92e048b99b99bd\
+        2da82b5fc1597f85028ae781fc8c2b7b"
+      tests/test262/results/language/function-code/58.yaml:
+        "01d9f92a14b036c802c86ca406b2f6f5\
+        d41178d42be7bd42ccf4c87261cc95de"
+      tests/test262/results/language/function-code/46.yaml:
+        "83c822137db169cc8095329426341cda\
+        bff64181ef7e635ad7fdfd0a261c55a6"
+      tests/test262/results/language/function-code/41.yaml:
+        "ab457852390a47d09607aed06b011443\
+        b15c8e47e20be2b52125a8f2431ba920"
+      tests/test262/results/language/function-code/81.yaml:
+        "ea654d7b203c1b269904341236bad2f1\
+        6967182ac8261496218559e04aa4e492"
+    reason: "Maintainer decision 2026-10-28 item 1 applies to the 42 separately
+      assessed paths in dynamic-source-private-binding-assessment.yaml: 21
+      private identity paths, eight named self bindings, one
+      argument-before-callability path and 12 caller/callee this paths. Each
+      table row names its reviewed passing static replacement, exact assertions,
+      pinned source digest, native target and strictness/specialization
+      variants. These observations cover every non-source subject; only eval or
+      Function source evaluation remains. The other 24 selected originals retain
+      remediation. Preserve every original path, assertion and unsupported
+      observation; no pass is counted. Reopen on changed source, observation or
+      replacement evidence, or an accepted ADR 0016 amendment admitting these
+      dynamic source forms; ADR 0019 non-source normative-dependence reopening
+      remains in force."
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -9665,7 +9745,7 @@ paths:
     subject: "Reassignment of function name is silently ignored
       in non-strict mode code. (async function named
       expression in non-strict mode code)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/async-function/named-stric\
       t-error-reassign-fn-name-in-body-in-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9679,7 +9759,7 @@ paths:
     subject: "Reassignment of function name is silently ignored
       in non-strict mode code. (async function named
       expression in strict mode code)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/async-function/nameless-ev\
       al-var-scope-syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9745,7 +9825,7 @@ paths:
     subject: "Reassignment of function name is silently ignored
       in non-strict mode code. (async generator named
       function expression in non-strict mode code)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/async-generator/named-stri\
       ct-error-reassign-fn-name-in-body-in-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9759,7 +9839,7 @@ paths:
     subject: "Reassignment of function name is silently ignored
       in non-strict mode code. (async generator named
       function expression in strict mode code)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/bitwise-and/S11.10.1_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -9816,7 +9896,7 @@ paths:
     subject: "Call arguments are evaluated before the check is
       made to see if the object is actually callable
       (eval'ed)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/call/S11.2.3_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -11152,7 +11232,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private getter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-getter-brand\
       -check-multiple-evaluations-of-class-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11165,7 +11245,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private getter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-getter-brand\
       -check-multiple-evaluations-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11178,7 +11258,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private getter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-getter-brand-che\
       ck-multiple-evaluations-of-class-realm-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11217,7 +11297,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private method)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-method-brand\
       -check-multiple-evaluations-of-class-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11230,7 +11310,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private method)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-method-brand\
       -check-multiple-evaluations-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11243,7 +11323,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private method)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-method-brand-che\
       ck-multiple-evaluations-of-class-realm-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11282,7 +11362,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private setter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-setter-brand\
       -check-multiple-evaluations-of-class-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11295,7 +11375,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private setter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-setter-brand\
       -check-multiple-evaluations-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11308,7 +11388,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private setter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-setter-brand-che\
       ck-multiple-evaluations-of-class-realm-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11347,7 +11427,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static field)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-field\
       -multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11360,7 +11440,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static field)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-field\
       -multiple-evaluations-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11373,7 +11453,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static field)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-field-mul\
       tiple-evaluations-of-class-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11399,7 +11479,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static getter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-gette\
       r-multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11412,7 +11492,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static getter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-gette\
       r-multiple-evaluations-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11425,7 +11505,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static getter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-getter-mu\
       ltiple-evaluations-of-class-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11452,7 +11532,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private static methods)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-metho\
       d-brand-check-multiple-evaluations-of-class-eval-indi\
       rect.js"
@@ -11466,7 +11546,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private static methods)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-metho\
       d-brand-check-multiple-evaluations-of-class-function-\
       ctor.js"
@@ -11480,7 +11560,7 @@ paths:
     section: "sec-privatefieldget"
     subject: "Every new evaluation of a class creates a
       different brand (private static methods)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-method-br\
       and-check-multiple-evaluations-of-class-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11506,7 +11586,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static setter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-sette\
       r-multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11519,7 +11599,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static setter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-sette\
       r-multiple-evaluations-of-class-function-ctor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11532,7 +11612,7 @@ paths:
     section: "sec-runtime-semantics-evaluate-name"
     subject: "Every new evaluation of a class creates a
       different Private Name (private static setter)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/class/private-static-setter-mu\
       ltiple-evaluations-of-class-realm.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18208,7 +18288,7 @@ paths:
     section: "sec-function-definitions-runtime-semantics-evaluation"
     subject: "Reassignment of the function name binding from
       eval code in the body (non-strict mode)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/function/named-strict-erro\
       r-reassign-fn-name-in-body-in-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18221,7 +18301,7 @@ paths:
     section: "sec-function-definitions-runtime-semantics-evaluation"
     subject: "Reassignment of the function name binding from
       eval code in the body (strict mode)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/function/param-eval-strict\
       eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18344,7 +18424,7 @@ paths:
       ics-evaluation"
     subject: "Reassignment of the generator function name
       binding from eval code in the body (non-strict mode)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/generators/named-strict-er\
       ror-reassign-fn-name-in-body-in-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18358,7 +18438,7 @@ paths:
       ics-evaluation"
     subject: "Reassignment of the generator function name
       binding from eval code in the body (strict mode)"
-    assessment: "fixture-construction"
+    assessment: ds6-static-private-binding
   - path: "test/language/expressions/generators/scope-body-lex-\
       distinct.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19851,7 +19931,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-63gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19865,7 +19945,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-64-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19879,7 +19959,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-64gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19893,7 +19973,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-65-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19907,7 +19987,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-65gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19921,7 +20001,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-82-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19935,7 +20015,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-82gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19949,7 +20029,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-83-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19963,7 +20043,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-83gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19977,7 +20057,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-84-s.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19991,7 +20071,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: test/language/function-code/10.4.3-1-84gs.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -20005,7 +20085,7 @@ paths:
       its own strict/non-strict this contract, but is
       invoked only from rejected eval or Function-produced
       caller code.
-    assessment: static-this-and-call-context
+    assessment: ds6-static-private-binding
   - path: "test/language/function-code/eval-param-env-with-comp\
       uted-key.js"
     proposedOwner: adr:0016-dynamic-source-boundary

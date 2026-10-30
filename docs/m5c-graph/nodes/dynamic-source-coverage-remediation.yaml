@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 1001 reviewed unsupported paths assigned to
+delivers: "Resolves the 959 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -129,6 +129,12 @@ delivers: "Resolves the 1001 reviewed unsupported paths assigned to
   rejection leaves the non-source realm/constructor contract as active
   coverage debt; no exclusion or replacement evidence is claimed.
   ADR 0016 and ADR 0019 remain unchanged.
+  DS-6 accounts for 42 of its 66 private identity, binding, call-order and
+  this-binding paths under maintainer decision 2026-10-28 item 1, using
+  the reviewed static replacements in
+  dynamic-source-private-binding-assessment.yaml.
+  Its other 24 paths stay here; no new tests or UPDATE are needed. The current
+  total is 1004, down from 1046, including later observation additions.
   B19/B20/B30 add exactly 459 paths: 66 observed OSEO1001 Unknown binding
   eval rejections and 393 observed OSEO1001 ImportExpression outside M1
   rejections. Preserve the existing 306 paths and dependencies; the combined
@@ -183,7 +189,9 @@ delivers: "Resolves the 1001 reviewed unsupported paths assigned to
   UPDATE. DS4 then moves 40 of its 86 callable-family paths to ADR 0016
   through existing passing static replacements, and DS-5 moves two
   U+180E lexical probes through paired reviewed static passes, leaving
-  71 of its 73 selected paths here. The current scope is 1001; no native
+  71 of its 73 selected paths here. DS-6 moves 42 of its 66 private
+  identity, binding, call-order and this-binding paths through reviewed
+  static replacements and keeps 24. The current scope is 959; no native
   or fixture evidence was added, and all original unsupported results
   remain unchanged."
 dependencies:
