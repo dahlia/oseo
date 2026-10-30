@@ -40,6 +40,10 @@ scope:
     Module frontend accepts valid top-level forms and rejects nested ones.
     Type-only forms, including star exports, and unsupported TypeScript
     namespaces and ambient modules retain OSEO1001; no erasure is added."
+  - "Top-level binding and assignment patterns admit await in defaults,
+    computed keys and member targets through the module's traced async
+    frame, including catch and loop heads. Module scheduling detects await
+    in classic for declaration patterns as well as standalone patterns."
 owners:
   - PLAN-M5C.md
   - docs/adr/0009-module-identity-and-linking.md
@@ -47,12 +51,14 @@ evidence:
   differential:
     status: covered
     references:
+      - tests/module-pattern-await-native.test.ts
       - tests/native/scenarios/shard-2.ts
       - tests/fixtures/module-export-forms/entry.mjs
       - tests/fixtures/module-namespace-uninitialized/entry.mjs
   fixed:
     status: covered
     references:
+      - tests/module-pattern-await-native.test.ts
       - tests/fixtures/module-export-forms/entry.mjs
       - tests/fixtures/module-export-forms/cycle-a.mjs
       - tests/fixtures/module-export-forms/cycle-b.mjs
@@ -67,10 +73,12 @@ evidence:
   forced-collection:
     status: covered
     references:
+      - tests/module-pattern-await-native.test.ts
       - tests/native/scenarios/shard-2.ts
   generated:
     status: covered
     references:
+      - tests/property/m5-module-continuation.property.test.ts
       - tests/property-seeds.yaml
       - packages/testkit/tests/module-graph.property.test.ts
       - tests/property/m5-script-module-declarations.property.test.ts
@@ -85,6 +93,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/module-pattern-await-native.test.ts
       - tests/native/scenarios/shard-2.ts
   standards:
     status: covered

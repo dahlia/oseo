@@ -1556,8 +1556,7 @@ function-name inference, and immutable failure. Forty-two reviewed test262
 `for-of` binding cases now pass because their `+=` loop bodies use the same
 lowering. An ordinary asynchronous function now retains the reference and
 already-read target value across suspension. Module top level uses its private
-traced frame for the same position; only the pattern-position module await gap
-recorded below remains.
+traced frame for the same position, including the later M5c pattern admission.
 
 Prefix and postfix update expressions now accept `++` and `--` on existing
 identifier and static or computed member targets. Each form reads the target
@@ -1937,13 +1936,10 @@ the `await` position, an unfinished array-pattern iterator closes exactly once
 before that completion leaves the pattern, and a done iterator is not closed
 again.
 
-Module top level keeps a source-located rejection for the same positions. Its
-private traced frame can suspend an ordinary expression or control-flow
-position, but module graph compilation rejects these pattern positions before
-constructing that frame. That residue stays with the modules and asynchronous
-execution stream. The module-owned follow-up must also replace the adjacent
-stale compiler comment, which attributes this rejection to the continuation
-transform, with this traced-frame rationale.
+At this unit's original checkpoint, module top level kept a source-located
+rejection for these positions before constructing its private traced frame.
+M5c's module-top-level-await-patterns follow-up removes that guard and admits
+the patterns through the existing frame, as its work note records.
 
 The generated property suite uses seed `0x60002800` across four pattern
 positions, three body forms, supplied and missing selections, fulfilled and
@@ -3310,8 +3306,8 @@ exactly as a direct head target does, and a strict fallback write keeps
 the M5a Unit 8.5i rejection while a non-strict one records its name so
 that unit's `typeof` fold stays rejected for it. A pattern subexpression
 may `await` wherever the M5a Unit 8.3 positions may, which is a body that
-owns a traced suspension frame; a module top level keeps that unit's
-rejection, now located at the for-in statement that carries the head.
+owns a traced suspension frame. M5c later admits module top level through
+its existing private frame, as the module pattern-await work note records.
 
 Because ToObject of the key is modeled rather than materialized, the
 values a head pattern can read are exactly a String exotic object's: one
@@ -3371,8 +3367,8 @@ reserved-word binding name in the head reports its early error first.
 Compiler-core tests build a nested array pattern head directly in owned
 syntax, bypassing the frontend, and pin the HIR rejection for the
 lexical, `var`, and assignment forms. A module
-test pins that an `await` inside the head pattern keeps the M5a Unit 8.3
-module top-level rejection at the statement that carries it. A fixed
+test originally pinned the module top-level pattern-await rejection; M5c
+replaces it with admission through the private traced evaluator frame. A fixed
 *for-in-object-patterns* native differential fixture covers the four head
 forms, computed names and their evaluation order, defaults applied only
 to `undefined`, a rest property and the keys it excludes, a nested object
@@ -3446,8 +3442,9 @@ execution stream. M5c later admits the first three: node `import-meta` admits
 `import.meta` in Module code, and node `module-export-forms` admits
 `export var` and `export * as` namespace re-exports, as the import.meta
 section below and the Module export forms section of
-[*PLAN-M5C.md*](./PLAN-M5C.md) record. Pattern-position `await` is still
-rejected and is owned by node `module-top-level-await-patterns`.
+[*PLAN-M5C.md*](./PLAN-M5C.md) record.
+Node `module-top-level-await-patterns` later admits pattern-position
+`await` through the existing module frame; its work note records the evidence.
 TypeScript-only syntax is outside the ECMA-262 claim, and dynamic source
 remains owned by ADR 0016.
 
@@ -9690,3 +9687,15 @@ debt under `dynamic-source-coverage-remediation`. Earlier focused and
 source-qualified observations remain historical. The
 [IH-A work note](./docs/m5c-graph/iterator-helpers-tag-activation.md)
 binds the raw Full packet; candidate/Main gates and landing remain pending.
+
+
+Module pattern-await follow-up
+------------------------------
+
+M5c removes the pre-frame pattern-await rejection and detects await inside a
+classic for declaration pattern when choosing the module evaluator's async
+frame. The existing pattern lowering retains evaluation order, roots, abrupt
+completion and cleanup. The
+[work note](./docs/m5c-graph/module-top-level-await-patterns.md) names the
+thirteen owned paths and the fixed and generated evidence. Prior manifest
+observations remain unchanged pending Root's full UPDATE.

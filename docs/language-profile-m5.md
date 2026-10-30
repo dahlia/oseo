@@ -538,8 +538,8 @@ current evidence assessment. Those live only in the indexed records above.
     the strict and non-strict fallback-write boundaries behave exactly as
     they do for a direct head target, and a pattern subexpression may
     `await` wherever the M5a Unit 8.3 pattern positions may, which is a
-    body that owns a traced suspension frame; a module top level keeps
-    that unit's rejection for the same position. Deliberate boundary,
+    body that owns a traced suspension frame, including module top level
+    under M5c's module pattern-await admission. Deliberate boundary,
     rejected with
     a source-located diagnostic: every array pattern position, both the
     head's own form and one nested below an admitted object head. The key
@@ -645,8 +645,8 @@ current evidence assessment. Those live only in the indexed records above.
     centralized promise reaction construction and dispatch paths required by
     [ADR 0022](./adr/0022-async-context-boundary.md). M5a Unit 8.3 admits the
     binding-pattern subexpressions recorded below. Top-level module await uses
-    its own private traced frame, with the pattern-position boundary recorded
-    below. Fixed native evidence
+    its own private traced frame, including the pattern positions admitted by
+    M5c. Fixed native evidence
     covers evaluation order, nested and loop positions, abrupt completion,
     awaited cleanup, heap locals across suspension, both specialization
     policies, false hints, a deliberate guard miss, and forced collection. A
@@ -902,8 +902,7 @@ current evidence assessment. Those live only in the indexed records above.
     `0x60000c03` cover member reference order. An ordinary
     asynchronous function retains the reference and current value in its traced
     frame when the right operand awaits. Module top level uses its private
-    traced frame for the same position; only the pattern-position module await
-    gap recorded below remains.
+    traced frame for the same position, including pattern subexpressions.
  -  Prefix and postfix `++` and `--` for identifiers and static or computed
     member references. Each form reads once, coerces through the admitted
     Number path, adds or subtracts one, and performs a checked write. Prefix
@@ -8686,19 +8685,6 @@ complete. The remaining gaps retain their existing owners.
     capability, as the `globalthis-binding` section records. Owner: the
     intrinsics and built-in objects stream and the dynamic-source boundary;
     the surface audit in [*PLAN-M6.md*](../PLAN-M6.md) depends on this unit.
- -  Await inside a computed member of an assignment target, a computed binding
-    property name, or an array or object binding default is admitted by M5a
-    Unit 8.3 in ordinary asynchronous and asynchronous generator bodies, as
-    recorded above. The same positions stay rejected with a source-located
-    diagnostic at module top level. Its private traced frame can suspend an
-    ordinary expression, but module construction still rejects a pattern that
-    contains `await` before that frame is built. The reviewed test262 case
-    *top-level-await/syntax/catch-parameter.js* reaches this diagnostic and
-    records `unsupported-profile-feature` with `profile-syntax`, rather than
-    a frontmatter feature rejection. Package tests in
-    *packages/parser-babel/tests/bindings.test.ts* and
-    *packages/compiler/tests/modules.test.ts* also prove the diagnostic and
-    its location. Owner: `module-top-level-await-patterns`.
  -  `%AsyncFromSyncIteratorPrototype%` is not materialized. ECMA-262 never
     exposes an AsyncFromSyncIterator object to a program, so no
     `Object.getPrototypeOf` route reaches it and the unreachable internal
@@ -10013,3 +9999,23 @@ reference order with mutations. Seeds `0x60009200` and `0x60009201` use
 8 ordinary cases each, both specialization policies and forced collection.
 These sources add no test262 path or classification. D3, full observation,
 review and publication remain separate gates owned by Root.
+
+
+Module top-level await patterns
+-------------------------------
+
+Module binding and assignment patterns admit await in computed keys, defaults,
+and member targets. Catch parameters, classic for initializers, and for-of
+and object-pattern for-in heads use the same traced evaluator frame. Defaults
+run only for undefined; rejection resumes the pending throw at the await,
+retaining iterator cleanup, finally precedence and live binding cells. The
+module scheduler recognizes a pattern await even when it occurs only in a
+classic for declaration. No new runtime operation or ABI is introduced.
+
+The fixed module fixture and the generated pattern domain with seed
+`0x60001f01` cover both specialization policies and forced collection, with
+Node.js, Deno and independent expected output. Parameter
+early errors and the ADR 0016 boundary remain.
+The thirteen owned test262 records retain their prior unsupported results
+until Root's actual full UPDATE; compilation alone supplies no promotion.
+See [the work note](./m5c-graph/module-top-level-await-patterns.md).
