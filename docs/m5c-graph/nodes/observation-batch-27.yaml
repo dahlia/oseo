@@ -1,11 +1,15 @@
 version: 1
 id: observation-batch-27
 title: Observe language/statements/if/ and 8 more
-delivers: "Observes the 640 unreviewed paths that
-  docs/m5c-closure/observation-batches.yaml selects for observation-batch-27
-  (464 review units): admits them to the reviewed subset with dependency tags,
-  regenerates the manifest and the ledger, and assigns every unsupported
-  result an owner."
+delivers: "Prepares all 640 original observation-batch-27 paths with
+  actual source-bound focused observations: 373 pass, 192 expected-negative
+  and 75 unsupported-profile-feature. No original is held or removed.
+  Unsupported paths retain active dynamic-source-coverage-remediation
+  ownership and source-bound exclusion-audit assessments, without a
+  whole-path exclusion or change to ADR 0013, ADR 0016 or ADR 0019.
+  Exact selectors, self-audit and evidence are in
+  docs/m5c-graph/observation-batch-27.md. Root retains UPDATE,
+  integration, landing, publication and the outer gate."
 dependencies:
   - observation-batch-plan
 landed: false

@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 881 reviewed unsupported paths assigned to
+delivers: "Resolves the 1024 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -168,7 +168,16 @@ delivers: "Resolves the 881 reviewed unsupported paths assigned to
   docs/m5c-graph/observation-batch-06.md,
   docs/m5c-graph/observation-batch-08.md and
   docs/m5c-graph/observation-batch-14.md; ADR 0016 and ADR 0019 remain
-  unchanged."
+  unchanged. B26a/B26b/B27 preparation adds exactly 143 original
+  source-rejection paths, distributed 9,
+  59 and 75 by batch. The original statement, function,
+  binding, completion and source-evaluation subjects remain active
+  coverage remediation. Preserve the preceding 881 owners and all their
+  contracts. Exact selectors and source-bound observations are linked
+  from docs/m5c-graph/observation-batch-26a.md,
+  docs/m5c-graph/observation-batch-26b.md and
+  docs/m5c-graph/observation-batch-27.md. No equivalent replacement,
+  whole-path exclusion or change to ADR 0016 or ADR 0019 is claimed."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family
