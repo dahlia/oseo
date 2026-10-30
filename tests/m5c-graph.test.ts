@@ -548,11 +548,11 @@ test("the checked-in M5c work graph is valid", () => {
   );
   assert.equal(summary.ready + summary.blocked + summary.parked, summary.nodes);
   // Landing marks change this count without changing the graph's shape.
-  assert.ok(summary.landed >= 75);
+  assert.ok(summary.landed >= 81);
   assert.equal(summary.parked, 0);
   assert.equal(summary.nodes, 118);
-  assert.equal(summary.ready, 114);
-  assert.equal(summary.blocked, 4);
+  assert.equal(summary.ready, 115);
+  assert.equal(summary.blocked, 3);
   const array = readImportAttributesNode(
     "ordinary-array-indexed-lookup-performance",
   );
@@ -828,12 +828,14 @@ test("computed member key order owns its Reference contract", () => {
 
 test("observation train retains bounded remediation dependencies", () => {
   validateCurrentM5cWorkGraph();
-  // Landed by the 2026-10-29 remediation publication; their batches are
-  // now ready for the admission of the paths these nodes owned.
+  // The first three landed in the 2026-10-29 remediation publication, so
+  // their batches could admit the paths these nodes owned;
+  // with-var-loop-head-resolution landed in the 2026-10-30 bundle.
   const landedRemediations = new Set([
     "dynamic-import-early-error-precedence",
     "module-namespace-uninitialized-bindings",
     "test262-module-harness-globals",
+    "with-var-loop-head-resolution",
   ]);
   const exit = readImportAttributesNode("m5-exit-audit");
   for (const id of [
@@ -883,6 +885,6 @@ test("dynamic-source selection waits for its observation batches", () => {
       batches.map((batch) => `observation-batch-${batch}`),
     );
     assert.equal(node.status, "ready");
-    assert.equal(node.landed, id === "dynamic-source-unknown-eval");
+    assert.equal(node.landed, true);
   }
 });

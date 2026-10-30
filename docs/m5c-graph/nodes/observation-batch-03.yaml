@@ -10,5 +10,5 @@ dependencies:
   - annexb-proto-dependency-classification
   - observation-batch-plan
   - typed-array-construction-order
-landed: false
+landed: true
 status: ready
