@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 536 reviewed unsupported paths assigned to
+delivers: "Resolves the 460 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -142,7 +142,16 @@ delivers: "Resolves the 536 reviewed unsupported paths assigned to
   for 11 unknown-eval paths
   under item 1 using existing reviewed static replacements, leaving 536.
   Its 55 other paths retain remediation ownership; see
-  docs/m5c-graph/dynamic-source-unknown-eval-assessment.md."
+  docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. DS2 then
+  reviews 108 module subjects among 175 candidates: 76 paths move to
+  ADR 0016 under item 1 after static-import observations replace
+  every non-source subject; 32 selected subjects and 67 candidates outside DS2
+  stay. The per-path table in
+  docs/m5c-graph/dynamic-source-module-semantics-assessment.yaml records
+  the evidence and remaining gaps. One native integration test and two
+  fixture modules add exact static namespace-default update evidence;
+  original test262 observations stay unchanged. The umbrella now owns
+  460 paths."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family

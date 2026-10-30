@@ -506,7 +506,8 @@ assessments:
       subjects that dynamic-source-importcall-accounting reassessed under the
       import-call-syntax, import-call-specifier, and import-call-promise
       assessments; DS-3 separately assesses its 66 unknown-eval paths,
-      closing 11 under item 1 and retaining 55; 175 remain under this
+      closing 11 under item 1 and retaining 55; DS2 additionally accounts
+      for 76 paths under ds2-static-module-semantics; 99 remain under this
       shared assessment. Original source, subjects and
       assertions remain visible; the observation does not establish equivalent
       replacement evidence or authorize a whole-path exclusion. ADR 0016 and
@@ -615,6 +616,142 @@ assessments:
       replacement covers every non-source assertion. Static import alone
       cannot prove the ImportCall promise contract; retain the original as
       unsupported remediation.
+  ds2-static-module-semantics:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-module-semantics-assessment.yaml:
+        "f54655780498f6edb3a058753c0f4d2d\
+        b8bb20fb513a41a28f2495cf5871ffe7"
+      tests/fixtures/module-default-namespace-update/entry.mjs:
+        "edaea4f950fa73e0da9327bb6dfb184d\
+        8430c36e397160fb7cda63acd064b06d"
+      tests/fixtures/module-default-namespace-update/value.mjs:
+        "e7af490b37682b37fdd279708d245985\
+        1fb5de3ea45c5a0b2f906c8c118837c3"
+      tests/module-default-namespace-update-native.test.ts:
+        "2c2a90017527471bc6873fbf5ed9c40a\
+        a7f0518fc845b424f84eb8673c858de7"
+      tests/test262/results/language/module-code/05.yaml:
+        "99850c52c07ec322d0694c4e6761ec40\
+        336920731b31d59f1728124e40728004"
+      tests/test262/results/language/module-code/11.yaml:
+        "baa4bdd4f4936e74ec6ed618df88b8bf\
+        f9530bbdae95dc368dd11b80fd125990"
+      tests/test262/results/language/module-code/16.yaml:
+        "6b49ffb07dc3969b7e66016cfd97fc00\
+        a94f3e60208c1bb1c2a4105c2dbbdd32"
+      tests/test262/results/language/module-code/19.yaml:
+        "e1612de6013162d24372a91e1ad1410e\
+        34d996f6945d67ca1f6794b3d0044cdc"
+      tests/test262/results/language/module-code/24.yaml:
+        "977d455b32ce0ce11cf00af713d072d0\
+        8557db6bcd5d846f6650700724cfe7df"
+      tests/test262/results/language/module-code/29.yaml:
+        "0e97c744cac68bba81e49827805f8535\
+        16fecd18107e5dd147d81dfc595a8bdf"
+      tests/test262/results/language/module-code/2c.yaml:
+        "f01a63800794ef44d58e55d1afe217fb\
+        0ee8b9954601830dec3f470a3a7dd823"
+      tests/test262/results/language/module-code/6d.yaml:
+        "4a61dee85c78b5ebb33dbb04c8a1620b\
+        e332e4f3d74f5ca8ab5492f73ea79352"
+      tests/test262/results/language/module-code/6f.yaml:
+        "44663d148d890a107c2fb2d0d27d0ffc\
+        665933622bba89070440d34820f18083"
+      tests/test262/results/language/module-code/78.yaml:
+        "7a706e7d577efef4eeed78ef9ab8d019\
+        f9b1a30b2b24631c58f1492c334272f9"
+      tests/test262/results/language/module-code/7a.yaml:
+        "e19d64bb5dee031d12e5ed1edf6fd836\
+        fa4bca515adc22ed098f0a313f6d8c4a"
+      tests/test262/results/language/module-code/7f.yaml:
+        "1e46c861e6010ce1477636195e6300e0\
+        fd301bdd0bd2299d4531c9e9d4ec7dce"
+      tests/test262/results/language/module-code/83.yaml:
+        "d7d08ee2c41899cd90902a3d90c07d31\
+        3dc2756d6afd5a4af1d71e7008823ef2"
+      tests/test262/results/language/module-code/89.yaml:
+        "8c40411a28739ccd459d4907aa2f3c17\
+        ee82ede7e46e5fb502f2c8db8098005f"
+      tests/test262/results/language/module-code/90.yaml:
+        "154274049c6b2019711ce1f05bb953a5\
+        074c2f1134c26ecf5fe79437740ce512"
+      tests/test262/results/language/module-code/92.yaml:
+        "edb6bec92aef96bafe094a97d66656fb\
+        6cfdd0214380793c636257ed4a832ac4"
+      tests/test262/results/language/module-code/9e.yaml:
+        "09526f7e3296f20c9b45f732866e3971\
+        e17ae4c0d07a37dd313408f4dca4edaa"
+      tests/test262/results/language/module-code/a6.yaml:
+        "bf22e192ad06db73ca7d428e12abd7ac\
+        ebde1a73d50645f5b51c4a5ea616a43e"
+      tests/test262/results/language/module-code/b5.yaml:
+        "9594ccdf4c00d0512314e9479ce45051\
+        aa71990ac37ae4ba71a11b16362d1506"
+      tests/test262/results/language/module-code/c2.yaml:
+        "61e4d0a4f2ff751d90b86153efec379c\
+        bf0740cfb9926709f763958e0fe252a1"
+      tests/test262/results/language/module-code/c3.yaml:
+        "968f6af8fe03687a3cc5b12c417ae97e\
+        ca771deb6d8c23813ed9304966732c45"
+      tests/test262/results/language/module-code/dd.yaml:
+        "f4715ebac568b13480f9b9ab0c4bd192\
+        0590d6abc5f8223e3949f929972a7df5"
+      tests/test262/results/language/module-code/e2.yaml:
+        "853d79cab977fc7ceb303824ec51ebe0\
+        4b76ee6e99b45be039a0ae6ff1416006"
+      tests/test262/results/language/module-code/e8.yaml:
+        "c20ccdb630b3d9e97f6b84ddb4800bf7\
+        e93f91e33acb71ee9b59a45cf1d8e268"
+      tests/test262/results/language/module-code/ed.yaml:
+        "68937ef4685526ed2467cb623dedcc4a\
+        3b4bc122ee6da25ed094f4550d412e1b"
+      tests/test262/results/language/module-code/f1.yaml:
+        "a44ec8466c4e8c00ce6a942e0c687842\
+        2060db3b7dea7400c9d0c75f1f3b3780"
+      tests/test262/results/language/module-code/f8.yaml:
+        "8dee209221688f2d5ec1e35c54f24eeb\
+        5691ba64e614fadad58702e948703372"
+      tests/test262/results/language/module-code/f9.yaml:
+        "2b0fe566bd78f1dc71d00a54c3bf7f99\
+        027e0f5116bb344d467e8923d4a901c8"
+      tests/test262/results/language/module-code/fe.yaml:
+        "19f450e3f04f0eca3b337abf5a29d767\
+        54c833bb63e2295178490eee99d5e2fd"
+      tests/test262/results/language/module-code/ff.yaml:
+        "5213678b9be7a75cc5fd5d5da721b9e6\
+        ffa058daa59c0f4dce7f5827d4df7e33"
+    reason: "The maintainer decision of 2026-10-28, item 1, authorizes
+      accounting only after replacement observations cover every
+      non-source subject. The per-path table in
+      docs/m5c-graph/dynamic-source-module-semantics-assessment.yaml names
+      the reviewed passing static-import test262 counterpart and its
+      checked-in observation for each of these 76 paths: 47
+      namespace-object cases, 11 default-export initialization cases, and
+      18 live-default-binding cases. The table binds the pinned
+      replacement sources, including their static fixture graph; the
+      result partitions bound here retain their pass observations. The
+      namespace counterparts preserve the asserted exotic-object
+      operations and export categories; differing literal sentinel values
+      do not change that contract. Default-export counterparts preserve
+      initialization, name inference and name methods; the named generator
+      uses a different return-value sentinel for the same binding
+      observation. The live-default static test observes a direct default
+      binding returning 1 then becoming 2. The additional bound
+      module-default-namespace-update fixture imports a namespace
+      statically and observes namespace.default() returning 1 followed by
+      namespace.default yielding 2. Its bound native integration test
+      passed with stdout 1 and 2 on separate lines under Node.js, Deno and
+      both native specialization modes on Linux AMD64, as the table
+      records. This replaces the namespace live-value assertion separately
+      from direct binding reads. Await/then only acquires the tested
+      namespace, so only its dynamic import() source-evaluation site
+      remains. No remaining non-source assertion is excluded. Every
+      original path, assertion and unsupported-profile-feature observation
+      remains; none counts as a pass. An accepted ADR 0016 amendment
+      admitting any form of dynamic import reopens every selected path for
+      reassessment."
 paths:
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -7732,7 +7869,7 @@ paths:
     section: "sec-moduleevaluation"
     subject: 'Default "anonymous" class declaration is correctly initialized
       upon evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-cls-name-m\
       eth.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7745,7 +7882,7 @@ paths:
     section: "sec-moduleevaluation"
     subject: 'Default "anonymous" class declaration containing a static `name`
       method is correctly initialized upon evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-c\
       ls-named.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7758,7 +7895,7 @@ paths:
     section: "sec-moduleevaluation"
     subject: 'Default "named" class declaration is correctly initialized upon
       evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-cls-a\
       non.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7772,7 +7909,7 @@ paths:
     subject: 'Default AssignmentExpression (which can be recognized as an
       "anonymous" class declaration) is correctly initialized upon
       evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-cls-n\
       ame-meth.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7786,7 +7923,7 @@ paths:
     subject: 'Default AssignmentExpression (which can be recognized as an
       "anonymous" class declaration with a static `name` method) is
       correctly initialized upon evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-cls-n\
       amed.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7799,7 +7936,7 @@ paths:
     section: "sec-moduleevaluation"
     subject: 'Default AssignmentExpression (which can be recognized as a
       "named" class declaration) is correctly initialized upon evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-fn-an\
       on.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7813,7 +7950,7 @@ paths:
     subject: 'Default AssignmentExpression (which can be recognized as an
       "anonymous" function declaration) is correctly initialized upon
       evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-fn-na\
       med.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7827,7 +7964,7 @@ paths:
     subject: 'Default AssignmentExpression (which can be recognized as a
       "named" function declaration) is correctly initialized upon
       evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-gen-a\
       non.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7841,7 +7978,7 @@ paths:
     subject: 'Default AssignmentExpression (which can be recognized as an
       "anonymous" generator function declaration) is correctly initialized
       upon evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-gen-n\
       amed.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7855,7 +7992,7 @@ paths:
     subject: 'Default AssignmentExpression (which can be recognized as a
       "named" generator function declaration) is correctly initialized upon
       evaluation'
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-in.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -7867,7 +8004,7 @@ paths:
     section: "sec-moduleevaluation"
     subject: "The `in` operator may occur within an exported Assignmen\
       tExpression"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/for-await-resolution-and-er\
       ror-agen-yield.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8238,7 +8375,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace objects have a Symbol.toStringTag (value from
       await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-define-o\
       wn-property.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8252,7 +8389,7 @@ paths:
     subject: "The [[DefineOwnProperty]] internal method returns `true` if no
       change is requested, and `false` otherwise. (value from await
       resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-delete-e\
       xported-init-no-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8304,7 +8441,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that does not describe an
       exported binding (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-extensib\
       le.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8317,7 +8454,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace objects are not extensible. (value from await
       resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-own-\
       property-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8330,7 +8467,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[GetOwnProperty]] internal method with a string
       argument describing an initialized binding (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-own-\
       property-str-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8344,7 +8481,7 @@ paths:
     subject: "Behavior of the [[GetOwnProperty]] internal method with a string
       argument describing a binding that cannot be found (value from await
       resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-own-\
       property-sym.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8357,7 +8494,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[GetOwnProperty]] internal method with a Symbol
       argument (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-str-\
       found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8370,7 +8507,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a string argument for
       exported initialized bindings. (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-str-\
       not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8383,7 +8520,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a string argument for
       non-exported bindings (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-sym-\
       found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8396,7 +8533,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a symbol argument
       that can be found (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-sym-\
       not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8409,7 +8546,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a symbol argument
       that cannot be found (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-prop\
       erty-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8423,7 +8560,7 @@ paths:
     subject: "Behavior of the [[HasProperty]] internal method with a string
       argument for exported initialized bindings. (value from await
       resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-prop\
       erty-str-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8436,7 +8573,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[HasProperty]] internal method with a string
       argument for non-exported bindings (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-prop\
       erty-sym-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8449,7 +8586,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[HasProperty]] internal method with a symbol
       argument that can be found (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-prop\
       erty-sym-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8462,7 +8599,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[HasProperty]] internal method with a symbol
       argument that cannot be found (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-no-itera\
       tor.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8475,7 +8612,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace objects lack a Symbol.iterator property (value
       from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-own-prop\
       erty-keys-sort.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8488,7 +8625,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[OwnPropertyKeys]] internal method reflects the sorted order
       (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-prevent-\
       extensions-object.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8501,7 +8638,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[PreventExtensions]] internal method returns `true` (value
       from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-prevent-\
       extensions-reflect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8514,7 +8651,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[PreventExtensions]] internal method returns `true` (value
       from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-prop-des\
       cs.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8527,7 +8664,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "imported object properties descriptors (value from awai\
       t resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-prototyp\
       e.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8540,7 +8677,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace object prototype is null (value from aw\
       ait resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-no-s\
       trict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8566,7 +8703,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[SetPrototypeOf]] internal method returns `true` if passed
       `null` (value from await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-prot\
       otype-of.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8579,7 +8716,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[SetPrototypeOf]] internal method returns `false` (value from
       await resolving)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-same\
       -values-no-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8631,7 +8768,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The default property is not set the if the module doesn't export
       any default"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-S\
       ymbol-toStringTag.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8644,7 +8781,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace objects have a Symbol.toStringTag (value from
       promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-d\
       efine-own-property.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8657,7 +8794,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[DefineOwnProperty]] internal method returns `true` if no
       change is requested, and `false` otherwise. (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-d\
       elete-exported-init-no-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8709,7 +8846,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[Delete]] behavior for a key that does not describe an
       exported binding (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-e\
       xtensible.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8722,7 +8859,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace objects are not extensible. (value fro\
       m promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-own-property-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8735,7 +8872,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[GetOwnProperty]] internal method with a string
       argument describing an initialized binding (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-own-property-str-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8749,7 +8886,7 @@ paths:
     subject: "Behavior of the [[GetOwnProperty]] internal method with a string
       argument describing a binding that cannot be found (value from promise
       then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-own-property-sym.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8762,7 +8899,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[GetOwnProperty]] internal method with a Symbol
       argument (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-str-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8775,7 +8912,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a string argument for
       exported initialized bindings. (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-str-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8788,7 +8925,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a string argument for
       non-exported bindings (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-sym-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8801,7 +8938,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a symbol argument
       that can be found (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-sym-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8814,7 +8951,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[Get]] internal method with a symbol argument
       that cannot be found (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-h\
       as-property-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8827,7 +8964,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[HasProperty]] internal method with a string
       argument for exported initialized bindings. (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-h\
       as-property-str-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8840,7 +8977,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[HasProperty]] internal method with a string
       argument for non-exported bindings (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-h\
       as-property-sym-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8853,7 +8990,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[HasProperty]] internal method with a symbol
       argument that can be found (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-h\
       as-property-sym-not-found.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8866,7 +9003,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Behavior of the [[HasProperty]] internal method with a symbol
       argument that cannot be found (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-n\
       o-iterator.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8879,7 +9016,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace objects lack a Symbol.iterator property (value
       from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-o\
       wn-property-keys-sort.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8892,7 +9029,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[OwnPropertyKeys]] internal method reflects the sorted order
       (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-p\
       revent-extensions-object.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8905,7 +9042,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[PreventExtensions]] internal method returns `true` (value
       from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-p\
       revent-extensions-reflect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8918,7 +9055,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[PreventExtensions]] internal method returns `true` (value
       from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-p\
       rop-descs.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8930,7 +9067,7 @@ paths:
     missingDynamicTag: false
     section: "sec-finishdynamicimport"
     subject: "imported object properties descriptors (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-p\
       rototype.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8943,7 +9080,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "Module namespace object prototype is null (value from pr\
       omise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-s\
       et-no-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8969,7 +9106,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[SetPrototypeOf]] internal method returns `true` if passed
       `null` (value from promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-s\
       et-prototype-of.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8982,7 +9119,7 @@ paths:
     section: "sec-finishdynamicimport"
     subject: "The [[SetPrototypeOf]] internal method returns `false` (value from
       promise then)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-s\
       et-same-values-no-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10501,7 +10638,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assignme\
       nt-expression-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10564,7 +10701,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested arrow)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10628,7 +10765,7 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested in async arrow
       function, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10694,7 +10831,7 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested in async arrow
       function, returned)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-return-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10760,7 +10897,7 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested in async function,
       awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10825,7 +10962,7 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested in async
       function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10865,7 +11002,7 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested in async function,
       returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -return-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10956,7 +11093,7 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested in async
       generator, awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-awai\
       t-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11021,7 +11158,7 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested in async
       generator, returns awaited)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-retu\
       rn-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11086,7 +11223,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested block)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-block-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11149,7 +11286,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested do while syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-do-while-eval-\
       script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11213,7 +11350,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested else)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-else-import-th\
       en-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11276,7 +11413,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested function)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-function-impor\
       t-then-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11339,7 +11476,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested if syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-braceless-e\
       val-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11402,7 +11539,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested if)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-import-then\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11465,7 +11602,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested while)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/nested-while-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11528,7 +11665,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested block syntax)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/syntax-nested-block-l\
       abeled-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11591,7 +11728,7 @@ paths:
     section: "sec-import-call-runtime-semantics-evaluation"
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (top level)"
-    assessment: "observation-train-dynamic-source"
+    assessment: "ds2-static-module-semantics"
   - path: "test/language/expressions/dynamic-import/usage/top-level-import-then\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
