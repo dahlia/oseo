@@ -23,7 +23,6 @@ results:
       - default-parameters
       - dynamic-source
       - error-intrinsics
-      - expression-operators
       - functions
       - object-properties
       - promise-settlement

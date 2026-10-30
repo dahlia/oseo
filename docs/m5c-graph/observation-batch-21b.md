@@ -45,13 +45,34 @@ unsupported owner or new remediation node is needed for this batch.
 Internal review corrections
 ---------------------------
 
-The first internal round prompted a synchronous-generator witness audit
-across all 1,768 train rows. ADR 0013 reserves generators for synchronous
-generators: 540 async-only wrappers in this batch lose that tag. The other
-100 rows retain it because their asserted case has a synchronous-generator
-witness. Async iteration and async-function prerequisites remain recorded.
+Internal reviews prompted syntax and reachability audits of all 1,768
+train rows. ADR 0013 reserves generators for synchronous generators:
+548 rows in this batch have no executed or asserted synchronous witness.
+The other 92 retain that tag. Async iteration and async-function
+prerequisites remain recorded.
 
-The complete audit is *sync-generator-full-row-audit.json* beside the
-focused evidence; *known-pattern-full-row-audit.json* covers the other
-review patterns across every train row. Classifications, owners, source
-observations, and landed flags are unchanged.
+The syntax audit is *sync-generator-full-row-audit.json*; the executed
+witness follow-up is *sync-generator-reachability-followup.json* beside
+the focused evidence. Every train row was also checked for the other
+review patterns in *known-pattern-full-row-audit.json*.
+
+
+Round two reachability audit
+----------------------------
+
+A full-train audit removes expression-operators from 12 destructuring
+rows whose sole increment cannot execute: either parameter initialization
+throws before a later default initializer, or an iterator throws before
+a following counter update. The zero-counter assertions confirm that
+those operations are skipped. Other rows with executed body counters
+retain expression-operators.
+
+A reachability follow-up also removes generators from eight rows whose
+sole synchronous generator helper is in a skipped default initializer.
+The final batch has 92 rows with synchronous-generator witnesses; the
+other 548 have none. Details are in
+*sync-generator-reachability-followup.json*.
+
+The records are *round-2-full-row-pattern-audit.json* and
+*zero-asserted-operator-ast-audit.json* beside the focused evidence.
+Classifications, owners, observations, and landed flags are unchanged.

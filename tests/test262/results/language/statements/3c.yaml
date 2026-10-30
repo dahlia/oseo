@@ -186,7 +186,6 @@ results:
       - classes
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - object-literals
@@ -227,7 +226,6 @@ results:
       - abrupt-completion
       - classes
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - object-literals

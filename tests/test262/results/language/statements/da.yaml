@@ -155,7 +155,6 @@ results:
       - async-iteration
       - classes
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties

@@ -32132,7 +32132,7 @@ paths:
   test/language/statements/async-function/early-errors-declaration-formals-contains-super-call.js: [expected-negative, observation]
   test/language/statements/async-function/early-errors-declaration-formals-contains-super-property.js: [expected-negative, observation]
   test/language/statements/async-function/escaped-async.js: [expected-negative, observation]
-  test/language/statements/async-function/eval-var-scope-syntax-err.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, async-functions, default-parameters, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, promise-settlement, var-bindings]]
+  test/language/statements/async-function/eval-var-scope-syntax-err.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, async-functions, default-parameters, dynamic-source, error-intrinsics, functions, object-properties, promise-settlement, var-bindings]]
   test/language/statements/async-function/evaluation-body-that-returns-after-await.js: [pass, observation]
   test/language/statements/async-function/evaluation-body-that-returns.js: [pass, observation]
   test/language/statements/async-function/evaluation-body-that-throws-after-await.js: [pass, observation]

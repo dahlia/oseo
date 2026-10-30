@@ -22989,9 +22989,9 @@ summary:
       expectedNegatives: 596
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 7184
+      passes: 7146
       semanticFailures: 0
-      unsupportedProfileFeatures: 571
+      unsupportedProfileFeatures: 570
     - dependency: functions
       expectedNegatives: 1010
       harnessFailures: 0
@@ -23003,14 +23003,14 @@ summary:
       expectedNegatives: 321
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 2720
+      passes: 2712
       semanticFailures: 0
       unsupportedProfileFeatures: 162
     - dependency: iterator-protocol
       expectedNegatives: 94
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 5007
+      passes: 4935
       semanticFailures: 0
       unsupportedProfileFeatures: 33
     - dependency: json-parse

@@ -83,3 +83,21 @@ The complete pattern audit is *known-pattern-full-row-audit.json* beside
 the focused evidence. It also covers batch 21b's async-only wrappers and
 confirms all 640 batch 21c rows have synchronous-generator witnesses.
 Classifications, owners, source observations, and landed flags are unchanged.
+
+
+Round two reachability audit
+----------------------------
+
+A second full-train audit removes expression-operators from 15 rows whose
+parameter initialization aborts before their body counter can execute.
+It also removes iterator-protocol from 72 async-only cases. ADR 0013
+assigns asynchronous acquisition and stepping to async-iteration;
+failure-trap Symbol.iterator getters supply no synchronous coverage.
+Synchronous fallback cases and executed iterable spreads retain their
+tags, and async Symbol dispatch retains symbols.
+
+The audit covers all 1,768 train rows. Its records are
+*round-2-full-row-pattern-audit.json* and
+*zero-asserted-operator-ast-audit.json* beside the focused evidence.
+Executed counters, logical-assignment subjects with zero results, and
+helpers that change asserted protocol results remain tagged.

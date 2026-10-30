@@ -40,3 +40,18 @@ validate the derived records. No property test file is added.
 
 All original paths pass or are phase/type-correct expected negatives. No
 unsupported owner or new remediation node is needed for this batch.
+
+
+Internal review reachability corrections
+----------------------------------------
+
+The full-train audit prompted by round two removes expression-operators
+from 12 synchronous-generator destructuring rows. Their sole increment
+cannot execute because an earlier parameter or iterator operation throws;
+the source explicitly asserts that the respective counter remains zero.
+Executed counters and logical-assignment subjects remain tagged.
+
+The audit covers all 1,768 train rows in
+*round-2-full-row-pattern-audit.json* and
+*zero-asserted-operator-ast-audit.json* beside the focused evidence.
+Classifications, owners, observations, and landed flags are unchanged.

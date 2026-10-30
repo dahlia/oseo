@@ -78,7 +78,6 @@ results:
       - abrupt-completion
       - classes
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - iterator-protocol

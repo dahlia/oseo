@@ -65,7 +65,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - iterator-protocol
       - object-literals
       - object-properties
       - promise-settlement

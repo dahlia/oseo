@@ -189,7 +189,6 @@ results:
       - classes
       - default-parameters
       - error-intrinsics
-      - expression-operators
       - functions
       - object-properties
       - promise-settlement

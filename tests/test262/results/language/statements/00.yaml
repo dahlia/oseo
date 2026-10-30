@@ -96,7 +96,6 @@ results:
       - async-iteration
       - classes
       - default-parameters
-      - expression-operators
       - functions
       - object-properties
       - var-bindings

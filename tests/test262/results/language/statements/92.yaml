@@ -92,7 +92,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - iterator-protocol
       - lexical-bindings
       - object-properties
       - promise-settlement

@@ -87,7 +87,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - iterator-protocol
       - object-literals
       - object-properties
       - promise-settlement
@@ -136,7 +135,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - iterator-protocol
       - object-literals
       - object-properties
       - promise-settlement

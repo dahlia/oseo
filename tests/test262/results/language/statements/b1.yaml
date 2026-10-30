@@ -114,7 +114,6 @@ results:
       - async-functions
       - classes
       - default-parameters
-      - expression-operators
       - functions
       - object-properties
       - promise-settlement

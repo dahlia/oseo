@@ -104,7 +104,6 @@ results:
       - classes
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties

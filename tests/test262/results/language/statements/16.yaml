@@ -22,7 +22,6 @@ results:
       - async-functions
       - default-parameters
       - error-intrinsics
-      - expression-operators
       - functions
       - object-properties
       - promise-settlement

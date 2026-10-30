@@ -61,7 +61,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - iterator-protocol
       - object-literals
       - object-properties
       - promise-settlement
