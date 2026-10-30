@@ -698,7 +698,7 @@ function deliveredPaths(node: Batch11PrerequisiteNode): readonly string[] {
   return [...new Set(node.delivers.match(/test\/[^\s,]+\.js/gu))].toSorted();
 }
 
-test("batch11 prerequisites retain their three-path contracts", () => {
+test("class accessor prerequisites retain their bounded paths", () => {
   validateCurrentM5cWorkGraph();
   const readNode = (id: string): Batch11PrerequisiteNode =>
     // SAFETY: graph validation checked each parsed node's shape.
@@ -721,7 +721,12 @@ test("batch11 prerequisites retain their three-path contracts", () => {
       "private-setter-is-not-a-own-property.js",
   ];
   assert.deepEqual(deliveredPaths(classifier), accessorPaths);
-  assert.deepEqual(deliveredPaths(coverage), accessorPaths);
+  assert.deepEqual(deliveredPaths(coverage), [
+    ...accessorPaths,
+    ...accessorPaths.map((path) =>
+      path.replace("/expressions/", "/statements/"),
+    ),
+  ]);
   assert.deepEqual(deliveredPaths(earlyError), [
     "test/language/expressions/class/elements/syntax/early-errors/" +
       "grammar-class-body-ctor-duplicate.js",
