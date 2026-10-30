@@ -835,20 +835,22 @@ assessments:
   ds7-39:
     disposition: exclusion
     normativeDependency: source-evaluation-only
-    reason: "Maintainer decision 2026-10-28 item 1 applies. Distinct template
-      sites with identical source have distinct template objects. Passing
-      static evidence observes distinct-site template identity for the same
-      expression relationship; only creation of the second site by dynamic
-      source evaluation remains. Replacement:
-      test/language/expressions/tagged-template/cache-identical-source.js
-      (reviewed pass; observation passed: true). Reopen on changed source,
-      observation or replacement evidence, or an accepted ADR 0016 amendment
-      admitting this source form; ADR 0019 non-source reopening remains in
-      force."
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Despite its
+      upstream description, the original compares tag`head${a}tail` with a
+      second site tag`head${b}tail` built with arguments 1 and 2, so the two
+      distinct sites differ in their substitution expressions. Passing
+      static evidence observes distinct template objects for distinct sites
+      with differing expressions; only creation of the second site by
+      dynamic source evaluation remains. Replacement:
+      test/language/expressions/tagged-template/cache-differing-expressions\
+      .js (reviewed pass; observation passed: true). Reopen on changed
+      source, observation or replacement evidence, or an accepted ADR 0016
+      amendment admitting this source form; ADR 0019 non-source reopening
+      remains in force."
     replacementEvidence:
-      tests/test262/results/language/expressions/0a.yaml:
-        "e8e61e7ca496ffd14b2f09a1f3aff90c6db2c30688e9357a\
-        fb5d17610f67c013"
+      tests/test262/results/language/expressions/3f.yaml:
+        "361cc35d4d063401f9da3f3e2bf19cf51e083a5f8bd38e5a\
+        2d760deaa2123b18"
   ds7-61:
     disposition: exclusion
     normativeDependency: source-evaluation-only

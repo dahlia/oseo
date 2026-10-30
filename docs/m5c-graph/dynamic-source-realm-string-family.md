@@ -10,7 +10,7 @@ umbrella that lands when it owns zero paths.
 This node owns exactly the 80 paths below at test262 revision
 `f2d1435644797268dca1f7988cad5a4e89ccd8d2`. At base main
 `1f3ade13`, all 80 are unsupported umbrella paths in the derived ledger.
-The per-path assessment below prepares 10 ADR 0016 owners and retains 70
+The per-path assessment below prepares 9 ADR 0016 owners and retains 71
 umbrella owners; this node remains unlanded. The path set,
 sorted with one final newline, has SHA256
 `e0822eea02a0a34eef63da1fe738fe0a8e13c5be2094b3d937c2a7c92c33e87e`.
