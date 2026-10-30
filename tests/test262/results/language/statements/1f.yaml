@@ -158,7 +158,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - var-bindings
     execution:
       harnessIncludes:
@@ -304,8 +303,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - object-properties
-      - symbols
       - var-bindings
     execution:
       harnessIncludes:

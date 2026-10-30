@@ -289,7 +289,6 @@ results:
       - expression-operators
       - functions
       - object-properties
-      - symbols
       - var-bindings
     execution:
       harnessIncludes:

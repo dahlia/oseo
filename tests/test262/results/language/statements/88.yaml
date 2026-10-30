@@ -285,13 +285,11 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - expression-operators
       - functions
       - iterator-protocol
       - object-literals
       - object-properties
       - symbols
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

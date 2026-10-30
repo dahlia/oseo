@@ -304,11 +304,8 @@ results:
       - abrupt-completion
       - control-flow
       - error-intrinsics
-      - expression-operators
-      - functions
       - object-literals
       - object-properties
-      - symbols
       - var-bindings
     execution:
       harnessIncludes:

@@ -106,3 +106,26 @@ Its `round1-*-candidates.json` and `round1-*-conclusions.json` retain the
 full-train pattern audits, while *review-round-1/attempts.json* retains every
 first-pass verdict. The final packet includes every later review verdict
 and Codex rollout path for Root's audit.
+
+
+Internal pass 2 corrections
+---------------------------
+
+All 1,669 train rows were checked for every second-pass finding pattern
+against the latest consolidated tag rules. This batch has
+14 dependency rows corrected in that audit.
+
+Expected-error sentinel comparisons and constant loop reach-marker assignments
+add no expression-operators coverage. Real loop input declarations, loop-head
+bindings and computed counters remain prerequisites.
+
+Root confirmed that expected-error comparisons and their implicit
+instanceof protocol are assertion plumbing, as are constant reach markers
+and declarations whose sole purpose is to hold those markers. Actual
+catch binding and destructuring subjects retain their own families.
+
+The dispatch packet records source hashes, the full-train pattern audits,
+and exact changes in `round2-fix-plan.json`, `round2-fix-applied.json` and
+the `round2-*-audit.json` and `round2-*-candidates.json` artifacts. The fixed
+second-pass verdicts are in `review-round-2/attempts.json`. Classifications,
+counts, unsupported ownership and the original admitted rows are preserved.

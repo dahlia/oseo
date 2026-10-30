@@ -635,7 +635,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties

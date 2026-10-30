@@ -570,12 +570,10 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - iterator-protocol
       - object-literals
       - object-properties
       - symbols
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

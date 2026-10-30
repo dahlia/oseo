@@ -369,10 +369,8 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - iterator-protocol
       - symbols
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

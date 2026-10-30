@@ -188,7 +188,6 @@ results:
     dependencies:
       - abrupt-completion
       - control-flow
-      - expression-operators
       - functions
     execution:
       harnessIncludes:
@@ -313,12 +312,10 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - iterator-protocol
       - object-literals
       - object-properties
       - symbols
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

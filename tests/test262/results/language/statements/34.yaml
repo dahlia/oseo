@@ -330,11 +330,9 @@ results:
       - classes
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

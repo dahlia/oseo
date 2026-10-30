@@ -425,7 +425,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - iterator-protocol
       - object-properties
@@ -501,6 +500,7 @@ results:
       - expression-operators
       - functions
       - object-properties
+      - symbols
       - var-bindings
     observation:
       detail: "test/language/statements/while/S12.6.2_A8.js non-strict

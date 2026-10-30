@@ -173,7 +173,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - object-literals
       - var-bindings
     execution:
@@ -411,7 +410,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - iterator-protocol
       - object-properties

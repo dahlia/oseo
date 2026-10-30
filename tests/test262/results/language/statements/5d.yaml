@@ -414,7 +414,6 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
-      - expression-operators
       - var-bindings
     execution:
       harnessIncludes:

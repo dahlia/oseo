@@ -229,7 +229,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/function/13.1-2-s.js strict disabled
         failed (1): stdout=\"\"
@@ -344,13 +343,11 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - expression-operators
       - functions
       - iterator-protocol
       - object-literals
       - object-properties
       - symbols
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

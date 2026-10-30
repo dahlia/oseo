@@ -22989,14 +22989,14 @@ summary:
       expectedNegatives: 615
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6688
+      passes: 6625
       semanticFailures: 0
       unsupportedProfileFeatures: 624
     - dependency: functions
       expectedNegatives: 989
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 12643
+      passes: 12642
       semanticFailures: 0
       unsupportedProfileFeatures: 1330
     - dependency: generators
@@ -23031,7 +23031,7 @@ summary:
       expectedNegatives: 327
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1299
+      passes: 1297
       semanticFailures: 0
       unsupportedProfileFeatures: 398
     - dependency: lexical-grammar
@@ -23052,7 +23052,7 @@ summary:
       expectedNegatives: 200
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3715
+      passes: 3713
       semanticFailures: 0
       unsupportedProfileFeatures: 162
     - dependency: object-own-keys
@@ -23066,7 +23066,7 @@ summary:
       expectedNegatives: 602
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17981
+      passes: 17979
       semanticFailures: 0
       unsupportedProfileFeatures: 827
     - dependency: promise-settlement
@@ -23129,9 +23129,9 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3169
+      passes: 3159
       semanticFailures: 0
-      unsupportedProfileFeatures: 239
+      unsupportedProfileFeatures: 240
     - dependency: top-level-await
       expectedNegatives: 11
       harnessFailures: 0
@@ -23192,9 +23192,9 @@ summary:
       expectedNegatives: 220
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6834
+      passes: 6803
       semanticFailures: 0
-      unsupportedProfileFeatures: 676
+      unsupportedProfileFeatures: 673
     - dependency: weak-collections
       expectedNegatives: 0
       harnessFailures: 0

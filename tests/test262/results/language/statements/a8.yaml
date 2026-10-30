@@ -244,7 +244,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/function/13.0-8-s.js strict disabled
         failed (1): stdout=\"\"
@@ -362,7 +361,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - iterator-protocol

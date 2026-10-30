@@ -416,7 +416,6 @@ results:
       - lexical-bindings
       - object-literals
       - object-properties
-      - symbols
       - var-bindings
     execution:
       harnessIncludes:

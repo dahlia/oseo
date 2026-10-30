@@ -185,7 +185,6 @@ results:
     dependencies:
       - abrupt-completion
       - control-flow
-      - expression-operators
       - functions
     execution:
       harnessIncludes:
