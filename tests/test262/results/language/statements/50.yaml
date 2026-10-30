@@ -630,7 +630,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - iterator-protocol
       - lexical-bindings

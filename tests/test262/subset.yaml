@@ -161895,6 +161895,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -161911,6 +161912,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -162118,6 +162120,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -170767,7 +170770,6 @@ tests:
         async-iteration,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -170800,6 +170802,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -170894,6 +170897,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -170911,6 +170915,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -170928,6 +170933,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -170945,6 +170951,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -170980,6 +170987,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -170997,6 +171005,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -171014,6 +171023,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -171031,6 +171041,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -171084,6 +171095,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -171166,6 +171178,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -171232,6 +171245,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         async-functions,
         async-iteration,
         control-flow,
@@ -175381,7 +175395,6 @@ tests:
         async-iteration,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -175499,7 +175512,6 @@ tests:
         async-iteration,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -178269,7 +178281,6 @@ tests:
         async-iteration,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -178379,7 +178390,6 @@ tests:
         async-iteration,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -181039,7 +181049,6 @@ tests:
         async-iteration,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -181153,7 +181162,6 @@ tests:
         async-iteration,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -185529,7 +185537,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -185622,7 +185629,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -186813,7 +186819,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -186906,7 +186911,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -188338,6 +188342,7 @@ tests:
         functions,
         iterator-protocol,
         object-literals,
+        object-own-keys,
         object-properties,
         symbols,
         var-bindings,
@@ -189581,7 +189586,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         object-literals,
@@ -189670,7 +189674,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         object-literals,
@@ -190355,6 +190358,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        abrupt-completion,
         control-flow,
         expression-operators,
         functions,

@@ -329,7 +329,6 @@ results:
       - async-iteration
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - iterator-protocol

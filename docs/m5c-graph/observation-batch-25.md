@@ -112,3 +112,30 @@ retained `symbols` but omitted the paired property-read family. The complete
 1,440-row audit now checks this prerequisite consistently. This changes no
 executed variant, observation, classification or owner. R also refreshes the
 explicit current totals in *PLAN-M5.md* and *docs/language-profile-m5.md*.
+
+
+Internal review round 1 corrections
+-----------------------------------
+
+The full-row audit applies the review findings to every original in this
+train, preserving all classifications, execution records, owners and graph
+state. Named exceptions observed through promise rejection retain
+`abrupt-completion`; break-driven iterator closing does too. Unreachable
+prefix or postfix increments do not establish `expression-operators`,
+whether their untouched counters are asserted or not. A throwing getter
+during object-rest copying retains `object-own-keys`, because enumeration
+precedes the getter; null and undefined still fail before enumeration.
+
+This batch corrects 8 dependency rows. The
+[round-1 fix plan](/data/m5c-d17-20261031/train-d/task_f6880fe9a7b3/ctx_2931b5fdcc73/round1-fix-plan.json)
+records every original hash and before/after dependency list, and the companion
+pattern audits cover all 1,440 train rows. Companion source evidence is in
+*round1-missing-rejection-abrupt-candidates.json*,
+*round1-unreachable-operator-pattern-audit.json*,
+*round1-prefix-counter-audit.json*,
+*round1-object-rest-interruption-audit.json* and
+*round1-break-continue-audit.json* in the dispatch packet.
+
+This correction is U3. Root must run its scoped UPDATE against the
+previous accepted R before renewed internal review; no observation,
+publication or landing is implied by the dependency correction.
