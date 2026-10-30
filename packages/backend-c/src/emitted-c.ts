@@ -647,6 +647,10 @@ export const emittedC = {
     resultAssignOseoObjectLiteralCreateContext: [
       ["result = oseo_object_literal_create(context);"],
     ],
+    resultAssignOseoToObject: [
+      ["result = oseo_to_object(context, ", "roots["],
+      ["]);"],
+    ],
     resultAssignOseoRequireObjectCoercible: [
       ["result = oseo_require_object_coercible(context, ", "roots["],
       ["]);"],

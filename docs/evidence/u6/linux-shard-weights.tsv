@@ -140,6 +140,7 @@ tests/property/m5-update-expression.property.test.ts	151	153921.319426	149055.95
 tests/property/m5-uri-handling-functions.property.test.ts	921	699329.044285	670673.834684	971238.908783	700
 tests/property/m5-weak-collections.property.test.ts	591	428359.956699	415064.734905	546403.446431	429
 tests/property/m5-well-known-symbols.property.test.ts	592	441463.378188	432485.370605	560361.571132	442
+tests/property/m5-with-primitive-boxing.property.test.ts	179	-	-	-	179
 tests/property/m5-with-var-loop-head.property.test.ts	465	-	-	-	465
 tests/property/nio-clock-wakeup.property.test.ts	134	136256.414937	133015.472225	177115.582916	137
 tests/property/unicode-tables.property.test.ts	1	278.221585	176.836766	399.479566	1

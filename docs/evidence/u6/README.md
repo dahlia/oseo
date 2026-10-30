@@ -1915,3 +1915,40 @@ The raw logs, job list, extraction script and SHA-256 sums are retained in
 ~~~~
 
 [41059687055]: https://github.com/dahlia/oseo/actions/runs/41059687055
+
+
+Primitive with binding object local cost
+----------------------------------------
+
+*tests/property/m5-with-primitive-boxing.property.test.ts* postdates the
+three Linux source runs. Root authorized one local Linux AMD64 extended
+measurement for its initial shard weight. The command used
+`OSEO_PROPERTY_RUN_SCALE=10` on the Zig lane, under the heavy lock and a
+fresh capacity prefix. Its unchanged seed `0x60009300`, small size and
+base 180,000-millisecond limit used the standard property helper's scaling:
+80 generated cases and an effective 1,800,000-millisecond interrupt limit.
+No seed, size or time-scale override was set. Every case kept both
+specialization policies, ordinary and host Script modes, forced collection,
+shrinking and replay.
+
+The single complete passing registration took 178939.798128 milliseconds;
+its per-test case sum is therefore 178939.798128 milliseconds and its rounded-up
+Linux weight is 179 seconds. The whole command wall was
+179.26 seconds. This is one local observation, not a CI
+file-shard sum, a run-to-run bound or a macOS measurement. Root may replace
+it with exact-candidate CI case sums. macOS gains no entry and keeps its
+existing unknown-file median fallback.
+
+The TSV retains this later file with `-` for all three historical source
+samples. The extraction script and its unit test retain it explicitly.
+Linux now has 145 table entries and the unchanged upper-median rule
+derives 443 seconds. Every other weight, exclusion, worker width and
+shard total stays unchanged. The regenerated model still reproduces every
+historical source log's file order exactly.
+
+[Raw measurement and source fingerprints](/data/m5c-d17-20261031/with-boxing/)
+are retained as *weight-extended-zig.json*, *weight-extended-zig.stdout*,
+*weight-extended-zig.stderr* and *weight-source.json*. The source fingerprint
+packet binds the changed compiler, backend, runtime and test inputs to
+base `1f3ade138ea7cbee80b2d62940e8f497db2bc1a2`; later changes in this
+preparation are scheduling metadata, digest expectations and documentation.

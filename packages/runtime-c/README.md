@@ -1267,3 +1267,16 @@ the next unused identity after Main and both branches. Their ABI history
 notes retain their original source identities.
 
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
+
+
+With binding object boxing
+--------------------------
+
+The `m5-143` ABI exports `oseo_to_object` for generated with entry.
+It uses the same ToObject implementation as the intrinsic built-ins:
+objects retain identity, primitives receive wrappers with their intrinsic
+prototype, and null or undefined throws TypeError. String wrappers carry
+their own indexed properties and length. The compiler roots the result
+before initializing the with environment, so repeated lookups and escaped
+closures retain one binding object. The helper does not read a mutable
+JavaScript `Object` binding or invoke primitive conversion hooks.

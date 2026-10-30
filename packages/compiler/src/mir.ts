@@ -220,6 +220,7 @@ export interface MirOperation {
     | "load-fixed-slot"
     | "module-namespace-create"
     | "new-target"
+    | "to-object"
     | "object-coercible"
     | "object-create"
     | "object-rest"
