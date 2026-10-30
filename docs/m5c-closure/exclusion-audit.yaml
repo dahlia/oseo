@@ -19727,6 +19727,29 @@ paths:
     subject: "Regular Expression Literal (Eval production of StatementList
       starting with a Function Declaration)"
     assessment: ds3-statementlist-completion
+  - path: test/language/statements/async-function/cptn-decl.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "24fcdf381cea49595a8d161954d303718607e7160bf6\
+      4deb78b546067a0c23d9"
+    observationDigest: "52c8604ad5eef5fee7fccad5cb7bceca393690c189bc\
+      b9557212e95d72fc4b4d"
+    missingDynamicTag: false
+    section: sec-async-function-definitions-runtime-semantics-evaluation
+    subject: Async function declaration completion value is empty.
+    assessment: completion-observation
+  - path: test/language/statements/async-function/eval-var-scope-syntax-err.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "29865a812061e66fa971002d06c78ac4500fa0e2b275\
+      1533813f4e19de81900b"
+    observationDigest: "e266bba3adea1ef5540999bacf70053305aa6d9501c1\
+      6a8b6cdf75dbd771485b"
+    missingDynamicTag: false
+    section: sec-async-function-definitions
+    subject: sloppy direct eval in params introduces var (async function
+      declaration in sloppy code)
+    assessment: eval-semantics
   - path: "test/language/statements/async-generator/eval-var-sc\
       ope-syntax-err.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -19740,6 +19763,28 @@ paths:
     subject: sloppy direct eval in params introduces var (async
       generator function declaration in sloppy code)
     assessment: eval-semantics
+  - path: test/language/statements/break/S12.8_A7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: source-subject
+    sourceDigest: "af80f24ff90a804646692fc94abcac6e0d2617221c50\
+      436a8e63d85bc4a4e6dc"
+    observationDigest: "14024bfc631b27a2f97a3c0467175e52c7345b9bd495\
+      949ce50f995e5303c4f0"
+    missingDynamicTag: false
+    section: "Original es5id: 12.8_A7"
+    subject: Using eval "eval("break LABEL1")"
+    assessment: eval-semantics
+  - path: test/language/statements/class/cptn-decl.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "7015f8441010b5feb72c5a6bf369500783a04a0dc1a6\
+      585edb82e3a419f9d7e0"
+    observationDigest: "b75e014a71cd3bf7b15759e9df6fe0666029717cddc8\
+      8c438fc17ea35c605750"
+    missingDynamicTag: false
+    section: sec-class-definitions-runtime-semantics-evaluation
+    subject: Class declaration completion value is empty.
+    assessment: completion-observation
   - path: "test/language/statements/class/elements/derived-cls-\
       direct-eval-err-contains-supercall.js"
     proposedOwner: adr:0016-dynamic-source-boundary
