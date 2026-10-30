@@ -8,10 +8,10 @@ This record backs the M5c graph node `dynamic-source-realm-string-family`
 umbrella that lands when it owns zero paths.
 
 This node owns exactly the 80 paths below at test262 revision
-`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. Every one is currently owned by
-`node:dynamic-source-coverage-remediation` in the derived closure ledger,
-and it stays there until this node lands; the landing moves each path to
-its reviewed owner. This change moves no ledger ownership. The path set,
+`f2d1435644797268dca1f7988cad5a4e89ccd8d2`. At base main
+`1f3ade13`, all 80 are unsupported umbrella paths in the derived ledger.
+The per-path assessment below prepares 10 ADR 0016 owners and retains 70
+umbrella owners; this node remains unlanded. The path set,
 sorted with one final newline, has SHA256
 `e0822eea02a0a34eef63da1fe738fe0a8e13c5be2094b3d937c2a7c92c33e87e`.
 
@@ -38,6 +38,29 @@ Evidence obligations
     remove an assertion, or widen ADR 0016. ADR 0016 and ADR 0019 stay
     unchanged, and all 41,091 inventory paths remain.
  -  Split review scopes by subdirectory where a diff is large.
+
+
+Per-path review result
+----------------------
+
+The [per-path assessment](./dynamic-source-realm-string-assessment.md)
+records each original normative subject, selected evidence or remaining gap,
+and its decision. Ten paths close under the 2026-10-28 decision, item 1:
+five template-site paths, four ASCII string case-conversion paths, and one
+mixed generator-instance path.
+Their audit records bind fresh source and observation digests and name the
+existing passing static paths or native fixtures. No evidence was added.
+
+The other 70 paths stay with the umbrella: all 34 foreign-realm subjects,
+the realm template registry path, seven RegExp paths, 23 string/global/block
+paths, and five intrinsic/mixed-function paths. Their table rows name the
+uncovered assertions in the candidates inspected. The umbrella now owns
+1,036 paths on this base, before parallel DS-4 through DS-6 integration
+(450 of the historical 765-path cohort and 586 later admissions).
+All 80 classifications remain unsupported-profile-feature; all 41,091
+inventory paths remain. No subset, result, tag or runtime change was made,
+so no UPDATE is needed. No native tests were added; Root retains the full
+publication suites and outer review.
 
 
 Owned paths

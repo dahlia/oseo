@@ -781,6 +781,178 @@ assessments:
       asserted contract or an input prerequisite; its in-claim
       assertions remain unresolved. No whole-path exclusion or
       equivalent replacement is established by this admission.
+  ds7-35:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Distinct template
+      sites with differing expressions have distinct template objects.
+      Passing static evidence observes distinct-site template identity for
+      the same expression relationship; only creation of the second site by
+      dynamic source evaluation remains. Replacement:
+      test/language/expressions/tagged-template/cache-differing-expressions\
+      .js (reviewed pass; observation passed: true). Reopen on changed
+      source, observation or replacement evidence, or an accepted ADR 0016
+      amendment admitting this source form; ADR 0019 non-source reopening
+      remains in force."
+    replacementEvidence:
+      tests/test262/results/language/expressions/3f.yaml:
+        "361cc35d4d063401f9da3f3e2bf19cf51e083a5f8bd38e5a\
+        2d760deaa2123b18"
+  ds7-36:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Distinct template
+      sites with differing expressions have distinct template objects.
+      Passing static evidence observes distinct-site template identity for
+      the same expression relationship; only creation of the second site by
+      dynamic source evaluation remains. Replacement:
+      test/language/expressions/tagged-template/cache-differing-expressions\
+      .js (reviewed pass; observation passed: true). Reopen on changed
+      source, observation or replacement evidence, or an accepted ADR 0016
+      amendment admitting this source form; ADR 0019 non-source reopening
+      remains in force."
+    replacementEvidence:
+      tests/test262/results/language/expressions/3f.yaml:
+        "361cc35d4d063401f9da3f3e2bf19cf51e083a5f8bd38e5a\
+        2d760deaa2123b18"
+  ds7-37:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Repeated use of
+      one template site shares an object; separate evaluations create
+      distinct sites. Passing static evidence observes same-site reuse and
+      distinct-site separation; only fresh sites introduced by repeated eval
+      source evaluation remain. Replacement:
+      test/language/expressions/tagged-template/cache-same-site.js (reviewed
+      pass; observation passed: true);
+      test/language/expressions/tagged-template/cache-identical-source.js
+      (reviewed pass; observation passed: true). Reopen on changed source,
+      observation or replacement evidence, or an accepted ADR 0016 amendment
+      admitting this source form; ADR 0019 non-source reopening remains in
+      force."
+    replacementEvidence:
+      tests/test262/results/language/expressions/75.yaml:
+        "817b4754a12283dfad14f0a7a2ffeb43643cf494eb43e3e5\
+        6657082fb8a016ca"
+      tests/test262/results/language/expressions/0a.yaml:
+        "e8e61e7ca496ffd14b2f09a1f3aff90c6db2c30688e9357a\
+        fb5d17610f67c013"
+  ds7-38:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Distinct template
+      sites with identical source have distinct template objects. Passing
+      static evidence observes distinct-site template identity for the same
+      expression relationship; only creation of the second site by dynamic
+      source evaluation remains. Replacement:
+      test/language/expressions/tagged-template/cache-identical-source.js
+      (reviewed pass; observation passed: true). Reopen on changed source,
+      observation or replacement evidence, or an accepted ADR 0016 amendment
+      admitting this source form; ADR 0019 non-source reopening remains in
+      force."
+    replacementEvidence:
+      tests/test262/results/language/expressions/0a.yaml:
+        "e8e61e7ca496ffd14b2f09a1f3aff90c6db2c30688e9357a\
+        fb5d17610f67c013"
+  ds7-39:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Distinct template
+      sites with identical source have distinct template objects. Passing
+      static evidence observes distinct-site template identity for the same
+      expression relationship; only creation of the second site by dynamic
+      source evaluation remains. Replacement:
+      test/language/expressions/tagged-template/cache-identical-source.js
+      (reviewed pass; observation passed: true). Reopen on changed source,
+      observation or replacement evidence, or an accepted ADR 0016 amendment
+      admitting this source form; ADR 0019 non-source reopening remains in
+      force."
+    replacementEvidence:
+      tests/test262/results/language/expressions/0a.yaml:
+        "e8e61e7ca496ffd14b2f09a1f3aff90c6db2c30688e9357a\
+        fb5d17610f67c013"
+  ds7-61:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. toLocaleLowerCase
+      maps ASCII uppercase input to lowercase. The existing fixture compares
+      ASCII ABC/abc case conversion with explicit expected text using the
+      same method, also with Unicode suffixes; only obtaining the ASCII
+      string through eval remains. Replacement:
+      tests/native/fixtures/string-prototype-case.ts (string-prototype-case:
+      locale case lower). Reopen on changed source, observation or
+      replacement evidence, or an accepted ADR 0016 amendment admitting this
+      source form; ADR 0019 non-source reopening remains in force."
+    replacementEvidence:
+      tests/native/fixtures/string-prototype-case.ts:
+        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
+        e1d2d7bb7ebfdba8"
+  ds7-62:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. toLocaleUpperCase
+      maps ASCII lowercase input to uppercase. The existing fixture compares
+      ASCII ABC/abc case conversion with explicit expected text using the
+      same method, also with Unicode suffixes; only obtaining the ASCII
+      string through eval remains. Replacement:
+      tests/native/fixtures/string-prototype-case.ts (string-prototype-case:
+      locale case upper). Reopen on changed source, observation or
+      replacement evidence, or an accepted ADR 0016 amendment admitting this
+      source form; ADR 0019 non-source reopening remains in force."
+    replacementEvidence:
+      tests/native/fixtures/string-prototype-case.ts:
+        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
+        e1d2d7bb7ebfdba8"
+  ds7-63:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. toLowerCase maps
+      ASCII uppercase input to lowercase. The existing fixture compares
+      ASCII ABC/abc case conversion with explicit expected text using the
+      same method, also with Unicode suffixes; only obtaining the ASCII
+      string through eval remains. Replacement:
+      tests/native/fixtures/string-prototype-case.ts (string-prototype-case:
+      lower). Reopen on changed source, observation or replacement evidence,
+      or an accepted ADR 0016 amendment admitting this source form; ADR 0019
+      non-source reopening remains in force."
+    replacementEvidence:
+      tests/native/fixtures/string-prototype-case.ts:
+        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
+        e1d2d7bb7ebfdba8"
+  ds7-64:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. toUpperCase maps
+      ASCII lowercase input to uppercase. The existing fixture compares
+      ASCII ABC/abc case conversion with explicit expected text using the
+      same method, also with Unicode suffixes; only obtaining the ASCII
+      string through eval remains. Replacement:
+      tests/native/fixtures/string-prototype-case.ts (string-prototype-case:
+      upper). Reopen on changed source, observation or replacement evidence,
+      or an accepted ADR 0016 amendment admitting this source form; ADR 0019
+      non-source reopening remains in force."
+    replacementEvidence:
+      tests/native/fixtures/string-prototype-case.ts:
+        "d3742f6a27ebe1a0bd943860031b80d44614587f40733519\
+        e1d2d7bb7ebfdba8"
+  ds7-79:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: "Maintainer decision 2026-10-28 item 1 applies. Generator
+      declarations, expressions and dynamic functions are instances of
+      GeneratorFunction. The existing fixture observes declaration
+      instanceof GeneratorFunction and identical intrinsic prototype for the
+      generator expression; together these cover both static forms. Only
+      dynamic construction and instanceof of its results remain.
+      Replacement: tests/native/fixtures/function-intrinsic-chains.ts
+      (function-intrinsic-chains: instances and every form). Reopen on
+      changed source, observation or replacement evidence, or an accepted
+      ADR 0016 amendment admitting this source form; ADR 0019 non-source
+      reopening remains in force."
+    replacementEvidence:
+      tests/native/fixtures/function-intrinsic-chains.ts:
+        "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
+        f06e8bef6382e1e3"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3438,15 +3610,15 @@ paths:
   - path: test/built-ins/GeneratorFunction/has-instance.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
-    sourceDigest: "f0f63b507d06b4fdae876fefb9143173b24a753a337d\
-      950f3d8cd6e3f3b727d5"
-    observationDigest: "0a83c6a643b7c2017962b4f18ebee5ea6c0fb09\
-      72d85f56341af684a2cc60016"
+    sourceDigest: "f0f63b507d06b4fdae876fefb9143173b24a753a337d950f\
+      3d8cd6e3f3b727d5"
+    observationDigest: "0a83c6a643b7c2017962b4f18ebee5ea6c0fb0972d85f563\
+      41af684a2cc60016"
     missingDynamicTag: false
     section: sec-generatorfunction
     subject: Generator function instances are correctly reported
       as instances of the GeneratorFunction intrinsic.
-    assessment: mixed-static-functions
+    assessment: "ds7-79"
   - path: "test/built-ins/GeneratorFunction/instance-construct-\
       throws.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4123,10 +4295,10 @@ paths:
   - path: test/built-ins/String/S15.5.1.1_A1_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "9600bad0eb4cb7909d7ebf6b60d18d99a7a3696a1d3d\
-      2d18825ff8d8e7f4f959"
-    observationDigest: "21620c64428b6faa13bdd519c2a5e9491cc3357\
-      81daaec346f502b861abc38b5"
+    sourceDigest: "9600bad0eb4cb7909d7ebf6b60d18d99a7a3696a1d3d2d18\
+      825ff8d8e7f4f959"
+    observationDigest: "21620c64428b6faa13bdd519c2a5e9491cc335781daaec34\
+      6f502b861abc38b5"
     missingDynamicTag: true
     section: sec-string-constructor
     subject: Checking by using eval, Call String(eval());
@@ -4294,50 +4466,50 @@ paths:
       5.5.4.17_A1_T3.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "da9d01ada111dff73f5c05171c02aa8bc41da362dc8a\
-      f5d4bcfdc9b916bf81c8"
-    observationDigest: "aa0722eaaecdaa8426cdf58d6b25cac09f3d812\
-      dd2ac6c37d2fedea8ff5b9393"
+    sourceDigest: "da9d01ada111dff73f5c05171c02aa8bc41da362dc8af5d4\
+      bcfdc9b916bf81c8"
+    observationDigest: "aa0722eaaecdaa8426cdf58d6b25cac09f3d812dd2ac6c37\
+      d2fedea8ff5b9393"
     missingDynamicTag: true
     section: sec-string.prototype.tolocalelowercase
     subject: Checking by using eval
-    assessment: fixture-construction
+    assessment: "ds7-61"
   - path: "test/built-ins/String/prototype/toLocaleUpperCase/S1\
       5.5.4.19_A1_T3.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "bcb8ad159ac00a9cfbcc7ae45f03c0753e075efccdc8\
-      e58dbca3a1da4d78285b"
-    observationDigest: "7ec569daa539feffbe3f3a828456bdbfa2daafb\
-      2715dcd192df9e1419d2b7c22"
+    sourceDigest: "bcb8ad159ac00a9cfbcc7ae45f03c0753e075efccdc8e58d\
+      bca3a1da4d78285b"
+    observationDigest: "7ec569daa539feffbe3f3a828456bdbfa2daafb2715dcd19\
+      2df9e1419d2b7c22"
     missingDynamicTag: true
     section: sec-string.prototype.tolocaleuppercase
     subject: Checking by using eval
-    assessment: fixture-construction
+    assessment: "ds7-62"
   - path: "test/built-ins/String/prototype/toLowerCase/S15.5.4.\
       16_A1_T3.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "d929870b199d26c07af201701a001f2205bf1b779f7d\
-      5f88c91df89839853169"
-    observationDigest: "b39607112e314d1948370ce3d7f33001bd82d25\
-      87bb3e4c09935d9af43e3e164"
+    sourceDigest: "d929870b199d26c07af201701a001f2205bf1b779f7d5f88\
+      c91df89839853169"
+    observationDigest: "b39607112e314d1948370ce3d7f33001bd82d2587bb3e4c0\
+      9935d9af43e3e164"
     missingDynamicTag: true
     section: sec-string.prototype.tolowercase
     subject: Checking by using eval
-    assessment: fixture-construction
+    assessment: "ds7-63"
   - path: "test/built-ins/String/prototype/toUpperCase/S15.5.4.\
       18_A1_T3.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "26abe8512fcc98912c9979c8035e5b8850c4fb7489e0\
-      cd9e1ca676b20059d9a7"
-    observationDigest: "6e43b0702a7ac5649005b392aa8b35fc76276ba\
-      d4217e7be4e70000b2dfefa26"
+    sourceDigest: "26abe8512fcc98912c9979c8035e5b8850c4fb7489e0cd9e\
+      1ca676b20059d9a7"
+    observationDigest: "6e43b0702a7ac5649005b392aa8b35fc76276bad4217e7be\
+      4e70000b2dfefa26"
     missingDynamicTag: true
     section: sec-string.prototype.touppercase
     subject: Checking by using eval
-    assessment: fixture-construction
+    assessment: "ds7-64"
   - path: test/built-ins/ThrowTypeError/distinct-cross-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19274,67 +19446,67 @@ paths:
       ering-expressions-eval.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
-    sourceDigest: "943f004c1a54e3d481076fa8a033d18deb85ab121a63\
-      f92c9f801597881c8f66"
-    observationDigest: "f0a2907a6b8b24b4cc32f1f37760713b046b8f4\
-      8f18d89085211f2ee8341cb5a"
+    sourceDigest: "943f004c1a54e3d481076fa8a033d18deb85ab121a63f92c\
+      9f801597881c8f66"
+    observationDigest: "f0a2907a6b8b24b4cc32f1f37760713b046b8f48f18d8908\
+      5211f2ee8341cb5a"
     missingDynamicTag: false
     section: sec-gettemplateobject
     subject: Template caching using distinct expressions within
       `eval`
-    assessment: template-sites
+    assessment: "ds7-35"
   - path: "test/language/expressions/tagged-template/cache-diff\
       ering-expressions-new-function.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
-    sourceDigest: "e4b24504bbd389f7c14d1228892a4d50adb35beb6fc6\
-      2b065032d31fc0cf2610"
-    observationDigest: "2875f71969addc34f787f494d8a728e068c0db4\
-      796bcd69deeb0b5f6c0e02e2b"
+    sourceDigest: "e4b24504bbd389f7c14d1228892a4d50adb35beb6fc62b06\
+      5032d31fc0cf2610"
+    observationDigest: "2875f71969addc34f787f494d8a728e068c0db4796bcd69d\
+      eeb0b5f6c0e02e2b"
     missingDynamicTag: false
     section: sec-gettemplateobject
     subject: Template caching using distinct expressions within
       `new Function`
-    assessment: template-sites
+    assessment: "ds7-36"
   - path: "test/language/expressions/tagged-template/cache-eval\
       -inner-function.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
-    sourceDigest: "16925bb7e47b1fcdca0e7f66bd7175756f39e3cc452d\
-      a19bd3d454bb6b1db949"
-    observationDigest: "2b01751e6c99404410a67f6d3aa22e8e78e7b44\
-      4846edbbe35b97311fe9b8433"
+    sourceDigest: "16925bb7e47b1fcdca0e7f66bd7175756f39e3cc452da19b\
+      d3d454bb6b1db949"
+    observationDigest: "2b01751e6c99404410a67f6d3aa22e8e78e7b444846edbbe\
+      35b97311fe9b8433"
     missingDynamicTag: false
     section: sec-gettemplateobject
     subject: Templates are cached by source location inside a
       function
-    assessment: template-sites
+    assessment: "ds7-37"
   - path: "test/language/expressions/tagged-template/cache-iden\
       tical-source-eval.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
-    sourceDigest: "08a530bc5122b3172f624a1132d2ced94f78056df111\
-      1ac4b755c663c4b3163e"
-    observationDigest: "2e7386e145e860def705c2a88df2e54de9f7e45\
-      bc4dcdbc82e9eb771a03c08cb"
+    sourceDigest: "08a530bc5122b3172f624a1132d2ced94f78056df1111ac4\
+      b755c663c4b3163e"
+    observationDigest: "2e7386e145e860def705c2a88df2e54de9f7e45bc4dcdbc8\
+      2e9eb771a03c08cb"
     missingDynamicTag: false
     section: sec-gettemplateobject
     subject: Templates are cached by site, even using identical
       expressions within `eval`
-    assessment: template-sites
+    assessment: "ds7-38"
   - path: "test/language/expressions/tagged-template/cache-iden\
       tical-source-new-function.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
-    sourceDigest: "254f85741af71fab6706e7f904b46ce6b9fc23fb35dd\
-      1146043adf72d1322ec2"
-    observationDigest: "c92885dab26e7958115d229c26f66890ff80669\
-      2733382e8a9c21863f4cc3211"
+    sourceDigest: "254f85741af71fab6706e7f904b46ce6b9fc23fb35dd1146\
+      043adf72d1322ec2"
+    observationDigest: "c92885dab26e7958115d229c26f66890ff806692733382e8\
+      a9c21863f4cc3211"
     missingDynamicTag: false
     section: sec-gettemplateobject
     subject: Template caching is by site, using identical
       expressions within `new Function`
-    assessment: template-sites
+    assessment: "ds7-39"
   - path: test/language/expressions/tagged-template/cache-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

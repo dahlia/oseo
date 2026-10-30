@@ -83,8 +83,14 @@ owners:
       dynamic-source-module-semantics-assessment.yaml cover all
       non-source subjects; 584 paths. Only the import()
       source-evaluation site remains; an accepted ADR 0016 amendment
-      admitting any dynamic import reopens them."
-    paths: 584
+      admitting any dynamic import reopens them. DS-7 accounts for 10 of
+      its 80 reserved paths using reviewed static template-site,
+      case-conversion and generator-instance replacement evidence under
+      the maintainer decision of 2026-10-28 item 1; 70 remain umbrella
+      remediation. The per-path assessment and fresh-digest audit
+      records bound every exclusion; no unsupported result is counted as
+      a pass."
+    paths: 594
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -207,8 +213,10 @@ owners:
       grants no whole-path exclusion. The global eval rebinding row
       remains unsupported under
       node:global-eval-rebinding-tail-call-resolution; it does not
-      evaluate source."
-    paths: 1046
+      evaluate source. DS-7 accounts for 10 paths and retains 70 of its
+      80 reserved paths, with remaining contracts recorded in
+      docs/m5c-graph/dynamic-source-realm-string-assessment.md."
+    paths: 1036
   node:global-eval-rebinding-tail-call-resolution:
     note: Root-approved bounded ordinary binding/call remediation for
       tco-non-eval-global.js. The source assigns its statically declared
@@ -5939,7 +5947,7 @@ paths:
   test/built-ins/Function/prototype/toString/symbol-named-builtins.js: [pass, observation]
   test/built-ins/Function/prototype/toString/unicode.js: [pass, observation]
   test/built-ins/GeneratorFunction/extensibility.js: [pass, observation]
-  test/built-ins/GeneratorFunction/has-instance.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, generators]]
+  test/built-ins/GeneratorFunction/has-instance.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]
   test/built-ins/GeneratorFunction/instance-construct-throws.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]
   test/built-ins/GeneratorFunction/instance-length.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]
   test/built-ins/GeneratorFunction/instance-name.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, generators]]
@@ -15239,7 +15247,7 @@ paths:
   test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T13.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T14.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T2.js: [pass, observation]
-  test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [object-properties]]
+  test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [object-properties]]
   test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T4.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T5.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleLowerCase/S15.5.4.17_A1_T6.js: [pass, observation]
@@ -15266,7 +15274,7 @@ paths:
   test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T13.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T14.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T2.js: [pass, observation]
-  test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [object-properties]]
+  test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [object-properties]]
   test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T4.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T5.js: [pass, observation]
   test/built-ins/String/prototype/toLocaleUpperCase/S15.5.4.19_A1_T6.js: [pass, observation]
@@ -15293,7 +15301,7 @@ paths:
   test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T13.js: [pass, observation]
   test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T14.js: [pass, observation]
   test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T2.js: [pass, observation]
-  test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [object-properties]]
+  test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [object-properties]]
   test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T4.js: [pass, observation]
   test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T5.js: [pass, observation]
   test/built-ins/String/prototype/toLowerCase/S15.5.4.16_A1_T6.js: [pass, observation]
@@ -15329,7 +15337,7 @@ paths:
   test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T13.js: [pass, observation]
   test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T14.js: [pass, observation]
   test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T2.js: [pass, observation]
-  test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [object-properties]]
+  test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [object-properties]]
   test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T4.js: [pass, observation]
   test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T5.js: [pass, observation]
   test/built-ins/String/prototype/toUpperCase/S15.5.4.18_A1_T6.js: [pass, observation]
@@ -29919,14 +29927,14 @@ paths:
   test/language/expressions/super/realm.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source, expression-operators, functions, object-properties, reflect-namespace, var-bindings]]
   test/language/expressions/super/super-reference-resolution.js: [pass, observation]
   test/language/expressions/tagged-template/cache-different-functions-same-site.js: [pass, observation]
-  test/language/expressions/tagged-template/cache-differing-expressions-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators]]
-  test/language/expressions/tagged-template/cache-differing-expressions-new-function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators]]
+  test/language/expressions/tagged-template/cache-differing-expressions-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
+  test/language/expressions/tagged-template/cache-differing-expressions-new-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-differing-expressions.js: [pass, observation]
   test/language/expressions/tagged-template/cache-differing-raw-strings.js: [pass, observation]
   test/language/expressions/tagged-template/cache-differing-string-count.js: [pass, observation]
-  test/language/expressions/tagged-template/cache-eval-inner-function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators]]
-  test/language/expressions/tagged-template/cache-identical-source-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators]]
-  test/language/expressions/tagged-template/cache-identical-source-new-function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators]]
+  test/language/expressions/tagged-template/cache-eval-inner-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
+  test/language/expressions/tagged-template/cache-identical-source-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
+  test/language/expressions/tagged-template/cache-identical-source-new-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-identical-source.js: [pass, observation]
   test/language/expressions/tagged-template/cache-realm.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [expression-operators]]
   test/language/expressions/tagged-template/cache-same-site-top-level.js: [pass, observation]
