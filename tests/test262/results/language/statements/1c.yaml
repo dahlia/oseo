@@ -112,6 +112,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - var-bindings
@@ -255,6 +256,7 @@ results:
     dependencies:
       - classes
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

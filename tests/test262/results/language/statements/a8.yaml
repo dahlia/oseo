@@ -123,7 +123,6 @@ results:
       - abrupt-completion
       - classes
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties
@@ -252,6 +251,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -292,7 +292,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - object-properties
       - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-direct-eval\

@@ -772,6 +772,16 @@ assessments:
       authorizes no whole-path exclusion. The two direct non-String eval
       identity paths have a separate bounded remediation owner. ADR 0013,
       ADR 0016 and ADR 0019, including reopening triggers, remain unchanged.
+  class-declaration-setter-mixed-assertion:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The direct-eval setter assertion is inside ADR 0016, but the
+      final callback reads C.getWithEval.call(D). The class declares only
+      setWithEval, so the absent getWithEval target produces an ordinary
+      TypeError before any method invocation or eval. That independent
+      non-source assertion remains in claim, without replacement evidence
+      or a maintainer accounting decision. Preserve the original source
+      and unsupported observation under active coverage remediation.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -20898,7 +20908,7 @@ paths:
     missingDynamicTag: false
     section: "sec-privatefieldget"
     subject: "Private static setter is visible to direct eval code"
-    assessment: eval-semantics
+    assessment: class-declaration-setter-mixed-assertion
   - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
       arlyerr-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

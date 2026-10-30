@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 884 reviewed unsupported paths assigned to
+delivers: "Resolves the 885 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -168,16 +168,18 @@ delivers: "Resolves the 884 reviewed unsupported paths assigned to
   docs/m5c-graph/observation-batch-06.md,
   docs/m5c-graph/observation-batch-08.md and
   docs/m5c-graph/observation-batch-14.md; ADR 0016 and ADR 0019 remain
-  unchanged. B22a adds one class-declaration fixture subject,
-  nested-private-direct-eval-err-contains-newtarget.js, and B22b adds two:
+  unchanged. B22a adds one fixture-construction subject,
+  nested-private-direct-eval-err-contains-newtarget.js. B22b adds two
+  fixture-construction subjects,
   private-direct-eval-err-contains-newtarget.js and
-  static-field-init-with-this.js. All three remain active remediation
-  under the existing fixture-construction assessment. B21d adds no
-  source-compilation rejection. The other 97 class-declaration eval
+  static-field-init-with-this.js, and the mixed-assertion path
+  private-static-setter-visible-to-direct-eval.js. Its final callback
+  reads the absent C.getWithEval target and throws TypeError before eval.
+  All four additions remain active remediation. B21d adds no
+  source-compilation rejection. The other 96 class-declaration eval
   subjects use the existing eval-semantics exclusion assessment under
-  ADR 0016. The B22a and B22b batch notes link the exact original
-  sources and the full-row assertion audit.
-  The current remediation scope is 884 paths."
+  ADR 0016. The B22a and B22b batch notes link the original sources and
+  full-row assertion audit. The current remediation scope is 885 paths."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family

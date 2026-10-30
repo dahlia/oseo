@@ -323,6 +323,7 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -372,6 +373,7 @@ results:
       - functions
       - generators
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols

@@ -330,6 +330,7 @@ results:
       - functions
       - generators
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - symbols
       - var-bindings
@@ -479,6 +480,7 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols

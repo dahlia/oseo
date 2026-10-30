@@ -179,6 +179,7 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -222,7 +223,6 @@ results:
       - classes
       - default-parameters
       - error-intrinsics
-      - expression-operators
       - functions
       - generators
       - object-properties

@@ -134,6 +134,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - var-bindings
@@ -180,6 +181,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - var-bindings
@@ -224,7 +226,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - object-properties
     execution:
       harnessIncludes:
         - base.js
@@ -263,6 +264,7 @@ results:
       - expression-operators
       - functions
       - generators
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

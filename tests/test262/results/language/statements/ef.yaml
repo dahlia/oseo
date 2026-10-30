@@ -248,6 +248,7 @@ results:
       - classes
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -292,6 +293,7 @@ results:
       - classes
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -333,6 +335,7 @@ results:
     dependencies:
       - classes
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

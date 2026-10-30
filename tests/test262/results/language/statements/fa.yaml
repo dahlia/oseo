@@ -60,7 +60,6 @@ results:
       - classes
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties
@@ -148,6 +147,7 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -289,6 +289,7 @@ results:
       - functions
       - generators
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -545,7 +546,6 @@ results:
       - classes
       - default-parameters
       - error-intrinsics
-      - expression-operators
       - functions
       - generators
       - object-properties

@@ -137,6 +137,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - var-bindings
@@ -181,7 +182,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - object-properties
       - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-private-der\
@@ -215,6 +215,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

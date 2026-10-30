@@ -179,6 +179,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -219,7 +220,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - object-properties
       - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-derived-cls\
@@ -330,6 +330,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

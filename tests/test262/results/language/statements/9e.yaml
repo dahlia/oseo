@@ -172,6 +172,7 @@ results:
       - expression-operators
       - functions
       - generators
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -212,6 +213,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -254,6 +256,7 @@ results:
       - expression-operators
       - functions
       - generators
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -415,6 +418,7 @@ results:
       - classes
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols

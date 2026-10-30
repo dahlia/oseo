@@ -144,7 +144,6 @@ results:
       - destructuring-bindings
       - expression-operators
       - functions
-      - generators
       - iterator-protocol
       - object-properties
       - symbols
@@ -190,6 +189,7 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -479,6 +479,7 @@ results:
       - expression-operators
       - functions
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols

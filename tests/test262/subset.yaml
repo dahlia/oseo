@@ -159925,7 +159925,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -160336,7 +160335,6 @@ tests:
         abrupt-completion,
         classes,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -160695,7 +160693,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -161136,7 +161133,6 @@ tests:
         classes,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -161567,7 +161563,6 @@ tests:
         classes,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -161658,7 +161653,6 @@ tests:
         classes,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -162013,7 +162007,6 @@ tests:
         abrupt-completion,
         classes,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -162098,7 +162091,6 @@ tests:
         abrupt-completion,
         classes,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -162393,7 +162385,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -162799,7 +162790,6 @@ tests:
         abrupt-completion,
         classes,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -163157,7 +163147,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -163593,7 +163582,6 @@ tests:
         classes,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -164020,7 +164008,6 @@ tests:
         classes,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -164109,7 +164096,6 @@ tests:
         classes,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -164456,7 +164442,6 @@ tests:
         abrupt-completion,
         classes,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -164539,7 +164524,6 @@ tests:
         abrupt-completion,
         classes,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -164801,7 +164785,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -165381,7 +165364,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -166540,7 +166522,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -167120,7 +167101,6 @@ tests:
         destructuring-bindings,
         expression-operators,
         functions,
-        generators,
         iterator-protocol,
         object-properties,
         symbols,
@@ -168304,6 +168284,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168315,6 +168296,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168326,6 +168308,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168337,6 +168320,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168348,6 +168332,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168359,6 +168344,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168370,6 +168356,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168381,6 +168368,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168392,6 +168380,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168403,6 +168392,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168414,6 +168404,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168425,6 +168416,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168438,6 +168430,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168453,6 +168446,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168468,6 +168462,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168483,6 +168478,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168497,6 +168493,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -168510,6 +168507,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -168522,6 +168520,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168533,6 +168532,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168544,6 +168544,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168555,6 +168556,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168566,6 +168568,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168577,6 +168580,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168588,6 +168592,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168599,6 +168604,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168610,6 +168616,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168758,6 +168765,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168768,6 +168776,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168778,6 +168787,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168788,6 +168798,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168798,6 +168809,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168808,6 +168820,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168818,6 +168831,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168828,6 +168842,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168838,6 +168853,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168848,6 +168864,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168858,6 +168875,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168868,6 +168886,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168880,6 +168899,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168894,6 +168914,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168908,6 +168929,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168922,6 +168944,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -168936,6 +168959,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -168949,6 +168973,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -168960,6 +168985,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168970,6 +168996,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168983,6 +169010,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -168999,6 +169027,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -169009,6 +169038,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -169019,6 +169049,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -169182,6 +169213,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169194,6 +169226,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169206,6 +169239,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169218,6 +169252,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169230,6 +169265,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169242,6 +169278,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169254,6 +169291,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169266,6 +169304,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169278,6 +169317,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169290,6 +169330,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169302,6 +169343,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169314,6 +169356,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169327,6 +169370,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169341,6 +169385,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169356,6 +169401,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169371,6 +169417,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169386,6 +169433,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169401,6 +169449,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169414,6 +169463,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169426,6 +169476,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169438,6 +169489,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169450,6 +169502,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169462,6 +169515,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169474,6 +169528,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169486,6 +169541,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169498,6 +169554,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169510,6 +169567,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169682,6 +169740,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169694,6 +169753,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169706,6 +169766,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169718,6 +169779,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169730,6 +169792,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169742,6 +169805,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169754,6 +169818,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169766,6 +169831,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169778,6 +169844,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169790,6 +169857,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169802,6 +169870,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169814,6 +169883,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169828,6 +169898,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169843,6 +169914,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169857,6 +169929,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169871,6 +169944,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169886,6 +169960,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169901,6 +169976,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -169914,6 +169990,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169926,6 +170003,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169941,6 +170019,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169959,6 +170038,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169971,6 +170051,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -169983,6 +170064,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -170146,6 +170228,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170157,6 +170240,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170168,6 +170252,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170179,6 +170264,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170190,6 +170276,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170201,6 +170288,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170212,6 +170300,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170223,6 +170312,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170234,6 +170324,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170245,6 +170336,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170256,6 +170348,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170267,6 +170360,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170280,6 +170374,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170295,6 +170390,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170310,6 +170406,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170325,6 +170422,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170339,6 +170437,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -170352,6 +170451,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -170364,6 +170464,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170375,6 +170476,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170386,6 +170488,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170397,6 +170500,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170408,6 +170512,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170419,6 +170524,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170430,6 +170536,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170441,6 +170548,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170452,6 +170560,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170600,6 +170709,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170610,6 +170720,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170620,6 +170731,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170630,6 +170742,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170640,6 +170753,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170650,6 +170764,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170660,6 +170775,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170670,6 +170786,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170680,6 +170797,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170690,6 +170808,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170700,6 +170819,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170710,6 +170830,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170722,6 +170843,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170736,6 +170858,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170750,6 +170873,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170764,6 +170888,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -170778,6 +170903,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -170791,6 +170917,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -170802,6 +170929,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170812,6 +170940,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170825,6 +170954,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170841,6 +170971,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170851,6 +170982,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170861,6 +170993,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -170935,7 +171068,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-2.js
@@ -170947,7 +171079,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall.js
@@ -170959,7 +171090,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-contains-superproperty-1.js
@@ -170996,7 +171126,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
@@ -171008,7 +171137,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
@@ -171020,7 +171148,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-body-direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
@@ -171031,7 +171158,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-direct-eval-err-contains-newtarget.js
@@ -171055,7 +171181,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-1.js
     expectedClassification: unsupported-profile-feature
@@ -171088,7 +171213,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall-2.js
@@ -171100,7 +171224,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall.js
@@ -171112,7 +171235,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-contains-superproperty-1.js
@@ -171149,7 +171271,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall-2.js
     expectedClassification: unsupported-profile-feature
@@ -171161,7 +171282,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall.js
     expectedClassification: unsupported-profile-feature
@@ -171173,7 +171293,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-arguments.js
     expectedClassification: unsupported-profile-feature
@@ -171184,7 +171303,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js
@@ -171208,7 +171326,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        object-properties,
       ]
   - path: test/language/statements/class/elements/arrow-fnc-init-err-contains-arguments.js
     expectedClassification: expected-negative
@@ -174319,6 +174436,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174329,6 +174447,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174339,6 +174458,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174349,6 +174469,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174359,6 +174480,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174369,6 +174491,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174379,6 +174502,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174389,6 +174513,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174399,6 +174524,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174409,6 +174535,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174419,6 +174546,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174429,6 +174557,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174441,6 +174570,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -174455,6 +174585,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -174469,6 +174600,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -174483,6 +174615,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -174497,6 +174630,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -174510,6 +174644,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -174521,6 +174656,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174531,6 +174667,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174544,6 +174681,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174560,6 +174698,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174570,6 +174709,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -174580,6 +174720,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175602,6 +175743,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175612,6 +175754,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175622,6 +175765,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175632,6 +175776,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175642,6 +175787,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175652,6 +175798,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175708,6 +175855,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -175722,6 +175870,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -175736,6 +175885,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -175750,6 +175900,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -175764,6 +175915,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -175777,6 +175929,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -175788,6 +175941,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -175798,6 +175952,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176008,6 +176163,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176019,6 +176175,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176030,6 +176187,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176041,6 +176199,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176052,6 +176211,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176063,6 +176223,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176074,6 +176235,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176085,6 +176247,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176096,6 +176259,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176107,6 +176271,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176118,6 +176283,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176129,6 +176295,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176142,6 +176309,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176157,6 +176325,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176172,6 +176341,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176187,6 +176357,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176201,6 +176372,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -176214,6 +176386,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -176226,6 +176399,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176237,6 +176411,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176248,6 +176423,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176259,6 +176435,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176270,6 +176447,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176281,6 +176459,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176292,6 +176471,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176303,6 +176483,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176314,6 +176495,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176462,6 +176644,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176472,6 +176655,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176482,6 +176666,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176492,6 +176677,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176502,6 +176688,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176512,6 +176699,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176522,6 +176710,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176532,6 +176721,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176542,6 +176732,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176552,6 +176743,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176562,6 +176754,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176572,6 +176765,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176584,6 +176778,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176598,6 +176793,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176612,6 +176808,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176626,6 +176823,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -176640,6 +176838,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -176653,6 +176852,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -176664,6 +176864,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176674,6 +176875,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176687,6 +176889,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176703,6 +176906,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176713,6 +176917,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -176723,6 +176928,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -177872,7 +178078,6 @@ tests:
         dynamic-source,
         error-intrinsics,
         functions,
-        object-literals,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-8.js
@@ -178055,6 +178260,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -178065,6 +178271,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -178075,6 +178282,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -178085,6 +178293,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -178095,6 +178304,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -178105,6 +178315,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -178115,15 +178326,18 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/regular-definitions-rs-privatename-identifier-initializer-alt.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/regular-definitions-rs-privatename-identifier-initializer.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/regular-definitions-rs-privatename-identifier.js
     expectedClassification: pass
     dependencies:
@@ -178131,6 +178345,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -178142,6 +178357,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178155,6 +178371,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178168,6 +178385,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178181,6 +178399,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178194,6 +178413,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -178206,16 +178426,19 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/regular-definitions-rs-static-method-privatename-identifier-alt.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/regular-definitions-rs-static-method-privatename-identifier.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/regular-definitions-rs-static-privatename-identifier-alt-by-classname.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -178397,6 +178620,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178409,6 +178633,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178421,6 +178646,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178433,6 +178659,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178445,6 +178672,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178457,6 +178685,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178469,6 +178698,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178481,6 +178711,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178493,6 +178724,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178505,6 +178737,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178517,6 +178750,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178529,6 +178763,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178542,6 +178777,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178556,6 +178792,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178571,6 +178808,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178586,6 +178824,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178601,6 +178840,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178616,6 +178856,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -178629,6 +178870,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178641,6 +178883,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178653,6 +178896,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178665,6 +178909,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178677,6 +178922,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178689,6 +178935,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178701,6 +178948,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178713,6 +178961,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178725,6 +178974,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178897,6 +179147,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178909,6 +179160,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178921,6 +179173,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178933,6 +179186,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178945,6 +179199,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178957,6 +179212,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178969,6 +179225,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178981,6 +179238,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -178993,6 +179251,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179005,6 +179264,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179017,6 +179277,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179029,6 +179290,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179043,6 +179305,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179058,6 +179321,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179072,6 +179336,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179086,6 +179351,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179101,6 +179367,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179116,6 +179383,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179129,6 +179397,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179141,6 +179410,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179156,6 +179426,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179174,6 +179445,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179186,6 +179458,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179198,6 +179471,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         var-bindings,
@@ -179361,6 +179635,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179372,6 +179647,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179383,6 +179659,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179394,6 +179671,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179405,6 +179683,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179416,6 +179695,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179427,6 +179707,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179438,6 +179719,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179449,6 +179731,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179460,6 +179743,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179471,6 +179755,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179482,6 +179767,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179495,6 +179781,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179510,6 +179797,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179525,6 +179813,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179540,6 +179829,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179554,6 +179844,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -179567,6 +179858,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -179579,6 +179871,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179590,6 +179883,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179601,6 +179895,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179612,6 +179907,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179623,6 +179919,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179634,6 +179931,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179645,6 +179943,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179656,6 +179955,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179667,6 +179967,7 @@ tests:
         expression-operators,
         functions,
         generators,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179815,6 +180116,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179825,6 +180127,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179835,6 +180138,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179845,6 +180149,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179855,6 +180160,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179865,6 +180171,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179875,6 +180182,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179885,6 +180193,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179895,6 +180204,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179905,6 +180215,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179915,6 +180226,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179925,6 +180237,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -179937,6 +180250,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179951,6 +180265,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179965,6 +180280,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179979,6 +180295,7 @@ tests:
         expression-operators,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -179993,6 +180310,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -180006,6 +180324,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -180017,6 +180336,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -180027,6 +180347,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -180040,6 +180361,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -180056,6 +180378,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -180066,6 +180389,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -180076,6 +180400,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181229,6 +181554,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181239,6 +181565,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181249,6 +181576,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181259,6 +181587,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181269,6 +181598,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181279,6 +181609,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181289,15 +181620,18 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/wrapped-in-sc-rs-privatename-identifier-initializer-alt.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/wrapped-in-sc-rs-privatename-identifier-initializer.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/wrapped-in-sc-rs-privatename-identifier.js
     expectedClassification: pass
     dependencies:
@@ -181305,6 +181639,7 @@ tests:
         classes,
         expression-operators,
         functions,
+        lexical-grammar,
         object-properties,
         var-bindings,
       ]
@@ -181316,6 +181651,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -181329,6 +181665,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -181342,6 +181679,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -181355,6 +181693,7 @@ tests:
         classes,
         functions,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         promise-settlement,
         symbols,
@@ -181368,6 +181707,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -181380,16 +181720,19 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
       ]
   - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-method-privatename-identifier-alt.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-method-privatename-identifier.js
     expectedClassification: pass
-    dependencies: [classes, functions, object-properties, var-bindings]
+    dependencies:
+      [classes, functions, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/class/elements/wrapped-in-sc-rs-static-privatename-identifier-alt-by-classname.js
     expectedClassification: pass
     dependencies: [classes, object-properties]
@@ -181475,7 +181818,6 @@ tests:
         abrupt-completion,
         classes,
         default-parameters,
-        expression-operators,
         functions,
         generators,
         object-properties,
@@ -181517,7 +181859,6 @@ tests:
         classes,
         default-parameters,
         error-intrinsics,
-        expression-operators,
         functions,
         generators,
         object-properties,
@@ -181543,7 +181884,6 @@ tests:
         classes,
         default-parameters,
         error-intrinsics,
-        expression-operators,
         functions,
         generators,
         object-properties,
@@ -181730,7 +182070,6 @@ tests:
         abrupt-completion,
         classes,
         default-parameters,
-        expression-operators,
         functions,
         generators,
         object-properties,
@@ -181772,7 +182111,6 @@ tests:
         classes,
         default-parameters,
         error-intrinsics,
-        expression-operators,
         functions,
         generators,
         object-properties,
@@ -181798,7 +182136,6 @@ tests:
         classes,
         default-parameters,
         error-intrinsics,
-        expression-operators,
         functions,
         generators,
         object-properties,

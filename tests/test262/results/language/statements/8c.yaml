@@ -94,7 +94,6 @@ results:
       - classes
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties
@@ -334,6 +333,7 @@ results:
       - expression-operators
       - functions
       - generators
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -377,6 +377,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - var-bindings
@@ -588,6 +589,7 @@ results:
     dependencies:
       - classes
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

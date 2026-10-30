@@ -213,7 +213,6 @@ results:
       - classes
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - iterator-protocol

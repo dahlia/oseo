@@ -297,7 +297,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - object-properties
       - var-bindings
     observation:
       detail: "test/language/statements/class/elements/arrow-body-derived-cls\

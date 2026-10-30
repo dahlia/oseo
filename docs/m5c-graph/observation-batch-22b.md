@@ -22,14 +22,15 @@ the base tree and shows byte preservation of every existing subset row.
 Classifications come from execution with empty tag inputs; materialization adds
 only the reviewed dependency tags through the canonical manifest serializer.
 
-Of the 37 unsupported paths, 33 eval-source subjects use the existing
-ADR 0016 eval-semantics exclusion assessment. Another 2 use eval as
-fixture construction and retain dynamic-source coverage remediation.
+Of the 37 unsupported paths, 32 eval-source subjects use the existing
+ADR 0016 eval-semantics exclusion assessment. Two use eval as fixture
+construction; another has an independent ordinary TypeError assertion.
+All three retain dynamic-source coverage remediation.
 The two optional private-accessor lookup subjects retain their bounded
 remediation owner.
 The [owner assignments](/data/m5c-d17-20261031/train-b/owner-assignments.json)
 list every path. The
-[source audit](/data/m5c-d17-20261031/train-b/round1-investigation/eval-owner-audit.json)
+[source audit](/data/m5c-d17-20261031/train-b/round2-investigation/independent-assertion-audit.json)
 reviews all 1,859 rows, including the source and assertion bounds for all 100
 eval rejections. Existing assessment and ADR boundaries are unchanged. No
 unsupported result counts as a pass.
@@ -90,3 +91,25 @@ also retain generators for their rejected grammar subjects. The
 [parse-grammar audit](/data/m5c-d17-20261031/train-b/round1-investigation/parse-generator-audit.json)
 covers all 1,859 rows and all 197 parse negatives. Execution counts and
 ownership are unchanged.
+
+The second-round
+[identifier audit](/data/m5c-d17-20261031/train-b/round2-investigation/identifier-audit.json)
+adds lexical-grammar to 203 additional identifier-matrix rows. Their Unicode
+and escaped names are the asserted subject. Across both element batches, all
+414 matrix instances now retain this family.
+
+The
+[operator audit](/data/m5c-d17-20261031/train-b/round2-investigation/unreached-operator-audit.json)
+removes expression-operators from six generator parameter-error rows, whose
+initializers throw before their body counter can run. The
+[object-fixture audit](/data/m5c-d17-20261031/train-b/round2-investigation/early-error-object-audit.json)
+removes object-literals from privatename-not-valid-eval-earlyerr-7.js: eval
+rejects the undeclared private name before obj is read.
+
+The
+[independent-assertion audit](/data/m5c-d17-20261031/train-b/round2-investigation/independent-assertion-audit.json)
+reviews all 100 eval rejections and preserves the mixed static-setter case as
+remediation. Its final C.getWithEval.call(D) reads an absent method and throws
+TypeError before any eval. The existing dynamic-source node owns 885 paths,
+including four additions from these batches. The original source, all
+assertions and the unsupported observation stay.

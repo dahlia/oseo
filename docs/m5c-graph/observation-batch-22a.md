@@ -27,7 +27,7 @@ ADR 0016 eval-semantics exclusion assessment. Another 1 use eval as
 fixture construction and retain dynamic-source coverage remediation.
 The [owner assignments](/data/m5c-d17-20261031/train-b/owner-assignments.json)
 list every path. The
-[source audit](/data/m5c-d17-20261031/train-b/round1-investigation/eval-owner-audit.json)
+[source audit](/data/m5c-d17-20261031/train-b/round2-investigation/independent-assertion-audit.json)
 reviews all 1,859 rows, including the source and assertion bounds for all 100
 eval rejections. Existing assessment and ADR boundaries are unchanged. No
 unsupported result counts as a pass.
@@ -72,3 +72,20 @@ The
 covers all 1,859 train rows and distinguishes asserted insertion from explicit
 semicolons and complete method definitions. Execution counts and ownership are
 unchanged.
+
+The second-round
+[identifier audit](/data/m5c-d17-20261031/train-b/round2-investigation/identifier-audit.json)
+adds lexical-grammar to 177 additional identifier-matrix rows. The 27 shared
+rs-\* cases explicitly specify IdentifierStart, IdentifierPart and Unicode
+escapes, and assert reads, writes or calls through the declared names. The
+full-train AST scan checks all 1,859 sources and finds no additional
+unclassified Unicode identifier subject outside the matrices.
+
+Root's
+[property-syntax ruling](/data/m5c-d17-20261031/train-b/round2-investigation/property-tag-policy-decision.json)
+removes object-properties from 16 constructor-eval error rows whose recorded
+read follows aborted construction. Four explicit indirect-eval SuperProperty
+subjects keep the family for their rejected property syntax. Their corrected
+per-row evidence claims no runtime property lookup; the
+[full-train audit](/data/m5c-d17-20261031/train-b/round2-investigation/constructor-property-audit.json)
+records every disposition.

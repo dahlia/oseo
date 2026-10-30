@@ -84,10 +84,10 @@ owners:
       non-source subjects; 584 paths. Only the import()
       source-evaluation site remains; an accepted ADR 0016 amendment
       admitting any dynamic import reopens them. B22a adds 64 and B22b
-      adds 33 reviewed eval-source subjects under the existing
+      adds 32 reviewed eval-source subjects under the existing
       eval-semantics assessment; the batch notes bind their source and
       assertion audit."
-    paths: 681
+    paths: 680
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -206,9 +206,10 @@ owners:
       B06/B08/B14 source-rejection paths (325/2/12); fresh source-bound
       audit rows retain active remediation; no whole-path exclusion or
       ADR boundary change is authorized. B22a adds one
-      fixture-construction rejection and B22b adds two; their non-source
-      subjects retain active remediation."
-    paths: 884
+      fixture-construction rejection; B22b adds two fixture-construction
+      rejections and one mixed eval/ordinary-TypeError assertion. All
+      four retain active remediation."
+    paths: 885
   node:module-top-level-await-patterns:
     note: "Observed OSEO1001: Await inside a module top-level binding or
       assignment pattern is unsupported. The dynamic-import observe-only
@@ -35188,30 +35189,30 @@ paths:
   test/language/statements/class/elements/after-same-line-static-method-string-literal-names.js: [pass, observation]
   test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-contains-superproperty-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-contains-superproperty-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
+  test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
+  test/language/statements/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-contains-superproperty-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
   test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-contains-superproperty-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/statements/class/elements/arrow-body-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/statements/class/elements/arrow-body-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/statements/class/elements/arrow-body-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
+  test/language/statements/class/elements/arrow-body-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
+  test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
+  test/language/statements/class/elements/arrow-body-private-derived-cls-direct-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-contains-superproperty-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
   test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-contains-superproperty-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
-  test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
+  test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/statements/class/elements/arrow-body-private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/statements/class/elements/arrow-body-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
-  test/language/statements/class/elements/arrow-body-private-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
+  test/language/statements/class/elements/arrow-body-private-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/statements/class/elements/arrow-fnc-init-err-contains-arguments.js: [expected-negative, observation]
   test/language/statements/class/elements/arrow-fnc-init-err-contains-super.js: [expected-negative, observation]
   test/language/statements/class/elements/async-gen-private-method-static/await-as-binding-identifier-escaped.js: [expected-negative, observation]
@@ -35873,7 +35874,7 @@ paths:
   test/language/statements/class/elements/private-static-method-usage-inside-nested-class.js: [pass, observation]
   test/language/statements/class/elements/private-static-method-visible-to-direct-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties]]
   test/language/statements/class/elements/private-static-setter-abrupt-completition.js: [pass, observation]
-  test/language/statements/class/elements/private-static-setter-visible-to-direct-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
+  test/language/statements/class/elements/private-static-setter-visible-to-direct-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, object-properties]]
   test/language/statements/class/elements/private-ternary-init-err-contains-arguments.js: [expected-negative, observation]
   test/language/statements/class/elements/private-ternary-init-err-contains-super.js: [expected-negative, observation]
   test/language/statements/class/elements/private-typeof-init-err-contains-arguments.js: [expected-negative, observation]
@@ -35922,7 +35923,7 @@ paths:
   test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-4.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-properties, var-bindings]]
   test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-5.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-6.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
-  test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-7.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, object-literals, var-bindings]]
+  test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-7.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/statements/class/elements/privatename-not-valid-eval-earlyerr-8.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, classes, dynamic-source, error-intrinsics, functions, var-bindings]]
   test/language/statements/class/elements/privatename-valid-no-earlyerr.js: [pass, observation]
   test/language/statements/class/elements/prod-private-getter-before-super-return-in-constructor.js: [pass, observation]

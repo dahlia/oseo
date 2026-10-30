@@ -60,3 +60,18 @@ iterator acquisition throws before symbol-keyed property access. The
 [null-dispatch audit](/data/m5c-d17-20261031/train-b/round1-investigation/null-symbol-audit.json)
 covers all 1,859 train rows, including all other implicit-symbol consumers. The
 classifications and ownership are unchanged.
+
+The second-round full-train reachability audit removes expression-operators
+from 12 destructuring error rows. Four counters follow an unconditional
+iterator throw; eight default-initializer counters are bypassed by an
+earlier binding failure. Their zero assertions do not observe an operator.
+The
+[operator audit](/data/m5c-d17-20261031/train-b/round2-investigation/unreached-operator-audit.json)
+records every train row and retains the eight ordinary methods whose body
+counter really runs.
+
+Those eight methods use a supplied inner array, so their g() default is
+skipped. The generator declaration is an unused fixture, not asserted
+generator behavior. The
+[generator-fixture audit](/data/m5c-d17-20261031/train-b/round2-investigation/unused-generator-audit.json)
+removes only that family and keeps the reached method-body operators.

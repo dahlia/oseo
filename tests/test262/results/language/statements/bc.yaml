@@ -173,6 +173,7 @@ results:
       - functions
       - generators
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - symbols
@@ -219,7 +220,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - object-properties
     execution:
       harnessIncludes:
         - base.js
@@ -361,6 +361,7 @@ results:
       - expression-operators
       - functions
       - generators
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

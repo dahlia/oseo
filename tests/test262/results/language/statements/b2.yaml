@@ -199,6 +199,7 @@ results:
       - functions
       - generators
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - symbols
       - var-bindings

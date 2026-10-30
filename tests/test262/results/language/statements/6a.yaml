@@ -382,6 +382,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -482,7 +483,6 @@ results:
       - abrupt-completion
       - classes
       - default-parameters
-      - expression-operators
       - functions
       - generators
       - object-properties
