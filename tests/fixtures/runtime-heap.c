@@ -1604,6 +1604,7 @@ typedef enum {
     REGEXP_ALLOCATION_LITERAL,
     REGEXP_ALLOCATION_EXEC,
     REGEXP_ALLOCATION_EXEC_INDICES,
+    REGEXP_ALLOCATION_ANCHORED_SCAN,
     REGEXP_ALLOCATION_TO_STRING,
     REGEXP_ALLOCATION_OPERATION_COUNT,
 } RegExpAllocationOperation;
@@ -1649,7 +1650,8 @@ static const OseoRegExpLiteral literal_descriptor = {
 };
 
 static bool regexp_allocation_uses_method(RegExpAllocationOperation op) {
-    return op == REGEXP_ALLOCATION_EXEC ||
+    return op == REGEXP_ALLOCATION_ANCHORED_SCAN ||
+        op == REGEXP_ALLOCATION_EXEC ||
         op == REGEXP_ALLOCATION_EXEC_INDICES ||
         op == REGEXP_ALLOCATION_TO_STRING;
 }
@@ -1684,7 +1686,11 @@ static void prepare_regexp_allocation_operation(
      * method they call, so both are prepared before the sweep starts
      * failing allocations: only the operation itself is under test.
      */
-    roots[3] = make_text(context, "(?<pair>a+)(b*)");
+    roots[3] = make_text(
+        context,
+        operation == REGEXP_ALLOCATION_ANCHORED_SCAN
+            ? "^[a]+$" : "(?<pair>a+)(b*)"
+    );
     roots[4] = make_text(
         context,
         operation == REGEXP_ALLOCATION_EXEC_INDICES ? "d" : ""
@@ -1702,7 +1708,10 @@ static void prepare_regexp_allocation_operation(
     roots[6] = require_normal(
         oseo_object_get(context, roots[5], roots[6])
     );
-    roots[1] = make_text(context, "xaabby");
+    roots[1] = make_text(
+        context,
+        operation == REGEXP_ALLOCATION_ANCHORED_SCAN ? "aaa" : "xaabby"
+    );
 }
 
 static OseoResult run_regexp_allocation_operation(
@@ -1828,8 +1837,11 @@ static void validate_regexp_allocation_retry(
         roots[4] = make_text(context, "index");
         assert(
             require_normal(oseo_object_get(context, roots[3], roots[4])) ==
-            oseo_number(1.0)
+            oseo_number(
+                operation == REGEXP_ALLOCATION_ANCHORED_SCAN ? 0.0 : 1.0
+            )
         );
+        if (operation == REGEXP_ALLOCATION_ANCHORED_SCAN) return;
         roots[4] = make_text(
             context,
             operation == REGEXP_ALLOCATION_EXEC_INDICES ? "indices" : "groups"
@@ -2024,6 +2036,59 @@ static void test_regexp_matcher_limits(void) {
     }
     assert_regexp_diagnostic(pattern, instruction_length, limit_message);
     free(pattern);
+}
+
+/* Exercise unchanged default limits and the selected scan's step ceiling. */
+static void assert_regexp_execution_limit(
+    const char *pattern,
+    size_t input_length
+) {
+    OseoContext context;
+    oseo_context_init(&context, "runtime-heap.c", 14u);
+    OseoValue roots[5] = {
+        oseo_undefined(), oseo_undefined(), oseo_undefined(),
+        oseo_undefined(), oseo_undefined(),
+    };
+    OseoRootFrame frame = {NULL, roots, 5u};
+    oseo_roots_push(&context, &frame);
+    roots[0] = require_normal(oseo_intrinsic(&context, OSEO_INTRINSIC_REGEXP));
+    roots[1] = make_text(&context, pattern);
+    roots[2] = require_normal(oseo_call_function(
+        &context, roots[0], oseo_undefined(), 1u, &roots[1], roots[0]
+    ));
+    uint16_t *units = allocate_regexp_units(input_length);
+    for (size_t index = 0u; index < input_length; index += 1u) {
+        units[index] = 'a';
+    }
+    roots[3] = require_normal(
+        oseo_string_from_units(&context, units, input_length)
+    );
+    free(units);
+    roots[4] = make_text(&context, "exec");
+    roots[4] = require_normal(oseo_object_get(&context, roots[2], roots[4]));
+    OseoResult result = oseo_call_function(
+        &context, roots[4], roots[2], 1u, &roots[3], oseo_undefined()
+    );
+    assert(result.status == OSEO_STATUS_THROW);
+    assert(result.value == oseo_undefined());
+    assert(context.has_diagnostic);
+    assert(strcmp(context.error_code, "OSEO2001") == 0);
+    assert(strcmp(context.error_message,
+        "Regular expression matching exceeds the reviewed matcher limit."
+    ) == 0);
+    oseo_roots_pop(&context, &frame);
+    oseo_context_destroy(&context);
+}
+
+static void test_regexp_execution_limits(void) {
+    /* Selected scan reaches its unchanged 16,777,216-step ceiling. */
+    assert_regexp_execution_limit("^a+$", (size_t)0x1000000u);
+    /* Ordered exponential steps, capture trail and pending forks. */
+    assert_regexp_execution_limit("^(a+)+b$", 24u);
+    assert_regexp_execution_limit("^(a)+$", (size_t)0x200000u);
+    assert_regexp_execution_limit(
+        "^(?:(?:|)(?:|)(?:|)a)+$", (size_t)0x200000u
+    );
 }
 
 static void test_regexp_duplicate_name_scale(void) {
@@ -3331,6 +3396,7 @@ int main(void) {
     test_data_view_prototype_revalidation();
     test_regexp_allocation_sweep();
     test_regexp_matcher_limits();
+    test_regexp_execution_limits();
     test_regexp_duplicate_name_scale();
     test_regexp_prototype_and_conversion_order();
     test_realm_random_sequences();

@@ -393,6 +393,118 @@ function collectCaptures(
 }
 
 /**
+ * Prove the entire artifact is ^set+$ before touching match state.
+ *
+ * Keep this exact layout proof in sync with anchored_repeat_set in C.
+ * There is no continuation, capture, empty body or alternative whose
+ * state could escape the scan. Everything else keeps ordered execution.
+ */
+function anchoredRepeatSet(
+  program: RegExpMatcherProgram,
+): RegExpMatcherSet | undefined {
+  if (
+    !["", "u", "v"].includes(program.flags.text) ||
+    program.captures.length !== 0 ||
+    program.registers !== 4 ||
+    program.instructions.length !== 11
+  )
+    return undefined;
+  const [
+    save,
+    start,
+    init,
+    repeat,
+    enter,
+    consume,
+    end,
+    edge,
+    close,
+    accept,
+    fail,
+  ] = program.instructions;
+  if (
+    save?.kind !== "save" ||
+    save.slot !== 0 ||
+    start?.kind !== "edge" ||
+    start.assertion !== "start" ||
+    start.multiline ||
+    init?.kind !== "repeat-init" ||
+    init.counter !== 2 ||
+    repeat?.kind !== "repeat" ||
+    repeat.counter !== 2 ||
+    repeat.enter !== 4 ||
+    repeat.exit !== 7 ||
+    !repeat.greedy ||
+    repeat.minimum !== 1 ||
+    repeat.maximum !== Infinity ||
+    enter?.kind !== "repeat-enter" ||
+    enter.counter !== 2 ||
+    enter.position !== 3 ||
+    enter.body !== 5 ||
+    enter.clearFrom !== 0 ||
+    enter.clearTo !== 0 ||
+    consume?.kind !== "consume" ||
+    consume.backward ||
+    end?.kind !== "repeat-end" ||
+    end.counter !== 2 ||
+    end.position !== 3 ||
+    end.head !== 3 ||
+    end.minimum !== 1 ||
+    edge?.kind !== "edge" ||
+    edge.assertion !== "end" ||
+    edge.multiline ||
+    close?.kind !== "save" ||
+    close.slot !== 1 ||
+    accept?.kind !== "accept" ||
+    fail?.kind !== "fail"
+  )
+    return undefined;
+  return program.sets[consume.set];
+}
+
+/**
+ * Constant-state scan of a proved complete pattern, with no undo state.
+ * Charge one entry, one per character tested, and one terminal decision.
+ * The existing step ceiling remains explicit; no trail or stack is used.
+ * Non-multiline $ requires InputLength, including after line terminators.
+ */
+function scanAnchoredRepeat(
+  request: RegExpExecutionInput,
+  limits: RegExpExecutionLimits,
+  set: RegExpMatcherSet,
+): RegExpExecution {
+  const { program, text } = request;
+  let steps = 0;
+  const limited = (): RegExpLimitedExecution => ({
+    limit: "steps",
+    outcome: "limit",
+    steps,
+  });
+  if (steps >= limits.steps) return limited();
+  steps += 1;
+  if (alignedStart(text, request.startIndex, program.unicodeMode) !== 0) {
+    return { outcome: "unmatched", steps };
+  }
+  let index = 0;
+  while (index < text.length) {
+    if (steps >= limits.steps) return limited();
+    steps += 1;
+    const character = characterAt(text, index, program.unicodeMode);
+    if (!setHas(set, character)) return { outcome: "unmatched", steps };
+    index += character > 0xff_ff ? 2 : 1;
+  }
+  if (steps >= limits.steps) return limited();
+  steps += 1;
+  return index === 0
+    ? { outcome: "unmatched", steps }
+    : {
+        captures: [{ end: index, start: 0 }],
+        outcome: "matched",
+        steps,
+      };
+}
+
+/**
  * Run one anchored match attempt at one position.
  *
  * The attempt starts at `startIndex` and never searches a later position;
@@ -408,6 +520,8 @@ export function matchRegExpMatcher(
   if (startIndex < 0 || startIndex > text.length) {
     return { outcome: "unmatched", steps: 0 };
   }
+  const scanSet = anchoredRepeatSet(program);
+  if (scanSet != null) return scanAnchoredRepeat(request, limits, scanSet);
   const machine: Machine = {
     index: alignedStart(text, startIndex, program.unicodeMode),
     limit: undefined,
@@ -596,6 +710,8 @@ export function searchRegExpMatcher(
   if (request.startIndex < 0 || request.startIndex > text.length) {
     return { outcome: "unmatched", steps: 0 };
   }
+  const scanSet = anchoredRepeatSet(program);
+  if (scanSet != null) return scanAnchoredRepeat(request, limits, scanSet);
   let index = alignedStart(text, request.startIndex, program.unicodeMode);
   for (;;) {
     const attempt = matchRegExpMatcher({

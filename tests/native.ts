@@ -94,6 +94,8 @@ const { typedArrayStaticsFixtures } =
 
 const { regexpLiteralAotFixtures } =
   await import("./native/fixtures/regexp-literal-aot.ts");
+const { regexpAnchoredRepeatFixtures } =
+  await import("./native/fixtures/regexp-anchored-repeat.ts");
 const { regexpPrototypeAndExecFixtures } =
   await import("./native/fixtures/regexp-prototype-and-exec.ts");
 const { regexpPatternExtensionFixtures } =
@@ -266,6 +268,7 @@ const fixtures: readonly Fixture[] = [
   ...regexpLiteralAotFixtures,
   ...regexpPatternExtensionFixtures,
   ...regexpPrototypeAndExecFixtures,
+  ...regexpAnchoredRepeatFixtures,
   ...regexpSymbolMethodsFixtures,
   ...generatorFixtures,
   ...functionIntrinsicChainFixtures,
@@ -1274,6 +1277,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
+    fixture.name === "regexp-anchored-repeat" ||
     fixture.name === "regexp-symbol-methods" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-float16" ||
@@ -1605,6 +1609,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "regexp-literal-aot" ||
     fixture.name === "regexp-pattern-extensions" ||
     fixture.name === "regexp-prototype-and-exec" ||
+    fixture.name === "regexp-anchored-repeat" ||
     fixture.name === "bigint-primitive" ||
     fixture.name === "bigint-false-number-hint" ||
     fixture.name === "reflect-namespace" ||
@@ -1745,6 +1750,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "regexp-literal-aot" ||
             fixture.name === "regexp-pattern-extensions" ||
             fixture.name === "regexp-prototype-and-exec" ||
+            fixture.name === "regexp-anchored-repeat" ||
             fixture.name === "typed-array-constructors" ||
             fixture.name === "typed-array-float16" ||
             fixture.name === "typed-array-core" ||

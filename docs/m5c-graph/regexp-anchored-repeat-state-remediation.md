@@ -168,3 +168,117 @@ The unchanged helper adds no property file or weight. B retains 79 jobs,
 policies and deadlines. Root will use exact-source candidate job logs and
 stock failed-job replay after diagnosis; no lowered budget, new shard total,
 benchmark, Native duplicate or Full duplicate is authorized by this plan.
+
+
+2026-10-31 bounded implementation
+---------------------------------
+
+The implementation starts at Main `8f4202628356e172e1b4093a371d086070619de3`
+without rebasing. Its three owned checked-in records still classify the
+originals as `unsupported-profile-feature` with `regexp-matcher-limit`;
+only non-strict/disabled is stored for each. No subset, result, ledger,
+owner or landed-state change is made by this implementation.
+
+Both executors prove the complete eleven-instruction artifact before
+selecting a constant-state `^set+$` scan. The proof checks zero captures,
+four registers, all save slots, a forward consume of one existing set,
+the greedy minimum-one/unbounded repeat, its counter and position links,
+every continuation, non-multiline edges and the final accept/fail layout.
+The exact flag allowlist is empty, `u`, or `v`; the C wrapper supplies
+eligibility from the artifact mask because the program does not retain
+all flags. Root confirmed this bound through the dispatch question on
+2026-10-31. Other flags and shapes take the unchanged ordered executor
+before any scan state is exposed.
+
+A selected attempt charges one entry step, one per tested character and
+one terminal decision at input exhaustion, under the unchanged step limit.
+It uses no undo-trail or backtrack entries and allocates no matcher work
+area. Capture/result allocation remains owned by the wrapper and is swept
+for failure and retry in the existing heap fixture. Ordered stack/trail/
+step limits and their counters remain unchanged. The scan advances by
+code unit or code point according to the program, returns actual UTF-16
+spans, rejects empty input, and requires InputLength for non-multiline `$`.
+The wrapper retains ordinary `lastIndex` conversion and property effects;
+flags that write it remain on the ordered path.
+
+Fixed compiler tests cover set and line-terminator boundaries, paired and
+lone surrogates, exact step accounting, fallback guards and input lengths
+2,097,151 through 2,097,153. The existing matcher property family adds seed
+`0x60004d02` for scan/forced-ordered span comparisons. The existing native
+execution family adds seed `0x60005004` for literal/dynamic comparisons
+against Node.js and Deno, both policies, false hints and forced collection.
+No new property file, seed block, case-budget override or shard weight is
+introduced. The new native fixture is registered in both forced-collection
+lists. The original-subject native suite adds all three exact upstream
+paths, preserving data, assertions and four actual execution variants.
+
+Focused execution, internal review and Root's D3/UPDATE remain separate
+requirements; their results are recorded below when obtained. No current
+promotion, complete review or publication is inferred from source changes.
+
+
+Initial focused checks
+----------------------
+
+The compiler matcher suites and both existing matcher property domains,
+plus the new forced-ordered domain, passed 53 registrations. The capacity-
+wrapped serial `mise run check` exited zero; the compatibility ratchet
+reported zero overrides. Logs are under
+*/data/m5c-d17-20261031/regexanchor/* and its sibling unit logs.
+
+The first native vector observed all three original subjects as passes,
+each with all four variants, but the vector as a whole failed because the
+two new literal tests used the data-free frontend. Those tests now select
+the production CLI frontend, which links the required Unicode data. This
+is a test-composition correction, not a matcher or upstream-source change.
+The failed vector is retained as *native-zig.stdout* and is not a clean
+gate. A final vector on the corrected source is required below.
+
+The next vector passed 13 of 14 registrations, including the updated C heap
+controls, both native policies in the generated domain, and all original
+subjects. Its fixed fixture reached the existing located dynamic `v`
+class-set boundary for `new RegExp("^[a]+$", "v")`; that rejection is
+preserved. The large literal/source comparison now uses `^a+$`, which has
+the same single-consuming-set artifact and is dynamically admitted under
+all three allowed flag strings. The native generator constructs `v` cases
+from its admitted atom vocabulary directly; bracket class sets remain in
+its other flag modes and in fixed ahead-of-time `v` evidence. It does not
+filter generated draws or weaken an assertion. The failed vector remains
+*native-zig-final.stdout*; its passing C heap and upstream scopes have
+unchanged inputs after this test-only correction.
+
+
+Final focused validation
+------------------------
+
+All required affected scopes passed with their ordinary seeds, cases,
+policies and deadlines. The pure matcher/unit/property vector passed 53
+registrations. The fast non-native root suite passed all 833 registrations
+across 58 files, with no failure, skip or cancellation.
+
+The final combined heavy gate ran from 2026-10-30T18:05:07Z to 18:07:52Z
+and exited zero. Its host-cc lane passed all seven sanitizer self-tests,
+then all fourteen registrations across the native execution property file,
+original RegExp helper/subject file and runtime heap file. The corrected
+whole execution property file then passed all six registrations on Zig.
+The Zig runtime heap and original-subject scopes, eight registrations,
+retain their passing observations in the earlier vector: their source and
+test inputs are unchanged. This is scoped retention, not a claim that the
+earlier failed fourteen-registration vector was clean. The retained source
+and test digest comparison reported no changed validation inputs.
+
+Both lanes observed each of the three exact owned originals as a pass in
+all four actual strictness/policy variants. Their standard, `u` and `v`
+patterns, data and assertions are unchanged. These are focused executions,
+not a test262 UPDATE or an edit to checked-in classifications. The C heap
+scope includes the new selected allocation-failure/retry sweep and the
+unchanged-default-limit controls for selected and ordered execution; it
+adds no counter trace for the original subjects.
+
+The final gate metadata is *remaining-heavy.json*. Raw outputs are
+*hostcc-clean.stdout*, *hostcc-clean.stderr*, *property-zig-clean.stdout*
+and *property-zig-clean.stderr* under the external evidence directory
+above. *non-native.stdout* records the fast suite. The earlier failed
+vectors remain intact. No extended property or whole repository test task
+was run. Internal review and Root's D3/UPDATE remain pending at this source
+commit; Root owns any result changes and publication.

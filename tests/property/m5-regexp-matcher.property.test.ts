@@ -587,9 +587,10 @@ function printCase(model: CaseModel): PrintedCase {
 function artifactOf(
   source: string,
   flags: string,
+  extensions: RegExpPatternExtensions = propertyExtensions,
 ): RegExpMatcherProgram | undefined {
   const parsed = parseRegExpPattern({
-    extensions: propertyExtensions,
+    extensions,
     flags,
     source,
   });
@@ -828,6 +829,69 @@ test("a generated artifact stays well formed under its own limits", () => {
       profile: "M5b generic regular expression matcher",
       seed: 0x6000_4d01,
       sizeLimit: `terms<=${maximumTerms} depth<=${maximumDepth}`,
+      timeLimitMilliseconds: 60_000,
+    },
+  );
+});
+
+test("anchored scans agree with forced ordered execution", () => {
+  assertProperty(
+    "single-set scan and ordered artifact return identical match spans",
+    fc.property(
+      fc.record({
+        atom: fc.constantFrom("[a-c]", "[^a]", "\\D", "\\S", "\\W", "."),
+        flags: fc.constantFrom("", "u", "v"),
+        parts: fc.array(
+          fc.constantFrom(
+            "a",
+            "d",
+            "0",
+            " ",
+            "\n",
+            "\r",
+            "\u2028",
+            "\u2029",
+            "\ud800",
+            "\udc00",
+            "\u{1f600}",
+          ),
+          { maxLength: 20 },
+        ),
+        startIndex: fc.integer({ min: 0, max: 22 }),
+      }),
+      ({ atom, flags, parts, startIndex }) => {
+        const program = artifactOf(`^${atom}+$`, flags, {
+          ...propertyExtensions,
+          admitted: ["unicode-property-escapes", "class-set-notation"],
+        });
+        assert.ok(program != null);
+        // An unreachable extra fail leaves ordered semantics unchanged,
+        // but deliberately fails the complete-layout applicability proof.
+        const ordered: RegExpMatcherProgram = {
+          ...program,
+          instructions: [...program.instructions, { kind: "fail" }],
+        };
+        const text = parts.join("");
+        const selected = searchRegExpMatcher({ program, startIndex, text });
+        const generic = searchRegExpMatcher({
+          program: ordered,
+          startIndex,
+          text,
+        });
+        assert.equal(selected.outcome, generic.outcome);
+        if (selected.outcome === "matched" && generic.outcome === "matched") {
+          assert.deepEqual(selected.captures, generic.captures);
+        }
+      },
+    ),
+    {
+      domain:
+        "whole anchored one-set greedy +, UTF-16 parts and starts; " +
+        "same immutable artifact with an unreachable fail forces fallback",
+      numRuns: 300,
+      profile: "M5 anchored repetition and ordered fallback",
+      seed: 0x6000_4d02,
+      sizeLimit: "twenty parts, flags empty/u/v, start positions 0..22",
       timeLimitMilliseconds: 60_000,
     },
   );

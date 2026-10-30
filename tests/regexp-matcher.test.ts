@@ -676,3 +676,101 @@ test("keeps the matcher independent of the specialization policy", () => {
   assert.deepEqual(first, second);
   assert.deepEqual(first, hostObserve("(a|ab)+c", "giu", "aababc"));
 });
+
+test("anchored single-set scans keep bounded state and UTF-16 spans", () => {
+  for (const flags of ["", "u", "v"]) {
+    for (const length of [0x1f_ffff, 0x20_0000, 0x20_0001]) {
+      const text = "a".repeat(length);
+      const result = searchRegExpMatcher({
+        program: artifact("^[a]+$", flags),
+        startIndex: 0,
+        text,
+      });
+      assert.equal(result.outcome, "matched");
+      if (result.outcome === "matched") {
+        assert.deepEqual(result.captures, [{ end: length, start: 0 }]);
+        assert.equal(result.steps, length + 2);
+      }
+    }
+    for (const text of [
+      "",
+      "a",
+      "aa",
+      "a\n",
+      "a\r\n",
+      "\u{1f600}",
+      "\ud800",
+      "\udc00",
+      "\ud800\udc00",
+      "0",
+    ]) {
+      for (const source of [
+        "^\\D+$",
+        "^\\S+$",
+        "^\\W+$",
+        "^[a]+$",
+        "^[\\uD800-\\uDFFF]+$",
+      ]) {
+        assert.deepEqual(
+          observe(source, flags, text),
+          hostObserve(source, flags, text),
+          `/${source}/${flags} ${text}`,
+        );
+      }
+    }
+  }
+});
+
+test("anchored scan charges deterministic steps without undo state", () => {
+  const program = artifact("^[a]+$", "");
+  const request = { program, startIndex: 0, text: "aaa" };
+  assert.deepEqual(
+    matchRegExpMatcher({
+      ...request,
+      limits: { backtrackEntries: 0, steps: 5, trailEntries: 0 },
+    }),
+    { captures: [{ end: 3, start: 0 }], outcome: "matched", steps: 5 },
+  );
+  for (let steps = 0; steps < 5; steps += 1) {
+    assert.deepEqual(
+      matchRegExpMatcher({
+        ...request,
+        limits: { backtrackEntries: 0, steps, trailEntries: 0 },
+      }),
+      { limit: "steps", outcome: "limit", steps },
+    );
+  }
+});
+
+test("anchored scan guard misses preserve the ordered executor", () => {
+  const sources = [
+    "^([a]+)$",
+    "^[a]+b$",
+    "^[a]+?$",
+    "^(?:a+)+$",
+    "^(?=a)[a]+$",
+    "^(a)\\1+$",
+    "[a]+$",
+    "^[a]*$",
+    "^[a]{1,3}$",
+  ];
+  for (const source of sources) {
+    const result = matchRegExpMatcher({
+      limits: { backtrackEntries: 0, steps: 100, trailEntries: 0 },
+      program: artifact(source, ""),
+      startIndex: 0,
+      text: "aaa",
+    });
+    assert.equal(result.outcome, "limit", source);
+    if (result.outcome === "limit") assert.equal(result.limit, "trail-entries");
+  }
+  for (const flags of ["m", "i", "g", "y", "d", "s", "gu", "yu"]) {
+    const result = matchRegExpMatcher({
+      limits: { backtrackEntries: 0, steps: 100, trailEntries: 0 },
+      program: artifact("^[a]+$", flags),
+      startIndex: 0,
+      text: "aaa",
+    });
+    assert.equal(result.outcome, "limit", flags);
+  }
+});
