@@ -54,13 +54,41 @@ field, following instance and static methods, a comment-contained newline,
 and numeric hints with string and fractional guard misses. The runner enables
 forced collection for it under both policies and asserts positive collection
 counts. The class property suite adds eight generated cases under seed
-`0x60000b03`, inside its existing reserved block. Its original three domains,
+`0x60000b05`, inside its existing reserved block. Its original three domains,
 seeds and case budgets remain. The new domain compares an independent
 placement/addition model with Node.js, Deno and both native policies, with
 forced collection on both paths. No new property file is added. The fixture
-uses JavaScript Script references with JSDoc hints, because Node's TypeScript
-loader rejects the valid escaped-name ASI form before JavaScript parsing.
+and the generated domain use JavaScript Script references with JSDoc hints.
+Their opt-in wrappers indirectly evaluate the unchanged source in the
+reference engines. Existing typed domains keep their original TypeScript
+input route. No source evaluation capability is added to Oseo.
+
+Early author attempts failed in reference parsing: Node's TypeScript loader
+rejected the fixture's valid escaped-name ASI form, and Deno's JavaScript
+loader rejected the new generated domain. Both internal reviewers reproduced
+the latter failure under seed `0x60000b03`, replay `0:1:0:0:1:1:1`. Those
+failed attempts do not establish passing property evidence. The repaired Script
+route bypasses the reference loaders while keeping the original programs and
+the independent oracle.
+
+[Author checks and review artifacts](/data/m5c-d17-20261031/static-escape/)
+retain the failed attempts and subsequent validation separately.
 
 Root owns fresh test262 observation, admission of the original path, D3 and
 publication. No runtime operation, specialization path, profile boundary or
 ADR changes.
+
+
+Root coordination before U2
+---------------------------
+
+Root's 2026-10-30T23:34Z ruling reserves `0x60000b05` for the ASI
+property domain. Slots `0x60000b03` and `0x60000b04` belong to other class
+nodes. The original author and review replay above remains historical;
+the current domain uses the new slot with the same eight-case budget.
+
+Root selected Full under D3 and authorized bootstrap admission of the one
+owned original in U2, using fresh focused observations and canonical
+manifest/ledger APIs. Root will run the combined Full after the semantic
+bundle lands and owns R, the outer gate and publication. No UPDATE has
+been run by this worker.

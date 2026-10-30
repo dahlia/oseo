@@ -722,9 +722,13 @@ function expected(testCase: ClassCase): string {
   return `${lines.join("\n")}\n`;
 }
 
+interface ClassReferenceOptions {
+  readonly globalScriptReference?: true;
+}
+
 async function references(
   source: string,
-  extension: "js" | "ts" = "ts",
+  options: ClassReferenceOptions = {},
 ): Promise<
   readonly [
     {
@@ -740,10 +744,17 @@ async function references(
   ]
 > {
   const directory = await host.makeTemporaryDirectory("oseo-class-property-");
-  const sourcePath = `${directory}/case.${extension}`;
+  const sourcePath = `${directory}/case.ts`;
   let succeeded = false;
   try {
-    await host.writeTextFile(sourcePath, source);
+    // Loader parsers reject some valid escaped static ASI fields. Only
+    // this opt-in JavaScript domain uses the engines' Script parser;
+    // the existing typed domains keep their original TypeScript input.
+    const referenceSource =
+      options.globalScriptReference === true
+        ? `(0, eval)(${JSON.stringify(source)});\n`
+        : source;
+    await host.writeTextFile(sourcePath, referenceSource);
     const observations = [
       await host.run({
         args: [sourcePath],
@@ -1922,7 +1933,7 @@ console.log(Object.hasOwn(instance, "static"), instance.static,
           };
           assertMatchingObservations([
             expectedObservation,
-            ...(await references(source, "js")),
+            ...(await references(source, { globalScriptReference: true })),
           ]);
           for (const specialization of ["disabled", "enabled"] as const) {
             const compiled = compileSource(
@@ -1965,7 +1976,7 @@ console.log(Object.hasOwn(instance, "static"), instance.static,
           "placement/addition model, Node.js and Deno",
         numRuns: 8,
         profile: "M5 classes with escaped static ASI fields",
-        seed: 0x6000_0b03,
+        seed: 0x6000_0b05,
         sizeLimit:
           "one field, one method, six escape positions, and bounded " +
           "numbers/strings; shrinking preserves the field/member split",
