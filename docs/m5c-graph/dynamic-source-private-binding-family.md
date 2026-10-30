@@ -44,7 +44,7 @@ same static class twice, observe own getter/method/field access or setter
 side effects, and reject both cross-brand accesses with TypeError. The eight
 named-binding replacements keep the original strictness, self identity or
 TypeError, invocation count, and async/generator observation. The static
-call-order replacement observes both argument side effects and TypeError.
+call-order replacement observes the argument side effect and TypeError.
 The 12 caller/callee replacements observe callee strictness independently
 of caller strictness. Their original eval/Function caller supplies only
 source evaluation to that receiver contract.

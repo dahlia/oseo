@@ -886,8 +886,8 @@ assessments:
     normativeDependency: source-evaluation-only
     replacementEvidence:
       docs/m5c-graph/dynamic-source-private-binding-assessment.yaml:
-        "8f9675ea41b4a54f8eb02cd48daa18d7\
-        bb2d57f054d3e49329fd5d0b89df4461"
+        "7ffba07fed2249ff66a82f8a14d81f21\
+        1926186b0428f1809a6f0f364bab220b"
       tests/test262/results/language/expressions/11.yaml:
         "f6339dea2e410c9b1ccc72280d1473dc\
         a7dfad36f0314ee54e77c00119c15ca1"

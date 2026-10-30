@@ -332,9 +332,10 @@ paths:
     sourceDigest: "644cac2a5bf43a356eac968fa4130002d4d47118bc5909f8ec29996562\
       550108"
     replacement: null
-    reason: Static f/g assertions precede rejected eval, but no complete
-      replacement is established for h reading the prior g through initializer
-      this.
+    reason: All C.f, C.g and C.h assertions follow class initialization and
+      remain unobserved after the compile-stage eval rejection; no complete
+      replacement is established for ordered initialization, constructor this
+      and concatenation.
   - path: "test/language/expressions/class/private-getter-brand-check-multipl\
       e-evaluations-of-class-eval-indirect.js"
     subject: Fresh private instance getter identity on repeated class evaluation
