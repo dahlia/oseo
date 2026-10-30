@@ -1867,3 +1867,51 @@ bf13fabdf0540688093e274df059dbcdf26be32c99907de167622750e545dfd8
 ~~~~
 
 [40869736577]: https://github.com/dahlia/oseo/actions/runs/40869736577
+
+
+With-var loop-head candidate CI cost
+------------------------------------
+
+*tests/property/m5-with-var-loop-head.property.test.ts* postdates the three
+Linux source runs and had no measured weight. Candidate [41059687055] at
+`20ac1098cd047778a750c0ccd274f63f384c9849` passed its native file shards,
+but the unit inventory check failed because the file lacked a Linux weight.
+
+The run's own file-shard logs supply both host weights. Extraction follows
+*linux-shards.py*: start at the `native-shard` marker, map every complete
+reported title to exactly one selected source, require all selected files'
+registrations and passing summary counts, then sum each file's cases.
+Divide milliseconds by 1,000 and round up, rather than using job wall time.
+
+| Host  | Job          | Shard | Cases | Case sum, ms  | Weight, seconds |
+| ----- | ------------ | ----- | ----- | ------------- | --------------- |
+| Linux | 124076306332 | 3/7   | 2     | 464513.381271 | 465             |
+| macOS | 124076306487 | 11/12 | 2     | 563723.779750 | 564             |
+
+The individual Linux durations were 205944.767517 and 258568.613754
+milliseconds; macOS durations were 290018.836167 and 273704.943583.
+These are concurrent case sums from one run, not isolated latencies,
+conservative bounds or estimates of run-to-run variation. A later three-run
+refresh should replace this single observation. The TSV records the Linux
+weight as a retained later file with `-` for all three source-run samples;
+*linux-shards.py* and the unit test retain it explicitly.
+
+Only this file gains a weight in each table. Linux now has 144 entries and
+its unchanged upper-median rule derives 452 seconds, previously 443;
+macOS has 141 entries and retains its 296-second fallback. No other weight,
+exclusion, width or shard total changes. The regenerated Linux model still
+reproduces every historical source log's selected file order exactly. Its
+refreshed seven-shard maximum is 3,024 modeled seconds, or 50.4 minutes,
+against a 2,962.571-second mean.
+
+The raw logs, job list, extraction script and SHA-256 sums are retained in
+*/data/m5c-bundle2-20261030/weight-logs-41059687055/*:
+
+~~~~ text
+124076306332.log
+8a15c6795dc1015b7f8ba87a623ba80eb534d328adf0fd8d21ef674c3ab23cda
+124076306487.log
+03f8f3a39a712c9106cac4111aa41cf8553c23e1f9203dded226ac76a4b9fe5e
+~~~~
+
+[41059687055]: https://github.com/dahlia/oseo/actions/runs/41059687055

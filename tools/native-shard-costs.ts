@@ -17,7 +17,7 @@
  * Compound assignment's logged registrations are rebucketed into its
  * three split files. Host script bindings and proper tail calls postdate
  * these runs and retain their weights. The Linux upper-median fallback is
- * 443 seconds across 143 entries.
+ * 452 seconds across 144 entries.
  * docs/evidence/u6/linux-shard-weights.tsv retains each sum and old weight;
  * linux-shards.py reproduces them and the model. See the U6 README.
  *
@@ -110,6 +110,11 @@
  * three Linux runs. Both hosts use one-run case sums from candidate CI
  * 40869736577 at `ad1a1eba`: Linux jobs 123433597564 and 123433597780,
  * macOS job 123433598882. One run estimates no variation. See U6.
+ *
+ * With-var loop heads postdate the three Linux runs. Both hosts use
+ * one-run case sums from candidate CI 41059687055 at `20ac1098`:
+ * Linux job 124076306332 and macOS job 124076306487. The rounded
+ * weights are 465 and 564 seconds; one run estimates no variation. See U6.
  */
 export const nativeShardCosts = {
   "linux-x86_64-gnu": {
@@ -261,6 +266,7 @@ export const nativeShardCosts = {
     "tests/property/m5-uri-handling-functions.property.test.ts": 700,
     "tests/property/m5-weak-collections.property.test.ts": 429,
     "tests/property/m5-well-known-symbols.property.test.ts": 442,
+    "tests/property/m5-with-var-loop-head.property.test.ts": 465,
     "tests/property/nio-clock-wakeup.property.test.ts": 137,
     "tests/property/unicode-tables.property.test.ts": 1,
   },
@@ -420,6 +426,7 @@ export const nativeShardCosts = {
     "tests/property/m5-uri-handling-functions.property.test.ts": 511,
     "tests/property/m5-weak-collections.property.test.ts": 261,
     "tests/property/m5-well-known-symbols.property.test.ts": 529,
+    "tests/property/m5-with-var-loop-head.property.test.ts": 564,
     "tests/property/nio-clock-wakeup.property.test.ts": 119,
     "tests/property/unicode-tables.property.test.ts": 1,
   },
