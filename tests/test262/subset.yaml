@@ -164988,6 +164988,9 @@ tests:
   - path: test/language/statements/class/syntax/early-errors/class-definition-evaluation-scriptbody-duplicate-binding.js
     expectedClassification: expected-negative
     dependencies: [classes, functions]
+  - path: test/language/statements/class/syntax/escaped-static.js
+    expectedClassification: expected-negative
+    dependencies: [classes, lexical-grammar]
   - path: test/language/statements/const/block-local-closure-get-before-initialization.js
     expectedClassification: pass
     dependencies:

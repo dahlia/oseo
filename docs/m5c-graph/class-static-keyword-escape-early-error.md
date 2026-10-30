@@ -92,3 +92,38 @@ owned original in U2, using fresh focused observations and canonical
 manifest/ledger APIs. Root will run the combined Full after the semantic
 bundle lands and owns R, the outer gate and publication. No UPDATE has
 been run by this worker.
+
+
+U2 bootstrap admission
+----------------------
+
+Fresh stock `executeTest262Case` observation on semantic U
+`6c24a75ac6980acae62ff90f8ea01514d924f0eb` records the exact original above as
+`expected-negative`: `SyntaxError` at parse under both strictness modes.
+The runner never invokes its native executor for this parse-only subject.
+Four supplementary compiler probes retain `OSEO0001` and no HIR/MIR under
+both strictness modes and both specialization policies. The pinned source
+hash and structured results are in
+[the focused packet](/data/m5c-d17-20261031/static-escape/owned-observation.json).
+
+The dependency self-audit uses Root's 2026-10-29 tag rules. `classes` names
+the ClassBody grammar carrier that gives `static` its contextual terminal
+role; `lexical-grammar` names the prohibition on Unicode escapes in that
+terminal. Rule 6 excludes runtime-only families. The inert method skeleton,
+`$DONOTEVALUATE`, harness plumbing and diagnostic message text add no
+function, property, abrupt-completion or error-intrinsic tag. There are no
+fixture-derived rows.
+
+Root authorized the one-row bootstrap admission. U2 inserts the subset row,
+uses the canonical manifest serializer, and uses the ledger API to move the
+path from `node:observation-batch-23` to `observation`. All 34,337 existing
+records and subset rows remain unchanged; all 41,090 off-scope ledger
+entries remain unchanged. The manifest now records 34,338 reviewed paths:
+29,004 passes, 3,628 expected negatives and 1,706 unsupported results, with
+zero failures. The inventory remains 41,091 paths, with 6,753 unreviewed.
+
+The graph baseline, fixed observation selectors and current profile counts
+follow those records. No graph status or landed flag changes. The scoped
+allow-list proof compares U2 with its exact semantic U, not with Main, and
+does not replace the required Full. Root owns the combined Full, R, outer
+review and publication; this U2 is not an UPDATE result.

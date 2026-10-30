@@ -72,8 +72,8 @@ exclusion or equivalent replacement is claimed. ADR 0013, ADR 0016 and
 ADR 0019 remain unchanged.
 
 
-Unreviewed follow-ups
----------------------
+Original unreviewed follow-ups
+------------------------------
 
  -  [*default-constructor-spread-override.js*]:
     `default-derived-constructor-spread-iterator` remediation; retain batch
@@ -204,3 +204,22 @@ CreateDynamicFunction contract. The earlier paragraph records the audit
 that was performed; later rounds found and corrected further omissions,
 so it does not establish complete or clean tag coverage. This batch has
 0 dependency rows changed by this correction.
+
+
+Class keyword follow-up admission
+---------------------------------
+
+The original holding list above describes the earlier train. Fresh
+parse-only observations on semantic U
+`6c24a75ac6980acae62ff90f8ea01514d924f0eb` close
+*test/language/statements/class/syntax/escaped-static.js* as an expected
+negative under both strictness modes. The authorized U2 adds its canonical
+record with `classes` and `lexical-grammar`, and moves its ledger owner to
+`observation`. No earlier batch row, tag or observation changes.
+
+The default-derived-constructor original remains unreviewed under this
+batch in this branch. The
+[*class keyword work note*](./class-static-keyword-escape-early-error.md)
+records the tag self-audit and focused packet. Root's D3 decision requires a
+combined Full after the semantic bundle lands; neither this bootstrap
+admission nor the historical scoped UPDATE substitutes for that run.
