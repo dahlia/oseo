@@ -858,6 +858,29 @@ assessments:
       the original unsupported classification and umbrella owner; the observed
       dynamic-source rejection authorizes no exclusion of those missing
       observations.
+  ds5-static-u180e:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    replacementEvidence:
+      tests/test262/results/language/comments/5a.yaml:
+        "9a2636d75c0fd49dfef96b771b76d7ab81dabcddc1e49391e992c8ef95a0\
+        ec70"
+      tests/test262/results/language/expressions/b3.yaml:
+        "6b59172f4375775b9f6fe65c15c332d22a3e2083fdc17abd905a4135d069\
+        d2fa"
+    reason: Maintainer decision 2026-10-28 item 1 applies only to the two U+180E
+      probes listed in
+      docs/m5c-graph/dynamic-source-lexical-completion-assessment.yaml. The
+      paired static comment path preserves the zero expression with U+180E in
+      its trailing comment; the paired static template path asserts the exact
+      U+180E string. Both reviewed pass observations cover non-strict/strict and
+      disabled/enabled specialization on linux-x86_64-gnu. These cover every
+      non-source assertion; only eval source evaluation remains. Original source
+      and observation digests are fresh. Both originals remain
+      unsupported-profile-feature and never count as passes. Reopen on an
+      accepted ADR 0016 amendment admitting eval, or changed
+      original/replacement source or observations; ADR 0019 non-source reopening
+      remains in force.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4919,7 +4942,7 @@ paths:
     section: "sec-unicode-format-control-characters"
     subject: "U+180E may appear in a single-line comment; eval
       only compiles the probe source that contains it"
-    assessment: "fixture-construction"
+    assessment: ds5-static-u180e
   - path: "test/language/directive-prologue/10.1.1-11-s.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -19457,7 +19480,7 @@ paths:
     section: sec-unicode-format-control-characters
     subject: U+180E is preserved in the template literal value,
       independent of runtime eval as an observation vehicle.
-    assessment: fixture-construction
+    assessment: ds5-static-u180e
   - path: test/language/expressions/this/S11.1.1_A3.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

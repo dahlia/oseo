@@ -1,0 +1,670 @@
+version: 1
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+pathSetDigest: 1f540200bd7b2e1a109da611f0762bf5383c14ae38d4eb11c50fb1ae83f617ee
+selected: 73
+closed: 2
+staying: 71
+evidenceAdded: 0
+qualification: Only reviewed pass observations or repository fixture/native
+  tests qualify in this task; related expected-negative counterparts are
+  identified but do not close the three caught-error probes. None established
+  means no complete qualifying replacement is established here, not that no
+  related test exists.
+replacements:
+  - original: test/language/comments/mongolian-vowel-separator-single-eval.js
+    path: test/language/comments/mongolian-vowel-separator-single.js
+    sourceDigest: "80ef24c0135feac43b2ef8a27c5551edc1bb596530ed6153ac57f1fe3977\
+      c7d6"
+    resultPartition: tests/test262/results/language/comments/5a.yaml
+    resultDigest: "9a2636d75c0fd49dfef96b771b76d7ab81dabcddc1e49391e992c8ef95a0\
+      ec70"
+    classification: pass
+    observation: >-
+      passed: true; linux-x86_64-gnu; non-strict/strict x disabled/enabled
+    contract:
+      U+180E is accepted inside a single-line comment while the preceding
+      expression remains zero.
+  - original: "test/language/expressions/template-literal/mongolian-vowel-s\
+      eparator-eval.js"
+    path: "test/language/expressions/template-literal/mongolian-vowel-s\
+      eparator.js"
+    sourceDigest: "ef69f42b1865600cb6dc25ec0bc618cc70838c2448d478bf00e3b6f91213\
+      3c49"
+    resultPartition: tests/test262/results/language/expressions/b3.yaml
+    resultDigest: "6b59172f4375775b9f6fe65c15c332d22a3e2083fdc17abd905a4135d069\
+      d2fa"
+    classification: pass
+    observation: >-
+      passed: true; linux-x86_64-gnu; non-strict/strict x disabled/enabled
+    contract: An untagged template containing U+180E evaluates to the string
+      containing that code point.
+paths:
+  - path: test/built-ins/Boolean/S9.2_A1_T1.js
+    subject: ToBoolean of undefined inputs, including a var-declaration
+      completion, is false.
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/built-ins/String/S9.8_A1_T1.js
+    subject:
+      ToString of undefined inputs, including a var-declaration completion,
+      is "undefined".
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/built-ins/undefined/S15.1.1.3_A1.js
+    subject: The global undefined value agrees with typeof, void zero and a
+      var-declaration completion.
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/language/arguments-object/10.5-1-s.js
+    subject: Strict assignment to the arguments identifier throws SyntaxError.
+    replacement: test/language/expressions/assignment/id-arguments-strict.js
+    disposition: remediation
+    reason:
+      The static counterpart is an expected-negative, not a reviewed passing
+      or fixture/native replacement of the caught SyntaxError assertion
+      required by this task; retain remediation.
+  - path: test/language/comments/S7.4_A5.js
+    subject:
+      Single-line comments accept every BMP code unit except LF, CR, LS and
+      PS, which terminate the comment and execute the assignment.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for all 65,536 code units and their
+      assignment effects is established; isolated comment examples do not
+      cover this matrix.
+  - path: test/language/comments/S7.4_A6.js
+    subject:
+      Multi-line comments contain every BMP code unit without executing the
+      enclosed assignment.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for all 65,536 code units and the
+      unchanged binding is established.
+  - path: test/language/comments/mongolian-vowel-separator-single-eval.js
+    subject: U+180E is accepted inside a single-line comment while the preceding
+      expression remains zero.
+    replacement: test/language/comments/mongolian-vowel-separator-single.js
+    disposition: exclusion
+    reason: The paired reviewed static path observes the same lexical acceptance
+      and asserted value in all four native variants; only eval source
+      evaluation remains.
+  - path: test/language/expressions/addition/S11.6.1_A1.js
+    subject:
+      White Space and Line Terminator between AdditiveExpression and "+" or
+      between "+" and MultiplicativeExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/bitwise-and/S11.10.1_A1.js
+    subject:
+      White Space and Line Terminator between BitwiseANDExpression and "&"
+      or between "&" and EqualityExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/bitwise-not/S11.4.8_A1.js
+    subject: White Space and Line Terminator between "~" and UnaryExpression are
+      allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/bitwise-or/S11.10.3_A1.js
+    subject: White Space and Line Terminator between BitwiseORExpression and "|"
+      or between "|" and BitwiseXORExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/bitwise-xor/S11.10.2_A1.js
+    subject:
+      White Space and Line Terminator between BitwiseXORExpression and "^"
+      or between "^" and BitwiseANDExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/call/S11.2.3_A1.js
+    subject: White Space and Line Terminator between MemberExpression and
+      Arguments are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/comma/S11.14_A1.js
+    subject:
+      White Space and Line Terminator between Expression and , or between ,
+      and AssignmentExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.10_T1.js
+    subject:
+      Compound ^= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.11_T1.js
+    subject:
+      Compound |= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.1_T1.js
+    subject:
+      Compound *= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.2_T1.js
+    subject:
+      Compound /= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.3_T1.js
+    subject:
+      Compound %= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.4_T1.js
+    subject:
+      Compound += retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.5_T1.js
+    subject:
+      Compound -= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.6_T1.js
+    subject:
+      Compound <<= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.7_T1.js
+    subject:
+      Compound >>= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.8_T1.js
+    subject:
+      Compound >>>= retains the pre-RHS outer Reference while eval creates
+      a distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/compound-assignment/S11.13.2_A6.9_T1.js
+    subject:
+      Compound &= retains the pre-RHS outer Reference while eval creates a
+      distinct inner x binding, then observes both bindings.
+    replacement: null
+    disposition: remediation
+    reason: Ordinary compound-assignment tests cannot create a new nearer var
+      binding during RHS evaluation; no complete replacement for the retained
+      Reference and both final values is established.
+  - path: test/language/expressions/concatenation/S9.8_A1_T2.js
+    subject: String concatenation converts undefined inputs, including a
+      var-declaration completion, to "undefined".
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/language/expressions/conditional/S11.12_A1.js
+    subject: White Space and Line Terminator between LogicalORExpression and "?"
+      or between "?" and AssignmentExpression or between AssignmentExpression
+      and ":" or between ":" and AssignmentExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/division/S11.5.2_A1.js
+    subject:
+      White Space and Line Terminator between MultiplicativeExpression and
+      "/" or between "/" and UnaryExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/division/no-magic-asi-from-block-eval.js
+    subject:
+      A block containing an array expression followed by .8/of/g parses as
+      division without spurious ASI and yields completion value 0.1.
+    replacement: null
+    disposition: remediation
+    reason: Parsing and ordinary division evidence alone do not observe this
+      StatementList completion value; no complete replacement is established.
+  - path: test/language/expressions/does-not-equals/S11.9.2_A1.js
+    subject: White Space and Line Terminator between EqualityExpression and "!="
+      or between "!=" and RelationalExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/does-not-equals/S11.9.2_A6.1.js
+    subject: Abstract inequality of undefined/null inputs, including a
+      var-declaration completion, is false.
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/language/expressions/equals/S11.9.1_A1.js
+    subject: White Space and Line Terminator between EqualityExpression and "=="
+      or between "==" and RelationalExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/equals/S11.9.1_A6.1.js
+    subject: Abstract equality of undefined/null inputs, including a
+      var-declaration completion, is true.
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/language/expressions/function/name-eval-stricteval.js
+    subject: A strict FunctionExpression cannot be named eval.
+    replacement: test/language/expressions/function/name-eval-strict.js
+    disposition: remediation
+    reason:
+      The static counterpart is an expected-negative, not a reviewed passing
+      or fixture/native replacement of the caught SyntaxError assertion
+      required by this task; retain remediation.
+  - path: test/language/expressions/function/param-eval-stricteval.js
+    subject: >-
+      A strict FunctionExpression cannot have a formal parameter named eval.
+    replacement: test/language/expressions/function/param-eval-strict-body.js
+    disposition: remediation
+    reason:
+      The static counterpart is an expected-negative, not a reviewed passing
+      or fixture/native replacement of the caught SyntaxError assertion
+      required by this task; retain remediation.
+  - path: test/language/expressions/greater-than-or-equal/S11.8.4_A1.js
+    subject:
+      White Space and Line Terminator between RelationalExpression and ">="
+      or ">=" and ShiftExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/greater-than/S11.8.2_A1.js
+    subject:
+      White Space and Line Terminator between RelationalExpression and ">"
+      or ">" and ShiftExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/grouping/S11.1.6_A1.js
+    subject: >-
+      White Space and Line Terminator inside "grouping" operator are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/in/S11.8.7_A1.js
+    subject:
+      White Space and Line Terminator between RelationalExpression and "in"
+      and between "in" and ShiftExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/instanceof/S11.8.6_A1.js
+    subject: White Space and Line Terminator between RelationalExpression and
+      "instanceof" and between "instanceof" and ShiftExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/property-accessors/S11.2.1_A1.1.js
+    subject: White Space and Line Terminator between MemberExpression or
+      CallExpression and "." and between "." and Identifier are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/property-accessors/S11.2.1_A1.2.js
+    subject: >-
+      Whitespace and line terminators inside computed property brackets preserve
+      the Number.POSITIVE_INFINITY property read.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/right-shift/S11.7.2_A1.js
+    subject: White Space and Line Terminator between ShiftExpression and ">>" or
+      between ">>" and AdditiveExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/strict-does-not-equals/S11.9.5_A1.js
+    subject:
+      White Space and Line Terminator between EqualityExpression and "!=="
+      or between "!==" and RelationalExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/strict-does-not-equals/S11.9.5_A6.1.js
+    subject: Strict inequality of undefined inputs, including a var-declaration
+      completion, is false.
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/language/expressions/strict-equals/S11.9.4_A1.js
+    subject:
+      White Space and Line Terminator between EqualityExpression and "==="
+      or between "===" and RelationalExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/strict-equals/S11.9.4_A6.1.js
+    subject: Strict equality of undefined inputs, including a var-declaration
+      completion, is true.
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/language/expressions/subtraction/S11.6.2_A1.js
+    subject:
+      White Space and Line Terminator between AdditiveExpression and "-" or
+      between "-" and MultiplicativeExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: "test/language/expressions/template-literal/mongolian-vowel-s\
+      eparator-eval.js"
+    subject: An untagged template containing U+180E evaluates to the string
+      containing that code point.
+    replacement: "test/language/expressions/template-literal/mongolian-vowel-s\
+      eparator.js"
+    disposition: exclusion
+    reason: The paired reviewed static path observes the same lexical acceptance
+      and asserted value in all four native variants; only eval source
+      evaluation remains.
+  - path: test/language/expressions/typeof/syntax.js
+    subject:
+      White Space and Line Terminator between "typeof" and UnaryExpression
+      are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement covers all nine separators, their
+      combined sequence after typeof, and the grouped-operand assertion.
+  - path: test/language/expressions/unary-minus/S11.4.7_A1.js
+    subject: White Space and Line Terminator between "-" and UnaryExpression are
+      allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/unary-plus/S11.4.6_A1.js
+    subject: White Space and Line Terminator between "+" and UnaryExpression are
+      allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/unary-plus/S9.3_A1_T2.js
+    subject: Unary plus converts undefined inputs, including a var-declaration
+      completion, to NaN.
+    replacement: null
+    disposition: remediation
+    reason:
+      Ordinary undefined inputs cover the conversion or comparison only; no
+      complete replacement observes the var-declaration completion used as an
+      input.
+  - path: test/language/expressions/unsigned-right-shift/S11.7.3_A1.js
+    subject:
+      White Space and Line Terminator between ShiftExpression and ">>>" or
+      between ">>>" and AdditiveExpression are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/expressions/void/S11.4.2_A1.js
+    subject: White Space and Line Terminator between "void" and UnaryExpression
+      are allowed.
+    replacement: null
+    disposition: remediation
+    reason: No complete static replacement for the nine individual
+      whitespace/line-terminator insertions and their combined sequence at
+      these token positions is established.
+  - path: test/language/function-code/eval-param-env-with-computed-key.js
+    subject: Parameter computed-property-key evaluation introduces a local var
+      seen by the function body instead of the outer binding.
+    replacement: null
+    disposition: remediation
+    reason:
+      A static body var is instantiated at a different time and environment;
+      no complete replacement for parameter-time binding introduction is
+      established.
+  - path: test/language/function-code/eval-param-env-with-prop-initializer.js
+    subject:
+      Parameter property-initializer evaluation introduces a local var seen
+      by the function body instead of the outer binding.
+    replacement: null
+    disposition: remediation
+    reason:
+      A static body var is instantiated at a different time and environment;
+      no complete replacement for parameter-time binding introduction is
+      established.
+  - path: test/language/global-code/script-decl-lex-var-declared-via-eval.js
+    subject: GlobalDeclarationInstantiation permits later lexical declarations
+      after eval-created var/function bindings, with strict and sloppy source
+      behavior.
+    replacement: null
+    disposition: remediation
+    reason: Static global vars are non-configurable and do not model these
+      eval-created bindings; no replacement establishes both later lexical
+      declarations and reads.
+  - path: test/language/statements/do-while/cptn-normal.js
+    subject: Do-while normal completion yields undefined for an empty body and 3
+      for a body expression, replacing preceding StatementList values.
+    replacement: null
+    disposition: remediation
+    reason: No non-source observation of the loop Completion Record values is
+      established; a function return or loop side effect would test a
+      different contract.
+  - path: test/language/statements/for-in/S12.6.4_A3.1.js
+    subject: For-in over an array of numbers, using var declaration, accumulates
+      every value and returns the same string as its completion.
+    replacement: null
+    disposition: remediation
+    reason: Static enumeration tests can cover the accumulated values but no
+      replacement observes equality with the statement completion string.
+  - path: test/language/statements/for-in/S12.6.4_A3.js
+    subject: For-in over an array of numbers, using an existing target,
+      accumulates every value and returns the same string as its completion.
+    replacement: null
+    disposition: remediation
+    reason: Static enumeration tests can cover the accumulated values but no
+      replacement observes equality with the statement completion string.
+  - path: test/language/statements/for-in/S12.6.4_A4.1.js
+    subject: For-in over an object of string values, using var declaration,
+      accumulates every value and returns the same string as its completion.
+    replacement: null
+    disposition: remediation
+    reason: Static enumeration tests can cover the accumulated values but no
+      replacement observes equality with the statement completion string.
+  - path: test/language/statements/for-in/S12.6.4_A4.js
+    subject: For-in over an object of string values, using an existing target,
+      accumulates every value and returns the same string as its completion.
+    replacement: null
+    disposition: remediation
+    reason: Static enumeration tests can cover the accumulated values but no
+      replacement observes equality with the statement completion string.
+  - path: test/language/statements/for-in/cptn-decl-abrupt-empty.js
+    subject: "For-in with var declaration: empty break and outer continue update
+      empty completion to undefined, while a preceding body expression
+      contributes 3 or 6."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/cptn-decl-itr.js
+    subject: "For-in with var declaration: an empty iteration body yields
+      undefined and a body expression yields 3."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/cptn-decl-skip-itr.js
+    subject: "For-in with var declaration: null and undefined RHS skip iteration
+      and yield undefined regardless of the body expression."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/cptn-decl-zero-itr.js
+    subject: "For-in with var declaration: an empty object RHS performs zero
+      iterations and yields undefined regardless of the body expression."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/cptn-expr-abrupt-empty.js
+    subject:
+      "For-in with assignment: empty break and outer continue update empty
+      completion to undefined, while a preceding body expression contributes 3
+      or 6."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/cptn-expr-itr.js
+    subject:
+      "For-in with assignment: an empty iteration body yields undefined and
+      a body expression yields 3."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/cptn-expr-skip-itr.js
+    subject: "For-in with assignment: null and undefined RHS skip iteration and
+      yield undefined regardless of the body expression."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/cptn-expr-zero-itr.js
+    subject:
+      "For-in with assignment: an empty object RHS performs zero iterations
+      and yields undefined regardless of the body expression."
+    replacement: null
+    disposition: remediation
+    reason: No non-source replacement exposes these exact Completion Record
+      values; observing iteration side effects or returning from a function
+      does not replace UpdateEmpty.
+  - path: test/language/statements/for-in/scope-head-var-none.js
+    subject: For-in head evaluation retains the variable environment across
+      declaration, RHS and body closures and a var introduced during RHS
+      evaluation.
+    replacement: null
+    disposition: remediation
+    reason: A static var would be hoisted before the probes; no replacement
+      observes the same dynamic binding introduction and all five reads.
+  - path: test/language/statements/try/scope-catch-param-var-none.js
+    subject:
+      Catch parameter destructuring retains the variable environment shared
+      by closures before, within and after try/catch.
+    replacement: null
+    disposition: remediation
+    reason: No replacement covers var introduction during the parameter
+      initializer and all five closure/binding reads; ordinary catch
+      assignment alone is incomplete.

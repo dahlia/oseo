@@ -11,7 +11,9 @@ delivers: "DS-5 of the dynamic-source-coverage-remediation split approved by
   observations, 2 batch 17 parameter-expression environments, and the Host
   Full global declaration path, as grouped by the 2026-10-24 audit families
   and, for later additions, by their recorded missing contracts. The
-  umbrella owns them until this node lands. For each path, reviews
+  per-path assessment records two ADR 0016 exclusions and 71 paths still
+  owned by the umbrella, with no added native or fixture evidence. The
+  node note links the per-path assessment. For each path, reviews
   ahead-of-time observation or replacement evidence for every non-source
   subject. A path closes under adr:0016-dynamic-source-boundary only by the
   item 1 rule, with a fresh-digest exclusion-audit record naming that

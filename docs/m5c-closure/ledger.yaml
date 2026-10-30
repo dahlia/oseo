@@ -90,8 +90,13 @@ owners:
       source and observation digests and replacement partition digests
       bind each exclusion; only source evaluation remains. No pass is
       added; 624 paths. Changed evidence or an accepted ADR 0016
-      amendment admitting the excluded source form reopens them."
-    paths: 624
+      amendment admitting the excluded source form reopens them. DS-5
+      accounts for two U+180E comment/template lexical probes under
+      maintainer decision 2026-10-28 item 1, using the paired static
+      pass observations in
+      dynamic-source-lexical-completion-assessment.yaml; its other 71
+      paths remain umbrella remediation."
+    paths: 626
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -215,8 +220,10 @@ owners:
       and moves 40 to ADR 0016 through existing passing static
       replacement evidence; 46 remain here for the per-path missing
       observations in
-      docs/m5c-graph/dynamic-source-callable-family-assessment.md."
-    paths: 1003
+      docs/m5c-graph/dynamic-source-callable-family-assessment.md. DS-5
+      moves its two U+180E lexical probes to ADR 0016 and keeps 71
+      here."
+    paths: 1001
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
     paths: 2
@@ -18958,7 +18965,7 @@ paths:
   test/language/comments/hashbang/statement-block.js: [expected-negative, observation]
   test/language/comments/hashbang/use-strict.js: [pass, observation]
   test/language/comments/mongolian-vowel-separator-multi.js: [pass, observation]
-  test/language/comments/mongolian-vowel-separator-single-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, lexical-grammar]]
+  test/language/comments/mongolian-vowel-separator-single-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, lexical-grammar]]
   test/language/comments/mongolian-vowel-separator-single.js: [pass, observation]
   test/language/comments/multi-line-asi-carriage-return.js: [pass, observation]
   test/language/comments/multi-line-asi-line-feed.js: [pass, observation]
@@ -29960,7 +29967,7 @@ paths:
   test/language/expressions/template-literal/middle-list-one-expr-primitive.js: [pass, observation]
   test/language/expressions/template-literal/middle-list-one-expr-template.js: [pass, observation]
   test/language/expressions/template-literal/middle-list-one-expr-tostr-error.js: [pass, observation]
-  test/language/expressions/template-literal/mongolian-vowel-separator-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, lexical-grammar]]
+  test/language/expressions/template-literal/mongolian-vowel-separator-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, lexical-grammar]]
   test/language/expressions/template-literal/mongolian-vowel-separator.js: [pass, observation]
   test/language/expressions/template-literal/no-sub.js: [pass, observation]
   test/language/expressions/template-literal/tv-character-escape-sequence.js: [pass, observation]
