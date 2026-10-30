@@ -45,22 +45,23 @@ Per-path review result
 
 The [per-path assessment](./dynamic-source-realm-string-assessment.md)
 records each original normative subject, selected evidence or remaining gap,
-and its decision. Ten paths close under the 2026-10-28 decision, item 1:
-five template-site paths, four ASCII string case-conversion paths, and one
+and its decision. Nine paths close under the 2026-10-28 decision, item 1:
+four template-site paths, four ASCII string case-conversion paths, and one
 mixed generator-instance path.
 Their audit records bind fresh source and observation digests and name the
 existing passing static paths or native fixtures. No evidence was added.
 
-The other 70 paths stay with the umbrella: all 34 foreign-realm subjects,
-the realm template registry path, seven RegExp paths, 23 string/global/block
-paths, and five intrinsic/mixed-function paths. Their table rows name the
-uncovered assertions in the candidates inspected. The umbrella now owns
-1,036 paths on this base, before parallel DS-4 through DS-6 integration
-(450 of the historical 765-path cohort and 586 later admissions).
-All 80 classifications remain unsupported-profile-feature; all 41,091
-inventory paths remain. No subset, result, tag or runtime change was made,
-so no UPDATE is needed. No native tests were added; Root retains the full
-publication suites and outer review.
+The other 71 paths stay with the umbrella: all 34 foreign-realm subjects,
+the realm template registry path, the same-site template identity path
+whose substitution values change between calls, seven RegExp paths, 23
+string/global/block paths, and five intrinsic/mixed-function paths. Their table
+rows name the uncovered assertions in the candidates inspected. The umbrella
+now owns 1,037 paths on this base, before parallel DS-4 through DS-6
+integration (451 of the historical 765-path cohort and 586 later admissions).
+All 80 classifications remain unsupported-profile-feature; all 41,091 inventory
+paths remain. No subset, result, tag or runtime change was made, so no UPDATE
+is needed. No native tests were added; Root retains the full publication suites
+and outer review.
 
 
 Owned paths

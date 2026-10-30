@@ -83,14 +83,14 @@ owners:
       dynamic-source-module-semantics-assessment.yaml cover all
       non-source subjects; 584 paths. Only the import()
       source-evaluation site remains; an accepted ADR 0016 amendment
-      admitting any dynamic import reopens them. DS-7 accounts for 10 of
+      admitting any dynamic import reopens them. DS-7 accounts for 9 of
       its 80 reserved paths using reviewed static template-site,
       case-conversion and generator-instance replacement evidence under
-      the maintainer decision of 2026-10-28 item 1; 70 remain umbrella
+      the maintainer decision of 2026-10-28 item 1; 71 remain umbrella
       remediation. The per-path assessment and fresh-digest audit
       records bound every exclusion; no unsupported result is counted as
       a pass."
-    paths: 594
+    paths: 593
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -213,10 +213,10 @@ owners:
       grants no whole-path exclusion. The global eval rebinding row
       remains unsupported under
       node:global-eval-rebinding-tail-call-resolution; it does not
-      evaluate source. DS-7 accounts for 10 paths and retains 70 of its
+      evaluate source. DS-7 accounts for 9 paths and retains 71 of its
       80 reserved paths, with remaining contracts recorded in
       docs/m5c-graph/dynamic-source-realm-string-assessment.md."
-    paths: 1036
+    paths: 1037
   node:global-eval-rebinding-tail-call-resolution:
     note: Root-approved bounded ordinary binding/call remediation for
       tco-non-eval-global.js. The source assigns its statically declared
@@ -29932,7 +29932,7 @@ paths:
   test/language/expressions/tagged-template/cache-differing-expressions.js: [pass, observation]
   test/language/expressions/tagged-template/cache-differing-raw-strings.js: [pass, observation]
   test/language/expressions/tagged-template/cache-differing-string-count.js: [pass, observation]
-  test/language/expressions/tagged-template/cache-eval-inner-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
+  test/language/expressions/tagged-template/cache-eval-inner-function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-identical-source-eval.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-identical-source-new-function.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators]]
   test/language/expressions/tagged-template/cache-identical-source.js: [pass, observation]
