@@ -524,14 +524,17 @@ function expectedLivenessOutput(testCase: LivenessCase): string {
   return `${outcome} ${testCase.depth + 1} ${sum}\n`;
 }
 
-async function references(source: string) {
+async function references(source: string, globalScriptReference = false) {
   const directory = await host.makeTemporaryDirectory(
     "oseo-proper-tail-calls-property-",
   );
   const sourcePath = `${directory}/case.js`;
   let succeeded = false;
   try {
-    await host.writeTextFile(sourcePath, source);
+    await host.writeTextFile(
+      sourcePath,
+      globalScriptReference ? `(0, eval)(${JSON.stringify(source)});` : source,
+    );
     const observations = [
       await host.run({
         args: [sourcePath],
@@ -561,9 +564,13 @@ async function observe(
   source: string,
   stdout: string,
   resources?: (mir: MirProgram) => ResourceOutcome,
+  globalScriptReference = false,
 ): Promise<void> {
   const expected = { exitStatus: 0, stderr: "", stdout };
-  assertMatchingObservations([expected, ...(await references(source))]);
+  assertMatchingObservations([
+    expected,
+    ...(await references(source, globalScriptReference)),
+  ]);
   const sourceId = "generated-m5-proper-tail-calls.js";
   for (const specialization of ["disabled", "enabled"] as const) {
     const compiled = compileSource(
@@ -627,6 +634,59 @@ const context =
         `sanitizers=${nativeTarget.sanitizers.join(",")}`,
       ];
 const skip = nativeTarget == null ? "requires a supported native host" : false;
+
+test(
+  "generated rebound global eval tail calls keep argument identity",
+  { skip },
+  async () => {
+    await assertAsyncProperty(
+      "ordinary global eval bindings remain tail callees",
+      fc.asyncProperty(
+        fc.record({
+          depth: fc.integer({ min: 300, max: tailDepthLimit }),
+          label: fc.string({ maxLength: 12 }),
+          spread: fc.boolean(),
+        }),
+        async ({ depth, label, spread }) => {
+          // Keep the Script sloppy so assigning eval is legal; only the
+          // recursive function needs strict code for PrepareForTailCall.
+          const source = `
+const intrinsic = eval;
+const marker = { label: ${JSON.stringify(label)} };
+let steps = 0;
+function step(n, value) {
+  "use strict";
+  steps += 1;
+  if (n === 0) return [this === undefined, value === marker, value.label];
+  return eval(${spread ? "...[n - 1, value]" : "n - 1, value"});
+}
+eval = step;
+const result = step(${depth}, marker);
+eval = intrinsic;
+console.log(result[0], result[1], result[2] === marker.label, steps);
+`;
+          await observe(
+            source,
+            `true true true ${depth + 1}\n`,
+            undefined,
+            true,
+          );
+        },
+      ),
+      {
+        context,
+        domain:
+          "strict recursion through a rebound global eval, generated depths " +
+          "and String payloads, with plain or spread arguments",
+        numRuns: 4,
+        profile: "M5 rebound global eval tail calls",
+        seed: 0x6000_8903,
+        sizeLimit: `depth ${tailDepthLimit}, 12-character payload`,
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
 
 test(
   "generated tail position chains run in bounded native frames",

@@ -1623,6 +1623,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "tagged-templates" ||
     fixture.name === "template-literals" ||
     fixture.name === "proper-tail-calls" ||
+    fixture.name === "global-eval-tail-calls" ||
     fixture.name.startsWith("cross-realm-")
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
@@ -1679,7 +1680,8 @@ for (const fixture of selectedFixtures) {
           assert(native.emittedC.includes("OseoResult"), "generic call ABI");
           if (
             fixture.name === "iterator-next-callability" ||
-            fixture.name === "proper-tail-calls"
+            fixture.name === "proper-tail-calls" ||
+            fixture.name === "global-eval-tail-calls"
           ) {
             // Forced collection runs while tail call records and the
             // trampoline's steps hold the only references to arguments.
