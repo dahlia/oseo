@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 1046 reviewed unsupported paths assigned to
+delivers: "Resolves the 1036 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -173,7 +173,13 @@ delivers: "Resolves the 1046 reviewed unsupported paths assigned to
   docs/m5c-graph/observation-batch-08.md and
   docs/m5c-graph/observation-batch-14.md; ADR 0016 and ADR 0019 remain
   unchanged. The B23/B28/B29/B32 train adds 165 dynamic-source
-  admissions, bringing the current scope to 1046."
+  admissions, bringing that scope to 1046. DS-7 accounts for 10 of its
+  exact 80 reserved paths using reviewed static template-site, string
+  case-conversion and generator-instance replacement evidence under the
+  maintainer decision of 2026-10-28 item 1, leaving the current scope at
+  1036. Its other 70 paths retain umbrella remediation; no path becomes
+  a pass and no native test or observation is added. The per-path review
+  is in docs/m5c-graph/dynamic-source-realm-string-assessment.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family

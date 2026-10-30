@@ -40,9 +40,10 @@ from clean source `6aab0fc8`, tree
 every original path and exact diagnostic. No path was re-observed here.
 
 The table below preserves the original observation-train evidence. Later
-DS-1 and DS-3 audit assessments account for the paths described above; all
-other paths remain active remediation. A dependency tag alone authorizes
-no exclusion. Every original subject and normative section is preserved.
+DS-1, DS-2, DS-3 and DS-7 audit assessments account for the paths described
+above; all other paths remain active remediation. A dependency tag alone
+authorizes no exclusion. Every original subject and normative section is
+preserved.
 
 | Original path                                                                                                                           | Exact observed diagnostic                                                                                                                                                                                                                                                                                                                                                                               | Raw result                                                                               |
 | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
