@@ -9,20 +9,20 @@ usage: "Take a node whose status is ready and whose landed field is
   m5-exit-audit path. Update baseline whenever the checked-in reviewed
   manifest changes; check:m5c-graph rejects stale counts."
 baseline:
-  expectedNegatives: 3430
+  expectedNegatives: 3531
   harnessFailures: 0
   infrastructureFailures: 0
   inventoryPaths: 41091
-  passes: 27652
-  reviewedPaths: 32281
+  passes: 28363
+  reviewedPaths: 33434
   semanticFailures: 0
   suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-  unreviewedPaths: 8810
-  unsupportedProfileFeatures: 1199
+  unreviewedPaths: 7657
+  unsupportedProfileFeatures: 1540
 summary:
-  nodes: 118
-  ready: 115
-  blocked: 3
+  nodes: 120
+  ready: 116
+  blocked: 4
   parked: 0
   landed: 81
 serializationPoints:
@@ -6705,6 +6705,12 @@ collisions:
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
+      - direct-eval-non-string-dispatch
+      - unicode-class-native-frame-budget
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
       - dynamic-import-early-error-precedence
       - unicode-class-native-frame-budget
     note: "These independent remediation and observation publishers share
@@ -6933,6 +6939,12 @@ collisions:
       the canonical manifest index; serialize their publication."
   - path: tests/test262/results.yaml
     nodes:
+      - test262-diagnostic-host-path-normalization
+      - unicode-class-native-frame-budget
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
       - test262-module-harness-globals
       - unicode-class-native-frame-budget
     note: "These independent remediation and observation publishers share
@@ -6964,6 +6976,570 @@ collisions:
   - path: tests/test262/results.yaml
     nodes:
       - unicode-class-native-frame-budget
+      - with-var-loop-head-resolution
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-generated-property-cost-remediation
+      - direct-eval-non-string-dispatch
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - array-generated-property-cost-remediation
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - direct-eval-non-string-dispatch
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - class-private-accessor-lookup-coverage-remediation
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-import-early-error-precedence
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-callable-family
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-lexical-completion-family
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-module-semantics
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-private-binding-family
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-realm-string-family
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-retagging
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - dynamic-source-unknown-eval
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - iterator-helpers
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - module-namespace-uninitialized-bindings
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - module-top-level-await-patterns
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - non-blocking-agent
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-01
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-03
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-06
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-08
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-14
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-18
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-20
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-21a
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-21b
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-21c
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-21d
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-22a
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-22b
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-23
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-24
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-25
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-26a
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-26b
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-27
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-28
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-29
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-30
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-31
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - observation-batch-32
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - regexp-anchored-repeat-state-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - regexp-split-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - test262-module-harness-globals
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - typed-array-proto-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - unhandled-rejection-observation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - with-optional-call-receiver
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - with-optional-call-receiver-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - direct-eval-non-string-dispatch
+      - with-var-loop-head-resolution
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-import-early-error-precedence
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-callable-family
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-coverage-remediation
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-lexical-completion-family
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-module-semantics
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-private-binding-family
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-realm-string-family
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-retagging
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - dynamic-source-unknown-eval
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - iterator-helpers
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-namespace-uninitialized-bindings
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - module-top-level-await-patterns
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - non-blocking-agent
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-01
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-03
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-08
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-14
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-18
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-20
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21a
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21b
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21c
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-21d
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22a
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-22b
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-23
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-24
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-25
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26a
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-26b
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-27
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-28
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-29
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-30
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-31
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - observation-batch-32
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-anchored-repeat-state-remediation
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - regexp-split-coverage-remediation
+      - test262-diagnostic-host-path-normalization
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-diagnostic-host-path-normalization
+      - test262-module-harness-globals
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-diagnostic-host-path-normalization
+      - typed-array-proto-coverage-remediation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-diagnostic-host-path-normalization
+      - unhandled-rejection-observation
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-diagnostic-host-path-normalization
+      - with-optional-call-receiver
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-diagnostic-host-path-normalization
+      - with-optional-call-receiver-tail
+    note: "These independent remediation and observation publishers share
+      the canonical manifest index; serialize their publication."
+  - path: tests/test262/results.yaml
+    nodes:
+      - test262-diagnostic-host-path-normalization
       - with-var-loop-head-resolution
     note: "These independent remediation and observation publishers share
       the canonical manifest index; serialize their publication."

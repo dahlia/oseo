@@ -1,0 +1,111 @@
+group: language/eval-code
+key: "79"
+results:
+  - case:
+      async: true
+      features:
+        - globalThis
+      flags:
+        - generated
+        - async
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/async-func-expr-named-fn-body-cntns-arguments-func-decl-declare-arguments.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - async-functions
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/async-func-expr-named-fn-body-c\
+        ntns-arguments-func-decl-declare-arguments.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/async-func-expr-named-f\
+        n-body-cntns-arguments-func-decl-declare-arguments.js:115:30:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/indirect/cptn-nrml-empty-if.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - expression-operators
+      - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/eval-code/indirect/cptn-nrml-empty-if.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/indirect/cptn-nrml-empty-if.js:87:18:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/indirect/parse-failure-1.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-grammar
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/eval-code/indirect/parse-failure-1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/eval-code/indirect/parse-failure-1.js:89:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

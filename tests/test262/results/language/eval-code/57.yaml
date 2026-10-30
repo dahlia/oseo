@@ -1,0 +1,42 @@
+group: language/eval-code
+key: "57"
+results:
+  - case:
+      async: true
+      features:
+        - globalThis
+      flags:
+        - generated
+        - async
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/async-func-decl-no-pre-existing-arguments-bindings-are-present-declare-arguments.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - async-functions
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/async-func-decl-no-pre-existing\
+        -arguments-bindings-are-present-declare-arguments.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/async-func-decl-no-pre-\
+        existing-arguments-bindings-are-present-declare-arguments.js:11\
+        5:22: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

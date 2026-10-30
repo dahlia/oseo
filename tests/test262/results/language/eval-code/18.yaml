@@ -1,0 +1,32 @@
+group: language/eval-code
+key: "18"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/var-env-func-init-local-new-delete.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/var-env-func-init-local-new-del\
+        ete.js non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/var-env-func-init-local\
+        -new-delete.js:102:3: error[OSEO1001]: Unknown binding
+        'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

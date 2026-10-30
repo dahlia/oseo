@@ -1,0 +1,75 @@
+group: language/eval-code
+key: ff
+results:
+  - case:
+      async: true
+      features:
+        - globalThis
+      flags:
+        - generated
+        - async
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/async-func-expr-nameless-fn-body-cntns-arguments-lex-bind-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - async-functions
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/async-func-expr-nameless-fn-bod\
+        y-cntns-arguments-lex-bind-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/async-func-expr-nameles\
+        s-fn-body-cntns-arguments-lex-bind-declare-arguments-and-assign\
+        .js:115:28: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/func-decl-fn-body-cntns-arguments-lex-bind-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/func-decl-fn-body-cntns-argumen\
+        ts-lex-bind-declare-arguments-and-assign.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/func-decl-fn-body-cntns\
+        -arguments-lex-bind-declare-arguments-and-assign.js:89:16:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

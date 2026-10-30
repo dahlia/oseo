@@ -1,0 +1,35 @@
+group: language/eval-code
+key: "17"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/arrow-fn-body-cntns-arguments-lex-bind-arrow-func-declare-arguments-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - default-parameters
+      - dynamic-source
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/arrow-fn-body-cntns-arguments-l\
+        ex-bind-arrow-func-declare-arguments-assign.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/arrow-fn-body-cntns-arg\
+        uments-lex-bind-arrow-func-declare-arguments-assign.js:87:16:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

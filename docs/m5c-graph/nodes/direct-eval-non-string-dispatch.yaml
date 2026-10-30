@@ -1,0 +1,25 @@
+version: 1
+id: direct-eval-non-string-dispatch
+title: Preserve non-String direct eval argument identity
+delivers: "Closes exactly two observation-batch-06 paths:
+  test/language/eval-code/direct/non-string-object.js and
+  test/language/eval-code/direct/non-string-primitive.js. Their original
+  assertions pass non-String objects or primitive values to the eval
+  intrinsic and require the same value back, with no source text to
+  compile. Focused observations on 68b026bb report OSEO1001 Unknown
+  binding 'eval' before those assertions; the corresponding indirect
+  original paths pass. Preserve both original paths, assertions and
+  dependency tags as ordinary in-claim coverage. Repair non-String
+  direct-call dispatch without admitting String source evaluation or
+  emulating eval; keep ADR 0013, ADR 0016 and ADR 0019 unchanged. Follow
+  PLAN-M5.md for focused, property, differential, forced-collection and
+  specialization-invariance evidence, with a guard-miss test reaching
+  the generic fallback if a specialized path changes, and update the
+  applicable normative family record. Re-observe both original paths
+  and the affected reviewed corpus under the actual repaired source;
+  do not replace the current unsupported observations with predicted
+  passes or claim an exclusion from the dynamic-source dependency tag."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

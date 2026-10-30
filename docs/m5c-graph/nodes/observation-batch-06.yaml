@@ -1,13 +1,20 @@
 version: 1
 id: observation-batch-06
 title: Observe language/eval-code/ and 1 more
-delivers: "Observes the 334 unreviewed paths that
-  docs/m5c-closure/observation-batches.yaml selects for observation-batch-06
-  (242 review units): admits them to the reviewed subset with dependency tags,
-  regenerates the manifest and the ledger, and assigns every unsupported
-  result an owner."
+delivers: "Partially observes the original 334-path observation-batch-06 cohort.
+  This train admits 332 originals with actual focused observations,
+  dependency tags and bounded unsupported owners. The two originals
+  test/language/eval-code/indirect/export.js and
+  test/language/eval-code/indirect/import.js remain unreviewed under this
+  batch until test262-diagnostic-host-path-normalization removes their
+  host-dependent diagnostic IDs and supplies fresh observations. Preserve
+  every original path and assertion, keep the two-path selector until
+  both are admitted, and mark no completion or landed state while this
+  prerequisite remains open. Exact preparation counts and raw evidence
+  are in docs/m5c-graph/observation-batch-06.md."
 dependencies:
   - eval-intrinsic-value
   - observation-batch-plan
+  - test262-diagnostic-host-path-normalization
 landed: false
-status: ready
+status: blocked

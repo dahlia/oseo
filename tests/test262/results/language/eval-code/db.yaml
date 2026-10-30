@@ -1,0 +1,38 @@
+group: language/eval-code
+key: db
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/gen-func-expr-named-fn-body-cntns-arguments-func-decl-declare-arguments.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - generators
+      - lexical-bindings
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/gen-func-expr-named-fn-body-cnt\
+        ns-arguments-func-decl-declare-arguments.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/gen-func-expr-named-fn-\
+        body-cntns-arguments-func-decl-declare-arguments.js:88:26:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

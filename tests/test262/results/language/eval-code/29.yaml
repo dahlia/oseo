@@ -1,0 +1,61 @@
+group: language/eval-code
+key: "29"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/func-expr-a-following-parameter-is-named-arguments-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/func-expr-a-following-parameter\
+        -is-named-arguments-declare-arguments-and-assign.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/func-expr-a-following-p\
+        arameter-is-named-arguments-declare-arguments-and-assign.js:89:\
+        22: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/this-value-func-strict-caller.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/this-value-func-strict-caller.js
+        strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/this-value-func-strict-\
+        caller.js:90:15: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

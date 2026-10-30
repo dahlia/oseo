@@ -1,0 +1,72 @@
+group: language/eval-code
+key: "89"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/gen-func-decl-a-following-parameter-is-named-arguments-declare-arguments.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - generators
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/gen-func-decl-a-following-param\
+        eter-is-named-arguments-declare-arguments.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/gen-func-decl-a-followi\
+        ng-parameter-is-named-arguments-declare-arguments.js:89:18:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/indirect/non-definable-function-with-variable.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - expression-operators
+      - functions
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/eval-code/indirect/non-definable-function-with-variable.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/indirect/non-definable-function-with-variable.js:107:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

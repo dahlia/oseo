@@ -1,0 +1,71 @@
+group: language/eval-code
+key: "55"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/gen-func-decl-no-pre-existing-arguments-bindings-are-present-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - generators
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/gen-func-decl-no-pre-existing-a\
+        rguments-bindings-are-present-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/gen-func-decl-no-pre-ex\
+        isting-arguments-bindings-are-present-declare-arguments-and-ass\
+        ign.js:88:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/meth-fn-body-cntns-arguments-func-decl-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/meth-fn-body-cntns-arguments-fu\
+        nc-decl-declare-arguments-and-assign.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/meth-fn-body-cntns-argu\
+        ments-func-decl-declare-arguments-and-assign.js:88:17:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
