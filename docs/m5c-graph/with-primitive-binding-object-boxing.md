@@ -6,9 +6,10 @@ before object environment HasBinding. All three observed runtime failures
 report TypeError: The in operator requires an object.
 
 Focused observation on base `68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f`,
-native target `linux-x86_64-gnu`, found these failures. The original paths
-remain unreviewed under observation-batch-28. This paragraph records the
-original failure; the source repair and its evidence are recorded below.
+native target `linux-x86_64-gnu`, found these failures. The original train
+retained these paths unreviewed under observation-batch-28. This paragraph
+records the original failure; the source repair and its evidence are recorded
+below.
 
  -  `test/language/statements/with/12.10-2-1.js`
  -  `test/language/statements/with/12.10-2-2.js`
@@ -22,6 +23,10 @@ Repair and re-observe these exact originals before closing this dependency.
 
 Source repair
 -------------
+
+This section records semantic U
+`d7808583c66ad45ef870ea4a28b394d9420fa7dd`. The later admission below is
+separate from that source repair.
 
 On base `1f3ade138ea7cbee80b2d62940e8f497db2bc1a2`, the three paths
 are absent from the checked-in result partitions and remain unreviewed in
@@ -108,6 +113,58 @@ argv and output are *fast-root-final.json*, *fast-root-final.stdout* and
 *fast-root-final.stderr* in the raw evidence directory. The affected
 harness and shard metadata tests also passed all 23 registrations.
 
-Internal review, Root's D3 decision, observations and later publication
-gates remain pending. No full test, full extended property gate or Test262
-UPDATE ran in this worker.
+Internal pass 1 on semantic U completed clean under DeepSeek and Astra,
+with no findings, incomplete areas or snapshot drift. Root made D3 Full
+and authorized the separate bootstrap admission below. Root owns the later
+Full, R, outer review and publication; no full test, full extended property
+gate or Test262 UPDATE ran in this worker.
+
+
+U2 admission and dependency self-audit
+--------------------------------------
+
+Root's D3 reply authorizes admitting the three original paths because a
+Full UPDATE does not add unreviewed subset paths. Fresh stock
+`executeTest262Case` observations on semantic U passed all three complete
+pinned sources, with both non-strict specialization variants and the
+reviewed base harness. All six native executions returned zero with empty
+stdout and stderr. Strict variants do not apply: each original has
+`noStrict`. The raw source hashes, observations and natural exit are in
+[the admission packet](/data/m5c-d17-20261031/with-boxing/admission-observations.json).
+No upstream source or assertion was changed.
+
+Before this admission, all three paths were absent from the manifest and
+unreviewed under batch 28. Their canonical results and expected subset
+classifications are now pass, and the ledger API assigns them to
+`observation`. Existing subset rows, result records and off-scope ledger
+entries remain unchanged; the source revision and supported feature list
+are fixed. Graph and batch counts and the two current manifest-count
+paragraphs are derived or refreshed without changing graph landed state,
+policy, limits or ownership of another path. The canonical batch refresh
+prunes only the now-exhausted with prefix from batch 28; its types prefix
+remains. The new stored
+manifest has 34,340 records: 29,007 pass, 3,627 expected-negative and 1,706
+unsupported, with no failure classification. The 41,091-path inventory is
+unchanged, leaving 6,751 unreviewed paths.
+
+The row audit follows Root's consolidated 2026-10-29 tag rules. Every row
+carries `expression-operators`, `object-properties` and `var-bindings`:
+line 13 assigns the checked value 42 through with resolution to the outer
+foo cell; line 12 requires ToObject and the binding object's HasProperty;
+lines 10-11 bind the actual primitive operand and the outer var fallback.
+The Number, Boolean and String originals share that contract. This is an
+observed assignment destination and value, not only a reachability marker.
+No tag comes from assert internals, a diagnostic string or a failure-only
+throw. There is no fixture, observed abrupt completion, subject function,
+object literal or branch/loop. HasProperty misses foo on each wrapper and
+returns before the unscopables Get; ToObject performs no ToPrimitive, so
+there is no reached Symbol dispatch to justify `symbols`. The packet
+records all three source hashes and the same per-row audit.
+
+The scoped allow-list is proved against semantic U, including unchanged
+implementation and test sources, unchanged prior records and rows, and
+canonical serialization. The repeated 60-file non-native gate passed all
+835 registrations without skips in 105.27 seconds. U2 precheck and its
+admission-only internal pair are recorded in the final worker packet. These
+focused observations and bootstrap records do not claim the later Full,
+candidate CI, outer review, landing or publication.

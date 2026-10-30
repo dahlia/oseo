@@ -173819,6 +173819,15 @@ tests:
   - path: test/language/statements/with/12.10-0-9.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-2-1.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-2-2.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, var-bindings]
+  - path: test/language/statements/with/12.10-2-3.js
+    expectedClassification: pass
+    dependencies: [expression-operators, object-properties, var-bindings]
   - path: test/language/statements/with/12.10-2-4.js
     expectedClassification: pass
     dependencies: [control-flow, error-intrinsics, object-properties]

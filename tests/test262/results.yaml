@@ -23461,7 +23461,7 @@ summary:
   expectedNegatives: 3627
   harnessFailures: 0
   infrastructureFailures: 0
-  passes: 29004
+  passes: 29007
   semanticFailures: 0
   unsupportedProfileFeatures: 1706
   dependencies:
@@ -23574,7 +23574,7 @@ summary:
       expectedNegatives: 602
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6218
+      passes: 6221
       semanticFailures: 0
       unsupportedProfileFeatures: 668
     - dependency: functions
@@ -23651,7 +23651,7 @@ summary:
       expectedNegatives: 608
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 17472
+      passes: 17475
       semanticFailures: 0
       unsupportedProfileFeatures: 926
     - dependency: promise-settlement
@@ -23777,7 +23777,7 @@ summary:
       expectedNegatives: 171
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 6273
+      passes: 6276
       semanticFailures: 0
       unsupportedProfileFeatures: 707
     - dependency: weak-collections
@@ -24366,7 +24366,7 @@ summary:
       expectedNegatives: 681
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 1656
+      passes: 1659
       semanticFailures: 0
       unsupportedProfileFeatures: 59
     - group: language/types

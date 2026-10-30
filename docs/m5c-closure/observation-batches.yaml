@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 6754
+unreviewedPaths: 6751
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,7 +165,7 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 113138
+  currentExecutedVariants: 113144
   currentSeconds: 6216
   finalExecutedVariants: 136568
   finalSeconds: 7503
@@ -176,8 +176,8 @@ regeneration:
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 28.99
-    fullUpdateScheduleHours: 57.27
+    scheduleHours: 29
+    fullUpdateScheduleHours: 57.28
   alternatives:
     - batches: 12
       largestPaths: 1920
@@ -231,7 +231,7 @@ batches:
     regeneration:
       executableVariants: 4
       scopedUpdateSeconds: 0
-      fullCorpusSeconds: 6216
+      fullCorpusSeconds: 6217
   - id: observation-batch-18
     selector:
       prerequisiteSets:
@@ -259,7 +259,7 @@ batches:
     regeneration:
       executableVariants: 40
       scopedUpdateSeconds: 2
-      fullCorpusSeconds: 6218
+      fullCorpusSeconds: 6219
   - id: observation-batch-21a
     selector:
       prerequisiteSets:
@@ -501,7 +501,7 @@ batches:
     regeneration:
       executableVariants: 2082
       scopedUpdateSeconds: 114
-      fullCorpusSeconds: 6805
+      fullCorpusSeconds: 6806
   - id: observation-batch-22b
     selector:
       prerequisiteSets:
@@ -723,7 +723,7 @@ batches:
     regeneration:
       executableVariants: 2210
       scopedUpdateSeconds: 121
-      fullCorpusSeconds: 7218
+      fullCorpusSeconds: 7219
   - id: observation-batch-26a
     selector:
       prerequisiteSets:
@@ -771,7 +771,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7291
+      fullCorpusSeconds: 7292
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -876,27 +876,24 @@ batches:
       prerequisiteSets:
         - ""
       prefixes:
-        - test/language/statements/with/
         - test/language/types/
     dependsOn:
       - observation-batch-plan
-    paths: 4
-    reviewUnits: 4
+    paths: 1
+    reviewUnits: 1
     generatedPaths: 0
     prerequisites: {}
     dynamicSource: {}
-    flags:
-      noStrict: 3
+    flags: {}
     includes: {}
     features: {}
     negatives: {}
     partitions:
       groups:
-        - language/statements
         - language/types
-      files: 4
+      files: 1
       newFiles: 1
     regeneration:
-      executableVariants: 10
-      scopedUpdateSeconds: 1
+      executableVariants: 4
+      scopedUpdateSeconds: 0
       fullCorpusSeconds: 7503

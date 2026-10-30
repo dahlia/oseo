@@ -5,15 +5,15 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 32631
-openPaths: 8460
+closedPaths: 32634
+openPaths: 8457
 states:
   expected-negative: 3627
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 29004
+  pass: 29007
   semantic-failure: 0
-  unreviewed: 6754
+  unreviewed: 6751
   unsupported-profile-feature: 1706
 owners:
   adr:0016-dynamic-source-boundary:
@@ -299,7 +299,7 @@ owners:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
       selects for observation-batch-28. The batch observes them; no
       classification is assumed before it does.
-    paths: 4
+    paths: 1
   node:regexp-anchored-repeat-state-remediation:
     note: Fresh normal Full on Reg-only
       U6e5ebf2effdcedc5f0205e1af22f71606d7b9726 retains three original
@@ -334,7 +334,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 32631
+    paths: 32634
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -41074,9 +41074,9 @@ paths:
   test/language/statements/with/12.10-0-7.js: [pass, observation]
   test/language/statements/with/12.10-0-8.js: [pass, observation]
   test/language/statements/with/12.10-0-9.js: [pass, observation]
-  test/language/statements/with/12.10-2-1.js: [unreviewed, node:observation-batch-28]
-  test/language/statements/with/12.10-2-2.js: [unreviewed, node:observation-batch-28]
-  test/language/statements/with/12.10-2-3.js: [unreviewed, node:observation-batch-28]
+  test/language/statements/with/12.10-2-1.js: [pass, observation]
+  test/language/statements/with/12.10-2-2.js: [pass, observation]
+  test/language/statements/with/12.10-2-3.js: [pass, observation]
   test/language/statements/with/12.10-2-4.js: [pass, observation]
   test/language/statements/with/12.10-2-5.js: [pass, observation]
   test/language/statements/with/12.10-7-1.js: [pass, observation]
