@@ -237,6 +237,18 @@ test("a function-level directive admits tail calls in sloppy code", () => {
   );
 });
 
+test("rebound global eval remains a dynamic strict tail call", () => {
+  for (const directive of ['"use strict";', ""]) {
+    assert.deepEqual(
+      tailCalls(
+        `function f(n) { ${directive} return eval(n - 1); }\n` +
+          "eval = f; f(10);\n",
+      ),
+      directive === "" ? [] : [dynamic],
+    );
+  }
+});
+
 test("constructor tail calls carry the derived this binding", () => {
   const tails = tailCalls(
     `"use strict";\n${prelude}` +
