@@ -23463,7 +23463,7 @@ summary:
   infrastructureFailures: 0
   passes: 29004
   semanticFailures: 0
-  unsupportedProfileFeatures: 1706
+  unsupportedProfileFeatures: 1708
   dependencies:
     - dependency: abrupt-completion
       expectedNegatives: 25
@@ -23471,7 +23471,7 @@ summary:
       infrastructureFailures: 0
       passes: 2292
       semanticFailures: 0
-      unsupportedProfileFeatures: 528
+      unsupportedProfileFeatures: 530
     - dependency: array-buffer
       expectedNegatives: 0
       harnessFailures: 0
@@ -23562,28 +23562,28 @@ summary:
       infrastructureFailures: 0
       passes: 30
       semanticFailures: 0
-      unsupportedProfileFeatures: 1480
+      unsupportedProfileFeatures: 1482
     - dependency: error-intrinsics
       expectedNegatives: 15
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 1846
       semanticFailures: 0
-      unsupportedProfileFeatures: 486
+      unsupportedProfileFeatures: 488
     - dependency: expression-operators
       expectedNegatives: 602
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 6218
       semanticFailures: 0
-      unsupportedProfileFeatures: 668
+      unsupportedProfileFeatures: 670
     - dependency: functions
       expectedNegatives: 866
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 12099
       semanticFailures: 0
-      unsupportedProfileFeatures: 1353
+      unsupportedProfileFeatures: 1355
     - dependency: generators
       expectedNegatives: 279
       harnessFailures: 0
@@ -23632,7 +23632,7 @@ summary:
       infrastructureFailures: 0
       passes: 371
       semanticFailures: 0
-      unsupportedProfileFeatures: 426
+      unsupportedProfileFeatures: 428
     - dependency: object-literals
       expectedNegatives: 199
       harnessFailures: 0
@@ -24242,7 +24242,7 @@ summary:
       infrastructureFailures: 0
       passes: 2
       semanticFailures: 0
-      unsupportedProfileFeatures: 343
+      unsupportedProfileFeatures: 345
     - group: language/export
       expectedNegatives: 3
       harnessFailures: 0

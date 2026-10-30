@@ -68,7 +68,19 @@ the raw CHECK, runner and native results under
 
 The capacity-wrapped `mise run check` passed; *check2.json* retains its
 natural exit status. Internal review decisions are recorded with the run
-evidence. Root owns D3, the exact-U UPDATE,
-reviewed admission or reclassification, the outer gate and publication.
-The two originals remain held until Root applies those decisions. This
-preparation changes no subset, manifest, ledger owner or landed state.
+evidence. Root owns the Full UPDATE, outer gate and publication.
+Root's reply to `msg_56c6e517dbc9` selected Full and authorized U2 to
+admit the two held subset rows from the completed focused observations.
+Each records `unsupported-profile-feature` and the six source-audited tags
+listed in the B06 work note. Canonical serialization preserves every
+previously reviewed record and adds exactly those two observations.
+Source/observation-bound audit rows keep both under active dynamic-source
+remediation: the umbrella grows from 881 to 883, without an exclusion.
+The observation plan no longer reserves already admitted paths; no inventory
+or subset path is removed.
+
+Both U1 internal stages were clean at
+`5dad0b2a4904d47190dcb17967d90e966997f3d6`. U2's admission scope gets a fresh
+pair and precheck. Root batches the Full UPDATE, owns R and the outer gate,
+and explicitly instructed this worker to report U2 without waiting for R.
+This preparation marks no landed state.

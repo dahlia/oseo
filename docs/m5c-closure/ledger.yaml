@@ -13,8 +13,8 @@ states:
   infrastructure-failure: 0
   pass: 29004
   semantic-failure: 0
-  unreviewed: 6754
-  unsupported-profile-feature: 1706
+  unreviewed: 6752
+  unsupported-profile-feature: 1708
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -207,8 +207,11 @@ owners:
       grants no whole-path exclusion. The global eval rebinding row
       remains unsupported under
       node:global-eval-rebinding-tail-call-resolution; it does not
-      evaluate source."
-    paths: 1046
+      evaluate source. Root admits the two held B06 indirect
+      import/export originals after diagnostic portability repair; their
+      asserted eval Script grammar stays active remediation with fresh
+      source and observation audit rows, not a whole-path exclusion."
+    paths: 1048
   node:global-eval-rebinding-tail-call-resolution:
     note: Root-approved bounded ordinary binding/call remediation for
       tco-non-eval-global.js. The source assigns its statically declared
@@ -224,11 +227,6 @@ owners:
     paths: 13
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
-    paths: 2
-  node:observation-batch-06:
-    note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
-      selects for observation-batch-06. The batch observes them; no
-      classification is assumed before it does.
     paths: 2
   node:observation-batch-18:
     note: Unreviewed paths that docs/m5c-closure/observation-batches.yaml
@@ -19418,13 +19416,13 @@ paths:
   test/language/eval-code/indirect/cptn-nrml-empty-while.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions]]
   test/language/eval-code/indirect/cptn-nrml-expr-obj.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-literals, var-bindings]]
   test/language/eval-code/indirect/cptn-nrml-expr-prim.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/indirect/export.js: [unreviewed, node:observation-batch-06]
+  test/language/eval-code/indirect/export.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking]]
   test/language/eval-code/indirect/global-env-rec-catch.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/global-env-rec-eval.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/global-env-rec-fun.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/eval-code/indirect/global-env-rec-with.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/eval-code/indirect/global-env-rec.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, var-bindings]]
-  test/language/eval-code/indirect/import.js: [unreviewed, node:observation-batch-06]
+  test/language/eval-code/indirect/import.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, module-linking]]
   test/language/eval-code/indirect/lex-env-distinct-cls.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, classes, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
   test/language/eval-code/indirect/lex-env-distinct-const.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]
   test/language/eval-code/indirect/lex-env-distinct-let.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-bindings]]

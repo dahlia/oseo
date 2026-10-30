@@ -764,7 +764,7 @@ assessments:
   observation-train-b06-b08-b14:
     disposition: remediation
     normativeDependency: not-demonstrated
-    reason: Root retains exactly 339 original B06/B08/B14 source-rejection
+    reason: Root retains exactly 341 original B06/B08/B14 source-rejection
       paths as active in-claim coverage remediation. Their original source
       evaluation, completion, Reference, lexical, property and operator
       contracts remain unresolved where rejection prevents observation.
@@ -8812,6 +8812,17 @@ paths:
     section: "sec-performeval"
     subject: "Expression statement. Eval return primitive value"
     assessment: "observation-train-b06-b08-b14"
+  - path: "test/language/eval-code/indirect/export.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5c73daa134edc98a7c86e0c2b768b7c2bf9b7f128acbc5ac\
+      31e47ff0d95fd110"
+    observationDigest: "2c09b1273bde6c16815a5f68c8fa19da49805112b5d53082\
+      8aeedf9f60443d2d"
+    missingDynamicTag: false
+    section: "sec-scripts"
+    subject: "The `export` declaration may not appear within eval code"
+    assessment: "observation-train-b06-b08-b14"
   - path: "test/language/eval-code/indirect/global-env-rec-catch.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -8870,6 +8881,17 @@ paths:
     missingDynamicTag: false
     section: "Original es5id: 10.4.2-1-1"
     subject: "Indirect call to eval has context set to global context"
+    assessment: "observation-train-b06-b08-b14"
+  - path: "test/language/eval-code/indirect/import.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "3c3de7291db32e85c746761a22a7af5b7077ebbcb50d7eb5\
+      0cac6401ed51a9b2"
+    observationDigest: "88c4c33ede5558a0efd1f35eac72cfe639554199c9ff6db8\
+      138c38e25d0eb130"
+    missingDynamicTag: false
+    section: "sec-scripts"
+    subject: "The `import` declaration may not appear within eval code"
     assessment: "observation-train-b06-b08-b14"
   - path: "test/language/eval-code/indirect/lex-env-distinct-cls.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"

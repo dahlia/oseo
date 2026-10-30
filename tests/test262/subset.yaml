@@ -67414,6 +67414,17 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [dynamic-source, expression-operators, functions, var-bindings]
+  - path: test/language/eval-code/indirect/export.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        module-linking,
+      ]
   - path: test/language/eval-code/indirect/global-env-rec-catch.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -67448,6 +67459,17 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [dynamic-source, expression-operators, functions, var-bindings]
+  - path: test/language/eval-code/indirect/import.js
+    expectedClassification: unsupported-profile-feature
+    dependencies:
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        module-linking,
+      ]
   - path: test/language/eval-code/indirect/lex-env-distinct-cls.js
     expectedClassification: unsupported-profile-feature
     dependencies:
