@@ -747,6 +747,7 @@ results:
       - functions
       - iterator-protocol
       - lexical-bindings
+      - object-properties
       - symbols
       - var-bindings
     execution:

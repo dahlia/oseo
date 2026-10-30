@@ -405,6 +405,7 @@ results:
       - error-intrinsics
       - functions
       - iterator-protocol
+      - object-properties
       - symbols
       - var-bindings
     execution:

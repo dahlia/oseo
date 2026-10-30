@@ -23,9 +23,9 @@ Its *intake.json* binds the pinned source hashes and exact batch selectors.
 variants, while *raw/* retains every native execution request and result.
 *reviewed-tags.json* records per-path dependency evidence and audit
 corrections; *observation-batch-24.paths* and
-*observation-batch-24.review-units* name the 794 paths and 228 review units.
-The canonical serializer materializes the saved observations into the manifest
-before U; Root's scoped UPDATE must strictly agree before R is accepted.
+*observation-batch-24.review-units* name the 794 paths and 228 review units. U
+canonically materializes the saved focused observations. The independent scoped
+UPDATE and strict agreement are recorded below.
 
 
 Dependency self-audit
@@ -52,3 +52,29 @@ Rejected declaration placements and destructuring targets retain their subject
 syntax families, without runtime protocol claims. No fixture module contributes
 a tag in this train; the fixture-derived row count is zero. Existing subset
 rows, classifications, tags and owners are preserved.
+
+
+Scoped UPDATE agreement
+-----------------------
+
+Root independently observed U `fe82c8aea6f8d880b4ea3d3e38fc56873b8124c6`
+against baseline `8f4202628356e172e1b4093a371d086070619de3`.
+Its scoped UPDATE completed with exit 0, selecting all 1,440 B24/B25
+originals: 1,354 passes, 79 expected negatives and 7 unsupported results,
+with no retries. The remote result tree equals U's tree, all manifest
+partitions were unchanged, and the result patch and worktree status are
+empty. Every admitted record strictly agrees with the focused observations,
+including classifications and executed variants, after the reviewed
+dependency-tag projection.
+
+The
+[raw Root reply](/data/m5c-d17-20261031/train-d/task_f6880fe9a7b3/ctx_2931b5fdcc73/UPDATE-reply.json),
+[remote result](/data/m5c-d17-20261031/train-d/root-scoped-fe82c8ae/remote-20261030T185908Z-1b2dd1fa843f/meta.json)
+and
+[agreement receipt](/data/m5c-d17-20261031/train-d/task_f6880fe9a7b3/ctx_2931b5fdcc73/R-receipt.json)
+retain the execution and comparison evidence. The derived ledger, batch counts
+and graph baseline retain their canonical values. B31's 65 existing records are
+outside this first-admission UPDATE and remain unchanged. The graph node set,
+dependencies and scheduling state are unchanged; the 833 passing non-native
+tests include the existing graph contract tests. Root retains the outer gate,
+integration, landing and publication.

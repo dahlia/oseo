@@ -190070,6 +190070,7 @@ tests:
         error-intrinsics,
         functions,
         iterator-protocol,
+        object-properties,
         symbols,
         var-bindings,
       ]
@@ -190654,6 +190655,7 @@ tests:
         functions,
         generators,
         iterator-protocol,
+        object-properties,
         symbols,
         var-bindings,
       ]
@@ -190783,6 +190785,7 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
+        object-properties,
         symbols,
         var-bindings,
       ]
@@ -190797,6 +190800,7 @@ tests:
         functions,
         iterator-protocol,
         lexical-bindings,
+        object-properties,
         symbols,
         var-bindings,
       ]
