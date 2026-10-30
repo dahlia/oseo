@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/import/dup-bound-names.js:91:18: error[OSEO0001]:
+      detail: "test/language/import/dup-bound-names.js:16:18: error[OSEO0001]:
         Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

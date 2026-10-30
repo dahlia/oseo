@@ -18,7 +18,7 @@ results:
     dependencies:
       - lexical-grammar
     observation:
-      detail: "test/language/import/escaped-as-namespace-import.js:99:9:
+      detail: "test/language/import/escaped-as-namespace-import.js:24:9:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse
