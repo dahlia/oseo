@@ -781,6 +781,83 @@ assessments:
       asserted contract or an input prerequisite; its in-claim
       assertions remain unresolved. No whole-path exclusion or
       equivalent replacement is established by this admission.
+  ds4-static-callable-subjects:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Maintainer decision 2026-10-28 item 1 applies. The per-path table in
+      docs/m5c-graph/dynamic-source-callable-family-assessment.md identifies
+      every non-source assertion and its reviewed passing static replacement.
+      Each exclusion row has complete replacement evidence; only eval or
+      source-compiling constructor evaluation remains. No path becomes a pass.
+      Changed source, observation, or replacement evidence requires
+      reassessment; admitting the excluded source form under an accepted ADR
+      0016 amendment reopens these rows, and ADR 0019 non-source dependence
+      remains a reopening trigger.
+    replacementEvidence:
+      docs/m5c-graph/dynamic-source-callable-family-assessment.md:
+        "dd825748a5af3e38e1943b3b56cb9c84\
+        ac45e0f7f24adc151c005aacb71ff22d"
+      tests/test262/results/built-ins/Function/24.yaml:
+        "397dcedbdc5940390b91a061dc705a06\
+        092a75e67b0eddb6a5484f7823f8b99b"
+      tests/test262/results/built-ins/Function/fa.yaml:
+        "f4a0e180c0ccee967045dc1e827710fc\
+        80587d42b81cf899f92f8a46f8f6e3ac"
+      tests/test262/results/built-ins/Function/ea.yaml:
+        "24adf1e777ed90bad61378fe05027d9e\
+        30ae026571785fcdc75f4373ab14b663"
+      tests/test262/results/built-ins/Function/03.yaml:
+        "9f53ba0d50a70179bb55de90c1a5a375\
+        bebb4d948598f0b523e38e6250b1ff0e"
+      tests/test262/results/built-ins/Function/19.yaml:
+        "e7217c8bbbeb7c02e35a873ffe8229f9\
+        ade681c6be9ab2ee5d00a51a54b9772b"
+      tests/test262/results/built-ins/Function/ef.yaml:
+        "48b8bff33b3a753c55c779670bf92f06\
+        9e279af554f5e9c496c3208bd6359383"
+      tests/test262/results/built-ins/Function/4f.yaml:
+        "4e9524a3bdb9d54922697fce93df2730\
+        7982db7be5e2aab68f93c14c520c2e5f"
+      tests/test262/results/built-ins/Function/3c.yaml:
+        "7daca0f723233a013ca9dd47aa3cd087\
+        ec6afcc6ad4fe277fb01319099ab1f4c"
+      tests/test262/results/built-ins/Function/60.yaml:
+        "61360d9403ef33cfed1930f726d4ae4a\
+        1894174f82f511f71bbaf953cac30b75"
+      tests/test262/results/built-ins/Function/95.yaml:
+        "a31c652194e5d268668d15044e81a4ae\
+        2199910c89042dfe3ef71056f12b3593"
+      tests/test262/results/built-ins/Function/f6.yaml:
+        "6e1f86b137febf294ab7e2d54d2387a2\
+        1344a8cd7ed7f940b486836297d77b67"
+      tests/test262/results/built-ins/Function/58.yaml:
+        "6ca80c8b52fab774746457b525f2836c\
+        64c18748cecc3d8965b0f3c1bc55080b"
+      tests/test262/results/built-ins/Object/e6.yaml:
+        "a319e6d4e4b19011c071f404aecdb8da\
+        7c682674ea5b9b2abecd1c4e2d06e7c0"
+      tests/test262/results/language/expressions/af.yaml:
+        "c60c130164b2ca664afa8d347851358d\
+        161b039039f0fb9b4590fb4c755492d3"
+      tests/test262/results/language/expressions/04.yaml:
+        "9bd3ff7aa96d2d09bb142a59dd6af4be\
+        fff8aaf12755df41259fc356e2c532e8"
+      tests/test262/results/language/expressions/4f.yaml:
+        "85e62caf61f9f00043786fb875bdb841\
+        2f2a04d9bdf63dbfcad726939bb2e783"
+      tests/test262/results/language/expressions/9a.yaml:
+        "84efc96b2fc51a77523b989e7e657f4f\
+        679e1821c6bc57c2c00504bad38000c0"
+  ds4-callable-remediation:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The per-path assessment in
+      docs/m5c-graph/dynamic-source-callable-family-assessment.md names the
+      remaining non-source assertions for each of these paths. Existing
+      partial static witnesses do not establish every asserted contract. Keep
+      the original unsupported classification and umbrella owner; the observed
+      dynamic-source rejection authorizes no exclusion of those missing
+      observations.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -1132,7 +1209,7 @@ paths:
     section: sec-toboolean
     subject: Different objects convert to Boolean by explicit
       transformation
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Boolean/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2720,7 +2797,7 @@ paths:
     subject: Calling "apply" method of the object that does not
       have a [[Call]] property. Prototype of the object is
       Function()
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2731,7 +2808,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: Not any arguments at apply function
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: "test/built-ins/Function/prototype/apply/S15.3.4.3_A3\
       _T10.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2744,7 +2821,7 @@ paths:
     section: sec-function.prototype.apply
     subject: Checking by using eval, no any arguments at apply
       function
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2755,7 +2832,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: Argument at apply function is null
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2766,7 +2843,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: Argument at apply function is void 0
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2777,7 +2854,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: Argument at apply function is undefined
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2789,7 +2866,7 @@ paths:
     section: sec-function.prototype.apply
     subject: No any arguments at apply function and it called
       inside function declaration
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2801,7 +2878,7 @@ paths:
     section: sec-function.prototype.apply
     subject: Argument at apply function is void 0 and it called
       inside function declaration
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A3_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2813,7 +2890,7 @@ paths:
     section: sec-function.prototype.apply
     subject: Checking by using eval, argument at apply function
       is void 0
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2824,7 +2901,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is number
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2835,7 +2912,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is boolean true
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2846,7 +2923,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is new Number()
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A5_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2857,7 +2934,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: thisArg is Function()
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2868,7 +2945,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: argArray is (null,[1])
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: "test/built-ins/Function/prototype/apply/S15.3.4.3_A7\
       _T10.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2881,7 +2958,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, arguments), inside
       function call without declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2892,7 +2969,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.apply
     subject: argArray is (null,[1,2,3])
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2904,7 +2981,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, new
       Array("nine","inch","nails"))
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2916,7 +2993,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, ( function(){return
       arguments;}) ("a","b","c"))
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2928,7 +3005,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (null, arguments), inside function
       declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2940,7 +3017,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (this, arguments), inside function
       declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2952,7 +3029,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (null, arguments), inside function call
       without declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2964,7 +3041,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (this, arguments), inside function call
       without declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A7_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2976,7 +3053,7 @@ paths:
     section: sec-function.prototype.apply
     subject: argArray is (empty object, arguments), inside
       function declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2988,7 +3065,7 @@ paths:
     section: sec-function.prototype.apply
     subject: Checking if creating "new
       (Function("this.p1=1").apply)" fails
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3000,7 +3077,7 @@ paths:
     section: sec-function.prototype.apply
     subject: Checking if creating "new
       Function("this.p1=1").apply" fails
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/apply/S15.3.4.3_A8_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3012,7 +3089,7 @@ paths:
     section: sec-function.prototype.apply
     subject: Checking if creating "new (Function("function
       f(){this.p1=1;};return f").apply())" fails
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: "test/built-ins/Function/prototype/apply/argarray-not\
       -object-realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3079,7 +3156,7 @@ paths:
     subject: Call "call" method of the object that does not have
       a [[Call]] property. Prototype of the object is
       Function()
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A2_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3090,7 +3167,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Checking f.call.length, where f is new Function
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3101,7 +3178,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Not any arguments at call function
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T10.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3113,7 +3190,7 @@ paths:
     section: sec-function.prototype.call
     subject: Checking by using eval, no any arguments at call
       function
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3124,7 +3201,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Argument at call function is null
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3135,7 +3212,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Argument at call function is void 0
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3146,7 +3223,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Argument at call function is undefined
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3158,7 +3235,7 @@ paths:
     section: sec-function.prototype.call
     subject: No any arguments at call function and it called
       inside function declaration
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3170,7 +3247,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argument at call function is void 0 and it called
       inside function declaration
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A3_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3182,7 +3259,7 @@ paths:
     section: sec-function.prototype.call
     subject: Checking by using eval, argument at call function
       is void 0
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3193,7 +3270,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is number
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3204,7 +3281,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is boolean true
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3215,7 +3292,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is new Number()
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A5_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3226,7 +3303,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: thisArg is Function()
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3237,7 +3314,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Argunemts of call function is (null,[1])
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T10.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3250,7 +3327,7 @@ paths:
     subject: Argunemts of call function is (empty object, "",
       arguments,2), inside function call without declaration
       used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3261,7 +3338,7 @@ paths:
     missingDynamicTag: true
     section: sec-function.prototype.call
     subject: Argunemts of call function is (null,[3,2,1])
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3273,7 +3350,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (empty object, new
       Array("nine","inch","nails"))
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3285,7 +3362,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (empty object, (
       function(){return arguments;})("a","b","c","d"),"",2)
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3297,7 +3374,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (null,
       arguments,"",2), inside function declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3309,7 +3386,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (this,
       arguments,"",2), inside function declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T7.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3322,7 +3399,7 @@ paths:
     subject: Argunemts of call function is (null,
       arguments,"",2), inside function call without
       declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T8.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3335,7 +3412,7 @@ paths:
     subject: Argunemts of call function is (this,
       arguments,"",2), inside function call without
       declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A6_T9.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3347,7 +3424,7 @@ paths:
     section: sec-function.prototype.call
     subject: Argunemts of call function is (empty object, "",
       arguments,2), inside function declaration used
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T4.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3359,7 +3436,7 @@ paths:
     section: sec-function.prototype.call
     subject: Checking if creating "new
       (Function("this.p1=1").call)" fails
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T5.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3371,7 +3448,7 @@ paths:
     section: sec-function.prototype.call
     subject: Checking if creating "new
       Function("this.p1=1").call" fails
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Function/prototype/call/S15.3.4.4_A7_T6.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3383,7 +3460,7 @@ paths:
     section: sec-function.prototype.call
     subject: Checking if creating "new (Function("function
       f(){this.p1=1;};return f").call())" fails
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: "test/built-ins/Function/prototype/toString/AsyncFunc\
       tion.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3758,7 +3835,7 @@ paths:
     subject: Object.getOwnPropertyDescriptor returns data desc
       for properties on built-ins (Function
       (instance).length)
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: "test/built-ins/Object/getOwnPropertyDescriptor/15.2.\
       3.3-4-188.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -3772,7 +3849,7 @@ paths:
     subject: Object.getOwnPropertyDescriptor returns undefined
       for non-existent properties on built-ins (Function
       (instance).name)
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Object/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3797,7 +3874,7 @@ paths:
     section: sec-object.prototype.tostring
     subject: has a [[Call]] internal method, let builtinTag be
       "Function".
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Object/seal/seal-arrowfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3808,7 +3885,7 @@ paths:
     missingDynamicTag: false
     section: sec-object.seal
     subject: Object.seal ArrowFunction
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Object/seal/seal-asyncarrowfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3841,7 +3918,7 @@ paths:
     missingDynamicTag: true
     section: sec-object.seal
     subject: Object.seal AsyncGeneratorFunction
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Object/seal/seal-function.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3852,7 +3929,7 @@ paths:
     missingDynamicTag: true
     section: sec-object.seal
     subject: Object.seal Function
-    assessment: fixture-construction
+    assessment: "ds4-static-callable-subjects"
   - path: test/built-ins/Object/seal/seal-generatorfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3863,7 +3940,7 @@ paths:
     missingDynamicTag: true
     section: sec-object.seal
     subject: Object.seal GeneratorFunction
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/Object/values/tamper-with-global-object.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3978,7 +4055,7 @@ paths:
     section: sec-reflect.apply
     subject: Return abrupt if argumentsList is not an ArrayLike
       object.
-    assessment: fixture-construction
+    assessment: "ds4-callable-remediation"
   - path: test/built-ins/RegExp/S15.10.4.1_A5_T3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -11458,7 +11535,7 @@ paths:
     section: "sec-function-constructor"
     subject: "new SubFunction() instanceof Function (Subclass
       instanceof Heritage)"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/comma/S11.14_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18474,7 +18551,7 @@ paths:
     section: "sec-instanceofoperator"
     subject: "A Function object created by new Function is
       instanceof Function and its constructor is Function"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T1\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18488,7 +18565,7 @@ paths:
     subject: 'instanceof returns false when V is number (not an
       object); F comes from Function("name",
       "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T2\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18502,7 +18579,7 @@ paths:
     subject: 'instanceof returns false when V is string (not an
       object); F comes from Function("name",
       "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T3\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18516,7 +18593,7 @@ paths:
     subject: 'instanceof returns false when V is boolean true
       (not an object); F comes from Function("name",
       "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T4\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18530,7 +18607,7 @@ paths:
     subject: 'instanceof returns false when V is boolean false
       (not an object); F comes from Function("name",
       "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T5\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18544,7 +18621,7 @@ paths:
     subject: 'instanceof returns false when V is void 0 (not an
       object); F comes from Function("name",
       "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T6\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18558,7 +18635,7 @@ paths:
     subject: 'instanceof returns false when V is null (not an
       object); F comes from Function("name",
       "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T7\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18572,7 +18649,7 @@ paths:
     subject: 'instanceof returns false when V is undefined (not
       an object); F comes from Function("name",
       "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A1_T8\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18586,7 +18663,7 @@ paths:
     subject: 'instanceof returns false when V is an undefined
       variable (not an object); F comes from
       Function("name", "this.name=name;")'
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A2_T2\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18599,7 +18676,7 @@ paths:
     section: "sec-ordinaryhasinstance"
     subject: "F.prototype is undefined and V is an empty object:
       TypeError"
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A2_T5\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18612,7 +18689,7 @@ paths:
     section: "sec-ordinaryhasinstance"
     subject: "F.prototype is void 0 and V is new F: TypeError;
       instance.constructor and inherited name stay intact"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A2_T6\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18625,7 +18702,7 @@ paths:
     section: "sec-ordinaryhasinstance"
     subject: "F.prototype is a string and V is a function:
       TypeError"
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A3_T1\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18637,7 +18714,7 @@ paths:
     missingDynamicTag: false
     section: "sec-ordinaryhasinstance"
     subject: "V = new F inherits F.prototype, so instanceof is true"
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/instanceof/S15.3.5.3_A3_T2\
       .js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -18650,7 +18727,7 @@ paths:
     section: "sec-ordinaryhasinstance"
     subject: "instanceof follows a reassigned F.prototype
       (Object.prototype) for an ordinary object"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/left-shift/S11.7.1_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18796,7 +18873,7 @@ paths:
     subject: "A get and set accessor pair defined in an object
       literal reads and writes through its functions; eval
       only compiles the object literal under test"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/object/11.1.5-0-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18810,7 +18887,7 @@ paths:
       object literal each read and write through their own
       functions; eval only compiles the object literal under
       test"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/object/11.1.5_4-4-a-3.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18824,7 +18901,7 @@ paths:
       literal is allowed and the property gets the last
       defined value; eval only compiles the object literal
       under test"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/object/11.1.5_4-4-b-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18838,7 +18915,7 @@ paths:
       same-named get accessor definition is not a
       SyntaxError; eval only compiles the object literal
       under test"
-    assessment: "fixture-construction"
+    assessment: "ds4-callable-remediation"
   - path: "test/language/expressions/object/11.1.5_6-3-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18851,7 +18928,7 @@ paths:
     subject: "The property descriptor that a get accessor
       definition creates; eval only compiles the object
       literal under test"
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/object/11.1.5_6-3-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18863,7 +18940,7 @@ paths:
     section: "sec-object-initializer"
     subject: "A get accessor definition creates no set function;
       eval only compiles the object literal under test"
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/object/11.1.5_7-3-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18876,7 +18953,7 @@ paths:
     subject: "The property descriptor that a set accessor
       definition creates; eval only compiles the object
       literal under test"
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/object/11.1.5_7-3-2.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18888,7 +18965,7 @@ paths:
     section: "sec-object-initializer"
     subject: "A set accessor definition creates no get function;
       eval only compiles the object literal under test"
-    assessment: "fixture-construction"
+    assessment: "ds4-static-callable-subjects"
   - path: "test/language/expressions/object/method-definition/a\
       sync-gen-meth-eval-var-scope-syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19450,7 +19527,7 @@ paths:
       independent checks of the existing Object, String,
       Boolean, Number, Date, Error and RegExp callable
       intrinsics.
-    assessment: mixed-typeof-callability
+    assessment: "ds4-callable-remediation"
   - path: test/language/expressions/typeof/syntax.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding

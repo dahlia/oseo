@@ -1,8 +1,14 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
-The current umbrella owns 460 paths: DS1 accounts for 218, DS-3 for 11 and
-DS2 for 76 of the historical 765 below. DS2's
+The current umbrella owns 841 paths: DS1 accounts for 218, DS-3 for 11,
+DS2 for 76, and DS4 for 40 of the historical 765 below. Root's later
+observation additions contribute 421 paths (82 from batches 01/18 and
+339 from B06/B08/B14). DS4's
+[*per-path assessment*](./dynamic-source-callable-family-assessment.md)
+reviews all 86 reserved callable-family paths, closes 40 through existing
+passing static replacements under decision item 1, and keeps 46 in
+remediation. It adds no native evidence. DS2's
 [*per-path assessment*](./dynamic-source-module-semantics-assessment.yaml)
 uses reviewed static-import observations and one new native test of a live
 default namespace property, keeping 32 selected module subjects and 67
@@ -33,7 +39,7 @@ from clean source `6aab0fc8`, tree
 every original path and exact diagnostic. No path was re-observed here.
 
 The table below preserves the original observation-train evidence. Later
-DS-1 and DS-3 audit assessments account for the paths described above; all
+DS-1 through DS-4 audit assessments account for the paths described above; all
 other paths remain active remediation. A dependency tag alone authorizes
 no exclusion. Every original subject and normative section is preserved.
 
