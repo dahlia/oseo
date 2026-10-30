@@ -120,8 +120,13 @@ with the four retained Node/Zig property registrations, these are 28
 successful framework registrations across the three execution vectors and
 sanitizer self-checks; they overlap and are not unique test262 paths.
 Both fixed and property suites literally use NodeHost under both test
-frameworks; their references invoke the independent Node.js and Deno
-executables. These are Linux AMD64 author checks, not macOS executions,
+frameworks. The fixed suite names the `node` and `deno` reference
+executables explicitly, so both frameworks compare against independent
+Node.js and Deno runs. The property suite takes its first reference from
+`process.execPath`, which is the running framework: its Node.js run
+compares against Node.js and Deno, while its Deno run invokes Deno twice
+and supplies no independent Node.js reference. These are Linux AMD64
+author checks, not macOS executions,
 extended properties, full repository gates or stored test262 promotions.
 
 The two original sources execute without edits through `executeTest262Case`
