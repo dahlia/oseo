@@ -45,6 +45,7 @@ import type {
   Test262Classification,
   Test262Result,
 } from "../packages/testkit/src/index.ts";
+import { canonicalizeFileModuleUrl } from "../packages/host/src/index.ts";
 import { isString } from "../tools/value-kinds.ts";
 
 const revision = "f2d1435644797268dca1f7988cad5a4e89ccd8d2";
@@ -3351,9 +3352,14 @@ import "./dep_FIXTURE.js";
       ].map(async (diagnosticId) => {
         const results = await Promise.all(
           roots.map(async (root) => {
+            // Diagnostics name the graph's canonical identity. Windows
+            // percent-encodes the ~ of 8.3 short names in pathToFileURL,
+            // which canonicalization decodes as an unreserved byte.
             const canonical = diagnosticId.startsWith("oseo:")
               ? diagnosticId
-              : pathToFileURL(join(root, diagnosticId)).href;
+              : canonicalizeFileModuleUrl(
+                  pathToFileURL(join(root, diagnosticId)),
+                );
             const message = `kept ${payload}:1:2: error[OSEO1001]: payload`;
             const stderr =
               `${canonical}:98:3: error[OSEO1001]: ${message}\n` +
