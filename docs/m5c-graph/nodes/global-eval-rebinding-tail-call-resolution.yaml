@@ -1,0 +1,17 @@
+version: 1
+id: global-eval-rebinding-tail-call-resolution
+title: Resolve rebound global eval tail calls
+delivers: >-
+  Resolves the ordinary global binding and tail-call behavior of
+  test/language/expressions/call/tco-non-eval-global.js. The source assigns
+  its statically declared function to eval and recursively calls that
+  ordinary function with numeric arguments. The observed OSEO1001 Unknown
+  binding eval rejection does not represent source evaluation. Preserve
+  the observed unsupported classification until the exact original passes;
+  do not emulate source evaluation or widen ADR 0016. The work note
+  docs/m5c-graph/global-eval-rebinding-tail-call-resolution.md binds the
+  original source and observation.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

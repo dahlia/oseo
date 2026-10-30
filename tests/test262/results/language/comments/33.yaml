@@ -1,0 +1,29 @@
+group: language/comments
+key: "33"
+results:
+  - case:
+      async: false
+      features:
+        - hashbang
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/comments/hashbang/no-line-separator.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - lexical-grammar
+    observation:
+      detail: "test/language/comments/hashbang/no-line-separator.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/comments/hashbang/no-line-separator.js:8\
+        9:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

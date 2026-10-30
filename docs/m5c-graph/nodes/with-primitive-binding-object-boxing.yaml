@@ -1,0 +1,15 @@
+version: 1
+id: with-primitive-binding-object-boxing
+title: Box primitive with binding objects
+delivers: >-
+  Apply ToObject when entering with over Number, Boolean, and String values
+  before object environment HasBinding. All three observed runtime failures
+  report TypeError: The in operator requires an object. Repair this cause
+  without changing Test262 expectations, profile boundaries, or unrelated
+  behavior. The work note
+  docs/m5c-graph/with-primitive-binding-object-boxing.md binds every original
+  path and raw observation.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

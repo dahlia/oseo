@@ -219,6 +219,33 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: false
+      features:
+        - tail-call-optimization
+      flags:
+        - noStrict
+      includes:
+        - tcoHelper.js
+      mode: script
+      path: test/language/expressions/call/tco-non-eval-global.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - expression-operators
+      - functions
+      - var-bindings
+    observation:
+      detail: "test/language/expressions/call/tco-non-eval-global.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/expressions/call/tco-non-eval-global.js:\
+        123:10: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: true
       features:
         - async-iteration
@@ -794,6 +821,45 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class
+        - class-methods-private
+        - cross-realm
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-realm.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - classes
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-realm.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/private-getter-brand-check-multiple-evaluations-of-class-realm.js:114:15:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
       features:
@@ -956,6 +1022,38 @@ results:
       detail: 'test/language/expressions/dynamic-import/assignment-expression/object-literal.js
         non-strict disabled failed (1): stdout=""
         stderr="test/language/expressions/dynamic-import/assignment-expression/object-literal.js:221:23:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: true
+      features:
+        - export-star-as-namespace-from-module
+        - dynamic-import
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/namespace/await-ns-get-nested-namespace-props-nrml.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - async-functions
+      - dynamic-source
+      - functions
+      - lexical-bindings
+      - module-linking
+      - object-properties
+      - promise-settlement
+    observation:
+      detail: 'test/language/expressions/dynamic-import/namespace/await-ns-get-nested-namespace-props-nrml.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/namespace/await-ns-get-nested-namespace-props-nrml.js:202:22:
         error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax

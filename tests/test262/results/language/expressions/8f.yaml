@@ -268,6 +268,38 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: false
+      features:
+        - tail-call-optimization
+      flags:
+        - noStrict
+      includes:
+        - tcoHelper.js
+      mode: script
+      path: test/language/expressions/call/tco-non-eval-function.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - expression-operators
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - tcoHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
       async: true
       features:
         - async-functions
@@ -1028,6 +1060,43 @@ results:
           strictness: non-strict
         - specialization: enabled
           strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - import.meta
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/expressions/import.meta/distinct-for-each-module.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/expressions/import.meta/distinct-for-each-module_FIXTURE.js
+          id: test/language/expressions/import.meta/distinct-for-each-module.js
+          sourceHash: fnv1a64:03ddb674f60b32fe
+        - dependencies: []
+          id: test/language/expressions/import.meta/distinct-for-each-module_FIXTURE.js
+          sourceHash: fnv1a64:62dd9645f273595e
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
         - specialization: disabled
           strictness: strict
         - specialization: enabled

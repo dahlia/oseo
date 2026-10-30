@@ -1628,6 +1628,38 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - import.meta
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/expressions/import.meta/syntax/goal-module.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/expressions/import.meta/syntax/goal-module.js
+          sourceHash: fnv1a64:e893ba1f9b8d3ab7
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

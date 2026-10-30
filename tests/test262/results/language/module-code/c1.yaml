@@ -4,6 +4,44 @@ results:
   - case:
       async: false
       features:
+        - export-star-as-namespace-from-module
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/export-star-as-dflt.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/export-star-as-dflt_FIXTURE.js
+            - test/language/module-code/export-star-as-dflt.js
+          id: test/language/module-code/export-star-as-dflt.js
+          sourceHash: fnv1a64:fe7b11402e01f988
+        - dependencies: []
+          id: test/language/module-code/export-star-as-dflt_FIXTURE.js
+          sourceHash: fnv1a64:bf7a12809f78338c
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - top-level-await
         - class
       flags:
