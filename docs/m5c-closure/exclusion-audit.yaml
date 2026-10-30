@@ -772,6 +772,13 @@ assessments:
       authorizes no whole-path exclusion. The two direct non-String eval
       identity paths have a separate bounded remediation owner. ADR 0013,
       ADR 0016 and ADR 0019, including reopening triggers, remain unchanged.
+  class-declaration-train-retained-remediation:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: B21d, B22a, and B22b retain every source-compilation rejection
+      as active class/private-element coverage remediation. Original
+      subjects and assertions stay visible, without replacement evidence
+      or a whole-path exclusion. ADR 0016 and ADR 0019 are unchanged.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -19740,6 +19747,366 @@ paths:
     subject: sloppy direct eval in params introduces var (async
       generator function declaration in sloppy code)
     assessment: eval-semantics
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-direc\
+      t-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e771494969af15e2cfc0a3e9ad6e6da4542e75780e0052c74e7f71172e9\
+      a613b"
+    observationDigest: "6cd2953733e1058630f123d71e2178413cedf24210d3f3e16847f2\
+      1d30c16393"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-direc\
+      t-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a1d9bdd2e4d54cf4a1d21907e74126d115b5f8020c4293e9928e888aa56\
+      3aafc"
+    observationDigest: "817e9243200619b013b479e957dc31cf1096fc88e30fad9585b403\
+      604d84635f"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-direc\
+      t-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d3293d70770e48cbb9f837f0015cf465f5b59306a2ba2dcbe8c30b97d02\
+      0419a"
+    observationDigest: "2952d7deebd18b6c3c24aa39b8ee7713aee8e5b8b5c24c7dde4ba2\
+      31681965c9"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-direc\
+      t-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5a31c92d042ffe85f1a076d0e88d2850fc4a7410b91e46bc6c04dc98275\
+      fcb8f"
+    observationDigest: "6f470879b0f252032b803090dbec1fdd14ba28b2ad179d01721476\
+      e235bffb1c"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-direc\
+      t-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "717ca05d20a0cf735fa801d26d50532c3111db07b3b8cc20db4a1c34aa1\
+      3b253"
+    observationDigest: "9fccb078f4f2f3d99d6edce4b61d701669386554496941d97f5996\
+      31b74a165a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-indir\
+      ect-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "88819990f0c3dc93c348a844863d51f2897add75d9be8512a52276915e2\
+      a89a2"
+    observationDigest: "c9249bd442ce6b80acb8287d59c62425a5933dc56c8d89799d7856\
+      868ca567e8"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-indir\
+      ect-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4ce43de8cd51754a00a79b27d50139cd3deb0cc3f4eaa3226a29c18098a\
+      6a74e"
+    observationDigest: "bb7aed9bfa25d9255bbd84ef0f28fca3f7d933ecb8726e7bff9344\
+      a1ad40d65a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-indir\
+      ect-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2a12c12e38c586fc9ace4831d32dc914e51c6ed84ed5347b766ccba76f7\
+      23b36"
+    observationDigest: "869750b331e88dd9154be4a4a4a6a1dec7f2fa7acdbf6db12bc7bb\
+      31d89dd139"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-indir\
+      ect-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "99aff5ba3208c4229df8bd8f70cadf04c960bc18c674fd1fc11f51bd5bb\
+      c14d9"
+    observationDigest: "b4ac2b35677dd872b88ec66511102e964107c78b4b13bbc32a56fa\
+      0b36301c40"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-derived-cls-indir\
+      ect-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e77d8613c65cb78c40f4b3ede97669a3638f59e724ecada4e824227b295\
+      292a4"
+    observationDigest: "c7fc7395d475614b4204e6a5cc24a8564b3ce44a362ebe6d9390dd\
+      80562e7f6a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-direct-eval-err-c\
+      ontains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "661bdf04cc5a66bdd0ddf0d41a3450f0bc675f1b2d30ef2d526aed3e212\
+      1cabe"
+    observationDigest: "84d9e3a40eb936a22d634e9714827587f3a5acb106fb80d044653f\
+      44640e9fdd"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-direct-eval-err-c\
+      ontains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "557a8991b9592ad8ca0003c13740e83df3ed169adee55d5c3dbbcc97b7a\
+      1ebbf"
+    observationDigest: "87ac2c9cb301b17a1e5707095f04f6ab1895be8217c93942a5c7ce\
+      34b82cd2c5"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-indirect-eval-err\
+      -contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "65c460f579a2d8e37b933b711042eda76146fbf23d808b1299e3eb26ba4\
+      44c4b"
+    observationDigest: "35572b8d923bca686687ac13518c51b2810bc8576c5ba7c6418b3d\
+      e316c03110"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-direct-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b86798b1776fedc1f7fd46ea56000ff9d4dd67cfe87c0288a9e260025da\
+      7d775"
+    observationDigest: "a547b0bab79e1ecdca9f1d3db04f49af304bb7dcdaf00a65b56cb6\
+      05d66def58"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-direct-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "76b87038a46af4783fb2e7fec80f89609ac2d93abdd05e5c4c442651565\
+      de668"
+    observationDigest: "bbcf3215b4ba59b564a1b215f0f74b40dd147fa6e5badf8a9de740\
+      37ed241727"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-direct-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4036ee7d12238a2e2459955d6a43c8e8bb08e2f6935bbc1ad8ec11002ee\
+      fa003"
+    observationDigest: "ba17949f8078eba0e347890b8e16f20a27cfe1b3aa2b10d8d0f2b3\
+      eecbbc7e0f"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-direct-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cc03630e346928a21f155cc1b2453c43efe96ad8af42654b1edc50c2ca5\
+      c436f"
+    observationDigest: "56a2764e0e54fc5c4c99a5314671e8566ffb9a15eab414282f65d5\
+      3a9a49c1ac"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-direct-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "78564a6728bd60b9774111b71442a525b96aa682eddf66db3886a7a5ef4\
+      67b46"
+    observationDigest: "cb24073242561fcbc5e47d6e360d41f9c6c7e79204b91983e24651\
+      a1e914474e"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-indirect-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "066f0419616b53544ab6bb47bad553ffb2f2b03261f87bbcaf7e1754a77\
+      ff7c2"
+    observationDigest: "2c0d8de822082c2f2482913a119ee393360df1cfa849f412e50cc2\
+      c4fe6db2a0"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-indirect-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "085f1524a7730f5d8c2bd7581caf9155f40f8ee26658a90879bd4a34c5c\
+      40028"
+    observationDigest: "2e2460550a6dbf5a0f5abc23ff3c4f727ee5cef2cba8f6ed090389\
+      41982e45cf"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-indirect-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "66d79017209a7ea968f5103d0c6aa9ef41bb1ebc77d69b38b57d53cfa86\
+      80af8"
+    observationDigest: "8ef9fe91be4f386172ae94632f1870d17ee983e6eb0ec67ebf0e28\
+      a923e0b28a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-indirect-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "53da8f111761e3d9546f1e16d924162adc0ff98b2537df5dc45cf92030b\
+      602d8"
+    observationDigest: "9fec1599b2d39b7c39a99296683b489879c11c12c51c62ad35ff2c\
+      37321b8112"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-derived-c\
+      ls-indirect-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dd229209f68d02fc9e2b352975dad5a1e9b74bedd6346f3b1bf4a1b8a0e\
+      6c734"
+    observationDigest: "24a7f635268c40d38499a93c594ce0d7f4a2f36a8cc06a8a3a0017\
+      d3523be903"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-direct-ev\
+      al-err-contains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8b1ba97c7aae963819839ba29df8f6828830f9b7e64028547b109f1f381\
+      3ac94"
+    observationDigest: "0216d59f956b0677b06bd2ca3c3126dc1f1b613c4fd13b9fdab384\
+      ad602c63d1"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-direct-ev\
+      al-err-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1fe0d552e9acf56125bc333f03bf3a4d62d836bf6f1adb3fcbff15f42a2\
+      00d75"
+    observationDigest: "506d9568b9729265437f598760e51c7e10867ea0b3957c8a9a44f3\
+      976e6a3503"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/arrow-body-private-indirect-\
+      eval-err-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ce38cfdb3c3044f3286e4bce6740aa89b4401bb5d0e72340fdf9f3c34d4\
+      7ad95"
+    observationDigest: "f2f5320ccc3d26c8d5c0e6e4922d7e485df1b67630dc3a525e5909\
+      ee7be2e99f"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/derived-cls-direct-eval-cont\
+      ains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9cd509121ef66e0bab66f63728272206fb468364b02982fb3a9c68cf0f3\
+      8afc7"
+    observationDigest: "5fe4420af3fcb9ad20d2a98b6737a5366a56e487990ac2e1c8b922\
+      7bf38c891c"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/derived-cls-direct-eval-cont\
+      ains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c78d80be301bdca26d3e5a206c54d7316d085ffa5a93deeffb2623987d3\
+      73967"
+    observationDigest: "8fc81e5002834935d4b4737d01399f0427a0f66547d166cc8003a1\
+      a52bbca4e9"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/derived-cls-direct-eval-err-\
+      contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e81dd44994568e8fe521cbab376938e36ce5386b8513b88be42c239f17c\
+      0bc2c"
+    observationDigest: "b8d9880a5f291f73883c0715bcd6e19f15e44a727076e647df9bc6\
+      9ebde6683a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/derived-cls-direct-eval-err-\
+      contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "afb48760f80e188fd5ef5bd9a87509d61bbb2f55cbbd5b1a1f8a4afdeae\
+      7d101"
+    observationDigest: "6a5af043aa84989e688f2839861be34de1f715b270c4a6c68c6554\
+      574808a513"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
   - path: "test/language/statements/class/elements/derived-cls-\
       direct-eval-err-contains-supercall.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -19767,6 +20134,54 @@ paths:
     upstreamSection: sec-performeval-rules-in-initializer
     subject: super.x in StatementList of eval (indirect eval)
     assessment: eval-semantics
+  - path: "test/language/statements/class/elements/derived-cls-indirect-eval-co\
+      ntains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0b0f3a93af5b89bb999a252df05bd090a34d8a009fe0e2311a2be810162\
+      59b8a"
+    observationDigest: "0291778727c55fd3d91f5f6e9420a57ad40efce9918e9fb8b5a608\
+      f695449f66"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/derived-cls-indirect-eval-er\
+      r-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f4e22951d3e1a9f0c819db2bf2e065f1a62d30f4cd3a3af9d5073f39b84\
+      21331"
+    observationDigest: "a8cd593d52098bac6212695767653f6807066642597628e9ec902e\
+      95ec5ad129"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/derived-cls-indirect-eval-er\
+      r-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ac3d9897f065bb90f839348decacae43cf3c200a14d17b3705a0d4513be\
+      3e22f"
+    observationDigest: "d06f7238d3b8cffc86f25dbea7f6d460daecd33cbc7f019640f2e2\
+      6e938092e1"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/derived-cls-indirect-eval-er\
+      r-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "575c342fba74610c4e8e6d483e133dbed98255c52a74803bbe19518c70d\
+      cc91c"
+    observationDigest: "52a63d2ffe24a8dc160890474c251fa83430fc16381287351642fa\
+      2941ad2a5a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
   - path: "test/language/statements/class/elements/direct-eval-\
       err-contains-arguments.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -19781,6 +20196,831 @@ paths:
     subject: error if `arguments` in StatementList of eval
       (direct eval)
     assessment: eval-semantics
+  - path: "test/language/statements/class/elements/direct-eval-err-contains-new\
+      target.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a68a88f199b8579f418c819d46a133e54ad8cef461be506125c8a423b03\
+      68c8f"
+    observationDigest: "ef2139287cee5ea45cb1f6838609d3063fad76c2101f052ef5243c\
+      66c0904892"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/indirect-eval-contains-argum\
+      ents.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "847a75a1f30d55c95c75143ff8c70bc3f2e799a04a3461a1113ccca3c89\
+      074f9"
+    observationDigest: "63450124590ce4e0cdb17c4adbee906ad1cf5db07f8526f176f864\
+      6f14396056"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/indirect-eval-err-contains-n\
+      ewtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "47ad78ff08932d4f1c79e67919a89cf82514b02c9963894b3e8b362f007\
+      c501a"
+    observationDigest: "499f2121ab0a3cc7a1a11df471875c7f497044d71e4f842206ed13\
+      5a2dd4b939"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-direct-ev\
+      al-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f06b3e30620c1fe403ea3b931a9bfeae663873b5c997f4ff9120763ff60\
+      ad6ed"
+    observationDigest: "6a38c2d20d49c1fc6f950fe197f57911058b2a22a3df25fa950f7b\
+      85b5a9659d"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-direct-ev\
+      al-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "89a7dd00dc466907eac8fe01c0f0416fd3436396c2055dc00fad1578a13\
+      7030d"
+    observationDigest: "abb0dd3b765052edb596a82d2a9e9329499cc0e68209c23cd328e5\
+      3fa2117962"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-direct-ev\
+      al-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e0dded17657f41e74cb28ae678e9f3db4848f291990ea74d4f5fd06dd34\
+      ca96f"
+    observationDigest: "99018faf9e16b87e891ff958b32813bd8a9f720aa573da872a10c0\
+      e9525677ff"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-direct-ev\
+      al-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "16f7d12deda67cd9821d29e68cad68764cecbdfce000c92c9accbdacfed\
+      ca535"
+    observationDigest: "1795fda02bc5bbc0523d90b1c76049ded5867fa783a083cc9c724a\
+      fbf52380cb"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-direct-ev\
+      al-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "58b1b761172a63b6ce756554af9ef8bb5257c51b06cdaf60f3c8569060e\
+      670b3"
+    observationDigest: "e8aeeabe3b7f305a9fcba8e7856881d421bd2bbbf36fca27c67834\
+      e61e4b829a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-indirect-\
+      eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f80668cebaefddb9159b266a96558ed8a78de14794f002f39f4cec7c2ee\
+      1b007"
+    observationDigest: "ab0bf3803e01dd9aa721f22b3187a70fa08ac761b96fd512a95bd8\
+      3f07a541bb"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-indirect-\
+      eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ca75f8abd92786f1a15a344313f084709245331f6713eec6a4d243a7ab5\
+      6a123"
+    observationDigest: "624383f9f47a67b40054cc4c1e62371044b344481cdbbda525c3f9\
+      e93e4423d9"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-indirect-\
+      eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7a631dc9bb2a12d5873eb2ea13f5131e7415c28c8971eee8645bac8ca77\
+      9d669"
+    observationDigest: "39a3622d1d9e6a77ad78a8ede26bfbf39618733f82a407c6b8f05b\
+      64946bc37a"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-indirect-\
+      eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "48dd8e72c55a4511b7ff96dd8b084d137f03e51bad9eabe59f682f3e610\
+      a9edb"
+    observationDigest: "0ff6ed85f509b5d2e8ed5ba98b2f753683fe631ad2df6c33e273bd\
+      16c70e855b"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-derived-cls-indirect-\
+      eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9126e1a5aefeb19d0343d9f54a1f63a2732f188810e58dca0cf856ee0d6\
+      d33cd"
+    observationDigest: "1b5a0f9b52111280b7f2a992756ede1c4c17327c7e72caa760f139\
+      89570acb46"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-direct-eval-err-conta\
+      ins-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e51031787ff0b1af187907a8f7def1779105725e8d88705676dd30b824d\
+      b51c7"
+    observationDigest: "e5a4d1c68ff832e0c00d0beeda2df48293add469a7afeb2efda867\
+      fe39e39e3b"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-direct-eval-err-conta\
+      ins-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5f40954ea813e91ba782f9f2a25467febf17718a5558d114093da1b0eff\
+      b9de6"
+    observationDigest: "88c359ee03501f498244973c8ab14b97a70928b8907765f853dacb\
+      591dd650e3"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-indirect-eval-contain\
+      s-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "35272c58ff2798a58c092f738916b86b16874a38821c468ce76931047da\
+      f9352"
+    observationDigest: "8180bd64118403ff3e4730908001505fe9f6a4143175bdbc51789f\
+      a28b0d9533"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-indirect-eval-err-con\
+      tains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "98217736463cdf23061018d9fc16cb1dbf8f48132860daee0798eb89108\
+      a3f9d"
+    observationDigest: "6794999c4c29c72c43a87d9097d8ca8eecb9452ac61a90cd6fb2af\
+      7731c6e9a9"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-d\
+      irect-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5f6382dc9835ce58a312d6da064f488f4b2152dc947a933dae9201d913f\
+      7306d"
+    observationDigest: "d718bedee7392443ba7c2421ebec6e0ffd60c1b24d6ebc4b950a05\
+      a11ae09b3b"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-d\
+      irect-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "229cd7880c1e36985f9374bbacae248fed9da2b0fa9ee3d91636a742741\
+      0f2a0"
+    observationDigest: "aadad4ab28b4409084cb9af504bbe5ca5d9b4967e6fabf5b2a5afe\
+      fbad0c2315"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-d\
+      irect-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "675e8c5fd1beb0a5ef7973b494543b4f9e3cdfc6d5585d46e77f797dbf9\
+      4d09b"
+    observationDigest: "14fd752083436282a800488413859041eb7a8fd62669403561a70c\
+      311893a7c3"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-d\
+      irect-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "16c4be87e83aa99fb36b914138714e53c202a0ecd84b47283a254dfce15\
+      13ee6"
+    observationDigest: "ff0f579cb6ef7aaacd43b236a3bf63251c33651d7d658e791f603d\
+      d52f9bd699"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-d\
+      irect-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "636f05f7e89ef742b1f566c6941bb169cc1c5439b711934dc8e42138e4a\
+      b8bcd"
+    observationDigest: "da324d21b5ba943fc13da22195843000407b00d5354a416d4a0a2c\
+      bb743b6404"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-i\
+      ndirect-eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3d0dbc6b44316b06056a38c14d0982129d737079c0315109b0e62a197fd\
+      d18b1"
+    observationDigest: "c1b98c8f8a94fde6e544dae32fbb5cb23abd46bfd9ef2b45594014\
+      f1aa8d9c7e"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-i\
+      ndirect-eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c99e07deaa5e62bef0a511840a23b5bbbe0972235101af94954a2fbebc2\
+      12040"
+    observationDigest: "4505e2c6751ff5788cbe085e5668e781fff47e75c8ff560035f55e\
+      57adce2dbe"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-i\
+      ndirect-eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "011726cea59746329fc0c5d5de3e8c97960fbadd14c5eb907463d6daf10\
+      07e72"
+    observationDigest: "56917fe7af34af87be5d9c779b5301018ac6980a98d0e7555aa053\
+      f6d7effd0b"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-i\
+      ndirect-eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e1a4247b8142326a16a29440afcc1b4acae1c6d0b991b0795f3702037dd\
+      3895c"
+    observationDigest: "5a340e7d309d28f849ce4c50c00c542ace47d7de1b7e1521695de5\
+      1e65366b09"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-derived-cls-i\
+      ndirect-eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "17ae25ac6ba2fa72d44657d7d10b582b55b1e95f917e6bce3165a4db6aa\
+      ad32b"
+    observationDigest: "5f0f47ad8dc78bcedc2d88f5550531064bc11045829e279e795da4\
+      fb75518ef8"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-direct-eval-e\
+      rr-contains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "219ec00312e65f2ecc8f088f03320b7e254a625eda74266eb433a8f5128\
+      01883"
+    observationDigest: "cbff3b1dd5bdc1578c090bd93214c4921658a82f22f5c43453d675\
+      61c9d30df5"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-direct-eval-e\
+      rr-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "610a0e497f972cfcce8da14a738ddf1759133a83fa95d21f86533e0090d\
+      acb1a"
+    observationDigest: "3a0cfb86bf94cbc30dcd9a78ef97b95c561f77214fdab84b57504a\
+      3b61d0afa5"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-indirect-eval\
+      -contains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a8f2773572f378e804b3401b5af1914aeef7b4c53cece7f11435a036334\
+      5e65f"
+    observationDigest: "ae69506c121b9f60a871c4d4cd8426bc4eef84b52ec60aa3b7fd3c\
+      6cf217373d"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/nested-private-indirect-eval\
+      -err-contains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dac7c7524abe6c44b8812517d44fe61b77422f0a63c5afd85be353d307f\
+      8ecf2"
+    observationDigest: "dbc70eb5a3eb67fedb72d0f4290c8434612de89cde02b53e0fb954\
+      6e2ac7d545"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-direct-e\
+      val-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6b64f37446dc6e6904c1ca34ce0e32149994773abd3db2bba5f78a056da\
+      52431"
+    observationDigest: "7da8bd98674488a29799017bba1b04c69625065de03985b567440d\
+      edd863ad10"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-direct-e\
+      val-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "caeb58f331ffc3c5b99a09814da5fc36494711b6b18962b098fde6fc43c\
+      7e0ad"
+    observationDigest: "3f1e50c272d3d64e5b2654374f375a3b7a90509c784cd1ad8562b3\
+      4d8312d8e6"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-direct-e\
+      val-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a23cf8ded5cdd892f03ec2d2b45b5a4595a890205347cf8bc1241605b97\
+      eb3a3"
+    observationDigest: "ad67abfbf3f223f41810a52ced27b49e1985f87e480510416bd8e8\
+      1c62702662"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-direct-e\
+      val-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0a6fc0edabc74314913f1319915866385a25c0985d83258af425034a57a\
+      7e739"
+    observationDigest: "17e8c68b23de82257f888ec2a71d8d2b20bfed5c54c2f4fe792658\
+      87fbc235b6"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-direct-e\
+      val-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "90abb2f21af69d06f7a31d43e36767cacfa0026a8a38dd7db354fb81674\
+      0054d"
+    observationDigest: "0880de25572851eaa835743b18577f93696dc1537b821e295ab75e\
+      d80b6ff455"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-indirect\
+      -eval-contains-superproperty-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ee07597fdd36e7ae2002879258c0f518f545232be3c5bb57643beff1f86\
+      1896d"
+    observationDigest: "cd09c00663b93f6020ad179ffbdb22071f8ec5b551cd23c4141e9e\
+      a37769726e"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super.x in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-indirect\
+      -eval-contains-superproperty-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "04daf75e27bf128058b99924f7f23d8db5c74f3c2c4cd3f1cd099471a95\
+      d7afb"
+    observationDigest: "6a715e89a41f48ccd30b6dadc876ba2467b6967ebe4bb402a8259a\
+      f430328b16"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "super['x'] in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-indirect\
+      -eval-err-contains-supercall-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c6b4573c434b9db03776b40e793618e5bd93050fada223ac41b93f97021\
+      e0f62"
+    observationDigest: "3b023319a00632b840b0fcce2fb53900ff5b0b36c2a5a47d97330e\
+      c89b4a95b4"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()['x']` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-indirect\
+      -eval-err-contains-supercall-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8b9e1fbecef705a805ec16177482b74db99d08f322e2bc75639aa2184d1\
+      9fed8"
+    observationDigest: "4e06c9b23d90ba2a8de14d2afc4b2670de940ea7c65f9f3e18816b\
+      82f6f1012d"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super().x` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-derived-cls-indirect\
+      -eval-err-contains-supercall.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7a461bc581ee29ec320c6307787026b6d62018c2d26c714a954c94303d4\
+      5ad77"
+    observationDigest: "6a6d9cd0c8296dc1093255154eb9e4bb2142b76ad48e6182b3013d\
+      10e5e293a3"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `super()` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-direct-eval-err-cont\
+      ains-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "06f5f492acfa4ffea0cdd67faba09a75efe33bb66e8b35c143359166cc9\
+      351f6"
+    observationDigest: "77febccd1da45b2ed34e91c6506786ef7d3757b628c5df428948c6\
+      9fa7c648f9"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `arguments` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-direct-eval-err-cont\
+      ains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c5a1acbf6a69b20a631e1c74b8c00093fe19a2e605270030b4bf599861a\
+      55125"
+    observationDigest: "64e2e838f1c83b3b653c064d875dfeb405999ca4572f68bc840166\
+      34cf7c1b3c"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (direct eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-field-visible-to-dir\
+      ect-eval-on-initializer.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f525d41bfbb9748d05188aacc6fb9e1e57244bc26c7967aec5956221d8f\
+      18c6e"
+    observationDigest: "aea2c1273f288ff80934c05490514bf13176f974404c28a286caa1\
+      ca54f4d8bb"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private field is visible on initializer with direct eval"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-field-visible-to-dir\
+      ect-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a40c8fcc07a68cc0b9ea8faa0ff9c0d851087d8bde3ef2533aac3a69c65\
+      06d01"
+    observationDigest: "b57a48220564b623892dc81584c06561a55aa57127d1323b5d6032\
+      008d8c4314"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private field is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-getter-is-not-a-own-\
+      property.js"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
+    priorCohort: "annex-b"
+    sourceDigest: "713aa6f8ca98f64920c54ae33e195ecc40e7ac4f3d1893d619c62f12f48\
+      8d9dc"
+    observationDigest: "ed50c14e1d3280c309a266301f8623f0ece786f26df40175a62704\
+      a726e0ee70"
+    missingDynamicTag: false
+    section: "prod-FieldDefinition"
+    subject: "Private getter is not stored as an own property of objects (field
+      definitions in a class declaration)"
+    assessment: "annex-b-legacy-lookup"
+  - path: "test/language/statements/class/elements/private-getter-visible-to-di\
+      rect-eval-on-initializer.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4a776b97759aa74d505adba8a8dc1bfaf1c0ff5a3f39242af6bc19f5f60\
+      a370e"
+    observationDigest: "629e82bac865eaf234d1baddc0dd761a7f13cfd3cee790600475b1\
+      97c8c84ac1"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private getter is visible on initializer with direct eval"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-getter-visible-to-di\
+      rect-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fb10b5f6c14f5e232baaef6afdcecfd8a26b4de9771f67320885331d90b\
+      4ee81"
+    observationDigest: "842fe3897b0f348eb5eb487b355aff98e9b1b2ea7851a0cf2c7829\
+      7ea28f2fdf"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private getter is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-indirect-eval-contai\
+      ns-arguments.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c54cf4cad381d49a859018e5e2b99f812505786fbeead3fda158cc65af2\
+      a339d"
+    observationDigest: "41ca207b54a9c0cacd4e3d5f787f9c52fd7c46d3eea1ad54088247\
+      82314b9183"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "No error if `arguments` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-indirect-eval-err-co\
+      ntains-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a9fedf2944899ae72757c5d406589c8e3cefc35ad1e5554f7c00580371e\
+      2c58a"
+    observationDigest: "ae22adb450af44309ad662e5086f17dcc8d6cfc7b022b245ac1e8d\
+      9a45f28c59"
+    missingDynamicTag: false
+    section: "sec-performeval-rules-in-initializer"
+    subject: "error if `new.target` in StatementList of eval (indirect eval)"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-method-visible-to-di\
+      rect-eval-on-initializer.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "181df38e4c1e642660d9deccc31548fa73d46e59de82f019748cf58dc06\
+      496f7"
+    observationDigest: "1ef41be602d9821febcba2cc528baeebd4e1c3440ab81bb643f247\
+      7d0ed434b9"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private method is visible on initializer with direct eval"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-method-visible-to-di\
+      rect-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d61f9e28bc6252785ac2492d00d97d1fe43503814dae7b77f3d1a65ccd3\
+      6987a"
+    observationDigest: "b617136cfe845d75118310960aef1beb2155b8d7143f5e5cd94a9f\
+      02bf65257e"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private method is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-setter-is-not-a-own-\
+      property.js"
+    proposedOwner: "adr:0013-m5-edition-and-manifest"
+    priorCohort: "annex-b"
+    sourceDigest: "9b9d199147e0937b7c7c12cc80b60ae51c16566372e88610492e2788857\
+      3a791"
+    observationDigest: "554a33191809aa28718419d32ce9ba0f658dad03373aeeae8a84b6\
+      a1d8366f07"
+    missingDynamicTag: false
+    section: "prod-FieldDefinition"
+    subject: "Private setter is not stored as an own property of objects (field
+      definitions in a class declaration)"
+    assessment: "annex-b-legacy-lookup"
+  - path: "test/language/statements/class/elements/private-setter-visible-to-di\
+      rect-eval-on-initializer.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cd150c66f47aa95f0e3bd946a9d5620585a1fa2f8c5ac3ad148ba0eccaa\
+      1bc9f"
+    observationDigest: "b86a312a3fa45fe72e8c8b3d3c014eb8259cd9b7a9f6a9f8d75b9b\
+      2108b421e4"
+    missingDynamicTag: false
+    section: "sec-privatefieldset"
+    subject: "Private setter is visible on initializer with direct eval"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-setter-visible-to-di\
+      rect-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3a7b21a0a1e294482e4f1b6d9f5793b1b55939f765e03723c64086a9e5a\
+      7a3df"
+    observationDigest: "1b7435eaa16c65020d1481a13efd1b50517dc87988bb8d5a5cbaf5\
+      ddaf931251"
+    missingDynamicTag: false
+    section: "sec-privatefieldset"
+    subject: "Private setter is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-static-field-visible\
+      -to-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ed017705198028283a01e8b128d723a9f33a86475f2dd082c24f1af8a57\
+      166e4"
+    observationDigest: "8fdac69a13449d2acd7123c79f95a5bc0d47bf51b13b8f1326a9f9\
+      80de10019f"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private static field is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-static-getter-visibl\
+      e-to-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8c3195ac05a1ab719aa3811eb24fde038c0dd4541ac8c06faf42abf8be3\
+      b75e5"
+    observationDigest: "0ba3db19a137903842f4b49634a8d163f2d130face9e7548902e79\
+      c96106713f"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private static getter is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-static-method-visibl\
+      e-to-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d227631a51ba8b12581a3057f99a1d1c0212a88ac10dbc56f308017be8e\
+      9cec1"
+    observationDigest: "bc999477ffda9b9fc6e64fd91a68df0af50c69684eb376a8426a65\
+      a40238ab3d"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private static method is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/private-static-setter-visibl\
+      e-to-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8221349fd36b13914d8235487939ea430004d9453403969f859cb0d37d0\
+      ea213"
+    observationDigest: "eac6b8e02e6749ea16ea9bae49ee001c23ef082c6eeb0a8c22f8bb\
+      989b526c5f"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Private static setter is visible to direct eval code"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "585c03e4aaf60c3458f7db58a77607c6a6d25a1ff940df0b69343f49129\
+      45b20"
+    observationDigest: "ffd92f0401773818b3c1f153c3d45b60801fcc92e33d8c1004650a\
+      164a1067a1"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename in constructor without
+      being declared in class fields"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "75a05e4955fc8edc83a003b98b84a72d12d6c0b2d1cfd2336263a892373\
+      f632b"
+    observationDigest: "e539266e342c8f6c07f357e487945f71038b8bde93ef0af8599f1c\
+      f4a7c20fa3"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename in function in class
+      without declaring in field"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c591fb14fbab113b551918eca312746e2935143ad8d9b4499068128e097\
+      b8870"
+    observationDigest: "576ef38a9955089fb7bdc86fc54c47293c90baea2a64c8a9bfd1d0\
+      4749c53cae"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename that has not been
+      declared in class."
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bf43665aafd3263f4d38d64d305c7ba7f056bdd4016c768b2dea7461fb9\
+      b73a1"
+    observationDigest: "8f97488605f4ea683eb0cbbd14191e62db3629437a658a99ea93d5\
+      bd2d476bc9"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename that has not been
+      declared in class."
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "abb2a5f4ec4876b9b885f43da5b990adfa9783d3a736c21bb0629290e67\
+      e8065"
+    observationDigest: "cccff95a002627d662dcc4cd0a0b16e43a57243a09c71883c94cb2\
+      7f2d40506a"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename outside of class"
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9dc5f36a9e917c3298e29eb70d3dac44bb9097e2224c7eafad77849dcfd\
+      a365f"
+    observationDigest: "3eb1553c21779a090a017bb8d1966ecebf722dc4f4f295a0ff0f31\
+      ba3a38187b"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename outside of class."
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-7.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4e983212864d5fd457f93546bdd64c36ab5811056775e796a8fe59a2633\
+      1a29f"
+    observationDigest: "fafb2a1413ff36dfa1538d426df94cbd27eef82dc1104bd0fd9ddc\
+      51d05b9321"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename on object, outside of c\
+      lass."
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/privatename-not-valid-eval-e\
+      arlyerr-8.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "826ed6198e8425ace91fc72b321cd75de93d38df51af977ad9151c3190b\
+      f2f02"
+    observationDigest: "2c17569bc8a86c594ed024665ddb489b364e653753e718cbb15e48\
+      53b62e38ae"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "Early error when referencing privatename on object, outside of c\
+      lass."
+    assessment: "class-declaration-train-retained-remediation"
+  - path: "test/language/statements/class/elements/static-field-init-with-this\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e9c8ccea4fb11ae4c42474f812aa106a9252633871dfde7efd56d6b95b0\
+      4e4ff"
+    observationDigest: "2dd61ce067c6398bf242ed4903607cffc69e5fe6c93597014b73d9\
+      65d78b7910"
+    missingDynamicTag: false
+    section: "prod-FieldDefinition"
+    subject: "Static fields initializer has `this` biding (field definitions in
+      a class declaration)"
+    assessment: "class-declaration-train-retained-remediation"
   - path: test/language/statements/do-while/cptn-normal.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
