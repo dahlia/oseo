@@ -187,6 +187,7 @@ results:
       - functions
       - object-literals
       - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:

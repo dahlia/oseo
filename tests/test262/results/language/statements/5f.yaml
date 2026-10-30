@@ -247,7 +247,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - var-bindings
     execution:
       harnessIncludes:
@@ -283,7 +282,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - lexical-bindings
       - object-literals

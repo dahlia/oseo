@@ -146,6 +146,7 @@ results:
     dependencies:
       - control-flow
       - destructuring-bindings
+      - var-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

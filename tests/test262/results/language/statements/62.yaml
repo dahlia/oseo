@@ -200,7 +200,6 @@ results:
       - control-flow
       - destructuring-bindings
       - error-intrinsics
-      - expression-operators
       - functions
       - iterator-protocol
       - object-properties
@@ -238,6 +237,7 @@ results:
       - abrupt-completion
       - dynamic-source
       - error-intrinsics
+      - expression-operators
       - functions
     observation:
       detail: "test/language/statements/function/13.0-16-s.js non-strict

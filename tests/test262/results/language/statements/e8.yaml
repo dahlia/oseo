@@ -379,7 +379,6 @@ results:
       - abrupt-completion
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - iterator-protocol
@@ -548,7 +547,6 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
-      - control-flow
       - expression-operators
       - var-bindings
     execution:

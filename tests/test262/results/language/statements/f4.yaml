@@ -355,7 +355,6 @@ results:
     dependencies:
       - abrupt-completion
       - destructuring-bindings
-      - expression-operators
       - functions
       - lexical-bindings
       - object-literals

@@ -315,7 +315,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - lexical-bindings
       - object-literals

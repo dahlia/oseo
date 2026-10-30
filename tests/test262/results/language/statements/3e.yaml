@@ -341,6 +341,7 @@ results:
     dependencies:
       - control-flow
       - destructuring-bindings
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -404,6 +405,7 @@ results:
       - functions
       - object-literals
       - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:
@@ -431,6 +433,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - control-flow
       - expression-operators
       - functions
       - lexical-bindings

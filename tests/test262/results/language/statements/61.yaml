@@ -352,6 +352,7 @@ results:
       - functions
       - object-literals
       - object-properties
+      - symbols
       - var-bindings
     execution:
       harnessIncludes:
@@ -506,7 +507,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - expression-operators
       - functions
       - iterator-protocol
       - object-properties

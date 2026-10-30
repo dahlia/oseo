@@ -286,6 +286,7 @@ results:
     dependencies:
       - control-flow
       - destructuring-bindings
+      - var-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -307,6 +308,8 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
+      - lexical-bindings
+      - var-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

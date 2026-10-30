@@ -449,6 +449,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - dynamic-source
+      - expression-operators
       - functions
       - var-bindings
     observation:

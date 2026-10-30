@@ -533,6 +533,7 @@ results:
     dependencies:
       - control-flow
       - destructuring-bindings
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

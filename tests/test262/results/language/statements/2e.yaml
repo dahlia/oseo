@@ -331,8 +331,7 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
-      - lexical-bindings
-      - property-enumeration
+      - lexical-grammar
     observation:
       errorType: SyntaxError
       failedPhase: parse

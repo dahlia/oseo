@@ -243,6 +243,7 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
+      - lexical-grammar
     observation:
       errorType: SyntaxError
       failedPhase: parse

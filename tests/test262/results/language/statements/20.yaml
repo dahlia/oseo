@@ -254,7 +254,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties
@@ -439,6 +438,7 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

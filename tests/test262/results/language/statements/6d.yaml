@@ -350,7 +350,6 @@ results:
       - abrupt-completion
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - object-literals
@@ -544,7 +543,6 @@ results:
       - abrupt-completion
       - destructuring-bindings
       - error-intrinsics
-      - expression-operators
       - functions
       - object-literals
       - object-properties

@@ -409,7 +409,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - var-bindings
     execution:
       harnessIncludes:

@@ -268,7 +268,6 @@ results:
       - abrupt-completion
       - default-parameters
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - object-literals

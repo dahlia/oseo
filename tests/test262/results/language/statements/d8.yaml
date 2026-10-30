@@ -223,7 +223,6 @@ results:
     classification: pass
     dependencies:
       - control-flow
-      - expression-operators
       - var-bindings
     execution:
       harnessIncludes:
@@ -500,7 +499,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/variable/12.2.1-4-s.js strict disabled
         failed (1): stdout=\"\"
@@ -525,7 +523,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - expression-operators
       - functions
       - iterator-protocol
       - object-properties

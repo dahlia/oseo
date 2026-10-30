@@ -453,6 +453,7 @@ results:
     classification: pass
     dependencies:
       - control-flow
+      - lexical-grammar
     execution:
       harnessIncludes:
         - base.js
@@ -506,6 +507,7 @@ results:
     dependencies:
       - abrupt-completion
       - control-flow
+      - error-intrinsics
       - expression-operators
       - functions
       - object-properties

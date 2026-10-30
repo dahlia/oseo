@@ -362,6 +362,7 @@ results:
     dependencies:
       - control-flow
       - expression-operators
+      - lexical-grammar
     execution:
       harnessIncludes:
         - base.js

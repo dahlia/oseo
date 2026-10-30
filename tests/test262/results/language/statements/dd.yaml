@@ -240,8 +240,6 @@ results:
       - dynamic-source
       - error-intrinsics
       - functions
-      - object-literals
-      - var-bindings
     observation:
       detail: "test/language/statements/function/13.1-41-s.js non-strict
         disabled failed (1): stdout=\"\"
@@ -264,7 +262,6 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
-      - control-flow
       - expression-operators
       - var-bindings
     execution:
@@ -301,7 +298,6 @@ results:
       - abrupt-completion
       - control-flow
       - destructuring-bindings
-      - expression-operators
       - functions
       - object-literals
       - object-properties

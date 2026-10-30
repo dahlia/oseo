@@ -101,7 +101,7 @@ Unsupported selector
 | test/language/statements/function/13.2-7-s.js                          | dynamic-source-coverage-remediation |
 | test/language/statements/function/13.2-8-s.js                          | dynamic-source-coverage-remediation |
 | test/language/statements/function/13.2-9-s.js                          | dynamic-source-coverage-remediation |
-| test/language/statements/function/S13.2.2\_A13.js                      | dynamic-source-coverage-remediation |
+| test/language/statements/function/`S13.2.2_A13.js`                     | dynamic-source-coverage-remediation |
 | test/language/statements/function/S13.2.2\_A14.js                      | dynamic-source-coverage-remediation |
 | test/language/statements/function/S13.2.2\_A8\_T3.js                   | dynamic-source-coverage-remediation |
 | test/language/statements/function/S13\_A14\_T1.js                      | dynamic-source-coverage-remediation |
@@ -122,3 +122,41 @@ Unsupported selector
 | test/language/statements/generators/scope-param-elem-var-open.js       | dynamic-source-coverage-remediation |
 | test/language/statements/generators/scope-param-rest-elem-var-close.js | dynamic-source-coverage-remediation |
 | test/language/statements/generators/scope-param-rest-elem-var-open.js  | dynamic-source-coverage-remediation |
+
+
+Internal pass 1 corrections
+---------------------------
+
+All 1,669 train rows were rechecked against each finding pattern and the
+latest consolidated tag rules, including Root's October 30 clarifications.
+This batch has 38 dependency rows corrected in that audit.
+
+Root retained dynamic-source on `S13.2.2_A13.js` even though eval is unreachable
+at run time: handling that construct is a prerequisite of the observed
+compile-time dynamic-source rejection under ADR 0013. The audit corrected
+nested evaluated Function assignments, unused holders around rejected source,
+implicit with-environment Symbol.unscopables reads, required runtime errors,
+and setup branches that deliberately define the observed caller property. Root
+confirmed that constant-false counterparts and assertion-only selection
+branches add no control-flow.
+
+Root confirmed that a declaration used only as an unread assignment
+target for source that must fail to parse adds no holder syntax coverage.
+Identifier-only let tests retain lexical-grammar rather than a directory-only
+lexical-bindings claim. Rejected for-in heads keep control-flow as their
+grammar carrier and drop runtime property-enumeration.
+
+The source-section audit checked all 143 unsupported assessments and
+recovered 37 es6id references omitted by the original fallback. Every
+unsupported path keeps its source hash and normalized observation digest.
+The full cohort audit distinguishes 61 source subjects from 82 incidental
+uses; this cohort records the asserted subject, not an exclusion or proof
+of normative dependence. Counts, classifications and active remediation
+owners remain as above.
+
+The dispatch packet's *round1-fix-plan.json* and
+*round1-fix-applied.json* record the exact changes and source-bound reasons.
+Its `round1-*-candidates.json` and `round1-*-conclusions.json` retain the
+full-train pattern audits, while *review-round-1/attempts.json* retains every
+first-pass verdict. The final packet includes every later review verdict
+and Codex rollout path for Root's audit.

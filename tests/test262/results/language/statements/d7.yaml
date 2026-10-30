@@ -461,6 +461,7 @@ results:
     dependencies:
       - functions
       - lexical-bindings
+      - var-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse

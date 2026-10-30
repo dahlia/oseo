@@ -121,8 +121,8 @@ results:
       - abrupt-completion
       - dynamic-source
       - error-intrinsics
+      - expression-operators
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/function/13.0-13-s.js non-strict
         disabled failed (1): stdout=\"\"

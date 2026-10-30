@@ -239,6 +239,7 @@ results:
     dependencies:
       - control-flow
       - destructuring-bindings
+      - var-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -262,6 +263,7 @@ results:
       - expression-operators
       - iterator-protocol
       - lexical-bindings
+      - lexical-grammar
       - object-properties
       - symbols
       - var-bindings

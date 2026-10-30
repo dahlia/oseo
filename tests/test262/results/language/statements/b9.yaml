@@ -287,7 +287,6 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
-      - var-bindings
     observation:
       detail: "test/language/statements/variable/12.2.1-19-s.js strict
         disabled failed (1): stdout=\"\"

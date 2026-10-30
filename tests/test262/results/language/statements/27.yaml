@@ -517,7 +517,6 @@ results:
     dependencies:
       - abrupt-completion
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - object-literals
@@ -578,7 +577,6 @@ results:
     dependencies:
       - abrupt-completion
       - destructuring-bindings
-      - expression-operators
       - functions
       - generators
       - iterator-protocol

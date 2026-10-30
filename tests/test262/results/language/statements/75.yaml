@@ -276,6 +276,7 @@ results:
     dependencies:
       - control-flow
       - expression-operators
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

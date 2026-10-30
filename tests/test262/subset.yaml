@@ -168367,16 +168367,16 @@ tests:
     dependencies: [control-flow, expression-operators, functions, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-11.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-12.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-13.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-14.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-15.js
     expectedClassification: pass
     dependencies: [control-flow, expression-operators, var-bindings]
@@ -168388,7 +168388,7 @@ tests:
     dependencies: [control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-18.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/for/12.6.3_2-3-a-ii-19.js
     expectedClassification: pass
     dependencies: [control-flow, expression-operators, var-bindings]
@@ -168444,7 +168444,8 @@ tests:
       [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A11.1_T2.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A11.1_T3.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -168454,7 +168455,8 @@ tests:
       [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A11_T2.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A11_T3.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -168464,7 +168466,8 @@ tests:
       [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A12.1_T2.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A12.1_T3.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -168474,7 +168477,8 @@ tests:
       [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A12_T2.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A12_T3.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -168486,7 +168490,8 @@ tests:
     dependencies: [control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A15.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies:
+      [abrupt-completion, control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/S12.6.3_A2.1.js
     expectedClassification: pass
     dependencies:
@@ -168611,7 +168616,7 @@ tests:
     dependencies: [classes, control-flow]
   - path: test/language/statements/for/decl-const.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/for/decl-fun.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions]
@@ -168620,7 +168625,7 @@ tests:
     dependencies: [control-flow, functions, generators]
   - path: test/language/statements/for/decl-let.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/for/dstr/const-ary-init-iter-close.js
     expectedClassification: pass
     dependencies:
@@ -169182,7 +169187,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -169405,13 +169409,13 @@ tests:
     dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/const-ary-ptrn-rest-not-final-ary.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/const-ary-ptrn-rest-not-final-id.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/const-ary-ptrn-rest-not-final-obj.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/const-ary-ptrn-rest-obj-id.js
     expectedClassification: pass
     dependencies:
@@ -169610,7 +169614,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -169697,7 +169700,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -170442,7 +170444,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -170665,13 +170666,13 @@ tests:
     dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/let-ary-ptrn-rest-not-final-ary.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/let-ary-ptrn-rest-not-final-id.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/let-ary-ptrn-rest-not-final-obj.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, lexical-bindings]
   - path: test/language/statements/for/dstr/let-ary-ptrn-rest-obj-id.js
     expectedClassification: pass
     dependencies:
@@ -170868,7 +170869,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -170955,7 +170955,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -171324,7 +171323,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -171440,7 +171438,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -171467,7 +171464,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -171620,7 +171616,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -171635,7 +171630,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -171677,7 +171671,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -171786,7 +171779,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -171888,13 +171880,13 @@ tests:
     dependencies: [control-flow, destructuring-bindings, var-bindings]
   - path: test/language/statements/for/dstr/var-ary-ptrn-rest-not-final-ary.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, var-bindings]
   - path: test/language/statements/for/dstr/var-ary-ptrn-rest-not-final-id.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, var-bindings]
   - path: test/language/statements/for/dstr/var-ary-ptrn-rest-not-final-obj.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, destructuring-bindings]
+    dependencies: [control-flow, destructuring-bindings, var-bindings]
   - path: test/language/statements/for/dstr/var-ary-ptrn-rest-obj-id.js
     expectedClassification: pass
     dependencies:
@@ -171928,7 +171920,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         var-bindings,
       ]
@@ -171940,7 +171931,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         var-bindings,
       ]
@@ -171963,7 +171953,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172050,7 +172039,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172064,7 +172052,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172087,7 +172074,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172130,7 +172116,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         iterator-protocol,
         object-literals,
@@ -172160,7 +172145,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         var-bindings,
@@ -172172,7 +172156,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172199,7 +172182,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172213,7 +172195,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172283,7 +172264,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172297,7 +172277,6 @@ tests:
         control-flow,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -172353,7 +172332,7 @@ tests:
       ]
   - path: test/language/statements/for/head-const-bound-names-in-stmt.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings, var-bindings]
   - path: test/language/statements/for/head-const-fresh-binding-per-iteration.js
     expectedClassification: pass
     dependencies: [control-flow, expression-operators, lexical-bindings]
@@ -172371,6 +172350,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [
+        abrupt-completion,
         control-flow,
         dynamic-source,
         expression-operators,
@@ -172384,6 +172364,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [
+        abrupt-completion,
         control-flow,
         dynamic-source,
         expression-operators,
@@ -172395,7 +172376,7 @@ tests:
     dependencies: [control-flow, expression-operators, var-bindings]
   - path: test/language/statements/for/head-let-bound-names-in-stmt.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings, var-bindings]
   - path: test/language/statements/for/head-let-destructuring.js
     expectedClassification: pass
     dependencies:
@@ -172405,6 +172386,7 @@ tests:
         expression-operators,
         iterator-protocol,
         lexical-bindings,
+        lexical-grammar,
         object-properties,
         symbols,
         var-bindings,
@@ -172415,7 +172397,13 @@ tests:
   - path: test/language/statements/for/head-lhs-let.js
     expectedClassification: pass
     dependencies:
-      [control-flow, expression-operators, object-properties, var-bindings]
+      [
+        control-flow,
+        expression-operators,
+        lexical-grammar,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/statements/for/head-var-bound-names-in-stmt.js
     expectedClassification: pass
     dependencies: [control-flow, expression-operators, var-bindings]
@@ -172433,10 +172421,10 @@ tests:
     dependencies: [control-flow, functions]
   - path: test/language/statements/for/let-array-with-newline.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/for/let-block-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/for/let-identifier-with-newline.js
     expectedClassification: pass
     dependencies: [control-flow, lexical-bindings]
@@ -172491,8 +172479,8 @@ tests:
         abrupt-completion,
         dynamic-source,
         error-intrinsics,
+        expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/function/13.0-14-s.js
     expectedClassification: unsupported-profile-feature
@@ -172501,24 +172489,43 @@ tests:
         abrupt-completion,
         dynamic-source,
         error-intrinsics,
+        expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/function/13.0-15-s.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [abrupt-completion, dynamic-source, error-intrinsics, functions]
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
   - path: test/language/statements/function/13.0-16-s.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [abrupt-completion, dynamic-source, error-intrinsics, functions]
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
   - path: test/language/statements/function/13.0-17-s.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [dynamic-source, functions, var-bindings]
+    dependencies:
+      [dynamic-source, expression-operators, functions, var-bindings]
   - path: test/language/statements/function/13.0-7-s.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [abrupt-completion, dynamic-source, error-intrinsics, functions]
+      [
+        abrupt-completion,
+        dynamic-source,
+        error-intrinsics,
+        expression-operators,
+        functions,
+      ]
   - path: test/language/statements/function/13.0-8-s.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -172606,14 +172613,7 @@ tests:
   - path: test/language/statements/function/13.1-41-s.js
     expectedClassification: unsupported-profile-feature
     dependencies:
-      [
-        abrupt-completion,
-        dynamic-source,
-        error-intrinsics,
-        functions,
-        object-literals,
-        var-bindings,
-      ]
+      [abrupt-completion, dynamic-source, error-intrinsics, functions]
   - path: test/language/statements/function/13.1-4gs.js
     expectedClassification: expected-negative
     dependencies: [functions]
@@ -173019,10 +173019,24 @@ tests:
     dependencies: [functions, var-bindings]
   - path: test/language/statements/function/S13.2.1_A7_T3.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/function/S13.2.1_A7_T4.js
     expectedClassification: pass
-    dependencies: [expression-operators, functions, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/function/S13.2.1_A8_T1.js
     expectedClassification: pass
     dependencies:
@@ -173050,7 +173064,14 @@ tests:
   - path: test/language/statements/function/S13.2.2_A11.js
     expectedClassification: pass
     dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/statements/function/S13.2.2_A12.js
     expectedClassification: pass
     dependencies:
@@ -173059,7 +173080,9 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [
+        abrupt-completion,
         dynamic-source,
+        error-intrinsics,
         expression-operators,
         functions,
         object-properties,
@@ -173142,6 +173165,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A17_T3.js
@@ -173152,6 +173176,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A18_T1.js
@@ -173162,6 +173187,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A18_T2.js
@@ -173172,6 +173198,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A19_T1.js
@@ -173192,6 +173219,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A19_T3.js
@@ -173203,6 +173231,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A19_T4.js
@@ -173214,6 +173243,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A19_T5.js
@@ -173225,6 +173255,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A19_T6.js
@@ -173236,6 +173267,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A19_T7.js
@@ -173258,6 +173290,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/function/S13.2.2_A1_T1.js
@@ -173365,7 +173398,14 @@ tests:
   - path: test/language/statements/function/S13.2.2_A9.js
     expectedClassification: pass
     dependencies:
-      [expression-operators, functions, object-properties, var-bindings]
+      [
+        abrupt-completion,
+        error-intrinsics,
+        expression-operators,
+        functions,
+        object-properties,
+        var-bindings,
+      ]
   - path: test/language/statements/function/S13.2_A1_T1.js
     expectedClassification: pass
     dependencies: [expression-operators, functions, object-properties]
@@ -174134,7 +174174,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -174867,7 +174906,6 @@ tests:
         abrupt-completion,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -175258,7 +175296,6 @@ tests:
         abrupt-completion,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -175340,7 +175377,6 @@ tests:
         abrupt-completion,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -175649,7 +175685,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -175720,7 +175755,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -175936,6 +175970,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        control-flow,
         expression-operators,
         functions,
         lexical-bindings,
@@ -175948,6 +175983,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        control-flow,
         expression-operators,
         functions,
         lexical-bindings,
@@ -176847,7 +176883,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -177629,7 +177664,6 @@ tests:
         abrupt-completion,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -178047,7 +178081,6 @@ tests:
         abrupt-completion,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         object-literals,
@@ -178135,7 +178168,6 @@ tests:
         abrupt-completion,
         default-parameters,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         object-literals,
@@ -178480,7 +178512,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         object-literals,
@@ -178562,7 +178593,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         object-literals,
@@ -178772,6 +178802,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        control-flow,
         expression-operators,
         functions,
         generators,
@@ -178785,6 +178816,7 @@ tests:
     expectedClassification: pass
     dependencies:
       [
+        control-flow,
         expression-operators,
         functions,
         generators,
@@ -179256,13 +179288,13 @@ tests:
     dependencies: [classes, control-flow]
   - path: test/language/statements/if/if-const-else-const.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/if-const-else-stmt.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/if-const-no-else.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/if-decl-else-decl-strict.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions]
@@ -179292,13 +179324,13 @@ tests:
     dependencies: [control-flow, functions, generators]
   - path: test/language/statements/if/if-let-else-let.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/if-let-else-stmt.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/if-let-no-else.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/if-stmt-else-async-fun.js
     expectedClassification: expected-negative
     dependencies: [async-functions, control-flow, functions]
@@ -179310,7 +179342,7 @@ tests:
     dependencies: [classes, control-flow]
   - path: test/language/statements/if/if-stmt-else-const.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/if-stmt-else-decl-strict.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions]
@@ -179322,7 +179354,7 @@ tests:
     dependencies: [control-flow, functions, generators]
   - path: test/language/statements/if/if-stmt-else-let.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/if/labelled-fn-stmt-first.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions]
@@ -179334,13 +179366,13 @@ tests:
     dependencies: [control-flow, functions]
   - path: test/language/statements/if/let-array-with-newline.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/if/let-block-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/if/let-identifier-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators]
+    dependencies: [control-flow, expression-operators, lexical-grammar]
   - path: test/language/statements/labeled/S12.12_A1_T1.js
     expectedClassification: pass
     dependencies:
@@ -179373,7 +179405,7 @@ tests:
     dependencies: [classes, control-flow]
   - path: test/language/statements/labeled/decl-const.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/labeled/decl-fun-strict.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions]
@@ -179385,13 +179417,13 @@ tests:
     dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/labeled/let-array-with-newline.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/labeled/let-block-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/labeled/let-identifier-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators]
+    dependencies: [control-flow, expression-operators, lexical-grammar]
   - path: test/language/statements/labeled/static-init-invalid-await.js
     expectedClassification: expected-negative
     dependencies: [classes, control-flow]
@@ -179548,7 +179580,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -179576,7 +179607,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -179601,7 +179631,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -179684,7 +179713,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         lexical-bindings,
@@ -179882,7 +179910,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -179940,6 +179967,7 @@ tests:
     dependencies:
       [
         destructuring-bindings,
+        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -180168,7 +180196,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -180207,7 +180234,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -180282,7 +180308,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -180296,7 +180321,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         lexical-bindings,
         object-literals,
@@ -180512,7 +180536,7 @@ tests:
     dependencies: [error-intrinsics, lexical-bindings]
   - path: test/language/statements/let/redeclaration-error-from-within-strict-mode-function.js
     expectedClassification: expected-negative
-    dependencies: [functions, lexical-bindings]
+    dependencies: [functions, lexical-bindings, var-bindings]
   - path: test/language/statements/let/static-init-await-binding-invalid.js
     expectedClassification: expected-negative
     dependencies: [classes, lexical-bindings]
@@ -180522,19 +180546,13 @@ tests:
   - path: test/language/statements/let/syntax/escaped-let.js
     expectedClassification: pass
     dependencies:
-      [
-        expression-operators,
-        lexical-bindings,
-        lexical-grammar,
-        object-properties,
-        var-bindings,
-      ]
+      [expression-operators, lexical-grammar, object-properties, var-bindings]
   - path: test/language/statements/let/syntax/identifier-let-allowed-as-lefthandside-expression-strict.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, lexical-bindings, property-enumeration]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/let/syntax/identifier-let-disallowed-as-boundname.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, lexical-bindings, property-enumeration]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/let/syntax/let-closure-inside-condition.js
     expectedClassification: pass
     dependencies:
@@ -180717,19 +180735,47 @@ tests:
     dependencies: [abrupt-completion, control-flow, functions, lexical-grammar]
   - path: test/language/statements/switch/S12.11_A1_T1.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, functions, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/switch/S12.11_A1_T2.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, functions, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/switch/S12.11_A1_T3.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, functions, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/switch/S12.11_A1_T4.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, functions, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/switch/S12.11_A2_T1.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, functions]
+    dependencies: [control-flow]
   - path: test/language/statements/switch/S12.11_A3_T1.js
     expectedClassification: expected-negative
     dependencies: [control-flow]
@@ -180747,7 +180793,14 @@ tests:
     dependencies: [control-flow]
   - path: test/language/statements/switch/S12.11_A4_T1.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, functions, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        expression-operators,
+        functions,
+        var-bindings,
+      ]
   - path: test/language/statements/switch/cptn-a-abrupt-empty.js
     expectedClassification: unsupported-profile-feature
     dependencies: [abrupt-completion, control-flow, dynamic-source, functions]
@@ -181085,8 +181138,7 @@ tests:
     dependencies: [control-flow, var-bindings]
   - path: test/language/statements/throw/S12.13_A1.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A2_T1.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
@@ -181095,22 +181147,18 @@ tests:
     dependencies: [abrupt-completion]
   - path: test/language/statements/throw/S12.13_A2_T3.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A2_T4.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A2_T5.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A2_T6.js
     expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
-        control-flow,
         expression-operators,
         functions,
         object-literals,
@@ -181122,7 +181170,6 @@ tests:
     dependencies:
       [
         abrupt-completion,
-        control-flow,
         expression-operators,
         functions,
         object-properties,
@@ -181130,41 +181177,31 @@ tests:
       ]
   - path: test/language/statements/throw/S12.13_A3_T1.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A3_T2.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A3_T3.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A3_T4.js
     expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
-        control-flow,
         expression-operators,
         functions,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/throw/S12.13_A3_T5.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+    dependencies: [abrupt-completion, expression-operators, var-bindings]
   - path: test/language/statements/throw/S12.13_A3_T6.js
     expectedClassification: pass
     dependencies:
-      [
-        abrupt-completion,
-        control-flow,
-        expression-operators,
-        functions,
-        var-bindings,
-      ]
+      [abrupt-completion, expression-operators, functions, var-bindings]
   - path: test/language/statements/try/12.14-10.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
@@ -181378,6 +181415,7 @@ tests:
       [
         abrupt-completion,
         control-flow,
+        error-intrinsics,
         expression-operators,
         functions,
         var-bindings,
@@ -181388,6 +181426,7 @@ tests:
       [
         abrupt-completion,
         control-flow,
+        error-intrinsics,
         expression-operators,
         functions,
         var-bindings,
@@ -181398,6 +181437,7 @@ tests:
       [
         abrupt-completion,
         control-flow,
+        error-intrinsics,
         expression-operators,
         functions,
         var-bindings,
@@ -181412,6 +181452,7 @@ tests:
         functions,
         object-literals,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/try/S12.14_A15.js
@@ -181472,6 +181513,7 @@ tests:
       [
         abrupt-completion,
         control-flow,
+        error-intrinsics,
         expression-operators,
         functions,
         object-properties,
@@ -181516,6 +181558,7 @@ tests:
         expression-operators,
         functions,
         object-properties,
+        symbols,
         var-bindings,
       ]
   - path: test/language/statements/try/S12.14_A19_T1.js
@@ -181549,7 +181592,13 @@ tests:
   - path: test/language/statements/try/S12.14_A3.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        var-bindings,
+      ]
   - path: test/language/statements/try/S12.14_A4.js
     expectedClassification: pass
     dependencies: [abrupt-completion, control-flow, expression-operators]
@@ -181566,7 +181615,13 @@ tests:
   - path: test/language/statements/try/S12.14_A6.js
     expectedClassification: pass
     dependencies:
-      [abrupt-completion, control-flow, expression-operators, var-bindings]
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        var-bindings,
+      ]
   - path: test/language/statements/try/S12.14_A7_T1.js
     expectedClassification: pass
     dependencies:
@@ -181672,6 +181727,7 @@ tests:
         abrupt-completion,
         control-flow,
         dynamic-source,
+        error-intrinsics,
         expression-operators,
         functions,
         object-properties,
@@ -181750,13 +181806,13 @@ tests:
     dependencies: [abrupt-completion, control-flow, dynamic-source, functions]
   - path: test/language/statements/try/cptn-finally-skip-catch.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [abrupt-completion, control-flow, dynamic-source, functions]
+    dependencies: [control-flow, dynamic-source, functions]
   - path: test/language/statements/try/cptn-finally-wo-catch.js
     expectedClassification: unsupported-profile-feature
     dependencies: [control-flow, dynamic-source, functions]
   - path: test/language/statements/try/cptn-try.js
     expectedClassification: unsupported-profile-feature
-    dependencies: [abrupt-completion, control-flow, dynamic-source, functions]
+    dependencies: [control-flow, dynamic-source, functions]
   - path: test/language/statements/try/dstr/ary-init-iter-close.js
     expectedClassification: pass
     dependencies:
@@ -182216,7 +182272,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -182572,7 +182627,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -182654,7 +182708,6 @@ tests:
         abrupt-completion,
         control-flow,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -182818,7 +182871,7 @@ tests:
     dependencies: [control-flow, functions]
   - path: test/language/statements/try/early-catch-lex.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/try/optional-catch-binding-finally.js
     expectedClassification: pass
     dependencies: [abrupt-completion]
@@ -182942,11 +182995,10 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/variable/12.2.1-1gs.js
     expectedClassification: expected-negative
-    dependencies: [control-flow, property-enumeration, var-bindings]
+    dependencies: [control-flow, var-bindings]
   - path: test/language/statements/variable/12.2.1-2-s.js
     expectedClassification: unsupported-profile-feature
     dependencies:
@@ -182956,7 +183008,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/variable/12.2.1-20-s.js
     expectedClassification: unsupported-profile-feature
@@ -182994,7 +183045,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/variable/12.2.1-4gs.js
     expectedClassification: expected-negative
@@ -183025,7 +183075,6 @@ tests:
         error-intrinsics,
         expression-operators,
         functions,
-        var-bindings,
       ]
   - path: test/language/statements/variable/12.2.1-9-s.js
     expectedClassification: unsupported-profile-feature
@@ -183172,7 +183221,13 @@ tests:
   - path: test/language/statements/variable/binding-resolution.js
     expectedClassification: pass
     dependencies:
-      [expression-operators, object-literals, object-properties, var-bindings]
+      [
+        expression-operators,
+        object-literals,
+        object-properties,
+        symbols,
+        var-bindings,
+      ]
   - path: test/language/statements/variable/cptn-value.js
     expectedClassification: unsupported-profile-feature
     dependencies: [dynamic-source, functions, var-bindings]
@@ -183264,7 +183319,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -183290,7 +183344,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -183313,7 +183366,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -183395,7 +183447,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         iterator-protocol,
         object-properties,
@@ -183595,7 +183646,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -183649,6 +183699,7 @@ tests:
     dependencies:
       [
         destructuring-bindings,
+        expression-operators,
         functions,
         generators,
         iterator-protocol,
@@ -183875,7 +183926,6 @@ tests:
     dependencies:
       [
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -183913,7 +183963,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -183987,7 +184036,6 @@ tests:
       [
         abrupt-completion,
         destructuring-bindings,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -184000,7 +184048,6 @@ tests:
         abrupt-completion,
         destructuring-bindings,
         error-intrinsics,
-        expression-operators,
         functions,
         object-literals,
         object-properties,
@@ -184253,6 +184300,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [
+        abrupt-completion,
         control-flow,
         dynamic-source,
         expression-operators,
@@ -184291,6 +184339,7 @@ tests:
     expectedClassification: unsupported-profile-feature
     dependencies:
       [
+        abrupt-completion,
         control-flow,
         dynamic-source,
         expression-operators,
@@ -184300,7 +184349,14 @@ tests:
       ]
   - path: test/language/statements/while/S12.6.2_A9.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators, var-bindings]
+    dependencies:
+      [
+        abrupt-completion,
+        control-flow,
+        error-intrinsics,
+        expression-operators,
+        var-bindings,
+      ]
   - path: test/language/statements/while/cptn-abrupt-empty.js
     expectedClassification: unsupported-profile-feature
     dependencies: [abrupt-completion, control-flow, dynamic-source, functions]
@@ -184328,7 +184384,7 @@ tests:
     dependencies: [classes, control-flow]
   - path: test/language/statements/while/decl-const.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/while/decl-fun.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions]
@@ -184337,19 +184393,19 @@ tests:
     dependencies: [control-flow, functions, generators]
   - path: test/language/statements/while/decl-let.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-bindings]
   - path: test/language/statements/while/labelled-fn-stmt.js
     expectedClassification: expected-negative
     dependencies: [control-flow, functions]
   - path: test/language/statements/while/let-array-with-newline.js
     expectedClassification: expected-negative
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/while/let-block-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow]
+    dependencies: [control-flow, lexical-grammar]
   - path: test/language/statements/while/let-identifier-with-newline.js
     expectedClassification: pass
-    dependencies: [control-flow, expression-operators]
+    dependencies: [control-flow, expression-operators, lexical-grammar]
   - path: test/language/statements/with/12.10-0-1.js
     expectedClassification: pass
     dependencies: [functions, object-properties, var-bindings]

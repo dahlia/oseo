@@ -453,6 +453,7 @@ results:
     dependencies:
       - abrupt-completion
       - control-flow
+      - error-intrinsics
       - expression-operators
       - functions
       - var-bindings

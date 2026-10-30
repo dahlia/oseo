@@ -243,6 +243,7 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -285,7 +286,6 @@ results:
     classification: pass
     dependencies:
       - abrupt-completion
-      - control-flow
       - expression-operators
       - var-bindings
     execution:

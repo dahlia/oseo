@@ -546,6 +546,7 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
+      - lexical-grammar
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -565,6 +566,7 @@ results:
     classification: pass
     dependencies:
       - control-flow
+      - lexical-grammar
     execution:
       harnessIncludes:
         - base.js

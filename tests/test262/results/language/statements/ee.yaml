@@ -657,6 +657,7 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -705,7 +706,6 @@ results:
     classification: pass
     dependencies:
       - destructuring-bindings
-      - expression-operators
       - functions
       - iterator-protocol
       - object-properties

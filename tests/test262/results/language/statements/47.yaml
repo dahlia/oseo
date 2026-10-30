@@ -395,6 +395,7 @@ results:
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
     classification: pass
     dependencies:
+      - abrupt-completion
       - control-flow
       - expression-operators
       - var-bindings
@@ -582,6 +583,7 @@ results:
     classification: expected-negative
     dependencies:
       - control-flow
+      - lexical-bindings
     observation:
       errorType: SyntaxError
       failedPhase: parse
@@ -604,7 +606,6 @@ results:
     dependencies:
       - control-flow
       - lexical-bindings
-      - property-enumeration
     observation:
       errorType: SyntaxError
       failedPhase: parse

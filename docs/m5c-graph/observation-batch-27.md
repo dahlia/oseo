@@ -138,3 +138,38 @@ Unsupported selector
 | test/language/statements/while/cptn-abrupt-empty.js                                          | dynamic-source-coverage-remediation |
 | test/language/statements/while/cptn-iter.js                                                  | dynamic-source-coverage-remediation |
 | test/language/statements/while/cptn-no-iter.js                                               | dynamic-source-coverage-remediation |
+
+
+Internal pass 1 corrections
+---------------------------
+
+All 1,669 train rows were rechecked against each finding pattern and the
+latest consolidated tag rules, including Root's October 30 clarifications.
+This batch has 86 dependency rows corrected in that audit.
+
+The audit corrected lexical-declaration conflicts and ASI grammar, parse-only
+enumeration claims, unused function wrappers, skipped initializer and
+post-throw operators, executed rest-consumption counters, asserted abrupt
+completions and runtime errors, implicit with/concat Symbol dispatch, and
+checking-only control flow around thrown values.
+
+Root confirmed that a declaration used only as an unread assignment
+target for source that must fail to parse adds no holder syntax coverage.
+Identifier-only let tests retain lexical-grammar rather than a directory-only
+lexical-bindings claim. Rejected for-in heads keep control-flow as their
+grammar carrier and drop runtime property-enumeration.
+
+The source-section audit checked all 143 unsupported assessments and
+recovered 37 es6id references omitted by the original fallback. Every
+unsupported path keeps its source hash and normalized observation digest.
+The full cohort audit distinguishes 61 source subjects from 82 incidental
+uses; this cohort records the asserted subject, not an exclusion or proof
+of normative dependence. Counts, classifications and active remediation
+owners remain as above.
+
+The dispatch packet's *round1-fix-plan.json* and
+*round1-fix-applied.json* record the exact changes and source-bound reasons.
+Its `round1-*-candidates.json` and `round1-*-conclusions.json` retain the
+full-train pattern audits, while *review-round-1/attempts.json* retains every
+first-pass verdict. The final packet includes every later review verdict
+and Codex rollout path for Root's audit.
