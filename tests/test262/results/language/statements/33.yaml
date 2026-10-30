@@ -191,6 +191,32 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/do-while/S12.6.1_A3.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - expression-operators
+      - functions
+      - var-bindings
+    observation:
+      detail: "test/language/statements/do-while/S12.6.1_A3.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/statements/do-while/S12.6.1_A3.js:89:15:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: true
       features:
         - generators
@@ -357,6 +383,116 @@ results:
           strictness: strict
         - specialization: enabled
           strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - resizable-arraybuffer
+      flags: []
+      includes:
+        - compareArray.js
+        - resizableArrayBufferUtils.js
+      mode: script
+      path: test/language/statements/for-of/typedarray-backed-by-resizable-buffer-grow-mid-iteration.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - array-buffer
+      - bigint-primitive
+      - classes
+      - control-flow
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - symbols
+      - typed-array-constructors
+      - typed-array-core
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+        - resizableArrayBufferUtils.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - tail-call-optimization
+      flags:
+        - onlyStrict
+      includes:
+        - tcoHelper.js
+      mode: script
+      path: test/language/statements/for/tco-lhs-body.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - control-flow
+      - expression-operators
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - tcoHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/statements/with/S12.10_A3.12_T3.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
     observation:
       passed: true
     unsupportedFeatures: []

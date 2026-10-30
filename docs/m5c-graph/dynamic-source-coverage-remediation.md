@@ -498,3 +498,21 @@ no exclusion. Every original subject and normative section is preserved.
 | `test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js`                                                             | `test/language/module-code/top-level-await/syntax/await-expr-dyn-import.js:112:9: error[OSEO1001]: ImportExpression is outside the M1 profile.`                                                                                                                                                                                                                                                         | `/data/m5c-b19-b20-b30-20261027/observation-6aab/remaining-904/raw/case-902-result.json` |
 | `test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js`                                         | `test/language/module-code/top-level-await/unobservable-global-async-evaluation-count-reset.js:180:12: error[OSEO1001]: ImportExpression is outside the M1 profile.`                                                                                                                                                                                                                                    | `/data/m5c-b19-b20-b30-20261027/observation-6aab/remaining-904/raw/case-903-result.json` |
 | `test/language/module-code/verify-dfs.js`                                                                                               | `test/language/module-code/verify-dfs-a_FIXTURE.js:6:7: error[OSEO1001]: ImportExpression is outside the M1 profile.`                                                                                                                                                                                                                                                                                   | `/data/m5c-b19-b20-b30-20261027/observation-6aab/remaining-904/raw/case-904-result.json` |
+
+
+Observation batches 23, 28, 29 and 32
+-------------------------------------
+
+This train adds 165 dynamic-source prerequisite rejections to the existing
+owner.
+Their sorted paths, pinned source digests, observation digests and original
+subjects use the observation-train-dynamic-coverage assessment in
+*docs/m5c-closure/exclusion-audit.yaml*. The batch notes and raw observations
+bind the admission. Coverage remains unresolved under the existing
+accounting work; no exclusion or static replacement is claimed.
+
+Root assigned `tco-non-eval-global.js` to the bounded
+`global-eval-rebinding-tail-call-resolution` node. That original source
+rebinds the global eval name to a statically declared function and performs
+no source evaluation. Its unsupported classification and observation remain
+unchanged, but it contributes no dynamic-source tag or exclusion assessment.

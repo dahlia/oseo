@@ -1191,6 +1191,36 @@ results:
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
   - case:
+      async: true
+      features:
+        - export-star-as-namespace-from-module
+        - dynamic-import
+      flags:
+        - generated
+        - async
+      includes: []
+      mode: script
+      path: test/language/expressions/dynamic-import/namespace/promise-then-ns-get-nested-namespace-props-nrml.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - module-linking
+      - object-properties
+      - promise-settlement
+    observation:
+      detail: 'test/language/expressions/dynamic-import/namespace/promise-then-ns-get-nested-namespace-props-nrml.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/namespace/promise-then-ns-get-nested-namespace-props-nrml.js:201:1:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: false
       features:
         - import-attributes
@@ -1299,6 +1329,40 @@ results:
           strictness: non-strict
         - specialization: enabled
           strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - import.meta
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/expressions/import.meta/same-object-returned.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - module-linking
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/expressions/import.meta/same-object-returned.js
+          sourceHash: fnv1a64:af7c51be8372827e
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
         - specialization: disabled
           strictness: strict
         - specialization: enabled

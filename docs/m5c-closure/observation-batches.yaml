@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 7657
+unreviewedPaths: 6754
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,44 +165,44 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 110923
-  currentSeconds: 6094
-  finalExecutedVariants: 137087
-  finalSeconds: 7532
+  currentExecutedVariants: 113138
+  currentSeconds: 6216
+  finalExecutedVariants: 136568
+  finalSeconds: 7503
   plan:
-    batches: 17
+    batches: 15
     largestPaths: 794
     largestReviewUnits: 500
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 32.82
-    fullUpdateScheduleHours: 64.84
+    scheduleHours: 28.99
+    fullUpdateScheduleHours: 57.27
   alternatives:
-    - batches: 17
+    - batches: 12
       largestPaths: 1920
       largestReviewUnits: 300
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 34.04
-      fullUpdateScheduleHours: 67.29
-    - batches: 9
+      scheduleHours: 24.06
+      fullUpdateScheduleHours: 47.4
+    - batches: 6
       largestPaths: 2420
       largestReviewUnits: 595
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 18.43
-      fullUpdateScheduleHours: 36.05
-    - batches: 5
-      largestPaths: 3912
+      scheduleHours: 12.27
+      fullUpdateScheduleHours: 23.82
+    - batches: 3
+      largestPaths: 3641
       largestReviewUnits: 1144
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 10.6
-      fullUpdateScheduleHours: 20.4
+      scheduleHours: 6.42
+      fullUpdateScheduleHours: 12.13
 batches:
   - id: observation-batch-06
     selector:
@@ -231,7 +231,7 @@ batches:
     regeneration:
       executableVariants: 4
       scopedUpdateSeconds: 0
-      fullCorpusSeconds: 6095
+      fullCorpusSeconds: 6216
   - id: observation-batch-18
     selector:
       prerequisiteSets:
@@ -259,7 +259,7 @@ batches:
     regeneration:
       executableVariants: 40
       scopedUpdateSeconds: 2
-      fullCorpusSeconds: 6097
+      fullCorpusSeconds: 6218
   - id: observation-batch-21a
     selector:
       prerequisiteSets:
@@ -324,7 +324,7 @@ batches:
     regeneration:
       executableVariants: 1498
       scopedUpdateSeconds: 82
-      fullCorpusSeconds: 6179
+      fullCorpusSeconds: 6301
   - id: observation-batch-21b
     selector:
       prerequisiteSets:
@@ -362,7 +362,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6309
+      fullCorpusSeconds: 6431
   - id: observation-batch-21c
     selector:
       prerequisiteSets:
@@ -401,7 +401,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6439
+      fullCorpusSeconds: 6561
   - id: observation-batch-21d
     selector:
       prerequisiteSets:
@@ -440,7 +440,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6569
+      fullCorpusSeconds: 6691
   - id: observation-batch-22a
     selector:
       prerequisiteSets:
@@ -501,7 +501,7 @@ batches:
     regeneration:
       executableVariants: 2082
       scopedUpdateSeconds: 114
-      fullCorpusSeconds: 6684
+      fullCorpusSeconds: 6805
   - id: observation-batch-22b
     selector:
       prerequisiteSets:
@@ -564,75 +564,36 @@ batches:
     regeneration:
       executableVariants: 2150
       scopedUpdateSeconds: 118
-      fullCorpusSeconds: 6802
+      fullCorpusSeconds: 6924
   - id: observation-batch-23
     selector:
       prerequisiteSets:
         - ""
       prefixes:
-        - test/language/statements/class/scope-
-        - test/language/statements/class/static-
-        - test/language/statements/class/strict-
-        - test/language/statements/class/subclass-builtins/subclass-
         - test/language/statements/class/subclass/
         - test/language/statements/class/syntax/
-        - test/language/statements/const/
-        - test/language/statements/continue/
-        - test/language/statements/do-while/
-        - test/language/statements/empty/
-        - test/language/statements/expression/S12.4_
     dependsOn:
       - observation-batch-plan
-    paths: 273
-    reviewUnits: 276
-    generatedPaths: 103
+    paths: 2
+    reviewUnits: 2
+    generatedPaths: 0
     prerequisites: {}
-    dynamicSource:
-      Function: 6
-      eval: 10
-    flags:
-      generated: 103
-      noStrict: 2
-    includes:
-      compareArray.js: 3
-      propertyHelper.js: 19
-      testTypedArray.js: 2
+    dynamicSource: {}
+    flags: {}
+    includes: {}
     features:
-      AggregateError: 1
-      ArrayBuffer: 1
-      BigInt: 2
-      DataView: 1
-      Map: 1
-      Proxy: 4
-      Set: 1
-      SharedArrayBuffer: 1
-      Symbol: 2
-      Symbol.iterator: 10
-      TypedArray: 6
-      WeakMap: 3
-      WeakRef: 1
-      WeakSet: 3
-      arrow-function: 1
-      async-functions: 2
-      async-iteration: 2
-      class: 5
-      class-static-block: 1
-      class-static-fields-public: 1
-      default-parameters: 1
-      destructuring-binding: 77
-      generators: 23
-      object-rest: 1
+      Symbol.iterator: 1
     negatives:
-      parse: 34
+      parse: 1
     partitions:
       groups:
         - language/statements
-      files: 173
+      files: 2
       newFiles: 0
     regeneration:
-      executableVariants: 956
-      scopedUpdateSeconds: 53
-      fullCorpusSeconds: 6854
+      executableVariants: 4
+      scopedUpdateSeconds: 0
+      fullCorpusSeconds: 6924
   - id: observation-batch-24
     selector:
       prerequisiteSets:
@@ -672,7 +633,7 @@ batches:
     regeneration:
       executableVariants: 3150
       scopedUpdateSeconds: 173
-      fullCorpusSeconds: 7028
+      fullCorpusSeconds: 7097
   - id: observation-batch-25
     selector:
       prerequisiteSets:
@@ -762,7 +723,7 @@ batches:
     regeneration:
       executableVariants: 2210
       scopedUpdateSeconds: 121
-      fullCorpusSeconds: 7149
+      fullCorpusSeconds: 7218
   - id: observation-batch-26a
     selector:
       prerequisiteSets:
@@ -810,7 +771,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7222
+      fullCorpusSeconds: 7291
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -857,7 +818,7 @@ batches:
     regeneration:
       executableVariants: 2116
       scopedUpdateSeconds: 116
-      fullCorpusSeconds: 7338
+      fullCorpusSeconds: 7408
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -909,7 +870,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7433
+      fullCorpusSeconds: 7503
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -917,236 +878,25 @@ batches:
       prefixes:
         - test/language/statements/with/
         - test/language/types/
-        - test/language/white-space/
     dependsOn:
       - observation-batch-plan
-    paths: 348
-    reviewUnits: 349
-    generatedPaths: 25
-    prerequisites: {}
-    dynamicSource:
-      Function: 4
-      eval: 73
-    flags:
-      generated: 25
-      noStrict: 173
-      onlyStrict: 11
-    includes:
-      compareArray.js: 6
-      propertyHelper.js: 1
-      proxyTrapsHelper.js: 6
-    features:
-      Proxy: 8
-      Reflect: 6
-      Symbol: 2
-      Symbol.unscopables: 11
-      TypedArray: 2
-      async-functions: 1
-      async-iteration: 1
-      generators: 1
-      u180e: 2
-    negatives:
-      parse: 32
-    partitions:
-      groups:
-        - language/statements
-        - language/types
-        - language/white-space
-      files: 260
-      newFiles: 140
-    regeneration:
-      executableVariants: 924
-      scopedUpdateSeconds: 51
-      fullCorpusSeconds: 7484
-  - id: observation-batch-29
-    selector:
-      prerequisiteSets:
-        - cross-realm-host
-      prefixes:
-        - test/
-    dependsOn:
-      - observation-batch-plan
-      - cross-realm-host
-    paths: 89
-    reviewUnits: 89
+    paths: 4
+    reviewUnits: 4
     generatedPaths: 0
-    prerequisites:
-      feature:cross-realm: 87
-      host:$262.createRealm: 89
-    dynamicSource:
-      Function: 1
+    prerequisites: {}
+    dynamicSource: {}
     flags:
-      noStrict: 8
-    includes:
-      detachArrayBuffer.js: 12
-      testTypedArray.js: 24
-    features:
-      AggregateError: 1
-      BigInt: 11
-      Proxy: 35
-      Reflect: 29
-      Reflect.construct: 2
-      SharedArrayBuffer: 2
-      Symbol: 10
-      TypedArray: 24
-      align-detached-buffer-semantics-with-web-reality: 12
-      class: 10
-      class-methods-private: 6
-      class-static-fields-private: 1
-      class-static-methods-private: 3
-      cross-realm: 87
-      generators: 1
+      noStrict: 3
+    includes: {}
+    features: {}
     negatives: {}
     partitions:
       groups:
-        - built-ins/AggregateError
-        - built-ins/Error
-        - built-ins/Function
-        - built-ins/NativeErrors
-        - built-ins/Proxy
-        - built-ins/TypedArrayConstructors
-        - language/eval-code
-        - language/expressions
-        - language/types
-      files: 84
-      newFiles: 20
-    regeneration:
-      executableVariants: 340
-      scopedUpdateSeconds: 19
-      fullCorpusSeconds: 7503
-  - id: observation-batch-32
-    selector:
-      prerequisiteSets:
-        - cross-realm-host+proper-tail-calls
-        - dynamic-import+fn-global-object-harness
-        - dynamic-import+import-meta
-        - dynamic-import+module-export-forms
-        - fn-global-object-harness
-        - fn-global-object-harness+module-export-forms
-        - frontmatter-feature-tags
-        - hashbang-comments
-        - import-meta
-        - minor-feature-tag-admission
-        - module-export-forms
-        - promise-feature-admission
-        - proper-tail-calls
-        - resizable-array-buffer-harness
-        - typed-array-feature-admission
-        - well-known-intrinsics-harness
-      prefixes:
-        - test/
-    dependsOn:
-      - observation-batch-plan
-      - cross-realm-host
-      - dynamic-import
-      - fn-global-object-harness
-      - frontmatter-feature-tags
-      - hashbang-comments
-      - import-meta
-      - minor-feature-tag-admission
-      - module-export-forms
-      - promise-feature-admission
-      - proper-tail-calls
-      - resizable-array-buffer-harness
-      - typed-array-feature-admission
-      - well-known-intrinsics-harness
-    paths: 199
-    reviewUnits: 191
-    generatedPaths: 44
-    prerequisites:
-      feature:Float32Array: 2
-      feature:Float64Array: 2
-      feature:Int16Array: 2
-      feature:Int32Array: 2
-      feature:Int8Array: 2
-      feature:Promise: 2
-      feature:Uint16Array: 2
-      feature:Uint32Array: 2
-      feature:Uint8Array: 2
-      feature:Uint8ClampedArray: 2
-      feature:__proto__: 3
-      feature:arbitrary-module-namespace-names: 1
-      feature:dynamic-import: 29
-      feature:export-star-as-namespace-from-module: 12
-      feature:hashbang: 29
-      feature:import.meta: 23
-      feature:json-superset: 4
-      feature:proxy-missing-checks: 3
-      feature:super: 15
-      feature:tail-call-optimization: 33
-      harness:fnGlobalObject.js: 41
-      harness:resizableArrayBufferUtils.js: 17
-      harness:tcoHelper.js: 32
-      harness:wellKnownIntrinsicObjects.js: 1
-      host:$262.createRealm: 1
-    dynamicSource:
-      Function: 2
-      eval: 20
-    flags:
-      async: 28
-      generated: 44
-      module: 45
-      noStrict: 4
-      onlyStrict: 29
-      raw: 23
-    includes:
-      compareArray.js: 14
-      fnGlobalObject.js: 41
-      proxyTrapsHelper.js: 1
-      resizableArrayBufferUtils.js: 17
-      tcoHelper.js: 32
-      wellKnownIntrinsicObjects.js: 1
-    features:
-      Float32Array: 2
-      Float64Array: 2
-      Int16Array: 2
-      Int32Array: 2
-      Int8Array: 2
-      Promise: 2
-      Proxy: 5
-      Reflect: 3
-      TypedArray: 18
-      Uint16Array: 2
-      Uint32Array: 2
-      Uint8Array: 2
-      Uint8ClampedArray: 2
-      __proto__: 3
-      arbitrary-module-namespace-names: 1
-      arrow-function: 2
-      async-functions: 2
-      async-iteration: 5
-      class: 1
-      coalesce-expression: 2
-      default-parameters: 1
-      destructuring-assignment: 4
-      dynamic-import: 29
-      export-star-as-namespace-from-module: 12
-      generators: 3
-      hashbang: 29
-      import.meta: 23
-      json-superset: 4
-      object-rest: 1
-      proxy-missing-checks: 3
-      resizable-arraybuffer: 17
-      super: 15
-      tail-call-optimization: 33
-    negatives:
-      parse: 31
-    partitions:
-      groups:
-        - built-ins/Array
-        - built-ins/Proxy
-        - built-ins/TypedArrayConstructors
-        - language/comments
-        - language/destructuring
-        - language/eval-code
-        - language/expressions
-        - language/literals
-        - language/module-code
         - language/statements
-      files: 178
-      newFiles: 36
+        - language/types
+      files: 4
+      newFiles: 1
     regeneration:
-      executableVariants: 528
-      scopedUpdateSeconds: 29
-      fullCorpusSeconds: 7532
+      executableVariants: 10
+      scopedUpdateSeconds: 1
+      fullCorpusSeconds: 7503

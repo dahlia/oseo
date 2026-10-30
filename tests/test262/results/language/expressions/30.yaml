@@ -725,6 +725,45 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      features:
+        - class
+        - class-methods-private
+        - cross-realm
+      flags:
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-realm.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - classes
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - lexical-bindings
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-realm.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/private-method-brand-check-multiple-evaluations-of-class-realm.js:114:15:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []
@@ -888,6 +927,37 @@ results:
       passed: false
     unsupportedFeatures: []
   - case:
+      async: true
+      features:
+        - dynamic-import
+      flags:
+        - generated
+        - async
+      includes:
+        - fnGlobalObject.js
+      mode: script
+      path: test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-gtbndng-indirect-update.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - lexical-bindings
+      - module-linking
+      - object-properties
+      - promise-settlement
+    observation:
+      detail: 'test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-gtbndng-indirect-update.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/dynamic-import/usage/nested-arrow-assignment-expression-eval-gtbndng-indirect-update.js:159:15:
+        error[OSEO1001]: ImportExpression is outside the M1 profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: false
       features:
         - generators
@@ -985,6 +1055,32 @@ results:
           strictness: strict
     observation:
       passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - import.meta
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/expressions/import.meta/syntax/invalid-assignment-target-for-of-loop.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - control-flow
+      - module-linking
+    observation:
+      detail: "test/language/expressions/import.meta/syntax/invalid-assignmen\
+        t-target-for-of-loop.js:30:6: error[OSEO0001]: Source could not
+        be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
     unsupportedFeatures: []
   - case:
       async: false

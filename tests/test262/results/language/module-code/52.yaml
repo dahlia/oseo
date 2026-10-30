@@ -1,0 +1,41 @@
+group: language/module-code
+key: "52"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - module
+      includes:
+        - fnGlobalObject.js
+      mode: module
+      path: test/language/module-code/instn-local-bndng-fun.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - module-linking
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - fnGlobalObject.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/module-code/instn-local-bndng-fun.js
+          sourceHash: fnv1a64:c5daff1f0f7f9737
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

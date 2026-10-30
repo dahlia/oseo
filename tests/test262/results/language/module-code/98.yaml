@@ -4,6 +4,56 @@ results:
   - case:
       async: false
       features:
+        - export-star-as-namespace-from-module
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - module-linking
+      - object-properties
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies:
+            - test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-named_FIXTURE.js
+            - test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-prod_FIXTURE.js
+          id: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip.js
+          sourceHash: fnv1a64:100c6d3cc5fad740
+        - dependencies:
+            - test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-named-end_FIXTURE.js
+          id: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-named_FIXTURE.js
+          sourceHash: fnv1a64:dc4878766ce1aa43
+        - dependencies: []
+          id: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-named-end_FIXTURE.js
+          sourceHash: fnv1a64:be1448e137032eba
+        - dependencies:
+            - test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-prod-end_FIXTURE.js
+          id: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-prod_FIXTURE.js
+          sourceHash: fnv1a64:87ab1634b0714bf9
+        - dependencies: []
+          id: test/language/module-code/namespace/internals/get-nested-namespace-dflt-skip-prod-end_FIXTURE.js
+          sourceHash: fnv1a64:909a2f8a4714096d
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
         - top-level-await
       flags:
         - generated

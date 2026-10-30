@@ -136,6 +136,43 @@ results:
       passed: true
     unsupportedFeatures: []
   - case:
+      async: false
+      features: []
+      flags: []
+      includes:
+        - propertyHelper.js
+      mode: script
+      path: test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-name.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - classes
+      - dynamic-source
+      - functions
+      - generators
+      - object-properties
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-name.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statements/class/subclass/builtin-objects/GeneratorFunction/instance-name.js:458:1:
+        error[OSEO1001]: GeneratorFunction compiles source text at run
+        time, which is outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
       async: true
       features:
         - destructuring-binding

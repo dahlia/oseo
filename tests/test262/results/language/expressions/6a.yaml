@@ -1171,6 +1171,33 @@ results:
     unsupportedFeatures: []
   - case:
       async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
+      features:
+        - import.meta
+        - destructuring-assignment
+      flags:
+        - module
+      includes: []
+      mode: module
+      path: test/language/expressions/import.meta/syntax/invalid-assignment-target-array-rest-destructuring-expr.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - destructuring-bindings
+      - module-linking
+    observation:
+      detail: "test/language/expressions/import.meta/syntax/invalid-assignmen\
+        t-target-array-rest-destructuring-expr.js:31:5: error[OSEO0001]:
+        Source could not be parsed."
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
       features: []
       flags: []
       includes: []

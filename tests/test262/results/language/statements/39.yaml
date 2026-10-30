@@ -96,6 +96,85 @@ results:
       passed: false
     unsupportedFeatures: []
   - case:
+      async: false
+      features:
+        - WeakRef
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/statements/class/subclass-builtins/subclass-WeakRef.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - classes
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - symbols
+      - weak-collections
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - arrow-function
+        - class
+        - Proxy
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/statements/class/subclass/superclass-arrow-function.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - abrupt-completion
+      - classes
+      - error-intrinsics
+      - functions
+      - object-literals
+      - object-properties
+      - proxy-exotic-object
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
       async: true
       features:
         - generators
@@ -249,5 +328,44 @@ results:
       errorType: SyntaxError
       failedPhase: parse
       passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - Proxy
+        - Reflect
+      flags:
+        - noStrict
+      includes:
+        - compareArray.js
+        - proxyTrapsHelper.js
+      mode: script
+      path: test/language/statements/with/set-mutable-binding-idref-compound-assign-with-proxy-env.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - object-literals
+      - object-properties
+      - proxy-exotic-object
+      - reflect-namespace
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - compareArray.js
+        - proxyTrapsHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+    observation:
+      passed: true
     unsupportedFeatures: []
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

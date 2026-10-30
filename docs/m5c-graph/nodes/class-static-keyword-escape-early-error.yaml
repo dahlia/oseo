@@ -1,0 +1,14 @@
+version: 1
+id: class-static-keyword-escape-early-error
+title: Reject escapes in the static contextual keyword
+delivers: >-
+  Reject Unicode escapes in the static contextual keyword. The observed
+  parse-negative unexpectedly succeeds instead of reporting SyntaxError.
+  Repair this cause without changing Test262 expectations, profile
+  boundaries, or unrelated behavior. The work note
+  docs/m5c-graph/class-static-keyword-escape-early-error.md binds every
+  original path and raw observation.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

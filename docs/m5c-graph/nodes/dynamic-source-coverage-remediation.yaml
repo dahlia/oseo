@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 881 reviewed unsupported paths assigned to
+delivers: "Resolves the 1046 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -89,7 +89,11 @@ delivers: "Resolves the 881 reviewed unsupported paths assigned to
   dynamic-source-private-binding-family, and
   dynamic-source-realm-string-family; their work notes select the paths
   each owns. Ownership moves to a child only in that child's landing, and
-  this node lands when it owns zero paths. The 3 paths from
+  this node lands when it owns zero paths. Observation batches 23, 28,
+  29 and 32 add 165 dynamic-source prerequisite rejections, bound by the
+  observation-train-dynamic-coverage assessment in exclusion-audit.yaml.
+  Preserve their original assertions and keep their coverage unresolved.
+  The 3 paths from
   well-known-intrinsics-harness
   assert AsyncFunction, AsyncGeneratorFunction, and GeneratorFunction
   are constructible before their trailing zero-argument construction
@@ -168,7 +172,8 @@ delivers: "Resolves the 881 reviewed unsupported paths assigned to
   docs/m5c-graph/observation-batch-06.md,
   docs/m5c-graph/observation-batch-08.md and
   docs/m5c-graph/observation-batch-14.md; ADR 0016 and ADR 0019 remain
-  unchanged."
+  unchanged. The B23/B28/B29/B32 train adds 165 dynamic-source
+  admissions, bringing the current scope to 1046."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family

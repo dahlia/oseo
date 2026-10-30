@@ -13,10 +13,12 @@ dependencies:
   - authorized-exclusion-audit
   - class-duplicate-constructor-early-error
   - class-private-accessor-lookup-coverage-remediation
+  - class-static-keyword-escape-early-error
   - compound-assignment-property-cost
   - compound-member-assignment-key-order
   - computed-member-reference-key-order
   - cross-realm-host
+  - default-derived-constructor-spread-iterator
   - destructuring-binding-target-order
   - direct-eval-non-string-dispatch
   - dynamic-import
@@ -36,6 +38,7 @@ dependencies:
   - frontmatter-feature-tags
   - function-caller-restrictions
   - generator-dispatch-stack-charge
+  - global-eval-rebinding-tail-call-resolution
   - hashbang-comments
   - import-attributes
   - import-attributes-dynamic-coverage-remediation
@@ -117,6 +120,7 @@ dependencies:
   - with-optional-call-receiver
   - with-optional-call-receiver-non-tail
   - with-optional-call-receiver-tail
+  - with-primitive-binding-object-boxing
   - with-strict-assignment-fallback
   - with-var-loop-head-resolution
   - yield-star-throw-callability

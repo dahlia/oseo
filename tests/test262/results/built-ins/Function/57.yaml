@@ -1,0 +1,42 @@
+group: built-ins/Function
+key: "57"
+results:
+  - case:
+      async: false
+      features:
+        - cross-realm
+        - Reflect
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Function/proto-from-ctor-realm-prototype.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+      - object-properties
+      - reflect-namespace
+      - symbols
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/built-ins/Function/proto-from-ctor-realm-prototype.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/built-ins/Function/proto-from-ctor-realm-prototype.js:116:17:
+        error[OSEO1001]: Function compiles source text at run time,
+        which is outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

@@ -642,8 +642,8 @@ assessments:
         "6b49ffb07dc3969b7e66016cfd97fc00\
         a94f3e60208c1bb1c2a4105c2dbbdd32"
       tests/test262/results/language/module-code/19.yaml:
-        "e1612de6013162d24372a91e1ad1410e\
-        34d996f6945d67ca1f6794b3d0044cdc"
+        "381e6f0d04f09098fcde8077500f7e68\
+        9982ee3261129c784287e9958e20652d"
       tests/test262/results/language/module-code/24.yaml:
         "977d455b32ce0ce11cf00af713d072d0\
         8557db6bcd5d846f6650700724cfe7df"
@@ -678,8 +678,8 @@ assessments:
         "154274049c6b2019711ce1f05bb953a5\
         074c2f1134c26ecf5fe79437740ce512"
       tests/test262/results/language/module-code/92.yaml:
-        "edb6bec92aef96bafe094a97d66656fb\
-        6cfdd0214380793c636257ed4a832ac4"
+        "d4ead11c5c468fdebf9ab348f154864f\
+        f62d8ff6c9835bcdefdbfd04b881592c"
       tests/test262/results/language/module-code/9e.yaml:
         "09526f7e3296f20c9b45f732866e3971\
         e17ae4c0d07a37dd313408f4dca4edaa"
@@ -708,17 +708,17 @@ assessments:
         "68937ef4685526ed2467cb623dedcc4a\
         3b4bc122ee6da25ed094f4550d412e1b"
       tests/test262/results/language/module-code/f1.yaml:
-        "a44ec8466c4e8c00ce6a942e0c687842\
-        2060db3b7dea7400c9d0c75f1f3b3780"
+        "898563d7a490bd7c29c58a53a9fa046f\
+        596265b28722192b6dad7b2fd7d5dbbd"
       tests/test262/results/language/module-code/f8.yaml:
-        "8dee209221688f2d5ec1e35c54f24eeb\
-        5691ba64e614fadad58702e948703372"
+        "ad566ab67d6870fafb59723bd785dc4b\
+        9e83aa4f8d64f23a4d7292c301f4d4f9"
       tests/test262/results/language/module-code/f9.yaml:
         "2b0fe566bd78f1dc71d00a54c3bf7f99\
         027e0f5116bb344d467e8923d4a901c8"
       tests/test262/results/language/module-code/fe.yaml:
-        "19f450e3f04f0eca3b337abf5a29d767\
-        54c833bb63e2295178490eee99d5e2fd"
+        "e516220e6c81bcec7cad9e644346fd6a\
+        860c4aa558aa5973c6ab0aa245c5b9ac"
       tests/test262/results/language/module-code/ff.yaml:
         "5213678b9be7a75cc5fd5d5da721b9e6\
         ffa058daa59c0f4dce7f5827d4df7e33"
@@ -772,6 +772,15 @@ assessments:
       authorizes no whole-path exclusion. The two direct non-String eval
       identity paths have a separate bounded remediation owner. ADR 0013,
       ADR 0016 and ADR 0019, including reopening triggers, remain unchanged.
+  observation-train-dynamic-coverage:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The focused observation reports a source-compilation,
+      ImportExpression, or eval-binding resolution rejection. The
+      original pinned source needs dynamic-source behavior for its
+      asserted contract or an input prerequisite; its in-claim
+      assertions remain unresolved. No whole-path exclusion or
+      equivalent replacement is established by this admission.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -785,6 +794,18 @@ paths:
     subject: Fallback to the NewTarget's [[Prototype]] if the prototype
       property is not an object
     assessment: observation-b01-b18-dynamic-source
+  - path: "test/built-ins/AggregateError/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1c3451e247c6fed9e593dfb1287604331e130a87e42e2613\
+      46c7cb65025e688a"
+    observationDigest: "977cbbe11cd4b3761e6440e5cc7b2501ad5ed3aded4\
+      72cd43b84a39a90d884b5"
+    missingDynamicTag: false
+    section: "sec-aggregate-error"
+    subject: "Default [[Prototype]] value derived from realm of the
+      NewTarget."
+    assessment: "observation-train-dynamic-coverage"
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1184,6 +1205,18 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: fixture-construction
+  - path: "test/built-ins/Error/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "743114a2446d45809e360a5e9428961fee5c6a2df1acd4cc\
+      28f6ea01dd1c2212"
+    observationDigest: "5f8d2ba440a7ec6f236f95d28aed0413c7ac3496c39\
+      955a70e9995fdb1bb8c5e"
+    missingDynamicTag: false
+    section: "sec-error-message"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/built-ins/FinalizationRegistry/proto-from-ctor-\
       realm.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -2376,6 +2409,31 @@ paths:
       or "arguments" other than those that are created by applying the
       AddRestrictedFunctionProperties abstract operation to the function.
     assessment: observation-b01-b18-dynamic-source
+  - path: "test/built-ins/Function/call-bind-this-realm-undef.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a67e59e1a132ad25555897e35308b2543c660e9adf4b2e77\
+      360cd3b89703bc7b"
+    observationDigest: "ef68da61b58b7cdf673170caf55498eaad03f01a87b\
+      d308a63d083effed489bb"
+    missingDynamicTag: false
+    section: "sec-ecmascript-function-objects-call-thisargument-arg\
+      umentslist"
+    subject: 'The "this" value is set to the global This value'
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/Function/call-bind-this-realm-value.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "134d4a96da1398b3274dd6f33b6ec571bea0b3b64d9efb20\
+      b9ea5ed567552656"
+    observationDigest: "6a18f0834360b124ea71872ffb4e5582fae91c31e74\
+      c6942a6e93f653fe5db03"
+    missingDynamicTag: false
+    section: "sec-ecmascript-function-objects-call-thisargument-arg\
+      umentslist"
+    subject: 'The "this" value is wrapped in an object using the
+      callee realm'
+    assessment: "observation-train-dynamic-coverage"
   - path: test/built-ins/Function/instance-name.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -2600,6 +2658,32 @@ paths:
     subject: CreateDynamicFunction throws SyntaxError if there is some
       invalid private identifier on its body
     assessment: observation-b01-b18-dynamic-source
+  - path: "test/built-ins/Function/proto-from-ctor-realm-prototype.\
+      js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8f328d34a09b781bf2eda96f435bbf24b0f80df45a82ab85\
+      7009b1a7dbc15bdb"
+    observationDigest: "6178ae7f5fa0b25fd2d8fc24f81ccbe573b83a0887e\
+      b293ab3a184db7486a872"
+    missingDynamicTag: false
+    section: "sec-createdynamicfunction"
+    subject: 'While default [[Prototype]] value derives from realm
+      of the newTarget, "prototype" object inherits from
+      %Object.prototype% of constructor''s realm.'
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/Function/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "61b21ae8b2075a56c336379338f763eac8ba9fa97fcc42b3\
+      161554e2f27363ef"
+    observationDigest: "c9a82ea17c0b45bd3fb17aa9386917a3767485d4409\
+      4545da5f281aa82be4931"
+    missingDynamicTag: false
+    section: "sec-function-p1-p2-pn-body"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
   - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -3558,6 +3642,84 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: fixture-construction
+  - path: "test/built-ins/NativeErrors/EvalError/proto-from-ctor-re\
+      alm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9d9ada2e228c6f939884adda8e576cd862d6596e9b82ede2\
+      360053b92727baae"
+    observationDigest: "b44cf3b591c0f717040f9e265d1c1e4790d47b83b3c\
+      62a240a1230152674a0b6"
+    missingDynamicTag: false
+    section: "sec-nativeerror"
+    subject: "Default [[Prototype]] value derived from realm of the
+      NewTarget."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/NativeErrors/RangeError/proto-from-ctor-r\
+      ealm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "387b0a0f6b6d0e60c77f3c358dac76874353870cfdd06f7f\
+      cb06cddd550545b5"
+    observationDigest: "ab638c266549cc884e3a3befa3ad9d4200eefb1a890\
+      661927ce4ce77db52b160"
+    missingDynamicTag: false
+    section: "sec-nativeerror"
+    subject: "Default [[Prototype]] value derived from realm of the
+      NewTarget."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/NativeErrors/ReferenceError/proto-from-ct\
+      or-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5e954332c37971d990022a76576d8ce7a05decf814af198f\
+      e70e7c845f7e07b4"
+    observationDigest: "b60655400bb1a7e073b80c17e0a10e69ce80ec2c00f\
+      0d32dfada706d79e76fae"
+    missingDynamicTag: false
+    section: "sec-nativeerror"
+    subject: "Default [[Prototype]] value derived from realm of the
+      NewTarget."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/NativeErrors/SyntaxError/proto-from-ctor-\
+      realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9e3dd8bba96fd1d68647db3686dbd37f0ec44286c69c97d6\
+      186f951c50ee045f"
+    observationDigest: "645823d06bffddf8d6de3a023720a6fccc3a1155d77\
+      9834675bcc2f509654ac0"
+    missingDynamicTag: false
+    section: "sec-nativeerror"
+    subject: "Default [[Prototype]] value derived from realm of the
+      NewTarget."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/NativeErrors/TypeError/proto-from-ctor-re\
+      alm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "38cdf364855aad6f4e4ebbb14fffdd0c172d53356fcad61b\
+      5b57e80145645539"
+    observationDigest: "92f08a3c377d4c04e0ac820e5c734afe01e2c3498f0\
+      375289db1866d370ea803"
+    missingDynamicTag: false
+    section: "sec-nativeerror"
+    subject: "Default [[Prototype]] value derived from realm of the
+      NewTarget."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/NativeErrors/URIError/proto-from-ctor-rea\
+      lm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6b611e4c97f8da4f0b777150c84d686a4c991e0ab54cafec\
+      6d00f1f55096006b"
+    observationDigest: "30d319284778d1cfc6d7801b17da707f3f6f0058e27\
+      fbcee76afa262f60eea28"
+    missingDynamicTag: false
+    section: "sec-nativeerror"
+    subject: "Default [[Prototype]] value derived from realm of the
+      NewTarget."
+    assessment: "observation-train-dynamic-coverage"
   - path: test/built-ins/Number/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -3726,6 +3888,84 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: fixture-construction
+  - path: "test/built-ins/Proxy/apply/arguments-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a39fa265434645a951d318fffdd67aa0820cb5a070b1b254\
+      e706417a09ed1bd6"
+    observationDigest: "021e082e376c60ea344df54e60779d20779bfc625c1\
+      cf5cee4d5bb85a1a05297"
+    missingDynamicTag: false
+    section: "sec-proxy-object-internal-methods-and-internal-slots-\
+      call-thisargument-argumentslist"
+    subject: "Arguments array is created in the Realm of the current
+      execution context"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/Proxy/construct/arguments-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "75d84e7604e2e64e2f6bcc46552178a624af71a40e6ad837\
+      c6e111bb934ca15c"
+    observationDigest: "286c2ee77e0b56d8ce24610d6bf8eb56d44fb321bcf\
+      a219c9b691d6616c27b1f"
+    missingDynamicTag: false
+    section: "sec-proxy-object-internal-methods-and-internal-slots-\
+      construct-argumentslist-newtarget"
+    subject: "Arguments array is created in the Realm of the current
+      execution context"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/Proxy/construct/trap-is-undefined-proto-f\
+      rom-cross-realm-newtarget.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "aa57ebb9677301627e0ea93a146f68ae0b1248180d6ed140\
+      dfae75302a7df83d"
+    observationDigest: "e6d38763e0c699e18ea06fe82ce19b38a8c08aa464d\
+      74864f556e79d9125dd11"
+    missingDynamicTag: false
+    section: "sec-proxy-object-internal-methods-and-internal-slots-\
+      construct-argumentslist-newtarget"
+    subject: "If trap is undefined, propagate [[Construct]] to
+      target, passing correct newTarget parameter"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/Proxy/construct/trap-is-undefined-proto-f\
+      rom-newtarget-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "83f20098b154000c81be1e12819e587159d034dbc2e2604d\
+      d0f1a156976ececc"
+    observationDigest: "a69083c4d92d1d23ec03f942f1a0a9fd85b1aa4c5a6\
+      b159964a938e8e39848f4"
+    missingDynamicTag: false
+    section: "sec-proxy-object-internal-methods-and-internal-slots-\
+      construct-argumentslist-newtarget"
+    subject: "If trap is undefined, propagate [[Construct]] to
+      target, passing correct newTarget parameter"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/Proxy/get-fn-realm-recursive.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fb08fbf7b19066b012d3a5feef78f9f077dfc340c8985f10\
+      67f752e10592afc5"
+    observationDigest: "20740990a0c775edd23440b36dec1dfc42787532659\
+      7715357c4de7c9886b1ae"
+    missingDynamicTag: false
+    section: "sec-getfunctionrealm"
+    subject: "The realm of a Proxy exotic object is the realm of its
+      target function. GetFunctionRealm is called recursively."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/Proxy/get-fn-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "476e4df4f17891f95bc31b5e57e4f0b4699ebe1aa80b4d8d\
+      1812a3f203216221"
+    observationDigest: "bd08f62cfc1273037d4b8aaddb865456d72448a2c49\
+      9fc767e28a681e4f60f28"
+    missingDynamicTag: false
+    section: "sec-getfunctionrealm"
+    subject: "The realm of a Proxy exotic object is the realm of its
+      target function."
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/built-ins/Reflect/apply/arguments-list-is-not-a\
       rray-like-but-still-valid.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -4136,6 +4376,136 @@ paths:
       have the same prototypes as those backed by
       fixed-length buffers
     assessment: annex-b-resizable-typed-array-prototype
+  - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/buffe\
+      r-arg/proto-from-ctor-realm-sab.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a3c9d7ecd47568f88ec695345fed597d37014fe473cae7b0\
+      1f3c3af025789588"
+    observationDigest: "562b66b8efa0fb26ccd93e06a06d3739665459986dd\
+      20ad39fa6c75a22c9a9fe"
+    missingDynamicTag: false
+    section: "sec-typedarray-buffer-byteoffset-length"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/buffe\
+      r-arg/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d2a30dea64be202faa9bc5ae9897076bbd7200ba3ae7fc60\
+      348b66fee3bf779e"
+    observationDigest: "43359afdb43dee8e1fbaecb034f302d24f79b9646e2\
+      a936702adb46229e58081"
+    missingDynamicTag: false
+    section: "sec-typedarray-buffer-byteoffset-length"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/lengt\
+      h-arg/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6b6845972b5cc12cbf7877bcd6cbc358f39a634d3d449842\
+      59c2ef94088820bc"
+    observationDigest: "187f8d14da2c22fcff63c18078767fd9ca6dc356cb5\
+      9b65f3cc69efe94c1b2c2"
+    missingDynamicTag: false
+    section: "sec-typedarray-length"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/no-ar\
+      gs/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0fb989081039ec5c63f47df53004275105f0e074ee244a7e\
+      50e10fa7efa293da"
+    observationDigest: "d00aa95725e812018e8ab6b3c2a90d752be6035a960\
+      7cda6198a9610cdcfeadc"
+    missingDynamicTag: false
+    section: "sec-typedarray"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/objec\
+      t-arg/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9c2ae2f7176c5789ecd3f007352fdbbab0e69a8def4c58d0\
+      ce2548da56d3e5f9"
+    observationDigest: "9b3397e4af78776507ae6729d4d424d3bf7c3f9aa5a\
+      cd85c622861ae1dae9e17"
+    missingDynamicTag: false
+    section: "sec-typedarray-object"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors-bigint/typed\
+      array-arg/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8bd0d597b2063440f4e02b7020368292a120b0fc4163e57e\
+      c26452ace27d656e"
+    observationDigest: "5b24f6cea66554faf7d894be5e76b8bb3f80f4853be\
+      326d75e4dbd6265330cd8"
+    missingDynamicTag: false
+    section: "sec-typedarray-typedarray"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors/buffer-arg/p\
+      roto-from-ctor-realm-sab.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7c7af58f5dd63b252756fe4993e7af24297e0d30b92b77e4\
+      3afe96ed6a4ded2f"
+    observationDigest: "822aaf778ff22cbd5bf6a6e8cd5aec7a32537cc8c4f\
+      240b8d581745a83d1c1e8"
+    missingDynamicTag: false
+    section: "sec-typedarray-buffer-byteoffset-length"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors/buffer-arg/p\
+      roto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1236e139b320d3c48a07ecf477f54780441a5cb9def31574\
+      9b03e633b2bafdd9"
+    observationDigest: "b8c49187d5debf8bc9c9204697f67ece97085da2eee\
+      9b00bbe6d3678d01c2782"
+    missingDynamicTag: false
+    section: "sec-typedarray-buffer-byteoffset-length"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors/length-arg/p\
+      roto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "069bf3498401b190e190c9d1bf4d99fae71517d58cebee53\
+      dea12fe21112ffdb"
+    observationDigest: "e434040d9897556deed492a24d339c9b87b01d1e1c0\
+      3e45a57a1e4b57b75f9ab"
+    missingDynamicTag: false
+    section: "sec-typedarray-length"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors/no-args/prot\
+      o-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1e9d738f54c8e472401885de5c2721b5478ca98581c13660\
+      a46319f1b9f1a4d9"
+    observationDigest: "7b8a1879ef7b721100f44e8318e93be656ae4cb9727\
+      1de7b73d3e843b9a5587b"
+    missingDynamicTag: false
+    section: "sec-typedarray"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
   - path: test/built-ins/TypedArrayConstructors/ctors/no-species.js
     proposedOwner: adr:0013-m5-edition-and-manifest
     priorCohort: annex-b
@@ -4148,6 +4518,32 @@ paths:
     subject: TypedArray cloning without ArrayBuffer subclass
       species construction
     assessment: annex-b-typed-array-prototype
+  - path: "test/built-ins/TypedArrayConstructors/ctors/object-arg/p\
+      roto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3cb2d24cfac5ed0869067e74063b5a444632db7c1d603ed6\
+      53232cb7189d1ca6"
+    observationDigest: "2f751757fbbff69a812042bc5da28c894a366e39611\
+      7ee7d0c72372859671c42"
+    missingDynamicTag: false
+    section: "sec-typedarray-object"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/built-ins/TypedArrayConstructors/ctors/typedarray-a\
+      rg/proto-from-ctor-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "15cfe4861a6823ddcac164ba0bdc1beb9fa4407f0749b1bb\
+      9c4d69389f3eb6f1"
+    observationDigest: "3d2428c9d25b0c52851c7ba171f78f49406b132dc16\
+      8eadb8d48663fa7993a5c"
+    missingDynamicTag: false
+    section: "sec-typedarray-typedarray"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget"
+    assessment: "observation-train-dynamic-coverage"
   - path: test/built-ins/WeakMap/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -4387,6 +4783,53 @@ paths:
       eval only compiles each probe source that places one
       code unit in the comment"
     assessment: "fixture-construction"
+  - path: "test/language/comments/hashbang/eval-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5722becf202d160b3dc744566af9a4eedce84789100a3706\
+      876397c320869705"
+    observationDigest: "dba8e4fddc4f7ec08b6bc1a0e6d80fab710d9a1e462\
+      ae8769ecc72f5467639a9"
+    missingDynamicTag: false
+    section: "ECMA-262 Hashbang Comments; PerformEval (Script goal)"
+    subject: "Hashbang comments should be available in Script
+      evaluator contexts. (indirect eval)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/comments/hashbang/eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f836abecfb7637b0fe01133d79f527964ea6e1f1ebce2883\
+      da1463e987d959f2"
+    observationDigest: "0fe473176e9110d828fc179eb5be30ceb7bdc5f3b04\
+      8c2d96ffb00bc3ae51bbc"
+    missingDynamicTag: false
+    section: "ECMA-262 Hashbang Comments; PerformEval (Script goal)"
+    subject: "Hashbang comments should be available in Script
+      evaluator contexts. (direct eval)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/comments/hashbang/function-constructor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7ae57d1047e3fab441abb44cbb8cdad830ee2dff5a048db1\
+      26f64d8868305197"
+    observationDigest: "fb45583f23549ef4721e7940301c4cd2eebea627867\
+      c09b7d5d51885e9873455"
+    missingDynamicTag: false
+    section: "ECMA-262 Hashbang Comments; CreateDynamicFunction"
+    subject: "Hashbang comments should not be allowed in function
+      evaluator contexts."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/comments/hashbang/no-line-separator.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3fe34c780c8b8a7587c59e77961a320be0f1293a11927837\
+      0cbfe119b9dc438b"
+    observationDigest: "9bc60db403ffd627f8c09b8534e85adf8dc089a069f\
+      92029dc2af793bd525c2f"
+    missingDynamicTag: false
+    section: "ECMA-262 Hashbang Comments; PerformEval (Script goal)"
+    subject: "Hashbang comments should not require a newline afterwards"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/comments/mongolian-vowel-separator-sin\
       gle-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -7681,6 +8124,126 @@ paths:
     subject: "Evaluated code honors a Use Strict Directive in the Directive \
       Prologue"
     assessment: "observation-train-b06-b08-b14"
+  - path: "test/language/eval-code/direct/super-call-arrow.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "f8aab2032512c1e22f6ed141a07754a7b0f3d5cd568ca227\
+      5f701a79ce1816b4"
+    observationDigest: "e872862fd8c16d1cdcb310f5acceda8d9a43f9957a8\
+      16b24e5eb5531a56aea08"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "A direct eval in the functon code of an ArrowFunction
+      may not contain SuperCall"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-call-fn.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "514d375663b874b5a685899a039409ac755663af22ce6f99\
+      64c5f13ffb2a7cad"
+    observationDigest: "4ac857707d7e0835cdd933bafd65114ae33c63d21d5\
+      2997ab04b080d8ad3d3f8"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject: "A direct eval in the functon code of a
+      non-ArrowFunction may not contain SuperCall"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-call-method.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "0c44c2c17aeeb1c41639c5841b252752451d77eec35c444e\
+      3142efaf79b14218"
+    observationDigest: "80b3fa8daf6853a330421c46ff99ac91c5901011097\
+      72b88a55776c24dd89088"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject: "SuperCall may may only occur in eval code for direct
+      eval within a constructor method"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-call.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "c869b7b219841caa953d8b1fd55947e9869ff342fcad4aa4\
+      b3621191f60d9cd3"
+    observationDigest: "c5574f24e1e3a785217c6ba91fbe508d93a18c2e46b\
+      507b9bd8f7ed98867280e"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "A direct eval in global code may not contain SuperCall"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-prop-arrow.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "29c39bac7a39dbaa195b122b94915499c9507423ac17dd3f\
+      1d25976b8d97ae10"
+    observationDigest: "5508c4a1997da3da64928831e2c19edc6c6a9049fa6\
+      6a2d80eedaed26e2b68a1"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "A direct eval in the functon code of an ArrowFunction
+      may not contain SuperProperty"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-prop-dot-no-home.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "7e33cd7fd21c1417421835cd07b4c833b20f7422243ee0e3\
+      c9048b82eab171f7"
+    observationDigest: "f74739c1203ce1a09f8214d79246fd84dd768ef9e59\
+      c1ade197607d379220bf2"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject: "SuperProperty may may only occur in eval code for
+      direct eval within a method"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-prop-expr-no-home-n\
+      o-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "50fc0222144738bb36ab8c107441efb77560bbabdd4eb290\
+      654e23eadcdba247"
+    observationDigest: "64b338ee9e0713ded54b0d247a9497de4705635d473\
+      f9a3da9ff6e7cd30fcd6f"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject: 'Expression is not evaluated prior to verification of
+      "super" binding'
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-prop-expr-no-home.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "6d150e6296657a86d53d5cff1b8da78429c856885f03c4d2\
+      9121fb10317e733b"
+    observationDigest: "041c9ce77e623d11c7cde4ce28660c6fa9f946d1859\
+      f000de89881e05c76e5e3"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject: "SuperProperty may may only occur in eval code for
+      direct eval within a method"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-prop-method.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "681dc9a1a2d545b77eea0d557c7c646535633a62b1da1979\
+      4eeccbd3b9dfa8cf"
+    observationDigest: "c9880efbeee8c2264bfb02b619d06d9018ed58bc53f\
+      f015a93048bfe1ef30ca3"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "A direct eval in the functon code of a
+      non-ArrowFunction may contain SuperProperty"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/direct/super-prop.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "37d0126e9ae3bea9d7bdfd6485bbd6caba47d49479fc7bb2\
+      ebce0990f6a9824b"
+    observationDigest: "a092a0247757db3966a6e91ff1824654175ec9793e7\
+      3e66e6d7dc7a802339f06"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "A direct eval in global code may not contain
+      SuperProperty"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/eval-code/direct/switch-case-decl-eval-source-is-stric\
       t-nostrict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -8531,6 +9094,40 @@ paths:
     section: "sec-performeval"
     subject: "For statement"
     assessment: "observation-train-b06-b08-b14"
+  - path: "test/language/eval-code/indirect/realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "045e0e81bbc08bf23b6fe7e51b42187eb791280004d6b6c5\
+      5dc926068d418c06"
+    observationDigest: "25372b9cc51c01f0ff390ac57a34a9965e89851d025\
+      cee75767f1584b85f56f6"
+    missingDynamicTag: false
+    section: "sec-performeval"
+    subject: "Uses the global variable envrionment of the running
+      execution context"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/indirect/super-call.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "4baabff3c6ce8406859b307ce3be9fe749b0de309592752b\
+      1291161bbb63f480"
+    observationDigest: "03f3e0dde17b9e89252225967963d7b20b7160d9b3d\
+      e6986e01fa38e0ec12af8"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "An indirect eval may not contain SuperCall"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/eval-code/indirect/super-prop.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "source-subject"
+    sourceDigest: "5ba3d03202aa5882f062f517b653a4813c0395238af3b43d\
+      6e8eab41d4d06398"
+    observationDigest: "0453ff9bd007a2dad928ea54f60c92c49f411371fe0\
+      7ecfd46b1f805be10eb0b"
+    missingDynamicTag: false
+    section: "sec-scripts-static-semantics-early-errors"
+    subject: "An indirect eval may not contain SuperProperty"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/eval-code/indirect/switch-case-decl-strict.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "source-subject"
@@ -9142,6 +9739,18 @@ paths:
     section: "sec-function-calls-runtime-semantics-evaluation"
     subject: "Error evaluating arguments list for direct eval"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/call/eval-realm-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6d68d9c5a8b02855d5826939693196344f8a1c16c5aafd07\
+      b230f8329d5466c6"
+    observationDigest: "72d7e3781f4b4c7836dca9c037da8bf94cd10f64c6e\
+      e47a33f6f70dbf00abb1f"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: "An eval function from another realm is not a candidate
+      for direct eval"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/call/eval-spread-empty-lea\
       ding.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -9214,6 +9823,19 @@ paths:
     subject: "Evaluated code honors the strictness of the
       calling context"
     assessment: "eval-semantics"
+  - path: "test/language/expressions/call/tco-non-eval-function-dyn\
+      amic.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8d381595908fa414b6aaa027f3386bf922220738e1902b16\
+      037f08f836b1c803"
+    observationDigest: "ff5d08d65b8e9bf28d4badf849dae9a00f30eda9b7c\
+      a3a19c7894993b6ae7a65"
+    missingDynamicTag: false
+    section: "sec-function-calls-runtime-semantics-evaluation"
+    subject: 'Tail-call with identifier named "eval" in function
+      environment, local "eval" binding dynamically added.'
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/elements/arrow-body-\
       derived-cls-direct-eval-contains-superproperty-1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10435,6 +11057,32 @@ paths:
     subject: "Every new evaluation of a class creates a
       different brand (private getter)"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-getter-brand-che\
+      ck-multiple-evaluations-of-class-realm-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9ef04956e6ee1d966b094b18f922fb47e9dd1c1815674d7b\
+      64843a88855acec8"
+    observationDigest: "bb057db4da9810f744f7bbc73f4bda7b977747ccb6e\
+      640c4b7fa3553495a6957"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different
+      brand (private getter)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/class/private-getter-brand-che\
+      ck-multiple-evaluations-of-class-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e26ea0205b994539d6ab8962ef6a54382149dc5d17b4d4c5\
+      e20a6f9c14330eab"
+    observationDigest: "f966acc53ad921fdca23fc94cf0e6ada7fb4a631041\
+      e6ef3768056fda79f1a69"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different
+      brand (private getter)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/private-method-brand\
       -check-multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10474,6 +11122,32 @@ paths:
     subject: "Every new evaluation of a class creates a
       different brand (private method)"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-method-brand-che\
+      ck-multiple-evaluations-of-class-realm-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2991c0719a99cd1a8526ead5011543479538c2cdb93909a9\
+      92ae93d8ac848842"
+    observationDigest: "f0987d84e5f38b9fe8637973fe469572a9c6cb7bb1e\
+      946e6dd3b2a8570e425c4"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different
+      brand (private method)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/class/private-method-brand-che\
+      ck-multiple-evaluations-of-class-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5c2b6e610c1a604ec7d5491352763615ff2140b2a3cd03a2\
+      8264943b0dd7d3e5"
+    observationDigest: "e102cbbd17dac9a19376cc4332c8a0154f35f28115c\
+      ef165fb076cb7926587ef"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different
+      brand (private method)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/private-setter-brand\
       -check-multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10513,6 +11187,32 @@ paths:
     subject: "Every new evaluation of a class creates a
       different brand (private setter)"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-setter-brand-che\
+      ck-multiple-evaluations-of-class-realm-function-ctor.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9da8c19c9bccd644c5030b864a067e4a7fabf1c03412d19a\
+      e8496506f742d6bb"
+    observationDigest: "83519f039d5f067e02b8c3daf4b1caa738b0f07a8df\
+      a015b36c4e6873e0f3781"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different
+      brand (private setter)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/class/private-setter-brand-che\
+      ck-multiple-evaluations-of-class-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "02aad503474478202ff16e078a69454c3939a79da8a96dab\
+      848a2413d2c11596"
+    observationDigest: "b6366736245b34b2f84e53677090c2172734dcfda9b\
+      7dea27f1c67dd550f4c70"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different
+      brand (private setter)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/private-static-field\
       -multiple-evaluations-of-class-direct-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10552,6 +11252,19 @@ paths:
     subject: "Every new evaluation of a class creates a
       different Private Name (private static field)"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-field-mul\
+      tiple-evaluations-of-class-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "57b9dbb85a2cbc4de251fdd765bb6e71614afc7ebe2e28ce\
+      eb4bc41069f19ab3"
+    observationDigest: "617f4ce331149078d67f183c48dc15e543fefbfea31\
+      2f5fae5420e4edf620292"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different
+      Private Name (private static field)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/private-static-gette\
       r-multiple-evaluations-of-class-direct-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10591,6 +11304,19 @@ paths:
     subject: "Every new evaluation of a class creates a
       different Private Name (private static getter)"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-getter-mu\
+      ltiple-evaluations-of-class-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2f0dd490916992582380722d008648eba4b1c7d79fa0a256\
+      14677cddbfdc36e2"
+    observationDigest: "8f94db0fdb975f34521a8bf1b4f009e69f334d4380b\
+      ab7a4367de58132e56033"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different
+      Private Name (private static getter)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/private-static-metho\
       d-brand-check-multiple-evaluations-of-class-direct-ev\
       al.js"
@@ -10633,6 +11359,19 @@ paths:
     subject: "Every new evaluation of a class creates a
       different brand (private static methods)"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-method-br\
+      and-check-multiple-evaluations-of-class-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c2d0931406b32d7258e22b63db724f2dba1b2429757c8b8b\
+      97215b9d99710b96"
+    observationDigest: "225355e99b87df537842766486d9dba592704d0a2f7\
+      b8c1b82c5f9e7b6bc3bb9"
+    missingDynamicTag: false
+    section: "sec-privatefieldget"
+    subject: "Every new evaluation of a class creates a different
+      brand (private static methods)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/private-static-sette\
       r-multiple-evaluations-of-class-direct-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -10672,6 +11411,19 @@ paths:
     subject: "Every new evaluation of a class creates a
       different Private Name (private static setter)"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/class/private-static-setter-mu\
+      ltiple-evaluations-of-class-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "99cddb4e054d586bd9b62850cd8ec0671332bdad8bf607b9\
+      7f45b0bc3531226f"
+    observationDigest: "af113ed73355ae3e4cd78fc4f2f725abcdefb7d04a5\
+      2267484a7076dce9ecd4c"
+    missingDynamicTag: false
+    section: "sec-runtime-semantics-evaluate-name"
+    subject: "Every new evaluation of a class creates a different
+      Private Name (private static setter)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/class/subclass-builtins/su\
       bclass-Function.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11265,6 +12017,19 @@ paths:
     section: "prod-ImportCall"
     subject: "Dynamic Import receives an AssignmentExpression (Identifier)"
     assessment: "import-call-specifier"
+  - path: "test/language/expressions/dynamic-import/assignment-expr\
+      ession/import-meta.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "25a06877484a087cc87a61dd39d71e76791210ede96642b0\
+      2b99dab6da9283b3"
+    observationDigest: "e9ad86ad36e2d37c2a60aee98bacd7346dd72eb8d50\
+      fda44fd96df08c6fda269"
+    missingDynamicTag: false
+    section: "prod-ImportCall"
+    subject: "Dynamic Import receives an AssignmentExpression
+      (ImportMeta)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/assignment-expression/lhs-a\
       ssign-operator-assign-expr.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13097,6 +13862,42 @@ paths:
     subject: "The `in` operator may occur within an exported Assignmen\
       tExpression"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/eval-rqstd-once\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b0ddc2e3390304f469e8e6348c28ee7407a00a62356c9889\
+      fdf9439c8152f881"
+    observationDigest: "f688097e98d5b6dbd988b1f72c81e79c2877292f6b5\
+      3a6d5b73882673d9a4ef0"
+    missingDynamicTag: false
+    section: "sec-moduleevaluation"
+    subject: "Requested modules are evaluated exactly once"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/dynamic-import/eval-self-once-\
+      module.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c2499ec1969ed861b17f2a58bcb5f60db281d82da6580ca1\
+      84f412f7fb65697b"
+    observationDigest: "0a9efa8ca18fa7bba4b5a08ec6c4f780e662f2ec459\
+      d5eb249806ed938f714cd"
+    missingDynamicTag: false
+    section: "sec-moduleevaluation"
+    subject: "Module is evaluated exactly once"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/dynamic-import/eval-self-once-\
+      script.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1ade26b3249019856801749bdb12f555eb7244b2cf82a789\
+      a79ebbbcbd09e2dd"
+    observationDigest: "d746e493238620b8d188459a0e51934dced40a6fd64\
+      1d594e6967295ad7b7b6c"
+    missingDynamicTag: false
+    section: "sec-hostimportmoduledynamically"
+    subject: "Script is evaluated exactly once after loaded by import"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/for-await-resolution-and-er\
       ror-agen-yield.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13547,6 +14348,48 @@ paths:
     subject: "Module namespace objects are not extensible. (value from await
       resolving)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/namespace/await\
+      -ns-get-nested-namespace-dflt-direct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b85ff1673dc5b1406bc322ac752be64cef0898979571382e\
+      e9058f7592b46b90"
+    observationDigest: "8d19cd2bdd3e1c230c0c2050068b27fb7801575ad14\
+      f457b4d46bc61c6c34be8"
+    missingDynamicTag: false
+    section: "sec-finishdynamicimport"
+    subject: "Direct Default exports are included in an imported
+      module namespace object when a namespace object is
+      created. (value from await resolving)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/dynamic-import/namespace/await\
+      -ns-get-nested-namespace-dflt-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ffb5a3791ebc0acfff888ce97285af83a2ebaa64f1e01316\
+      5b8e8abb9fcf5892"
+    observationDigest: "83ca3205b4e89e4d94ac73bd3ad61fe76608b77bcb5\
+      f5e47ce8336a91c43c9d3"
+    missingDynamicTag: false
+    section: "sec-finishdynamicimport"
+    subject: "Inirect Default exports are included in an imported
+      module namespace object when a namespace object is
+      created. (value from await resolving)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/dynamic-import/namespace/await\
+      -ns-get-nested-namespace-props-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2298702b6f05f54df262f687103eb1c72fc7dfd75e878b7c\
+      8f57cda45e32e070"
+    observationDigest: "3084dafb9653f8f5899c7a02917ca90fbcce9852fd6\
+      901ccd64780cf07ae150f"
+    missingDynamicTag: false
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace object reports properties for all
+      ExportEntries of all dependencies. (value from await
+      resolving)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-own-\
       property-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -13952,6 +14795,48 @@ paths:
     subject: "Module namespace objects are not extensible. (value fro\
       m promise then)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/namespace/promi\
+      se-then-ns-get-nested-namespace-dflt-direct.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a6a76d21199a00172ddd1f0f145993bc85c72f1e94e1a7a7\
+      223de83655ef62b2"
+    observationDigest: "8e45a1ca8d333859b2d395d160792b502f11966c32f\
+      4089d546b65c9157cd54a"
+    missingDynamicTag: false
+    section: "sec-finishdynamicimport"
+    subject: "Direct Default exports are included in an imported
+      module namespace object when a namespace object is
+      created. (value from promise then)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/dynamic-import/namespace/promi\
+      se-then-ns-get-nested-namespace-dflt-indirect.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ec7b9753525bd1fe142c61e78999730aa0e548f90d4b68f2\
+      30afa926b0d6a071"
+    observationDigest: "f3d8e44da95966aa2f16322baf7844eeae949eed8d3\
+      2999cdb0574c767d5e4d0"
+    missingDynamicTag: false
+    section: "sec-finishdynamicimport"
+    subject: "Inirect Default exports are included in an imported
+      module namespace object when a namespace object is
+      created. (value from promise then)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/dynamic-import/namespace/promi\
+      se-then-ns-get-nested-namespace-props-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "13468f713992c39346cc6ee887e092e1e93b8e4c35586985\
+      1a160b32fb236465"
+    observationDigest: "11875cf8d3d782d6c0e6b242b3d89c32e1ed4d5f704\
+      619de3ee17f3a7e8f59f5"
+    missingDynamicTag: false
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace object reports properties for all
+      ExportEntries of all dependencies. (value from promise
+      then)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/namespace/promise-then-ns-g\
       et-own-property-str-found-init.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -14251,6 +15136,18 @@ paths:
     subject: "The [[Set]] internal method consistently returns `false`, Strict
       Mode (value from promise then)"
     assessment: "observation-train-dynamic-source"
+  - path: "test/language/expressions/dynamic-import/returns-promise\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "75542f2ad421d38736bbbf438ad6277a1d317e02c33962d4\
+      2c79dc35e2c2fc2a"
+    observationDigest: "008283c6244d20ab6467d93a68f981d0e4990ad5f11\
+      93b220e8305317d2e1175"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "ImportCall returns a promise"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/reuse-namespace-object-from\
       -import.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15731,6 +16628,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested arrow)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-ar\
+      row-assignment-expression-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a5306473292a9e64aca98b3ea0c7dd0c02390114711c1acd\
+      6c7e791041918f9f"
+    observationDigest: "78efab8ad24bbb6c249d93df921f4402c3792559293\
+      57501ddf20485e3f8ec41"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested arrow)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assignme\
       nt-expression-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15794,6 +16705,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested arrow)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-ar\
+      row-import-then-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "b5b616a9ae3f1062bf7cb43dad89632db468b772867cac68\
+      3ad4faf41d38fa90"
+    observationDigest: "7f66f68a81919b85053ae3f8e4589c1320c02c9bffa\
+      7a44adae4c295944b4ab7"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested arrow)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-arrow-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15858,6 +16783,20 @@ paths:
       been evaluated are reflected in local binding (nested in async arrow
       function, awaited)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-as\
+      ync-arrow-function-await-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "391beff946bdebdbfcf818a1990a0325b175fd2cb814ee85\
+      92626344c9a5058e"
+    observationDigest: "e8299ed375d8b67651a86811c381e03f27d30475ed8\
+      c82d7f17de2319f2bf45d"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested in async arrow function, awaited)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15924,6 +16863,21 @@ paths:
       been evaluated are reflected in local binding (nested in async arrow
       function, returned)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-as\
+      ync-arrow-function-return-await-eval-gtbndng-indirect-upd\
+      ate.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fcaeba2d4fa0a77c229cc34a2b9d5672f80e2bb9d3d0edb7\
+      1003f0aaac571435"
+    observationDigest: "ec5af8852abced9f2635bbb5238fb8823b5fa474866\
+      eb44606578ca0d1c010e9"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested in async arrow function, returned)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-arrow-fu\
       nction-return-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -15990,6 +16944,20 @@ paths:
       been evaluated are reflected in local binding (nested in async function,
       awaited)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-as\
+      ync-function-await-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "65a9370ac498901dee8e1c47b55c754bdc372bc148e9e8ff\
+      3cb84a32a64a48e1"
+    observationDigest: "cac460eeee1e29e6ee35c1bd259b738d0086de5c9bb\
+      cfbfa7294fe7591badd80"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested in async function, awaited)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16055,6 +17023,20 @@ paths:
       been evaluated are reflected in local binding (nested in async
       function)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-as\
+      ync-function-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fae80388d419927da213c75b0112609febcb3fb033e9b42a\
+      977b82339c53c2f2"
+    observationDigest: "d7a303be8fb6d18270a789648e44b6e69fc50eaf69f\
+      71648a2b19eb2928d3092"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested in async function)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16095,6 +17077,20 @@ paths:
       been evaluated are reflected in local binding (nested in async function,
       returns awaited)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-as\
+      ync-function-return-await-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c597f91d86f6ba0fd8e77ef2ba72fb1154bf3bcc9b8b7e82\
+      963b1f0ef85cf470"
+    observationDigest: "13147552f465bd71c14dc8a05aae90fc88c15442893\
+      cd7f45f0b9b0d7e818419"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested in async function, returns awaited)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-function\
       -return-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16186,6 +17182,20 @@ paths:
       been evaluated are reflected in local binding (nested in async
       generator, awaited)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-as\
+      ync-gen-await-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "68e4fd6fc6f93ef4417c498d95addc5555ee44d2bd858a89\
+      7a7128b663792e46"
+    observationDigest: "e48fc50366f774cb3d962a8662d675d13baaa529c5d\
+      e4bd34d0cb6923f79df04"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested in async generator, awaited)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-awai\
       t-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16251,6 +17261,20 @@ paths:
       been evaluated are reflected in local binding (nested in async
       generator, returns awaited)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-as\
+      ync-gen-return-await-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "44c0d4998986fcb66ddbef6ea457b2ed205cd74609b941d6\
+      da11c762ee8ac00b"
+    observationDigest: "31a34bc007115439ad5b2eaf609c2b2f00f1d95c5ed\
+      9ee3c92b9dae16271cd19"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested in async generator, returns awaited)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-retu\
       rn-await-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16316,6 +17340,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested block)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-bl\
+      ock-import-then-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6101c6392ae9f0db51643449d289706704c0a40c7027b256\
+      f6c6068489ffe5fb"
+    observationDigest: "edba9b80921ca3f53caabe694ca06411fb48e827222\
+      18a7081d3efc992ae08c2"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested block)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-block-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16379,6 +17417,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested do while syntax)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-do\
+      -while-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bdd16ed959c226e62149f45449e175e8254c5ed3bb8eefee\
+      8cf3bf581352efe9"
+    observationDigest: "ceac0882b0c1642640cf18b1a336d171bdd71fd3892\
+      b8217f06b1401569e9214"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested do while syntax)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-do-while-eval-\
       script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16443,6 +17495,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested else)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-el\
+      se-import-then-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "241406f84ef566474546360fb6a05af8c16e4e0a7f419209\
+      bda10f0f6e1b0f02"
+    observationDigest: "2e99e817e947e891f7bc6f7fb2b4e457327d18e930f\
+      939638deef5c389aae926"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested else)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-else-import-th\
       en-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16506,6 +17572,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested function)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-fu\
+      nction-import-then-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "18a5b4d3b20cd2600f62f888813d9bff85f49ef855db8fd2\
+      ebcd7f69896d483e"
+    observationDigest: "3b138f85ef969f9988a09277890be86c051aca7780c\
+      62503a98483cdeb5f88d9"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested function)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-function-impor\
       t-then-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16569,6 +17649,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested if syntax)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-if\
+      -braceless-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "510397d103996e346146e97e7b5358dc39f72d77dc612737\
+      d686a5d82cbde495"
+    observationDigest: "2069e713a87de6c2f60957d0300db86f263709c9bc6\
+      307fe51f9640b9416cc5b"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested if syntax)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-braceless-e\
       val-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16632,6 +17726,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested if)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-if\
+      -import-then-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0049f0646309d418b6e903e915ca5e50c12d9ffbd96fbff0\
+      c4736221fa1e4a7e"
+    observationDigest: "15891ff19ba19381c797b00e20a128848f06618ae3d\
+      d31de72169cd53fe072c4"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested if)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-if-import-then\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16695,6 +17803,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested while)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/nested-wh\
+      ile-import-then-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4fb0e60deb925e95d863e2e56b87bd18a1e005a21003af0d\
+      f4c300b164246ac3"
+    observationDigest: "3d62062b7ec8aee8cab2989d4678eaeda570505a7f2\
+      773ba49d37a465444db77"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested while)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/nested-while-import-t\
       hen-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16758,6 +17880,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (nested block syntax)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/syntax-ne\
+      sted-block-labeled-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3b3af03c9335e712c76409e351dd58382fa5424d2512d5d6\
+      afdcc0f31de1999a"
+    observationDigest: "c6a1f8db43b9240fa7e84f72be958c3201f161ce782\
+      1a40402158191552e8e0f"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (nested block syntax)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/syntax-nested-block-l\
       abeled-eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -16821,6 +17957,20 @@ paths:
     subject: "Modifications to default binding that occur after dependency has
       been evaluated are reflected in local binding (top level)"
     assessment: "ds2-static-module-semantics"
+  - path: "test/language/expressions/dynamic-import/usage/top-level\
+      -import-then-eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "97daf29ac044e23578dfeae882c2d9e8b3adabdaebe63bfb\
+      0c723da7253b482f"
+    observationDigest: "5bd1c206f25dbd5581bb12451e1ec15fad308b3e064\
+      5fdadee99ddc7feef7a20"
+    missingDynamicTag: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding (top level)"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/dynamic-import/usage/top-level-import-then\
       -eval-script-code-host-resolves-module-code.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17031,6 +18181,20 @@ paths:
     subject: "Variable environments created by sloppy direct
       eval in function parameters"
     assessment: "eval-semantics"
+  - path: "test/language/expressions/generators/eval-body-proto-rea\
+      lm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "7d6320e7ec53e14dc44e685a92fb89685168ce5fb61b96b6\
+      a95652735f6bf5c4"
+    observationDigest: "a253094893d510238029e627d4089aa4d1294dd45ed\
+      ebd4dc71e27b808d5c095"
+    missingDynamicTag: false
+    section: "sec-generator-function-definitions-runtime-semantics-\
+      evaluatebody"
+    subject: "Default [[Prototype]] value derived from realm of the
+      generator function"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/generators/eval-var-scope-\
       syntax-err.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -17180,6 +18344,75 @@ paths:
       grouping operator; every check compiles a source
       string with eval"
     assessment: "fixture-construction"
+  - path: "test/language/expressions/import.meta/not-accessible-fro\
+      m-direct-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "211f92e37e1c87e80e68a289b00efa9f4e8369e5bd8ecb6d\
+      f799d744009b0a43"
+    observationDigest: "583a81c7c0739347e4d125dffc006149a8b4a2f408e\
+      ea0ed3b8e4a5a210eafc9"
+    missingDynamicTag: false
+    section: "sec-left-hand-side-expressions-static-semantics-early\
+      -errors"
+    subject: "import.meta is not allowed in direct eval in module code."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/import.meta/syntax/goal-async-\
+      function-params-or-body.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cbe2b1c3d4517a3990bd56a420cb7125195adda746591a54\
+      4e8b4a82a71e27a0"
+    observationDigest: "9cd0ea1dc81265cbe5b44d09a03425a79515e28f2f8\
+      30e27d20f7260fcf04805"
+    missingDynamicTag: false
+    section: "sec-left-hand-side-expressions-static-semantics-early\
+      -errors"
+    subject: "An Syntax Error is thrown when the syntactic goal
+      symbol is AsyncFunctionBody or FormalParameters."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/import.meta/syntax/goal-async-\
+      generator-params-or-body.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c89ed59d66c4c85396d1da2fa9c0f3d34f6392dd296226c2\
+      8f58ce32521ddea6"
+    observationDigest: "4a12eb7c1e44ea2db3cd3e2dd5fcbd8f6ba6aff3f2e\
+      b6e8855114fee100b59ca"
+    missingDynamicTag: false
+    section: "sec-left-hand-side-expressions-static-semantics-early\
+      -errors"
+    subject: "An Syntax Error is thrown when the syntactic goal
+      symbol is AsyncGeneratorBody or FormalParameters."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/import.meta/syntax/goal-functi\
+      on-params-or-body.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0f0f10d06669f27d6fa67c55415952d892e82cf7037c79f0\
+      b74a755289f17bbb"
+    observationDigest: "86082794f1f44a5258391916668572aec4563fec85a\
+      df2406b1edd5ec1bd749c"
+    missingDynamicTag: false
+    section: "sec-left-hand-side-expressions-static-semantics-early\
+      -errors"
+    subject: "An Syntax Error is thrown when the syntactic goal
+      symbol is FunctionBody or FormalParameters."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/expressions/import.meta/syntax/goal-genera\
+      tor-params-or-body.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0a24c4839d48c07a64e6c8cb0dfc9d7747d4cc5542c691bd\
+      559abc227de07f53"
+    observationDigest: "f45353a7df777bb8d4d31e1b1561cc1e6d7cf92a772\
+      5f177a9f465e7164d2558"
+    missingDynamicTag: false
+    section: "sec-left-hand-side-expressions-static-semantics-early\
+      -errors"
+    subject: "An Syntax Error is thrown when the syntactic goal
+      symbol is GeneratorBody or FormalParameters."
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/in/S11.8.7_A1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -18025,6 +19258,18 @@ paths:
     subject: Value of reference returned by SuperProperty (from
       eval code)
     assessment: eval-semantics
+  - path: "test/language/expressions/super/realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1f0182259cfcaa55eaaf5a37f84ff5da9192bb4cdafeee68\
+      e8816530ce75ddef"
+    observationDigest: "521908ffc721a6425cd86b59a58739586c0734951be\
+      5a4cb0d4d54388cc7878f"
+    missingDynamicTag: false
+    section: "sec-super-keyword"
+    subject: "Default [[Prototype]] value derived from realm of the
+      newTarget value"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/expressions/tagged-template/cache-diff\
       ering-expressions-eval.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -19084,6 +20329,18 @@ paths:
     section: "prod-GroupSpecifier"
     subject: "Lone surrogates in RegExp group names"
     assessment: ds3-literal-coverage
+  - path: "test/language/literals/string/line-separator-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a2494eca0cbcd90cf8c17581e03ebec75e41dcaa5fceaa82\
+      66c8f1fae32c7f0f"
+    observationDigest: "86bc1eff8b52a1430983f1945cb76711384ff892f0e\
+      f8afab952af1613faa884"
+    missingDynamicTag: false
+    section: "sec-literals-string-literals"
+    subject: "U+2028 LINE SEPARATOR can appear in string literals
+      (eval code)."
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/literals/string/mongolian-vowel-separator-eval.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"
@@ -19096,6 +20353,79 @@ paths:
     subject: "Mongolian Vowel Separator can appear in string literals \
       (eval code)."
     assessment: ds3-u180e-string
+  - path: "test/language/literals/string/paragraph-separator-eval.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "afe313499d8604099e935405bd41b616fdc0e1824075fc0a\
+      a0f09afa2d5b0633"
+    observationDigest: "50168aea98c22b2b430c3849e5f18652c24298f6d89\
+      193a5bc7c029a0ad114be"
+    missingDynamicTag: false
+    section: "sec-literals-string-literals"
+    subject: "U+2029 PARAGRAPH SEPARATOR can appear in string
+      literals (eval code)."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/module-code/eval-gtbndng-indirect-update-a\
+      s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "531a6d88591198d2c6d8ca9151a675b17b1259c150bfd0b2\
+      4a9b5208799fcb52"
+    observationDigest: "1b0cfd72ca1aee00952e3a9aecaa2d867c356682fb9\
+      86e73743187826a10eced"
+    missingDynamicTag: false
+    section: "sec-moduleevaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/module-code/eval-gtbndng-indirect-update.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2e382b6cef4a65f3c1b58ed7a21f9311b2627e7980b41080\
+      5d1018b714d4b5b6"
+    observationDigest: "80132e1e0c52cb94d05faebdc2b50614ac25d7ee062\
+      42176f57fce21f603a8de"
+    missingDynamicTag: false
+    section: "sec-moduleevaluation"
+    subject: "Modifications to named bindings that occur after
+      dependency has been evaluated are reflected in local
+      binding"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/module-code/eval-rqstd-once.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "882ed0917cb6f3e51819d3df04b339fa3bedc5066f82e096\
+      a5caccee46b02ae6"
+    observationDigest: "4130d9c804a1a4ce7b7582f477a150489156867a502\
+      2d90b5df0a5642190d04b"
+    missingDynamicTag: false
+    section: "sec-moduleevaluation"
+    subject: "Requested modules are evaluated exactly once"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/module-code/eval-rqstd-order.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6bc5fcbee5e8c6c9315ac71d6b88b47ff0b0c826a0f44305\
+      37130d64fd70f5e6"
+    observationDigest: "a454c29906d6b90c8481a17f35894e2a7d44a5d3220\
+      d1b77dffe7be42e86fbd9"
+    missingDynamicTag: false
+    section: "sec-moduleevaluation"
+    subject: "Requested modules are evaluated prior to the
+      requesting module in source code order"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/module-code/instn-same-global.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "564f38753491b84941656868c73ce342c2111fc9b29ed7b6\
+      81ee9732f4e5cbce"
+    observationDigest: "266613de38ee64f4e753b96b1dbcdc9296a0539b976\
+      7d09ee28b759e917a8772"
+    missingDynamicTag: false
+    section: "sec-moduledeclarationinstantiation"
+    subject: "Modules share the same global `this` value"
+    assessment: "observation-train-dynamic-coverage"
   - path: "test/language/module-code/top-level-await/await-dynamic-import-rejec\
       tion.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19781,6 +21111,212 @@ paths:
     subject: error if `arguments` in StatementList of eval
       (direct eval)
     assessment: eval-semantics
+  - path: "test/language/statements/class/subclass-builtins/subclas\
+      s-Function.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e1388907a63526c117b728443656348ee9326ddb3fccea54\
+      51bc083191ce3ddf"
+    observationDigest: "bdf29ea2103435c6059294976874a562416a5bdb147\
+      28a528e1983de527f7e84"
+    missingDynamicTag: false
+    section: "ECMA-262 Function constructor and
+      ClassDefinitionEvaluation"
+    subject: "new SubFunction() instanceof Function (Subclass
+      instanceof Heritage)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      Function/instance-length.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "86a518c72cbbec7393ef4ce5e66c2b37076aa41d2a0061ab\
+      33701c7ec032f484"
+    observationDigest: "1fead4a39e58204918a8fb129c077878f420860f708\
+      daf80973bf6155c7875ef"
+    missingDynamicTag: false
+    section: "19.2.4.1"
+    subject: "Subclassed Function instances has length and name
+      properties"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      Function/instance-name.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "95b5db396dd732ef83676a57ac33953bd15ddb6f504f80c4\
+      60ffb3eea765c9a9"
+    observationDigest: "963be16e1a519adcb89eae8a81d42ce8d0cca0773e0\
+      34dc7fac739c10857a331"
+    missingDynamicTag: false
+    section: "19.2.4.2"
+    subject: "Subclassed Function instances has length and name
+      properties"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      Function/regular-subclassing.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0a2ba98fc9d78c1e8a7ddbe1725828403275ef5844ecc780\
+      1d7513fc9a2e966f"
+    observationDigest: "628235e3152722d373cfce9a2052f6a6c4de7f18e3c\
+      23e0cf13baea9e80503bd"
+    missingDynamicTag: false
+    section: "19.2.1"
+    subject: "Subclassing Function"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      Function/super-must-be-called.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ae099a1bc300ad9c6c70ebd15aa633d2b16ae6dc176cbf4c\
+      e17e75cc99bfbe53"
+    observationDigest: "a6ccac319aa01f1d27fa786ca9b53586e3f499107ac\
+      c1cdc4e1008b4dd51227a"
+    missingDynamicTag: false
+    section: "19.2.1"
+    subject: "super must be called to initialize Function internal
+      slots"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      GeneratorFunction/instance-length.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ea432b0c4d335318c5b97422a819f9e79f9ed72debf43238\
+      b6df40f393db395c"
+    observationDigest: "f66a27c54caa2be659c202f8f2489f0c69c16c3e9fc\
+      ea04a4a937b2cad40117f"
+    missingDynamicTag: false
+    section: "25.2.4.1"
+    subject: "Subclassed GeneratorFunction instances `length` property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      GeneratorFunction/instance-name.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9b3c1ac19e3296873f91917a8a1d4a4cb670aff374ed3402\
+      14768ccb06e0bbf7"
+    observationDigest: "f9aac1f02736a7b84be7258c37fc3f5c88d2572a0d4\
+      b3ca621158a510504e3a5"
+    missingDynamicTag: false
+    section: "25.2.4.2"
+    subject: "Subclassed GeneratorFunction instances `name` property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      GeneratorFunction/instance-prototype.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a14c27fdc0e712b4f7cd28b6e59d142c96195c524d278fb7\
+      88b70cc6f421cf46"
+    observationDigest: "326fad4b1d5674803d07b21918d9fe3a41b103eb6cd\
+      71e22b351aa5239757282"
+    missingDynamicTag: false
+    section: "25.2.4.3"
+    subject: "Subclassed GeneratorFunction instances `prototype`
+      property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      GeneratorFunction/regular-subclassing.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "20396554e49ca18f053ab2e1a4ecedf45f329bd0d073c191\
+      43e68197a22f9b74"
+    observationDigest: "b3709dfb558c51358112389d1971a6ad726e4d01a1f\
+      e4e3c81465bc55a1b5567"
+    missingDynamicTag: false
+    section: "25.2.1"
+    subject: "Subclassing GeneratorFunction"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/class/subclass/builtin-objects/\
+      GeneratorFunction/super-must-be-called.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "757446c1931cb4a2c6d76a57a79b9e4646e42815ba08de05\
+      a0e3b3104b92dba0"
+    observationDigest: "e7f5862e882c0ba837c7786da061fd5ed67bbb7a3b7\
+      43e6196b9bde933813361"
+    missingDynamicTag: false
+    section: "25.2.1"
+    subject: "super must be called to initialize GeneratorFunction
+      internal slots"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/const/cptn-value.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "eb73132a2020ec248079749891dd5b0940dcb3e442cc66f5\
+      7c3650422f31b58c"
+    observationDigest: "6f4f49caef611130bb3aca21cfb483e93e68f8f4322\
+      740d389f6c3f7f4a47750"
+    missingDynamicTag: false
+    section: "sec-let-and-const-declarations-runtime-semantics-eval\
+      uation"
+    subject: "Returns an empty completion"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/continue/S12.7_A7.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "4cc9ad8804129d5579ca16e0a1e83c3f15e6847d8d153e9c\
+      d71f0f28ddfef6bc"
+    observationDigest: "8c0ff0e82dfe0c01a3e386211cb75684099830340ae\
+      6afdb3e6a81348693d35b"
+    missingDynamicTag: false
+    section: "12.7_A7"
+    subject: 'Using eval "eval("continue LABEL1")"'
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/do-while/S12.6.1_A3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "e23804c6df0d6594a524123c65cf799a297b40acf71abc5a\
+      36229836ab476418"
+    observationDigest: "872ed496a949d840dd2ad10c9e6ec840bff78995e22\
+      4def3f80bf74bf31b70e8"
+    missingDynamicTag: false
+    section: "12.6.1_A3"
+    subject: 'Using eval "eval("do __in__do=1; while (false)")"'
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/do-while/S12.6.1_A5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d34a8c38396e06a9d0aed59c436e99478b4376f8fba23635\
+      6cb6f2a120339052"
+    observationDigest: "eaf10c20aa0eb581f39cfd21c818ef00e62c7c17a80\
+      a1d4f40d5619a9ddb74a5"
+    missingDynamicTag: false
+    section: "12.6.1_A5"
+    subject: "Using eval"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/do-while/S12.6.1_A7.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2ab0333dc6f0d4d019a1ff7038a902f45a4fdb6a77e958fc\
+      33a62952d96abd77"
+    observationDigest: "3f473d0b1015e0e7387e2125eed0730915936f67503\
+      4db053f9977246f60b0ac"
+    missingDynamicTag: false
+    section: "12.6.1_A7"
+    subject: "Using eval"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/do-while/S12.6.1_A8.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a27c30e78884600a30e0577caa65bc70953c8263a96f58de\
+      2762a0dafd19f0ec"
+    observationDigest: "53877a44e6ccd0489c5a622049abbb2083a83c37a22\
+      70ee3b56e89209907a68f"
+    missingDynamicTag: false
+    section: "12.6.1_A8"
+    subject: "Using eval"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/do-while/cptn-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bd8f5f2fa06db42a4c526c9131c4b25447d1811887e82705\
+      1501d1511012017e"
+    observationDigest: "57136946083d7d76ecd47e5ede2c51591a915c816a9\
+      e4d58b616622385bf7112"
+    missingDynamicTag: false
+    section: "13.7.2.6"
+    subject: "Completion value when iteration completes due to an
+      empty abrupt completion"
+    assessment: "observation-train-dynamic-coverage"
   - path: test/language/statements/do-while/cptn-normal.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19793,6 +21329,39 @@ paths:
     subject: Completion value when iteration completes due to
       expression value
     assessment: completion-observation
+  - path: "test/language/statements/empty/cptn-value.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bc81e54969488d71d24e41054e780cc3b9ae5a9072d62625\
+      3245ecf582866396"
+    observationDigest: "015124a75d89b4f4917a212afae0c8dab352f5b49b3\
+      585180ee58cf8938713c8"
+    missingDynamicTag: false
+    section: "sec-empty-statement-runtime-semantics-evaluation"
+    subject: "Returns an empty completion"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/expression/S12.4_A2_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "c1bbd528803650683ead06fc50ef365f7408d116f6e7424c\
+      714ea1dd0e446e8a"
+    observationDigest: "2ade13b33f31795a94f76fd69703394b832d4befaee\
+      50e44f0b6cbfb5537d0b2"
+    missingDynamicTag: false
+    section: "12.4_A2_T1"
+    subject: 'Checking by using eval "(eval("x+1+x==1"))"'
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/expression/S12.4_A2_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "ca53c4ffffa102e965939820c3bcf51920e9e0160761742e\
+      77abe5edc7a54b84"
+    observationDigest: "46d2c1f10f232d844e98e4fb51dd5775b430d9f6387\
+      185620603943e62e3fdee"
+    missingDynamicTag: false
+    section: "12.4_A2_T2"
+    subject: "Checking by using eval(eval(x), where x is any string)"
+    assessment: "observation-train-dynamic-coverage"
   - path: test/language/statements/for-in/S12.6.4_A3.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -19962,3 +21531,498 @@ paths:
     subject: Retainment of existing variable environment for
       `catch` parameter
     assessment: variable-environment
+  - path: "test/language/statements/with/12.10.1-10-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "dd423d69db2feb4f75d26f5184444afe028dfac97e16b0a2\
+      79f7081a01b85916"
+    observationDigest: "d2ececbe7fe5e87c0460aca65b4efdce1198382deb8\
+      ade60a01b713adaaf7838"
+    missingDynamicTag: false
+    section: "12.10.1-10-s"
+    subject: "with statement in strict mode throws SyntaxError
+      (eval, where the container function is strict)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/12.10.1-12-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "bd6e41a05fc5e8f7e209710e292b5c7ab0dec48f8f3c0a64\
+      869e597397706744"
+    observationDigest: "231b3c2f21ff523a97e4182d2756ae97d98df39006f\
+      59c257808a8bd67cbd643"
+    missingDynamicTag: false
+    section: "12.10.1-12-s"
+    subject: "with statement in strict mode throws SyntaxError
+      (strict eval)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/12.10.1-4-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9bf81a852697a3871dfda0ea56af407694b4bede3148e325\
+      30473acdb664674d"
+    observationDigest: "6ddbef0972994ea5a45aa1f26f036c82906680fd31a\
+      c0a0389b554fd1d43eb5a"
+    missingDynamicTag: false
+    section: "12.10.1-4-s"
+    subject: "with statement in strict mode throws SyntaxError
+      (strict Function)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/12.10.1-5-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8f1deffa657d1f507ae25f2e9fb7e361339abdfef901763c\
+      34e4a196d8ce2f26"
+    observationDigest: "e8e1b2edd6d30278e723b3bc8770ad4c46c7402bdac\
+      6a5727843c02623ae7b23"
+    missingDynamicTag: false
+    section: "12.10.1-5-s"
+    subject: "with statement allowed in nested Function even if its
+      container Function is strict)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/12.10.1-8-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a07b0fcff0dcc7b70bec0dd16e71e6a00b089bfab44dccab\
+      2a47169ca581302e"
+    observationDigest: "7ff5e0663ed8028386ab25a3ca4a47256cd63d7c2c0\
+      f44d04347b201862d59d7"
+    missingDynamicTag: false
+    section: "12.10.1-8-s"
+    subject: "with statement in strict mode throws SyntaxError
+      (function expression, where the container Function is
+      strict)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A4_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f07e55089148aba7b2541d25d599600fc989a82278e92a7f\
+      38934f70109321df"
+    observationDigest: "6aceac5ee6ff67b6acf061b85c13655df0ed6d55f35\
+      4b99281740887c51f654d"
+    missingDynamicTag: false
+    section: "12.10_A4_T1"
+    subject: "Changing string property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A4_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1128b53b7e6e8b2145258eed8f6b0584b5c0df6264b9d264\
+      2a8be402ad1f07c0"
+    observationDigest: "f85f89923b4f47105cb3a3ab412c2481c189351bb16\
+      5c2fdc27d80f79853bdc0"
+    missingDynamicTag: false
+    section: "12.10_A4_T2"
+    subject: "Changing number property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A4_T3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "52d7e70fb92e08b6de70a08d6bf9bf238465581f837f3b01\
+      413c84f8d0e921c6"
+    observationDigest: "f2021fb3847655025f627c9bf58f9775d6405ef7212\
+      c34864514579451ae174b"
+    missingDynamicTag: false
+    section: "12.10_A4_T3"
+    subject: "Changing boolean property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A4_T4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "91a1a373808469f70f75b31530436897078d86ff24d95cb4\
+      1c905f6bc48fa664"
+    observationDigest: "6fad89ddb20df490df0ec15c262cc29f9cb30262591\
+      3e17b4e66b037636946df"
+    missingDynamicTag: false
+    section: "12.10_A4_T4"
+    subject: "Changing object property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A4_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5251ccf103df24f3e0d7b244ce0ffbcc716389298bcc3bfa\
+      5439019e49820475"
+    observationDigest: "acfdb456ffcff1ddbb539dc34fddff998064033567b\
+      9ea44b6b2d21f85e29c56"
+    missingDynamicTag: false
+    section: "12.10_A4_T5"
+    subject: "Changing array property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A4_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "a6191b5cce16ed6eef84464dcff1fab3636ac79598b806d3\
+      995360742b010949"
+    observationDigest: "7e29bc59f81c0bb93c711b1b9dc0fef06822fcd1585\
+      b7f02c5abfa798fc181f6"
+    missingDynamicTag: false
+    section: "12.10_A4_T6"
+    subject: "Changing function property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A5_T1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cefd7f41f238078757ca81c7b400bd0c325c9a443a0f9b47\
+      916535885510284d"
+    observationDigest: "34886f9b3dd0820ee99648fde83b5952d084933aa83\
+      9f9f712b56bc9e5f92b40"
+    missingDynamicTag: false
+    section: "12.10_A5_T1"
+    subject: "Deleting string property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A5_T2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3b34235404b72a9296c9597bfe1647308d909859ebf8402c\
+      8d2e254ab627c763"
+    observationDigest: "cd7795147272c9971aca377a50006b856c25a9b7cf5\
+      3dcc03183ee6e61ffafa6"
+    missingDynamicTag: false
+    section: "12.10_A5_T2"
+    subject: "Deleting number property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A5_T3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8a5c40a0f5283a55a556aeae785a639555212ca1ab6c7b10\
+      5cb8bcce42da07c2"
+    observationDigest: "cd92d26edadc744bd268351b911f52baf196ea2bcbe\
+      7979bf5a18f1dffe0fc90"
+    missingDynamicTag: false
+    section: "12.10_A5_T3"
+    subject: "Deleting boolean property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A5_T4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fef4784ba9eaaafbb90ecb98bfff68545becff04257ac0f4\
+      011a9cc0ac267c52"
+    observationDigest: "b43e00d2a4096db3f95a62c42c0b554264cc3fb25ab\
+      8d455db8da0d48513e90d"
+    missingDynamicTag: false
+    section: "12.10_A5_T4"
+    subject: "Deleting object property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A5_T5.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "9e184ed563e673dfdf5fedd5f0d6a236699d8e5cb2b732c0\
+      691fafc676b7cad3"
+    observationDigest: "47fb60c1f00e5811cab6ea63fbace049a716fbcaa8e\
+      a5932240d0a07e419e0de"
+    missingDynamicTag: false
+    section: "12.10_A5_T5"
+    subject: "Deleting array property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/S12.10_A5_T6.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cbcacfeaffeed1292b23bf6d571c1c1ae011fe76d120ac15\
+      3cc74ff1c8d835de"
+    observationDigest: "50e870d42f3ad3a4c3c8109686986b252f5fc90a84a\
+      5d948976c6aff35e76ccf"
+    missingDynamicTag: false
+    section: "12.10_A5_T6"
+    subject: "Deleting function property"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/cptn-abrupt-empty.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "70306dbbbc2f57a3b104c7c039e16e9f64491461c9c8a282\
+      a6d2213690c6f804"
+    observationDigest: "cd275241957db5e193e762dc54b4baf43b9ed3f585b\
+      d01128fbec693ff33b47b"
+    missingDynamicTag: false
+    section: "sec-with-statement-runtime-semantics-evaluation"
+    subject: "Statement completion value when body returns an empty
+      abrupt completion"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/cptn-nrml.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "331dcede2fe28dc88e7c44cf0e1fb4dd63f6276c2366335b\
+      9c0d21d1a2dde4f7"
+    observationDigest: "12c41b6b66b46147db1773338e83c0ebb78efe9d200\
+      d66083d7cbb32ff91a968"
+    missingDynamicTag: false
+    section: "13.11.7"
+    subject: "Statement completion value when body returns a normal
+      completion"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/statements/with/scope-var-open.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "59ed9f1509259ae4296f32a82dfaef31d1d05b9db449bec9\
+      253b19ca16f80e2c"
+    observationDigest: "7477223cd0f0816484fda5b1ac31e1a556e7102e0d0\
+      1d3d3cb58ee1aa718dc3a"
+    missingDynamicTag: false
+    section: "sec-with-statement-runtime-semantics-evaluation"
+    subject: "Creation of new variable environment"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/types/reference/8.7.2-1-s.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "560bd5efe4a1a9eb22fd5976bbfc726594b380444967adba\
+      0e2ae73eadcaa71c"
+    observationDigest: "466448dc5a994fa20d8dcd1661e84e30601edf7424b\
+      e46c4e6c8bd7c9fb903fe"
+    missingDynamicTag: false
+    section: "8.7.2-1-s"
+    subject: "Strict Mode - ReferenceError is thrown if LeftHandSide
+      evaluates to an unresolvable Reference"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/types/reference/get-value-prop-base-primit\
+      ive-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "f962247e8a0fc941e6d8e10c88bbc9e2077038c2b3e69945\
+      e12bddd92c4f33dd"
+    observationDigest: "41a5263b9ae47d40918a8afe058ac2c1730930f4f86\
+      87ceb089c4d8a0cf507f4"
+    missingDynamicTag: false
+    section: "sec-getvalue"
+    subject: "When the base of a property reference is primitive, it
+      is coerced to an object during value retrieval (honoring
+      the realm of the current execution context)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/types/reference/put-value-prop-base-primit\
+      ive-realm.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6004b7450e2b115370c2dbe711cd8bf9c566643ca8111cd9\
+      871b356d84caae6b"
+    observationDigest: "e894f8fc7fc8352826542c2013757c3bef01349a6b1\
+      a5e7a25c21c6d819efb4b"
+    missingDynamicTag: false
+    section: "sec-putvalue"
+    subject: "When the base of a property reference is primitive, it
+      is coerced to an object during value assignment (honoring
+      the realm of the current execution context)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/types/string/S8.4_A7.1.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "228dd9e2129e52f8108cb55eead776c44d61170777d113b5\
+      4ed2c01050fdfc63"
+    observationDigest: "0c4b75ce4738877e356778255f9192ae63b61325142\
+      7f2662becd10d1c6d3b5d"
+    missingDynamicTag: false
+    section: "sec-line-terminators"
+    subject: "Line terminator <LF> may appear as an escape sequence
+      within a StringLiteral"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/types/string/S8.4_A7.2.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "399b5687918d6a12ea7ec742618aaf2f48c1086e1866eb45\
+      6d67f63ba0ca5558"
+    observationDigest: "530bd27bd1673fd0c1e9570a93114f0dc9324d1db9a\
+      1823ab8517f6187d5e3c2"
+    missingDynamicTag: false
+    section: "sec-line-terminators"
+    subject: "Line terminator <CR> may appear as an escape sequence
+      within a StringLiteral"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/types/string/S8.4_A7.3.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3a02ff865aa86e284f730b4c2881e0a7202133768955d6b2\
+      6fd0dc818398fc78"
+    observationDigest: "474362d876b96804b8cc73a9d6ebccc2deb0c1d061b\
+      554f500ab6c911e51efb5"
+    missingDynamicTag: false
+    section: "sec-line-terminators"
+    subject: "Line terminator <PS> may appear as an escape sequence
+      within a StringLiteral"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/types/string/S8.4_A7.4.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "d02a352fca50b66152b6d05e70d2c8b8d41461d5ed72edb2\
+      1dd0053edeb9f408"
+    observationDigest: "f5dbe3d347e96a406d7328eceebe60515f5ec423675\
+      2344a7b439eaad61fde32"
+    missingDynamicTag: false
+    section: "sec-line-terminators"
+    subject: "Line terminator <LS> may appear as an escape sequence
+      within a StringLiteral"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-multi-form-feed.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "420e368f4de8d2a078bfab75f9a116c75ea7619217de87d1\
+      75c498b2e5a31574"
+    observationDigest: "7376c3b17450adf1e4ba7825b1524b45aa834f467f1\
+      74b8ae51d7d5df4ce2b15"
+    missingDynamicTag: false
+    section: "7.2_A4.3_T1"
+    subject: "Use FORM FEED(\\u000C)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-multi-horizontal-tab.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8417e76ae3eb0309f81c083cef9e8b7571a6adc631200ef5\
+      084e0ae1e397e8de"
+    observationDigest: "acdd1d22c83ba73f359187bcf5f6e32759b94fb14a0\
+      6d1bedbc49c81ee6c8a0d"
+    missingDynamicTag: false
+    section: "7.2_A4.1_T1"
+    subject: "Use HORIZONTAL TAB(\\u0009)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-multi-nbsp.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fbc163402c77510e4e93059dee45612c8a63fe23000c93f7\
+      0a4ff631e49c2ca9"
+    observationDigest: "cbae9fbf18e99d8d1df02c7cfa25d88e5357e71f323\
+      d4103ca760ed46cea697c"
+    missingDynamicTag: false
+    section: "7.2_A4.5_T1"
+    subject: "Use NO-BREAK SPACE(\\u00A0)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-multi-space.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "cbe251e575e9ec40dd676d90563bb5931f97790bad8317f4\
+      136ec190c71de8c9"
+    observationDigest: "6889315d58916c80fbc168c3ce93f931d6dbedf20cf\
+      1c6af0a847ca59ba048b8"
+    missingDynamicTag: false
+    section: "7.2_A4.4_T1"
+    subject: "Use SPACE(\\u0020)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-multi-vertical-tab.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "5ff4ad7875170827da5bf0b036a57e3ac734a727b98a4821\
+      b3cca737d4456afa"
+    observationDigest: "26073b4378e76876035b970e7eb4367d59416b8ccbb\
+      7d2efe10dd84c05fc686d"
+    missingDynamicTag: false
+    section: "7.2_A4.2_T1"
+    subject: "Use VERTICAL TAB(\\u000B)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-single-form-feed.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fc1c31b680e9d4ce541529889df793f73bb0b9565c2c41f2\
+      284dba1e12aa6352"
+    observationDigest: "fd358a76d0599587b460f33c1d668db121420fc6014\
+      6bfe45dbdea505fe0c092"
+    missingDynamicTag: false
+    section: "7.2_A3.3_T1"
+    subject: "Use FORM FEED(\\u000C)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-single-horizontal-tab.\
+      js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "0b13a46486136d8b62efaeb5682c60cfedd98f4fe4d2c43a\
+      29b8477eefc63d5d"
+    observationDigest: "1b8ff93524d367c115a157e18167cf5c1f74dfa9220\
+      b4064000f61ff428ccb2c"
+    missingDynamicTag: false
+    section: "7.2_A3.1_T1"
+    subject: "Use HORIZONTAL TAB(\\u0009)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-single-nbsp.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "655ff14f674bcd61d01eb83e761c721151c88162d0746612\
+      5c45842832fa22d6"
+    observationDigest: "ae409e8653416a713d6b0a9888e49981d6c89d1cff5\
+      3cbbcfc52a48e8b1b0168"
+    missingDynamicTag: false
+    section: "7.2_A3.5_T1"
+    subject: "Use NO-BREAK SPACE(\\u00A0)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-single-space.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "1223c178c4408b329e0782103dff0eb66b46fe67d548546c\
+      4d86131d0621af0a"
+    observationDigest: "e0709aced97107d1d110c522ee764e93ca52da835c2\
+      a172d6c3214e720c2f358"
+    missingDynamicTag: false
+    section: "7.2_A3.4_T1"
+    subject: "Use SPACE(\\u0020)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/comment-single-vertical-tab.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "fb59b9ca2642c20924308661b7b22953da55fe51deffe31f\
+      d7a24a137159a3c7"
+    observationDigest: "c48be0a219acf035a6a46881c60c32b7396bd5f6cd5\
+      2a7dd8db409d521574f0f"
+    missingDynamicTag: false
+    section: "7.2_A3.2_T1"
+    subject: "Use VERTICAL TAB(\\u000B)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/mongolian-vowel-separator-eval\
+      .js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "6b2139d618919e96d0b9fdee14b451136fef101cfe967a3e\
+      31c99a3385d14ac6"
+    observationDigest: "5f85a993bb53ea525307560d86a145cb20864b2bd0f\
+      8e598234480b7a770a15a"
+    missingDynamicTag: false
+    section: "sec-white-space"
+    subject: "Mongolian Vowel Separator is not recognized as white
+      space (eval code)."
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/string-form-feed.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "2f044164e0ce7d1cd720a42cb67253838966c69021b26813\
+      89750fcc3fb34cb4"
+    observationDigest: "d9dac1108598e6b2a83f6caa63dd0810d66737a02b7\
+      c2fb578cf31900e9486b1"
+    missingDynamicTag: false
+    section: "7.2_A2.3_T1"
+    subject: "Use FORM FEED(\\u000C and \\f)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/string-horizontal-tab.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "882e36d5bd5b3478fb8a46c73a717e0eeaaf5683c86e09f3\
+      958adf99dd8515dc"
+    observationDigest: "7a08ae1243c58e66607f5b32be0a647319628f7bfb7\
+      d8fee2c5f94bc6cc676c8"
+    missingDynamicTag: false
+    section: "7.2_A2.1_T1"
+    subject: "Use HORIZONTAL TAB(\\u0009 and \\t)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/string-nbsp.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "491a77b96bb9c008a36310efbafe96a279113d4a2a22bd19\
+      95a0662cfe43559d"
+    observationDigest: "2d12263dd41f9436e57d9c42e5d79f2b2ec2c2295bb\
+      17c38f3f5f9d676102754"
+    missingDynamicTag: false
+    section: "7.2_A2.5_T1"
+    subject: "Use NO-BREAK SPACE(\\u00A0)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/string-space.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "8c577e14d668318ee44223c902fe661db0dcd1e4866b288b\
+      9250c21fadcbc6db"
+    observationDigest: "31dacb8af2a5e5ddd4c22ea2e71893d1a5cc2be1ff1\
+      6722cb0a107d3e252c00d"
+    missingDynamicTag: false
+    section: "7.2_A2.4_T1"
+    subject: "Use SPACE(\\u0020)"
+    assessment: "observation-train-dynamic-coverage"
+  - path: "test/language/white-space/string-vertical-tab.js"
+    proposedOwner: "adr:0016-dynamic-source-boundary"
+    priorCohort: "incidental-scaffolding"
+    sourceDigest: "3eca3990e938a55ceb8fde6a2ca0e74e037b7d761206b370\
+      a7387ad52e9aee5b"
+    observationDigest: "6aac330bab2c4cf12a24078de4806d90d7ce8b31e69\
+      0a848b95b51c44c30a393"
+    missingDynamicTag: false
+    section: "7.2_A2.2_T1"
+    subject: "Use VERTICAL TAB(\\u000B and \\v)"
+    assessment: "observation-train-dynamic-coverage"
