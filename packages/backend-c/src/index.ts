@@ -2491,20 +2491,23 @@ function emitClassStaticFieldDefine(
 
 /**
  * Creates one private name: the identity a class evaluation gives one
- * declared `#name`. The name itself carries nothing, so the operation
- * takes no operand and the spelled name stays in the MIR detail.
+ * declared `#name`, and initializes its fresh lexical cell in one runtime
+ * call. The runtime owns intermediate roots and C temporaries, so they do
+ * not accumulate in the enclosing script's frame across private names.
  */
 function emitPrivateNameCreate(
   state: EmitState,
   operation: MirOperation,
 ): void {
+  if (operation.bindingId == null) {
+    throw new Error(`MIR private name %${operation.id} has no binding.`);
+  }
   location(state, operation.range);
   state.usesAbrupt = true;
   line(
     state,
-    renderC(
-      emittedC.privateNameCreate.resultAssignOseoPrivateNameCreateContext,
-    ),
+    "result = oseo_private_name_bind(context, " +
+      `roots[${state.environmentSlot}], ${operation.bindingId}u);`,
   );
   line(state, renderC(emittedC.common.rootAssignResultValue, operation.id));
 }

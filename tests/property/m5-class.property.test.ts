@@ -20,6 +20,8 @@ import {
   withNativeFixture,
 } from "../../packages/testkit/src/index.ts";
 import { nativeToolchain } from "../native-toolchain.ts";
+const { privateNameLifetimeSource } =
+  await import("../native/fixtures/class-private-name-lifetimes.ts");
 
 const { assertAsyncProperty } = await import(
   ["../../packages/testkit/tests/", "property-support.ts"].join("")
@@ -1852,6 +1854,94 @@ test(
         sizeLimit:
           "one private element, one branded object, one unbranded object, " +
           "and one bounded primitive",
+        timeLimitMilliseconds: 120_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated class evaluations retain independent private cells",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "fresh private cells preserve earlier class closures",
+      fc.asyncProperty(
+        fc.array(fc.integer({ min: -20, max: 20 }), {
+          minLength: 2,
+          maxLength: 5,
+        }),
+        async (values) => {
+          const source = privateNameLifetimeSource(values);
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout:
+              values
+                .map(
+                  (value) =>
+                    `${value} ${value + 1} ${value + 2}\n` +
+                    "true false\nbrand true\n",
+                )
+                .join("") + "4 false1\n",
+          };
+          assertMatchingObservations([
+            expectedObservation,
+            ...(await references(source)),
+          ]);
+          for (const specialization of ["disabled", "enabled"] as const) {
+            const compiled = compileSource(
+              babelFrontend,
+              { source, sourceId: "private-name-lifetimes.js" },
+              { observeSpecialization: true, specialization },
+            );
+            assert.deepEqual(compiled.diagnostics, []);
+            assert.ok(compiled.mir);
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok(native.counters);
+                  assert.ok(native.counters.collections > 0);
+                  if (specialization === "enabled") {
+                    assert.ok(native.counters.guardMisses > 0);
+                  }
+                },
+              );
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        },
+      ),
+      {
+        context:
+          nativeTarget == null || host.executionHost == null
+            ? ["target=unsupported host=unknown"]
+            : [
+                `target=${nativeTarget.name}`,
+                `host=${host.executionHost.operatingSystem}/` +
+                  host.executionHost.architecture,
+                `sanitizers=${nativeTarget.sanitizers.join(",")}`,
+              ],
+        domain:
+          "two to five repeated evaluations of three class declarations " +
+          "with instance fields, methods, accessors, static private fields, " +
+          "cross-evaluation brand misses and false numeric hints",
+        numRuns: 6,
+        profile: "M5 private-name cell lifetime",
+        seed: 0x6000_0b03,
+        sizeLimit: "two to five class groups and integer values from -20 to 20",
         timeLimitMilliseconds: 120_000,
       },
     );

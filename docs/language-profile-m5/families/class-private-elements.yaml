@@ -3,6 +3,11 @@ id: class-private-elements
 title: "Private instance elements"
 scope:
   - "Private fields, methods, accessors, brands, and optional reads."
+  - "Private-name creation initializes a fresh lexical cell in one bounded
+    runtime call. Intermediate roots end at its return; earlier class
+    evaluations retain their captured cells and private identities.
+    Runtime ABI m5-142 adds this entry point without changing native frame
+    limits, general binding-access charges, or specialization policies."
 owners:
   - PLAN-M5.md
 evidence:
@@ -10,18 +15,23 @@ evidence:
     status: covered
     references:
       - tests/native/fixtures/classes.ts
+      - tests/native/fixtures/class-private-name-lifetimes.ts
   fixed:
     status: covered
     references:
       - tests/native/fixtures/classes.ts
+      - tests/unicode-class-frame-native.test.ts
+      - tests/fixtures/runtime-environment-bitmap.c
   forced-collection:
     status: covered
     references:
       - tests/property/m5-optional-private.property.test.ts
+      - tests/property/m5-class.property.test.ts
   generated:
     status: covered
     references:
       - tests/property/m5-optional-private.property.test.ts
+      - tests/property/m5-class.property.test.ts
   guard-fallback:
     status: covered
     references:
@@ -40,3 +50,4 @@ evidence:
     status: covered
     references:
       - packages/parser-babel/tests/basics.test.ts
+      - tests/unicode-class-frame-source.test.ts

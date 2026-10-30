@@ -40,6 +40,8 @@ import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
 import * as booleanFixture from "./native/fixtures/boolean-intrinsic.ts";
 import { classFixtures } from "./native/fixtures/classes.ts";
+const { privateNameLifetimeFixtures } =
+  await import("./native/fixtures/class-private-name-lifetimes.ts");
 import { dataViewFixtures } from "./native/fixtures/data-view.ts";
 import { dateFamilyFixtures } from "./native/fixtures/date-family.ts";
 import { expressionFixtures } from "./native/fixtures/expressions.ts";
@@ -254,6 +256,7 @@ const fixtures: readonly Fixture[] = [
   ...typedArraySortFixtures,
   ...typedArrayStaticsFixtures,
   ...classFixtures,
+  ...privateNameLifetimeFixtures,
   ...bindingFixtures,
   ...bigintFixtures,
   ...bigintIntrinsicFixtures,
@@ -1511,6 +1514,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-field-scope" ||
     fixture.name === "class-field-super" ||
     fixture.name === "class-private-fields" ||
+    fixture.name === "class-private-name-lifetimes" ||
     fixture.name === "class-private-methods" ||
     fixture.name === "class-private-accessors" ||
     fixture.name === "class-private-brand-checks" ||
@@ -1729,6 +1733,7 @@ for (const fixture of selectedFixtures) {
           }
           if (
             fixture.name === "array-buffer" ||
+            fixture.name === "class-private-name-lifetimes" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-change-by-copy" ||
             fixture.name === "array-prototype-iterative" ||

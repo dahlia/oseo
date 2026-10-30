@@ -1266,4 +1266,11 @@ Both source branches used `m5-140` independently, so this composition uses
 the next unused identity after Main and both branches. Their ABI history
 notes retain their original source identities.
 
+ABI `m5-142` adds `oseo_private_name_bind`. It replaces a private binding
+with a fresh cell and initializes it to a new private identity within one
+runtime call. The helper roots its environment and cell across allocation,
+then releases its intermediate roots before returning. Earlier class
+closures retain their original cells. The native frame ceiling, callable
+cost multiplier and general declaration charges stay unchanged.
+
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
