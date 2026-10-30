@@ -23052,7 +23052,7 @@ summary:
       expectedNegatives: 198
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3682
+      passes: 3670
       semanticFailures: 0
       unsupportedProfileFeatures: 163
     - dependency: object-own-keys

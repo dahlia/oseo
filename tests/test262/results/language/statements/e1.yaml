@@ -313,7 +313,6 @@ results:
       - functions
       - generators
       - lexical-bindings
-      - object-literals
       - object-properties
       - symbols
       - var-bindings

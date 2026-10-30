@@ -64,3 +64,10 @@ All subjects use the primary source; no fixture-derived rows occur.
 
 Root owns the scoped UPDATE, landing, and publication. This observation
 commit does not mark any graph node landed.
+
+The pre-UPDATE caller-guard audit removes object-literals from all 12
+forbidden-extension bullet-two rows. Their optional descriptor creation
+requires an own caller property; freshly created Oseo functions have
+none, so the descriptor objects are not evaluated. The original counts
+and observations are unchanged. The full-row audit above includes this
+pattern across all 1,859 train paths.

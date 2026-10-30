@@ -394,7 +394,6 @@ results:
       - expression-operators
       - functions
       - lexical-bindings
-      - object-literals
       - object-properties
       - symbols
       - var-bindings
