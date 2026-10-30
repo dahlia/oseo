@@ -1556,7 +1556,6 @@ for (const fixture of selectedFixtures) {
     fixture.name === "object-integrity-levels" ||
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
-    fixture.name === "direct-eval-non-string" ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "symbols" ||
     fixture.name === "symbol-intrinsic" ||

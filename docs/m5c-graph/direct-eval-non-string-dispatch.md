@@ -60,11 +60,12 @@ The parser tests were changed first and failed against the old resolver.
 The fixed native fixture covers strict/sloppy, parenthesized/spread and
 zero-argument calls, primitive and object identity, boxed Strings, a revoked
 Proxy, coercion traps, argument order and abrupt completion, callee capture,
-replacement/deletion and false numeric hints. It is in both forced-GC lists
-of *tests/native.ts*. The focused native suite compares Node.js and Deno
-references with both native policies under forced collection and asserts
-specialized guard hits/misses and generic addition fallback. Separate
-negative executions assert a located String rejection and no source effect.
+replacement/deletion and false numeric hints. It is in the forced-collection
+selector and positive collection-counter assertion of *tests/native.ts*. The
+focused native suite compares Node.js and Deno references with both native
+policies under forced collection and asserts specialized guard hits/misses and
+generic addition fallback. Separate negative executions assert a located String
+rejection and no source effect.
 
 The existing *m5-global-object-record.property.test.ts* generator adds direct,
 parenthesized and spread call forms plus non-String identity values to its
@@ -141,3 +142,29 @@ requires the owned eval source-compilation `OSEO1001` rejection, and uses
 change stops the operation and is reported to Root. Its per-row output is
 separate from the original impact inventory. Root has authorized digest
 refresh only after that successful verification of the actual Full result.
+
+
+Internal pass 1 corrections
+---------------------------
+
+Both complete internal stages on `621ed751` found the same blocking stale
+profile claim, `M5C-PROFILE-STALE-DIRECT-EVAL`: two older sections still
+stated that direct calls reject before argument evaluation. Both passages
+now describe non-String identity and the located String runtime boundary.
+The nonblocking `M5C-DUPLICATE-FORCED-GC` finding removes one redundant OR
+entry and clarifies the selector and positive collection-counter assertion.
+All required fixture selection remains enabled. No compiler, runtime,
+fixture program, generator, seed or budget changes in this correction.
+
+Pass 1 artifacts, including both complete verdicts and their focused test
+notes, are under the external *reviews/* directory. Those verdicts are
+blocking history, not a clean result for the corrected source. The next
+pass rechecks the same implementation scope after the normal-hook fix
+commit and precheck. The author native evidence above remains bound to its
+unchanged compiler, runtime, programs and property inputs; focused selector
+and profile checks cover this correction separately.
+
+The focused native-fixture, host-guard and evidence-lane command passed all
+85 registrations after the correction, with no skips or failures. Its raw
+output is *fix-p1-tests.log*. The fix commit retains normal hooks and the
+full check; no native or property result is relabeled as a new execution.
