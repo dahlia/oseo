@@ -14,12 +14,15 @@ delivers: "DS-3 of the dynamic-source-coverage-remediation split approved
   by the item 1 rule, with a fresh-digest exclusion-audit record naming
   replacement evidence for every non-source subject; otherwise it stays in
   remediation. Never counts a pass, emulates eval, or widens ADR 0016; ADR
-  0016 and ADR 0019 remain unchanged."
+  0016 and ADR 0019 remain unchanged. The per-path assessment in
+  docs/m5c-graph/dynamic-source-unknown-eval-assessment.md accounts for
+  11 paths with reviewed static replacements and retains 55 under the
+  umbrella; no evidence test is added."
 after:
   - observation-batch-19
   - observation-batch-20
   - observation-batch-30
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready
