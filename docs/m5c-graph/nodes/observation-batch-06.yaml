@@ -13,5 +13,5 @@ dependencies:
   - eval-intrinsic-value
   - observation-batch-plan
   - test262-diagnostic-host-path-normalization
-landed: false
-status: blocked
+landed: true
+status: ready

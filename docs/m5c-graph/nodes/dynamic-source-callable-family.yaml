@@ -23,5 +23,5 @@ delivers: "DS-4 of the dynamic-source-coverage-remediation split approved by
   This partial accounting does not mark the node landed."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

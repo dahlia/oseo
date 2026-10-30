@@ -9,5 +9,5 @@ delivers: "Owns the 13 reviewed pattern-await rejections listed in
   pass. See the work note for source preparation and validation."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

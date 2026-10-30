@@ -21,5 +21,5 @@ delivers: "Closes exactly two observation-batch-06 paths:
   passes or claim an exclusion from the dynamic-source dependency tag."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready

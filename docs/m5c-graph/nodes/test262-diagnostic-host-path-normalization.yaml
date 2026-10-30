@@ -22,5 +22,5 @@ delivers: "Removes host-specific source identifiers from test262 module
   recorded in docs/m5c-graph/observation-batch-06.md."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
