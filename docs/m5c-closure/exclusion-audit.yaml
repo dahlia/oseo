@@ -752,7 +752,28 @@ assessments:
       remains; none counts as a pass. An accepted ADR 0016 amendment
       admitting any form of dynamic import reopens every selected path for
       reassessment."
+  observation-b01-b18-dynamic-source:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: The 82 focused source-compilation rejections in observation batches
+      01 and 18 retain their built-in callable, conversion, prototype, seal,
+      lexical grammar, and line-terminator subjects inside the claim. No
+      reviewed equivalent replacement evidence is asserted and no whole-path
+      exclusion is authorized. The existing ADR 0016 boundary and ADR 0019
+      reopening triggers remain unchanged.
 paths:
+  - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "efa50936d077637ad43f2a043e07ba3a6c305906\
+      ed31257d61083658a5df4280"
+    observationDigest: "6742dbc2f714643678bee1e92f1e6a8e68e66036\
+      4e19567978f4328806718135"
+    missingDynamicTag: false
+    section: sec-aggregate-error
+    subject: Fallback to the NewTarget's [[Prototype]] if the prototype
+      property is not an object
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Array/from/proto-from-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1165,6 +1186,194 @@ paths:
     subject: Default [[Prototype]] value derived from realm of
       the newTarget
     assessment: fixture-construction
+  - path: test/built-ins/Function/15.3.2.1-10-6gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "65f19e5b986f34401d1185edfc8ed2d18f0ee460\
+      6a7c709c4fb1ec7e60d781a9"
+    observationDigest: "84241e8d07af78679c66d2fcc8f1cafd3540c360\
+      3bfea3340059701d13a2c568"
+    missingDynamicTag: false
+    section: 15.3.2.1-10-6gs
+    subject: Strict Mode - SyntaxError is thrown if a function using the
+      Function constructor has two identical parameters in (local) strict
+      mode
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-1-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0f04348d109c895c067024df960b868bcdbd0cc6\
+      1c8c12651dc4843fa648eedf"
+    observationDigest: "9bfdde1b70beeb93b6dc06fa70107c0ac62f9b30\
+      088831f7c775dc35b893d805"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-1-s
+    subject: Duplicate seperate parameter name in Function constructor
+      throws SyntaxError in strict mode
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "adf6d2ae368b5c49e3c5e08c334383af60cc90bb\
+      b5ebe4b6eb770cac76f2db8a"
+    observationDigest: "02e2581672cd19695e9a5547d3688fdb49ff94e8\
+      ae5de8ad8fc07ae750716ac0"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-1
+    subject: Duplicate separate parameter name in Function constructor
+      allowed if body not strict
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-2-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "094bb020ce154bc34192855342136badec91594b\
+      7c22f5541ad7cafa765b1eea"
+    observationDigest: "a6eabf8c335ba7094f51d110e7fece6fa1574da3\
+      8d1bb73148234460a3955056"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-2-s
+    subject: Duplicate seperate parameter name in Function constructor
+      called from strict mode allowed if body not strict
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-3-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "06c10eb321c764889d607c326b824f6fd2f81894\
+      2ce57c1ba05ed98322d105ea"
+    observationDigest: "b06e799eaa4efd761d343817af09814404b6a3e8\
+      6679494dd5b7c221f45c13b2"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-3-s
+    subject: Function constructor having a formal parameter named 'eval'
+      throws SyntaxError if function body is strict mode
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "8cfe951f639203f37b25fc42617562e7cb496ec4\
+      db910fbcc9f3ff0054a5eca9"
+    observationDigest: "80bf6c1a88458514f4bb5f7fe7fb0d353cc7ec01\
+      140a063691294dc210852eb3"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-3
+    subject: Function constructor may have a formal parameter named 'eval'
+      if body is not strict mode
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-4-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "680fb83202d7ff828cc08b96b673b65cf9d6ec9d\
+      0063733d6ca7b34c9f2cf82b"
+    observationDigest: "23e1677166d67c50edadcd1411c319065e41ed70\
+      5226782c4a52c36a20d89b1c"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-4-s
+    subject: Function constructor call from strict code with formal
+      parameter named 'eval' does not throws SyntaxError if function body
+      is not strict mode
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-5-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "07ff29e0033c729dd043c7602432515d3af2a431\
+      7d7a543ed4d8901e08169e18"
+    observationDigest: "1e9c1aa00fbdc0dda909fd4620a1f596baea7571\
+      28af84de54045ae3bf9fe808"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-5-s
+    subject: Duplicate combined parameter name in Function constructor
+      throws SyntaxError in strict mode
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "cf1233fcaecb69c13b5f6bc927ec9730084061fe\
+      4723d4cea605253721737793"
+    observationDigest: "9cc420529a497c12058579404877ad7f947c19bd\
+      2c05635a56295e690350a416"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-5
+    subject: Duplicate combined parameter name in Function constructor
+      allowed if body is not strict
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-6-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c569c95a0299d73a5d3c43d0da011b7de7c7375a\
+      16a66778e0f78f02e0174527"
+    observationDigest: "c2745c77a3d4eaffc3b6695520350c3cab9c8a37\
+      a972b052c35c0e58d3437b5f"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-6-s
+    subject: Duplicate combined parameter name allowed in Function
+      constructor called in strict mode if body not strict
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-7-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bc484ea9fdd4c8cd31bf085a417d86338a0acf37\
+      894dad7b2d158f41604afc88"
+    observationDigest: "53eaae739dfafe7ac44370dea6358eb61c7ae172\
+      2f5da5d7709812b7ab506150"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-7-s
+    subject: Function constructor call from strict code with formal
+      parameter named arguments does not throws SyntaxError if function
+      body is not strict mode
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-8-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "21d656be99252ac2a0dcced823e2bf78e8e37464\
+      05073614f66c9f0e767fc03f"
+    observationDigest: "365ffff72ca5b0688236ee33d201b174664357a6\
+      cc557cbe04f03cf235d8d33d"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-8-s
+    subject: Strict Mode - SyntaxError is not thrown if a function is
+      created using a Function constructor that has two identical
+      parameters, which are separated by a unique parameter name and there
+      is no explicit 'use strict' in the function constructor's body
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.2.1-11-9-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "f795f13df7423eb03b5e95a43aa611f3be00dc66\
+      c76a9efde81a31053f5cdb4e"
+    observationDigest: "96c379a4cb84d791ce4b68ddd4953bfa4d43046e\
+      42ac342793dd0fdcc20404c6"
+    missingDynamicTag: false
+    section: 15.3.2.1-11-9-s
+    subject: Strict Mode - No SyntaxError is thrown if a function is created
+      using the Function constructor that has three identical parameters
+      and there is no explicit 'use strict' in the function constructor's
+      body
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.5.4_2-10gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ad2b9df16d940fb0a32bba81a828b424539cd9ed\
+      e045262261b6b5c522b9aff6"
+    observationDigest: "82abce2263a3f9343bed16c0aa38023f7caa2809\
+      645a794b9aab5cd996def2b2"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-10gs
+    subject: Strict mode - checking access to strict function caller from
+      non-strict function (New'ed Function constructor includes strict
+      directive prologue)
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.5.4_2-11gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d0c98863bd7b884733ddccff220eeb9149f8004a\
+      ac8789a863ee0e1d9df80b02"
+    observationDigest: "83296ba667980b4f1f819d32ffe4a317edd44139\
+      808dba4fba6340e2b26deac9"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-11gs
+    subject: Strict mode - checking access to strict function caller from
+      strict function (eval used within strict mode)
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-12gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1177,6 +1386,18 @@ paths:
     subject: Legacy caller read of a non-strict function from
       strict code (eval includes strict directive prologue)
     assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-13gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0a1a3c08ad56924092af405bcb85e95e01e0e576\
+      749dd60194871ee8ee8eee9d"
+    observationDigest: "6c2181da8fabcac14479897f8117ee0c51e05ef5\
+      5049220519e09abd643be256"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-13gs
+    subject: Strict mode - checking access to non-strict function caller
+      from strict function (indirect eval used within strict mode)
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-14gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1190,6 +1411,45 @@ paths:
       strict code (indirect eval includes strict directive
       prologue)
     assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-57gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "025aeff82b4f600a19435f50ad884f65f4ea0f86\
+      87ab073496410c5f6cceabf7"
+    observationDigest: "18ec81bad6b9bdc5c2962a1e845868470cfa0969\
+      df3097f8297234e203eba9b3"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-57gs
+    subject: Strict mode - checking access to strict function caller from
+      non-strict function (strict function declaration called by
+      non-strict eval)
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.5.4_2-58gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d534f3af61bc3865e80131191256e28678e07389\
+      4f9698ebc9b21621a103796b"
+    observationDigest: "cc266f638fcfa556a42007723011f72bd4492c5c\
+      24e825fcfb32a8de6853db72"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-58gs
+    subject: Strict mode - checking access to strict function caller from
+      non-strict function (strict function declaration called by
+      non-strict Function constructor)
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.5.4_2-59gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2696660b35a9cb2938791816e1c5cbc9fffef698\
+      b69a1305e5361d2ae70e9262"
+    observationDigest: "d97aace4c1cf360cb890b34eb4387aca06702280\
+      291a49772acd5ee9e49ef6bb"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-59gs
+    subject: Strict mode - checking access to strict function caller from
+      non-strict function (strict function declaration called by
+      non-strict new'ed Function constructor)
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-75gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1254,6 +1514,19 @@ paths:
       a non-strict function called by strict
       Function.prototype.apply()
     assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-7gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "82a43a0e9bf4d85b40d1bd600fc89a5a23d7ae0f\
+      ca41c646f39963c98b2e1146"
+    observationDigest: "4f05ae4619b374c75c831fed35a176f55b997a59\
+      969d852dadb164e400b16650"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-7gs
+    subject: Strict mode - checking access to non-strict function caller
+      from strict function (Function constructor defined within strict
+      mode)
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-80gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1384,6 +1657,19 @@ paths:
       a non-strict function called by strict
       Function.prototype.bind()()
     assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-8gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "aaa141ca6a0e9a3b51baecf062552afb6a671122\
+      f33ac6ef4ab81d054226a804"
+    observationDigest: "b250a3e65efca6011d81755a5eb31539341c636e\
+      ffd6583aaedc465e3554b453"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-8gs
+    subject: Strict mode - checking access to strict function caller from
+      non-strict function (Function constructor includes strict directive
+      prologue)
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/15.3.5.4_2-90gs.js
     proposedOwner: adr:0028-legacy-function-caller-boundary
     priorCohort: legacy-caller
@@ -1436,6 +1722,526 @@ paths:
       a non-strict function called by strict
       Function.prototype.bind(globalObject)()
     assessment: legacy-caller
+  - path: test/built-ins/Function/15.3.5.4_2-95gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "e044dc989c9650a093a6a40ef693683bd4fd4401\
+      ee9cf1e3883d783d3c65a2c6"
+    observationDigest: "dadb340bdfca07be884e71ed0ab14d829116d5df\
+      03fc2f4fdeb262e92c5391b9"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-95gs
+    subject: Strict mode - checking access to strict function caller from
+      non-strict, constructor-based function (FunctionDeclaration includes
+      strict directive prologue)
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/15.3.5.4_2-9gs.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "314c2b2a9719acd6634244b9fb5618967729474c\
+      3f82dbfada512e7acaf5fc86"
+    observationDigest: "5058d44928756272bf62936b8de55f9986c37ef6\
+      4705a5f1387ff7ea322bb4f4"
+    missingDynamicTag: false
+    section: 15.3.5.4_2-9gs
+    subject: Strict mode - checking access to non-strict function caller
+      from strict function (New'ed Function constructor defined within
+      strict mode)
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.1_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "16aa0faa2a0ab569444109d8cf2e768cef4de1ae\
+      6467070b7f3428cad826768a"
+    observationDigest: "2acffe26b0a62aa78c24589505d8a0d3d986043b\
+      13fb2a1852beb8b918aae9a5"
+    missingDynamicTag: false
+    section: 15.3.1_A1_T1
+    subject: Create simple functions and check returned values
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "3f785032fa741e02ceea3d3dedeed25b71859280\
+      7ae12967c432ca3d0c74d161"
+    observationDigest: "e600b4ed46edd5c14f80ae862a6f73f995489647\
+      bc2d0c6398901cba14838ac9"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T1
+    subject: The body of the function is "{toString:function(){throw 7;}}"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T10.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "070c4b4a8d716be6c4876b00bb061a84b92dabfb\
+      c6ce7e6cd487d488a686231a"
+    observationDigest: "bf824758caedafd0e2f2ea36e5626f095f6a77b4\
+      f8d22b2907bc920df4e0f29d"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T10
+    subject: Value of the function constructor argument is "null"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T11.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9ec34a42e5b28fec0b7c0914f6d066687503a6f3\
+      c54ac901c29468ac5f3ad6ee"
+    observationDigest: "820a07dcbbc2ffe8b8676838a064fb1f155cfd46\
+      6af003dde0d926e278309c66"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T11
+    subject: Value of the function constructor argument is "undefined"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T12.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "294743747899a4a8600b08ab9b1e0e7004e17946\
+      bc514ba59f50113e2959db52"
+    observationDigest: "8b3eb7aee402e553b711d07851a53103c0154de1\
+      5a6094797185c907dce3b470"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T12
+    subject: Value of the function constructor argument is "void 0"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T13.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "dd994f362f70afa08fa593ed3d67ab4c2c960105\
+      fe904cce301d84a7712d9ab9"
+    observationDigest: "b3b15759141f6b14162b7b92bf6a146f87607c83\
+      0bd4c30cd5eca1f2365d1772"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T13
+    subject: Value of the function constructor argument is "{}"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "131cdeb46d75d0caf988995845ed3a44ddcda5a5\
+      8eca579f2544c13aceea5781"
+    observationDigest: "36e6c1928932971c11cc92b975f646ca3bc5fae1\
+      99aa7b3357916ba481714764"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T2
+    subject: The body of the function is "{toString:function(){return
+      "return 1;";}}"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "279996e2be7441733d9a072f15e251871d602fd7\
+      1f27408953097d38e03668da"
+    observationDigest: "2019ca4b90ad9a27318da0c92982f7a2bf5c4d2d\
+      245035a0c0e927aeda9c4f0e"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T3
+    subject: Value of the function constructor argument is 1
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "da969a9898f54b39e5851d615306056d502d9e40\
+      a31dd4f32b04d41d01a2001b"
+    observationDigest: "9e18aceb1ac79bdfd50f7af898b36d2ad0505586\
+      723bb79e0bee3324f677f973"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T4
+    subject: Value of the function constructor argument is x, where x is
+      specified with "undefined"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "56f9534abddc5d42f3f020f9bb2179ae3d83847a\
+      fc547ff97f7fb419c5941a21"
+    observationDigest: "2588e821a387daaca6554d2ef0c8e78e6bba18c3\
+      47725b7ce85b0e29e36dc995"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T5
+    subject: Value of the function constructor argument is "Object("return
+      \'A\'")"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "88322748e4b26a0213e2a3435b54d0639a6472ed\
+      4e7a080d45f6840cd60ae191"
+    observationDigest: "11391b5d1cffd138e31d3a46475a2b1b0d1b5a91\
+      d6c42da17f9723ad2e4b5ec1"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T6
+    subject: Value of the function constructor argument is the string
+      "return true;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "e419c4e87a1c6bc73c4935b4c4db4a181b478503\
+      60410c7d7052ce9e2e19634c"
+    observationDigest: "66368ae4fa28f24db31681c814a5b000f35319e2\
+      0413fe02d9666d9210a9e6a9"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T7
+    subject: Value of the function constructor argument is "Object(1)"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T8.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "828c274e293a86ce39de2675c2f3dbc1603a2e15\
+      b23075d94f2e1b3b6bf7d7e0"
+    observationDigest: "bd8b6d41d1d183df927a6599f29f49082becd9e0\
+      af28f07d4448e4dd4a16f484"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T8
+    subject: Value of the function constructor argument is "var 1=1;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A1_T9.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a2ff596d95d1068695cafa1f052a454525c944f3\
+      896eaf5b7dcc87b2381c6ec3"
+    observationDigest: "da78166d0b7fd8b59e24d6807a67b19eb23a1691\
+      9a0cddb012ed2466b2c5641f"
+    missingDynamicTag: false
+    section: 15.3.2.1_A1_T9
+    subject: >-
+      Value of the function constructor argument is
+      "return arguments[0];"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A2_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "235804d210aa57bcd51df4deb9bdc8495fe12faf\
+      cc663ed6f305c2c47544eedd"
+    observationDigest: "7d0681b7f285110ef3b9ac49f8412598dd2b0117\
+      01148ea86714d1e9ad3aa748"
+    missingDynamicTag: false
+    section: 15.3.2.1_A2_T1
+    subject: Values of the function constructor arguments are "arg1",
+      "arg2", "arg3", "return arg1+arg2+arg3;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A2_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "565ee5867dfae567d67105278708ed674606d6c8\
+      8db70bbb94b2e54926c59842"
+    observationDigest: "d525934e10d6e714e74a1990f6646a48d659ae0c\
+      5a0d245192b20aa94f938f06"
+    missingDynamicTag: false
+    section: 15.3.2.1_A2_T2
+    subject: Values of the function constructor arguments are "arg1, arg2",
+      "arg3", "return arg1+arg2+arg3;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A2_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c9de62fda4ee34ce0810f379fb8185d5df4df7d3\
+      c1551e88876c5b5dccce770f"
+    observationDigest: "3c867190d3f4a28cdad06edca20779053e08132a\
+      8fd9dfd9c592633bc995430f"
+    missingDynamicTag: false
+    section: 15.3.2.1_A2_T3
+    subject: Values of the function constructor arguments are "arg1, arg2,
+      arg3", "return arg1+arg2+arg3;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A2_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "7d918aea3e1abe6035745e59a9f07211a11dfa97\
+      530084c24c68c7f019c017fd"
+    observationDigest: "67d099914a12eb1901314e9e3d45b2090b1ad8d8\
+      a10a35bfdcc210b3f9010915"
+    missingDynamicTag: false
+    section: 15.3.2.1_A2_T4
+    subject: Values of the function constructor arguments are "return"-s of
+      various results
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A2_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bf4aa6e9a541feac830d71a000ceab374b838551\
+      e49c09bc92b7fed6a36b3ad6"
+    observationDigest: "285e2afbb205c6757e7b544210facf086d181a59\
+      f49a89001a9e6b05a2ffb4c3"
+    missingDynamicTag: false
+    section: 15.3.2.1_A2_T5
+    subject: Values of the function constructor arguments are "return"-s of
+      various results and a concotenation of strings
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A2_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c40f7e8b897d378bd60b35ded52bb10111830b19\
+      778b15ef80b3a3d542856e11"
+    observationDigest: "f895a516ea1c6509cee8b31c262877b8c430230d\
+      4467cf1a68950c81b7663c35"
+    missingDynamicTag: false
+    section: 15.3.2.1_A2_T6
+    subject: Values of the function constructor arguments are "return"-s of
+      various results and a concotenation of strings
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ff82eeef8bf7ec8b3c0e6e690bb098e816e1feb0\
+      b5856949e85cefb5b8e86829"
+    observationDigest: "5af247a31640d4f24cc650cf3bdbc46aa9264f89\
+      0bb5d696665af80680a3795b"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T1
+    subject: Values of the function constructor arguments are
+      "{toString:function(){throw 1;}}" and "{toString:function(){throw
+      'body';}}"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T10.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "25c02fb8333813c800e7baa8a2652c69eef89c0c\
+      0cc5638a8e5826b45844d9f0"
+    observationDigest: "36ac61b39846badf5b7bba48b64d451d3470498f\
+      71af3e7eef8e26d5684cbe29"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T10
+    subject: Values of the function constructor arguments are
+      "{toString:function(){return "z;x"}}" and "return this;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T11.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c9d3cfd3f1c4278055846e56150b1109d6437f02\
+      4c148561b7eb7a5fe968bc87"
+    observationDigest: "df0606ff04079888416044a581b810aed2f5de42\
+      01aaebf4ca2658786b6e2af7"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T11
+    subject: >-
+      Values of the function constructor arguments are
+      "a,b,c" and "void 0"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T12.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "af253ffa7a2f79d0cba80412bab5200829c56ce7\
+      93dae358fb35846710b6625e"
+    observationDigest: "023c0968ee0f6413166f9ed41f5a4f84cc1fe8b1\
+      9f20ccd8a38b1e4fdb313581"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T12
+    subject: Values of the function constructor arguments are "a,b,c" and
+      "undefined"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T13.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "89ff4316fdd115925bae4c827258dd55bd93bc4e\
+      0889640071ff6f839236adcb"
+    observationDigest: "085a6fb2b20c97af331778d2fe3fa1af18a77416\
+      fa3438be0ebfdae3cd2f2d32"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T13
+    subject: Values of the function constructor arguments are "a,b,c" and "null"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T14.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "be70fc577253e8d8c78dd528960624d1c8992623\
+      b5d3980432e50c3409cedf32"
+    observationDigest: "f75b69cefb85cf04e0a7d707560bd771a45782da\
+      04db5854d99c295e54774705"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T14
+    subject: Values of the function constructor arguments are "a,b,c" and an
+      undefined variable
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T15.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "cb5c592f124137f04ff7e15e28d2604d823b8b22\
+      66c85330d5ab26910238d675"
+    observationDigest: "7e456860cccaf6d6601c3bb6ca1d29c468d01181\
+      b9789294257ea305e8dff78c"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T15
+    subject: Values of the function constructor arguments are are two empty
+      strings
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "782a17f0e0434e095231b08931ef702b96b0fc0b\
+      faf19ba429a2234003a2f74c"
+    observationDigest: "43007dbb320d58d01e53df5c8731d52ad8514932\
+      31d66832d3affb751761edda"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T2
+    subject: Values of the function constructor arguments are
+      "{toString:function(){return 'a';}}" and "return a;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "beda9e8b7b13030f38ad141d9ad8ec1efade4e01\
+      ef1b92a95acf88d3d3b1d26e"
+    observationDigest: "fe914f20487e4f4f5c5f84e6fde21b9e5bf63d43\
+      803c70c491d2f246299cf77e"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T3
+    subject: Values of the function constructor arguments are
+      "{toString:function(){p=1;return "a";}}" and
+      "{toString:function(){throw "body";}}"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ae62ee8bb3ce631665beae828527b091530682fc\
+      a11622e8b1d19830b924e1a3"
+    observationDigest: "71e95f8b6c073ce7c6112328b79cd27ad8198e56\
+      3ae0ed206ab2cff3f7152ee0"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T4
+    subject: Values of the function constructor arguments are an undefined
+      variable and "return 1.1;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2bd4f222fe88cf0a4f6cde87c7bc3ff450c4239a\
+      b1a647282195003fb182cefd"
+    observationDigest: "1c3fb268e1a41a684b27a7566f9d95367b88e37f\
+      ae1dda1ae9125e5a3fb39b40"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T5
+    subject: Values of the function constructor arguments are "void 0" and
+      "return \"A\";"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1255aeba510eadebe5bd2090b54f99f8fe06b039\
+      b74abff0319673b8ce63fbcd"
+    observationDigest: "566176a820c2a1d7c6178bf850d7ba6c52f7a662\
+      014d829709737da75383e554"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T6
+    subject: Values of the function constructor arguments are "null" and
+      "return true;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "13bef7cac00010da6c634185303a440975c6a9bf\
+      325fb1d8cd4b90f86cb6bf95"
+    observationDigest: "b44d4a9267e3c87c8ae78b702b80fdf6433b0db8\
+      5d7287f5eed55a367bf21d72"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T7
+    subject: Values of the function constructor arguments are "Object("a")"
+      and "return a;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T8.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "eb011c62eccf88e50c31d5b4e781f2a42adc159a\
+      8f15114049d5f709eaf99463"
+    observationDigest: "f33ff604457845c74d7a7b43de7e0141dc0c619b\
+      667391acb6e2baa77c81b615"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T8
+    subject: Values of the function constructor arguments are "undefined"
+      and "return this;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2.1_A3_T9.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "4f2dbb2d79d1a6b8a9f0eefaf45f9b1738bf9335\
+      75c0c5a5b2e910c3a893c36b"
+    observationDigest: "572297e354f7b07fb8300901dd0f76db72244e41\
+      e9f131e3ae049add93060c51"
+    missingDynamicTag: false
+    section: 15.3.2.1_A3_T9
+    subject: Values of the function constructor arguments are "1,1" and
+      "return this;"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.2_A1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1a20252056ab436556929e9f33979ae5da9f4bb6\
+      6e39cb6b9b397a05bf401ab5"
+    observationDigest: "40b541fade1b0d10215b618912ed69811b775a5b\
+      cf37b83939c1987c27b0f8ed"
+    missingDynamicTag: false
+    section: 15.3.2_A1
+    subject: Checking the constuctor of the object that is created as a new
+      Function
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.5_A1_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "88dc5c472a2da37f42ddaba7e61136a2fc75a89c\
+      ae458989688f3dae8b366846"
+    observationDigest: "d19e545303142e655b6d95491e5b7efbb162bc0d\
+      66871e06b9b390723b42c097"
+    missingDynamicTag: false
+    section: 15.3.5_A1_T1
+    subject: For testing use variable f = new Function
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.5_A1_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c37f56f8dabff4b25aeec629f1afe76917c2dda5\
+      22d695abc78e545754a0d862"
+    observationDigest: "25e85142fe8846944fc66a755d20a09de48778eb\
+      aee67213a8d7b698fed28f58"
+    missingDynamicTag: false
+    section: 15.3.5_A1_T2
+    subject: For testing use variable f = Function()
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.5_A2_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bbde674ccb03a49667ff60792ffaf377f53c4c37\
+      d8c39057b9fa2ce64a20bb3a"
+    observationDigest: "6ad7fedcba354ec530aa1cb493ecf7218aa7de30\
+      06008aea52cd876e81bd5909"
+    missingDynamicTag: false
+    section: 15.3.5_A2_T1
+    subject: For testing call Function("var x =1; this.y=2;return \"OK\";")()
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.5_A2_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bd7cce182b27ffa4d065b6d054b5154653c571ec\
+      4f961c800b5d084461e2a255"
+    observationDigest: "b0e5807ba6516cd33d357a4b2ca5402d34f50da1\
+      72e6f0e3651d9c0ae4196310"
+    missingDynamicTag: false
+    section: 15.3.5_A2_T2
+    subject: For testing call (new Function("arg1,arg2","var x =arg1;
+      this.y=arg2;return arg1+arg2;"))("1",2)
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.5_A3_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "83ea06e2e0e9afa8e2d37ec35b9fbd512c2d339a\
+      0d8ed6cc962ab8c93868cbce"
+    observationDigest: "b07479a7e44ba9775121caf3beba62ccac5feb27\
+      6d64f3ab77d82784a6af650f"
+    missingDynamicTag: false
+    section: 15.3.5_A3_T1
+    subject: As constructor use Function("var x =1; this.y=2;return \"OK\";")
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/S15.3.5_A3_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "16418cef71a4f948dbf42310f85e7359df139eb8\
+      80ed659f86cd245144be96a5"
+    observationDigest: "87c9bd1dbea58ae10321d51fc967ea00f22d9064\
+      dabc09ca7ff6f2be408f29f6"
+    missingDynamicTag: false
+    section: 15.3.5_A3_T2
+    subject: As constructor use new Function("arg1,arg2","var x =1;
+      this.y=arg1+arg2;return \"OK\";")
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/S15.3_A2_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -1534,6 +2340,42 @@ paths:
     subject: A function created by Function.call(this, body)
       reads a later global var through this
     assessment: dynamic-construction
+  - path: test/built-ins/Function/StrictFunction_reservedwords_with.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "32c00ed5c8601ada64f71f65e592b0e886ff1f81\
+      b29db949c5d27ce2ec9c2333"
+    observationDigest: "b13828931d6fbbb72b43077b2a96ef3338b81915\
+      8008511d2c9e3ea248dc32f1"
+    missingDynamicTag: false
+    section: sec-createdynamicfunction
+    subject: Strictfunction shouldn't have the reserved word "with"
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/StrictFunction_restricted-properties.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ff2c1868a8e0ce1d31065c5d6f6129d413784c2f\
+      425b22118812cbbcfc07de6c"
+    observationDigest: "e09d7e3cc5e0eb08825724cff2b401a0f982d6eb\
+      5ab87b677822a5b435eadd43"
+    missingDynamicTag: false
+    section: "16.1"
+    subject: ECMAScript Function objects defined using syntactic
+      constructors in strict mode code do not have own properties "caller"
+      or "arguments" other than those that are created by applying the
+      AddRestrictedFunctionProperties abstract operation to the function.
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Function/instance-name.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c1dab727bcc6c8c62e176cc7ab9afcadb0a23b21\
+      09dcbeecb5906a59e9f9df07"
+    observationDigest: "9c673d2b6e939931a97cfaa24bee5dcff2681e62\
+      12e9f17cec2e1e56678795b5"
+    missingDynamicTag: false
+    section: 19.2.1.1
+    subject: Assignment of function `name` attribute
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/internals/Call/class-ctor-realm.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -1577,6 +2419,17 @@ paths:
       the `this` binding (honoring the Realm of the current
       execution context)
     assessment: fixture-construction
+  - path: test/built-ins/Function/is-a-constructor.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9ae83534bebf2eaf85c7d804386ba92656af3d9c\
+      9f82240cec086e283d811ea8"
+    observationDigest: "5d3148883c5f7fdd0f2ed31a2e02bc12597c7841\
+      888c8ad8a9cc3070901a9159"
+    missingDynamicTag: false
+    section: sec-ecmascript-standard-built-in-objects
+    subject: The Function constructor implements [[Construct]]
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/length/S15.3.5.1_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -1724,6 +2577,18 @@ paths:
       Function("arg1,arg2,arg3","arg1,arg2","arg3", null)
       fails
     assessment: dynamic-construction
+  - path: test/built-ins/Function/private-identifiers-not-empty.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9b6600f6323352f7958ab7da0d611d0018294789\
+      2bbeda77eef4ef6c729bccc2"
+    observationDigest: "52a33205a9eff9478b7f74f5bfffa58265e7dd8b\
+      80cb4eb8cd2a4982188889d2"
+    missingDynamicTag: false
+    section: sec-createdynamicfunction
+    subject: CreateDynamicFunction throws SyntaxError if there is some
+      invalid private identifier on its body
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Function/prototype/S15.3.5.2_A1_T1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
@@ -2771,6 +3636,28 @@ paths:
     section: sec-object.seal
     subject: Object.seal ArrowFunction
     assessment: fixture-construction
+  - path: test/built-ins/Object/seal/seal-asyncarrowfunction.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "48f7230da8535634b556e62f6572c8815ece7fd6\
+      4451f9de3385ddd4c776f7d6"
+    observationDigest: "7e5531961c5ff38f72d5bdc2f9f4ede7939618cf\
+      d683a415a12b45d4d02ba599"
+    missingDynamicTag: false
+    section: sec-object.seal
+    subject: Object.seal AsyncArrowFunction
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/built-ins/Object/seal/seal-asyncfunction.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a95f0c51d33b4e89ca6e7e7b3defa42ecbee2804\
+      ca547707230935a36782351d"
+    observationDigest: "aadad5f1a7a338b35bd7477df9c5e9baa5e26970\
+      d13b1652c90489214141de34"
+    missingDynamicTag: false
+    section: sec-object.seal
+    subject: Object.seal AsyncFunction
+    assessment: observation-b01-b18-dynamic-source
   - path: test/built-ins/Object/seal/seal-asyncgeneratorfunction.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
@@ -13476,6 +14363,105 @@ paths:
     subject: "The same object representation is returned to all
       import sites"
     assessment: "json-module-dynamic-site-identity"
+  - path: test/language/line-terminators/S7.3_A5.4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1cabb856757465a17d72950b0b6a0f23ceb69180\
+      e41917f8a7658e16c975f1e6"
+    observationDigest: "afe6f53f5294e0cdd00901faa3210e5f16a253a2\
+      9645250bba549a08f9b4f6d0"
+    missingDynamicTag: false
+    section: 7.3_A5.4
+    subject: Insert PARAGRAPH SEPARATOR (U+2029) into multi line comment
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T1.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b167e636eaecba5a5983499e94c364d8b33389a3\
+      933f29a6747e54b0c8d078a9"
+    observationDigest: "6d5a5e74a36766995751815f7be3ec497c0d81b2\
+      5b5bd8310bbd93220285cfac"
+    missingDynamicTag: false
+    section: 7.3_A7_T1
+    subject: Insert Line Terminator in var x=y+z
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T2.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "2b003345ddc348d45a199bd71e812950e7352ea2\
+      f21402e7465bb0f297103d3f"
+    observationDigest: "cc34f99e5c401de5cc62933d25a769984316a8aa\
+      c577ca2a030d70060a63cada"
+    missingDynamicTag: false
+    section: 7.3_A7_T2
+    subject: Insert Line Terminator in var x=y-z
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T3.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "10a968294c665df76278d3887f43b73ce32fe7fe\
+      abcb0a7ce146540347be11c3"
+    observationDigest: "20ff2989085877726b2e8d42cd6f7075a2030b3e\
+      413c7ca8a51210934b0ed840"
+    missingDynamicTag: false
+    section: 7.3_A7_T3
+    subject: Insert Line Terminator in var x=y*z
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T4.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "7fcb42dfef9fd47306396fa41a331b86e22d75c4\
+      8b83744cf4711d89a81e5173"
+    observationDigest: "b3510d7317df791a4326c5e6d9b979451d94bed0\
+      c2323bc44b484a5ecb36d490"
+    missingDynamicTag: false
+    section: 7.3_A7_T4
+    subject: Insert Line Terminator in var x=y/z
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T5.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "314ed963ae148aed4a68405487270c21c5da3156\
+      f6f071a1b82bea81f80c6598"
+    observationDigest: "4c977c922406f5b564846de828339210b9693f01\
+      167e1ef23eb29952772300f4"
+    missingDynamicTag: false
+    section: 7.3_A7_T5
+    subject: Insert Line Terminator in var x=y%z
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T6.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "208af09a6cb341c652cf29e322037d697ee52b98\
+      a5e26f3a3e36d371a1430a6a"
+    observationDigest: "aae4d9fd9b8813c2e1bfb22c758e01a492852727\
+      9e83d3744d26605c6bd85602"
+    missingDynamicTag: false
+    section: 7.3_A7_T6
+    subject: Insert Line Terminator in var x=y>>z
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T7.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "79b2bd240573054ec1729a8ab8f8c93a6a96b261\
+      0be76df211216d7f070024e4"
+    observationDigest: "a95d2798ac8862e0e5f6a5a8311d94ff871f8e51\
+      5e34913e6c1601d1c4f25f99"
+    missingDynamicTag: false
+    section: 7.3_A7_T7
+    subject: Insert Line Terminator in var x=y<<z
+    assessment: observation-b01-b18-dynamic-source
+  - path: test/language/line-terminators/S7.3_A7_T8.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "fe64d66db9132ffe240d3ea1f8281d01d07cc1f9\
+      d5abd212fc82a3127a0f6128"
+    observationDigest: "5935b759b672d6805ceb2fddbcb2cfb557304ef4\
+      a63490ec8838f85a1a40774f"
+    missingDynamicTag: false
+    section: 7.3_A7_T8
+    subject: Insert Line Terminator in var x=y<z
+    assessment: observation-b01-b18-dynamic-source
   - path: "test/language/literals/numeric/7.8.3-3gs.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
     priorCohort: "incidental-scaffolding"

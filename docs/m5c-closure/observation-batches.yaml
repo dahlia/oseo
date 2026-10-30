@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 9754
+unreviewedPaths: 8810
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,184 +165,45 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 105606
-  currentSeconds: 5802
-  finalExecutedVariants: 138226
-  finalSeconds: 7594
+  currentExecutedVariants: 108255
+  currentSeconds: 5948
+  finalExecutedVariants: 137923
+  finalSeconds: 7578
   plan:
-    batches: 21
+    batches: 19
     largestPaths: 794
     largestReviewUnits: 500
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 39.82
-    fullUpdateScheduleHours: 78.64
+    scheduleHours: 36.44
+    fullUpdateScheduleHours: 71.98
   alternatives:
-    - batches: 26
+    - batches: 22
       largestPaths: 1920
       largestReviewUnits: 300
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 49.54
-      fullUpdateScheduleHours: 98.08
-    - batches: 13
+      scheduleHours: 42.75
+      fullUpdateScheduleHours: 84.6
+    - batches: 12
       largestPaths: 2408
       largestReviewUnits: 595
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 25.37
-      fullUpdateScheduleHours: 49.73
-    - batches: 8
+      scheduleHours: 23.66
+      fullUpdateScheduleHours: 46.41
+    - batches: 6
       largestPaths: 3900
       largestReviewUnits: 1144
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 15.84
-      fullUpdateScheduleHours: 30.68
+      scheduleHours: 12.42
+      fullUpdateScheduleHours: 23.94
 batches:
-  - id: observation-batch-01
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/built-ins/AggregateError/
-        - test/built-ins/Array/
-        - test/built-ins/AsyncFromSyncIteratorPrototype/
-        - test/built-ins/AsyncGeneratorPrototype/return/return-
-        - test/built-ins/Error/
-        - test/built-ins/FinalizationRegistry/prototype/
-        - test/built-ins/Function/
-        - test/built-ins/Map/
-        - test/built-ins/Math/
-        - test/built-ins/NativeErrors/
-        - test/built-ins/Object/
-        - test/built-ins/Promise/
-    dependsOn:
-      - observation-batch-plan
-    paths: 305
-    reviewUnits: 305
-    generatedPaths: 0
-    prerequisites: {}
-    dynamicSource:
-      Function: 75
-      eval: 3
-    flags:
-      async: 22
-      noStrict: 57
-      onlyStrict: 31
-    includes:
-      asyncHelpers.js: 3
-      compareArray.js: 8
-      isConstructor.js: 10
-      nativeErrors.js: 1
-      promiseHelper.js: 10
-      propertyHelper.js: 34
-      proxyTrapsHelper.js: 2
-      testTypedArray.js: 3
-    features:
-      AggregateError: 12
-      FinalizationRegistry: 3
-      Map: 1
-      Promise.allSettled: 2
-      Promise.any: 4
-      Reflect.construct: 11
-      Symbol: 4
-      Symbol.iterator: 5
-      Symbol.species: 1
-      Symbol.toStringTag: 1
-      TypedArray: 3
-      array-grouping: 1
-      arrow-function: 3
-      async-iteration: 6
-      class: 1
-      class-fields-private: 1
-      error-cause: 2
-      exponentiation: 2
-      resizable-arraybuffer: 3
-    negatives: {}
-    partitions:
-      groups:
-        - built-ins/AggregateError
-        - built-ins/Array
-        - built-ins/AsyncFromSyncIteratorPrototype
-        - built-ins/AsyncGeneratorPrototype
-        - built-ins/Error
-        - built-ins/FinalizationRegistry
-        - built-ins/Function
-        - built-ins/Map
-        - built-ins/Math
-        - built-ins/NativeErrors
-        - built-ins/Object
-        - built-ins/Promise
-      files: 258
-      newFiles: 117
-    regeneration:
-      executableVariants: 1044
-      scopedUpdateSeconds: 57
-      fullCorpusSeconds: 5860
-  - id: observation-batch-03
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/built-ins/TypedArrayConstructors/BigInt64Array/
-        - test/built-ins/TypedArrayConstructors/BigUint64Array/
-        - test/built-ins/TypedArrayConstructors/Float32Array/
-        - test/built-ins/TypedArrayConstructors/Float64Array/
-        - test/built-ins/TypedArrayConstructors/Int16Array/
-        - test/built-ins/TypedArrayConstructors/Int32Array/
-        - test/built-ins/TypedArrayConstructors/Int8Array/
-        - test/built-ins/TypedArrayConstructors/Uint16Array/
-        - test/built-ins/TypedArrayConstructors/Uint32Array/
-        - test/built-ins/TypedArrayConstructors/Uint8Array/
-        - test/built-ins/TypedArrayConstructors/Uint8ClampedArray/
-        - test/built-ins/TypedArrayConstructors/ctors-bigint/
-        - test/built-ins/TypedArrayConstructors/ctors/
-        - test/built-ins/TypedArrayConstructors/from/
-    dependsOn:
-      - observation-batch-plan
-    paths: 313
-    reviewUnits: 313
-    generatedPaths: 0
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      noStrict: 2
-      onlyStrict: 2
-    includes:
-      byteConversionValues.js: 1
-      compareArray.js: 1
-      detachArrayBuffer.js: 6
-      isConstructor.js: 11
-      nans.js: 1
-      testTypedArray.js: 293
-    features:
-      Array.prototype.values: 3
-      BigInt: 141
-      Reflect: 23
-      Reflect.construct: 11
-      SharedArrayBuffer: 48
-      Symbol: 20
-      Symbol.iterator: 19
-      Symbol.species: 6
-      Symbol.toPrimitive: 4
-      TypedArray: 310
-      generators: 1
-      resizable-arraybuffer: 1
-    negatives: {}
-    partitions:
-      groups:
-        - built-ins/TypedArrayConstructors
-      files: 185
-      newFiles: 34
-    regeneration:
-      executableVariants: 1244
-      scopedUpdateSeconds: 68
-      fullCorpusSeconds: 5928
   - id: observation-batch-06
     selector:
       prerequisiteSets:
@@ -386,7 +247,7 @@ batches:
     regeneration:
       executableVariants: 850
       scopedUpdateSeconds: 47
-      fullCorpusSeconds: 5975
+      fullCorpusSeconds: 5994
   - id: observation-batch-08
     selector:
       prerequisiteSets:
@@ -432,7 +293,7 @@ batches:
     regeneration:
       executableVariants: 1308
       scopedUpdateSeconds: 72
-      fullCorpusSeconds: 6047
+      fullCorpusSeconds: 6066
   - id: observation-batch-14
     selector:
       prerequisiteSets:
@@ -485,47 +346,35 @@ batches:
     regeneration:
       executableVariants: 1350
       scopedUpdateSeconds: 74
-      fullCorpusSeconds: 6121
+      fullCorpusSeconds: 6141
   - id: observation-batch-18
     selector:
       prerequisiteSets:
         - ""
       prefixes:
         - test/language/identifiers/
-        - test/language/import/
-        - test/language/keywords/ident-ref-
-        - test/language/line-terminators/
     dependsOn:
       - observation-batch-plan
-    paths: 336
-    reviewUnits: 336
+    paths: 10
+    reviewUnits: 10
     generatedPaths: 0
     prerequisites: {}
-    dynamicSource:
-      eval: 9
-    flags:
-      module: 4
-      onlyStrict: 1
+    dynamicSource: {}
+    flags: {}
     includes: {}
     features:
-      class: 60
-      class-fields-private: 60
-      numeric-separator-literal: 1
-    negatives:
-      parse: 160
-      runtime: 7
+      class: 10
+      class-fields-private: 10
+    negatives: {}
     partitions:
       groups:
         - language/identifiers
-        - language/import
-        - language/keywords
-        - language/line-terminators
-      files: 252
-      newFiles: 251
+      files: 10
+      newFiles: 2
     regeneration:
-      executableVariants: 704
-      scopedUpdateSeconds: 39
-      fullCorpusSeconds: 6159
+      executableVariants: 40
+      scopedUpdateSeconds: 2
+      fullCorpusSeconds: 6143
   - id: observation-batch-21a
     selector:
       prerequisiteSets:
@@ -590,7 +439,7 @@ batches:
     regeneration:
       executableVariants: 1498
       scopedUpdateSeconds: 82
-      fullCorpusSeconds: 6242
+      fullCorpusSeconds: 6225
   - id: observation-batch-21b
     selector:
       prerequisiteSets:
@@ -628,7 +477,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6372
+      fullCorpusSeconds: 6355
   - id: observation-batch-21c
     selector:
       prerequisiteSets:
@@ -667,7 +516,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6502
+      fullCorpusSeconds: 6485
   - id: observation-batch-21d
     selector:
       prerequisiteSets:
@@ -706,7 +555,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6632
+      fullCorpusSeconds: 6615
   - id: observation-batch-22a
     selector:
       prerequisiteSets:
@@ -767,7 +616,7 @@ batches:
     regeneration:
       executableVariants: 2082
       scopedUpdateSeconds: 114
-      fullCorpusSeconds: 6746
+      fullCorpusSeconds: 6730
   - id: observation-batch-22b
     selector:
       prerequisiteSets:
@@ -830,7 +679,7 @@ batches:
     regeneration:
       executableVariants: 2150
       scopedUpdateSeconds: 118
-      fullCorpusSeconds: 6864
+      fullCorpusSeconds: 6848
   - id: observation-batch-23
     selector:
       prerequisiteSets:
@@ -898,7 +747,7 @@ batches:
     regeneration:
       executableVariants: 956
       scopedUpdateSeconds: 53
-      fullCorpusSeconds: 6917
+      fullCorpusSeconds: 6900
   - id: observation-batch-24
     selector:
       prerequisiteSets:
@@ -938,7 +787,7 @@ batches:
     regeneration:
       executableVariants: 3150
       scopedUpdateSeconds: 173
-      fullCorpusSeconds: 7090
+      fullCorpusSeconds: 7073
   - id: observation-batch-25
     selector:
       prerequisiteSets:
@@ -1028,7 +877,7 @@ batches:
     regeneration:
       executableVariants: 2210
       scopedUpdateSeconds: 121
-      fullCorpusSeconds: 7212
+      fullCorpusSeconds: 7195
   - id: observation-batch-26a
     selector:
       prerequisiteSets:
@@ -1076,7 +925,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7284
+      fullCorpusSeconds: 7268
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -1123,7 +972,7 @@ batches:
     regeneration:
       executableVariants: 2116
       scopedUpdateSeconds: 116
-      fullCorpusSeconds: 7401
+      fullCorpusSeconds: 7384
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -1175,7 +1024,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7496
+      fullCorpusSeconds: 7479
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -1223,7 +1072,7 @@ batches:
     regeneration:
       executableVariants: 924
       scopedUpdateSeconds: 51
-      fullCorpusSeconds: 7547
+      fullCorpusSeconds: 7530
   - id: observation-batch-29
     selector:
       prerequisiteSets:
@@ -1275,11 +1124,11 @@ batches:
         - language/expressions
         - language/types
       files: 84
-      newFiles: 21
+      newFiles: 20
     regeneration:
       executableVariants: 340
       scopedUpdateSeconds: 19
-      fullCorpusSeconds: 7565
+      fullCorpusSeconds: 7549
   - id: observation-batch-32
     selector:
       prerequisiteSets:
@@ -1411,8 +1260,8 @@ batches:
         - language/module-code
         - language/statements
       files: 178
-      newFiles: 45
+      newFiles: 44
     regeneration:
       executableVariants: 528
       scopedUpdateSeconds: 29
-      fullCorpusSeconds: 7594
+      fullCorpusSeconds: 7578

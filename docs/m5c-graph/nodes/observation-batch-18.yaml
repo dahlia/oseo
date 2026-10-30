@@ -8,5 +8,6 @@ delivers: "Observes the 336 unreviewed paths that
   result an owner."
 dependencies:
   - observation-batch-plan
+  - unicode-class-native-frame-budget
 landed: false
-status: ready
+status: blocked

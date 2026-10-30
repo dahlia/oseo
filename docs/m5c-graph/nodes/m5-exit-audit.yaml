@@ -110,6 +110,7 @@ dependencies:
   - typed-array-tolocalestring-arguments
   - typedarray-copywithin-detached-cost
   - unhandled-rejection-observation
+  - unicode-class-native-frame-budget
   - well-known-intrinsics-harness
   - with-optional-call-receiver
   - with-optional-call-receiver-non-tail

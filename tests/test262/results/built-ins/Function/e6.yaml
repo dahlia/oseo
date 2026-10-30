@@ -4,6 +4,32 @@ results:
   - case:
       async: false
       features: []
+      flags:
+        - onlyStrict
+      includes: []
+      mode: script
+      path: test/built-ins/Function/15.3.5.4_2-11gs.js
+      strictness:
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - object-properties
+    observation:
+      detail: "test/built-ins/Function/15.3.5.4_2-11gs.js strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/built-ins/Function/15.3.5.4_2-11gs.js:89:3:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
       flags: []
       includes: []
       mode: script

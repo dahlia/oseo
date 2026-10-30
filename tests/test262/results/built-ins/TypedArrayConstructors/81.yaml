@@ -7,6 +7,41 @@ results:
         - TypedArray
       flags: []
       includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/Float64Array/prototype/proto.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - functions
+      - object-properties
+      - typed-array-constructors
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - TypedArray
+      flags: []
+      includes:
         - propertyHelper.js
       mode: script
       path: test/built-ins/TypedArrayConstructors/Int8Array/length.js
@@ -54,6 +89,52 @@ results:
       harnessIncludes:
         - base.js
         - propertyHelper.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - BigInt
+        - Symbol.iterator
+        - TypedArray
+      flags: []
+      includes:
+        - testTypedArray.js
+      mode: script
+      path: test/built-ins/TypedArrayConstructors/from/BigInt/custom-ctor-returns-other-instance.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - array-buffer
+      - bigint-primitive
+      - expression-operators
+      - functions
+      - iterator-protocol
+      - object-literals
+      - object-properties
+      - symbols
+      - typed-array-constructors
+      - typed-array-core
+      - typed-array-statics
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - testTypedArray.js
       target: linux-x86_64-gnu
       variants:
         - specialization: disabled
