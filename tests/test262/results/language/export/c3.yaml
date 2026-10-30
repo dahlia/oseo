@@ -18,7 +18,7 @@ results:
     dependencies:
       - module-linking
     observation:
-      detail: "test/language/export/escaped-as-export-specifier.js:100:11:
+      detail: "test/language/export/escaped-as-export-specifier.js:25:11:
         error[OSEO0001]: Source could not be parsed."
       errorType: SyntaxError
       failedPhase: parse

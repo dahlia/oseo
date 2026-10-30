@@ -6177,8 +6177,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "648a257196bc895409842b12191cc0a8d9e1\
       0d28e66886afb89059412761caca"
-    observationDigest: "1f56a1fc58bf6e63ef570bc677da639348c9\
-      e03b685770d50bd98c28fadceaba"
+    observationDigest: "789028a3acc020ce857c5b6503343d148bca\
+      d23965f5a5c476615a9d754d00a4"
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `export` declaration may not appear within eval code"
@@ -7230,8 +7230,8 @@ paths:
     priorCohort: "source-subject"
     sourceDigest: "28c29caa8c8649579790526b511323df0483\
       7efad886d2f9d0ea75140dc5fa89"
-    observationDigest: "82513abf66a894dfd501e96e803d90257549\
-      6e53091d058ab8ee38cbc7793a33"
+    observationDigest: "2e06b1a419c029a114cd4f8bfb5efa2f345a\
+      61ab4c6d090f0954d881605ff463"
     missingDynamicTag: false
     section: "sec-scripts"
     subject: "The `import` declaration may not appear within eval code"

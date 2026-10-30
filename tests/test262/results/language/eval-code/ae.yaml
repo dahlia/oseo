@@ -55,7 +55,7 @@ results:
       - functions
       - module-linking
     observation:
-      detail: "test/language/eval-code/direct/export.js:98:3: error[OSEO1001]:
+      detail: "test/language/eval-code/direct/export.js:23:3: error[OSEO1001]:
         Unknown binding 'eval'."
       passed: false
       unsupportedCapability: profile-syntax
