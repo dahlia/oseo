@@ -153243,6 +153243,12 @@ tests:
   - path: test/language/identifiers/start-underscore.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/identifiers/start-unicode-10.0.0-class-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
+  - path: test/language/identifiers/start-unicode-10.0.0-class.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
   - path: test/language/identifiers/start-unicode-10.0.0-escaped.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
@@ -153273,6 +153279,12 @@ tests:
   - path: test/language/identifiers/start-unicode-12.0.0.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/identifiers/start-unicode-13.0.0-class-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
+  - path: test/language/identifiers/start-unicode-13.0.0-class.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
   - path: test/language/identifiers/start-unicode-13.0.0-escaped.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
@@ -153339,6 +153351,12 @@ tests:
   - path: test/language/identifiers/start-unicode-17.0.0.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/identifiers/start-unicode-5.2.0-class-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
+  - path: test/language/identifiers/start-unicode-5.2.0-class.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
   - path: test/language/identifiers/start-unicode-5.2.0-escaped.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
@@ -153381,12 +153399,24 @@ tests:
   - path: test/language/identifiers/start-unicode-7.0.0.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/identifiers/start-unicode-8.0.0-class-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
+  - path: test/language/identifiers/start-unicode-8.0.0-class.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
   - path: test/language/identifiers/start-unicode-8.0.0-escaped.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
   - path: test/language/identifiers/start-unicode-8.0.0.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]
+  - path: test/language/identifiers/start-unicode-9.0.0-class-escaped.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
+  - path: test/language/identifiers/start-unicode-9.0.0-class.js
+    expectedClassification: pass
+    dependencies: [classes, lexical-grammar]
   - path: test/language/identifiers/start-unicode-9.0.0-escaped.js
     expectedClassification: pass
     dependencies: [lexical-grammar, var-bindings]

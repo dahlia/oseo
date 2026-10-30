@@ -17,7 +17,8 @@ against the unchanged 65,536-slot ceiling before its body runs.
 
 Root authorized registering this prerequisite and admitting the other
 944 train paths. That registration added no product fix, failure
-reclassification, or exclusion. These ten remain unreviewed under batch 18.
+reclassification, or exclusion. That train left these ten unreviewed under
+batch 18.
 
 
 Bounded private-name setup
@@ -41,9 +42,9 @@ exits. Runtime ABI `m5-142` identifies the new entry point.
 The shared ceiling, callable multiplier, general declaration charges,
 generic fallbacks, and both specialization policies remain unchanged.
 The complete Unicode 10 source now charges 49,977 slots at script entry.
-No upstream source, assertion, reviewed subset entry, result, ledger owner,
-or graph landed flag changes. The ten paths remain unreviewed under
-observation batch 18 until Root's fresh admission.
+Implementation U `554b5236` changes no upstream source, assertion, reviewed
+subset entry, result, ledger owner, or graph landed flag. It leaves the ten
+paths unreviewed under observation batch 18 for a separate admission.
 
 The source regression records its original failure in
 */data/m5c-d17-20261031/unicode/regression-before.log*. Structural coverage
@@ -109,8 +110,44 @@ property and fast/package vectors above completed naturally with exit zero.
 No expectation, seed, case count, or language behavior was changed to make
 those runs pass.
 
-Internal review and Root's exact-U D3/UPDATE judgment follow the normal-hook
-implementation commit. All ten paths still belong to observation batch 18.
+The normal-hook implementation commit `554b5236` passed the prescribed
+DeepSeek/Astra internal pair with no findings. The first DeepSeek attempt
+was OOM-killed at its 12 GiB sandbox limit; Root authorized one same-pass
+retry, which completed cleanly before Astra. The complete attempt records
+are retained under */data/m5c-review-runs/unicode-class-native-frame-budget/*.
+Root selected a Full UPDATE for this exact U because it changes the compiler
+and runtime, and authorized a separate ten-row admission before that run.
+
+
+Ten-row admission
+-----------------
+
+Root's D3 reply authorizes admitting the ten complete originals as `pass`
+before Root's batched Full UPDATE. A fresh focused capture at `554b5236`
+passed all ten and all 40 strictness/policy variants in 492.7 seconds.
+*/data/m5c-d17-20261031/unicode/observe-admission.json* records the
+capacity-wrapped command and natural exit zero; its sibling stdout retains
+each complete runner result. The canonical serializer materializes these
+results without changing any prior observation. Ledger ownership moves from
+`node:observation-batch-18` to `observation` for exactly these ten paths.
+Canonical batch-plan regeneration removes the now-empty batch 18 selector
+and refreshes the derived counts and cost model; every surviving selector
+and its planning basis are preserved. Graph readiness and landed flags
+remain unchanged.
+
+The shared observation-tag rules give each row `classes` and
+`lexical-grammar`: class evaluation creates the private fields, and the
+subject is Unicode ID\_Start spelling in private identifiers. Escaped and
+unescaped originals assert the same grammar family. No harness internals,
+diagnostic text, failure-only branch, scaffolding, or fixture supplies a tag.
+The per-row source-hash and tag self-audit is in *admission-observations.json*.
+The scoped allow-list proof in *admission-allow-list-proof.json* verifies
+every prior subset row byte for byte, every prior result, all other ledger
+entries, and all graph fields outside the derived baseline. No exclusion,
+source, assertion, frame ceiling, feature list, or graph state changes.
+
+This admission is separate from Root's Full UPDATE, R, outer gate,
+candidate CI, landing, and publication. Root retains all of those steps.
 
 
 Exact reserved paths
