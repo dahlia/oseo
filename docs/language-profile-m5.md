@@ -2044,7 +2044,17 @@ current evidence assessment. Those live only in the indexed records above.
     unresolvable computed key unsupported. The
     two `grammar-special-prototype-accessor-meth` cases remain outside this
     node's reviewed promotion root and await their owning class-family review.
- -  Class static methods and accessors on the constructor. A `static` element
+ -  Class static methods and accessors on the constructor. The `static`
+    contextual keyword must appear literally, without Unicode escapes.
+    Both source goals report `OSEO0001` at an escaped modifier before
+    profile conversion. Escaped IdentifierName property keys remain valid,
+    including a method or field named `static`. When a line terminator
+    separates an escaped field name from the following member, ASI closes
+    the field; a line terminator inside a comment also qualifies. The
+    frontend preserves original locations, source text and TypeScript hints
+    while separating those elements. Parser coverage lives in
+    *packages/parser-babel/tests/class-static-keyword.test.ts*.
+    A `static` element
     carries a placement flag through the owned syntax tree and HIR, and MIR
     lowering targets the constructor value instead of the prototype object
     with the same `property-define-method` and `property-define-accessor`

@@ -1,4 +1,4 @@
-import { parse as parseBabel } from "@babel/parser";
+import { parseWithClassStaticAsi as parseBabel } from "./class-static-asi.ts";
 import type {
   ModuleSourceFrontend,
   SourceFrontend,
@@ -10,6 +10,7 @@ import {
   type ConvertOptions,
   type ParserError,
 } from "./babel.ts";
+import { classStaticKeywordDiagnostics } from "./class-static-keyword.ts";
 import { program } from "./convert.ts";
 import { newImportCallDiagnostics } from "./import-call-early-errors.ts";
 import { createSourceIndex, diagnosticAt, errorOffset } from "./locations.ts";
@@ -61,6 +62,18 @@ export function createBabelFrontend(
             diagnostics: moduleDeclarations.map((declaration) =>
               diagnosticAt(input, locations, declaration.start ?? 0),
             ),
+            parsed: false,
+            sourceId: input.sourceId,
+          };
+        }
+        const staticKeywordErrors = classStaticKeywordDiagnostics(
+          input,
+          locations,
+          file,
+        );
+        if (staticKeywordErrors.length > 0) {
+          return {
+            diagnostics: staticKeywordErrors,
             parsed: false,
             sourceId: input.sourceId,
           };
