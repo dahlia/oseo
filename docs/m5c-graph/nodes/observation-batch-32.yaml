@@ -32,5 +32,5 @@ dependencies:
   - resizable-array-buffer-harness
   - typed-array-feature-admission
   - well-known-intrinsics-harness
-landed: false
+landed: true
 status: ready
