@@ -32,7 +32,7 @@ unreviewed under `node:observation-batch-23`; the historical failure above is
 an observation outside that manifest.
 
 The frontend had synthesized a rest parameter and `super(...args)`.
-That source-equivalent expansion incorrectly reads the Array iterator.
+That expansion incorrectly reads the Array iterator.
 Default constructors now carry an internal forwarding marker through
 syntax, HIR and MIR. The C backend passes the running function's incoming
 argument count and values directly to super construction. Explicit source
@@ -55,3 +55,28 @@ slot 4 because the concurrent Unicode-class candidate reserves slot 3.
 Root owns D3, the full UPDATE and any later admission of the original.
 No subset entry, manifest result, exclusion boundary or landed state is
 changed by this implementation.
+
+
+Focused validation and generated output
+---------------------------------------
+
+The compiler, Babel frontend and C backend package suites passed 674 tests
+under Node.js and 674 under Deno. The fixed fixture passed both native
+policies on Zig and host-cc with forced collection. The complete class
+property file passed all 17 tests on each lane, including the new seed-4
+domain. These runs use the implementation committed as `52adde9b`;
+the following corrections change documentation and fingerprints only.
+
+The first fast repository run passed 832 of 833 tests. Its single failure
+was the whole-Script fingerprint check: direct argument forwarding changes
+four records for *function-prototype* and *object-constructor*, each under
+both policies. A source archive of the pinned base reproduced all 44 old
+hashes; the other 40 outputs remain unchanged. The generated fingerprint
+refresh and *docs/harness-fragment-abi.md* record that deliberate output
+change. No test262 expectation changes with these fingerprints.
+
+Internal pass 1 completed both stages. DeepSeek identified the stale
+rest-and-spread description in the normative profile; Astra reported no
+blocking finding. The normative profile and matching *PLAN-M5.md* passage
+now describe direct forwarding. Affected checks and review follow these
+corrections; no admission or landing is claimed here.

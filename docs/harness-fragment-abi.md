@@ -435,3 +435,21 @@ The post-revert sanitizer repair guards function bodies with the shared
 runtime frame ceiling and applies the explicit host C callable-frame charge
 in both direct and dispatched calls. All 44 whole-Script digest records are
 regenerated for these C-only changes; HIR and MIR are unchanged.
+
+
+Default derived constructor forwarding
+--------------------------------------
+
+M5c node `default-derived-constructor-spread-iterator` regenerates four
+of the 44 whole-Script records: *functions/function-prototype* and
+*objects/object-constructor*, each under both specialization policies.
+These fixtures contain implicit derived constructors. Removing their
+synthetic rest binding and iterator evaluation changes printed HIR, MIR
+and emitted C, including subsequent binding and root numbering.
+A clean source archive of base
+`1f3ade138ea7cbee80b2d62940e8f497db2bc1a2` reproduced all 44 old hashes;
+the other 40 outputs remain unchanged. This changes no runtime ABI.
+The comparison script and its output live in
+*/data/m5c-derived-spread-20261031/compare-baseline.ts* and
+*baseline-compare.out*. These hashes measure code generation; the node's
+work note records its separate native execution evidence.

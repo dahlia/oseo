@@ -2141,9 +2141,11 @@ current evidence assessment. Those live only in the indexed records above.
     never ran, and any other value is a `TypeError`. MIR rewrites the
     terminators after the body is built, so a `return` inside `try` still runs
     its `finally`, including a `finally` that calls `super()`. A class body
-    without a `constructor` gets the implicit
-    `constructor(...args) { super(...args); }` with a synthetic rest parameter
-    name and a `length` of zero. `new.target` is admitted as its own
+    without a `constructor` gets an implicit derived constructor with a
+    `length` of zero. It forwards the incoming argument list directly to
+    parent construction, without creating a rest Array or reading an Array
+    iterator. Explicit source `super(...args)` retains iterator evaluation.
+    `new.target` is admitted as its own
     expression that reads the construction target the call ABI already
     carries: it is the constructed class through every `super()` hop, and
     `undefined` for an ordinary call, a method call, a generator body, and an

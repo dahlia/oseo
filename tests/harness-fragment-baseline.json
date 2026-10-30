@@ -39,13 +39,13 @@
     "family": "functions",
     "name": "function-prototype",
     "specialization": "enabled",
-    "sha256": "f600a2c87532654b7727663f3cc63fec00e9b18b2c79c6cf758f442edd160db8"
+    "sha256": "826aecd37074c60f3c21513b95ffd1cafa65de0c350cbb74208f3887dfd091d1"
   },
   {
     "family": "functions",
     "name": "function-prototype",
     "specialization": "disabled",
-    "sha256": "815c2d8be7b329ea98ad0398fb4cf2495be77667d83ad97323a26f78a923b5ee"
+    "sha256": "2a249d5f10bf58fb0210057df592a67701e22716e5528584a66b1878568883b9"
   },
   {
     "family": "functions",
@@ -111,13 +111,13 @@
     "family": "objects",
     "name": "object-constructor",
     "specialization": "enabled",
-    "sha256": "c931aa0f7fb7199cfe4a45951027f86264db4e161506a31343ed147750e30998"
+    "sha256": "cca681c55afdb790dad5bfbd134f957d590cdf23cca9cd78b0fdf98ace1ea54e"
   },
   {
     "family": "objects",
     "name": "object-constructor",
     "specialization": "disabled",
-    "sha256": "74faed65d0dc141e971c75b8efdb3cb22f2d053fe270e90e039eda431ddff951"
+    "sha256": "c772f50a9d3d7527a0d5546c99f67eee202f9b4ef2571de82d9b5f75388aa7a7"
   },
   {
     "family": "objects",
