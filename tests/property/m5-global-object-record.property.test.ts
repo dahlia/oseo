@@ -42,17 +42,21 @@ const caseArbitrary: fc.Arbitrary<GlobalRecordCase> = fc.record({
 
 /**
  * One statement that observes or changes the global `eval` binding
- * without passing a String to %eval%. ADR 0016 rejects an unshadowed
- * `eval(...)` call, so calls go through a comma expression, a `with`
- * object whose fallback reaches the global property, or a tagged
- * template, which is an ordinary call passing a template object.
+ * without passing a String to %eval%. Calls include direct, indirect,
+ * parenthesized, spread, with-fallback and tagged forms. The current
+ * binding still determines whether %eval% or a replacement is called.
  */
 type EvalStep =
-  | { readonly kind: "call"; readonly value: number }
+  | {
+      readonly kind: "call";
+      readonly form: "direct" | "indirect" | "parenthesized" | "spread";
+      readonly value: number;
+    }
   | { readonly kind: "construct" }
   | { readonly kind: "delete" }
   | { readonly kind: "descriptor" }
   | { readonly kind: "hint" }
+  | { readonly kind: "identity"; readonly expression: string }
   | { readonly kind: "read" }
   | { readonly kind: "restore" }
   | { readonly kind: "shadow"; readonly value: number }
@@ -69,11 +73,39 @@ interface EvalCase {
 const evalValue = fc.integer({ max: 100, min: 0 });
 
 const evalStepArbitrary: fc.Arbitrary<EvalStep> = fc.oneof(
-  fc.record({ kind: fc.constant("call" as const), value: evalValue }),
+  fc.record({
+    kind: fc.constant("call" as const),
+    form: fc.constantFrom(
+      "direct" as const,
+      "indirect" as const,
+      "parenthesized" as const,
+      "spread" as const,
+    ),
+    value: evalValue,
+  }),
   fc.record({ kind: fc.constant("construct" as const) }),
   fc.record({ kind: fc.constant("delete" as const) }),
   fc.record({ kind: fc.constant("descriptor" as const) }),
   fc.record({ kind: fc.constant("hint" as const) }),
+  fc.record({
+    kind: fc.constant("identity" as const),
+    expression: fc.constantFrom(
+      "undefined",
+      "null",
+      "true",
+      "false",
+      "-0",
+      "NaN",
+      "Infinity",
+      "12n",
+      'Symbol("identity")',
+      "({})",
+      "[]",
+      "(() => 1)",
+      'new String("boxed")',
+      "new Proxy({}, {})",
+    ),
+  }),
   fc.record({ kind: fc.constant("read" as const) }),
   fc.record({ kind: fc.constant("restore" as const) }),
   fc.record({ kind: fc.constant("shadow" as const), value: evalValue }),
@@ -187,10 +219,25 @@ function expected(testCase: GlobalRecordCase): string {
 function evalStepSource(step: EvalStep): string {
   const shown = 'eval === intrinsic ? "intrinsic" : eval';
   switch (step.kind) {
-    case "call":
+    case "call": {
+      const callee =
+        step.form === "indirect"
+          ? "(0, eval)"
+          : step.form === "parenthesized"
+            ? "(eval)"
+            : "eval";
+      const argument =
+        step.form === "spread" ? `...[${step.value}]` : `${step.value}`;
       return (
-        `try { console.log("call", (0, eval)(${step.value})); } ` +
+        `try { console.log("call", ${callee}(${argument})); } ` +
         'catch (error) { console.log("call", error.name); }'
+      );
+    }
+    case "identity":
+      return (
+        `{ const value = ${step.expression}; try { ` +
+        'console.log("identity", Object.is(eval(value), value)); } ' +
+        'catch (error) { console.log("identity", error.name); } }'
       );
     case "construct":
       return (
@@ -307,6 +354,17 @@ function evalExpected(testCase: EvalCase): string {
           `call ${
             value === "intrinsic"
               ? step.value
+              : value === "missing"
+                ? "ReferenceError"
+                : "TypeError"
+          }`,
+        );
+        break;
+      case "identity":
+        lines.push(
+          `identity ${
+            value === "intrinsic"
+              ? "true"
               : value === "missing"
                 ? "ReferenceError"
                 : "TypeError"
@@ -608,6 +666,9 @@ test(
                   host.executionHost.architecture,
                 `sanitizers=${nativeTarget.sanitizers.join(",")}`,
               ],
+        // This stable domain key retains its seed/budget identity. The
+        // generator also covers direct, parenthesized and spread calls,
+        // and non-String identity for objects, proxies and boxed Strings.
         domain:
           "one to eight reads, typeof, indirect and with-fallback calls with " +
           "non-String arguments, plain and parenthesized tagged template " +

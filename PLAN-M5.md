@@ -8721,11 +8721,22 @@ binding, which repairs the `OSEO2001` “Binding is read before
 initialization” failure of a `with` fallback read. Parameters, `var`,
 function, and lexical declarations named `eval` stay ordinary bindings.
 
-ADR 0016's call-position exclusion is unchanged. ECMA-262 2025 13.3.6.1
+The later `direct-eval-non-string-dispatch` node routes every direct call
+through the existing resolved-callee runtime dispatch. Non-String values
+return unchanged after argument evaluation; String arguments report the
+source-located ADR 0016 runtime boundary before source evaluation. This
+supersedes the syntactic rejection described in the historical value-only
+preparation below. The fixed native fixture and the existing global-object
+record property cover direct, parenthesized and spread forms, both policies,
+false hints and forced collection; the node's work note records validation.
+No source compiler, interpreter or new exclusion is admitted.
+
+At the earlier value-only preparation, ADR 0016's call-position exclusion
+was retained by the resolver. ECMA-262 2025 13.3.6.1
 performs a direct eval for a call whose callee is an identifier reference
 named `eval` holding %eval%, and only the global property can hold it where
-no declaration or `with` object supplies the name. The resolver therefore
-rejects an unshadowed `eval(...)`, including a parenthesized callee and
+no declaration or `with` object supplies the name. The resolver then
+rejected an unshadowed `eval(...)`, including a parenthesized callee and
 spread arguments, at the same point and with the same
 `Unknown binding 'eval'.` text and range as before. A compile-only
 comparison of base `c249cad8` with this change over every reviewed Script
@@ -8764,8 +8775,8 @@ or ``(eval)`x` ``, is also an ordinary call. ECMA-262 2025 13.3.11.1
 evaluates it through EvaluateCall rather than the direct eval steps of
 13.3.6.1, and it passes the site's template object, which PerformEval
 (19.2.1.1, step 2) returns unchanged because it is not a String. The
-resolver recognizes the tagged form by its synthesized template object
-argument, so an `eval(...)` call keeps its rejection even when its
+resolver then recognized the tagged form by its synthesized template object
+argument, so an `eval(...)` call kept its rejection even when its
 argument is an untagged template literal. No reviewed path uses a tagged
 `eval`: rerunning the compile-only comparison after this distinction left
 every MIR digest of the 388 compiled Script paths and every diagnostic

@@ -13,8 +13,10 @@ scope:
   - "A bare eval identifier that no declaration or with object supplies
     reads, writes, deletes, and applies typeof to the global object's eval
     property, including through a with fallback; a tagged template with
-    that tag is an ordinary call, the ADR 0016 rejection of an unshadowed
-    eval call is unchanged, and no source is evaluated."
+    that tag is an ordinary call. Direct calls likewise preserve every
+    non-String argument unchanged after ordinary argument evaluation.
+    Passing a String to %eval% reports the source-located ADR 0016
+    runtime boundary; no source is evaluated."
   - "A with object that supplies eval but loses it before GetBindingValue
     reads undefined in non-strict code and throws ReferenceError in strict
     code; the with-statement family owns that lookup contract."
@@ -61,6 +63,8 @@ evidence:
       - tests/host-script-directives-source.test.ts
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native/fixtures/global-object-record.ts
+      - tests/direct-eval-non-string.test.ts
+      - tests/native/fixtures/direct-eval-non-string.ts
       - tests/property/m5-global-object-record.property.test.ts
       - tests/property/m5-module-prelude-script.property.test.ts
       - tests/native/scenarios/shard-2.ts
@@ -74,6 +78,8 @@ evidence:
       - tests/native/fixtures/host-script-directives.ts
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native/fixtures/global-object-record.ts
+      - tests/direct-eval-non-string.test.ts
+      - tests/native/fixtures/direct-eval-non-string.ts
       - tests/native/fixtures/with-get-binding-value.ts
       - tests/native.ts
       - tests/fixtures/runtime-heap.c
@@ -103,6 +109,8 @@ evidence:
       - tests/property/m5-host-script-bindings.property.test.ts
       - tests/native.ts
       - tests/native/fixtures/global-object-record.ts
+      - tests/direct-eval-non-string.test.ts
+      - tests/native/fixtures/direct-eval-non-string.ts
       - tests/property/m5-global-object-record.property.test.ts
       - tests/property/m5-module-prelude-script.property.test.ts
   specialization:

@@ -749,38 +749,6 @@ function callsDynamicFunctionConstructor(
 }
 
 /**
- * Whether a call names `eval` where only the realm global object can
- * supply it, which ECMA-262 treats as a direct eval whenever the value
- * is %eval%. ADR 0016 keeps that call position outside the profile even
- * though the identifier itself reads the global property, so the
- * resolver keeps rejecting it before any argument is evaluated. The
- * diagnostic keeps the text the identifier rejection gave the call
- * before `eval` became a value, because the exclusion audit binds each
- * accepted direct eval observation to that exact text. A declared or
- * `with` binding may hold any value, so a call through one stays an
- * ordinary call whose String argument reaches %eval%'s run-time
- * boundary instead.
- *
- * Only a CallExpression with an Arguments list is a direct eval
- * candidate. A tagged template such as ``eval`x` `` evaluates as an
- * ordinary call that passes a template object, and %eval% returns that
- * non-String argument unchanged, so the call stays in the profile. The
- * template object argument is the syntactic mark of a tagged call,
- * because a frontend synthesizes it only there.
- */
-function callsUnshadowedEval(
-  name: string,
-  callArguments: readonly SyntaxCallArgument[],
-  scopes: readonly Map<string, Binding>[],
-  state: ResolveState,
-): boolean {
-  if (name !== "eval") return false;
-  if (callArguments[0]?.kind === "template-object") return false;
-  const resolution = resolveName(scopes, state, name, true);
-  return resolution.binding == null && resolution.objectBindingIds.length === 0;
-}
-
-/**
  * Whether `$262` here reads the global object's property, which the host
  * object occupies unless the program replaces it. A Script-level `var` or
  * function binding is that property, but a lexical binding or an
@@ -2024,23 +1992,9 @@ function resolveExpression(
       target = { callee, kind: "dynamic" };
     }
   } else if (expression.target.kind === "name") {
-    if (
-      callsUnshadowedEval(
-        expression.target.name,
-        expression.arguments,
-        scopes,
-        state,
-      )
-    ) {
-      state.diagnostics.push(
-        sourceDiagnostic(
-          state.sourceId,
-          { range: expression.target.range },
-          "Unknown binding 'eval'.",
-        ),
-      );
-      return undefined;
-    }
+    // The current global value determines the callee. %eval% returns
+    // non-Strings unchanged; its runtime dispatch reports ADR 0016 for
+    // Strings after ordinary argument evaluation, without parsing source.
     const callee = resolveExpression(
       {
         kind: "identifier",

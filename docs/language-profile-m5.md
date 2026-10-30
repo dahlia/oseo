@@ -8637,10 +8637,11 @@ complete. The remaining gaps retain their existing owners.
     and M5b `globalthis-binding` exposes it as `globalThis` and resolves every
     other unresolved global reference through it at run time. Three
     boundaries remain. First, M5c node `eval-intrinsic-value` admits a bare
-    `eval` identifier read as the global object's `eval` property, but an
-    unshadowed `eval(...)` call stays the source-located ADR 0016
-    rejection, and any other call that passes a String to `%eval%` reaches
-    its run-time `OSEO1001` boundary. Every realm's global
+    `eval` identifier read as the global object's `eval` property.
+    The direct-eval-non-string-dispatch node also admits direct calls
+    with non-String arguments, preserving identity without coercion.
+    Every call that passes a String to `%eval%` reaches its located
+    run-time `OSEO1001` boundary under ADR 0016. Every realm's global
     object holds the `%eval%` value of
     [ADR 0027](./adr/0027-realms-beyond-the-initial-realm.md), so a Script
     top-level `var eval` keeps it. M5c node `typed-array-feature-admission`
