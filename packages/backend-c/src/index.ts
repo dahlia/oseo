@@ -666,6 +666,12 @@ function emitTemplateObject(state: EmitState, operation: MirOperation): void {
 }
 
 function emitArguments(state: EmitState, operation: MirOperation) {
+  if (operation.forwardArguments === true) {
+    return {
+      count: renderC(emittedC.arguments.incomingCount),
+      name: renderC(emittedC.arguments.incomingValues),
+    };
+  }
   if (operation.argumentListId != null) {
     const count = renderC(emittedC.arguments.argumentCount, operation.id);
     const name = renderC(emittedC.arguments.argumentValues, operation.id);

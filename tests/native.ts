@@ -1482,6 +1482,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "class-evaluation-order" ||
     fixture.name === "class-strict-body" ||
     fixture.name === "class-inheritance" ||
+    fixture.name === "class-default-forwarding" ||
     fixture.name === "class-super-binding" ||
     fixture.name === "class-super-property" ||
     fixture.name === "super-without-extends" ||
@@ -1719,6 +1720,7 @@ for (const fixture of selectedFixtures) {
             }
           }
           if (
+            fixture.name === "class-default-forwarding" ||
             fixture.name === "array-buffer" ||
             fixture.name === "array-prototype-copying" ||
             fixture.name === "array-prototype-change-by-copy" ||

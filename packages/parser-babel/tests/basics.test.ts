@@ -2653,9 +2653,6 @@ console.log(new Derived(1).x, new Implicit() instanceof Base);
   const text = printHir(result.hir);
   assert.match(text, /class Derived extends %b\d+\(Base\)\{/u);
   assert.match(text, /call super -> %b\d+ this\(\)/u);
-  // The implicit derived constructor forwards every argument through one
-  // synthetic rest parameter, so it is a spread super call.
-  assert.match(text, /call super -> %b\d+ this\(\.\.\.%b\d+\(/u);
   assert.ok(result.mir != null);
 });
 
@@ -3626,4 +3623,45 @@ test("converts optional private member chains to owned syntax", () => {
   assert.match(hir, /\?\.\[%b\d+ #method\]\(\)/u);
   assert.match(mir, /private-get private-get/u);
   assert.match(mir, /optional chain function value/u);
+});
+
+test("implicit derived constructors forward without iteration", () => {
+  for (const specialization of ["disabled", "enabled"] as const) {
+    const result = compileSource(
+      babelFrontend,
+      {
+        source: "class Base {} class Derived extends Base {} new Derived(1);",
+        sourceId: "implicit-derived.ts",
+      },
+      { specialization },
+    );
+    assert.deepEqual(result.diagnostics, []);
+    assert.ok(result.mir != null);
+    const text = printMir(result.mir);
+    assert.doesNotMatch(text, /iterator-get|argument-list-create/u);
+    const forwarded = result.mir.functions
+      .flatMap((fn) => fn.blocks.flatMap((block) => block.operations))
+      .filter((operation) => operation.forwardArguments === true);
+    assert.equal(forwarded.length, 1);
+    assert.equal(forwarded[0]?.kind, "construct");
+    assert.equal(forwarded[0]?.target?.kind, "super");
+  }
+});
+
+test("explicit derived constructor spreads still evaluate iterators", () => {
+  const result = compileSource(babelFrontend, {
+    source: `class Base {}
+class Derived extends Base { constructor(...args) { super(...args); } }
+new Derived(1);`,
+    sourceId: "explicit-derived.ts",
+  });
+  assert.deepEqual(result.diagnostics, []);
+  assert.ok(result.mir != null);
+  assert.match(printMir(result.mir), /argument-list-create/u);
+  const operations = result.mir.functions.flatMap((fn) =>
+    fn.blocks.flatMap((block) => block.operations),
+  );
+  assert.ok(
+    operations.every((operation) => operation.forwardArguments !== true),
+  );
 });

@@ -2,6 +2,70 @@ import type { Fixture } from "../fixture.ts";
 
 export const classFixtures: readonly Fixture[] = [
   {
+    name: "class-default-forwarding",
+    source: `
+let reads = 0;
+const marker = { value: 17 };
+class Base {
+  constructor(first, second) {
+    this.count = arguments.length;
+    this.first = first;
+    this.second = second;
+    this.target = new.target;
+  }
+}
+class Middle extends Base {}
+class Derived extends Middle {
+  field = this.first;
+  #private = this.second;
+  read() { return this.#private; }
+}
+const original = Object.getOwnPropertyDescriptor(
+  Array.prototype, Symbol.iterator,
+);
+Object.defineProperty(Array.prototype, Symbol.iterator, {
+  configurable: true,
+  get() { reads++; throw marker; },
+});
+const empty = new Derived();
+const pair = new Derived(marker, "second", 3);
+console.log(empty.count, empty.first, empty.read(), empty.target === Derived);
+console.log(pair.count, pair.first === marker, pair.field === marker);
+console.log(pair.read(), pair.target === Derived, reads, Derived.length);
+class Explicit extends Base {
+  constructor(...args) { super(...args); }
+}
+try { new Explicit(marker); }
+catch (error) { console.log("explicit", error === marker, reads); }
+Object.defineProperty(Array.prototype, Symbol.iterator, {
+  configurable: true, value: null,
+});
+console.log("null iterator", new Derived(marker).first === marker);
+class Alternate {
+  constructor(value) { this.value = value; this.target = new.target; }
+}
+Object.setPrototypeOf(Middle, Alternate);
+const changed = new Derived(marker);
+console.log("changed", changed.value === marker, changed.target === Derived);
+class Replacement {
+  constructor(value) { return value; }
+}
+class Replacing extends Replacement { field = 21; }
+const replaced = new Replacing(marker);
+console.log("replacement", replaced === marker, marker.field);
+class Throwing {
+  constructor(value) { throw value; }
+}
+class Abrupt extends Throwing {}
+try { new Abrupt(marker); }
+catch (error) { console.log("abrupt", error === marker); }
+class Invalid extends null {}
+try { new Invalid(marker); }
+catch (error) { console.log("invalid", error instanceof TypeError); }
+Object.defineProperty(Array.prototype, Symbol.iterator, original);
+`,
+  },
+  {
     name: "class-definitions",
     source: `
 class Empty {}

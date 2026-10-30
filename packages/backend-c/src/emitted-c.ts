@@ -293,6 +293,8 @@ export const emittedC = {
     rootsAssignOseoNumberStatement: [["roots["], ["] = oseo_number("], [");"]],
   },
   arguments: {
+    incomingCount: [["argument_count"]],
+    incomingValues: [["arguments"]],
     argumentCount: [["argument_count_"], [""]],
     argumentValues: [["argument_values_"], [""]],
     sizeTAssignUStatement: [["size_t "], [" = 0u;"]],
