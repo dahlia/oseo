@@ -1953,21 +1953,26 @@ that is not closed, rejected keys and targets, `finally` precedence, a catch
 parameter, an asynchronous generator that mixes `await` and `yield` in the same
 positions, and a deliberate guard miss reaching the generic fallback.
 
-An AST scan of all 47,381 candidate paths finds `await` inside a pattern in
-seventeen upstream cases, and every one is module code or a parse negative for
-function parameters, so no reviewed case can promote to pass here. Three of
-those parse negatives enter the reviewed subset as executable boundary
-evidence: they pin that the admission reaches neither an asynchronous arrow's
-nor an asynchronous generator's formal parameters, and that the module Await
-capability does not propagate into a nested function's parameters. The one
-module positive, *top-level-await/syntax/catch-parameter.js*, enters as
-inventory evidence only; its declared `dynamic-import` feature stops it before
-compilation, so it never reaches the module pattern-await diagnostic. The
-compiler tests in *packages/parser-babel/tests/bindings.test.ts* and
-*packages/compiler/tests/modules.test.ts* are what prove that diagnostic and
-its location. The manifest grows to 4,219 cases and stays at 2,482 passes,
-with 1,182 expected negatives and 555 unsupported profile features and no
-semantic or harness failures.
+At the original Unit 8.3 checkpoint, an AST scan of all 47,381 candidate
+paths found `await` inside a pattern in seventeen upstream cases. Every one
+was module code or a parse negative for function parameters, so that unit
+promoted no reviewed case. Three parse negatives entered the reviewed subset
+as executable boundary evidence: they pin that the admission reaches neither
+an asynchronous arrow's nor an asynchronous generator's formal parameters,
+and that the module Await capability does not propagate into a nested
+function's parameters. The newly reviewed module positive,
+*top-level-await/syntax/catch-parameter.js*, entered as inventory evidence only:
+its declared `dynamic-import` feature stopped it before compilation. The
+compiler tests then proved the module pattern-await diagnostic and its
+location. That historical manifest had 4,219 cases: 2,482 passes, 1,182 expected
+negatives, 555 unsupported profile features and no semantic or harness failures.
+
+M5c's later dynamic-import observation reached the pattern-await diagnostic.
+The module-top-level-await-patterns follow-up now removes that diagnostic and
+changes *packages/parser-babel/tests/bindings.test.ts* and
+*packages/compiler/tests/modules.test.ts* to assert admission through a traced
+asynchronous evaluator. Its work note records the thirteen currently owned
+unsupported paths; their actual promotions still require Root's full UPDATE.
 
 M5a Unit 8.4 closes the reviewed
 *AsyncFromSyncIteratorPrototype/throw/iterator-result.js* gap with targeted
