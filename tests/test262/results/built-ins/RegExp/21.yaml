@@ -15,7 +15,7 @@ results:
         - non-strict
         - strict
       suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-    classification: unsupported-profile-feature
+    classification: pass
     dependencies:
       - functions
     execution:
@@ -26,14 +26,14 @@ results:
       variants:
         - specialization: disabled
           strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
     observation:
-      detail: 'test/built-ins/RegExp/CharacterClassEscapes/character-class-non-word-class-escape-positive-cases.js
-        non-strict disabled failed (1): stdout=""
-        stderr="test/built-ins/RegExp/CharacterClassEscapes/character-class-non-word-class-escape-positive-cases.js:239:8:
-        error[OSEO2001]: Regular expression matching exceeds the
-        reviewed matcher limit.\n"'
-      passed: false
-      unsupportedCapability: regexp-matcher-limit
+      passed: true
     unsupportedFeatures: []
   - case:
       async: false

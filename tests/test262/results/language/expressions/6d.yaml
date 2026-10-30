@@ -136,12 +136,19 @@ results:
       - dynamic-source
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/call/eval-strictness-inherit-non-str\
-        ict.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/call/eval-strictness-inherit\
-        -non-strict.js:95:1: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/expressions/call/eval-strictness-inherit-non-strict.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/call/eval-strictness-inherit-non-strict.js:95:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1167,11 +1174,19 @@ results:
       - dynamic-source
       - expression-operators
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/this/S11.1.1_A3.1.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/this/S11.1.1_A3.1.js:95:35:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/this/S11.1.1_A3.1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/this/S11.1.1_A3.1.js:95:35:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -43,11 +43,19 @@ results:
       - object-properties
       - regular-expressions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/literals/regexp/S7.8.5_A1.1_T2.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/literals/regexp/S7.8.5_A1.1_T2.js:100:19:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/literals/regexp/S7.8.5_A1.1_T2.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/literals/regexp/S7.8.5_A1.1_T2.js:100:19:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

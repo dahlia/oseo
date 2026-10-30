@@ -441,13 +441,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/elements/arrow-body-derived-cl\
-        s-direct-eval-err-contains-supercall-1.js non-strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/arrow-body-de\
-        rived-cls-direct-eval-err-contains-supercall-1.js:104:7:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-1.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-1.js:104:7:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1251,11 +1257,19 @@ results:
     dependencies:
       - classes
       - object-literals
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/super/prop-dot-obj-val-from-eval.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/super/prop-dot-obj-val-from-\
-        eval.js:110:13: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/super/prop-dot-obj-val-from-eval.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/super/prop-dot-obj-val-from-eval.js:110:13:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

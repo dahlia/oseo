@@ -274,11 +274,19 @@ results:
       - dynamic-source
       - expression-operators
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/bitwise-or/S11.10.3_A1.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/bitwise-or/S11.10.3_A1.js:88\
-        :6: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/bitwise-or/S11.10.3_A1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/bitwise-or/S11.10.3_A1.js:88:6:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -495,13 +503,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/elements/arrow-body-private-de\
-        rived-cls-direct-eval-contains-superproperty-2.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/arrow-body-pr\
-        ivate-derived-cls-direct-eval-contains-superproperty-2.js:101:8:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-2.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/arrow-body-private-derived-cls-direct-eval-contains-superproperty-2.js:101:8:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1143,11 +1157,19 @@ results:
       - object-literals
       - object-properties
       - symbols
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/instanceof/S11.8.6_A1.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/instanceof/S11.8.6_A1.js:88:\
-        5: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/instanceof/S11.8.6_A1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/instanceof/S11.8.6_A1.js:88:5:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1170,11 +1192,19 @@ results:
       - object-literals
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/object/11.1.5_7-3-1.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/object/11.1.5_7-3-1.js:90:3:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/object/11.1.5_7-3-1.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/expressions/object/11.1.5_7-3-1.js:90:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

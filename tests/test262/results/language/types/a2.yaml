@@ -55,11 +55,19 @@ results:
       - error-intrinsics
       - expression-operators
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/types/reference/8.7.2-1-s.js strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/language/types/reference/8.7.2-1-s.js:90:13:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/types/reference/8.7.2-1-s.js strict disabled
+        failed (1): stdout=""
+        stderr="test/language/types/reference/8.7.2-1-s.js:90:13:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -21,11 +21,19 @@ results:
       - expression-operators
       - functions
       - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/lex-env-distinct-let.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/lex-env-distinct-let.js\
-        :93:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/lex-env-distinct-let.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/lex-env-distinct-let.js:93:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -46,12 +54,19 @@ results:
       - dynamic-source
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/super-prop-expr-no-home-no-eval\
-        .js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/super-prop-expr-no-home\
-        -no-eval.js:113:5: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/super-prop-expr-no-home-no-eval.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/super-prop-expr-no-home-no-eval.js:113:5:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -71,11 +86,19 @@ results:
       - dynamic-source
       - expression-operators
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/var-env-func-strict-source.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/var-env-func-strict-sou\
-        rce.js:87:9: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/var-env-func-strict-source.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/var-env-func-strict-source.js:87:9:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

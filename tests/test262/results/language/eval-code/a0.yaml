@@ -29,13 +29,21 @@ results:
       - promise-settlement
       - symbols
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+        - doneprintHandle.js
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/async-func-expr-named-no-pre-ex\
-        isting-arguments-bindings-are-present-declare-arguments.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/async-func-expr-named-n\
-        o-pre-existing-arguments-bindings-are-present-declare-arguments\
-        .js:115:30: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/async-func-expr-named-no-pre-existing-arguments-bindings-are-present-declare-arguments.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/async-func-expr-named-no-pre-existing-arguments-bindings-are-present-declare-arguments.js:115:30:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -63,13 +71,19 @@ results:
       - lexical-bindings
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/gen-func-expr-named-fn-body-cnt\
-        ns-arguments-func-decl-declare-arguments-and-assign.js
-        non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/gen-func-expr-named-fn-\
-        body-cntns-arguments-func-decl-declare-arguments-and-assign.js:\
-        88:26: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/gen-func-expr-named-fn-body-cntns-arguments-func-decl-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/gen-func-expr-named-fn-body-cntns-arguments-func-decl-declare-arguments-and-assign.js:88:26:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -97,14 +111,19 @@ results:
       - lexical-bindings
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/gen-func-expr-nameless-no-pre-e\
-        xisting-arguments-bindings-are-present-declare-arguments-and-as\
-        sign.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/gen-func-expr-nameless-\
-        no-pre-existing-arguments-bindings-are-present-declare-argument\
-        s-and-assign.js:88:25: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/gen-func-expr-nameless-no-pre-existing-arguments-bindings-are-present-declare-arguments-and-assign.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/gen-func-expr-nameless-no-pre-existing-arguments-bindings-are-present-declare-arguments-and-assign.js:88:25:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -133,13 +152,19 @@ results:
       - object-literals
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/gen-meth-fn-body-cntns-argument\
-        s-lex-bind-declare-arguments.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/eval-code/direct/gen-meth-fn-body-cntns-\
-        arguments-lex-bind-declare-arguments.js:89:19: error[OSEO1001]:
-        Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/gen-meth-fn-body-cntns-arguments-lex-bind-declare-arguments.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/gen-meth-fn-body-cntns-arguments-lex-bind-declare-arguments.js:89:19:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -24,13 +24,19 @@ results:
       - generators
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/gen-func-decl-a-preceding-param\
-        eter-is-named-arguments-declare-arguments.js non-strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/gen-func-decl-a-precedi\
-        ng-parameter-is-named-arguments-declare-arguments.js:89:29:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/gen-func-decl-a-preceding-parameter-is-named-arguments-declare-arguments.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/gen-func-decl-a-preceding-parameter-is-named-arguments-declare-arguments.js:89:29:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -55,11 +61,19 @@ results:
       - object-literals
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/super-call-method.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/super-call-method.js:11\
-        4:5: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/super-call-method.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/super-call-method.js:114:5:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

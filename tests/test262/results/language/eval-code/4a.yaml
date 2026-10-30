@@ -24,13 +24,19 @@ results:
       - lexical-bindings
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/eval-code/direct/func-expr-fn-body-cntns-argumen\
-        ts-var-bind-declare-arguments.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/eval-code/direct/func-expr-fn-body-cntns\
-        -arguments-var-bind-declare-arguments.js:88:22: error[OSEO1001]:
-        Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/func-expr-fn-body-cntns-arguments-var-bind-declare-arguments.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/func-expr-fn-body-cntns-arguments-var-bind-declare-arguments.js:88:22:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -50,11 +56,19 @@ results:
       - dynamic-source
       - expression-operators
       - functions
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/eval-code/direct/var-env-func-strict-caller-2.js
-        strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/eval-code/direct/var-env-func-strict-cal\
-        ler-2.js:89:9: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/eval-code/direct/var-env-func-strict-caller-2.js
+        strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/direct/var-env-func-strict-caller-2.js:89:9:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

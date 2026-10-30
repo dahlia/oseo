@@ -53,12 +53,19 @@ results:
       - object-literals
       - object-properties
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/function-code/eval-param-env-with-prop-initializ\
-        er.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/function-code/eval-param-env-with-prop-i\
-        nitializer.js:96:50: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/function-code/eval-param-env-with-prop-initializer.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/function-code/eval-param-env-with-prop-initializer.js:96:50:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

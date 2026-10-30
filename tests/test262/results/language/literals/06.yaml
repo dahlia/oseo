@@ -130,11 +130,19 @@ results:
       - dynamic-source
       - functions
       - lexical-grammar
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/literals/string/line-separator-eval.js non-strict
-        disabled failed (1): stdout=\"\"
-        stderr=\"test/language/literals/string/line-separator-eval.js:9\
-        2:18: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/literals/string/line-separator-eval.js non-strict
+        disabled failed (1): stdout=""
+        stderr="test/language/literals/string/line-separator-eval.js:92:18:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

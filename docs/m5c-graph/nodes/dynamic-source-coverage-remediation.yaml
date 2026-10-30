@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 1048 reviewed unsupported paths assigned to
+delivers: "Resolves the 1043 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -174,10 +174,13 @@ delivers: "Resolves the 1048 reviewed unsupported paths assigned to
   docs/m5c-graph/observation-batch-14.md; ADR 0016 and ADR 0019 remain
   unchanged. The B23/B28/B29/B32 train adds 165 dynamic-source
   admissions. The diagnostic portability prerequisite then admits the
-  two held B06 indirect import/export originals, bringing the current
-  scope to 1048. Their runtime String-eval rejections retain the
-  original asserted Script grammar subjects as active remediation, with
-  fresh source and observation digests and no whole-path exclusion."
+  two held B06 indirect import/export originals, bringing the scope to
+  1048. Their runtime String-eval rejections retain the original
+  asserted Script grammar subjects as active remediation, with fresh
+  source and observation digests and no whole-path exclusion. Direct
+  eval with no argument or a non-String argument no longer parses
+  source, so five paths promote to pass in the semantic bundle Full
+  UPDATE and the current scope is 1043."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family

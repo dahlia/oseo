@@ -761,13 +761,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/elements/arrow-body-derived-cl\
-        s-direct-eval-err-contains-supercall-2.js non-strict disabled
-        failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/arrow-body-de\
-        rived-cls-direct-eval-err-contains-supercall-2.js:97:7:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-2.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/arrow-body-derived-cls-direct-eval-err-contains-supercall-2.js:97:7:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -1038,12 +1044,19 @@ results:
       - rest-parameters
       - symbols
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/function/scope-param-rest-elem-var-c\
-        lose.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/function/scope-param-rest-el\
-        em-var-close.js:97:14: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/expressions/function/scope-param-rest-elem-var-close.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/function/scope-param-rest-elem-var-close.js:97:14:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

@@ -5,16 +5,16 @@
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
 inventoryPaths: 41091
-closedPaths: 32641
-openPaths: 8450
+closedPaths: 32665
+openPaths: 8426
 states:
   expected-negative: 3627
   harness-failure: 0
   infrastructure-failure: 0
-  pass: 29014
+  pass: 29038
   semantic-failure: 0
   unreviewed: 6742
-  unsupported-profile-feature: 1708
+  unsupported-profile-feature: 1684
 owners:
   adr:0016-dynamic-source-boundary:
     note: "ADR 0016 excludes \"`eval` in call position, the `Function`
@@ -107,13 +107,6 @@ owners:
       until reviewed replacement evidence and the maintainer accounting
       decision.
     paths: 2
-  node:direct-eval-non-string-dispatch:
-    note: The two B06 direct non-String eval argument identity subjects
-      remain in-claim under OSEO1001 unknown-eval binding observations;
-      no source text is compiled, no dynamic-source tag or exclusion is
-      authorized. Exact originals are in
-      docs/m5c-graph/observation-batch-06.md.
-    paths: 2
   node:dynamic-source-coverage-remediation:
     note: "Authorized compile-stage rejection, unresolved in-claim subject
       coverage: 111 incidental-scaffolding paths, 5 template-site
@@ -204,27 +197,15 @@ owners:
       and 32 add 165 dynamic-source prerequisite rejections, with source
       and observation digests in exclusion-audit.yaml; their original
       assertions remain unresolved under remediation and this train
-      grants no whole-path exclusion. The global eval rebinding row
-      remains unsupported under
-      node:global-eval-rebinding-tail-call-resolution; it does not
-      evaluate source. Root admits the two held B06 indirect
-      import/export originals after diagnostic portability repair; their
-      asserted eval Script grammar stays active remediation with fresh
-      source and observation audit rows, not a whole-path exclusion."
-    paths: 1048
-  node:global-eval-rebinding-tail-call-resolution:
-    note: Root-approved bounded ordinary binding/call remediation for
-      tco-non-eval-global.js. The source assigns its statically declared
-      function f to the global eval binding and calls it with numeric
-      arguments. The unchanged Unknown binding eval observation is not
-      source evaluation; no exclusion is claimed.
-    paths: 1
-  node:module-top-level-await-patterns:
-    note: "Observed OSEO1001: Await inside a module top-level binding or
-      assignment pattern is unsupported. The dynamic-import observe-only
-      change exposed this gap in catch-parameter.js, whose source has no
-      import() call; it is not an ADR 0016 exclusion."
-    paths: 13
+      grants no whole-path exclusion. Root admits the two held B06
+      indirect import/export originals after diagnostic portability
+      repair; their asserted eval Script grammar stays active
+      remediation with fresh source and observation audit rows, not a
+      whole-path exclusion. Direct eval with no argument or a non-String
+      argument no longer parses source, so five umbrella paths and the
+      global eval rebinding row promote to pass in the semantic bundle
+      Full UPDATE."
+    paths: 1043
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
     paths: 2
@@ -293,16 +274,6 @@ owners:
       selects for observation-batch-28. The batch observes them; no
       classification is assumed before it does.
     paths: 4
-  node:regexp-anchored-repeat-state-remediation:
-    note: Fresh normal Full on Reg-only
-      U6e5ebf2effdcedc5f0205e1af22f71606d7b9726 retains three original
-      CharacterClassEscapes positive subjects as regexp-matcher-limit
-      unsupported. Blocked bounded core matcher remediation; exact
-      paths, unmeasured static undo-trail lead, InputLength contract and
-      required future evidence are in
-      docs/m5c-graph/regexp-anchored-repeat-state-remediation.md. No
-      exclusion, runtime repair or predicted promotion.
-    paths: 3
   node:regexp-split-coverage-remediation:
     note: The observed Annex B-only named backreference rejection in
       separator-regexp.js is authorized by ADR 0013, but the same path
@@ -327,7 +298,7 @@ owners:
     note: Closed by a reviewed pass or expected negative in the manifest.
       The owner changes only when a regenerated manifest changes the
       state.
-    paths: 32641
+    paths: 32665
 paths:
   test/built-ins/AggregateError/cause-property.js: [pass, observation]
   test/built-ins/AggregateError/errors-iterabletolist-failures.js: [pass, observation]
@@ -11953,11 +11924,11 @@ paths:
   test/built-ins/RegExp/CharacterClassEscapes/character-class-digit-class-escape-negative-cases.js: [pass, observation]
   test/built-ins/RegExp/CharacterClassEscapes/character-class-digit-class-escape-positive-cases.js: [pass, observation]
   test/built-ins/RegExp/CharacterClassEscapes/character-class-non-digit-class-escape-negative-cases.js: [pass, observation]
-  test/built-ins/RegExp/CharacterClassEscapes/character-class-non-digit-class-escape-positive-cases.js: [unsupported-profile-feature, node:regexp-anchored-repeat-state-remediation, [functions]]
+  test/built-ins/RegExp/CharacterClassEscapes/character-class-non-digit-class-escape-positive-cases.js: [pass, observation]
   test/built-ins/RegExp/CharacterClassEscapes/character-class-non-whitespace-class-escape-negative-cases.js: [pass, observation]
-  test/built-ins/RegExp/CharacterClassEscapes/character-class-non-whitespace-class-escape-positive-cases.js: [unsupported-profile-feature, node:regexp-anchored-repeat-state-remediation, [functions]]
+  test/built-ins/RegExp/CharacterClassEscapes/character-class-non-whitespace-class-escape-positive-cases.js: [pass, observation]
   test/built-ins/RegExp/CharacterClassEscapes/character-class-non-word-class-escape-negative-cases.js: [pass, observation]
-  test/built-ins/RegExp/CharacterClassEscapes/character-class-non-word-class-escape-positive-cases.js: [unsupported-profile-feature, node:regexp-anchored-repeat-state-remediation, [functions]]
+  test/built-ins/RegExp/CharacterClassEscapes/character-class-non-word-class-escape-positive-cases.js: [pass, observation]
   test/built-ins/RegExp/CharacterClassEscapes/character-class-whitespace-class-escape-negative-cases.js: [pass, observation]
   test/built-ins/RegExp/CharacterClassEscapes/character-class-whitespace-class-escape-positive-cases.js: [pass, observation]
   test/built-ins/RegExp/CharacterClassEscapes/character-class-word-class-escape-negative-cases.js: [pass, observation]
@@ -14367,7 +14338,7 @@ paths:
   test/built-ins/String/S15.5.1.1_A1_T3.js: [pass, observation]
   test/built-ins/String/S15.5.1.1_A1_T4.js: [pass, observation]
   test/built-ins/String/S15.5.1.1_A1_T5.js: [pass, observation]
-  test/built-ins/String/S15.5.1.1_A1_T6.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [object-properties]]
+  test/built-ins/String/S15.5.1.1_A1_T6.js: [pass, observation]
   test/built-ins/String/S15.5.1.1_A1_T7.js: [pass, observation]
   test/built-ins/String/S15.5.1.1_A1_T8.js: [pass, observation]
   test/built-ins/String/S15.5.1.1_A1_T9.js: [pass, observation]
@@ -18793,7 +18764,7 @@ paths:
   test/language/block-scope/leave/for-loop-block-let-declaration-only-shadows-outer-parameter-value-2.js: [pass, observation]
   test/language/block-scope/leave/nested-block-let-declaration-only-shadows-outer-parameter-value-1.js: [pass, observation]
   test/language/block-scope/leave/nested-block-let-declaration-only-shadows-outer-parameter-value-2.js: [pass, observation]
-  test/language/block-scope/leave/outermost-binding-updated-in-catch-block-nested-block-let-declaration-unseen-outside-of-block.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, functions, lexical-bindings, var-bindings]]
+  test/language/block-scope/leave/outermost-binding-updated-in-catch-block-nested-block-let-declaration-unseen-outside-of-block.js: [pass, observation]
   test/language/block-scope/leave/try-block-let-declaration-only-shadows-outer-parameter-value-1.js: [pass, observation]
   test/language/block-scope/leave/try-block-let-declaration-only-shadows-outer-parameter-value-2.js: [pass, observation]
   test/language/block-scope/leave/verify-context-in-finally-block.js: [pass, observation]
@@ -19341,8 +19312,8 @@ paths:
   test/language/eval-code/direct/non-definable-global-function.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
   test/language/eval-code/direct/non-definable-global-generator.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, generators, object-properties, symbols, var-bindings]]
   test/language/eval-code/direct/non-definable-global-var.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
-  test/language/eval-code/direct/non-string-object.js: [unsupported-profile-feature, node:direct-eval-non-string-dispatch, [functions, object-literals, object-properties, var-bindings]]
-  test/language/eval-code/direct/non-string-primitive.js: [unsupported-profile-feature, node:direct-eval-non-string-dispatch, [functions, var-bindings]]
+  test/language/eval-code/direct/non-string-object.js: [pass, observation]
+  test/language/eval-code/direct/non-string-primitive.js: [pass, observation]
   test/language/eval-code/direct/parse-failure-1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, object-properties, symbols, var-bindings]]
   test/language/eval-code/direct/parse-failure-2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, dynamic-source, error-intrinsics, expression-operators, functions, lexical-grammar, var-bindings]]
   test/language/eval-code/direct/parse-failure-3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [abrupt-completion, control-flow, dynamic-source, error-intrinsics, expression-operators, functions, object-properties, symbols, var-bindings]]
@@ -21644,13 +21615,13 @@ paths:
   test/language/expressions/call/S11.2.4_A1.4_T2.js: [pass, observation]
   test/language/expressions/call/S11.2.4_A1.4_T3.js: [pass, observation]
   test/language/expressions/call/S11.2.4_A1.4_T4.js: [pass, observation]
-  test/language/expressions/call/eval-err-args.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, functions]]
+  test/language/expressions/call/eval-err-args.js: [pass, observation]
   test/language/expressions/call/eval-first-arg.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [abrupt-completion, control-flow, dynamic-source, functions, var-bindings]]
-  test/language/expressions/call/eval-no-args.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions]]
+  test/language/expressions/call/eval-no-args.js: [pass, observation]
   test/language/expressions/call/eval-realm-indirect.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/expressions/call/eval-spread-empty-leading.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
   test/language/expressions/call/eval-spread-empty-trailing.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
-  test/language/expressions/call/eval-spread-empty.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
+  test/language/expressions/call/eval-spread-empty.js: [pass, observation]
   test/language/expressions/call/eval-spread.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, functions, iterator-protocol, symbols, var-bindings]]
   test/language/expressions/call/eval-strictness-inherit-non-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, functions, var-bindings]]
   test/language/expressions/call/eval-strictness-inherit-strict.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [control-flow, dynamic-source, error-intrinsics, functions, var-bindings]]
@@ -21703,7 +21674,7 @@ paths:
   test/language/expressions/call/tco-member-args.js: [pass, observation]
   test/language/expressions/call/tco-non-eval-function-dynamic.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [control-flow, dynamic-source, expression-operators, functions, var-bindings]]
   test/language/expressions/call/tco-non-eval-function.js: [pass, observation]
-  test/language/expressions/call/tco-non-eval-global.js: [unsupported-profile-feature, node:global-eval-rebinding-tail-call-resolution, [control-flow, expression-operators, functions, var-bindings]]
+  test/language/expressions/call/tco-non-eval-global.js: [pass, observation]
   test/language/expressions/call/tco-non-eval-with.js: [pass, observation]
   test/language/expressions/call/trailing-comma.js: [pass, observation]
   test/language/expressions/call/with-base-obj.js: [pass, observation]
@@ -31769,7 +31740,7 @@ paths:
   test/language/module-code/top-level-await/syntax/block-await-expr-regexp.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/block-await-expr-template-literal.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/block-await-expr-this.js: [pass, observation]
-  test/language/module-code/top-level-await/syntax/catch-parameter.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [module-linking, top-level-await]]
+  test/language/module-code/top-level-await/syntax/catch-parameter.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-body.js: [expected-negative, observation]
   test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-params.js: [expected-negative, observation]
   test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-expr-body.js: [expected-negative, observation]
@@ -31823,18 +31794,18 @@ paths:
   test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-regexp.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-template-literal.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/export-lex-decl-await-expr-this.js: [pass, observation]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-array-literal.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-func-expression.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, functions, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-identifier.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-number.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-string.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-nested.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-new-expr.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, functions, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-null.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-obj-literal.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, functions, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-regexp.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, regular-expressions, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-template-literal.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
-  test/language/module-code/top-level-await/syntax/export-var-await-expr-this.js: [unsupported-profile-feature, node:module-top-level-await-patterns, [destructuring-bindings, module-linking, object-literals, object-properties, promise-settlement, top-level-await, var-bindings]]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-array-literal.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-func-expression.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-identifier.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-number.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-string.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-nested.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-new-expr.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-null.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-obj-literal.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-regexp.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-template-literal.js: [pass, observation]
+  test/language/module-code/top-level-await/syntax/export-var-await-expr-this.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/for-await-await-expr-array-literal.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/for-await-await-expr-func-expression.js: [pass, observation]
   test/language/module-code/top-level-await/syntax/for-await-await-expr-identifier.js: [pass, observation]

@@ -19,9 +19,24 @@ results:
       - error-intrinsics
       - functions
       - module-linking
+    execution:
+      harnessIncludes:
+        - base.js
+      moduleGraph:
+        - dependencies: []
+          id: test/language/eval-code/direct/import.js
+          sourceHash: fnv1a64:5f66a0cb13039775
+      scheduler: deterministic-logical-clock
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: strict
     observation:
-      detail: "test/language/eval-code/direct/import.js:23:3: error[OSEO1001]:
-        Unknown binding 'eval'."
+      detail: 'test/language/eval-code/direct/import.js strict disabled failed
+        (1): stdout=""
+        stderr="test/language/eval-code/direct/import.js:23:3:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

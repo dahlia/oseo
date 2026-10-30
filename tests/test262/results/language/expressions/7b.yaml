@@ -179,12 +179,19 @@ results:
     dependencies:
       - async-iteration
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/async-generator/eval-var-scope-synta\
-        x-err.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/expressions/async-generator/eval-var-sco\
-        pe-syntax-err.js:105:25: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/expressions/async-generator/eval-var-scope-syntax-err.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/async-generator/eval-var-scope-syntax-err.js:105:25:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -699,13 +706,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/elements/derived-cls-direct-ev\
-        al-err-contains-supercall-1.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/derived-cls-d\
-        irect-eval-err-contains-supercall-1.js:104:7: error[OSEO1001]:
-        Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/elements/derived-cls-direct-eval-err-contains-supercall-1.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/derived-cls-direct-eval-err-contains-supercall-1.js:104:7:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -727,13 +740,19 @@ results:
     dependencies:
       - classes
       - dynamic-source
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/expressions/class/elements/nested-derived-cls-di\
-        rect-eval-err-contains-supercall-2.js non-strict disabled failed
-        (1): stdout=\"\"
-        stderr=\"test/language/expressions/class/elements/nested-derive\
-        d-cls-direct-eval-err-contains-supercall-2.js:97:7:
-        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      detail: 'test/language/expressions/class/elements/nested-derived-cls-direct-eval-err-contains-supercall-2.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/expressions/class/elements/nested-derived-cls-direct-eval-err-contains-supercall-2.js:97:7:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []

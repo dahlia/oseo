@@ -37134,19 +37134,19 @@ tests:
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-non-digit-class-escape-positive-cases.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-non-whitespace-class-escape-negative-cases.js
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-non-whitespace-class-escape-positive-cases.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-non-word-class-escape-negative-cases.js
     expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-non-word-class-escape-positive-cases.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions]
   - path: test/built-ins/RegExp/CharacterClassEscapes/character-class-whitespace-class-escape-negative-cases.js
     expectedClassification: pass
@@ -44377,7 +44377,7 @@ tests:
     expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/S15.5.1.1_A1_T6.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [object-properties]
   - path: test/built-ins/String/S15.5.1.1_A1_T7.js
     expectedClassification: pass
@@ -62630,7 +62630,7 @@ tests:
     expectedClassification: pass
     dependencies: [control-flow, functions, lexical-bindings]
   - path: test/language/block-scope/leave/outermost-binding-updated-in-catch-block-nested-block-let-declaration-unseen-outside-of-block.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         abrupt-completion,
@@ -66853,10 +66853,10 @@ tests:
         var-bindings,
       ]
   - path: test/language/eval-code/direct/non-string-object.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, object-literals, object-properties, var-bindings]
   - path: test/language/eval-code/direct/non-string-primitive.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [functions, var-bindings]
   - path: test/language/eval-code/direct/parse-failure-1.js
     expectedClassification: unsupported-profile-feature
@@ -80788,14 +80788,14 @@ tests:
     expectedClassification: pass
     dependencies: [abrupt-completion, control-flow, functions, var-bindings]
   - path: test/language/expressions/call/eval-err-args.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, error-intrinsics, functions]
   - path: test/language/expressions/call/eval-first-arg.js
     expectedClassification: unsupported-profile-feature
     dependencies:
       [abrupt-completion, control-flow, dynamic-source, functions, var-bindings]
   - path: test/language/expressions/call/eval-no-args.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [dynamic-source, functions]
   - path: test/language/expressions/call/eval-realm-indirect.js
     expectedClassification: unsupported-profile-feature
@@ -80816,7 +80816,7 @@ tests:
     dependencies:
       [dynamic-source, functions, iterator-protocol, symbols, var-bindings]
   - path: test/language/expressions/call/eval-spread-empty.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [dynamic-source, functions, iterator-protocol, symbols, var-bindings]
   - path: test/language/expressions/call/eval-spread.js
@@ -81079,7 +81079,7 @@ tests:
       - functions
       - var-bindings
   - path: test/language/expressions/call/tco-non-eval-global.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       - control-flow
       - expression-operators
@@ -158306,7 +158306,7 @@ tests:
     expectedClassification: pass
     dependencies: [module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/catch-parameter.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies: [module-linking, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/early-does-not-propagate-to-fn-declaration-body.js
     expectedClassification: expected-negative
@@ -158774,7 +158774,7 @@ tests:
     dependencies:
       [lexical-bindings, module-linking, promise-settlement, top-level-await]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-array-literal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158786,7 +158786,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-func-expression.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158799,7 +158799,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-identifier.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158811,7 +158811,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-number.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158823,7 +158823,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-literal-string.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158835,7 +158835,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-nested.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158847,7 +158847,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-new-expr.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158860,7 +158860,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-null.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158872,7 +158872,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-obj-literal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158885,7 +158885,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-regexp.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158898,7 +158898,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-template-literal.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,
@@ -158910,7 +158910,7 @@ tests:
         var-bindings,
       ]
   - path: test/language/module-code/top-level-await/syntax/export-var-await-expr-this.js
-    expectedClassification: unsupported-profile-feature
+    expectedClassification: pass
     dependencies:
       [
         destructuring-bindings,

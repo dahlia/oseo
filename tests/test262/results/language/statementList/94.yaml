@@ -20,12 +20,19 @@ results:
       - dynamic-source
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statementList/eval-block-arrow-function-assignme\
-        nt-expr.js non-strict disabled failed (1): stdout=\"\"
-        stderr=\"test/language/statementList/eval-block-arrow-function-\
-        assignment-expr.js:130:14: error[OSEO1001]: Unknown binding
-        'eval'.\\n\""
+      detail: 'test/language/statementList/eval-block-arrow-function-assignment-expr.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statementList/eval-block-arrow-function-assignment-expr.js:130:14:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
@@ -48,13 +55,19 @@ results:
       - dynamic-source
       - functions
       - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
     observation:
-      detail: "test/language/statementList/eval-block-with-statment-arrow-fun\
-        ction-functionbody.js non-strict disabled failed (1):
-        stdout=\"\"
-        stderr=\"test/language/statementList/eval-block-with-statment-a\
-        rrow-function-functionbody.js:131:14: error[OSEO1001]: Unknown
-        binding 'eval'.\\n\""
+      detail: 'test/language/statementList/eval-block-with-statment-arrow-function-functionbody.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/statementList/eval-block-with-statment-arrow-function-functionbody.js:131:14:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
       passed: false
       unsupportedCapability: profile-syntax
     unsupportedFeatures: []
