@@ -6,10 +6,10 @@ consulting an overridden Array iterator. The observed runtime Test262Error
 reports @@iterator invoked.
 
 Focused observation on base `68b026bb8275b9b7ddd15b9bdd02ef90ef3b123f`,
-native target `linux-x86_64-gnu`, found these failures. The original paths
-remain unreviewed under observation-batch-23. This node registers the
-repair. At that observation, no product change or successful replacement
-was claimed.
+native target `linux-x86_64-gnu`, found this failure. At that observation,
+the original remained unreviewed under observation-batch-23. This node
+registers the repair. At that observation, no product change or successful
+replacement was claimed.
 
  -  [*default-constructor-spread-override.js*]
 
@@ -52,9 +52,9 @@ sum, field and new-target model with Node.js, Deno and both native policies.
 Shrinking retains the constructor chain and iterator override. Root assigned
 slot 4 because the concurrent Unicode-class candidate reserves slot 3.
 
-Root owns D3, the full UPDATE and any later admission of the original.
-No subset entry, manifest result, exclusion boundary or landed state is
-changed by this implementation.
+Root owns D3 and the full UPDATE. The implementation commits changed no
+subset entry, manifest result, exclusion boundary or landed state. The
+U2 admission below follows Root's later explicit D3 direction.
 
 
 Focused validation and generated output
@@ -80,3 +80,56 @@ rest-and-spread description in the normative profile; Astra reported no
 blocking finding. The normative profile and matching *PLAN-M5.md* passage
 now describe direct forwarding. Affected checks and review follow these
 corrections; no admission or landing is claimed here.
+
+
+U2 admission under Root's D3 direction
+--------------------------------------
+
+Root selected Full for source `58bd752b` and authorized this separate
+admission commit before bundling the bounded nodes into that Full UPDATE.
+Root retains R, the outer gate, candidate/Main gates and publication.
+This admission is not a completed Full or a landed-state change.
+
+Fresh `executeTest262Case` execution on that exact source observes the
+unchanged pinned original as pass on `linux-x86_64-gnu`: strict and
+non-strict execution each run with specialization disabled and enabled.
+The stock fragment executor and whole-CLI fallback are retained. All four
+variants execute successfully with empty stdout/stderr and exit zero.
+The upstream source SHA-256 is
+`4e15b3eb84bc6b869246c6dd2dcd87edc178d58d26306682050e4060112bc1fb`.
+The packet is */data/m5c-derived-spread-20261031/admission-observations.json*;
+*observe-admission.json* records the natural zero exit.
+
+The row enters the subset with observed expected classification `pass`.
+The canonical serializer adds its result to one partition and derives the
+index and target-parity digest. All 34,337 pre-existing result records and
+all existing subset row bytes are preserved. The ledger API moves only
+this path from unreviewed/batch-23 to pass/observation; the other 41,090
+ledger entries are unchanged. Batch 23 retains its one escaped-static
+original. Graph baseline and current profile/plan counts follow the new
+union: 34,338 reviewed cases, 29,005 passes, 3,627 expected negatives and
+1,706 unsupported results, with zero recorded failure classifications.
+The other 34,337 observations were not rerun here; Root's Full remains
+required for the changed implementation.
+
+The row's tag self-audit follows the consolidated 2026-10-29 rules:
+
+ -  `classes`: the asserted contract constructs a subclass with no explicit
+    constructor and checks its forwarded value.
+ -  `functions`: the base constructor's parameter receives that argument;
+    the uncalled poison closure is not the witness.
+ -  `object-properties`: the Array prototype iterator override is a
+    prerequisite, and the base stores `this.value` for the asserted read.
+ -  `symbols`: the well-known `Symbol.iterator` property key installs the
+    poison hook whose non-use the test asserts.
+
+No iterator consumer executes, so `iterator-protocol` is omitted. The
+poison closure's throw is failure-only, so it contributes neither
+`abrupt-completion` nor `error-intrinsics`. Harness assertion internals,
+diagnostic text and incidental grammar supply no extra generic tags.
+The shared supported-feature list and all ADR boundaries remain unchanged.
+
+The preservation packet and scoped allow-list proof are under the same
+artifact directory. The allow-list is checked against U `58bd752b`;
+it establishes observation-neutral U2 inputs, not freshness of the
+untouched corpus or permission to omit Root's Full.
