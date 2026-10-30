@@ -1053,6 +1053,8 @@ interface EntryGraphResult {
   readonly entryDisplayId: string;
   readonly graphDiagnostics: readonly Diagnostic[];
   readonly nodes?: readonly Test262ModuleGraphNode[];
+  /** Canonical graph identities mapped to their portable recorded IDs. */
+  readonly sourceIds?: ReadonlyMap<string, string>;
 }
 
 function relativeModuleId(
@@ -1132,6 +1134,12 @@ async function buildEntryGraph(
       graphDiagnostics: result.diagnostics.map(displayDiagnostic),
     };
   }
+  const sourceIds = new Map(
+    result.graph.modules.map((module) => [
+      module.canonicalId,
+      relativeModuleId(module.canonicalId, entryId, entryDisplayId, rootUrl),
+    ]),
+  );
   const nodes = result.graph.modules.map((module) => ({
     dependencies: module.dependencies.map((dependency) =>
       relativeModuleId(
@@ -1170,7 +1178,24 @@ async function buildEntryGraph(
     entryDisplayId,
     graphDiagnostics: result.diagnostics.map(displayDiagnostic),
     nodes,
+    sourceIds,
   };
+}
+
+/**
+ * Relativize only the outer diagnostic's source identity. Graph membership
+ * supplies exact identities; messages, continuation lines, and unknown or
+ * virtual sources keep their bytes, even when they contain a file URL.
+ */
+function portableModuleStderr(
+  stderr: string,
+  sourceIds: ReadonlyMap<string, string>,
+): string {
+  return stderr.replace(
+    /^(.+?)(:\d+:\d+: error\[OSEO\d{4}\])/mu,
+    (prefix: string, id: string, location: string) =>
+      sourceIds.has(id) ? `${sourceIds.get(id)}${location}` : prefix,
+  );
 }
 
 function diagnosticDetail(diagnostic: Diagnostic): string {
@@ -1362,9 +1387,16 @@ type PlannedTest262Strictness =
 async function startTest262Execution(
   executor: Test262Executor,
   request: Test262ExecutionRequest,
+  sourceIds?: ReadonlyMap<string, string>,
 ): Promise<SettledTest262Execution> {
   try {
-    return { observation: await executor.execute(request) };
+    const raw = await executor.execute(request);
+    return {
+      observation:
+        sourceIds == null
+          ? raw
+          : { ...raw, stderr: portableModuleStderr(raw.stderr, sourceIds) },
+    };
   } catch (error) {
     return { error };
   }
@@ -1505,6 +1537,7 @@ async function executedResult(
   const expectRuntimeNegative = testCase.expectedFailurePhase === "runtime";
   const variants: Test262Variant[] = [];
   let moduleGraph: readonly Test262ModuleGraphNode[] | undefined;
+  let moduleSourceIds: ReadonlyMap<string, string> | undefined;
   let moduleScript: string | undefined;
   const execution = (): Test262Execution => ({
     harnessIncludes: parsed.flags.includes("raw")
@@ -1566,6 +1599,7 @@ async function executedResult(
       rootPath,
     );
     moduleGraph = graph.nodes;
+    moduleSourceIds = graph.sourceIds;
     const diagnostic = graph.graphDiagnostics[0] ?? graph.compileDiagnostics[0];
     const harnessFailure =
       diagnostic == null ? undefined : moduleHarnessFailure(diagnostic);
@@ -1666,6 +1700,7 @@ async function executedResult(
     const probed = await startTest262Execution(
       executor,
       request(probe.input, probe.variant),
+      moduleSourceIds,
     );
     awaited.push({ settled: probed, variant: probe.variant });
     if (!test262VariantDecides(probed, expectRuntimeNegative)) {
@@ -1673,6 +1708,7 @@ async function executedResult(
         settled: startTest262Execution(
           executor,
           request(entry.input, entry.variant),
+          moduleSourceIds,
         ),
         variant: entry.variant,
       }));

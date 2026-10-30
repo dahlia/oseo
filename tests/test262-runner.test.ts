@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import test from "node:test";
 import { createContext, runInContext, runInNewContext } from "node:vm";
 
@@ -3317,6 +3318,91 @@ test("executes module cases with explicit module intent", async () => {
     );
   } finally {
     await rm(directory, { force: true, recursive: true });
+  }
+});
+
+test("records portable module runtime diagnostic locations", async () => {
+  const roots = await Promise.all(
+    ["first #", "second %"].map((name) =>
+      mkdtemp(join(tmpdir(), `oseo-test262-${name}-`)),
+    ),
+  );
+  try {
+    const source = `/*---
+flags: [module]
+---*/
+import "./dep_FIXTURE.js";
+`;
+    const path = "test/module-case.js";
+    const parsed = parseTest262Case(source, path, revision);
+    // Path-looking payload is program data, even when it names a module.
+    const payload = pathToFileURL(join(roots[0]!, "module-case.js")).href;
+    await Promise.all(
+      roots.map((root) =>
+        writeFile(join(root, "dep_FIXTURE.js"), "export {};\n"),
+      ),
+    );
+    await Promise.all(
+      [
+        "module-case.js",
+        "dep_FIXTURE.js",
+        "oseo:test262-harness.js",
+        "outside/module-case.js",
+      ].map(async (diagnosticId) => {
+        const results = await Promise.all(
+          roots.map(async (root) => {
+            const canonical = diagnosticId.startsWith("oseo:")
+              ? diagnosticId
+              : pathToFileURL(join(root, diagnosticId)).href;
+            const message = `kept ${payload}:1:2: error[OSEO1001]: payload`;
+            const stderr =
+              `${canonical}:98:3: error[OSEO1001]: ${message}\n` +
+              `${payload}:4:5: error[OSEO2001]: message continuation\n`;
+            const observed: CliResult = {
+              executed: true,
+              exitStatus: 7,
+              stderr,
+              stdout: `${payload}\n`,
+            };
+            const result = await executeTest262Case(
+              source,
+              parsed,
+              new Set<string>(),
+              harnesses,
+              { execute: async () => observed },
+              ["module-linking"],
+              { rootPath: root, sourcePath: join(root, "module-case.js") },
+            );
+            const display =
+              diagnosticId === "module-case.js"
+                ? path
+                : diagnosticId === "dep_FIXTURE.js"
+                  ? diagnosticId
+                  : canonical;
+            assert.deepEqual(result.observation, {
+              detail:
+                `${path} strict disabled failed (7): ` +
+                `stdout=${JSON.stringify(observed.stdout)} ` +
+                `stderr=${JSON.stringify(stderr.replace(canonical, display))}`,
+              passed: false,
+              unsupportedCapability: "profile-syntax",
+            });
+            assert.equal(result.classification, "unsupported-profile-feature");
+            assert.deepEqual(result.execution?.variants, [
+              { specialization: "disabled", strictness: "strict" },
+            ]);
+            assert.equal(observed.stderr, stderr);
+            return result;
+          }),
+        );
+        // Unknown sources are preserved instead of guessed from a basename.
+        if (diagnosticId !== "outside/module-case.js") {
+          assert.deepEqual(results[0], results[1]);
+        }
+      }),
+    );
+  } finally {
+    await Promise.all(roots.map((root) => rm(root, { recursive: true })));
   }
 });
 

@@ -277,3 +277,14 @@ text now states partial observation: 332 admitted and two held from the
 The full audit and candidate dispositions are recorded in
 [the outer-fix audit](/data/m5c-train-b06-b08-b14-20261029/task_327a4df2e5ee/ctx_3d3c7fa767fb/full-row-audit.json).
 Root owns the scoped UPDATE and the second outer review pass.
+
+
+Portable diagnostic implementation
+----------------------------------
+
+The bounded prerequisite now has an implementation work note at
+[*test262-diagnostic-host-path-normalization.md*](./test262-diagnostic-host-path-normalization.md).
+It maps runtime diagnostic locations through the prepared module graph's
+portable identities while preserving rejection and execution evidence. Both
+original B06 paths remain held and unreviewed pending the focused checks,
+internal review and Root's D3/UPDATE decision recorded there.
