@@ -84,12 +84,8 @@ jobs:
         if: runner.os != 'Windows'
       - run: mise run test:${{ matrix.runtime }}
 
-  # macOS only; the lane generator replaces this with one job per shard.
-  # The hosted macOS runner measured 63 minutes for the whole suite in run
-  # 38593093817, against 6 on Windows, where no native test can run, so the
-  # cost is native build and execution on a slow hosted runner. Node's own
-  # --test-shard partitions the files it discovers, which keeps the union
-  # equal to the unsharded set by construction.
+  # macOS only. The wrapper uses Node's default discovery and removes the
+  # dedicated Array file before Node partitions the rest into four shards.
   test_node_shard:
     name: >-
       test (macos-latest, node,
@@ -116,8 +112,25 @@ jobs:
           install: true
       - uses: ./.github/actions/runtime-archive-cache
       - run: >-
-          mise run test:node
-          --test-shard=${{ matrix.shard }}/${{ matrix.total }}
+          mise run test:node:macos:shard
+          --shard=${{ matrix.shard }}/${{ matrix.total }}
+
+  # Hosted macos-latest, like the ordinary Node shards. No time scaling.
+  # The generator places this on one of the same five hosted capacity lanes.
+  test_array_constructor_macos:
+    name: Array constructor (macos-latest, node)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@v4
+        with:
+          install: true
+      - uses: ./.github/actions/runtime-archive-cache
+      - run: >-
+          mise run test:node --test-concurrency=1
+          tests/property/m5-array-constructor.property.test.ts
 
   # Linux only. Over the fifteen runs since b59ac914 the unsharded job
   # took 24.72 to 49.30 minutes, a per-job runner speed factor rather
@@ -743,6 +756,7 @@ jobs:
       - test_property_case
       - test_reflect_case
       - test_array_constructor
+      - test_array_constructor_macos
       - test_test262
     runs-on: ubuntu-latest
     steps:
@@ -751,4 +765,5 @@ jobs:
           test "${{ needs.test_native.result }}" = success
           test "${{ needs.test_native_support.result }}" = success
           test "${{ needs.test_array_constructor.result }}" = success
+          test "${{ needs.test_array_constructor_macos.result }}" = success
           test "${{ needs.test_test262.result }}" = success

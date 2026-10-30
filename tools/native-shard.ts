@@ -33,6 +33,14 @@ export const dedicatedLinuxNativeFiles: readonly string[] = [
   "tests/property/m5-array-constructor.property.test.ts",
 ];
 
+/**
+ * Ordinary Node files with dedicated hosted macOS jobs. These keep their
+ * ordinary case count and deadline, independent of extended native jobs.
+ */
+export const dedicatedMacosNodeFiles: readonly string[] = [
+  "tests/property/m5-array-constructor.property.test.ts",
+];
+
 /** Fixed host-specific scheduling model for native property partitions. */
 export interface NativeShardModel {
   readonly costs: Readonly<Record<string, number>>;

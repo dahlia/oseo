@@ -5,7 +5,9 @@ The current seven Linux file shards exclude both `caseShardedNativeFiles`
 and `dedicatedLinuxNativeFiles` before cost partitioning. The latter contains
 only *tests/property/m5-array-constructor.property.test.ts*, which runs all
 120 extended cases in a required dedicated Linux job with its unchanged
-1,800-second property limit. macOS file shards keep that file. The historical
+1,800-second property limit. macOS extended file shards keep that file. The
+ordinary macOS Node gate now isolates it separately; see
+[*macOS Array placement evidence*](../array-macos/README.md). The historical
 measurements below retain their original input sets; they do not measure the
 dedicated job.
 

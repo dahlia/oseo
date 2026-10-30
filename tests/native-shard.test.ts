@@ -11,6 +11,7 @@ import {
 import {
   caseShardedNativeFiles,
   dedicatedLinuxNativeFiles,
+  dedicatedMacosNodeFiles,
   nativeShardModel,
   nativeTestArguments,
   selectNativeTestShard,
@@ -118,6 +119,8 @@ test("Linux jobs cover the real property inventory exactly once", async () => {
   const { costs, width } = nativeShardModel("linux");
   assert.equal(width, 4);
   assert.deepEqual(dedicatedLinuxNativeFiles, [array]);
+  assert.deepEqual(dedicatedMacosNodeFiles, [array]);
+  assert.notStrictEqual(dedicatedMacosNodeFiles, dedicatedLinuxNativeFiles);
   const linux = Array.from({ length: 7 }, (_, index) =>
     nativeTestArguments(
       [

@@ -257,6 +257,12 @@ depends = ["build"]
 raw_args = true
 run = "node --test"
 
+[tasks."test:node:macos:shard"]
+description = "Run ordinary Node shards without dedicated macOS files"
+depends = ["build"]
+raw_args = true
+run = "node tools/run-node-shard.ts"
+
 [tasks."test:property:extended"]
 description = "Run property suites at ten times the ordinary case budget"
 depends = ["test:property:extended:package"]
@@ -413,7 +419,7 @@ run = "node tools/generate-macos-lanes.ts"
 description = "Check generated macOS CI lanes and preserved jobs"
 run = """
 node tools/generate-macos-lanes.ts --check
-node --test tests/macos-lanes.test.ts
+node --test tests/macos-lanes.test.ts tests/node-shard.test.ts
 """
 
 [tasks."check:selfhosted-mac-shell"]

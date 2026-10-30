@@ -271,8 +271,9 @@ test("every check name and concurrency policy is preserved", () => {
         (_, index) => `host C sanitizers (Linux, ${index + 1}/3)`,
       ),
       // The hosted macOS Node.js suite is partitioned by Node's own
-      // --test-shard; see PLAN-GATE.md (U32), and the Linux one the same
-      // way; see PLAN-GATE.md (U46).
+      // --test-shard after excluding the dedicated Array file; Linux
+      // keeps default discovery. See PLAN-GATE.md (U32, U46).
+      "Array constructor (macos-latest, node)",
       ...Array.from(
         { length: 4 },
         (_, index) => `test (macos-latest, node, ${index + 1}/4)`,
@@ -308,7 +309,7 @@ test("every check name and concurrency policy is preserved", () => {
       ),
     ].toSorted(),
   );
-  assert.equal(names(after).length, 78);
+  assert.equal(names(after).length, 79);
   const { jobs: _beforeJobs, ...beforeHeader } = before;
   const { jobs: _afterJobs, ...afterHeader } = after;
   assert.deepEqual(afterHeader, beforeHeader);
@@ -360,8 +361,8 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   const lanes = macosLanes();
   assert.equal(lanes.length, 5);
   const jobs = lanes.flat();
-  assert.equal(jobs.length, 40);
-  assert.equal(new Set(jobs.map((job) => job.id)).size, 40);
+  assert.equal(jobs.length, 41);
+  assert.equal(new Set(jobs.map((job) => job.id)).size, 41);
   assert.deepEqual(
     jobs.map((job) => job.name).toSorted(),
     macosJobs()
@@ -395,12 +396,13 @@ test("every macOS job occurs exactly once in five LPT chains", () => {
   // three after that and three more from its own run, U44 the three its
   // merged main run observed, and U49 the seven whose observed hosted
   // median had moved by at least five percent. See PLAN-GATE.md
-  // (U33, U40, U41, U42, U43, U44, U49).
+  // (U33, U40, U41, U42, U43, U44, U49). The Array ordinary job adds
+  // an unmeasured 240-second allowance; see docs/evidence/array-macos.
   assert.equal(
     Math.max(
       ...lanes.map((lane) => lane.reduce((sum, job) => sum + job.seconds, 0)),
     ),
-    12229,
+    12334,
   );
 });
 
@@ -645,7 +647,7 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
     throw new Error("Template aggregate requires a dependency list");
   }
   const expected = [
-    ...nativeIds,
+    ...nativeIds.filter((id) => id !== "test_array_constructor_macos"),
     ...macosJobs()
       .filter((job) => nativeIds.includes(job.sourceId))
       .map((job) => job.id),
@@ -659,7 +661,7 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
   assert.deepEqual(needs.toSorted(), expected);
   assert.ok(needs.includes("test_sanitizer_property"));
   assert.ok(needs.includes("test_array_constructor"));
-  assert.equal(expected.length, 40);
+  assert.equal(expected.length, 41);
   assert.deepEqual(aggregate.steps[0]!.env, {
     RESULTS: "${{ toJSON(needs.*.result) }}",
   });
@@ -675,7 +677,9 @@ test("native aggregate explicitly requires all native and test262 jobs", () => {
           ...process.env,
           RESULTS: JSON.stringify(
             needs.map((id) =>
-              id === "test_array_constructor" ? verdict : "success",
+              id === "test_array_constructor_macos_macos_node"
+                ? verdict
+                : "success",
             ),
           ),
         },
@@ -712,7 +716,7 @@ test("aggregate follows additional dependencies in the source template", () => {
   const needs = workflow.jobs.native!.needs;
   assert.ok(needs != null && !isString(needs));
   assert.ok(needs.includes("test_sanitizer"));
-  assert.equal(needs.length, 41);
+  assert.equal(needs.length, 42);
 });
 
 test("committed workflow matches generator output exactly", () => {
@@ -750,8 +754,8 @@ test("lane-count preview leaves the committed workflow alone", () => {
 test("one extra lane retains every job and aggregate dependency", () => {
   const lanes = macosLanes(1);
   assert.equal(lanes.length, 6);
-  assert.equal(lanes.flat().length, 40);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 40);
+  assert.equal(lanes.flat().length, 41);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
   assert.ok(lanes[5]!.length > 0);
   assert.deepEqual(
     lanes[5]!
@@ -1153,7 +1157,8 @@ test("own-key cases lead the Mac lane with measured Mac seconds", () => {
             selfHostedFamilySpeedRatios[job.family]!),
     selfHostedProbeSeconds,
   );
-  assert.equal(Math.round(modeled), 8730);
+  // The dedicated ordinary Array allowance also loads a hosted lane.
+  assert.equal(Math.round(modeled), 8909);
 });
 
 test("hosted lanes take the jobs no Mac lane can run first", () => {
@@ -1170,7 +1175,7 @@ test("hosted lanes take the jobs no Mac lane can run first", () => {
     );
   }
   const ineligible = macosJobs().filter((job) => !macLaneEligible(job));
-  assert.equal(ineligible.length, 7);
+  assert.equal(ineligible.length, 8);
   for (const job of ineligible) {
     const lane = hosted.find((candidate) =>
       candidate.some((placed) => placed.id === job.id),
@@ -1319,8 +1324,8 @@ test("availability decides the second machine's lanes too", async () => {
 test("three Mac lanes keep every job and the own-key lane", () => {
   const lanes = macosLanes(3);
   assert.equal(lanes.length, 8);
-  assert.equal(lanes.flat().length, 40);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 40);
+  assert.equal(lanes.flat().length, 41);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   assert.deepEqual(
     lanes
@@ -1403,8 +1408,8 @@ test("eight Mac lanes route each label with its own hosted fallback", () => {
   ]);
   const lanes = macosLanes(8);
   assert.equal(lanes.length, 13);
-  assert.equal(lanes.flat().length, 40);
-  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 40);
+  assert.equal(lanes.flat().length, 41);
+  assert.equal(new Set(lanes.flat().map((job) => job.id)).size, 41);
   for (const lane of lanes.slice(5)) assert.ok(lane.length > 0);
   // One readiness output, so one runner class, for the shared deadline.
   assert.deepEqual(
@@ -2759,6 +2764,61 @@ test("job wall reports recognize only known Mac labels", () => {
     assert.equal(
       attempt.jobs.get(label)!.selfHosted,
       selfHostedLaneLabels.includes(label),
+    );
+  }
+});
+
+test("ordinary macOS Array keeps one hosted lane and deadline", () => {
+  const source = readFileSync(
+    "tests/property/m5-array-constructor.property.test.ts",
+    "utf8",
+  );
+  assert.equal(numberFrom(source, /numRuns: ([\d_]+)/gu), 12);
+  assert.equal(numberFrom(source, /timeLimitMilliseconds: ([\d_]+)/gu), 180000);
+  assert.match(source, /seed: 0x6000_3f00/u);
+  const planned = macosJobs().find(
+    (job) => job.sourceId === "test_array_constructor_macos",
+  );
+  assert.ok(planned);
+  const job = after.jobs[planned.id]!;
+  assert.equal(job["runs-on"], "macos-latest");
+  assert.equal(job.env, undefined);
+  assert.deepEqual(
+    job.steps.filter((step) => step.run).map((step) => step.run),
+    [
+      "sw_vers -productVersion",
+      "mise run test:node --test-concurrency=1 " +
+        "tests/property/m5-array-constructor.property.test.ts",
+    ],
+  );
+  assert.equal(after.jobs.test_array_constructor_macos, undefined);
+  const needs = after.jobs.native!.needs;
+  assert.ok(Array.isArray(needs) && needs.includes(planned.id));
+  for (const count of [0, 4, configuredSelfHostedLanes]) {
+    const lanes = macosLanes(count);
+    assert.equal(lanes.length, 5 + count);
+    assert.equal(
+      lanes
+        .slice(0, 5)
+        .flat()
+        .filter((entry) => entry.id === planned.id).length,
+      1,
+    );
+    assert.ok(
+      !lanes
+        .slice(5)
+        .flat()
+        .some((entry) => entry.id === planned.id),
+    );
+  }
+  for (const shard of macosJobs().filter(
+    (entry) => entry.sourceId === "test_node_shard",
+  )) {
+    const commands = after.jobs[shard.id]!.steps.map((step) => step.run);
+    assert.ok(
+      commands.includes(
+        `mise run test:node:macos:shard --shard=${shard.matrix.shard}/4`,
+      ),
     );
   }
 });

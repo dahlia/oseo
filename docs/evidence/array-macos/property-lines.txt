@@ -1,0 +1,20 @@
+oseo-array-shared-40938388428.log
+sha256 c38cbade3502c4632f7e4deaf7cbc34ca0b7933c7ce7a398853955278be7eadf
+2026-10-29T19:19:15.6012810Z ✔ generated Array construction and statics match the M5 property model (65706.487417ms)
+
+oseo-array-shared-40928163264.log
+sha256 9da3977e6f308bf7f12d574c2034cc4f86da064e8869efa92220d2c0d759fd48
+2026-10-29T18:15:50.7977970Z ✔ generated Array construction and statics match the M5 property model (105590.630875ms)
+
+oseo-array-shared-40906939547.log
+sha256 df140a3f45fa248c5127e255fe8a78883a851e3d1b399fb608aa3cd6f88ce1b4
+2026-10-29T16:07:30.5183680Z ✔ generated Array construction and statics match the M5 property model (159844.587917ms)
+
+oseo-array-shared-failed.log
+sha256 3878e666662c9297747d611f261621d80c532a87710e27cb0fca839aef686f0c
+2026-10-29T20:20:05.8077810Z ✖ generated Array construction and statics match the M5 property model (180016.799541ms)
+2026-10-29T20:36:25.9834600Z ✖ generated Array construction and statics match the M5 property model (180016.799541ms)
+
+oseo-array-alone-linux.log
+sha256 cb79eb02b1afefaeb1c41187c446d89eba7bf13e2a2568e741a916a8ed46a210
+2026-10-26T13:04:34.9834052Z ✔ generated Array construction and statics match the M5 property model (1108108.062665ms)

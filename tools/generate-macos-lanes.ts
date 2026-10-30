@@ -87,6 +87,13 @@ export function macosJobs(): readonly MacosLaneJob[] {
       "macos-latest",
     );
   }
+  add(
+    "test_array_constructor_macos",
+    "node",
+    "Array constructor (macos-latest, node)",
+    {},
+    "macos-latest",
+  );
   for (let shard = 1; shard <= 3; shard++) {
     add("test_native", String(shard), `native (macos-aarch64, ${shard}/3)`, {
       platform: { os: "macos-15", target: "macos-aarch64" },
@@ -715,7 +722,12 @@ export function generateMacosWorkflow(
   // Preserve Linux/Windows matrix jobs verbatim apart from macOS entries.
   for (const [id, block] of blocks) {
     let linux = block;
-    if (id === "test_sanitizer_macos" || id === "test_node_shard") linux = "";
+    if (
+      id === "test_sanitizer_macos" ||
+      id === "test_node_shard" ||
+      id === "test_array_constructor_macos"
+    )
+      linux = "";
     else {
       linux = linux.replace(/^          - macos-latest\n/m, "");
       linux = linux.replace(
@@ -734,7 +746,7 @@ export function generateMacosWorkflow(
     throw new Error("Native aggregate needs must be job IDs");
   }
   const required = [
-    ...nativeIds,
+    ...nativeIds.filter((id) => id !== "test_array_constructor_macos"),
     ...macosJobs()
       .filter((job) => nativeIds.includes(job.sourceId))
       .map((job) => job.id),
