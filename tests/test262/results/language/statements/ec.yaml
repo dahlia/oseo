@@ -370,6 +370,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:
@@ -411,6 +412,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

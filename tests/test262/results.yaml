@@ -23000,7 +23000,7 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 1289
     - dependency: generators
-      expectedNegatives: 325
+      expectedNegatives: 327
       harnessFailures: 0
       infrastructureFailures: 0
       passes: 2344
@@ -23035,10 +23035,10 @@ summary:
       semanticFailures: 0
       unsupportedProfileFeatures: 405
     - dependency: lexical-grammar
-      expectedNegatives: 477
+      expectedNegatives: 478
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 509
+      passes: 580
       semanticFailures: 0
       unsupportedProfileFeatures: 57
     - dependency: module-linking
@@ -23129,7 +23129,7 @@ summary:
       expectedNegatives: 0
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 3246
+      passes: 3242
       semanticFailures: 0
       unsupportedProfileFeatures: 235
     - dependency: top-level-await

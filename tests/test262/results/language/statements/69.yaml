@@ -84,7 +84,6 @@ results:
       - iterator-protocol
       - object-literals
       - object-properties
-      - symbols
       - var-bindings
     execution:
       harnessIncludes:

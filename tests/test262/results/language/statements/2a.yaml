@@ -288,6 +288,7 @@ results:
       - classes
       - expression-operators
       - functions
+      - lexical-grammar
       - object-properties
       - promise-settlement
       - var-bindings
@@ -471,6 +472,7 @@ results:
       - functions
       - generators
       - iterator-protocol
+      - lexical-grammar
       - object-properties
       - symbols
       - var-bindings

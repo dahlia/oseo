@@ -139,7 +139,6 @@ results:
       - iterator-protocol
       - object-literals
       - object-properties
-      - symbols
     execution:
       harnessIncludes:
         - base.js

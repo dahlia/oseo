@@ -22,10 +22,15 @@ the base tree and shows byte preservation of every existing subset row.
 Classifications come from execution with empty tag inputs; materialization adds
 only the reviewed dependency tags through the canonical manifest serializer.
 
-The 65 unsupported paths retain in-claim remediation owners.
+Of the 65 unsupported paths, 64 eval-source subjects use the existing
+ADR 0016 eval-semantics exclusion assessment. Another 1 use eval as
+fixture construction and retain dynamic-source coverage remediation.
 The [owner assignments](/data/m5c-d17-20261031/train-b/owner-assignments.json)
-list every path; source-compilation rejections also have source-bound
-exclusion-audit records with remediation dispositions. No ADR boundary changes.
+list every path. The
+[source audit](/data/m5c-d17-20261031/train-b/round1-investigation/eval-owner-audit.json)
+reviews all 1,859 rows, including the source and assertion bounds for all 100
+eval rejections. Existing assessment and ADR boundaries are unchanged. No
+unsupported result counts as a pass.
 
 
 Dependency self-audit
@@ -58,3 +63,12 @@ All subjects use the primary source; no fixture-derived rows occur.
 
 Root owns the scoped UPDATE, landing, and publication. This observation
 commit does not mark any graph node landed.
+
+The first internal review adds lexical-grammar to 44 ASI subjects:
+fields-asi-4, the six after-method literal-names-asi variants,
+multiple-definitions-literal-names-asi, and 36 stacked-definition cases.
+The
+[ASI audit](/data/m5c-d17-20261031/train-b/round1-investigation/asi-audit.json)
+covers all 1,859 train rows and distinguishes asserted insertion from explicit
+semicolons and complete method definitions. Execution counts and ownership are
+unchanged.

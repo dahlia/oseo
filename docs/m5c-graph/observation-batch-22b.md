@@ -22,10 +22,17 @@ the base tree and shows byte preservation of every existing subset row.
 Classifications come from execution with empty tag inputs; materialization adds
 only the reviewed dependency tags through the canonical manifest serializer.
 
-The 37 unsupported paths retain in-claim remediation owners.
+Of the 37 unsupported paths, 33 eval-source subjects use the existing
+ADR 0016 eval-semantics exclusion assessment. Another 2 use eval as
+fixture construction and retain dynamic-source coverage remediation.
+The two optional private-accessor lookup subjects retain their bounded
+remediation owner.
 The [owner assignments](/data/m5c-d17-20261031/train-b/owner-assignments.json)
-list every path; source-compilation rejections also have source-bound
-exclusion-audit records with remediation dispositions. No ADR boundary changes.
+list every path. The
+[source audit](/data/m5c-d17-20261031/train-b/round1-investigation/eval-owner-audit.json)
+reviews all 1,859 rows, including the source and assertion bounds for all 100
+eval rejections. Existing assessment and ADR boundaries are unchanged. No
+unsupported result counts as a pass.
 
 The two private getter/setter own-property subjects retain
 `node:class-private-accessor-lookup-coverage-remediation`, extending its
@@ -71,3 +78,15 @@ requires an own caller property; freshly created Oseo functions have
 none, so the descriptor objects are not evaluated. The original counts
 and observations are unchanged. The full-row audit above includes this
 pattern across all 1,859 train paths.
+
+The first internal review adds lexical-grammar to eleven explicit ASI
+subjects and seventeen without-semicolon template cases whose final
+field requires insertion before the asserted method. The
+[ASI audit](/data/m5c-d17-20261031/train-b/round1-investigation/asi-audit.json)
+covers the full train, including cases that need no correction.
+
+The private static generator whitespace negative and method-param-yield
+also retain generators for their rejected grammar subjects. The
+[parse-grammar audit](/data/m5c-d17-20261031/train-b/round1-investigation/parse-generator-audit.json)
+covers all 1,859 rows and all 197 parse negatives. Execution counts and
+ownership are unchanged.

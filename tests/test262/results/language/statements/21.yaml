@@ -273,6 +273,7 @@ results:
       - expression-operators
       - functions
       - lexical-bindings
+      - lexical-grammar
       - object-properties
       - var-bindings
     execution:

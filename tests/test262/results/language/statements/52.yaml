@@ -415,6 +415,7 @@ results:
       - classes
       - functions
       - generators
+      - lexical-grammar
       - object-properties
     execution:
       harnessIncludes:

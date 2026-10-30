@@ -53,3 +53,10 @@ All subjects use the primary source; no fixture-derived rows occur.
 
 Root owns the scoped UPDATE, landing, and publication. This observation
 commit does not mark any graph node landed.
+
+The first internal review removes symbols from the four public-method
+obj-ptrn-prop-ary-value-null rows. Their supplied value is null, so
+iterator acquisition throws before symbol-keyed property access. The
+[null-dispatch audit](/data/m5c-d17-20261031/train-b/round1-investigation/null-symbol-audit.json)
+covers all 1,859 train rows, including all other implicit-symbol consumers. The
+classifications and ownership are unchanged.

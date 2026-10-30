@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 981 reviewed unsupported paths assigned to
+delivers: "Resolves the 884 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -168,11 +168,16 @@ delivers: "Resolves the 981 reviewed unsupported paths assigned to
   docs/m5c-graph/observation-batch-06.md,
   docs/m5c-graph/observation-batch-08.md and
   docs/m5c-graph/observation-batch-14.md; ADR 0016 and ADR 0019 remain
-  unchanged. B21d, B22a, and B22b add 100 class declaration
-  source-compilation rejections. Their exact paths, source hashes, and
-  focused results are linked from the three batch notes, and every new
-  exclusion-audit row retains active remediation. The current scope is
-  981 paths."
+  unchanged. B22a adds one class-declaration fixture subject,
+  nested-private-direct-eval-err-contains-newtarget.js, and B22b adds two:
+  private-direct-eval-err-contains-newtarget.js and
+  static-field-init-with-this.js. All three remain active remediation
+  under the existing fixture-construction assessment. B21d adds no
+  source-compilation rejection. The other 97 class-declaration eval
+  subjects use the existing eval-semantics exclusion assessment under
+  ADR 0016. The B22a and B22b batch notes link the exact original
+  sources and the full-row assertion audit.
+  The current remediation scope is 884 paths."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family

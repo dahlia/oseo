@@ -461,6 +461,7 @@ results:
       - expression-operators
       - functions
       - generators
+      - lexical-grammar
     observation:
       errorType: SyntaxError
       failedPhase: parse
