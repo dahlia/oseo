@@ -1,0 +1,111 @@
+group: language/eval-code
+key: 7a
+results:
+  - case:
+      async: true
+      features:
+        - globalThis
+      flags:
+        - generated
+        - async
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/async-meth-fn-body-cntns-arguments-var-bind-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - async-functions
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - promise-settlement
+      - symbols
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/async-meth-fn-body-cntns-argume\
+        nts-var-bind-declare-arguments-and-assign.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/async-meth-fn-body-cntn\
+        s-arguments-var-bind-declare-arguments-and-assign.js:115:23:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/meth-fn-body-cntns-arguments-func-decl-declare-arguments.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/meth-fn-body-cntns-arguments-fu\
+        nc-decl-declare-arguments.js non-strict disabled failed (1):
+        stdout=\"\"
+        stderr=\"test/language/eval-code/direct/meth-fn-body-cntns-argu\
+        ments-func-decl-declare-arguments.js:88:17: error[OSEO1001]:
+        Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/meth-fn-body-cntns-arguments-lex-bind-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/meth-fn-body-cntns-arguments-le\
+        x-bind-declare-arguments-and-assign.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/meth-fn-body-cntns-argu\
+        ments-lex-bind-declare-arguments-and-assign.js:89:17:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

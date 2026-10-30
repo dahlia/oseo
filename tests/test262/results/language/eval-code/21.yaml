@@ -1,0 +1,37 @@
+group: language/eval-code
+key: "21"
+results:
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/gen-func-decl-fn-body-cntns-arguments-var-bind-declare-arguments.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - generators
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/gen-func-decl-fn-body-cntns-arg\
+        uments-var-bind-declare-arguments.js non-strict disabled failed
+        (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/gen-func-decl-fn-body-c\
+        ntns-arguments-var-bind-declare-arguments.js:88:18:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

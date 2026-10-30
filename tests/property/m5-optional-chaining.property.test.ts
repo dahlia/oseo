@@ -370,11 +370,18 @@ function innerTargetSource(testCase: WithOptionalCallCase): string {
   return "{}";
 }
 
-function printWithCallCase(testCase: WithOptionalCallCase): string {
+function printWithCallCase(
+  testCase: WithOptionalCallCase,
+  tail = false,
+  optional = true,
+): string {
+  const invocation = optional ? "f?.(argument())" : "f(argument())";
   const call = testCase.strict
     ? '(function () {\n      "use strict";\n' +
-      "      var r = f?.(argument());\n      return r;\n    })()"
-    : "f?.(argument())";
+      (tail
+        ? `      return ${invocation};\n    })()`
+        : `      var r = ${invocation};\n      return r;\n    })()`)
+    : invocation;
   const body = `with (inner) {\n    result = ${call};\n  }`;
   const wrapped = testCase.outer ? `with (outer) {\n  ${body}\n  }` : body;
   const lexical = testCase.fallback === "lexical";
@@ -441,7 +448,10 @@ console.log("result", shown);
  * call's `this` is WithBaseObject: the selected object, or `undefined`
  * for a declarative or global binding.
  */
-function expectedWithCall(testCase: WithOptionalCallCase): string {
+function expectedWithCall(
+  testCase: WithOptionalCallCase,
+  optional = true,
+): string {
   const log: string[] = ["has:first"];
   const finish = (result: string): string =>
     `${log.join(" ")}\nresult ${result}\n`;
@@ -462,9 +472,11 @@ function expectedWithCall(testCase: WithOptionalCallCase): string {
   } else if (testCase.outer) {
     receiver = "outer";
   }
-  if (value === "null" || value === "undefined") return finish("undefined");
+  if (optional && (value === "null" || value === "undefined")) {
+    return finish("undefined");
+  }
   log.push("argument");
-  if (value === "number") return finish("TypeError");
+  if (value !== "function") return finish("TypeError");
   log.push("call");
   return finish(`${receiver} ${testCase.argument}`);
 }
@@ -580,6 +592,72 @@ test(
         profile: "M5 optional chaining",
         seed: 0x6000_2401,
         sizeLimit: "one optional call, two with objects, and one integer",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);
+
+test(
+  "generated strict with tail calls preserve optional and ordinary receivers",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    await assertAsyncProperty(
+      "strict with tail calls retain their Reference and completion",
+      fc.asyncProperty(withCallArbitrary, async (draw) => {
+        const testCase = { ...draw, strict: true };
+        for (const optional of [true, false]) {
+          const source = printWithCallCase(testCase, true, optional)
+            .replace("return [this, value];", "return [this, value.value];")
+            .replace(
+              `return ${testCase.argument};`,
+              `return { value: ${testCase.argument} };`,
+            );
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout: expectedWithCall(testCase, optional),
+          };
+          for (const specialization of ["disabled", "enabled"] as const) {
+            const compiled = compileSource(
+              babelFrontend,
+              { source, sourceId: "generated-with-tail-call.js" },
+              { observeSpecialization: true, specialization },
+            );
+            assert.deepEqual(compiled.diagnostics, []);
+            assert.ok(compiled.mir != null);
+            process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+            try {
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget ?? describeTarget("linux-x86_64-gnu"),
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok((native.counters?.collections ?? 0) > 0);
+                },
+              );
+            } finally {
+              delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            }
+          }
+        }
+      }),
+      {
+        domain:
+          "strict optional and ordinary tail calls through own, inherited, " +
+          "blocked or missing with bindings, second has completion and " +
+          "heap arguments",
+        numRuns: 10,
+        profile: "M5 optional chaining",
+        seed: 0x6000_2402,
+        sizeLimit: "one tail call, two with objects and one heap argument",
         timeLimitMilliseconds: 180_000,
       },
     );

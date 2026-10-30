@@ -1,0 +1,28 @@
+group: language/eval-code
+key: "24"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/cptn-nrml-empty-for.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - control-flow
+      - dynamic-source
+      - functions
+    observation:
+      detail: "test/language/eval-code/direct/cptn-nrml-empty-for.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/cptn-nrml-empty-for.js:\
+        88:5: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

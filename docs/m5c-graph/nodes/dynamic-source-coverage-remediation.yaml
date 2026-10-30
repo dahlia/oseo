@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 536 reviewed unsupported paths assigned to
+delivers: "Resolves the 881 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -142,7 +142,33 @@ delivers: "Resolves the 536 reviewed unsupported paths assigned to
   for 11 unknown-eval paths
   under item 1 using existing reviewed static replacements, leaving 536.
   Its 55 other paths retain remediation ownership; see
-  docs/m5c-graph/dynamic-source-unknown-eval-assessment.md."
+  docs/m5c-graph/dynamic-source-unknown-eval-assessment.md. DS2 then
+  reviews 108 module subjects among 175 candidates: 76 paths move to
+  ADR 0016 under item 1 after static-import observations replace
+  every non-source subject; 32 selected subjects and 67 candidates outside DS2
+  stay. The per-path table in
+  docs/m5c-graph/dynamic-source-module-semantics-assessment.yaml records
+  the evidence and remaining gaps. One native integration test and two
+  fixture modules add exact static namespace-default update evidence;
+  original test262 observations stay unchanged. The umbrella then owns
+  460 paths. Observation batches 01 and 18 add 82 source-compilation
+  rejections: 73 built-in callable, constructor, prototype, and seal
+  subjects from batch 01, and nine line-terminator subjects from batch 18.
+  The pinned source hashes and exact per-path rejection records are linked
+  from their batch notes. These paths stay in remediation without an
+  exclusion assessment or expansion of ADR 0016; the scope becomes 542.
+  Root's B06/B08/B14 observation decision adds exactly 339 paths: 325
+  from batch 06, 2 from batch 08 and 12 from batch 14. Their 54 runtime
+  String-eval, 284 unknown-eval binding and one Function-constructor
+  rejections retain original subjects as active in-claim remediation,
+  with fresh exclusion-audit rows and no whole-path exclusion; the scope
+  becomes 881. The two direct non-String eval identity paths belong to
+  the separate direct-eval-non-string-dispatch node. Exact counts, source
+  evidence, observations and ownership are in
+  docs/m5c-graph/observation-batch-06.md,
+  docs/m5c-graph/observation-batch-08.md and
+  docs/m5c-graph/observation-batch-14.md; ADR 0016 and ADR 0019 remain
+  unchanged."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-callable-family

@@ -1,0 +1,73 @@
+group: language/eval-code
+key: "15"
+results:
+  - case:
+      async: false
+      features:
+        - globalThis
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/async-gen-meth-fn-body-cntns-arguments-func-decl-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - async-functions
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - functions
+      - generators
+      - lexical-bindings
+      - object-literals
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/async-gen-meth-fn-body-cntns-ar\
+        guments-func-decl-declare-arguments-and-assign.js non-strict
+        disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/async-gen-meth-fn-body-\
+        cntns-arguments-func-decl-declare-arguments-and-assign.js:87:24:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags:
+        - generated
+        - noStrict
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/func-expr-fn-body-cntns-arguments-func-decl-declare-arguments-and-assign.js
+      strictness:
+        - non-strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - default-parameters
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+      - object-properties
+      - var-bindings
+    observation:
+      detail: "test/language/eval-code/direct/func-expr-fn-body-cntns-argumen\
+        ts-func-decl-declare-arguments-and-assign.js non-strict disabled
+        failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/func-expr-fn-body-cntns\
+        -arguments-func-decl-declare-arguments-and-assign.js:88:22:
+        error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

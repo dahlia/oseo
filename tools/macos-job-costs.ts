@@ -1,5 +1,6 @@
 /**
- * Each entry is the median, rounded to whole seconds, of the job's measured
+ * Except for the explicitly unmeasured Array scheduling allowance, each
+ * entry is the median, rounded to whole seconds, of the job's measured
  * hosted `macos-15` or `macos-latest` walls (`started_at` to
  * `completed_at`). The lane generator sorts hosted jobs by these weights
  * before assignment, and `modeledJobSeconds` converts a weight to a Mac
@@ -101,6 +102,9 @@ export const macosJobCosts: MacosJobCosts = {
   "test262 (macos-aarch64, 6/12)": 1459, // 1
   "test262 (macos-aarch64, 9/12)": 1456, // retained
   "native support (macos-aarch64, 12/12)": 1397, // 5 hosted since b59ac914
+  // Scheduling allowance only: unchanged 180-second interrupt plus setup.
+  // Dedicated hosted macOS execution has not yet been measured.
+  "Array constructor (macos-latest, node)": 240,
   "test (macos-latest, node, 3/4)": 1311, // 18
   "native support (macos-aarch64, 3/12)": 1293, // 5 hosted since b59ac914
   "native (macos-aarch64, 1/3)": 1236, // 6 hosted since b59ac914

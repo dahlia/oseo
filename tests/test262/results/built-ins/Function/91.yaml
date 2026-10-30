@@ -1,0 +1,30 @@
+group: built-ins/Function
+key: "91"
+results:
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/built-ins/Function/S15.3.2.1_A3_T12.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - functions
+      - object-properties
+      - var-bindings
+    observation:
+      detail: 'test/built-ins/Function/S15.3.2.1_A3_T12.js non-strict disabled
+        failed (1): stdout=""
+        stderr="test/built-ins/Function/S15.3.2.1_A3_T12.js:99:11:
+        error[OSEO1001]: The Function constructor requires dynamic
+        source and is unsupported in M5.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

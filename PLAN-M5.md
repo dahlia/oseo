@@ -19,8 +19,8 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-31,337 reviewed cases: 26,963 passes, 3,263
-expected negatives, and 1,111 unsupported profile features with no semantic,
+33,434 reviewed cases: 28,363 passes, 3,531
+expected negatives, and 1,540 unsupported profile features with no semantic,
 harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the M5a
 denominator at 41,091 paths from 47,381 candidates: 22,998 language tests and
@@ -8182,12 +8182,18 @@ The
 [*with-optional-call-receiver-non-tail.md*](./docs/m5c-graph/with-optional-call-receiver-non-tail.md)
 record lists the native, generated, and structural evidence.
 
-Strict tail-position optional calls through `with`, such as `return f?.()` in
-a strict function nested in a `with` body, remain a known gap, not an
-exclusion. Active node `with-optional-call-receiver-tail` owns their evidence,
-and `m5-exit-audit` depends on the umbrella `with-optional-call-receiver`. The
-[*with-optional-call-receiver.md*](./docs/m5c-graph/with-optional-call-receiver.md)
-record holds the defect and the repair contract.
+Strict tail-position optional calls through `with`, such as `return f?.()`
+in a strict function nested in a `with` body, retain that same receiver.
+WOC-1's lowering already supplies the receiver to the tail call. WOC-2 adds
+fixed native evidence, an independent generated oracle at seed `0x60002402`,
+and MIR assertions that the call is a tail call returned directly. The
+fixed fixture compares optional calls with ordinary strict tail calls for
+normal, nullish, non-callable and abrupt completions. Both specialization
+policies force collection while the trampoline retains the selected
+receiver, getter-produced callee and freshly allocated arguments. The
+[*WOC-2 work note*](./docs/m5c-graph/with-optional-call-receiver-tail.md)
+records validation and the remaining Root-owned publication gates. No
+manifest classification, exclusion or graph landed state changes.
 
 [identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
 [call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js

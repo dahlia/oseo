@@ -584,3 +584,7 @@ families:
     owner: tests/property/m5-module-prelude-script.property.test.ts
     start: 0x60009100
     end: 0x600091ff
+  - family: m5-with-var-loop-head
+    owner: tests/property/m5-with-var-loop-head.property.test.ts
+    start: 0x60009200
+    end: 0x600092ff

@@ -118,6 +118,30 @@ results:
       async: false
       expectedErrorType: SyntaxError
       expectedFailurePhase: parse
+      features:
+        - destructuring-assignment
+      flags:
+        - generated
+      includes: []
+      mode: script
+      path: test/language/expressions/assignment/dstr/syntax-error-ident-ref-continue-escaped.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: expected-negative
+    dependencies:
+      - destructuring-bindings
+      - expression-operators
+    observation:
+      errorType: SyntaxError
+      failedPhase: parse
+      passed: false
+    unsupportedFeatures: []
+  - case:
+      async: false
+      expectedErrorType: SyntaxError
+      expectedFailurePhase: parse
       features: []
       flags:
         - generated

@@ -237,8 +237,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 31,337 reviewed cases: 26,963 passes, 3,263
-expected negatives, and 1,111 unsupported profile features. It records no
+The current manifest contains 33,434 reviewed cases: 28,363 passes, 3,531
+expected negatives, and 1,540 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -727,11 +727,13 @@ current evidence assessment. Those live only in the indexed records above.
     8.5l promoted its `for-in` iteration-statement case and the M5b
     `string-intrinsic` node promoted its `String` one. Optional calls through
     `super` properties are admitted by M5a Unit 8.2 as recorded below. An
-    optional call outside tail position whose callee is an identifier
-    resolved through a `with` object environment passes the selected object
-    as `this`, as recorded under identifier reads through `with` below; M5c
-    node `with-optional-call-receiver-tail` still owns strict tail-position
-    optional calls through `with`, and the umbrella
+    optional call whose callee is an identifier resolved through a `with`
+    object environment passes the selected object as `this`, as recorded
+    under identifier reads through `with` below. WOC-2 supplies fixed,
+    generated and MIR evidence for strict tail-position optional calls:
+    both specialization policies retain the receiver, callee and heap
+    arguments through the trampoline with forced collection. Publication
+    and graph landing remain separate; the umbrella
     `with-optional-call-receiver` blocks the M5 exit until it lands. The
     remaining directory case stays outside the reviewed subset because its
     async function reaches `.call` through a function-intrinsic path that is
@@ -9249,12 +9251,21 @@ The
 [*with-optional-call-receiver-non-tail.md*](./m5c-graph/with-optional-call-receiver-non-tail.md)
 record lists the native, generated, and structural evidence.
 
-Strict tail-position optional calls through `with`, such as `return f?.()` in
-a strict function nested in a `with` body, remain a known gap, not an
-exclusion. Active node `with-optional-call-receiver-tail` owns their evidence,
-and `m5-exit-audit` depends on the umbrella `with-optional-call-receiver`. The
-[*with-optional-call-receiver.md*](./m5c-graph/with-optional-call-receiver.md)
-record holds the defect and the repair contract.
+Strict tail-position optional calls through `with`, such as `return f?.()`
+in a strict function nested in a `with` body, retain that same receiver.
+WOC-1's lowering already supplies the receiver to the tail call. WOC-2 adds
+fixed native evidence, an independent generated oracle at seed `0x60002402`,
+and MIR assertions that the call is a tail call returned directly. The
+fixed fixture pairs optional and ordinary strict tail calls for normal,
+nullish, non-callable and abrupt completions, including argument order.
+Both specialization policies force collection while the trampoline retains
+the selected receiver, getter-produced callee and freshly allocated
+arguments. The
+[*WOC-2 work note*](./m5c-graph/with-optional-call-receiver-tail.md)
+records the focused Linux execution and its limits. No manifest
+classification or exclusion changes. Publication and graph landing remain
+Root-owned gates; `m5-exit-audit` still depends on the umbrella
+`with-optional-call-receiver` until it lands.
 
 [identifier trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-idref-with-proxy-env.js
 [call trace]: https://github.com/tc39/test262/blob/f2d1435644797268dca1f7988cad5a4e89ccd8d2/test/language/statements/with/get-binding-value-call-with-proxy-env.js
@@ -9830,10 +9841,10 @@ references, and by a combined native fixture in
 *tests/native/fixtures/host-script-bindings.ts*. Undeclared names keep the
 existing rejection on both targets, and ordinary output is unchanged.
 
-A with-hit simple `for (var x in/of ...)` head writes the hoisted cell
-instead of the `with` object on both targets. That defect predates this node
-and is owned by the separate `with-var-loop-head-resolution` node; the new
-fixture does not cover it. Raw evidence is under
+At that checkpoint, a with-hit simple `for (var x in/of ...)` head wrote
+its hoisted cell instead of the `with` object on both targets. The separate
+`with-var-loop-head-resolution` repair below addresses this defect; the
+Host binding fixture above does not cover it. Original raw evidence is under
 */data/m5c-host-script-bindings-20261027/claude-native/diag-with02/*.
 
 `ce8ae0c84a632e414729872b5de928bac5ed4d2e` (tree
@@ -9876,11 +9887,10 @@ table. Deno's vm rejects the shadowing declaration through its legacy
 var-name check, as the generated model already qualifies, so its loops
 write the unshadowed properties.
 
-A simple `var` loop head inside a `with` statement still writes the hoisted
-cell, whether the `with` object supplies the name or not, so a later
-lexical declaration does not capture it there. That is the same
-pre-existing defect as the with-hit head above, owned by
-`with-var-loop-head-resolution` and not covered by this node.
+At that checkpoint, a simple `var` loop head inside a `with` statement
+still wrote its hoisted cell, whether the object supplied the name or not.
+A later lexical declaration consequently did not capture it there. The
+separate `with-var-loop-head-resolution` repair below addresses this gap.
 
 `16bb5e917afbe90ab050805af151a5eacfb98dac` (tree
 `cf9a53e9dae174604962a790d2374a294081b641`) completed the same nine focused
@@ -9961,3 +9971,34 @@ records the one window an external signal could still open. Its focused
 precheck observes the three *Iterator/from/* paths as pass;
 [its work note](./m5c-graph/temporal-helpers-harness.md) records the decision
 and evidence.
+
+
+With var loop-head resolution
+-----------------------------
+
+Simple `var` heads in `for-in` and `for-of`, including `for await`, now
+resolve the identifier through the active `with` chain on each iteration.
+A classic `for` var initializer selects its reference before evaluating the
+initializer. Lexical heads retain their own declaration environments.
+Nested environments, inherited properties, `Symbol.unscopables`, accessors,
+and abrupt lookup use the existing generic reference and PutValue paths.
+An all-miss host Script reference reaches the persistent Global Environment
+Record, including a later lexical shadow of a configurable global property.
+
+Array-pattern identifier leaves select their reference before the iterator
+step, default initializer, or rest collection, as ECMA-262 2025 section
+8.6.3 requires. The same preparation helper retains the existing keyed
+object leaf order without changing object rest preparation.
+A later addition or deletion cannot change the selected environment.
+Lookup failures close acquired iterators through the existing cleanup path.
+Fixed traces use the specification where V8's var binding order differs.
+
+*tests/with-var-loop-head-source.test.ts*,
+*tests/with-var-loop-head.test.ts*, and
+*tests/native/fixtures/with-var-loop-head-resolution.ts* cover both targets.
+*tests/property/m5-with-var-loop-head.property.test.ts* adds independent
+models for nested hit, miss, blocking and deletion sequences, and array
+reference order with mutations. Seeds `0x60009200` and `0x60009201` use
+8 ordinary cases each, both specialization policies and forced collection.
+These sources add no test262 path or classification. D3, full observation,
+review and publication remain separate gates owned by Root.

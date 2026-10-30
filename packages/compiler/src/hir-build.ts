@@ -260,8 +260,8 @@ function hostScriptWithGlobalFallback(
  * global object's property, but a later Script can declare a lexical
  * binding over that property when it is configurable, so each PutValue
  * resolves the name again, as an assignment head or a `var` pattern head
- * already does. A head inside a `with` statement keeps its hoisted
- * binding write; its object-environment resolution is not decided here.
+ * already does. Intervening `with` records use the pattern/reference
+ * path, retaining their object-environment lookup before this fallback.
  */
 function hostScriptGlobalVarHead(
   name: string,
@@ -3785,6 +3785,18 @@ function resolveForInTarget(
   }
   if (target.kind === "declaration") {
     if (
+      target.declarationKind === "var" &&
+      resolveName(scopes, state, target.name).objectBindingIds.length > 0
+    ) {
+      return resolveForInTarget(
+        { kind: "binding", name: target.name, range: target.range },
+        scopes,
+        headScopes,
+        undefined,
+        state,
+      );
+    }
+    if (
       declaredBinding == null &&
       hostScriptGlobalVarHead(target.name, scopes, state)
     ) {
@@ -4241,17 +4253,28 @@ function resolveStatement(
         if (
           declaration.kind === "binding" &&
           declaration.declarationKind === "var" &&
-          hostScriptGlobalVarHead(declaration.name, scopes, state)
+          (hostScriptGlobalVarHead(declaration.name, scopes, state) ||
+            resolveName(scopes, state, declaration.name).objectBindingIds
+              .length > 0)
         ) {
+          const pattern = resolveBindingPattern(
+            {
+              hints: declaration.hint == null ? [] : [declaration.hint],
+              kind: "binding-identifier",
+              name: declaration.name,
+              range: declaration.range,
+            },
+            scopes,
+            state,
+            "write",
+            false,
+          );
+          if (pattern == null) return undefined;
           declarations.push({
             declarationKind: "var",
             initializer: inferFunctionName(initializer, declaration.name),
             kind: "pattern",
-            pattern: intrinsicGlobalPatternTarget(
-              declaration.name,
-              declaration,
-              state,
-            ),
+            pattern,
             range: declaration.range,
           });
           continue;
@@ -4455,11 +4478,15 @@ function resolveStatement(
     if (
       statement.target.kind === "declaration" &&
       declaredBinding == null &&
-      hostScriptGlobalVarHead(statement.target.name, scopes, state)
+      (hostScriptGlobalVarHead(statement.target.name, scopes, state) ||
+        resolveName(scopes, state, statement.target.name).objectBindingIds
+          .length > 0)
     ) {
-      target = intrinsicGlobalLoopTarget(
-        statement.target.name,
-        statement.target.range,
+      target = resolveForInTarget(
+        statement.target,
+        scopes,
+        forScopes,
+        undefined,
         state,
       );
     } else if (statement.target.kind === "declaration") {

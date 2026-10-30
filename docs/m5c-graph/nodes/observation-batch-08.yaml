@@ -13,5 +13,5 @@ dependencies:
   - observation-batch-plan
   - parenthesized-assignment-function-name
   - with-strict-assignment-fallback
-landed: false
+landed: true
 status: ready

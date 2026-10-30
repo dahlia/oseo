@@ -3,6 +3,8 @@ id: async-iteration
 title: "Asynchronous iteration"
 scope:
   - "Async iterator operations, async-from-sync, and for-await-of."
+  - "Var for-await-of identifier heads resolve the active with chain per
+    iteration through the shared loop-head reference path."
 owners:
   - PLAN-M5.md
 evidence:
@@ -13,10 +15,12 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native/fixtures/async-iteration.ts
   forced-collection:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/property/m5-for-await-of.property.test.ts
   generated:
     status: covered
@@ -29,6 +33,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native.ts
       - tests/native/fixtures/async-iteration.ts
   standards:

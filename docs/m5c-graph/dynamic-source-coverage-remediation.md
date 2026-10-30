@@ -1,6 +1,14 @@
 B19/B20/B30 dynamic-source coverage remediation
 ===============================================
 
+The current umbrella owns 460 paths: DS1 accounts for 218, DS-3 for 11 and
+DS2 for 76 of the historical 765 below. DS2's
+[*per-path assessment*](./dynamic-source-module-semantics-assessment.yaml)
+uses reviewed static-import observations and one new native test of a live
+default namespace property, keeping 32 selected module subjects and 67
+candidates outside DS2 in remediation.
+All original paths and observations remain; no UPDATE is needed.
+
 Root authorized exactly 459 additions on 2026-10-27: 66 observed
 `OSEO1001` unknown-eval binding paths and 393 observed ImportExpression
 rejections. Preserve the existing 306 owned paths and dependencies. The

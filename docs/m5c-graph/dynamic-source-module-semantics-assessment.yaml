@@ -1,0 +1,2439 @@
+base: "74bb8e47c26e47c765c98c86bb37c41d152c699d"
+suiteRevision: "f2d1435644797268dca1f7988cad5a4e89ccd8d2"
+assessed: 175
+selected: 108
+closed: 76
+stayingSelected: 32
+outsideSelection: 67
+evidenceAdded: 1
+replacementSourceDigests:
+  - path: "test/language/module-code/eval-export-dflt-cls-anon.js"
+    digest: "aa9d5c379bff55735756c7f447ed368b56b0276277d97cca5a07c99b4cfc03d4"
+  - path: "test/language/module-code/eval-export-dflt-cls-name-meth.js"
+    digest: "176ca161854205b96d780b0a5568008c5f98d3e85224417d00c1f8a2d9a226e2"
+  - path: "test/language/module-code/eval-export-dflt-cls-named.js"
+    digest: "5522ec499f121872a462cc2c4b79572c84b96215818c194726c818ffb8595213"
+  - path: "test/language/module-code/eval-export-dflt-expr-cls-anon.js"
+    digest: "b5fa8a12655de8b56d7a6c6c30c7686988acdc3b7f557052adb4d1ad9633c1d3"
+  - path: "test/language/module-code/eval-export-dflt-expr-cls-name-meth.js"
+    digest: "4ed56bab4263eeabf56ab0227931f34dac658bb3ed3fb6e9e611eb100719cfca"
+  - path: "test/language/module-code/eval-export-dflt-expr-cls-named.js"
+    digest: "b36534c4e4484c30c69ed52957405dc77bb694168a100b9c2df8da21e11bc2e1"
+  - path: "test/language/module-code/eval-export-dflt-expr-fn-anon.js"
+    digest: "8d2ce3104e20aca09591911a65ad881cdcea15473b855662813d82be496bb89b"
+  - path: "test/language/module-code/eval-export-dflt-expr-fn-named.js"
+    digest: "e2d8ba24e84aa368887535e974ca4c06c65137b097edd48438e1a8df75995b6a"
+  - path: "test/language/module-code/eval-export-dflt-expr-gen-anon.js"
+    digest: "aa8991077c498d490869ec8003ca322036bc8769017a3b3bf3a1da5aef2d01a2"
+  - path: "test/language/module-code/eval-export-dflt-expr-gen-named.js"
+    digest: "8bc314bf83d82152cb9505999b881ce13ce581445072d924fdd47483b17cb770"
+  - path: "test/language/module-code/eval-export-dflt-expr-in.js"
+    digest: "7551d897ea97bab6c708d0db6791c2da411bb16f279515758bcd14c6a5a45fba"
+  - path: "test/language/module-code/namespace/Symbol.toStringTag.js"
+    digest: "6315c6f95c2c060a0f21a777655a498a47c44efbdbd72939685829f98355dca8"
+  - path: "test/language/module-code/namespace/internals/define-own-propert\
+      y.js"
+    digest: "490086320b7c5fb23f7ca4ebfad4a326e5fe49aa4259e628f1c3a1e52c7690c6"
+  - path: "test/language/module-code/namespace/internals/delete-non-exporte\
+      d.js"
+    digest: "5549137de62e046e20a0d64fb75a1ecdb83d7e5569f10012f4acc76678041209"
+  - path: "test/language/module-code/namespace/internals/is-extensible.js"
+    digest: "c500c5b92cfd978223c8528fc64a783ff99931b1a9629011b95f5c3b6969048c"
+  - path: "test/language/module-code/namespace/internals/get-own-property-s\
+      tr-found-init.js"
+    digest: "bba174e662b5bc81f0b82f71a98cadd6faeac1e885cdb356b211954bd6276faf"
+  - path: "test/language/module-code/namespace/internals/get-own-property-s\
+      tr-not-found.js"
+    digest: "722c22fdceee8ad9c76918220203241e79e038cd8dc33df3c43a744620b6f2d9"
+  - path: "test/language/module-code/namespace/internals/get-own-property-s\
+      ym.js"
+    digest: "5daefc7f5e487c260f2d78b8087e141c6f065940340ef6440a5577f7567db759"
+  - path: "test/language/module-code/namespace/internals/get-str-found-init\
+      .js"
+    digest: "ddd4e6b68b4093df6f87b8c1977155cdc85526e568a721f16b7ab44363405c52"
+  - path: "test/language/module-code/namespace/internals/get-str-not-found.\
+      js"
+    digest: "00adb485df5fb8ca302897d4db5d4b3e89a83ef569dd67913a12edc2e0db7b6e"
+  - path: "test/language/module-code/namespace/internals/get-sym-found.js"
+    digest: "954376d03885980563797915af1d933056d438d9eddab074a63cf4c35f2256d6"
+  - path: "test/language/module-code/namespace/internals/get-sym-not-found.\
+      js"
+    digest: "383f50910a9241dd148e178979e053d4b284cb663998d6abf1ccbf0eb51ac68a"
+  - path: "test/language/module-code/namespace/internals/has-property-str-f\
+      ound-init.js"
+    digest: "24244c2ffd67d73f90145b70b7f99df87c0962ba32679f057dad46a3ac098af8"
+  - path: "test/language/module-code/namespace/internals/has-property-str-n\
+      ot-found.js"
+    digest: "5ea28c74bfe936f7dca93b9c1a678f213cacdeb57fb1499fb462e663c6259d0b"
+  - path: "test/language/module-code/namespace/internals/has-property-sym-f\
+      ound.js"
+    digest: "6572cf48501dae9f8d4602c60cb0d342c623965c5ec52a89a34238569358715d"
+  - path: "test/language/module-code/namespace/internals/has-property-sym-n\
+      ot-found.js"
+    digest: "277e068c61a8c1d00e228147df1fadd2e699da65654e220cf2be652f98af7856"
+  - path: "test/language/module-code/namespace/internals/own-property-keys-\
+      sort.js"
+    digest: "b0eae14038b0da50ab314e3b63352c650318657cfc6e56e4cc61342fb7824f0b"
+  - path: "test/language/module-code/namespace/internals/prevent-extensions\
+      .js"
+    digest: "c0ee6e57a97cea72137fb19f80a12512fb2797f8903699a353ff717d6141bf30"
+  - path: "test/language/module-code/namespace/internals/get-prototype-of.js"
+    digest: "1a49c3befc8b4c820e8bbb4d2f3ec1e818afdfba0a633e634de7b8b274795643"
+  - path: "test/language/module-code/namespace/internals/set-prototype-of-n\
+      ull.js"
+    digest: "9c63575fc8841e01c02ef30ef47e7c8f713ad8cc4a879cf197f64b7023751e99"
+  - path: "test/language/module-code/namespace/internals/set-prototype-of.js"
+    digest: "3de9551554eea456e0075fe9dc03daeb5f8641c64d735f448d2c9396eff8e9b8"
+  - path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+    digest: "2d949247244a5054173aff0bff717cb22d83048bd2e552e27b3a635fa3456544"
+  - path: "test/language/module-code/eval-gtbndng-indirect-update-dflt_FIXT\
+      URE.js"
+    digest: "12a289fc58e54afefbf54b974ac7db0432b3dca1815d3c7f0fa7d4f639b0fe1f"
+  - path: "test/language/module-code/namespace/Symbol.iterator.js"
+    digest: "03082b2bf4a1432a2e190f4973be5c463dbe9a757b49f5908ac86b0a45343e09"
+paths:
+  - path: "test/language/expressions/dynamic-import/catch/nested-arrow-impo\
+      rt-catch-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested arrow)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-arrow-impo\
+      rt-catch-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested arrow)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-arrow-impo\
+      rt-catch-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested arrow)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-arro\
+      w-function-await-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested in async
+      arrow function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-arro\
+      w-function-await-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested in async arrow function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-arro\
+      w-function-await-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested in async arrow function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-arro\
+      w-function-return-await-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested in async
+      arrow function, returned)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-arro\
+      w-function-return-await-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested in async arrow function, returned)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-arro\
+      w-function-return-await-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested in async arrow function, returned)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-await-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested in async
+      function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-await-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested in async function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-await-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested in async function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested in async
+      function)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested in async function)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested in async function)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-return-await-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested in async
+      function, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-return-await-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested in async function, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-func\
+      tion-return-await-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested in async function, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-\
+      await-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested in async
+      generator, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-\
+      await-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested in async generator, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-\
+      await-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested in async generator, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-\
+      return-await-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested in async
+      generator, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-\
+      return-await-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested in async generator, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-async-gen-\
+      return-await-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested in async generator, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-block-impo\
+      rt-catch-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested block)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-block-impo\
+      rt-catch-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested block)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-block-impo\
+      rt-catch-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested block)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-block-labe\
+      led-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested block
+      syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-block-labe\
+      led-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested block syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-block-labe\
+      led-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested block syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-do-while-e\
+      val-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested do while
+      syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-do-while-i\
+      nstn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested do while syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-do-while-i\
+      nstn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested do while syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-else-impor\
+      t-catch-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested else)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-else-impor\
+      t-catch-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested else)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-else-impor\
+      t-catch-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested else)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-function-i\
+      mport-catch-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested function)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-function-i\
+      mport-catch-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested function)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-function-i\
+      mport-catch-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested function)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-if-import-\
+      catch-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested if)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-if-import-\
+      catch-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested if)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-if-import-\
+      catch-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested if)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-while-impo\
+      rt-catch-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (nested while)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/nested-while-impo\
+      rt-catch-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (nested while)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/nested-while-impo\
+      rt-catch-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (nested while)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/top-level-import-\
+      catch-eval-script-code-target.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a module code can load a file with script code,
+      but the target is resolved into a Module Record (top level)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static negative replacement for the same Script-valid but
+      Module-invalid target has not been established."
+  - path: "test/language/expressions/dynamic-import/catch/top-level-import-\
+      catch-instn-iee-err-ambiguous-import.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - ambiguous imported bindings
+      (top level)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/catch/top-level-import-\
+      catch-instn-iee-err-circular.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "IndirectExportEntries validation - circular imported bindings
+      (top level)"
+    disposition: "remediation"
+    reason: "Outside DS2: module parse/link validation, rather than
+      namespace, evaluation order, top-level await or JSON identity;
+      Static linking negatives do not replace catch-time SyntaxError
+      observation for this loaded ambiguous or circular target."
+  - path: "test/language/expressions/dynamic-import/custom-primitive.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Import a custom toString and valueOf bindings"
+    disposition: "remediation"
+    reason: "No complete static namespace ToPrimitive replacement for both
+      exported toString and valueOf fallbacks was established."
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-cls-an\
+      on.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default "anonymous" class declaration is correctly
+      initialized upon evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-cls-anon.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/7f.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-cls-na\
+      me-meth.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default "anonymous" class declaration containing a static
+      `name` method is correctly initialized upon evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-cls-name-meth.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/dd.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-cls-na\
+      med.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default "named" class declaration is correctly initialized
+      upon evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-cls-named.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/83.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-c\
+      ls-anon.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default AssignmentExpression (which can be recognized as an
+      "anonymous" class declaration) is correctly initialized upon
+      evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-cls-anon.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/c2.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-c\
+      ls-name-meth.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default AssignmentExpression (which can be recognized as an
+      "anonymous" class declaration with a static `name` method) is
+      correctly initialized upon evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-cls-name-meth.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f9.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-c\
+      ls-named.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default AssignmentExpression (which can be recognized as a
+      "named" class declaration) is correctly initialized upon
+      evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-cls-named.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/e2.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-f\
+      n-anon.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default AssignmentExpression (which can be recognized as an
+      "anonymous" function declaration) is correctly initialized upon
+      evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-fn-anon.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/89.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-f\
+      n-named.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default AssignmentExpression (which can be recognized as a
+      "named" function declaration) is correctly initialized upon
+      evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-fn-named.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/92.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-g\
+      en-anon.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default AssignmentExpression (which can be recognized as an
+      "anonymous" generator function declaration) is correctly
+      initialized upon evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-gen-anon.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f8.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-g\
+      en-named.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: 'Default AssignmentExpression (which can be recognized as a
+      "named" generator function declaration) is correctly initialized
+      upon evaluation'
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-gen-named.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/b5.yaml"
+  - path: "test/language/expressions/dynamic-import/eval-export-dflt-expr-i\
+      n.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: "The `in` operator may occur within an exported
+      AssignmentExpression"
+    disposition: "exclusion"
+    reason: "The static self-import preserves default initialization and the
+      asserted value, class/function/generator name or name method."
+    replacement:
+      path: "test/language/module-code/eval-export-dflt-expr-in.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/24.yaml"
+  - path: "test/language/expressions/dynamic-import/import-errored-module.js"
+    selected: true
+    section: "sec-ContinueDynamicImport"
+    subject: "Dynamic import of an already errored module should fail"
+    disposition: "remediation"
+    reason: "No static replacement observes the cached evaluation error
+      across both attempted loads."
+  - path: "test/language/expressions/dynamic-import/import-fulfilled-member\
+      -of-errored-cycle.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: "Dynamic import of a fulfilled member of an errored async cycle
+      rejects with the recorded evaluation error"
+    disposition: "remediation"
+    reason: "No static replacement observes identical recorded evaluation
+      error from a fulfilled member and its errored async cycle root."
+  - path: "test/language/expressions/dynamic-import/imported-self-update.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Imported self bindings should update the references"
+    disposition: "remediation"
+    reason: "Existing static live-binding evidence does not map both direct
+      and aliased self namespace reads before and after this update."
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-Symb\
+      ol-toStringTag.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace objects have a Symbol.toStringTag (value from
+      await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Module namespace objects have
+      a Symbol.toStringTag; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/Symbol.toStringTag.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/90.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-defi\
+      ne-own-property.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[DefineOwnProperty]] internal method returns `true` if no
+      change is requested, and `false` otherwise. (value from await
+      resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[DefineOwnProperty]]
+      internal method returns `true` if no change is requested, and
+      `false` otherwise.; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/define-own-propert\
+        y.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f1.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-dele\
+      te-exported-init-no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on non strict mode (value from await
+      resolving)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-dele\
+      te-exported-init-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on strict mode (value from await
+      resolving)"
+    disposition: "remediation"
+    reason: "Static deletion evidence omits an initialized default export;
+      the full export matrix is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-dele\
+      te-non-exported-no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that does not describe an
+      exported binding (value from await resolving)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-dele\
+      te-non-exported-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that does not describe an
+      exported binding (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[Delete]] behavior for a
+      key that does not describe an exported binding; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/delete-non-exporte\
+        d.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/fe.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-exte\
+      nsible.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace objects are not extensible. (value from await
+      resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Module namespace objects are
+      not extensible.; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/is-extensible.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/11.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-\
+      own-property-str-found-init.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[GetOwnProperty]] internal method with a
+      string argument describing an initialized binding (value from
+      await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[GetOwnProperty]] internal method with a string argument
+      describing an initialized binding; only the import() acquisition
+      site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        tr-found-init.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/e8.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-\
+      own-property-str-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[GetOwnProperty]] internal method with a
+      string argument describing a binding that cannot be found (value
+      from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[GetOwnProperty]] internal method with a string argument
+      describing a binding that cannot be found; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        tr-not-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/c3.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-\
+      own-property-sym.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[GetOwnProperty]] internal method with a
+      Symbol argument (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[GetOwnProperty]] internal method with a Symbol argument; only
+      the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        ym.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/29.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-\
+      str-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a string argument
+      for exported initialized bindings. (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a string argument for exported initialized
+      bindings.; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-str-found-init\
+        .js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-\
+      str-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a string argument
+      for non-exported bindings (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a string argument for non-exported bindings;
+      only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-str-not-found.\
+        js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/ff.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-\
+      sym-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a symbol argument
+      that can be found (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a symbol argument that can be found; only the
+      import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-sym-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/ed.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-get-\
+      sym-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a symbol argument
+      that cannot be found (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a symbol argument that cannot be found; only
+      the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-sym-not-found.\
+        js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/6d.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-\
+      property-str-found-init.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a string
+      argument for exported initialized bindings. (value from await
+      resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a string argument for
+      exported initialized bindings.; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-str-f\
+        ound-init.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/16.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-\
+      property-str-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a string
+      argument for non-exported bindings (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a string argument for
+      non-exported bindings; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-str-n\
+        ot-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/a6.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-\
+      property-sym-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a symbol
+      argument that can be found (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a symbol argument that can be
+      found; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-sym-f\
+        ound.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f1.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-has-\
+      property-sym-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a symbol
+      argument that cannot be found (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a symbol argument that cannot
+      be found; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-sym-n\
+        ot-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/9e.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-no-i\
+      terator.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace objects lack a Symbol.iterator property
+      (value from await resolving)"
+    disposition: "exclusion"
+    reason: "The passing static self namespace import asserts the identical
+      absence of an own Symbol.iterator property; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/Symbol.iterator.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/6f.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-own-\
+      property-keys-sort.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[OwnPropertyKeys]] internal method reflects the sorted
+      order (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[OwnPropertyKeys]]
+      internal method reflects the sorted order; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/own-property-keys-\
+        sort.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/05.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-prev\
+      ent-extensions-object.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[PreventExtensions]] internal method returns `true`
+      (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[PreventExtensions]]
+      internal method returns `true`; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/prevent-extensions\
+        .js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/19.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-prev\
+      ent-extensions-reflect.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[PreventExtensions]] internal method returns `true`
+      (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[PreventExtensions]]
+      internal method returns `true`; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/prevent-extensions\
+        .js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/19.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-prop\
+      -descs.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "imported object properties descriptors (value from await
+      resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes imported object properties
+      descriptors; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        tr-found-init.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/e8.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-prot\
+      otype.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace object prototype is null (value from await
+      resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Module namespace object
+      prototype is null; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-prototype-of.j\
+        s"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/7a.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-\
+      no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false`, No
+      Strict Mode (value from await resolving)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-\
+      prototype-of-null.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[SetPrototypeOf]] internal method returns `true` if
+      passed `null` (value from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[SetPrototypeOf]]
+      internal method returns `true` if passed `null`; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/set-prototype-of-n\
+        ull.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f1.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-\
+      prototype-of.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[SetPrototypeOf]] internal method returns `false` (value
+      from await resolving)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[SetPrototypeOf]]
+      internal method returns `false`; only the import() acquisition
+      site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/set-prototype-of.j\
+        s"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/2c.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-\
+      same-values-no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false` even
+      setting the same value - No Strict Mode (value from await
+      resolving)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-\
+      same-values-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false` even
+      setting the same value - Strict Mode (value from await resolving)"
+    disposition: "remediation"
+    reason: "Static set evidence lacks the initialized default-export write
+      matrix, including same-value writes where asserted."
+  - path: "test/language/expressions/dynamic-import/namespace/await-ns-set-\
+      strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false`,
+      Strict Mode (value from await resolving)"
+    disposition: "remediation"
+    reason: "Static set evidence lacks the initialized default-export write
+      matrix, including same-value writes where asserted."
+  - path: "test/language/expressions/dynamic-import/namespace/default-prope\
+      rty-not-set-own.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The default property is not set the if the module doesn't
+      export any default"
+    disposition: "exclusion"
+    reason: "The passing static namespace import asserts
+      hasOwnProperty(default) is false and the descriptor is undefined
+      without a default export; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        tr-not-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/c3.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-Symbol-toStringTag.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace objects have a Symbol.toStringTag (value from
+      promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Module namespace objects have
+      a Symbol.toStringTag; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/Symbol.toStringTag.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/90.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-define-own-property.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[DefineOwnProperty]] internal method returns `true` if no
+      change is requested, and `false` otherwise. (value from promise
+      then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[DefineOwnProperty]]
+      internal method returns `true` if no change is requested, and
+      `false` otherwise.; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/define-own-propert\
+        y.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f1.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-delete-exported-init-no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on non strict mode (value from
+      promise then)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-delete-exported-init-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that describes an
+      initialized exported binding on strict mode (value from promise
+      then)"
+    disposition: "remediation"
+    reason: "Static deletion evidence omits an initialized default export;
+      the full export matrix is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-delete-non-exported-no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that does not describe an
+      exported binding (value from promise then)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-delete-non-exported-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Delete]] behavior for a key that does not describe an
+      exported binding (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[Delete]] behavior for a
+      key that does not describe an exported binding; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/delete-non-exporte\
+        d.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/fe.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-extensible.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace objects are not extensible. (value from
+      promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Module namespace objects are
+      not extensible.; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/is-extensible.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/11.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-get-own-property-str-found-init.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[GetOwnProperty]] internal method with a
+      string argument describing an initialized binding (value from
+      promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[GetOwnProperty]] internal method with a string argument
+      describing an initialized binding; only the import() acquisition
+      site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        tr-found-init.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/e8.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-get-own-property-str-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[GetOwnProperty]] internal method with a
+      string argument describing a binding that cannot be found (value
+      from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[GetOwnProperty]] internal method with a string argument
+      describing a binding that cannot be found; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        tr-not-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/c3.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-get-own-property-sym.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[GetOwnProperty]] internal method with a
+      Symbol argument (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[GetOwnProperty]] internal method with a Symbol argument; only
+      the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        ym.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/29.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-get-str-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a string argument
+      for exported initialized bindings. (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a string argument for exported initialized
+      bindings.; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-str-found-init\
+        .js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-get-str-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a string argument
+      for non-exported bindings (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a string argument for non-exported bindings;
+      only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-str-not-found.\
+        js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/ff.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-get-sym-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a symbol argument
+      that can be found (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a symbol argument that can be found; only the
+      import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-sym-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/ed.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-get-sym-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[Get]] internal method with a symbol argument
+      that cannot be found (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the [[Get]]
+      internal method with a symbol argument that cannot be found; only
+      the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-sym-not-found.\
+        js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/6d.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-has-property-str-found-init.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a string
+      argument for exported initialized bindings. (value from promise
+      then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a string argument for
+      exported initialized bindings.; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-str-f\
+        ound-init.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/16.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-has-property-str-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a string
+      argument for non-exported bindings (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a string argument for
+      non-exported bindings; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-str-n\
+        ot-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/a6.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-has-property-sym-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a symbol
+      argument that can be found (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a symbol argument that can be
+      found; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-sym-f\
+        ound.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f1.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-has-property-sym-not-found.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Behavior of the [[HasProperty]] internal method with a symbol
+      argument that cannot be found (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Behavior of the
+      [[HasProperty]] internal method with a symbol argument that cannot
+      be found; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/has-property-sym-n\
+        ot-found.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/9e.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-no-iterator.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace objects lack a Symbol.iterator property
+      (value from promise then)"
+    disposition: "exclusion"
+    reason: "The passing static self namespace import asserts the identical
+      absence of an own Symbol.iterator property; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/Symbol.iterator.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/6f.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-own-property-keys-sort.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[OwnPropertyKeys]] internal method reflects the sorted
+      order (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[OwnPropertyKeys]]
+      internal method reflects the sorted order; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/own-property-keys-\
+        sort.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/05.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-prevent-extensions-object.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[PreventExtensions]] internal method returns `true`
+      (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[PreventExtensions]]
+      internal method returns `true`; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/prevent-extensions\
+        .js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/19.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-prevent-extensions-reflect.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[PreventExtensions]] internal method returns `true`
+      (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[PreventExtensions]]
+      internal method returns `true`; only the import() acquisition site
+      remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/prevent-extensions\
+        .js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/19.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-prop-descs.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "imported object properties descriptors (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes imported object properties
+      descriptors; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-own-property-s\
+        tr-found-init.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/e8.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-prototype.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Module namespace object prototype is null (value from promise
+      then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes Module namespace object
+      prototype is null; only the import() acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/get-prototype-of.j\
+        s"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/7a.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-set-no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false`, No
+      Strict Mode (value from promise then)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-set-prototype-of-null.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[SetPrototypeOf]] internal method returns `true` if
+      passed `null` (value from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[SetPrototypeOf]]
+      internal method returns `true` if passed `null`; only the import()
+      acquisition site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/set-prototype-of-n\
+        ull.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/f1.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-set-prototype-of.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[SetPrototypeOf]] internal method returns `false` (value
+      from promise then)"
+    disposition: "exclusion"
+    reason: "Static namespace import observes The [[SetPrototypeOf]]
+      internal method returns `false`; only the import() acquisition
+      site remains."
+    replacement:
+      path: "test/language/module-code/namespace/internals/set-prototype-of.j\
+        s"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/2c.yaml"
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-set-same-values-no-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false` even
+      setting the same value - No Strict Mode (value from promise then)"
+    disposition: "remediation"
+    reason: "Static module bodies are strict; the silent sloppy assignment
+      or delete result is not replaced."
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-set-same-values-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false` even
+      setting the same value - Strict Mode (value from promise then)"
+    disposition: "remediation"
+    reason: "Static set evidence lacks the initialized default-export write
+      matrix, including same-value writes where asserted."
+  - path: "test/language/expressions/dynamic-import/namespace/promise-then-\
+      ns-set-strict.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "The [[Set]] internal method consistently returns `false`,
+      Strict Mode (value from promise then)"
+    disposition: "remediation"
+    reason: "Static set evidence lacks the initialized default-export write
+      matrix, including same-value writes where asserted."
+  - path: "test/language/expressions/dynamic-import/reuse-namespace-object-\
+      from-import.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Reuse the resolved namespace object already imported from a
+      static import"
+    disposition: "remediation"
+    reason: "Static re-export fixtures cover some namespace identity, but
+      the repeated-load and empty-module cases have no complete mapped
+      replacement here."
+  - path: "test/language/expressions/dynamic-import/reuse-namespace-object-\
+      from-script.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Reuse the resolved namespace object from a script code."
+    disposition: "remediation"
+    reason: "Static re-export fixtures cover some namespace identity, but
+      the repeated-load and empty-module cases have no complete mapped
+      replacement here."
+  - path: "test/language/expressions/dynamic-import/reuse-namespace-object.\
+      js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Reuse the resolved namespace object instead of creating a new one"
+    disposition: "remediation"
+    reason: "Static re-export fixtures cover some namespace identity, but
+      the repeated-load and empty-module cases have no complete mapped
+      replacement here."
+  - path: "test/language/expressions/dynamic-import/update-to-dynamic-impor\
+      t.js"
+    selected: true
+    section: "sec-finishdynamicimport"
+    subject: "Resolve imports after a binding update"
+    disposition: "remediation"
+    reason: "Static eager graph evaluation does not replace the asserted
+      delayed evaluation after calling the exported function."
+  - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assi\
+      gnment-expression-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested arrow)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-arrow-assi\
+      gnment-expression-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested arrow)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-arrow-impo\
+      rt-then-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested arrow)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-arrow-impo\
+      rt-then-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested arrow)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-arro\
+      w-function-await-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      arrow function, awaited)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-arro\
+      w-function-await-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested in async arrow function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-arro\
+      w-function-return-await-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      arrow function, returned)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-arro\
+      w-function-return-await-eval-script-code-host-resolves-module-cod\
+      e.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested in async arrow function, returned)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-func\
+      tion-await-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      function, awaited)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-func\
+      tion-await-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested in async function, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-func\
+      tion-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      function)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-func\
+      tion-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested in async function)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-func\
+      tion-return-await-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      function, returns awaited)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-func\
+      tion-return-await-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested in async function, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-\
+      await-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      generator, awaited)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-\
+      await-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested in async generator, awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-\
+      return-await-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested in async
+      generator, returns awaited)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-async-gen-\
+      return-await-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested in async generator, returns awaited)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-block-impo\
+      rt-then-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested block)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-block-impo\
+      rt-then-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested block)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-do-while-e\
+      val-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested do while
+      syntax)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-do-while-e\
+      val-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested do while syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-else-impor\
+      t-then-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested else)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-else-impor\
+      t-then-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested else)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-function-i\
+      mport-then-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested
+      function)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-function-i\
+      mport-then-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested function)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-if-bracele\
+      ss-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested if
+      syntax)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-if-bracele\
+      ss-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested if syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-if-import-\
+      then-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested if)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-if-import-\
+      then-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested if)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/nested-while-impo\
+      rt-then-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested while)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/nested-while-impo\
+      rt-then-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested while)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/syntax-nested-blo\
+      ck-labeled-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (nested block
+      syntax)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/syntax-nested-blo\
+      ck-labeled-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (nested block syntax)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/expressions/dynamic-import/usage/top-level-import-\
+      then-eval-gtbndng-indirect-update-dflt.js"
+    selected: true
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "Modifications to default binding that occur after dependency
+      has been evaluated are reflected in local binding (top level)"
+    disposition: "exclusion"
+    reason: "The static default import observes the callable binding
+      returning 1 then becoming 2; the added static namespace fixture
+      preserves namespace.default() === 1 followed by namespace.default
+      === 2 under Node.js, Deno and both native policies."
+    replacement:
+      path: "test/language/module-code/eval-gtbndng-indirect-update-dflt.js"
+      classification: "pass"
+      observationDigest: "11c11db30f4b3f6c758722ba3e27eea08145b7d212f6a157451\
+        e364b48475280"
+      resultPartition: "tests/test262/results/language/module-code/78.yaml"
+    namespaceReplacement: "static-default-namespace-update"
+  - path: "test/language/expressions/dynamic-import/usage/top-level-import-\
+      then-eval-script-code-host-resolves-module-code.js"
+    selected: false
+    section: "sec-import-call-runtime-semantics-evaluation"
+    subject: "import() from a script code can load a file with module code
+      (top level)"
+    disposition: "remediation"
+    reason: "Outside DS2: Script versus Module loading goal; Static imports
+      cannot preserve this Script entry goal and the assertion that the
+      loaded file is evaluated as Module code."
+  - path: "test/language/module-code/top-level-await/await-dynamic-import-r\
+      ejection.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: "Top Level Await on a Dynamic import"
+    disposition: "remediation"
+    reason: "Static rejection fixtures do not replace this awaited import
+      rejection and unreachable continuation."
+  - path: "test/language/module-code/top-level-await/await-dynamic-import-r\
+      esolution.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: "Top Level Await on a Dynamic import"
+    disposition: "remediation"
+    reason: "Static async fixtures do not replace every namespace export
+      value after this awaited target evaluation."
+  - path: "test/language/module-code/top-level-await/dynamic-import-of-wait\
+      ing-module.js"
+    selected: true
+    section: "sec-ContinueDynamicImport"
+    subject: "Dynamic import of an ~evaluating-async~ module waits for the
+      module to finish its evaluation"
+    disposition: "remediation"
+    reason: "Static fixtures do not replace two loads of an already-waiting
+      module and the order of their resolutions."
+  - path: "test/language/module-code/top-level-await/dynamic-import-rejecti\
+      on.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: "Dynamic imported module with async exports"
+    disposition: "remediation"
+    reason: "Static async rejection evidence does not preserve the exact
+      exported TypeError constructor and message."
+  - path: "test/language/module-code/top-level-await/dynamic-import-resolut\
+      ion.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: "Dynamic imported module with async exports"
+    disposition: "remediation"
+    reason: "Static async fixtures do not replace all three namespace export
+      values after async target evaluation."
+  - path: "test/language/module-code/top-level-await/fulfillment-order.js"
+    selected: true
+    section: "sec-async-module-execution-fulfilled"
+    subject: "When an async module fulfills, the promises relative to itself
+      and its ancestors are resolved in leaf-to-root order"
+    disposition: "remediation"
+    reason: "No static replacement preserves leaf-to-root fulfillment order
+      across both concurrently evaluating graphs."
+  - path: "test/language/module-code/top-level-await/module-graphs-does-not\
+      -hang.js"
+    selected: true
+    section: "Module evaluation (original frontmatter has no esid)"
+    subject: "Module graphs with Top-Level Await shouldn't hang."
+    disposition: "remediation"
+    reason: "No static replacement preserves this parent/grandparent
+      top-level-await graph completion."
+  - path: "test/language/module-code/top-level-await/rejection-order.js"
+    selected: true
+    section: "sec-async-module-execution-rejected"
+    subject: "When an async module rejects, the promises relative to itself
+      and its ancestors are resolved in leaf-to-root order"
+    disposition: "remediation"
+    reason: "No static replacement preserves leaf-to-root rejection order
+      across both concurrently evaluating graphs."
+  - path: "test/language/module-code/top-level-await/syntax/await-expr-dyn-\
+      import.js"
+    selected: false
+    section: "prod-AwaitExpression"
+    subject: "Valid syntax for top level await. AwaitExpression ImportCall"
+    disposition: "remediation"
+    reason: "Grammar-only AwaitExpression ImportCall is outside the
+      module-semantic subject selection; retain umbrella ownership for
+      ImportCall reassessment."
+  - path: "test/language/module-code/top-level-await/unobservable-global-as\
+      ync-evaluation-count-reset.js"
+    selected: true
+    section: "sec-IncrementModuleAsyncEvaluationCount"
+    subject: "An implementation may unobservably reset
+      [[ModuleAsyncEvaluationCount]] to 0 whenever there are no pending
+      modules."
+    disposition: "remediation"
+    reason: "No static replacement preserves the A-before-D order across
+      this pending async-evaluation counter scenario."
+  - path: "test/language/module-code/verify-dfs.js"
+    selected: true
+    section: "sec-moduleevaluation"
+    subject: "Dynamic import can't preempt DFS evaluation order"
+    disposition: "remediation"
+    reason: "Existing static order evidence does not observe the attempted
+      dynamic import failing to preempt this DFS traversal."
+nativeReplacementEvidence:
+  id: "static-default-namespace-update"
+  entry: "tests/fixtures/module-default-namespace-update/entry.mjs"
+  test: "tests/module-default-namespace-update-native.test.ts"
+  sourceDigests:
+    - path: "tests/fixtures/module-default-namespace-update/entry.mjs"
+      digest: "edaea4f950fa73e0da9327bb6dfb184d8430c36e397160fb7cda63acd064b0\
+        6d"
+    - path: "tests/fixtures/module-default-namespace-update/value.mjs"
+      digest: "e7af490b37682b37fdd279708d2459851fb5de3ea45c5a0b2f906c8c118837\
+        c3"
+    - path: "tests/module-default-namespace-update-native.test.ts"
+      digest: "2c2a90017527471bc6873fbf5ed9c40aa7f0518fc845b424f84eb8673c858d\
+        e7"
+  observation:
+    command: "node --test tests/module-default-namespace-update-native.test.ts"
+    target: "linux-x86_64-gnu"
+    references:
+      - "Node.js"
+      - "Deno"
+    specialization:
+      - "disabled"
+      - "enabled"
+    stdout: "1
+
+      2\n"
+    stderr: ""
+    exitStatus: 0
+    testsPassed: 1
+    testsFailed: 0
+    rawLog: "/data/m5c-ds2-ds3-20261030/ds2/native2.log"
+    rawLogDigest: "fd95ba2b2192a0bc53d3d1f4a8e5fca9\
+      c5ddce20431d64f7199f43ddf319a1f6"

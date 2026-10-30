@@ -577,8 +577,23 @@ aggregate. Linux file shards also pass `--exclude-dedicated-linux`, which
 removes `dedicatedLinuxNativeFiles` before partitioning. That list contains
 *tests/property/m5-array-constructor.property.test.ts*, run in one required
 Linux job with all 120 extended cases and its unchanged 1,800-second limit.
-The seven Linux file shards partition the remaining files. macOS file shards
-omit that flag and still run the Array file once. The local unsharded extended
+The seven Linux file shards partition the remaining files. macOS extended
+file shards omit that flag and still run the Array file once.
+
+The ordinary macOS Node.js gate uses a separate dedicated hosted
+`macos-latest` job for that same file. It runs all 12 cases with the original
+seed and 180-second interrupt, with one file worker and no time scaling.
+`dedicatedMacosNodeFiles` lists this ordinary exclusion independently of the
+Linux extended one. The four ordinary shards use `test:node:macos:shard`:
+*tools/node-shard.ts* reproduces Node 24's default discovery, removes the
+dedicated file, and passes the remaining files to Node's `--test-shard`.
+The four shards and dedicated job together execute the original inventory
+exactly once. Linux ordinary Node discovery is unchanged. The lane generator
+puts the additional job on one of the existing five hosted macOS lanes;
+`native` requires its result even if an earlier lane job fails. See
+[*macOS Array placement evidence*](docs/evidence/array-macos/README.md).
+
+The local unsharded extended
 task still runs every file with all cases. The Linux singleton rule still
 applies to wrapper invocations that include
 *m5-object-own-keys.property.test.ts* without the

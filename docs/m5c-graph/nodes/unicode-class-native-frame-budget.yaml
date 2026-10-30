@@ -1,0 +1,20 @@
+version: 1
+id: unicode-class-native-frame-budget
+title: Preserve native frames across Unicode class declarations
+delivers: Repairs the native active-frame exhaustion observed on exactly the
+  ten pinned observation-batch-18 paths listed in
+  docs/m5c-graph/unicode-class-native-frame-budget.md. Each currently
+  reports runtime OSEO2001 Maximum active native frame budget exceeded on
+  the first non-strict specialization-disabled variant. Diagnose frame
+  ownership and lifetime across sequential class declarations and private
+  fields, and repair the responsible implementation without raising the
+  frame budget, reducing upstream input, filtering cases, or weakening
+  assertions. Validate both specialization policies and strictness modes,
+  all ten complete upstream sources, focused ordinary and private-class
+  controls, and the affected full semantic unit. Keep the paths unreviewed
+  under observation-batch-18 until its fresh admission; this node grants no
+  exclusion, reclassification, or budget override.
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

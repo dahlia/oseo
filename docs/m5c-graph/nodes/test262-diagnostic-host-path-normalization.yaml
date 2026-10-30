@@ -1,0 +1,24 @@
+version: 1
+id: test262-diagnostic-host-path-normalization
+title: Record module diagnostics with portable source IDs
+delivers: "Removes host-specific source identifiers from test262 module
+  runtime diagnostics. The focused B06 observations of exactly
+  test/language/eval-code/indirect/export.js and
+  test/language/eval-code/indirect/import.js embed a file URL under the
+  local aube cache in the OSEO1001 runtime String-eval rejection. Root
+  holds both originals unreviewed under observation-batch-06; the raw
+  observations remain evidence, not portable manifest records. Normalize
+  diagnostic source identifiers to the pinned suite-relative path,
+  preserving diagnostic code, message, phase, capability, stdout, exit
+  status and variant evidence. Do not truncate diagnostic content or
+  relax the line checker. Add focused portability tests for module runtime
+  diagnostics using distinct suite roots, preserve original assertions,
+  re-observe the two held originals under the repaired runner and apply
+  D3 to the affected reviewed observations. Keep ADR 0013, ADR 0016 and
+  ADR 0019 unchanged; no source-evaluation capability or exclusion is
+  admitted. Exact raw pointers and the complete train host-path scan are
+  recorded in docs/m5c-graph/observation-batch-06.md."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

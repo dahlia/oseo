@@ -11,6 +11,7 @@ import {
 import {
   caseShardedNativeFiles,
   dedicatedLinuxNativeFiles,
+  dedicatedMacosNodeFiles,
   nativeShardModel,
   nativeTestArguments,
   selectNativeTestShard,
@@ -118,6 +119,8 @@ test("Linux jobs cover the real property inventory exactly once", async () => {
   const { costs, width } = nativeShardModel("linux");
   assert.equal(width, 4);
   assert.deepEqual(dedicatedLinuxNativeFiles, [array]);
+  assert.deepEqual(dedicatedMacosNodeFiles, [array]);
+  assert.notStrictEqual(dedicatedMacosNodeFiles, dedicatedLinuxNativeFiles);
   const linux = Array.from({ length: 7 }, (_, index) =>
     nativeTestArguments(
       [
@@ -177,12 +180,13 @@ test("Linux weights match the three-run median case sums", async () => {
   const rows = evidence.trimEnd().split("\n").slice(1);
   const { costs } = nativeShardModel("linux");
   // Added after the three source runs; they keep their earlier weights.
-  // The module files use one candidate run's case sums (see U6).
+  // The module and with-var files use one candidate run each (see U6).
   const retained = [
     "tests/property/m5-host-script-bindings.property.test.ts",
     "tests/property/m5-module-namespace-uninitialized.property.test.ts",
     "tests/property/m5-module-prelude-script.property.test.ts",
     "tests/property/m5-proper-tail-calls.property.test.ts",
+    "tests/property/m5-with-var-loop-head.property.test.ts",
   ];
   assert.deepEqual(
     rows.map((row) => row.split("\t")[0]).toSorted(),

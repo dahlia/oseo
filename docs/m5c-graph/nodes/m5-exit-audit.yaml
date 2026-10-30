@@ -18,6 +18,7 @@ dependencies:
   - computed-member-reference-key-order
   - cross-realm-host
   - destructuring-binding-target-order
+  - direct-eval-non-string-dispatch
   - dynamic-import
   - dynamic-import-early-error-precedence
   - dynamic-import-staged-plan
@@ -101,6 +102,7 @@ dependencies:
   - script-module-declaration-early-error
   - shift-operator-c-size
   - temporal-helpers-harness
+  - test262-diagnostic-host-path-normalization
   - test262-host-script-bindings
   - test262-module-harness-globals
   - test262-runner-main-thread-offload
@@ -110,6 +112,7 @@ dependencies:
   - typed-array-tolocalestring-arguments
   - typedarray-copywithin-detached-cost
   - unhandled-rejection-observation
+  - unicode-class-native-frame-budget
   - well-known-intrinsics-harness
   - with-optional-call-receiver
   - with-optional-call-receiver-non-tail

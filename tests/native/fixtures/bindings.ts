@@ -1,6 +1,65 @@
 import type { Fixture } from "../fixture.ts";
+import { withVarLoopHeadFixtures } from "./with-var-loop-head-resolution.ts";
 
 export const bindingFixtures: readonly Fixture[] = [
+  ...withVarLoopHeadFixtures,
+  {
+    name: "with-optional-call-receiver-tail",
+    nonStrictScript: true,
+    source: `
+var log = [];
+function argument(label, abrupt) {
+  log.push(label);
+  if (abrupt) throw new RangeError(label);
+  return { label: label, nested: [{ alive: true }] };
+}
+function make(kind, optional) {
+  // Neither the getter-produced callee nor the selected object has a
+  // global owner. After the strict caller leaves, the trampoline must
+  // retain both and the freshly allocated argument objects.
+  with ({
+    tag: "selected",
+    get f() {
+      log.push("get");
+      if (kind === "get-throw") throw new SyntaxError("get");
+      if (kind === "null") return null;
+      if (kind === "undefined") return undefined;
+      if (kind === "number") return 7;
+      return function (a, b) {
+        "use strict";
+        var garbage = [];
+        for (var i = 0; i < 8; i++) garbage.push({ i: i });
+        log.push("call");
+        if (kind === "call-throw") throw new TypeError("callee");
+        return this.tag + " " + a.label + " " + b.label + " " +
+          a.nested[0].alive + " " + b.nested[0].alive;
+      };
+    },
+  }) {
+    if (optional) return function () {
+      "use strict";
+      return f?.(argument("a", kind === "arg-throw"), argument("b", false));
+    };
+    return function () {
+      "use strict";
+      return f(argument("a", kind === "arg-throw"), argument("b", false));
+    };
+  }
+}
+for (var mode = 0; mode < 2; mode++) {
+  for (var kind of [
+    "function", "null", "undefined", "number",
+    "get-throw", "arg-throw", "call-throw",
+  ]) {
+    log = [];
+    var result;
+    try { result = make(kind, mode === 0)(); }
+    catch (error) { result = error.constructor.name; }
+    console.log(mode, kind, result, log.join(","));
+  }
+}
+`,
+  },
   {
     name: "with-statements",
     nonStrictScript: true,

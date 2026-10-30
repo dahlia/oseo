@@ -1,0 +1,92 @@
+group: language/eval-code
+key: 2f
+results:
+  - case:
+      async: false
+      features:
+        - let
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/lex-env-distinct-let.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/eval-code/direct/lex-env-distinct-let.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/lex-env-distinct-let.js\
+        :93:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/var-env-func-strict-source.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - dynamic-source
+      - expression-operators
+      - functions
+    observation:
+      detail: "test/language/eval-code/direct/var-env-func-strict-source.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/var-env-func-strict-sou\
+        rce.js:87:9: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features:
+        - const
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/indirect/lex-env-distinct-const.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+    observation:
+      detail: 'test/language/eval-code/indirect/lex-env-distinct-const.js
+        non-strict disabled failed (1): stdout=""
+        stderr="test/language/eval-code/indirect/lex-env-distinct-const.js:95:1:
+        error[OSEO1001]: eval compiles source text at run time, which is
+        outside the admitted profile.\n"'
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

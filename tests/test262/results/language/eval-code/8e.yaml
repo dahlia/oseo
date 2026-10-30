@@ -1,0 +1,65 @@
+group: language/eval-code
+key: 8e
+results:
+  - case:
+      async: false
+      features:
+        - class
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/direct/lex-env-distinct-cls.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: unsupported-profile-feature
+    dependencies:
+      - abrupt-completion
+      - classes
+      - dynamic-source
+      - error-intrinsics
+      - expression-operators
+      - functions
+      - lexical-bindings
+    observation:
+      detail: "test/language/eval-code/direct/lex-env-distinct-cls.js
+        non-strict disabled failed (1): stdout=\"\"
+        stderr=\"test/language/eval-code/direct/lex-env-distinct-cls.js\
+        :93:1: error[OSEO1001]: Unknown binding 'eval'.\\n\""
+      passed: false
+      unsupportedCapability: profile-syntax
+    unsupportedFeatures: []
+  - case:
+      async: false
+      features: []
+      flags: []
+      includes: []
+      mode: script
+      path: test/language/eval-code/indirect/non-string-primitive.js
+      strictness:
+        - non-strict
+        - strict
+      suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
+    classification: pass
+    dependencies:
+      - expression-operators
+      - functions
+      - var-bindings
+    execution:
+      harnessIncludes:
+        - base.js
+      target: linux-x86_64-gnu
+      variants:
+        - specialization: disabled
+          strictness: non-strict
+        - specialization: enabled
+          strictness: non-strict
+        - specialization: disabled
+          strictness: strict
+        - specialization: enabled
+          strictness: strict
+    observation:
+      passed: true
+    unsupportedFeatures: []
+suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2

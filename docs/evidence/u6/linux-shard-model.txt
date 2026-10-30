@@ -1,16 +1,16 @@
 Derived seconds; concurrent case sums, no fixed job overhead.
 Statistic: ceil(median(per-run sum(case_ms)) / 1000).
 Measured files: 136
-No file-shard observation; retained: tests/property/m5-array-constructor.property.test.ts, tests/property/m5-host-script-bindings.property.test.ts, tests/property/m5-module-namespace-uninitialized.property.test.ts, tests/property/m5-module-prelude-script.property.test.ts, tests/property/m5-object-own-keys.property.test.ts, tests/property/m5-proper-tail-calls.property.test.ts, tests/property/m5-reflect-namespace.property.test.ts
+No file-shard observation; retained: tests/property/m5-array-constructor.property.test.ts, tests/property/m5-host-script-bindings.property.test.ts, tests/property/m5-module-namespace-uninitialized.property.test.ts, tests/property/m5-module-prelude-script.property.test.ts, tests/property/m5-object-own-keys.property.test.ts, tests/property/m5-proper-tail-calls.property.test.ts, tests/property/m5-reflect-namespace.property.test.ts, tests/property/m5-with-var-loop-head.property.test.ts
 Rebucketed: tests/property/m5-compound-assignment.property.test.ts -> 3 files
 d4d81be9 shard:run/job/cases 1:40401101765/121847031054/15 2:40401101765/121847031208/62 3:40401101765/121847031011/28 4:40401101765/121847031261/38 5:40401101765/121847031100/62 6:40401101765/121847030959/42 7:40401101765/121847030943/39
 98460f7c shard:run/job/cases 1:40442491966/121985959542/15 2:40442491966/121985959637/62 3:40442491966/121985959527/28 4:40442491966/121985959575/38 5:40442491966/121985959675/62 6:40442491966/121985959612/42 7:40442491966/121985959670/39
 6aab0fc8 shard:run/job/cases 1:40454201429/122023722631/15 2:40454201429/122023722692/62 3:40454201429/122023722851/28 4:40454201429/122023722807/38 5:40454201429/122023722742/62 6:40454201429/122023722630/42 7:40454201429/122023722816/39
-old entries/fallback: 138 415
-old 7 loads: 2647,2448,2513,2444,2434,2498,2509 mean: 2499.000 max/mean: 1.059224 scored with refreshed: 2673,3049,3347,3492,3212,3127,2429
-old 8 loads: 2647,2103,2130,2091,2110,2129,2147,2122 mean: 2184.875 max/mean: 1.211511 scored with refreshed: 2673,2546,2551,2027,3026,3466,2866,2382
-old 9 loads: 2647,1865,1910,1874,1877,1829,1848,1844,1871 mean: 1951.667 max/mean: 1.356277 scored with refreshed: 2673,2349,2185,2260,2240,2311,2025,2727,3209
-refreshed entries/fallback: 143 443
-refreshed 7 loads: 2937,2969,2944,2991,2937,2930,2933 mean: 2948.714 max/mean: 1.014340 scored with refreshed: 2937,2969,2944,2991,2937,2930,2933
-refreshed 8 loads: 2673,2605,2585,2579,2608,2631,2649,2591 mean: 2615.125 max/mean: 1.022131 scored with refreshed: 2673,2605,2585,2579,2608,2631,2649,2591
-refreshed 9 loads: 2673,2287,2254,2276,2324,2250,2251,2315,2325 mean: 2328.333 max/mean: 1.148031 scored with refreshed: 2673,2287,2254,2276,2324,2250,2251,2315,2325
+old entries/fallback: 139 415
+old 7 loads: 2647,2444,2526,2471,2484,2517,2531 mean: 2517.143 max/mean: 1.051589 scored with refreshed: 2673,3059,3799,3157,3302,3056,2551
+old 8 loads: 2647,2141,2158,2114,2118,2144,2153,2147 mean: 2202.750 max/mean: 1.201680 scored with refreshed: 2673,2630,2697,2084,3505,3285,2732,2325
+old 9 loads: 2647,1868,1924,1860,1883,1856,1873,1847,1918 mean: 1964.000 max/mean: 1.347760 scored with refreshed: 2673,2355,2185,2190,2226,2425,2131,2745,3270
+refreshed entries/fallback: 144 452
+refreshed 7 loads: 2939,3024,2947,2958,2992,2938,2940 mean: 2962.571 max/mean: 1.020735 scored with refreshed: 2939,3024,2947,2958,2992,2938,2940
+refreshed 8 loads: 2673,2614,2635,2584,2608,2640,2659,2600 mean: 2626.625 max/mean: 1.017656 scored with refreshed: 2673,2614,2635,2584,2608,2640,2659,2600
+refreshed 9 loads: 2673,2337,2259,2290,2290,2303,2255,2331,2333 mean: 2341.222 max/mean: 1.141711 scored with refreshed: 2673,2337,2259,2290,2290,2303,2255,2331,2333

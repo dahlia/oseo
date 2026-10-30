@@ -7019,14 +7019,11 @@ function lowerAssignmentReference(
 }
 
 /**
- * Evaluate one keyed object pattern leaf's reference after its property
- * key and before GetV reads the source. KeyedBindingInitialization and
- * KeyedDestructuringAssignmentEvaluation both resolve an identifier leaf
- * first, so a `with` object's HasProperty and `@@unscopables` lookups
- * precede the source getter and the default initializer, and the write
- * stores through the object selected then.
+ * Prepare a binding identifier before its value is evaluated. A selected
+ * with environment survives iterator steps, getters, defaults and rest
+ * collection; member and private targets keep their existing preparation.
  */
-function lowerKeyedAssignmentReference(
+function lowerBindingReference(
   pattern: HirBindingPattern,
   mode: BindingPatternMode,
   builder: MirBuilder,
@@ -7087,11 +7084,7 @@ function lowerObjectBindingPattern(
   for (const property of pattern.properties) {
     const key = lowerPropertyKey(property.key, builder);
     excludedKeys.push(key);
-    const target = lowerKeyedAssignmentReference(
-      property.pattern,
-      mode,
-      builder,
-    );
+    const target = lowerBindingReference(property.pattern, mode, builder);
     appendMirMetadata(
       builder,
       "safepoint",
@@ -7163,7 +7156,7 @@ function lowerArrayBindingRest(
   range: SourceRange,
   builder: MirBuilder,
 ): void {
-  const target = lowerAssignmentReference(pattern, mode, builder);
+  const target = lowerBindingReference(pattern, mode, builder);
   appendMirMetadata(
     builder,
     "safepoint",
@@ -7267,7 +7260,7 @@ function lowerArrayBindingPattern(
     const target =
       element == null
         ? undefined
-        : lowerAssignmentReference(element.pattern, mode, builder);
+        : lowerBindingReference(element.pattern, mode, builder);
     const next = lowerBindingIteratorNext(
       iterator,
       nextMethod,
@@ -7788,7 +7781,7 @@ function lowerStatements(
         // reference resolves before its initializer runs.
         const reference =
           declaration.kind === "pattern"
-            ? lowerAssignmentReference(declaration.pattern, mode, builder)
+            ? lowerBindingReference(declaration.pattern, mode, builder)
             : undefined;
         const value = lowerExpression(declaration.initializer, builder);
         if (declaration.kind === "binding") {

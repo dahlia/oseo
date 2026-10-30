@@ -10,5 +10,5 @@ dependencies:
   - computed-member-reference-key-order
   - observation-batch-05
   - observation-batch-plan
-landed: false
+landed: true
 status: ready

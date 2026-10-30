@@ -3,6 +3,8 @@ id: classic-for
 title: "Classic for statements"
 scope:
   - "Classic for heads and per-iteration lexical environments."
+  - "Classic var heads inside with select the reference before initializer
+    evaluation."
 owners:
   - PLAN-M5.md
 evidence:
@@ -13,14 +15,17 @@ evidence:
   fixed:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native/fixtures/bindings.ts
   forced-collection:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/property/m5-for-binding.property.test.ts
   generated:
     status: covered
     references:
+      - tests/property/m5-with-var-loop-head.property.test.ts
       - tests/property/m5-for-binding.property.test.ts
   guard-fallback:
     status: omitted
@@ -30,6 +35,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/with-var-loop-head.test.ts
       - tests/native.ts
       - tests/native/fixtures/bindings.ts
   standards:
