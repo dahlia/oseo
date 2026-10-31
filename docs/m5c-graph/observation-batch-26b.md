@@ -245,3 +245,23 @@ reachability remains candidate analysis; literal inputs and original source
 contracts establish the boundaries. Classifications, counts, unsupported
 ownership and prior admitted rows are preserved. All fixed fourth-pass verdicts
 are retained in `review-round-4/attempts.json`.
+
+
+Outer pass 1 correction
+-----------------------
+
+The throwing defaults in `function/dflt-params-abrupt.js` and
+`generators/dflt-params-abrupt.js` prevent their bodies from running.
+Their sole var, `callCount = 0`, only records that the body was skipped;
+both rows therefore drop var-bindings. A read on the right side of an
+unexecuted counter assignment is part of that update and supplies no
+independent input witness.
+
+The same-pattern audit scanned all 1,669 train originals and verified their
+pinned hashes. It retained 162 zero-counter or marker contrasts with
+independent binding evidence, including real input holders, executed
+counter computations, var patterns and the eval-var-scope-syntax-err
+subjects. The catch-scope subject in `try/12.14-3.js` also keeps its tag.
+Per-row changes, retained witnesses and the reused audit tools are in
+*/data/m5c-d17-20261031/train-c-outer-fix/audit.json*.
+Observations, classifications and unsupported owners are unchanged.

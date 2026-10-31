@@ -173401,8 +173401,7 @@ tests:
     dependencies: [dynamic-source, functions]
   - path: test/language/statements/function/dflt-params-abrupt.js
     expectedClassification: pass
-    dependencies:
-      [abrupt-completion, default-parameters, functions, var-bindings]
+    dependencies: [abrupt-completion, default-parameters, functions]
   - path: test/language/statements/function/dflt-params-arg-val-not-undefined.js
     expectedClassification: pass
     dependencies:
@@ -175966,14 +175965,7 @@ tests:
       ]
   - path: test/language/statements/generators/dflt-params-abrupt.js
     expectedClassification: pass
-    dependencies:
-      [
-        abrupt-completion,
-        default-parameters,
-        functions,
-        generators,
-        var-bindings,
-      ]
+    dependencies: [abrupt-completion, default-parameters, functions, generators]
   - path: test/language/statements/generators/dflt-params-arg-val-not-undefined.js
     expectedClassification: pass
     dependencies:

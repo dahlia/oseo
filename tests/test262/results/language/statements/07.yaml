@@ -401,7 +401,6 @@ results:
       - abrupt-completion
       - default-parameters
       - functions
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js

@@ -509,7 +509,6 @@ results:
       - default-parameters
       - functions
       - generators
-      - var-bindings
     execution:
       harnessIncludes:
         - base.js
