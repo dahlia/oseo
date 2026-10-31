@@ -186,10 +186,15 @@ Evaluate and its helper algorithms, used by every module graph:
  -  Startup calls Evaluate on the entry. The static program becomes the case
     with one Evaluate root, so mixed static and dynamic requests share one
     state machine and one record per canonical identity.
- -  A module without top-level `await` runs its evaluator synchronously
-    inside InnerModuleEvaluation. A module with it runs through
-    ExecuteAsyncModule. GatherAvailableAncestors, sorting by async-evaluation
-    order, and the fulfilled and rejected transitions follow the edition.
+ -  InnerModuleEvaluation runs a module's evaluator synchronously only when
+    the module has no top-level `await` and no pending asynchronous
+    dependency. A module with top-level `await` and no pending dependency
+    starts through ExecuteAsyncModule. Any module with a pending
+    asynchronous dependency, with or without top-level `await`, is marked
+    for asynchronous evaluation and waits. AsyncModuleExecutionFulfilled
+    later runs or starts it from the sorted list that
+    GatherAvailableAncestors builds. AsyncModuleExecutionRejected follows
+    the edition's separate recursive walk.
 
 The driver dispatches compiled native evaluators, as the promise job queue
 dispatches compiled reactions. It is not an interpreter: it executes no
@@ -283,11 +288,17 @@ an errored module, Evaluate returns the cycle root's top-level capability
 promise, rejected with `[[EvaluationError]]`. Every later request receives
 a new promise rejected with the same value, not a copy and not a new error.
 
-When a module in an asynchronous cycle fulfills but its cycle root rejects,
-every member records the root's error. A later request for that member uses
-the root's top-level capability. When the root has none because evaluation
-began from another entry, Evaluate creates it and rejects it with the cached
-error. *import-fulfilled-member-of-errored-cycle.js* observes that identity.
+In an asynchronous cycle, the error is recorded only on the module that
+threw and on the async parents its rejection reaches. A cycle member that
+had already finished stays evaluated with an empty `[[EvaluationError]]`.
+A later request for that member reaches the error through its cycle root:
+Evaluate redirects to the root, and when the root has no top-level
+capability because evaluation began from another entry, Evaluate creates
+one, InnerModuleEvaluation returns the root's recorded error, and the new
+capability rejects with that same value.
+*import-fulfilled-member-of-errored-cycle.js* observes that identity. The
+model and the runtime keep per-record error state; neither copies the root's
+error onto finished members.
 
 ### Self-import and reentrancy
 
@@ -308,12 +319,17 @@ Top-level `await` interactions
     Joined requests settle in the order their reactions were registered,
     which *dynamic-import-of-waiting-module.js* checks across an unrelated
     empty-module request.
- -  **Ancestor order.** When an asynchronous module fulfills, the driver
+ -  **Fulfillment order.** When an asynchronous module fulfills, the driver
     gathers its available ancestors, sorts them by async-evaluation order,
-    and runs or settles them in that order. Rejection propagates through the
-    same ancestors in the same order. Two overlapping, independently started
-    graphs therefore settle leaf to root, as *fulfillment-order.js* and
-    *rejection-order.js* observe.
+    and runs or settles them in that order. Two overlapping, independently
+    started graphs therefore fulfill leaf to root, as *fulfillment-order.js*
+    observes.
+ -  **Rejection order.** Rejection does not use that list or its sort.
+    AsyncModuleExecutionRejected records the error, rejects the module's
+    top-level capability when present, and then recurses through
+    `[[AsyncParentModules]]` in list order, so ancestors that are not yet
+    available still receive the error. *rejection-order.js* observes the
+    resulting leaf-to-root order.
  -  **Counter reset.** An implementation may reset the global async
     evaluation count when no module is pending. The driver either never
     resets it or resets it only when no module is pending, and a test starts
@@ -412,7 +428,7 @@ and forced collection.
 | G5    | Lazy evaluation and live binding updates                                  | native fixtures, differential                                |
 | G6    | Asynchronous export values and errors observed through `import()`         | native fixtures, differential                                |
 | G7    | Joining pending asynchronous evaluation and later re-entry                | native fixtures, model traces                                |
-| G8    | Leaf-to-root ancestor settlement and the evaluation counter               | native fixtures, model traces                                |
+| G8    | Fulfillment and rejection propagation order and the evaluation counter    | native fixtures, model traces                                |
 | G9    | Requests during static DFS                                                | native fixture, model trace                                  |
 | G10   | Fresh intrinsic promises, global `Promise` rebinding, `then` exports      | native fixtures, differential                                |
 | G11   | Build refusals: unadmitted forms, missing or broken targets, diagnostics  | compiler package tests                                       |
