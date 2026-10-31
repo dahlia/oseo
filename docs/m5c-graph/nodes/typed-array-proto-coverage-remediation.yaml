@@ -28,5 +28,5 @@ delivers: "Resolves exactly
   B, widen ADR 0013, or change the RegExp split remediation scope."
 dependencies:
   - annexb-proto-dependency-classification
-landed: false
+landed: true
 status: ready
