@@ -105,6 +105,7 @@ void oseo_context_init(
     oseo_internal_realm_init(&context->initial_realm);
     context->realm = &context->initial_realm;
     context->realm_record = oseo_undefined();
+    context->constructor_scope = NULL;
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;
          index += 1u) {
@@ -202,6 +203,7 @@ void oseo_context_destroy(OseoContext *context) {
      */
     context->realm = &context->initial_realm;
     context->realm_record = oseo_undefined();
+    context->constructor_scope = NULL;
     oseo_internal_realm_release(&context->initial_realm);
     for (size_t index = 0u;
          index < OSEO_WELL_KNOWN_SYMBOL_COUNT;

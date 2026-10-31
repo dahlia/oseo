@@ -1304,3 +1304,12 @@ their own indexed properties and length. The compiler roots the result
 before initializing the with environment, so repeated lookups and escaped
 closures retain one binding object. The helper does not read a mutable
 JavaScript `Object` binding or invoke primitive conversion hooks.
+
+ABI `m5-146` adds a context pointer to the active ordinary call's saved
+caller realm. The matching realm scope roots that realm until return.
+Derived constructor completion errors use the saved caller realm, while
+errors raised by the body retain the callee realm. A pending derived tail
+call retains and traces its constructor caller realm separately from the
+tail call's running realm, then checks its final result in that caller.
+Nested calls restore the previous scope. `m5-145` is reserved for the
+independent non-blocking-agent node.

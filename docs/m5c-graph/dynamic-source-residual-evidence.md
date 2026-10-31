@@ -61,3 +61,48 @@ Evidence requires focused native runs through run-gate.py —wait-lock,
 focused tests and fast non-native tests; no full or extended gate or UPDATE.
 Run m5c-precheck and the internal DeepSeek/Astra review with one stable scope.
 Reviewers are read-only and must not run repository-writing tools.
+
+
+Evidence candidate
+------------------
+
+The per-path assessment is
+[*dynamic-source-residual-evidence.assessment.md*](./dynamic-source-residual-evidence.assessment.md).
+It proposes 17 bounded ADR 0016 closures: 10 completion paths, five class paths
+and two derived-constructor error-realm paths. The no-newline hashbang and
+unexecuted-constructor paths retain umbrella ownership with exact gaps. All 19
+source and normalized observation digests match fresh inputs. No subset row,
+tag, observed classification or pass count changes.
+
+ABI `m5-146` saves the ordinary caller realm for constructor completion
+checks, restores it across nested calls, and retains and traces it through
+derived tail calls. Body errors still belong to the callee realm. The
+original DS19 assertions are unchanged and now have native registrations.
+Fixed direct/tail/finally matrices and class property slot `0x60000b06`
+cover caller realms, wrappers and primitive/object/empty/body-error cases.
+Node.js/Deno's empty-body ReferenceError realm differs from the pinned
+native oracle; only the reference program qualifies that expected realm.
+Wrong-realm mutations use an independent instanceof/reachability verdict.
+
+The source structure test retains the exact selector and checks finite
+Script tables, completion MIR and emitted constructor/tail helpers under
+both policies. Completion and class witnesses are also registered in the
+ordinary native suite with forced-GC setup and positive-counter checks.
+The focused native suite executes both policies with collection forced.
+
+Raw checks and review packets are retained under
+*/data/m5c-d17-20261031/residual-evidence/run/*. Source preparation is
+observation-affecting: Root owes the next bundle UPDATE, outer review,
+publication and landing. These focused witnesses do not regenerate the
+original unsupported observations.
+
+Tag self-audit before U: no dependency tags change; every original rejected
+source retains its dynamic-source prerequisite, including the unreachable
+constructor. No outside-scope observation moves.
+
+The shared value-oracle fixture also rejects 1/“1”, 42/“42”,
+undefined/“undefined”, true/“true”, and a String/object pair with the
+same printed text. Its verdict uses only error type and reachability.
+Factoring the shared checker preserves all 16 earlier completion/class
+programs byte for byte, verified by their SHA256 values in
+*fixture-inputs-oracle-verification.json* under the raw run directory.

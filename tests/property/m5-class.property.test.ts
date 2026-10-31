@@ -2180,3 +2180,104 @@ console.log(Object.hasOwn(instance, "static"), instance.static,
     );
   },
 );
+
+test(
+  "generated derived results preserve caller and body error realms",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    const { derivedConstructorRealmSource } =
+      await import("../native/fixtures/derived-constructor-realms.ts");
+    await assertAsyncProperty(
+      "derived constructor result realm",
+      fc.asyncProperty(
+        fc.record({
+          body: fc.constantFrom(
+            "primitive" as const,
+            "empty" as const,
+            "object" as const,
+            "super" as const,
+            "throw" as const,
+            "this" as const,
+          ),
+          primitive: fc.constantFrom(
+            "null",
+            "0",
+            "true",
+            '""',
+            "1n",
+            "Symbol()",
+          ),
+          strategy: fc.constantFrom(
+            "direct" as const,
+            "tail" as const,
+            "finally" as const,
+          ),
+          wrapper: fc.constantFrom(
+            "direct" as const,
+            "bound" as const,
+            "proxy" as const,
+          ),
+          foreignCaller: fc.boolean(),
+        }),
+        async (input) => {
+          const source = derivedConstructorRealmSource(input);
+          const expectedObservation = {
+            exitStatus: 0,
+            stderr: "",
+            stdout: "derived-realm ok\n",
+          };
+          const saved = process.env.OSEO_GC_EVERY_SAFEPOINT;
+          process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+          try {
+            for (const specialization of ["disabled", "enabled"] as const) {
+              const compiled = compileSource(
+                babelFrontend,
+                { source, sourceId: "generated-derived-realm.js" },
+                {
+                  specialization,
+                  test262Host: true,
+                  observeSpecialization: true,
+                },
+              );
+              assert.deepEqual(compiled.diagnostics, [], source);
+              await withNativeFixture(
+                {
+                  backend: cBackend,
+                  host,
+                  input: compiled.mir!,
+                  operation: "execute",
+                  runtime: cRuntimeProvider,
+                  target: nativeTarget!,
+                  toolchain: nativeToolchain,
+                },
+                (native) => {
+                  assertMatchingObservations([expectedObservation, native]);
+                  assert.ok(native.counters!.collections > 0);
+                  assert.match(
+                    native.emittedC,
+                    /oseo_derived_constructor_result/u,
+                  );
+                },
+              );
+            }
+          } finally {
+            if (saved == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+            else process.env.OSEO_GC_EVERY_SAFEPOINT = saved;
+          }
+        },
+      ),
+      {
+        domain:
+          "six completion/body contracts, six primitive values, direct/" +
+          "tail/finally returns, ordinary/bound/proxy constructors, " +
+          "same/foreign " +
+          "callers; independent caller versus callee error-constructor model",
+        numRuns: 10,
+        profile: "M5 derived constructor error realms",
+        seed: 0x6000_0b06,
+        sizeLimit: "two or three realms, one nested call, one constructor",
+        timeLimitMilliseconds: 180_000,
+      },
+    );
+  },
+);

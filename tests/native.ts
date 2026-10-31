@@ -31,6 +31,11 @@ import {
 import type { Fixture } from "./native/fixture.ts";
 import { hostScriptReferences } from "./native/host-script-reference.ts";
 import { staticCore } from "./native/fixtures/dynamic-source-static-core.ts";
+import {
+  residualCompletionFixtures,
+  residualClassFixtures,
+  residualValueOracleFixture,
+} from "./native/fixtures/dynamic-source-residual.ts";
 import * as records from "./native/fixtures/completion-records.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
@@ -242,6 +247,9 @@ Object.defineProperty(globalThis, "console", {
 const fixtures: readonly Fixture[] = [
   ...staticCore,
   ...records.completionRecordFixtures,
+  ...residualCompletionFixtures,
+  ...residualClassFixtures,
+  residualValueOracleFixture,
   records.completionRecordOracleFixture,
   ...functionFixtures,
   ...callableCases,
@@ -754,7 +762,10 @@ async function references(fixture: Fixture): Promise<
     },
   ]
 > {
-  if (fixture.name.startsWith("completion-records-")) {
+  if (
+    fixture.name.startsWith("completion-records-") ||
+    fixture.name.startsWith("residual-")
+  ) {
     const [node, deno] = await hostScriptReferences(host, fixture.source);
     assert(node != null && deno != null);
     return [node, deno];
@@ -1521,6 +1532,7 @@ for (const fixture of selectedFixtures) {
   if (
     fixture.name === "generated-native-operations" ||
     fixture.name.startsWith("completion-records-") ||
+    fixture.name.startsWith("residual-") ||
     fixture.name === "array-buffer" ||
     fixture.name === "typed-array-constructors" ||
     fixture.name === "typed-array-float16" ||
@@ -1869,6 +1881,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "class-default-forwarding" ||
             fixture.name === "generated-native-operations" ||
             fixture.name.startsWith("completion-records-") ||
+            fixture.name.startsWith("residual-") ||
             fixture.name === "array-buffer" ||
             fixture.name === "class-private-name-lifetimes" ||
             fixture.name === "array-prototype-copying" ||
@@ -1952,7 +1965,10 @@ for (const fixture of selectedFixtures) {
             assert.ok(native.counters.collections > 0);
             if (
               mode === "enabled" &&
-              !fixture.name.startsWith("completion-records-")
+              !(
+                fixture.name.startsWith("completion-records-") ||
+                fixture.name.startsWith("residual-")
+              )
             ) {
               if (
                 fixture.name === "array-buffer" ||

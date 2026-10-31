@@ -92,6 +92,7 @@ typedef struct {
 typedef struct OseoRootFrame OseoRootFrame;
 typedef struct OseoHeapObject OseoHeapObject;
 typedef struct OseoContext OseoContext;
+typedef struct OseoConstructorScope OseoConstructorScope;
 
 typedef OseoResult (*OseoFunctionDispatcher)(
     OseoContext *context,
@@ -606,6 +607,8 @@ struct OseoContext {
     OseoRealm initial_realm;
     OseoRealm *realm;
     OseoValue realm_record;
+    /* Saved caller realm for result checks; the call scope owns its life. */
+    OseoConstructorScope *constructor_scope;
     /*
      * The agent's well-known symbols are a separate edition-fixed table
      * that every realm of the context shares.

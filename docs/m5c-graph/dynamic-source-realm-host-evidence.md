@@ -177,3 +177,18 @@ operations. Six type mutations compare 1/“1”, undefined/“undefined” and
 expected value from 1 to “1”. Every mutation must throw Test262Error before
 the program's completion marker. These checks reject printed-text equality
 as an oracle while retaining the original successful assertions.
+
+
+Residual child follow-up
+------------------------
+
+The DS-19 assessment and execution statements above describe its original
+checkpoint. The later `dynamic-source-residual-evidence` candidate repairs
+the two retained derived-constructor error realms under ABI `m5-146`,
+restores their native registrations without changing the normative
+assertions, and accounts for those two paths under ADR 0016. The
+[*residual assessment*](./dynamic-source-residual-evidence.assessment.md)
+supersedes only those two remediation entries. Its fixed and generated
+evidence covers both policies with forced collection. This product change
+requires Root's next bundle UPDATE; DS-19's earlier accounting-only
+no-UPDATE statement does not apply to that later candidate.

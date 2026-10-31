@@ -2889,13 +2889,20 @@ void oseo_internal_realm_enter(
 );
 void oseo_internal_realm_leave(OseoContext *context, OseoRealmScope *scope);
 
+/* The matching realm scope roots this record until the call returns. */
+struct OseoConstructorScope {
+    OseoValue realm_record;
+    OseoConstructorScope *previous;
+};
+
 /*
  * The one call a PrepareForTailCall site owes after it discarded its own
  * frame (ECMA-262 15.10.3). `realm_record` is the running realm at that
  * site, which stays the realm of any error the call itself raises before
  * a callee switches to its own. A nonzero `host` names the OseoTailHost
  * intrinsic to run instead of calling `callee`. `this_cell` is the `this`
- * binding of a derived class constructor when `derived` is set.
+ * binding of a derived class constructor when `derived` is set. Its
+ * constructor_realm is the caller restored for the final result check.
  * `arguments` is a private buffer whose capacity only grows; only its
  * first `argument_count` entries are live, and only while `pending`.
  */
@@ -2904,6 +2911,7 @@ typedef struct {
     OseoValue receiver;
     OseoValue realm_record;
     OseoValue this_cell;
+    OseoValue constructor_realm;
     OseoValue *arguments;
     size_t argument_count;
     size_t argument_capacity;
