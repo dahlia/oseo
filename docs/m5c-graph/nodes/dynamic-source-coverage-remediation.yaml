@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 766 reviewed unsupported paths assigned to
+delivers: "Resolves the 771 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger.   Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -218,7 +218,23 @@ delivers: "Resolves the 766 reviewed unsupported paths assigned to
   declaration completion-value probes under test/language/statements/:
   async-function/cptn-decl.js and class/cptn-decl.js, bringing the scope
   to 766. They also lie outside the split and stay with the umbrella;
-  their ordinary Completion Records remain in-claim."
+  their ordinary Completion Records remain in-claim. B22a adds one
+  fixture-construction subject,
+  nested-private-direct-eval-err-contains-newtarget.js, and the mixed
+  implicit-return subject
+  arrow-body-private-direct-eval-err-contains-newtarget.js. The latter
+  asserts c.x() is undefined although x() discards this.#x() result.
+  B22b adds two fixture-construction subjects,
+  private-direct-eval-err-contains-newtarget.js and
+  static-field-init-with-this.js, and the mixed-assertion path
+  private-static-setter-visible-to-direct-eval.js. Its final callback
+  reads the absent C.getWithEval target and throws TypeError before eval.
+  These five also lie outside the split, stay with the umbrella and
+  remain active remediation, bringing the scope to 771. B21d adds no
+  source-compilation rejection. The other 95 class-declaration eval
+  subjects use the existing eval-semantics exclusion assessment under
+  ADR 0016. The B22a and B22b batch notes link the original sources and
+  full-row assertion audits."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

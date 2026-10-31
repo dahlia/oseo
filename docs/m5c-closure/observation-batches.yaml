@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 3529
+unreviewedPaths: 1670
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,208 +165,45 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 125489
-  currentSeconds: 6895
-  finalExecutedVariants: 137271
-  finalSeconds: 7542
+  currentExecutedVariants: 131730
+  currentSeconds: 7238
+  finalExecutedVariants: 136912
+  finalSeconds: 7522
   plan:
-    batches: 7
+    batches: 4
     largestPaths: 645
     largestReviewUnits: 464
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 14.42
-    fullUpdateScheduleHours: 28.49
+    scheduleHours: 8.35
+    fullUpdateScheduleHours: 16.55
   alternatives:
-    - batches: 8
-      largestPaths: 781
+    - batches: 5
+      largestPaths: 453
       largestReviewUnits: 300
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 16.49
-      fullUpdateScheduleHours: 32.63
-    - batches: 3
-      largestPaths: 1859
-      largestReviewUnits: 599
+      scheduleHours: 10.4
+      fullUpdateScheduleHours: 20.65
+    - batches: 2
+      largestPaths: 1115
+      largestReviewUnits: 581
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 6.36
-      fullUpdateScheduleHours: 12.36
-    - batches: 2
-      largestPaths: 3191
-      largestReviewUnits: 1180
+      scheduleHours: 4.23
+      fullUpdateScheduleHours: 8.31
+    - batches: 1
+      largestPaths: 1670
+      largestReviewUnits: 883
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 4.35
-      fullUpdateScheduleHours: 8.35
+      scheduleHours: 2.17
+      fullUpdateScheduleHours: 4.18
 batches:
-  - id: observation-batch-21d
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/dstr/meth-
-        - test/language/statements/class/dstr/private-meth-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 105
-    generatedPaths: 640
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      generated: 640
-    includes:
-      compareArray.js: 8
-      propertyHelper.js: 24
-    features:
-      Symbol.iterator: 52
-      class: 268
-      class-methods-private: 134
-      class-static-methods-private: 134
-      default-parameters: 320
-      destructuring-binding: 640
-      generators: 100
-      object-rest: 24
-    negatives:
-      parse: 48
-    partitions:
-      groups:
-        - language/statements
-      files: 240
-      newFiles: 0
-    regeneration:
-      executableVariants: 2368
-      scopedUpdateSeconds: 130
-      fullCorpusSeconds: 7025
-  - id: observation-batch-22a
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/elements/after-
-        - test/language/statements/class/elements/arrow-
-        - test/language/statements/class/elements/async-
-        - test/language/statements/class/elements/class-
-        - test/language/statements/class/elements/derived-
-        - test/language/statements/class/elements/direct-
-        - test/language/statements/class/elements/fields-
-        - test/language/statements/class/elements/gen-
-        - test/language/statements/class/elements/get-
-        - test/language/statements/class/elements/indirect-
-        - test/language/statements/class/elements/multiple-
-        - test/language/statements/class/elements/nested-
-    dependsOn:
-      - observation-batch-plan
-    paths: 579
-    reviewUnits: 212
-    generatedPaths: 574
-    prerequisites: {}
-    dynamicSource:
-      eval: 65
-    flags:
-      async: 243
-      generated: 574
-      noStrict: 3
-      onlyStrict: 8
-    includes:
-      compareArray.js: 5
-      propertyHelper.js: 306
-    features:
-      Proxy: 1
-      Symbol: 8
-      Symbol.asyncIterator: 88
-      Symbol.iterator: 106
-      async-functions: 61
-      async-iteration: 198
-      class: 375
-      class-fields-private: 131
-      class-fields-public: 370
-      class-methods-private: 166
-      class-static-fields-private: 57
-      class-static-methods-private: 183
-      computed-property-names: 16
-      generators: 103
-      new.target: 10
-      object-spread: 8
-    negatives:
-      parse: 57
-    partitions:
-      groups:
-        - language/statements
-      files: 235
-      newFiles: 0
-    regeneration:
-      executableVariants: 2082
-      scopedUpdateSeconds: 114
-      fullCorpusSeconds: 7139
-  - id: observation-batch-22b
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/class/elements/
-        - test/language/statements/class/gen-
-        - test/language/statements/class/ident-name-method-def-
-        - test/language/statements/class/method-
-        - test/language/statements/class/method/forbidden-ext/
-        - test/language/statements/class/name-binding/
-        - test/language/statements/class/name.
-        - test/language/statements/class/params-dflt-
-        - test/language/statements/class/poisoned-
-        - test/language/statements/class/private-
-        - test/language/statements/class/restricted-
-    dependsOn:
-      - observation-batch-plan
-    paths: 640
-    reviewUnits: 341
-    generatedPaths: 575
-    prerequisites: {}
-    dynamicSource:
-      eval: 35
-    flags:
-      async: 108
-      generated: 575
-      noStrict: 21
-      onlyStrict: 4
-    includes:
-      compareArray.js: 5
-      propertyHelper.js: 289
-    features:
-      BigInt: 2
-      Proxy: 3
-      Symbol: 9
-      arrow-function: 1
-      async-functions: 48
-      async-iteration: 67
-      class: 567
-      class-fields-private: 164
-      class-fields-public: 364
-      class-methods-private: 125
-      class-static-fields-private: 57
-      class-static-fields-public: 7
-      class-static-methods-private: 144
-      computed-property-names: 19
-      default-parameters: 24
-      generators: 158
-      new.target: 2
-      object-spread: 4
-      rest-parameters: 6
-    negatives:
-      parse: 92
-    partitions:
-      groups:
-        - language/statements
-      files: 237
-      newFiles: 0
-    regeneration:
-      executableVariants: 2150
-      scopedUpdateSeconds: 118
-      fullCorpusSeconds: 7257
   - id: observation-batch-26a
     selector:
       prerequisiteSets:
@@ -414,7 +251,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7330
+      fullCorpusSeconds: 7311
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -461,7 +298,7 @@ batches:
     regeneration:
       executableVariants: 2116
       scopedUpdateSeconds: 116
-      fullCorpusSeconds: 7446
+      fullCorpusSeconds: 7427
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -513,7 +350,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7542
+      fullCorpusSeconds: 7522
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -539,4 +376,4 @@ batches:
     regeneration:
       executableVariants: 4
       scopedUpdateSeconds: 0
-      fullCorpusSeconds: 7542
+      fullCorpusSeconds: 7522
