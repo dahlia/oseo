@@ -201,8 +201,8 @@ assessments:
       reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "0f6257b72166ef1fb5ffdf5b5a554ab05e43a4d51a540e830f7ab477\
-        71168055"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
         "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
         135151c5"
@@ -255,8 +255,8 @@ assessments:
       optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "0f6257b72166ef1fb5ffdf5b5a554ab05e43a4d51a540e830f7ab477\
-        71168055"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
         "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
         135151c5"
@@ -507,8 +507,8 @@ assessments:
       reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "0f6257b72166ef1fb5ffdf5b5a554ab05e43a4d51a540e830f7ab477\
-        71168055"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
         "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
         135151c5"
@@ -536,8 +536,8 @@ assessments:
       policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "0f6257b72166ef1fb5ffdf5b5a554ab05e43a4d51a540e830f7ab477\
-        71168055"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
         "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
         135151c5"
@@ -5496,8 +5496,8 @@ assessments:
       optional Annex B policy, or on ADR 0019's reopening triggers.
     replacementEvidence:
       tests/native/fixtures/annex-b-mixed-core.ts:
-        "0f6257b72166ef1fb5ffdf5b5a554ab05e43a4d51a540e830f7ab477\
-        71168055"
+        "45e4571f2e9f7556a21c4555d86720fd37a674479b9af0c291714648\
+        071a28cd"
       tests/annex-b-mixed-core-native.test.ts:
         "d3cc3f6d101465c0c6fb93467428f149adb7593495c0f2d518ea8485\
         135151c5"

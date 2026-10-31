@@ -107,7 +107,7 @@ ADR 0013 authorized the accessor rejection without excluding the whole path.
 The RegExp split and ordinary-object assessments named their remediation owners
 the same way. The checker accepted only those three bounded Annex B owners and
 required each ledger owner to have a reviewed assessment. The mixed-coverage
-section below records the later closure of all four assessments.
+section below records the later closure of all five assessments.
 
 The `typed-array-buffer-without-species-core` fixture in
 *../../tests/native/fixtures/typed-array-constructors.ts* preserves the

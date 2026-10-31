@@ -1,6 +1,6 @@
 import type { Fixture } from "../fixture.ts";
 
-// Core replacement evidence for four upstream paths whose only rejected
+// Core replacement evidence for five upstream paths whose only rejected
 // operation is optional Annex B: a __proto__ accessor read or write, or a
 // legacy regular expression escape. Each program keeps the upstream core
 // assertions and checks value and type with Object.is before printing one
