@@ -736,7 +736,8 @@ function unsupportedRuntimeCapability(stderr: string): string | undefined {
  * `$262.createRealm` and `$262.global` realm members of ADR 0027, plus
  * `$262.evalScript` and unresolved `print` under ADR 0029. A case that
  * reads neither a host member nor unresolved `print` keeps an ordinary
- * build, where those host names stay unresolvable. A case reads the
+ * build unless `executedResult` selects the host for `CanBlockIsFalse`.
+ * In an ordinary build those host names stay unresolvable. A case reads the
  * agent capability through atomicsHelper.js, which builds on it at load
  * time, or references
  * one of those members itself, which reads `$262` even to write or delete

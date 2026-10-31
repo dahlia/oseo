@@ -45,7 +45,8 @@ rejection of invalid CLI configurations. Native fixed cases cover both
 waitable widths, conversion order and throws, mismatch, zero/infinite
 timeout, waitAsync notification, realm policy and error identity, and
 child-agent defaults, with forced collection and both specialization
-policies. The default-policy fixture belongs to both forced-GC lists.
+policies. The default-policy fixture is selected for guard-structure checks
+and forced collection in the native fixture runner.
 
 The generated suite uses a separate family with seed block
 `0x60009300` through `0x600093ff`, slot zero, five ordinary cases, and up

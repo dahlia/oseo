@@ -1273,4 +1273,10 @@ then releases its intermediate roots before returning. Earlier class
 closures retain their original cells. The native frame ceiling, callable
 cost multiplier and general declaration charges stay unchanged.
 
+ABI `m5-145` adds `agent_can_block` to `OseoContext`. The main test262
+agent's generated setup selects false for `CanBlockIsFalse`; ordinary
+contexts and child agents initialize true, and realms retain their owning
+context's policy. `Atomics.wait` checks it after argument validation and
+conversion, before comparing memory. `Atomics.waitAsync` is unchanged.
+
 [activity audit]: https://github.com/dahlia/oseo/blob/main/docs/sanitizer-activity.md
