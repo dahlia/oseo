@@ -109,6 +109,8 @@ needed.
 
 The namespace witnesses preserve all original assertions and export
 categories, including absent names, symbols, descriptor flags and values.
+The nested-property observer also checks the actual six unexported
+declaration names, preserving the upstream negative-name assertions.
 Their observers are defined in a Script prelude: sloppy assignment and
 delete remain sloppy, while strict observers retain their directive.
 Each observer receives a statically imported namespace, directly and after
@@ -119,9 +121,10 @@ The live-binding witnesses keep the original enclosing syntax and the
 independent global updater. Static self-import observes both export aliases
 before and after a local update. Custom primitive witnesses retain all four
 String/Number results. The three static graph witnesses retain the original
-import/export forms, exact evaluation-count guard, global object identity
-and nine-dependency order. `globalThis` replaces only dynamic discovery of
-the existing global object.
+import/export forms (including default-plus-empty-named imports protected
+from formatter normalization), exact evaluation-count guard, global object
+identity and nine-dependency order. `globalThis` replaces only dynamic
+discovery of the existing global object.
 
 The ImportMeta specifier witness observes the null prototype and the exact
 conditional conversion failure; decision item 2 separately bounds ImportCall
@@ -132,7 +135,10 @@ ordinary, generator, async and async-generator bodies and parameters.
 
 The dedicated native suite requires Node.js and Deno references, both native
 specialization policies with collection forced at every safepoint, positive
-allocation/collection counters and emitted module C. Its forced-collection
+allocation/collection counters and emitted module C. Namespace subjects
+also require explicit namespace construction in MIR and C. The parser
+probes live under *packages/parser-babel/tests/* and run unchanged under
+both bootstrap hosts. Its forced-collection
 matrix applies to every group directly; these module/prelude groups do not
 enter the Script-fixture allowlists in *tests/native.ts*. Existing property
 domains and seeds remain unchanged.

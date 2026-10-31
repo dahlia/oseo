@@ -815,7 +815,7 @@
       parameter positions, leaving only dynamic source-goal
       construction."
     "evidence":
-      - "tests/ds12-import-meta-goals.test.ts"
+      - "packages/parser-babel/tests/ds12-import-meta-goals.test.ts"
   - "path": "test/language/expressions/import.meta/syntax/goal-async-functi\
       on-params-or-body.js"
     "sourceDigest": "cbe2b1c3d4517a3990bd56a420cb7125195adda746591a544e8\
@@ -830,7 +830,7 @@
       parameter positions, leaving only dynamic source-goal
       construction."
     "evidence":
-      - "tests/ds12-import-meta-goals.test.ts"
+      - "packages/parser-babel/tests/ds12-import-meta-goals.test.ts"
   - "path": "test/language/expressions/import.meta/syntax/goal-async-genera\
       tor-params-or-body.js"
     "sourceDigest": "c89ed59d66c4c85396d1da2fa9c0f3d34f6392dd296226c28f5\
@@ -845,7 +845,7 @@
       parameter positions, leaving only dynamic source-goal
       construction."
     "evidence":
-      - "tests/ds12-import-meta-goals.test.ts"
+      - "packages/parser-babel/tests/ds12-import-meta-goals.test.ts"
   - "path": "test/language/expressions/import.meta/syntax/goal-function-par\
       ams-or-body.js"
     "sourceDigest": "0f0f10d06669f27d6fa67c55415952d892e82cf7037c79f0b74\
@@ -860,7 +860,7 @@
       parameter positions, leaving only dynamic source-goal
       construction."
     "evidence":
-      - "tests/ds12-import-meta-goals.test.ts"
+      - "packages/parser-babel/tests/ds12-import-meta-goals.test.ts"
   - "path": "test/language/expressions/import.meta/syntax/goal-generator-pa\
       rams-or-body.js"
     "sourceDigest": "0a24c4839d48c07a64e6c8cb0dfc9d7747d4cc5542c691bd559\
@@ -875,7 +875,7 @@
       parameter positions, leaving only dynamic source-goal
       construction."
     "evidence":
-      - "tests/ds12-import-meta-goals.test.ts"
+      - "packages/parser-babel/tests/ds12-import-meta-goals.test.ts"
   - "path": "test/language/module-code/eval-gtbndng-indirect-update-as.js"
     "sourceDigest": "531a6d88591198d2c6d8ca9151a675b17b1259c150bfd0b24a9\
       b5208799fcb52"

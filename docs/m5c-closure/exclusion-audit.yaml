@@ -1119,13 +1119,14 @@ assessments:
     "replacementEvidence":
       ? "docs/m5c-graph/dynamic-source-module-observable-contracts-assessmen\
         t.yaml"
-      : "b4850c00865aa9de62fa58f2f6ba7ee8\
-        99571878860287462d76dbddfbb2ac6b"
-      "tests/ds12-import-meta-goals.test.ts": "ac709afe92b7fc5b688936e6826a6332\
-        b63b99cc0974b309e92da3cecf00ae9b"
+      : "11490a75e084e3f4e5494e1d614700b8\
+        7c36ea6f1bf5320bbbf2ad1ea21396dd"
+      "packages/parser-babel/tests/ds12-import-meta-goals.test.ts":
+        "bd73572597045b8e471a32e9e91ebcb9\
+        9510ddf5c7fe9e57d6d654b18135754f"
       "tests/ds12-module-observables-native.test.ts":
-        "c6aa9e6f450a421a83cb268fb74ed7d6\
-        80b8f0e9c81e986c21aed64e586b4e8f"
+        "a30d3f3d7118156e93d796bf4ce8f6ea\
+        4ece8197a9a740a9019287758c8a35ac"
       "tests/fixtures/ds12-module-observables/LICENSE":
         "2c921a1fe5e04c956db32cbc3e68ad2c\
         ec59078611ddb147449c498d6955e548"
@@ -1182,8 +1183,8 @@ assessments:
       : "eddadfff17d51b77cbbb9d08bc018ffd\
         10e7e1792f3304f7b4c916dbcaa2c27d"
       "tests/fixtures/ds12-module-observables/eval-rqstd-once.mjs":
-        "4946554f7d6e05fdef285c7cd7df7784\
-        7e2c834f72a6de07857248f072ac1382"
+        "111fee3f820a2182964d2ba4d82a6f45\
+        6b67e25ae54b91e1e9d6766e0bc53002"
       "tests/fixtures/ds12-module-observables/eval-rqstd-once_FIXTURE.mjs":
         "4503d1c01ad706edda8d832f145bf64e\
         d32e9be6f93493b598dc2af1cfc72194"
@@ -1224,8 +1225,8 @@ assessments:
       : "37c3d673513f64cf4324693b25734692\
         7a0c61138039bd862b4a3cecd14dda30"
       "tests/fixtures/ds12-module-observables/eval-rqstd-order.mjs":
-        "977c14ecb812ae53c80d5289a98f6664\
-        8b6352b89ffc46112b2e26557f9e52cb"
+        "9adeb3cad4146fd764dd3171f0b3b9bf\
+        2cae8e96213912d443186c03355733f8"
       ? "tests/fixtures/ds12-module-observables/get-nested-namespace-dflt-di\
         rect.mjs"
       : "8545d08dc4efb95a73c2ad0d394b0c29\
@@ -1264,8 +1265,8 @@ assessments:
         c9d0758e6c002a828ae770cd3c17e9c9"
       ? "tests/fixtures/ds12-module-observables/get-nested-namespace-props-n\
         rml.prelude.js"
-      : "5bb76db3108c450c8c4bcc99a0f393d0\
-        4af83427f62018c2bf623ebe40dafeac"
+      : "6d7cd9c6692413b4906423d2bb422db4\
+        03edc781836448d81c571b86e9a65de4"
       "tests/fixtures/ds12-module-observables/import-meta-specifier.mjs":
         "073f154bede3a470ee5b1315249eb79e\
         40e448c102fab1dd53e2c87b0f2fd427"

@@ -56,4 +56,17 @@ function observe(ns) {
     false,
     "nonExportedClass",
   );
+
+  // The upstream negative names differ from the actual declarations.
+  // Preserve those checks above, and observe the real private bindings.
+  for (const name of [
+    "notExportedVar",
+    "notExportedLet",
+    "notExportedConst",
+    "notExportedFunc",
+    "notExportedGen",
+    "notExportedClass",
+  ]) {
+    assert.sameValue(hasOwnProperty(ns.exportns, name), false, name);
+  }
 }

@@ -8,7 +8,9 @@ import "./eval-rqstd-once_FIXTURE.mjs";
 import * as ns1 from "./eval-rqstd-once_FIXTURE.mjs";
 import dflt1 from "./eval-rqstd-once_FIXTURE.mjs";
 export {} from "./eval-rqstd-once_FIXTURE.mjs";
-import dflt2 from "./eval-rqstd-once_FIXTURE.mjs";
+// Retain the original default-plus-empty-named import form.
+// oxfmt-ignore
+import dflt2, {} from "./eval-rqstd-once_FIXTURE.mjs";
 export * from "./eval-rqstd-once_FIXTURE.mjs";
 export * as ns2 from "./eval-rqstd-once_FIXTURE.mjs";
 export * as class from "./eval-rqstd-once_FIXTURE.mjs";

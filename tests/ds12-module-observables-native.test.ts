@@ -61,154 +61,186 @@ function asyncTest(operation) { operation().then($DONE, $DONE); }
 
 // Each group runs in a fresh realm so global updater and binding sentinels
 // cannot leak between cases. A prelude is a Script, even for strict modules.
-const groups: readonly (readonly [string, string, string])[] = [
+const groups: readonly (readonly [string, string, string, boolean])[] = [
   [
     "delete-exported-init-no-strict",
     "delete-exported-init-no-strict.mjs",
     "delete-exported-init-no-strict.prelude.js",
+    true,
   ],
   [
     "delete-exported-init-strict",
     "delete-exported-init-strict.mjs",
     "delete-exported-init-strict.prelude.js",
+    true,
   ],
   [
     "delete-non-exported-no-strict",
     "delete-non-exported-no-strict.mjs",
     "delete-non-exported-no-strict.prelude.js",
+    true,
   ],
   [
     "get-nested-namespace-dflt-direct",
     "get-nested-namespace-dflt-direct.mjs",
     "get-nested-namespace-dflt-direct.prelude.js",
+    true,
   ],
   [
     "get-nested-namespace-dflt-indirect",
     "get-nested-namespace-dflt-indirect.mjs",
     "get-nested-namespace-dflt-indirect.prelude.js",
+    true,
   ],
   [
     "get-nested-namespace-props-nrml",
     "get-nested-namespace-props-nrml.mjs",
     "get-nested-namespace-props-nrml.prelude.js",
+    true,
   ],
-  ["set-no-strict", "set-no-strict.mjs", "set-no-strict.prelude.js"],
+  ["set-no-strict", "set-no-strict.mjs", "set-no-strict.prelude.js", true],
   [
     "set-same-values-no-strict",
     "set-same-values-no-strict.mjs",
     "set-same-values-no-strict.prelude.js",
+    true,
   ],
   [
     "set-same-values-strict",
     "set-same-values-strict.mjs",
     "set-same-values-strict.prelude.js",
+    true,
   ],
-  ["set-strict", "set-strict.mjs", "set-strict.prelude.js"],
+  ["set-strict", "set-strict.mjs", "set-strict.prelude.js", true],
   [
     "nested-arrow-assignment-expression-eval-gtbndng-indirect-update",
     "nested-arrow-assignment-expression-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-arrow-import-then-eval-gtbndng-indirect-update",
     "nested-arrow-import-then-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-async-arrow-function-await-eval-gtbndng-indirect-update",
     "nested-async-arrow-function-await-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-async-arrow-function-return-await-eval-gtbndng-indirect-update",
     "nested-async-arrow-function-return-await-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-async-function-await-eval-gtbndng-indirect-update",
     "nested-async-function-await-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-async-function-eval-gtbndng-indirect-update",
     "nested-async-function-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-async-function-return-await-eval-gtbndng-indirect-update",
     "nested-async-function-return-await-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-async-gen-await-eval-gtbndng-indirect-update",
     "nested-async-gen-await-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-async-gen-return-await-eval-gtbndng-indirect-update",
     "nested-async-gen-return-await-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-block-import-then-eval-gtbndng-indirect-update",
     "nested-block-import-then-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-do-while-eval-gtbndng-indirect-update",
     "nested-do-while-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-else-import-then-eval-gtbndng-indirect-update",
     "nested-else-import-then-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-function-import-then-eval-gtbndng-indirect-update",
     "nested-function-import-then-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-if-braceless-eval-gtbndng-indirect-update",
     "nested-if-braceless-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-if-import-then-eval-gtbndng-indirect-update",
     "nested-if-import-then-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "nested-while-import-then-eval-gtbndng-indirect-update",
     "nested-while-import-then-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "syntax-nested-block-labeled-eval-gtbndng-indirect-update",
     "syntax-nested-block-labeled-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "top-level-import-then-eval-gtbndng-indirect-update",
     "top-level-import-then-eval-gtbndng-indirect-update.mjs",
     "",
+    true,
   ],
   [
     "eval-gtbndng-indirect-update-as",
     "eval-gtbndng-indirect-update-as.mjs",
     "",
+    false,
   ],
-  ["eval-gtbndng-indirect-update", "eval-gtbndng-indirect-update.mjs", ""],
-  ["eval-rqstd-once", "eval-rqstd-once.mjs", ""],
-  ["eval-rqstd-order", "eval-rqstd-order.mjs", ""],
-  ["instn-same-global", "instn-same-global.mjs", ""],
-  ["custom-primitive", "custom-primitive.mjs", ""],
-  ["imported-self-update", "imported-self-update.mjs", ""],
-  ["import-meta-specifier", "import-meta-specifier.mjs", ""],
+  [
+    "eval-gtbndng-indirect-update",
+    "eval-gtbndng-indirect-update.mjs",
+    "",
+    false,
+  ],
+  ["eval-rqstd-once", "eval-rqstd-once.mjs", "", false],
+  ["eval-rqstd-order", "eval-rqstd-order.mjs", "", false],
+  ["instn-same-global", "instn-same-global.mjs", "", false],
+  ["custom-primitive", "custom-primitive.mjs", "", true],
+  ["imported-self-update", "imported-self-update.mjs", "", true],
+  ["import-meta-specifier", "import-meta-specifier.mjs", "", false],
 ];
 
-for (const [name, entryName, observerName] of groups) {
+for (const [name, entryName, observerName, expectNamespace] of groups) {
   test(
     `DS-12 static module witness: ${name}`,
     { skip: nativeTarget == null ? "requires a supported native host" : false },
@@ -277,6 +309,9 @@ for (const [name, entryName, observerName] of groups) {
             assert.ok(compiled.mir);
             const mir = printMir(compiled.mir);
             assert.match(mir, /function @f\d+ \*module:/u);
+            if (expectNamespace) {
+              assert.match(mir, /module-namespace-create \d+ live exports/u);
+            }
             if (name === "import-meta-specifier") {
               assert.match(mir, /read \*import.meta\*/u);
             }
@@ -299,6 +334,12 @@ for (const [name, entryName, observerName] of groups) {
                 // The AOT module graph retains real binding cells. No runtime
                 // source operation replaces namespace reads or updates.
                 assert.match(native.emittedC, /oseo_function_\d+/u);
+                if (expectNamespace) {
+                  assert.match(
+                    native.emittedC,
+                    /oseo_module_namespace_create/u,
+                  );
+                }
               },
             );
           }

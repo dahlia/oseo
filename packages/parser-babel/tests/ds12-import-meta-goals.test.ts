@@ -1,10 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  babelFrontend,
-  babelModuleFrontend,
-} from "../packages/parser-babel/src/index.ts";
+import { babelFrontend, babelModuleFrontend } from "../src/index.ts";
 
 // These are fixed Script and Module goals, with no source compilation at
 // runtime. Constructor/eval source goals remain the ADR 0016 boundary.
