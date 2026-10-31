@@ -612,3 +612,15 @@ unexecuted constructor accounting 1. Its pinned selector and obligations
 are in that child's work note. Ownership moves only with reviewed closure;
 the umbrella retains every remaining path and requires child landing plus
 zero directly owned paths before its own landing.
+
+
+Train C host Script evidence child
+----------------------------------
+
+Item 1 of the 2026-11-01 umbrella-residual answer adds
+`dynamic-source-host-script-trainc-evidence` for exactly 98 train C paths:
+script completion values 62, eval syntax errors 34, one global binding row
+and one eval binding row. Its pinned selector and obligations are in that
+child's work note. Ownership moves only with reviewed closure; the umbrella
+retains every remaining path and requires child landing plus zero directly
+owned paths before its own landing.

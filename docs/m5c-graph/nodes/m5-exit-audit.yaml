@@ -33,6 +33,7 @@ dependencies:
   - dynamic-source-coverage-remediation
   - dynamic-source-eval-arguments-accounting
   - dynamic-source-eval-contract-accounting
+  - dynamic-source-host-script-trainc-evidence
   - dynamic-source-importcall-accounting
   - dynamic-source-importcall-residual-accounting
   - dynamic-source-lexical-completion-family

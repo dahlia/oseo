@@ -304,6 +304,7 @@ dependencies:
   - dynamic-source-construction-contracts
   - dynamic-source-eval-arguments-accounting
   - dynamic-source-eval-contract-accounting
+  - dynamic-source-host-script-trainc-evidence
   - dynamic-source-importcall-accounting
   - dynamic-source-importcall-residual-accounting
   - dynamic-source-lexical-completion-family
@@ -320,4 +321,4 @@ dependencies:
   - dynamic-source-template-site-evidence
   - dynamic-source-unknown-eval
 landed: false
-status: ready
+status: blocked
