@@ -32,7 +32,7 @@ the design review of the static-specifier import track. General `eval` and
 Scope of this node
 ------------------
 
- -  Draft ADR 0031, *docs/adr/0031-m5-named-deferral.md*, with status
+ -  Draft [ADR 0031](../adr/0031-m5-named-deferral.md) with status
     `Proposed`, defining the deferral record.
  -  Update the exit criteria in [*PLAN-M5C.md*](../../PLAN-M5C.md) and the
     `m5-exit-audit` delivers text to match the draft.
