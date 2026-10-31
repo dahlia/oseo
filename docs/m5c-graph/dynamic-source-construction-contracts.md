@@ -96,3 +96,110 @@ unavailable. Preserve ADR 0016/0019 reopening triggers; an accepted ADR 0016
 amendment admitting dynamic import reopens ImportCall accounting. Each child
 requires normal D1/D11 review and D3/D4 publication. This metadata change
 performs none of those closure or landing steps.
+
+
+Bounded evidence assessment
+---------------------------
+
+The implementation assessment uses split base
+`362ddb13d933600f6a0543ac332eb8479be9053f`. Its exact 57-path selector and
+SHA256 above match the ledger: every selected path is
+`unsupported-profile-feature` and initially belongs to
+`node:dynamic-source-coverage-remediation`. All 41,091 inventory paths remain.
+
+[*dynamic-source-construction-assessment.yaml*](./dynamic-source-construction-assessment.yaml)
+records each source digest, normalized observation digest, normative subject,
+replacement observation and one-line disposition reason. This node's delta is
+24 paths accounted under ADR 0016 and 33 retained in umbrella remediation:
+
+| Family                                  | Selected | ADR 0016 | Remaining |
+| --------------------------------------- | -------: | -------: | --------: |
+| Constructor grammar and strictness      |       15 |       15 |         0 |
+| Argument conversion, order and results  |       35 |        9 |        26 |
+| Source-compiling constructor subclasses |        7 |        0 |         7 |
+| Total                                   |       57 |       24 |        33 |
+
+These are exclusion-accounting changes. No path becomes a pass, no original
+assertion or observation changes, and the subset, result partitions and tags
+remain unchanged. The shared umbrella count and node YAML remain for Root to
+reconcile at publication.
+
+### Ordinary grammar and results
+
+*tests/construction-static-contracts.test.ts* adds eight static negative
+groups and one structural group. Complete ordinary function definitions
+reject strict duplicate parameters, strict `eval`/`arguments` parameters,
+strict `with`, an unbound private name, an invalid `var` binding and an
+invalid numeric parameter list. Both specialization policies report owned
+`OSEO0001` syntax diagnostics without MIR; Node.js and Deno's reference
+compiler reports `SyntaxError`. These observations cover the same ordinary
+FormalParameters and FunctionBody early errors. Catching a SyntaxError object
+in the original is the observer for that parse failure, rather than a
+separate error-object mutation or descriptor contract.
+
+The fixed *tests/native/fixtures/construction-static-contracts.ts* fixture
+adds six observation groups: duplicate parameter bindings; sloppy `eval` and
+`arguments` parameter acceptance; `arguments[0]` identity for numeric and
+String inputs; `instanceof Function` and `.constructor` identity; true and
+undefined return values; and the exact left-associative sums `6`, `ABBA1` and
+`2ABBA`. Its native registration in *tests/native.ts* runs both policies,
+enters both forced-GC lists, checks the fixed expected output and positive
+collection count, and retains the structural property guards/generic fallback
+checks. No property-generator domain or compiler/runtime support is added.
+
+The local strictness tests share ordinary strict-function grammar with these
+negative witnesses. A constructed function's independence from a strict
+caller is different: the constructor parses a separate body whose own
+ContainsUseStrict controls that grammar. Static sloppy definitions witness
+the admitted ordinary grammar; the separate-source strictness selection
+remains part of the excluded CreateDynamicFunction operation. Likewise,
+combining primitive String parameter arguments and choosing call versus new
+are source-construction steps. The nine result closures use only primitive
+String source arguments; their exact ordinary result and Function identity
+assertions have static/native witnesses.
+
+### Remaining mixed subjects
+
+The other 26 argument rows retain remediation because their conversions feed
+parameter or body parsing, or establish ordering across argument evaluation
+and constructor conversion. In particular, *A3\_T1* requires parameter ToString
+to throw `1` before the body conversion that would throw `"body"`; *A3\_T3*
+requires parameter conversion to change `p` before the body's exact thrown
+String. The *A2\_T4* through *A2\_T6* counters connect repeated conversion,
+created parameter names and later call results. Calling String explicitly
+would remove the constructor boundary these tests assert. Even the primitive
+non-String conversion cases keep their precise unwitnessed interaction in
+the table; the empty ordinary function alone does not establish it.
+
+All seven subclass rows retain remediation. Their Function-family allocation
+or internal-slot initialization cannot be reached without invoking the
+excluded source-compiling constructor. Static generator name/length/prototype
+checks and unrelated built-in subclasses would not witness these exact
+subclass instances. *super-must-be-called.js* also asserts successful super
+initialization and GeneratorFunction identity, so its ReferenceError half
+cannot close the whole path. Root was asked for a bounded decision on these
+unreachable mixed contracts; no broader exclusion is assumed.
+
+### Validation and publication
+
+The focused static tests pass on Node.js and Deno (9 each). The locked focused
+native run, `node tests/native.ts --shard 23/1000`, passes the new fixture on
+Linux x86-64 under both policies with forced collection, matches both
+references and the fixed expectation, and cross-links Linux AArch64. Its
+common runner prelude also passes. Logs are under
+*/data/m5c-d17-20261031/ds13/*.
+
+No UPDATE is needed: the subset and result observations are unchanged, and
+the test262 runner cannot reach the new test-only fixture or registration.
+Root must still run the exact candidate's full ordinary suites, including
+`test:node`, `test:deno` and `test:native`, on the supported native hosts;
+focused local evidence does not replace those publication gates. This node
+sets no landed state and performs no outer review, merge, push or publication.
+
+The dependency-tag self-audit leaves all selected rows and their tags intact.
+No incidental fixture syntax, assertion plumbing or unexecuted operation is
+used to retag a rejection. Audit records retain fresh original source and
+normalized observation digests and bind the replacement test files. Changed
+original/replacement evidence requires reassessment, as do ADR 0016's
+admission and laboratory/staged-compilation/WinterTC triggers and ADR 0019's
+non-source normative-dependence trigger.
