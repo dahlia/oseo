@@ -73,9 +73,11 @@ ordinary-property evidence.
 
 The exact reviewed admission is
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
-observation remains owned by `node:typed-array-proto-coverage-remediation`;
-ADR 0013 excludes the accessor behavior but does not close mixed core
-coverage. The
+observation became an ADR 0013 exclusion under the 2026-10-28
+maintainer decision, item 3, once the strict
+`annex-b-core-typed-array-no-species` evidence covered every core subject;
+the [closure note](./m5c-graph/typed-array-proto-coverage-remediation.md)
+records it. It is not counted as a pass. The
 fixed `typed-array-buffer-without-species-core` fixture preserves the original
 ArrayBuffer subclass, throwing constructor and species getter, TypedArray
 clone, and fresh buffer's intrinsic prototype and constructor. Core reflection
@@ -86,6 +88,14 @@ collection at every safepoint. Native diagnostic tests pin direct, computed,
 Reflect, proxy fallback, TypedArray, and cross-realm reads. The runtime ABI at
 that checkpoint was `oseo-runtime-m5-129`; Annex B and the ADR 0013 vocabulary
 stay unchanged.
+
+Observation-batch-28 admits *test/language/types/object/S8.6.2\_A8.js*, whose
+`__proto__` write on a non-extensible ordinary object is rejected at compile
+time with this `OSEO1001` accessor diagnostic in every variant. Its unsupported
+observation is owned by `node:ordinary-object-proto-coverage-remediation`. The
+asserted core contract, that the object keeps `Object.prototype` as its
+`[[Prototype]]`, does not require Annex B; no replacement evidence is bound
+yet, so the path is not an exclusion.
 
 Runtime ABI `oseo-runtime-m5-134` added the write half of that historical
 boundary. A `[[Set]]` of `"__proto__"` whose walk reached an intrinsic
@@ -255,8 +265,8 @@ with the executed variants and target, reviewed dependency tags, and summaries
 with raw, path-group, and dependency totals. Unsupported, harness, and
 infrastructure results never increase the pass count.
 
-The current manifest contains 41,090 reviewed cases: 34,751 passes, 4,401
-expected negatives, and 1,938 unsupported profile features. It records no
+The current manifest contains 41,091 reviewed cases: 34,751 passes, 4,401
+expected negatives, and 1,939 unsupported profile features. It records no
 semantic, harness, or infrastructure failures.
 
 The batch 16/17 dependency audit corrects 21 tag claims on 20 of their
@@ -7374,8 +7384,9 @@ the current harness.
 The current complete RAB harness update, recorded in `fbdb0824` from clean
 source `2e3d973f`, observes 27 passes among the 28 paths in these roots that
 include *resizableArrayBufferUtils.js*. The remaining
-*resizable-and-fixed-have-same-prototype.js* case is unsupported, with active
-owner `typed-array-proto-coverage-remediation`; it is not an exclusion.
+*resizable-and-fixed-have-same-prototype.js* case is unsupported. Since the
+2026-10-28 maintainer decision, item 3, it is an ADR 0013 exclusion backed by
+strict core replacement evidence, not a pass.
 The seven SharedArrayBuffer paths above now pass under the already-admitted
 shared-buffer support. The original admission counts above are historical.
 
@@ -7785,8 +7796,9 @@ inventory reaches 140 families, and the runtime ABI moves to `m5-124`.
 The current complete RAB harness update, recorded in `fbdb0824` from clean
 source `2e3d973f`, observes four passes among the five paths in these roots
 that include *resizableArrayBufferUtils.js*. The remaining
-*out-of-bounds-behaves-like-detached.js* case is unsupported, with active owner
-`typed-array-proto-coverage-remediation`; it is not an exclusion. The original
+*out-of-bounds-behaves-like-detached.js* case is unsupported. Since the
+2026-10-28 maintainer decision, item 3, it is an ADR 0013 exclusion backed by
+strict core replacement evidence, not a pass. The original
 admission counts above are historical.
 
 

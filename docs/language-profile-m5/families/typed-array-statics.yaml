@@ -24,8 +24,8 @@ scope:
     four inventory roots: the TypedArray root files, Symbol.species, from,
     and of. Of the five paths in these roots using the reviewed
     resizableArrayBufferUtils.js include, four pass and
-    out-of-bounds-behaves-like-detached.js remains unsupported with active
-    owner typed-array-proto-coverage-remediation."
+    out-of-bounds-behaves-like-detached.js remains unsupported as an ADR
+    0013 exclusion whose core subjects have strict replacement evidence."
 owners:
   - PLAN-M5.md
 evidence:
@@ -37,11 +37,13 @@ evidence:
   fixed:
     status: covered
     references:
-      - tests/native/fixtures/typed-array-statics.ts
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
+      - tests/native/fixtures/typed-array-statics.ts
   forced-collection:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/typed-array-statics.ts
       - tests/property/m5-typed-array-statics.property.test.ts
@@ -59,6 +61,7 @@ evidence:
   specialization:
     status: covered
     references:
+      - tests/annex-b-mixed-core-native.test.ts
       - tests/native.ts
       - tests/native/fixtures/typed-array-statics.ts
       - tests/property/m5-typed-array-statics.property.test.ts

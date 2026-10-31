@@ -9,5 +9,5 @@ delivers: "Resolves the one reviewed String/prototype/split/separator-regexp.js
   do not admit Annex B or widen ADR 0013."
 dependencies:
   - authorized-exclusion-audit
-landed: false
+landed: true
 status: ready

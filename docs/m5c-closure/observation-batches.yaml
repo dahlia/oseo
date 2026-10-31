@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 1
+unreviewedPaths: 0
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,68 +165,42 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 136661
-  currentSeconds: 7508
-  finalExecutedVariants: 136665
+  currentExecutedVariants: 136662
+  currentSeconds: 7509
+  finalExecutedVariants: 136662
   finalSeconds: 7509
   plan:
-    batches: 1
-    largestPaths: 1
-    largestReviewUnits: 1
+    batches: 0
+    largestPaths: 0
+    largestReviewUnits: 0
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 2.09
-    fullUpdateScheduleHours: 4.17
+    scheduleHours: 0
+    fullUpdateScheduleHours: 0
   alternatives:
-    - batches: 1
-      largestPaths: 1
-      largestReviewUnits: 1
+    - batches: 0
+      largestPaths: 0
+      largestReviewUnits: 0
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 2.09
-      fullUpdateScheduleHours: 4.17
-    - batches: 1
-      largestPaths: 1
-      largestReviewUnits: 1
+      scheduleHours: 0
+      fullUpdateScheduleHours: 0
+    - batches: 0
+      largestPaths: 0
+      largestReviewUnits: 0
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 2.09
-      fullUpdateScheduleHours: 4.17
-    - batches: 1
-      largestPaths: 1
-      largestReviewUnits: 1
+      scheduleHours: 0
+      fullUpdateScheduleHours: 0
+    - batches: 0
+      largestPaths: 0
+      largestReviewUnits: 0
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 2.09
-      fullUpdateScheduleHours: 4.17
-batches:
-  - id: observation-batch-28
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/types/
-    dependsOn:
-      - observation-batch-plan
-    paths: 1
-    reviewUnits: 1
-    generatedPaths: 0
-    prerequisites: {}
-    dynamicSource: {}
-    flags: {}
-    includes: {}
-    features: {}
-    negatives: {}
-    partitions:
-      groups:
-        - language/types
-      files: 1
-      newFiles: 1
-    regeneration:
-      executableVariants: 4
-      scopedUpdateSeconds: 0
-      fullCorpusSeconds: 7509
+      scheduleHours: 0
+      fullUpdateScheduleHours: 0
+batches: []

@@ -105,8 +105,11 @@ The mixed assessment names
 `disposition: remediation` with `normativeDependency: not-demonstrated`.
 ADR 0013 authorizes the accessor rejection, not exclusion of the whole path.
 The RegExp split assessment separately names its existing remediation owner.
-The checker accepts only these bounded Annex B owners and requires each
-ledger owner to have a reviewed assessment.
+The `annex-b-ordinary-object-prototype` assessment names
+`node:ordinary-object-proto-coverage-remediation` for
+*test/language/types/object/S8.6.2\_A8.js* with the same disposition and
+normative dependency. The checker accepts only these three bounded Annex B
+owners and requires each ledger owner to have a reviewed assessment.
 
 The new assessment binds the replacement source digest in
 `replacementEvidence`. The `typed-array-buffer-without-species-core` fixture
@@ -118,6 +121,11 @@ and retains the original upstream path unchanged. Existing constructor
 properties supply generated constructor, clone, and buffer coverage.
 Replacement evidence supports the core contract; assigning an exclusion still
 requires the remediation node's maintainer accounting decision.
+
+The checker requires replacement evidence only for the TypedArray owner. The
+ordinary-object assessment binds none: no reviewed replacement observation yet
+witnesses every core subject of *S8.6.2\_A8.js*, so its node must supply one,
+or obtain a maintainer accounting decision, before any exclusion.
 
 
 Dynamic import attributes and JSON identity
@@ -275,3 +283,38 @@ subjects remain in-claim under dynamic-source-coverage-remediation. The
 derived owner total is 273; no tag creates an exclusion. Source and
 observation digests bind every assessment to the pinned source and fresh
 canonical record. Integrated formal review remains pending.
+
+
+Annex B mixed-coverage closures
+-------------------------------
+
+Item 3 of the 2026-10-28 maintainer decision closes a mixed Annex B path
+under ADR 0013 only when reviewed replacement observations cover every core
+subject and a fresh-digest record names them. Four paths now meet that
+condition, and their assessments change to `disposition: exclusion` with
+`normativeDependency: annex-b-only`:
+
+ -  `annex-b-typed-array-prototype`:
+    *TypedArrayConstructors/ctors/no-species.js*;
+ -  `annex-b-resizable-typed-array-prototype`:
+    *TypedArray/prototype/resizable-and-fixed-have-same-prototype.js*;
+ -  `annex-b-out-of-bounds-prototype-setup`:
+    *TypedArray/out-of-bounds-behaves-like-detached.js*;
+ -  `annex-b-pattern`: *String/prototype/split/separator-regexp.js*.
+
+The first three keep the `Object.prototype.__proto__` rejection above; the
+fourth keeps the named backreference rejection. Each assessment binds
+*../../tests/native/fixtures/annex-b-mixed-core.ts* and
+*../../tests/annex-b-mixed-core-native.test.ts*. Those files check each core
+subject's value and type in the program, prove the comparator rejects
+near-miss values through an independent count, and run natively under both
+specialization policies with forced collection. The ledger moves the four
+paths to `adr:0013-m5-edition-and-manifest`. The earlier print-based
+replacement fixtures above stay but no longer close these paths. The two
+remediation nodes then own no path, and the paragraphs above that keep
+remediation for these paths describe the earlier state. The legacy accessor
+lookups and every other Annex B observer keep their owners. The per-path
+assertion tables are in
+[typed-array-proto-coverage-remediation.md](../m5c-graph/typed-array-proto-coverage-remediation.md)
+and
+[regexp-split-coverage-remediation.md](../m5c-graph/regexp-split-coverage-remediation.md).

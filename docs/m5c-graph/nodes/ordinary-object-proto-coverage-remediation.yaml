@@ -1,0 +1,21 @@
+version: 1
+id: ordinary-object-proto-coverage-remediation
+title: Resolve mixed Annex B ordinary-object prototype coverage
+delivers: "Resolves exactly test/language/types/object/S8.6.2_A8.js,
+  which observation-batch-28 admits as unsupported because its
+  Object.prototype.__proto__ write reaches the Annex B OSEO1001
+  rejection. Own the still-unsupported mixed path in the ledger, retain
+  its original path and assertions, and preserve its core coverage that
+  a non-extensible ordinary object keeps Object.prototype as its
+  [[Prototype]] through an approved replacement observation with a
+  witness for every core subject. Follow the full PLAN-M5.md evidence
+  contract and obtain the maintainer accounting decision in PLAN-M5C.md
+  before assigning an exclusion. Update the exclusion audit, ledger, and
+  applicable normative profile records, and regenerate the complete
+  manifest if observation behavior changes. Do not admit Annex B, widen
+  ADR 0013, or change the RegExp split or TypedArray prototype
+  remediation scopes."
+dependencies:
+  - unsupported-ownership-audit
+landed: false
+status: ready

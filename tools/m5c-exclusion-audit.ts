@@ -45,6 +45,7 @@ const reservedImportRejection = new RegExp(
   "u",
 );
 const annexRemediationOwners = new Set([
+  "node:ordinary-object-proto-coverage-remediation",
   "node:regexp-split-coverage-remediation",
   "node:typed-array-proto-coverage-remediation",
 ]);

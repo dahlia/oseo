@@ -19,8 +19,8 @@ the deterministic native scheduler through the explicit CLI module goal, and
 the dependency-indexed baseline manifest covers module linking and early
 errors, top-level await, asynchronous functions, and the Promise family with
 honest unsupported classifications. The current reviewed manifest records
-41,090 reviewed cases: 34,751 passes, 4,401
-expected negatives, and 1,938 unsupported profile features with no semantic,
+41,091 reviewed cases: 34,751 passes, 4,401
+expected negatives, and 1,939 unsupported profile features with no semantic,
 harness, or infrastructure failures.
 [ADR 0020](./docs/adr/0020-m5-applicable-test-inventory.md) now fixes the M5a
 denominator at 41,091 paths from 47,381 candidates: 22,998 language tests and
@@ -7429,8 +7429,11 @@ implemented; ADR 0013's exclusion remains unchanged.
 
 The exact reviewed admission is
 *test/built-ins/TypedArrayConstructors/ctors/no-species.js*. Its unsupported
-observation remains owned by `node:typed-array-proto-coverage-remediation`;
-ADR 0013 excludes the accessor but does not close mixed core coverage. The
+observation became an ADR 0013 exclusion under the 2026-10-28
+maintainer decision, item 3, once the strict
+`annex-b-core-typed-array-no-species` evidence covered every core subject;
+the [closure note](./docs/m5c-graph/typed-array-proto-coverage-remediation.md)
+records it. It is not counted as a pass. The
 fixed `typed-array-buffer-without-species-core` fixture preserves the original
 ArrayBuffer subclass, throwing constructor and species getter, TypedArray
 clone, and fresh buffer's intrinsic prototype and constructor. Core reflection
