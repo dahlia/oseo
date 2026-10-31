@@ -103,7 +103,7 @@ owners:
       reserved paths using reviewed static template-site,
       case-conversion and generator-instance replacement evidence; 71
       remain umbrella remediation."
-    paths: 677
+    paths: 695
   adr:0028-legacy-function-caller-boundary:
     note: ADR 0028 authorizes "an M5 exclusion of the expectation that
       reading the `caller` property of a non-strict ordinary function
@@ -234,7 +234,7 @@ owners:
       template-site, case-conversion and generator-instance paths to ADR
       0016 and keeps 71, with remaining contracts in
       docs/m5c-graph/dynamic-source-realm-string-assessment.md."
-    paths: 950
+    paths: 932
   node:non-blocking-agent:
     note: Needs an agent whose [[CanBlock]] is false; 2 paths.
     paths: 2
@@ -19565,10 +19565,10 @@ paths:
   test/language/expressions/array/spread-sngl-obj-ident.js: [pass, observation]
   test/language/expressions/arrow-function/ArrowFunction_restricted-properties.js: [pass, observation]
   test/language/expressions/arrow-function/array-destructuring-param-strict-body.js: [expected-negative, observation]
-  test/language/expressions/arrow-function/arrow/binding-tests-1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties]]
-  test/language/expressions/arrow-function/arrow/binding-tests-2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties]]
-  test/language/expressions/arrow-function/arrow/binding-tests-3.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties]]
-  test/language/expressions/arrow-function/arrow/capturing-closure-variables-1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, functions, object-properties, var-bindings]]
+  test/language/expressions/arrow-function/arrow/binding-tests-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties]]
+  test/language/expressions/arrow-function/arrow/binding-tests-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties]]
+  test/language/expressions/arrow-function/arrow/binding-tests-3.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties]]
+  test/language/expressions/arrow-function/arrow/capturing-closure-variables-1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, functions, object-properties, var-bindings]]
   test/language/expressions/arrow-function/arrow/capturing-closure-variables-2.js: [pass, observation]
   test/language/expressions/arrow-function/arrow/concisebody-lookahead-assignmentexpression-1.js: [pass, observation]
   test/language/expressions/arrow-function/arrow/concisebody-lookahead-assignmentexpression-2.js: [pass, observation]
@@ -24714,7 +24714,7 @@ paths:
   test/language/expressions/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
-  test/language/expressions/class/elements/nested-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/elements/nested-private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-indirect-eval-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-indirect-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/nested-private-literal-name-init-err-contains-arguments.js: [expected-negative, observation]
@@ -24892,7 +24892,7 @@ paths:
   test/language/expressions/class/elements/private-derived-cls-indirect-eval-err-contains-supercall-2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/private-derived-cls-indirect-eval-err-contains-supercall.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/private-direct-eval-err-contains-arguments.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
-  test/language/expressions/class/elements/private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/elements/private-direct-eval-err-contains-newtarget.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/private-field-access-on-inner-arrow-function.js: [pass, observation]
   test/language/expressions/class/elements/private-field-access-on-inner-function.js: [pass, observation]
   test/language/expressions/class/elements/private-field-after-optional-chain.js: [pass, observation]
@@ -25177,7 +25177,7 @@ paths:
   test/language/expressions/class/elements/static-field-anonymous-function-name.js: [pass, observation]
   test/language/expressions/class/elements/static-field-declaration.js: [pass, observation]
   test/language/expressions/class/elements/static-field-init-this-inside-arrow-function.js: [pass, observation]
-  test/language/expressions/class/elements/static-field-init-with-this.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [classes, dynamic-source]]
+  test/language/expressions/class/elements/static-field-init-with-this.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [classes, dynamic-source]]
   test/language/expressions/class/elements/static-field-redeclaration.js: [pass, observation]
   test/language/expressions/class/elements/static-literal-init-err-contains-arguments.js: [expected-negative, observation]
   test/language/expressions/class/elements/static-literal-init-err-contains-super.js: [expected-negative, observation]
@@ -25786,9 +25786,9 @@ paths:
   test/language/expressions/comma/S11.14_A2.1_T3.js: [pass, observation]
   test/language/expressions/comma/S11.14_A3.js: [pass, observation]
   test/language/expressions/comma/tco-final.js: [pass, observation]
-  test/language/expressions/compound-assignment/11.13.2-1-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
-  test/language/expressions/compound-assignment/11.13.2-10-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
-  test/language/expressions/compound-assignment/11.13.2-11-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-1-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-10-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-11-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/expressions/compound-assignment/11.13.2-12-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-13-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-14-s.js: [pass, observation]
@@ -25797,7 +25797,7 @@ paths:
   test/language/expressions/compound-assignment/11.13.2-17-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-18-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-19-s.js: [pass, observation]
-  test/language/expressions/compound-assignment/11.13.2-2-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-2-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/expressions/compound-assignment/11.13.2-20-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-21-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-22-s.js: [pass, observation]
@@ -25818,7 +25818,7 @@ paths:
   test/language/expressions/compound-assignment/11.13.2-37-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-38-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-39-s.js: [pass, observation]
-  test/language/expressions/compound-assignment/11.13.2-4-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-4-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/expressions/compound-assignment/11.13.2-40-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-41-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-42-s.js: [pass, observation]
@@ -25829,7 +25829,7 @@ paths:
   test/language/expressions/compound-assignment/11.13.2-47-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-48-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-49-s.js: [pass, observation]
-  test/language/expressions/compound-assignment/11.13.2-5-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-5-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/expressions/compound-assignment/11.13.2-50-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-51-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-52-s.js: [pass, observation]
@@ -25837,9 +25837,9 @@ paths:
   test/language/expressions/compound-assignment/11.13.2-54-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-55-s.js: [pass, observation]
   test/language/expressions/compound-assignment/11.13.2-6-1gs.js: [expected-negative, observation]
-  test/language/expressions/compound-assignment/11.13.2-6-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
-  test/language/expressions/compound-assignment/11.13.2-8-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
-  test/language/expressions/compound-assignment/11.13.2-9-s.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-6-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-8-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
+  test/language/expressions/compound-assignment/11.13.2-9-s.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, error-intrinsics, expression-operators, functions]]
   test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.1.js: [pass, observation]
   test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.10.js: [pass, observation]
   test/language/expressions/compound-assignment/S11.13.2_A2.1_T1.11.js: [pass, observation]
@@ -29998,8 +29998,8 @@ paths:
   test/language/expressions/template-literal/unicode-escape-no-hex-err.js: [expected-negative, observation]
   test/language/expressions/this/11.1.1-1.js: [pass, observation]
   test/language/expressions/this/S11.1.1_A1.js: [expected-negative, observation]
-  test/language/expressions/this/S11.1.1_A3.1.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions]]
-  test/language/expressions/this/S11.1.1_A3.2.js: [unsupported-profile-feature, node:dynamic-source-coverage-remediation, [dynamic-source, expression-operators, functions, object-properties]]
+  test/language/expressions/this/S11.1.1_A3.1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions]]
+  test/language/expressions/this/S11.1.1_A3.2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties]]
   test/language/expressions/this/S11.1.1_A4.1.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, var-bindings]]
   test/language/expressions/this/S11.1.1_A4.2.js: [unsupported-profile-feature, adr:0016-dynamic-source-boundary, [dynamic-source, expression-operators, functions, object-properties, var-bindings]]
   test/language/expressions/typeof/bigint.js: [pass, observation]

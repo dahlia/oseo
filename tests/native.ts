@@ -36,6 +36,8 @@ import { asyncFixtures } from "./native/fixtures/async.ts";
 import { asyncGeneratorFixtures } from "./native/fixtures/async-generators.ts";
 import { asyncIterationFixtures } from "./native/fixtures/async-iteration.ts";
 import { bindingFixtures } from "./native/fixtures/bindings.ts";
+const { bindingReferenceEvidenceFixtures } =
+  await import("./native/fixtures/binding-reference-evidence.ts");
 import { bigintFixtures } from "./native/fixtures/bigint.ts";
 import { bigintIntrinsicFixtures } from "./native/fixtures/bigint-intrinsic.ts";
 import * as booleanFixture from "./native/fixtures/boolean-intrinsic.ts";
@@ -229,6 +231,7 @@ const fixtures: readonly Fixture[] = [
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
   evalFixture.directEvalNonStringFixture,
+  ...bindingReferenceEvidenceFixtures,
   ...globalThisFixture.globalThisBindingFixtures,
   ...objectFixtures,
   ...objectOwnKeysFixtures,
@@ -1213,6 +1216,33 @@ for (const fixture of selectedFixtures) {
   }
   const [nodeReference, denoReference] = await references(fixture);
   assertMatchingObservations([nodeReference, denoReference]);
+  if (fixture.name === "binding-reference-arrows-and-this") {
+    assert.equal(
+      nodeReference.stdout,
+      "bare true true\nmember true true\ncapture 10\nupdate 12\n" +
+        "strict capture 10\nstrict update 12\n" +
+        "call true\nconstruct true [object Object]\n" +
+        "strict construct true [object Object]\n",
+    );
+  }
+  if (fixture.name === "binding-reference-class-fields") {
+    assert.equal(
+      nodeReference.stdout,
+      "private true true true false\n" +
+        "static test test262 test262test f,g,h\n",
+    );
+  }
+  if (fixture.name === "binding-reference-unresolvable-compound") {
+    const operators = ["*=", "/=", "+=", "-=", "<<=", ">>>=", "&=", "^=", "|="];
+    assert.equal(
+      nodeReference.stdout,
+      ["", "strict "]
+        .flatMap((prefix) =>
+          operators.map((operator) => `${prefix}${operator} true 0\n`),
+        )
+        .join("") + "absent false\n",
+    );
+  }
   const test262Host = fixture.test262Host === true;
   nativeProgress(`fixture ${fixture.name} source compile disabled begin`);
   const disabledCompilation = compileSource(
@@ -1240,6 +1270,16 @@ for (const fixture of selectedFixtures) {
   const enabledMir = enabledCompilation.mir;
   assert(disabledMir != null, `${fixture.name}: disabled MIR`);
   assert(enabledMir != null, `${fixture.name}: enabled MIR`);
+
+  if (fixture.name === "binding-reference-unresolvable-compound") {
+    assert.match(printMir(disabledMir), /global/u);
+    assert.match(printMir(enabledMir), /global/u);
+  }
+  if (fixture.name === "binding-reference-class-fields") {
+    for (const mir of [disabledMir, enabledMir]) {
+      assert.match(printMir(mir), /private-get private-get/u);
+    }
+  }
 
   if (fixture.name === "property-specialization") {
     const enabledText = printMir(enabledMir);
@@ -1307,6 +1347,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "direct-eval-non-string" ||
+    fixture.name.startsWith("binding-reference-") ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "set-intrinsic" ||
     fixture.name === "set-composition-methods" ||
@@ -1462,6 +1503,7 @@ for (const fixture of selectedFixtures) {
     fixture.name === "global-object-record" ||
     fixture.name === "eval-intrinsic-value" ||
     fixture.name === "direct-eval-non-string" ||
+    fixture.name.startsWith("binding-reference-") ||
     fixture.name === "globalthis-binding" ||
     fixture.name === "with-strict-heritage-write" ||
     fixture.name === "with-optional-call-receiver" ||
@@ -1777,6 +1819,7 @@ for (const fixture of selectedFixtures) {
             fixture.name === "global-object-record" ||
             fixture.name === "eval-intrinsic-value" ||
             fixture.name === "direct-eval-non-string" ||
+            fixture.name.startsWith("binding-reference-") ||
             fixture.name === "globalthis-binding" ||
             fixture.name === "with-strict-heritage-write" ||
             fixture.name === "with-optional-call-receiver" ||

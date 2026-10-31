@@ -1113,6 +1113,72 @@ assessments:
       tests/native/fixtures/function-intrinsic-chains.ts:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
+  ds18-static-arrow-and-this:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Maintainer decision 2026-10-28 item 1 applies. The
+      binding-reference-arrows-and-this fixture in
+      tests/native/fixtures/binding-reference-evidence.ts observes bare-call
+      global this, nested arrow lexical capture, member receiver identity, the
+      shared outer var cell initialized to 10 and updated to 12, and a
+      constructed receiver stored in THIS with [object Object] toString.
+      tests/native.ts pins exact stdout, compares Node.js, Deno and Linux
+      native execution under both specialization policies with forced
+      collection, and checks generated MIR/C. The per-path assessment in
+      docs/m5c-graph/dynamic-source-binding-reference-assessment.md binds each
+      original assertion to these observations. Only source evaluation
+      remains. Reopen if source, observation or replacement evidence changes,
+      ADR 0016 admits eval, or ADR 0019 non-source normative dependence is
+      established.
+    replacementEvidence:
+      tests/native/fixtures/binding-reference-evidence.ts: "47e009865211b11966\
+        fcca931b39fbaf19a478b115839a1bcda767fe621bc4d8"
+      tests/native.ts: "c3e997ca7fd4732d3e16605577a668f3846aa5ad3288c2ee22f59a\
+        ca17f787e0"
+  ds18-static-class-fields:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Maintainer decision 2026-10-28 item 1 applies. The
+      binding-reference-class-fields fixture in
+      tests/native/fixtures/binding-reference-evidence.ts observes a class
+      expression private initializer executing with new.target undefined while
+      public c.x remains undefined, and static fields f=test, g=test262,
+      h=test262test with the f,g,h initializer trace. tests/native.ts pins
+      exact stdout, compares Node.js, Deno and Linux native execution under
+      both specialization policies with forced collection, and checks
+      private-get MIR plus generated C. The two private newtarget originals
+      have identical executable bodies; their eval-context rules remain
+      excluded source evaluation. Each original non-source assertion is mapped
+      in docs/m5c-graph/dynamic-source-binding-reference-assessment.md. Reopen
+      on changed source, observation or replacement evidence, an ADR 0016
+      amendment admitting eval, or ADR 0019 non-source normative dependence.
+    replacementEvidence:
+      tests/native/fixtures/binding-reference-evidence.ts: "47e009865211b11966\
+        fcca931b39fbaf19a478b115839a1bcda767fe621bc4d8"
+      tests/native.ts: "c3e997ca7fd4732d3e16605577a668f3846aa5ad3288c2ee22f59a\
+        ca17f787e0"
+  ds18-unresolvable-compound:
+    disposition: exclusion
+    normativeDependency: source-evaluation-only
+    reason: Maintainer decision 2026-10-28 item 1 applies. The
+      binding-reference-unresolvable-compound fixture in
+      tests/native/fixtures/binding-reference-evidence.ts executes every
+      selected compound operator on an undeclared Script-global identifier, in
+      both sloppy and strict functions. Every call catches a runtime
+      ReferenceError, the RHS counter stays zero, and the global remains
+      absent. This is not a compile-time Unknown binding diagnostic or an
+      ordinary property TypeError. tests/native.ts pins exact stdout, compares
+      Node.js, Deno and Linux native execution under both specialization
+      policies with forced collection, and checks global-reference MIR plus
+      generated C. The per-path table names the matching operator. Only source
+      evaluation remains. Reopen on changed source, observation or replacement
+      evidence, an ADR 0016 amendment admitting eval, or ADR 0019 non-source
+      normative dependence.
+    replacementEvidence:
+      tests/native/fixtures/binding-reference-evidence.ts: "47e009865211b11966\
+        fcca931b39fbaf19a478b115839a1bcda767fe621bc4d8"
+      tests/native.ts: "c3e997ca7fd4732d3e16605577a668f3846aa5ad3288c2ee22f59a\
+        ca17f787e0"
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -9700,58 +9766,51 @@ paths:
     subject: Whitespace and line terminators around the addition
       operator
     assessment: fixture-construction
-  - path: "test/language/expressions/arrow-function/arrow/bindi\
-      ng-tests-1.js"
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b69\
-      9ee7a6f6459c75c659db"
-    observationDigest: "4fc20d4afc31b0e24400155f2f27be2eb8de7e1\
-      fe0e18ab76fbce353aaea7157"
+    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b699ee7a6f6459c75c\
+      659db"
+    observationDigest: "4fc20d4afc31b0e24400155f2f27be2eb8de7e1fe0e18ab76fbce3\
+      53aaea7157"
     missingDynamicTag: false
-    section: "sec-arrow-function-definitions-runtime-semantics-\
-      evaluation"
-    subject: Arrow lexical this capture
-    assessment: fixture-construction
-  - path: "test/language/expressions/arrow-function/arrow/bindi\
-      ng-tests-2.js"
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow lexical this captured from a bare-called sloppy function
+    assessment: ds18-static-arrow-and-this
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b69\
-      9ee7a6f6459c75c659db"
-    observationDigest: "1bc3ef98616518bf75a738e23a1046fbcf4d0e7\
-      2e632d23e6507df7f7036a768"
+    sourceDigest: "8fdaab321dd3fb9281ee3a0cea11a0935f10b10d5b699ee7a6f6459c75c\
+      659db"
+    observationDigest: "1bc3ef98616518bf75a738e23a1046fbcf4d0e72e632d23e6507df\
+      7f7036a768"
     missingDynamicTag: false
-    section: "sec-arrow-function-definitions-runtime-semantics-\
-      evaluation"
-    subject: Arrow lexical this capture
-    assessment: fixture-construction
-  - path: "test/language/expressions/arrow-function/arrow/bindi\
-      ng-tests-3.js"
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow lexical this captured from a bare-called sloppy function
+    assessment: ds18-static-arrow-and-this
+  - path: test/language/expressions/arrow-function/arrow/binding-tests-3.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "f863b06da48490f5769bb5e18f0e4e4e592da108ed51\
-      1ecf8f6460e8c8d7602d"
-    observationDigest: "5cde607d55481f2ee87828ea38ff2edf13195ac\
-      03df85053c156bd26abcf965b"
+    sourceDigest: "f863b06da48490f5769bb5e18f0e4e4e592da108ed511ecf8f6460e8c8d\
+      7602d"
+    observationDigest: "5cde607d55481f2ee87828ea38ff2edf13195ac03df85053c156bd\
+      26abcf965b"
     missingDynamicTag: false
-    section: "sec-arrow-function-definitions-runtime-semantics-\
-      evaluation"
-    subject: Arrow lexical this capture
-    assessment: fixture-construction
-  - path: "test/language/expressions/arrow-function/arrow/captu\
-      ring-closure-variables-1.js"
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow lexical this captured from a bare-called sloppy function
+    assessment: ds18-static-arrow-and-this
+  - path: "test/language/expressions/arrow-function/arrow/capturing-closure-va\
+      riables-1.js"
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "ab105605b61012ae8ba88cc2d0e69d2c6227f1ce4835\
-      a883056646032b89d551"
-    observationDigest: "dcd77eedd78d661b3c25aba2b3747fdeedd230f\
-      481efa1c3c961750ed65d5165"
+    sourceDigest: "ab105605b61012ae8ba88cc2d0e69d2c6227f1ce4835a883056646032b8\
+      9d551"
+    observationDigest: "dcd77eedd78d661b3c25aba2b3747fdeedd230f481efa1c3c96175\
+      0ed65d5165"
     missingDynamicTag: false
-    section: "sec-arrow-function-definitions-runtime-semantics-\
-      evaluation"
-    subject: Arrow closure capture of an outer variable
-    assessment: fixture-construction
+    section: sec-arrow-function-definitions-runtime-semantics-evaluation
+    subject: Arrow reads a shared outer var cell after a write
+    assessment: ds18-static-arrow-and-this
   - path: "test/language/expressions/arrow-function/eval-var-sc\
       ope-syntax-err.js"
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -11099,20 +11158,19 @@ paths:
     subject: "error if `arguments` in StatementList of eval
       (direct eval)"
     assessment: "eval-semantics"
-  - path: "test/language/expressions/class/elements/nested-priv\
-      ate-direct-eval-err-contains-newtarget.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "953355769378162a45854247463d10bc16fd1dde93e5\
-      776bdfbac0cb9b19c91a"
-    observationDigest: "3797138d207f3f33a3f56ee2b0e83e491ae4de5\
-      c64dd516140eff87939bdbde0"
+  - path: "test/language/expressions/class/elements/nested-private-direct-eval\
+      -err-contains-newtarget.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "953355769378162a45854247463d10bc16fd1dde93e5776bdfbac0cb9b1\
+      9c91a"
+    observationDigest: "3797138d207f3f33a3f56ee2b0e83e491ae4de5c64dd516140eff8\
+      7939bdbde0"
     missingDynamicTag: false
-    section: "sec-performeval"
-    upstreamSection: "sec-performeval-rules-in-initializer"
-    subject: "error if `new.target` in StatementList of eval
-      (direct eval)"
-    assessment: "fixture-construction"
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: Private initializer executes and public c.x remains undefined
+    assessment: ds18-static-class-fields
   - path: "test/language/expressions/class/elements/nested-priv\
       ate-indirect-eval-contains-arguments.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11291,20 +11349,19 @@ paths:
     subject: "error if `arguments` in StatementList of eval
       (direct eval)"
     assessment: "eval-semantics"
-  - path: "test/language/expressions/class/elements/private-dir\
-      ect-eval-err-contains-newtarget.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "1ab6e04331242b80ac3660702320d5b58a49e5227947\
-      1066bddeb763cffea185"
-    observationDigest: "16fe358cdcfad61a29de31af15c9f577ce17945\
-      ec1cdacda78987a96b1969af8"
+  - path: "test/language/expressions/class/elements/private-direct-eval-err-co\
+      ntains-newtarget.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1ab6e04331242b80ac3660702320d5b58a49e52279471066bddeb763cff\
+      ea185"
+    observationDigest: "16fe358cdcfad61a29de31af15c9f577ce17945ec1cdacda78987a\
+      96b1969af8"
     missingDynamicTag: false
-    section: "sec-performeval"
-    upstreamSection: "sec-performeval-rules-in-initializer"
-    subject: "error if `new.target` in StatementList of eval
-      (direct eval)"
-    assessment: "fixture-construction"
+    section: sec-performeval
+    upstreamSection: sec-performeval-rules-in-initializer
+    subject: Private initializer executes and public c.x remains undefined
+    assessment: ds18-static-class-fields
   - path: "test/language/expressions/class/elements/private-get\
       ter-is-not-a-own-property.js"
     proposedOwner: "adr:0013-m5-edition-and-manifest"
@@ -11359,19 +11416,18 @@ paths:
     subject: "Private setter is not stored as an own property of
       objects (field definitions in a class expression)"
     assessment: "annex-b-legacy-lookup"
-  - path: "test/language/expressions/class/elements/static-fiel\
-      d-init-with-this.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "644cac2a5bf43a356eac968fa4130002d4d47118bc59\
-      09f8ec29996562550108"
-    observationDigest: "996e5b4273c5f0cbfe5daafefb23c5d252b98bd\
-      eeaf18d70985c7d766d85c7ef"
+  - path: "test/language/expressions/class/elements/static-field-init-with-thi\
+      s.js"
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "644cac2a5bf43a356eac968fa4130002d4d47118bc5909f8ec299965625\
+      50108"
+    observationDigest: "996e5b4273c5f0cbfe5daafefb23c5d252b98bdeeaf18d70985c7d\
+      766d85c7ef"
     missingDynamicTag: false
-    section: "prod-FieldDefinition"
-    subject: "Static fields initializer has `this` biding (field
-      definitions in a class expression)"
-    assessment: "fixture-construction"
+    section: prod-FieldDefinition
+    subject: Static initializers receive the constructor and run in source order
+    assessment: ds18-static-class-fields
   - path: "test/language/expressions/class/private-getter-brand\
       -check-multiple-evaluations-of-class-eval-indirect.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -11803,132 +11859,105 @@ paths:
     subject: "Whitespace and line terminators around the comma
       operator"
     assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-1-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "bb850bf59179ff94b166b42c3003497e9c50c143fc4f\
-      9a69e2d95dcfc60bf15d"
-    observationDigest: "1bdee3de3f89c7ecd3ee35159d7e7d06c0bcd8f\
-      ec3ec121efec62128e2053b06"
+  - path: test/language/expressions/compound-assignment/11.13.2-1-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bb850bf59179ff94b166b42c3003497e9c50c143fc4f9a69e2d95dcfc60\
+      bf15d"
+    observationDigest: "1bdee3de3f89c7ecd3ee35159d7e7d06c0bcd8fec3ec121efec621\
+      28e2053b06"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(*=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-10-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "c6001a29cf1a80c2106d4520aacc5738db77ce5eb10f\
-      31f0559dbb8f999514cc"
-    observationDigest: "d979dd5b3b51c6ec232d479fe6471383019e581\
-      20e0c469fdf4356c0b3c3c684"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable *= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-10-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "c6001a29cf1a80c2106d4520aacc5738db77ce5eb10f31f0559dbb8f999\
+      514cc"
+    observationDigest: "d979dd5b3b51c6ec232d479fe6471383019e58120e0c469fdf4356\
+      c0b3c3c684"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(^=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-11-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "d8268662741a95bc2a6c6f021354477ed4874dbda384\
-      eec99b89bc40afbb90d4"
-    observationDigest: "c89f9750aef8ad3645fb5480f1cfe00a1e7f317\
-      35fcf6caacc822cf11a0ad5b5"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable ^= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-11-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d8268662741a95bc2a6c6f021354477ed4874dbda384eec99b89bc40afb\
+      b90d4"
+    observationDigest: "c89f9750aef8ad3645fb5480f1cfe00a1e7f31735fcf6caacc822c\
+      f11a0ad5b5"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(|=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-2-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "e1f51ddbdc3f1d9b4a0e0e09fe9b4112656c7a28c346\
-      a457224e29d24977aa10"
-    observationDigest: "3f9a7ab264b933847ec83a9268ef657deacf508\
-      d0827af7a597ce146093c16fb"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable |= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-2-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "e1f51ddbdc3f1d9b4a0e0e09fe9b4112656c7a28c346a457224e29d2497\
+      7aa10"
+    observationDigest: "3f9a7ab264b933847ec83a9268ef657deacf508d0827af7a597ce1\
+      46093c16fb"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "Strict Mode - ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(/=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-4-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "0fa130b05397cbc4f6ed3cdba9d0d9c57bef70e874d1\
-      b3ecfacfe0a0f33cac49"
-    observationDigest: "c8b457d323c99b34a2b17d966dea5cc269ffe63\
-      d997b7d857b169295b2b0a102"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable /= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-4-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "0fa130b05397cbc4f6ed3cdba9d0d9c57bef70e874d1b3ecfacfe0a0f33\
+      cac49"
+    observationDigest: "c8b457d323c99b34a2b17d966dea5cc269ffe63d997b7d857b1692\
+      95b2b0a102"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "Strict Mode - ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(+=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-5-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "1fb79d0b9135bce17553f1854bcfb32deaa77aa029bf\
-      f4ae1193c93de6f8ea85"
-    observationDigest: "cebf8b5d354fbdefb1bef51882af500d6b942c4\
-      0850342946fbfec2e71f4d796"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable += LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-5-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "1fb79d0b9135bce17553f1854bcfb32deaa77aa029bff4ae1193c93de6f\
+      8ea85"
+    observationDigest: "cebf8b5d354fbdefb1bef51882af500d6b942c40850342946fbfec\
+      2e71f4d796"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "Strict Mode - ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(-=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-6-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "5512efeb298132c68f78139094b10ec0ae0f11c5f175\
-      5b079b986236f3045b7c"
-    observationDigest: "dd26cdee55b504520c8a2a52b22fbd1a3e10cc2\
-      edcce8254fc13a8992dc8b579"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable -= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-6-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "5512efeb298132c68f78139094b10ec0ae0f11c5f1755b079b986236f30\
+      45b7c"
+    observationDigest: "dd26cdee55b504520c8a2a52b22fbd1a3e10cc2edcce8254fc13a8\
+      992dc8b579"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "Strict Mode - ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(<<=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-8-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "bd090dc38d7ed2e2dff444dfd49375c71baba9b96d09\
-      768f30d14b1bd972c248"
-    observationDigest: "cbaa7259c81fd68206ff5170f87426b832e9f48\
-      9b83bdaa39ea6aa61bb282b70"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable <<= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-8-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "bd090dc38d7ed2e2dff444dfd49375c71baba9b96d09768f30d14b1bd97\
+      2c248"
+    observationDigest: "cbaa7259c81fd68206ff5170f87426b832e9f489b83bdaa39ea6aa\
+      61bb282b70"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "Strict Mode - ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(>>>=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
-  - path: "test/language/expressions/compound-assignment/11.13.\
-      2-9-s.js"
-    proposedOwner: "adr:0016-dynamic-source-boundary"
-    priorCohort: "incidental-scaffolding"
-    sourceDigest: "d5eb4bea930d47fba0e931aa3b33522788a725634863\
-      b0bc74c2dfaf4ad3ef8c"
-    observationDigest: "87ae01feda1e40c96289bf32fdc4b25cb19f0d9\
-      361989b7fed0ed527935d292b"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable >>>= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
+  - path: test/language/expressions/compound-assignment/11.13.2-9-s.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "d5eb4bea930d47fba0e931aa3b33522788a725634863b0bc74c2dfaf4ad\
+      3ef8c"
+    observationDigest: "87ae01feda1e40c96289bf32fdc4b25cb19f0d9361989b7fed0ed5\
+      27935d292b"
     missingDynamicTag: false
-    section: "sec-assignment-operators-runtime-semantics-evaluation"
-    subject: "Strict Mode - ReferenceError is thrown if the
-      LeftHandSideExpression of a Compound Assignment
-      operator(&=) evaluates to an unresolvable reference"
-    assessment: "fixture-construction"
+    section: sec-assignment-operators-runtime-semantics-evaluation
+    subject: Unresolvable &= LHS throws runtime ReferenceError
+    assessment: ds18-unresolvable-compound
   - path: "test/language/expressions/compound-assignment/S11.13\
       .2_A6.10_T1.js"
     proposedOwner: "adr:0016-dynamic-source-boundary"
@@ -19716,31 +19745,25 @@ paths:
   - path: test/language/expressions/this/S11.1.1_A3.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "be99004f8e76e7d01c3dfa23584281888a89bd70a096\
-      d1604014bb01fb35c06e"
-    observationDigest: "dd96ded7ab880edc73c55ae254b56ab91c17709\
-      37b43b2f233ec22745f512faa"
+    sourceDigest: "be99004f8e76e7d01c3dfa23584281888a89bd70a096d1604014bb01fb3\
+      5c06e"
+    observationDigest: "dd96ded7ab880edc73c55ae254b56ab91c1770937b43b2f233ec22\
+      745f512faa"
     missingDynamicTag: false
     section: ES5 11.1.1 (original upstream clause)
-    subject: The statically declared ReturnThis or SetThis
-      call/construct assertions coexist with eval-dependent
-      counterparts; the frontend rejection prevents native
-      execution of even those static controls.
-    assessment: static-this-and-call-context
+    subject: Bare sloppy call returns the global this value
+    assessment: ds18-static-arrow-and-this
   - path: test/language/expressions/this/S11.1.1_A3.2.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: incidental-scaffolding
-    sourceDigest: "ee5c2a722df3a8dd729666593ea36dfa1ad3f02bfff8\
-      4b17d4c1f0085ba2d7c6"
-    observationDigest: "74191cfa9e4713b2fa8317b63fcc9faacf0cc06\
-      b448cb6aceb10c27a579922f4"
+    sourceDigest: "ee5c2a722df3a8dd729666593ea36dfa1ad3f02bfff84b17d4c1f0085ba\
+      2d7c6"
+    observationDigest: "74191cfa9e4713b2fa8317b63fcc9faacf0cc06b448cb6aceb10c2\
+      7a579922f4"
     missingDynamicTag: false
     section: ES5 11.1.1 (original upstream clause)
-    subject: The statically declared ReturnThis or SetThis
-      call/construct assertions coexist with eval-dependent
-      counterparts; the frontend rejection prevents native
-      execution of even those static controls.
-    assessment: static-this-and-call-context
+    subject: Constructed receiver stored on THIS and ordinary object toString
+    assessment: ds18-static-arrow-and-this
   - path: test/language/expressions/this/S11.1.1_A4.1.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
