@@ -1118,8 +1118,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "5f2538ab4ea61c846fc606a2c79970ca\
-        ff2fd4ca9d9420c62d9792914ca1651d"
+        "7cc9227aae85d1657aa32d5cba7c02da\
+        b2880474d8c90725d183b41db72d59ae"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1136,8 +1136,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "5f2538ab4ea61c846fc606a2c79970ca\
-        ff2fd4ca9d9420c62d9792914ca1651d"
+        "7cc9227aae85d1657aa32d5cba7c02da\
+        b2880474d8c90725d183b41db72d59ae"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1154,8 +1154,8 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "5f2538ab4ea61c846fc606a2c79970ca\
-        ff2fd4ca9d9420c62d9792914ca1651d"
+        "7cc9227aae85d1657aa32d5cba7c02da\
+        b2880474d8c90725d183b41db72d59ae"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
@@ -1171,35 +1171,40 @@ assessments:
     normativeDependency: "source-evaluation-only"
     replacementEvidence:
       docs/m5c-graph/dynamic-source-module-goal-validation-assessment.md:
-        "5f2538ab4ea61c846fc606a2c79970ca\
-        ff2fd4ca9d9420c62d9792914ca1651d"
+        "7cc9227aae85d1657aa32d5cba7c02da\
+        b2880474d8c90725d183b41db72d59ae"
       tests/module-goal-validation-source.test.ts:
         "8339a1e8ab6dd61e2d07440cc7c74e2e\
         1ddbc2b79bd9aad35c61a28989c21261"
       tests/module-goal-validation-native.test.ts:
-        "9d358469af96127f4b97e0457ddd22f0\
-        98cb561dd262e47a7883507e5c027152"
+        "e42a5e63c32b3b2d9ec71fd9a40d0113\
+        4f9e0d78d31713def24a588e63154bf6"
       tests/fixtures/module-goal-validation/entry.mjs:
-        "0d39af443c52b3ed7e0e19b7af807b28\
-        15c7e8f838c4f2915daeb099fbb921c1"
+        "d1e6eb304229ab13a7d39f21382eac99\
+        0db3e3fa924bab0aefb8b2654a1cf894"
       tests/fixtures/module-goal-validation/target.mjs:
         "a40085f1129e91c1699b4765f78e99bf\
         f399ef8f127173fcb32ba88b4c56a159"
       tests/fixtures/module-goal-validation/prelude.js:
         "85383879a2786c478abf619fe3e7dfee\
         c8638dc13b0426e2726d55c2049a84d8"
-    reason: "The static target retains default 42, named x Test262 and alias
-      z 42; the fixture observes all three namespace reads in each of the
-      18 original usage contexts, including the async-generator call
-      count. Structural checks bind one target and its three export cells.
-      The native test runs that graph after the Script-valid var/function
-      prelude under both policies with forced collection, and compares
-      positive module observations with Node.js and Deno. Separate
-      Script/Module parsing checks retain the caller grammar distinction.
-      Promise.resolve supplies already-known static namespace data and
-      implements no import operation. Only ImportCall source loading from
-      Script and its promise fulfillment remain under decision items 1 and
-      2."
+    reason: "The fixture strictly compares all three namespace values and
+      types against the finite nonzero numeric and string expectations,
+      preserving SameValue for this domain before printing success. A
+      string y mutation produces 18 failure markers and fails the positive
+      oracle in Node.js, Deno and both native policies with forced
+      collection. The static target retains default 42, named x Test262
+      and alias z 42; the fixture observes all three namespace reads in
+      each of the 18 original usage contexts, including the
+      async-generator call count. Structural checks bind one target and
+      its three export cells. The native test runs that graph after the
+      Script-valid var/function prelude under both policies with forced
+      collection, and compares positive module observations with Node.js
+      and Deno. Separate Script/Module parsing checks retain the caller
+      grammar distinction. Promise.resolve supplies already-known static
+      namespace data and implements no import operation. Only ImportCall
+      source loading from Script and its promise fulfillment remain under
+      decision items 1 and 2."
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary

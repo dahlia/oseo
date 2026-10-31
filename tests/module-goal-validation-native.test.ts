@@ -1,5 +1,8 @@
 /* eslint-disable no-await-in-loop -- Native policies run serially. */
 import assert from "node:assert/strict";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import process from "node:process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -15,6 +18,7 @@ const nativeTarget = targetForExecutionHost(
     operatingSystem: "unknown",
   },
 );
+
 const entry = fileURLToPath(
   new URL("./fixtures/module-goal-validation/entry.mjs", import.meta.url),
 );
@@ -78,6 +82,71 @@ test(
     } finally {
       if (previous == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
       else process.env.OSEO_GC_EVERY_SAFEPOINT = previous;
+    }
+  },
+);
+
+test(
+  "a string export fails the namespace value oracle in all usage contexts",
+  { skip: nativeTarget == null ? "requires a supported native host" : false },
+  async () => {
+    const directory = await mkdtemp(join(tmpdir(), "oseo-module-value-"));
+    const previous = process.env.OSEO_GC_EVERY_SAFEPOINT;
+    process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
+    try {
+      const mutatedEntry = join(directory, "entry.mjs");
+      await writeFile(mutatedEntry, await readFile(entry, "utf8"));
+      const target = await readFile(
+        new URL(
+          "./fixtures/module-goal-validation/target.mjs",
+          import.meta.url,
+        ),
+        "utf8",
+      );
+      assert.ok(target.includes("const y = 42;"));
+      await writeFile(
+        join(directory, "target.mjs"),
+        target.replace("const y = 42;", 'const y = "42";'),
+      );
+      const failed = [
+        ...Array.from({ length: 18 }, () => "failure Error"),
+        "completed 18",
+      ].toSorted();
+      const assertRejected = (result: Awaited<ReturnType<typeof host.run>>) => {
+        assert.equal(result.exitStatus, 0, result.stderr);
+        assert.equal(result.stderr, "");
+        const lines = result.stdout.trim().split("\n").toSorted();
+        assert.deepEqual(lines, failed);
+        assert.throws(() => assert.deepEqual(lines, expected));
+      };
+      for (const [command, args] of [
+        [process.execPath, [mutatedEntry]],
+        ["deno", ["run", "--quiet", mutatedEntry]],
+      ] as const) {
+        assertRejected(await host.run({ command, args, cwd: directory }));
+      }
+      for (const specialization of ["disabled", "enabled"] as const) {
+        assertRejected(
+          await runNativeCli(
+            {
+              args: [
+                ...(specialization === "disabled"
+                  ? ["--no-specialization"]
+                  : []),
+                "--script",
+                prelude,
+                mutatedEntry,
+              ],
+              version: "0.1.0",
+            },
+            host,
+          ),
+        );
+      }
+    } finally {
+      if (previous == null) delete process.env.OSEO_GC_EVERY_SAFEPOINT;
+      else process.env.OSEO_GC_EVERY_SAFEPOINT = previous;
+      await rm(directory, { recursive: true, force: true });
     }
   },
 );

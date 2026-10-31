@@ -8,6 +8,14 @@ function done(error) {
   if (completed === 18) console.log("completed", completed);
 }
 function observe(label, imported) {
+  // For these finite, nonzero numbers and string, === matches SameValue.
+  if (
+    imported.default !== 42 ||
+    imported.x !== "Test262" ||
+    imported.z !== 42
+  ) {
+    throw new Error("namespace value mismatch");
+  }
   console.log(label, imported.default, imported.x, imported.z);
 }
 
