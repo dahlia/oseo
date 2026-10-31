@@ -5,7 +5,7 @@
 # or a split of one batch that PLAN-M5C.md records.
 version: 1
 suiteRevision: f2d1435644797268dca1f7988cad5a4e89ccd8d2
-unreviewedPaths: 6737
+unreviewedPaths: 5297
 basis:
   supportedFeatures:
     - AggregateError
@@ -165,44 +165,44 @@ regeneration:
     wallSeconds: 3997
     workers: 8
   secondsPerVariant: 0.0549
-  currentExecutedVariants: 113938
-  currentSeconds: 6260
-  finalExecutedVariants: 137314
-  finalSeconds: 7544
+  currentExecutedVariants: 119272
+  currentSeconds: 6553
+  finalExecutedVariants: 137288
+  finalSeconds: 7543
   plan:
-    batches: 12
-    largestPaths: 794
-    largestReviewUnits: 500
+    batches: 10
+    largestPaths: 645
+    largestReviewUnits: 464
     limits:
       paths: 3000
       reviewUnits: 500
-    scheduleHours: 23.75
-    fullUpdateScheduleHours: 46.79
+    scheduleHours: 20.16
+    fullUpdateScheduleHours: 39.77
   alternatives:
-    - batches: 12
+    - batches: 9
       largestPaths: 1920
       largestReviewUnits: 300
       limits:
         paths: 2000
         reviewUnits: 300
-      scheduleHours: 24.19
-      fullUpdateScheduleHours: 47.67
-    - batches: 6
+      scheduleHours: 18.43
+      fullUpdateScheduleHours: 36.32
+    - batches: 4
       largestPaths: 2408
       largestReviewUnits: 595
       limits:
         paths: 4000
         reviewUnits: 600
-      scheduleHours: 12.33
-      fullUpdateScheduleHours: 23.95
-    - batches: 3
-      largestPaths: 3627
-      largestReviewUnits: 1144
+      scheduleHours: 8.42
+      fullUpdateScheduleHours: 16.28
+    - batches: 2
+      largestPaths: 4656
+      largestReviewUnits: 1153
       limits:
         paths: 8000
         reviewUnits: 1200
-      scheduleHours: 6.46
-      fullUpdateScheduleHours: 12.2
+      scheduleHours: 4.44
+      fullUpdateScheduleHours: 8.33
 batches:
   - id: observation-batch-21a
     selector:
@@ -268,7 +268,7 @@ batches:
     regeneration:
       executableVariants: 1498
       scopedUpdateSeconds: 82
-      fullCorpusSeconds: 6342
+      fullCorpusSeconds: 6635
   - id: observation-batch-21b
     selector:
       prerequisiteSets:
@@ -306,7 +306,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6472
+      fullCorpusSeconds: 6765
   - id: observation-batch-21c
     selector:
       prerequisiteSets:
@@ -345,7 +345,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6603
+      fullCorpusSeconds: 6896
   - id: observation-batch-21d
     selector:
       prerequisiteSets:
@@ -384,7 +384,7 @@ batches:
     regeneration:
       executableVariants: 2368
       scopedUpdateSeconds: 130
-      fullCorpusSeconds: 6733
+      fullCorpusSeconds: 7026
   - id: observation-batch-22a
     selector:
       prerequisiteSets:
@@ -445,7 +445,7 @@ batches:
     regeneration:
       executableVariants: 2082
       scopedUpdateSeconds: 114
-      fullCorpusSeconds: 6847
+      fullCorpusSeconds: 7140
   - id: observation-batch-22b
     selector:
       prerequisiteSets:
@@ -508,137 +508,7 @@ batches:
     regeneration:
       executableVariants: 2150
       scopedUpdateSeconds: 118
-      fullCorpusSeconds: 6965
-  - id: observation-batch-24
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/for-await-of/
-        - test/language/statements/for-in/
-    dependsOn:
-      - observation-batch-plan
-    paths: 794
-    reviewUnits: 228
-    generatedPaths: 781
-    prerequisites: {}
-    dynamicSource: {}
-    flags:
-      async: 785
-      generated: 781
-      noStrict: 11
-      onlyStrict: 2
-    includes:
-      compareArray.js: 4
-      propertyHelper.js: 33
-    features:
-      Symbol: 3
-      Symbol.iterator: 63
-      async-iteration: 787
-      const: 1
-      destructuring-binding: 781
-      generators: 117
-      object-rest: 38
-    negatives: {}
-    partitions:
-      groups:
-        - language/statements
-      files: 246
-      newFiles: 0
-    regeneration:
-      executableVariants: 3150
-      scopedUpdateSeconds: 173
-      fullCorpusSeconds: 7138
-  - id: observation-batch-25
-    selector:
-      prerequisiteSets:
-        - ""
-      prefixes:
-        - test/language/statements/for-of/Array.prototype.
-        - test/language/statements/for-of/array-
-        - test/language/statements/for-of/array.
-        - test/language/statements/for-of/body-
-        - test/language/statements/for-of/break-
-        - test/language/statements/for-of/break.
-        - test/language/statements/for-of/continue-
-        - test/language/statements/for-of/continue.
-        - test/language/statements/for-of/cptn-
-        - test/language/statements/for-of/decl-
-        - test/language/statements/for-of/dstr/
-        - test/language/statements/for-of/escaped-
-        - test/language/statements/for-of/float32array-
-        - test/language/statements/for-of/float32array.
-        - test/language/statements/for-of/float64array-
-        - test/language/statements/for-of/float64array.
-        - test/language/statements/for-of/generator-
-        - test/language/statements/for-of/generator.
-        - test/language/statements/for-of/generic-
-        - test/language/statements/for-of/head-
-        - test/language/statements/for-of/int16array-
-        - test/language/statements/for-of/int16array.
-        - test/language/statements/for-of/int32array-
-        - test/language/statements/for-of/int32array.
-        - test/language/statements/for-of/int8array-
-        - test/language/statements/for-of/int8array.
-        - test/language/statements/for-of/iterator-
-        - test/language/statements/for-of/labelled-fn-stmt-
-        - test/language/statements/for-of/let-
-        - test/language/statements/for-of/map-
-        - test/language/statements/for-of/map.
-        - test/language/statements/for-of/nested.
-        - test/language/statements/for-of/return-from-
-        - test/language/statements/for-of/return.
-        - test/language/statements/for-of/scope-
-        - test/language/statements/for-of/set-
-        - test/language/statements/for-of/set.
-        - test/language/statements/for-of/string-
-        - test/language/statements/for-of/throw-from-
-        - test/language/statements/for-of/throw.
-        - test/language/statements/for-of/uint16array-
-        - test/language/statements/for-of/uint16array.
-    dependsOn:
-      - observation-batch-plan
-    paths: 646
-    reviewUnits: 500
-    generatedPaths: 509
-    prerequisites: {}
-    dynamicSource:
-      eval: 9
-    flags:
-      generated: 509
-      noStrict: 29
-      onlyStrict: 20
-    includes:
-      compareArray.js: 7
-      propertyHelper.js: 32
-    features:
-      Map: 5
-      Proxy: 1
-      Set: 5
-      Symbol: 5
-      Symbol.iterator: 104
-      TypedArray: 12
-      async-functions: 1
-      async-iteration: 1
-      class: 4
-      const: 4
-      destructuring-binding: 509
-      for-of: 2
-      generators: 109
-      let: 13
-      object-rest: 29
-      optional-chaining: 4
-    negatives:
-      parse: 79
-    partitions:
-      groups:
-        - language/statements
-      files: 241
-      newFiles: 0
-    regeneration:
-      executableVariants: 2210
-      scopedUpdateSeconds: 121
-      fullCorpusSeconds: 7260
+      fullCorpusSeconds: 7258
   - id: observation-batch-26a
     selector:
       prerequisiteSets:
@@ -686,7 +556,7 @@ batches:
     regeneration:
       executableVariants: 1328
       scopedUpdateSeconds: 73
-      fullCorpusSeconds: 7333
+      fullCorpusSeconds: 7331
   - id: observation-batch-26b
     selector:
       prerequisiteSets:
@@ -733,7 +603,7 @@ batches:
     regeneration:
       executableVariants: 2116
       scopedUpdateSeconds: 116
-      fullCorpusSeconds: 7449
+      fullCorpusSeconds: 7447
   - id: observation-batch-27
     selector:
       prerequisiteSets:
@@ -785,7 +655,7 @@ batches:
     regeneration:
       executableVariants: 1734
       scopedUpdateSeconds: 95
-      fullCorpusSeconds: 7544
+      fullCorpusSeconds: 7543
   - id: observation-batch-28
     selector:
       prerequisiteSets:
@@ -811,4 +681,4 @@ batches:
     regeneration:
       executableVariants: 4
       scopedUpdateSeconds: 0
-      fullCorpusSeconds: 7544
+      fullCorpusSeconds: 7543

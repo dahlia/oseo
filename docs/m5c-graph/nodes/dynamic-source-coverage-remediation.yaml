@@ -1,7 +1,7 @@
 version: 1
 id: dynamic-source-coverage-remediation
 title: Resolve dynamic source coverage gaps
-delivers: "Resolves the 757 reviewed unsupported paths assigned to
+delivers: "Resolves the 764 reviewed unsupported paths assigned to
   node:dynamic-source-coverage-remediation in the derived closure
   ledger. Select exactly those owners and their exclusion-audit path
   assessments: the original 121 paths, 35 from cross-realm-host, 1 from
@@ -206,7 +206,15 @@ delivers: "Resolves the 757 reviewed unsupported paths assigned to
   moves to each child only as that child lands; no ledger owner changes
   in this metadata split. This umbrella remains blocked until every
   child lands and itself lands when it owns zero paths. The split
-  establishes no new exclusion or completed replacement evidence."
+  establishes no new exclusion or completed replacement evidence.
+  B24/B25 preparation then adds exactly 7 original source-rejection
+  paths, distributed 0 and 7 by batch, bringing the scope to 764. They
+  fall outside the 950 split paths, so the umbrella owns them directly
+  until a further child is assigned. Their original statement and
+  completion subjects remain active coverage remediation; selectors and
+  source-bound observations are linked from
+  docs/m5c-graph/observation-batch-24.md and
+  docs/m5c-graph/observation-batch-25.md."
 dependencies:
   - authorized-exclusion-audit
   - dynamic-source-binding-reference-evidence

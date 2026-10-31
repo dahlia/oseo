@@ -1138,6 +1138,14 @@ assessments:
       tests/native/fixtures/function-intrinsic-chains.ts:
         "c5eb018779c47f7de2959da4a1a64969475c8026fc831102\
         f06e8bef6382e1e3"
+  observation-train-b24-b25:
+    disposition: remediation
+    normativeDependency: not-demonstrated
+    reason: Retain the 7 original B24/B25 dynamic-source
+      rejections as active coverage remediation. Source hashes and normalized
+      observation digests bind every assessment to its original subject. No
+      equivalent replacement or whole-path exclusion is claimed; ADR 0013,
+      ADR 0016 and ADR 0019 and their reopening triggers remain unchanged.
 paths:
   - path: test/built-ins/AggregateError/newtarget-proto-fallback.js
     proposedOwner: adr:0016-dynamic-source-boundary
@@ -21898,6 +21906,88 @@ paths:
     subject: No variable environment is created for the
       statement "head"
     assessment: variable-environment
+  - path: test/language/statements/for-of/cptn-decl-abrupt-empty.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "9a0f69a525bf64409ca6829281bae2e7e3694aaeb1508717\
+      ce5399a3da700a07"
+    observationDigest: "3650c51f2c73d5231ce0a48c72abe29b0990563345b6f625\
+      8078489aa3820b6e"
+    missingDynamicTag: false
+    section: 13.7.5.11
+    subject: Completion value when head has a declaration and iteration is
+      cancelled
+    assessment: observation-train-b24-b25
+  - path: test/language/statements/for-of/cptn-decl-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "43cf1ed785382075a5a798cc226fd1839a44118b70e329bd\
+      1df2a2f2334b4a4c"
+    observationDigest: "f7bcb7183ab535ebd7e356c8cb22cd0805e5b5e0406f6d33\
+      f37e38f656e50456"
+    missingDynamicTag: false
+    section: 13.7.5.11
+    subject: Completion value when head has a declaration and iteration occurs
+    assessment: observation-train-b24-b25
+  - path: test/language/statements/for-of/cptn-decl-no-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "7071609ec5809b4ad2c8f84d2337aa58857b97280fb35539\
+      5966444ad76fe750"
+    observationDigest: "b03279704deb0226ea4080bc8f9043cd3b88bede4763dd9e\
+      1e3bab5d35982b00"
+    missingDynamicTag: false
+    section: 13.7.5.11
+    subject: Completion value when head has a declaration and no iteration
+      occurs
+    assessment: observation-train-b24-b25
+  - path: test/language/statements/for-of/cptn-expr-abrupt-empty.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "a80d8457ae444669eb5f845e49d2ed6760a03c654da2aa97\
+      d2a6d852decccd54"
+    observationDigest: "98038099f48fb58f6f224c173bd64e85912ec4949a833caf\
+      1755c52174d9b0bd"
+    missingDynamicTag: false
+    section: 13.7.5.11
+    subject: Completion value when head has no declaration and iteration is
+      cancelled
+    assessment: observation-train-b24-b25
+  - path: test/language/statements/for-of/cptn-expr-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "b8e10d5b313c9edf7b9a5d3931be8a0823985a31c6170f6d\
+      84bb7d621933e3ee"
+    observationDigest: "9695f96840249a3b0372bf60886be0336f4b55757fcadca0\
+      44d7c293b5dfc150"
+    missingDynamicTag: false
+    section: 13.7.5.11
+    subject: Completion value when head has no declaration and iteration occurs
+    assessment: observation-train-b24-b25
+  - path: test/language/statements/for-of/cptn-expr-no-itr.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "30ffa0ed8f4a2728d2e488151e179782d46cff30f3fe3704\
+      2f7843160d072d12"
+    observationDigest: "46d52b5551e78fe378c1c176d8c2cc8021895a2ec8f5f1c2\
+      b47f34dcc6d51fec"
+    missingDynamicTag: false
+    section: 13.7.5.11
+    subject: Completion value when head has no declaration and no iteration
+      occurs
+    assessment: observation-train-b24-b25
+  - path: test/language/statements/for-of/scope-head-var-none.js
+    proposedOwner: adr:0016-dynamic-source-boundary
+    priorCohort: incidental-scaffolding
+    sourceDigest: "ad40cbb12ec8ef496589b172141ae16e13e756d7444e9b12\
+      e2daf725c0954bcf"
+    observationDigest: "647840a7fe471d16387a17bdacbac35782df9ac76f56fa03\
+      50d747ffa579d14c"
+    missingDynamicTag: false
+    section: "sec-for-in-and-for-of-statements-runtime-semanti\
+      cs-labelledevaluation"
+    subject: No variable environment is created for the statement "head"
+    assessment: observation-train-b24-b25
   - path: test/language/statements/try/scope-catch-param-var-none.js
     proposedOwner: adr:0016-dynamic-source-boundary
     priorCohort: source-subject
