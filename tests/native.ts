@@ -29,6 +29,8 @@ import {
 } from "../tools/shard.ts";
 
 import type { Fixture } from "./native/fixture.ts";
+import { hostScriptReferences } from "./native/host-script-reference.ts";
+import { staticCore } from "./native/fixtures/dynamic-source-static-core.ts";
 import { agentReferencePrelude } from "./native/agent-reference.ts";
 import { realmReferencePrelude } from "./native/realm-reference.ts";
 import { arrayBufferFixtures } from "./native/fixtures/array-buffer.ts";
@@ -225,6 +227,7 @@ Object.defineProperty(globalThis, "console", {
 `;
 
 const fixtures: readonly Fixture[] = [
+  ...staticCore,
   ...functionFixtures,
   ...properTailCallFixtures,
   ...globalRecord.globalObjectRecordFixtures,
@@ -730,6 +733,10 @@ async function references(fixture: Fixture): Promise<
   ]
 > {
   nativeProgress(`fixture ${fixture.name} reference preparation begin`);
+  if (fixture.name.startsWith("ds15-")) {
+    const observations = await hostScriptReferences(host, fixture.source);
+    return [observations[0]!, observations[1]!];
+  }
   const directory = await host.makeTemporaryDirectory("oseo-reference-");
   const path = `${directory}/${fixture.name}.ts`;
   try {
@@ -1624,7 +1631,8 @@ for (const fixture of selectedFixtures) {
     fixture.name === "template-literals" ||
     fixture.name === "proper-tail-calls" ||
     fixture.name === "global-eval-tail-calls" ||
-    fixture.name.startsWith("cross-realm-")
+    fixture.name.startsWith("cross-realm-") ||
+    fixture.name.startsWith("ds15-")
   ) {
     process.env.OSEO_GC_EVERY_SAFEPOINT = "1";
   }
@@ -1805,7 +1813,8 @@ for (const fixture of selectedFixtures) {
             fixture.name === "number-prototype" ||
             fixture.name === "set-intrinsic" ||
             fixture.name === "set-composition-methods" ||
-            fixture.name === "weak-collections"
+            fixture.name === "weak-collections" ||
+            fixture.name.startsWith("ds15-")
           ) {
             assert.ok(native.counters.collections > 0);
             if (mode === "enabled") {
@@ -1833,7 +1842,9 @@ for (const fixture of selectedFixtures) {
               ) {
                 assert.ok(native.counters.guardHits > 0);
               }
-              assert.ok(native.counters.guardMisses > 0);
+              if (!fixture.name.startsWith("ds15-")) {
+                assert.ok(native.counters.guardMisses > 0);
+              }
             }
           }
           if (fixture.test262Host === true) {
