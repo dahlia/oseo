@@ -17,5 +17,5 @@ delivers: "Resolves exactly test/language/types/object/S8.6.2_A8.js,
   remediation scopes."
 dependencies:
   - unsupported-ownership-audit
-landed: false
+landed: true
 status: ready
