@@ -106,6 +106,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - control-flow
+      - dynamic-source
       - property-enumeration
     execution:
       harnessIncludes:

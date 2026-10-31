@@ -109,6 +109,7 @@ results:
     classification: unsupported-profile-feature
     dependencies:
       - classes
+      - dynamic-source
       - object-properties
     execution:
       harnessIncludes:

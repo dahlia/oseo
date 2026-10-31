@@ -23566,9 +23566,9 @@ summary:
       expectedNegatives: 147
       harnessFailures: 0
       infrastructureFailures: 0
-      passes: 34
+      passes: 35
       semanticFailures: 0
-      unsupportedProfileFeatures: 1478
+      unsupportedProfileFeatures: 1632
     - dependency: error-intrinsics
       expectedNegatives: 15
       harnessFailures: 0
@@ -23659,7 +23659,7 @@ summary:
       infrastructureFailures: 0
       passes: 17486
       semanticFailures: 0
-      unsupportedProfileFeatures: 912
+      unsupportedProfileFeatures: 917
     - dependency: promise-settlement
       expectedNegatives: 93
       harnessFailures: 0
